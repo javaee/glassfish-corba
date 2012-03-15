@@ -75,52 +75,52 @@ public class Settlement implements java.io.Serializable
 
     public Settlement (Player player, PlanetImpl planet, long initialSize)
     {
-	fPlayer = player;
-	fPlanet = planet;
+        fPlayer = player;
+        fPlanet = planet;
 
-	if ( fPlanet == null ) {
-	    System.out.println ("fPlanet is null");
-	    throw new Error ("Settlement.Settlement () - fPlanet is null");
-	}
+        if ( fPlanet == null ) {
+            System.out.println ("fPlanet is null");
+            throw new Error ("Settlement.Settlement () - fPlanet is null");
+        }
 
-	double temp = fPlayer.getIdealTemp ();
+        double temp = fPlayer.getIdealTemp ();
 
-	fTerraforming = new Terraforming (fPlanet, temp);
-	fMining = new Mining (fPlanet, fPlayer);
-	fBudget = new Budget (fPlanet.getName());
-	fBudget.addBudgetItem (new BudgetItem (fTerraforming, 50));
-	fBudget.addBudgetItem (new BudgetItem (fMining, 50));
+        fTerraforming = new Terraforming (fPlanet, temp);
+        fMining = new Mining (fPlanet, fPlayer);
+        fBudget = new Budget (fPlanet.getName());
+        fBudget.addBudgetItem (new BudgetItem (fTerraforming, 50));
+        fBudget.addBudgetItem (new BudgetItem (fMining, 50));
 
-	fPopulation = new Population (fPlanet, initialSize);
+        fPopulation = new Population (fPlanet, initialSize);
     }
 
     public Player getOwner ()
     {
-	return fPlayer;
+        return fPlayer;
     }
 
     public Budget getBudget ()
     {
-	return fBudget;
+        return fBudget;
     }
 
     public Population getPopulation ()
     {
-	return fPopulation;
+        return fPopulation;
     }
 
     public long getIncome ()
     {
-	if ( fPopulation == null ) System.out.println ("fPopulation is null!!");
-	if ( fPlanet == null ) System.out.println ("fPlanet is null!!");
-	if ( fPlayer == null ) System.out.println ("fPlayer is null!!");
+        if ( fPopulation == null ) System.out.println ("fPopulation is null!!");
+        if ( fPlanet == null ) System.out.println ("fPlanet is null!!");
+        if ( fPlayer == null ) System.out.println ("fPlayer is null!!");
 
-	return (long)(fPopulation.getIdealIncome() * fPlanet.getSuitabilityFor(fPlayer));
+        return (long)(fPopulation.getIdealIncome() * fPlanet.getSuitabilityFor(fPlayer));
     }
 
     public void growPopulation ()
     {
-	fPopulation.grow (fPlanet.getSuitabilityFor(fPlayer));
+        fPopulation.grow (fPlanet.getSuitabilityFor(fPlayer));
     }
 
 }

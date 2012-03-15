@@ -60,7 +60,7 @@ public final class INV_POLICY extends SystemException {
      * and a null description.
      */
     public INV_POLICY() {
-	this("");
+        this("");
     }
 
     /**

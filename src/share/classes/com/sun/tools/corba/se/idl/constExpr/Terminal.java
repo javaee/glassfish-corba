@@ -77,9 +77,9 @@ public class Terminal extends Expression
     rep (representation);
     value (charValue);
     if (isWide)
-	type( "wchar" ) ;
+        type( "wchar" ) ;
     else
-	type( "char" ) ;
+        type( "char" ) ;
   } // ctor
 
   protected Terminal (String representation, Boolean booleanValue)
@@ -116,9 +116,9 @@ public class Terminal extends Expression
     rep (stringValue);
     value (stringValue);
     if (isWide)
-	type( "wstring" ) ;
+        type( "wstring" ) ;
     else
-	type( "string" ) ;
+        type( "string" ) ;
   } // ctor
 
   protected Terminal (ConstEntry constReference)

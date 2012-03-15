@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.cosnaming;
+package com.sun.corba.ee.impl.naming.cosnaming;
 
 // Import general CORBA classes
 import org.omg.CORBA.ORB;
@@ -78,14 +78,14 @@ public class TransientBindingIterator extends BindingIteratorImpl
      * @throws java.lang.Exception a Java exception.
    */
     public TransientBindingIterator(ORB orb, 
-	Map<InternalBindingKey,InternalBindingValue> aTable,
+        Map<InternalBindingKey,InternalBindingValue> aTable,
         POA thePOA )
-	throws java.lang.Exception
+        throws java.lang.Exception
     {
-	super(orb);
-	bindingMap = aTable;
-	bindingIterator = aTable.values().iterator() ;
-	currentSize = this.bindingMap.size();
+        super(orb);
+        bindingMap = aTable;
+        bindingIterator = aTable.values().iterator() ;
+        currentSize = this.bindingMap.size();
         this.nsPOA = thePOA;
     }
 
@@ -98,16 +98,16 @@ public class TransientBindingIterator extends BindingIteratorImpl
    */
     final public boolean nextOneImpl(org.omg.CosNaming.BindingHolder b)
     {
-	// If there are more elements get the next element
-	boolean hasMore = bindingIterator.hasNext();
-	if (hasMore) {
-	    b.value = bindingIterator.next().theBinding;
-	    currentSize--;
-	} else {
-	    // Return empty but marshalable binding
-	    b.value = new Binding(new NameComponent[0],BindingType.nobject);
-	}
-	return hasMore;
+        // If there are more elements get the next element
+        boolean hasMore = bindingIterator.hasNext();
+        if (hasMore) {
+            b.value = bindingIterator.next().theBinding;
+            currentSize--;
+        } else {
+            // Return empty but marshalable binding
+            b.value = new Binding(new NameComponent[0],BindingType.nobject);
+        }
+        return hasMore;
     }
 
     /**
@@ -117,7 +117,7 @@ public class TransientBindingIterator extends BindingIteratorImpl
      */
     final public void destroyImpl()
     {
-	// Remove the object from the Active Object Map.
+        // Remove the object from the Active Object Map.
         try {
             byte[] objectId = nsPOA.servant_to_id( this );
             if( objectId != null ) {
@@ -135,7 +135,7 @@ public class TransientBindingIterator extends BindingIteratorImpl
      * @return the remaining number of elements in the iterator.   
      */
     public final int remainingElementsImpl() {
-	return currentSize;
+        return currentSize;
     }
 
     private int currentSize;

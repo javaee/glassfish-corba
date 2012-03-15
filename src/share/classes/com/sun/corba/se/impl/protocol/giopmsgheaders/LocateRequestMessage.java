@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
-import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
+import com.sun.corba.ee.spi.orb.ObjectKeyCacheEntry;
 
 /**
  * This interface captures the LocateRequestMessage contract.

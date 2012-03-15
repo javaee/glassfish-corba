@@ -47,17 +47,17 @@ public class ConnectionCacheStressTest extends CORBATest
     @Override
     protected void doTest() throws Throwable
     {
-	Controller client = createClient( "corba.connectioncache.StressClient",
+        Controller client = createClient( "corba.connectioncache.StressClient",
             "stressClient" ) ;
 
-	client.start();
+        client.start();
 
-	// Wait for the client to finish for up to 2 minutes, then
-	// throw an exception.
-	client.waitFor(120000);
+        // Wait for the client to finish for up to 2 minutes, then
+        // throw an exception.
+        client.waitFor(120000);
 
-	// Make sure all the processes are shut down.
-	client.stop();
+        // Make sure all the processes are shut down.
+        client.stop();
     }
 }
 

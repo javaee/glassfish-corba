@@ -40,7 +40,7 @@
 
 package pi.serverrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 
 /**
@@ -54,15 +54,15 @@ public class RequestId1Strategy
     private int requestId;
 
     public void receive_request_service_contexts (
-	SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
+        SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
         throws ForwardRequest
     {
-	super.receive_request_service_contexts( interceptor, ri );
+        super.receive_request_service_contexts( interceptor, ri );
         
         try {
             this.requestId = ri.request_id();
             log( "receive_request_service_contexts(): request_id = " + 
-		requestId );
+                requestId );
         }
         catch( Exception ex ) {
             failException( "receive_request_service_contexts", ex );
@@ -70,11 +70,11 @@ public class RequestId1Strategy
     }
 
     public void receive_request (
-	SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
+        SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
     {
-	super.receive_request( interceptor, ri );
+        super.receive_request( interceptor, ri );
         try {
-	    testId( "receive_request", ri.request_id() );
+            testId( "receive_request", ri.request_id() );
         }
         catch( Exception e ) {
             failException( "send_reply", e );
@@ -82,11 +82,11 @@ public class RequestId1Strategy
     }
 
     public void send_reply (
-	SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
+        SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
     {
-	super.send_reply( interceptor, ri );
+        super.send_reply( interceptor, ri );
         try {
-	    testId( "send_reply", ri.request_id() );
+            testId( "send_reply", ri.request_id() );
         }
         catch( Exception e ) {
             failException( "send_reply", e );
@@ -95,12 +95,12 @@ public class RequestId1Strategy
 
 
     public void send_exception (
-	SampleServerRequestInterceptor interceptor, ServerRequestInfo ri) 
-	throws ForwardRequest
+        SampleServerRequestInterceptor interceptor, ServerRequestInfo ri) 
+        throws ForwardRequest
     {
-	super.send_exception( interceptor, ri );
+        super.send_exception( interceptor, ri );
         try {
-	    testId( "send_exception", ri.request_id() );
+            testId( "send_exception", ri.request_id() );
         }
         catch( Exception e ) {
             failException( "send_exception", e );
@@ -108,13 +108,13 @@ public class RequestId1Strategy
     }
 
     public void send_other (
-	SampleServerRequestInterceptor interceptor, ServerRequestInfo ri) 
+        SampleServerRequestInterceptor interceptor, ServerRequestInfo ri) 
         throws ForwardRequest
     {
-	super.send_other( interceptor, ri );
+        super.send_other( interceptor, ri );
         
         try {
-	    testId( "send_other", ri.request_id() );
+            testId( "send_other", ri.request_id() );
         }
         catch( Exception e ) {
             failException( "send_other", e );
@@ -126,10 +126,10 @@ public class RequestId1Strategy
      */
     private void testId( String method, int id ) {
         log( method + "(): request_id = " + id );
-	if( id != this.requestId ) {
-	    fail( "Request ID in " + method + " did not match request " +
-		  "id in " + method );
-	}
+        if( id != this.requestId ) {
+            fail( "Request ID in " + method + " did not match request " +
+                  "id in " + method );
+        }
     }
 
 }

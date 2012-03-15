@@ -48,18 +48,18 @@ assigned in create_reference.
 Object Key: the object key in an IIOP message
 
 valuetype ObjectTemplate {
-	typedef sequence<octet> AdapterID ;
-	typedef sequence<octet> ObjectID ;
+        typedef sequence<octet> AdapterID ;
+        typedef sequence<octet> ObjectID ;
 
-	AdapterID get_adapter_id() ;
-	CORBA::Object make_object( in ObjectID id ) ;
+        AdapterID get_adapter_id() ;
+        CORBA::Object make_object( in ObjectID id ) ;
 
-	factory init( in CORBA::Object ) ;
+        factory init( in CORBA::Object ) ;
 }
 
 local interface IORInfoExt : PortableInterceptor::IORInfo {
-	ObjectTemplate get_object_template() ;
-	void set_object_template( in ObjectTemplate otemp ) ;
+        ObjectTemplate get_object_template() ;
+        void set_object_template( in ObjectTemplate otemp ) ;
 }
 
 - ORB must provide an implementation for ObjectTemplateValueFactory and register it.
@@ -73,24 +73,24 @@ interface Activator {
 
 ORBD Activator:
 
-package com.sun.corba.se.internal.PortableActivation ;
+package com.sun.corba.ee.internal.PortableActivation ;
 
-import com.sun.corba.se.PortableActivation.ObjectTemplate ;
-import com.sun.corba.se.PortableActivation.ObjectTemplateValueFactory ;
-import com.sun.corba.se.PortableActivation.Activator ;
+import com.sun.corba.ee.PortableActivation.ObjectTemplate ;
+import com.sun.corba.ee.PortableActivation.ObjectTemplateValueFactory ;
+import com.sun.corba.ee.PortableActivation.Activator ;
 import org.omg.CORBA_2_3.ORB  ;
 import org.omg.PortableServer.POA ;
 import org.omg.CORBA.Policy ;
 
 class ORBDActivator implements Activator {
     Activator( ORB orb ) {
-	this.orb = orb ;
-	POA rootPOA = (POA)orb.resolve_initial_references( ORBConstants.ROOT_POA_NAME ) ;
-	// This is probably not exactly the correct repository ID
-	otf = (ObjectTemplateFactory)(orb.lookup_value_factory( 
-	    "IDL:omg.org/Interceptors/ObjectTemplateFactory:1.0" ) ) ;
-	orbdTemplates = new HashMap() ;
-	poaTemplates = new HashMap() ;
+        this.orb = orb ;
+        POA rootPOA = (POA)orb.resolve_initial_references( ORBConstants.ROOT_POA_NAME ) ;
+        // This is probably not exactly the correct repository ID
+        otf = (ObjectTemplateFactory)(orb.lookup_value_factory( 
+            "IDL:omg.org/Interceptors/ObjectTemplateFactory:1.0" ) ) ;
+        orbdTemplates = new HashMap() ;
+        poaTemplates = new HashMap() ;
     }
 
     private ORB orb ;
@@ -107,45 +107,45 @@ class ORBDActivator implements Activator {
     
     private POA createPOA( String id ) throws AdapterAlreadyExists
     {
-	Policy[] policies = new Policy[ 6 ] ;
-	int index = 0 ;
+        Policy[] policies = new Policy[ 6 ] ;
+        int index = 0 ;
 
-	policies[ index++ ] = rootPOA.create_lifespan_policy( PERSISTENT ) ;
-	policies[ index++ ] = rootPOA.create_id_uniqueness_policy( UNIQUE_ID ) ;
-	policies[ index++ ] = rootPOA.create_id_assignment_policy( USER_ID ) ;
-	policies[ index++ ] = rootPOA.create_servant_retention_policy( NON_REATIN ) ;
-	policies[ index++ ] = rootPOA.create_request_processing_policy( USE_SERVANT_MANAGER ) ;
-	policies[ index++ ] = rootPOA.create_implicit_activation_policy( NO_IMPLICIT_ACTIVATION ) ;
+        policies[ index++ ] = rootPOA.create_lifespan_policy( PERSISTENT ) ;
+        policies[ index++ ] = rootPOA.create_id_uniqueness_policy( UNIQUE_ID ) ;
+        policies[ index++ ] = rootPOA.create_id_assignment_policy( USER_ID ) ;
+        policies[ index++ ] = rootPOA.create_servant_retention_policy( NON_REATIN ) ;
+        policies[ index++ ] = rootPOA.create_request_processing_policy( USE_SERVANT_MANAGER ) ;
+        policies[ index++ ] = rootPOA.create_implicit_activation_policy( NO_IMPLICIT_ACTIVATION ) ;
 
-	try { 
-	    return rootPOA.create_POA( id, rootPOA.the_POAManager, policies ) ;
-	} catch (InvalidPolicy ip) {
-	    // This should never happen
-	    return null ;
-	}
+        try { 
+            return rootPOA.create_POA( id, rootPOA.the_POAManager, policies ) ;
+        } catch (InvalidPolicy ip) {
+            // This should never happen
+            return null ;
+        }
     }
 
     public ObjectTemplate register_poa_template( ObjectTemplate poaTemplate ) {
-	AdapterID poaAID = poaTemplate.get_adapter_id() ;
-	ObjectTemplate orbdTemplate = (ObjectTemplate)(orbdTemplates.get( poaAID )) ;
+        AdapterID poaAID = poaTemplate.get_adapter_id() ;
+        ObjectTemplate orbdTemplate = (ObjectTemplate)(orbdTemplates.get( poaAID )) ;
 
-	if (orbdTemplate == null) {
-	    POA newPOA = createPOA( poaAID ) ;
-	    org.omg.CORBA.Object obj = newPOA.create_reference( "" ) ;
-	    orbdTemplate = otf.init( obj ) ;
-	    orbdTemplates.put( poaAID, orbdTemplate ) ;
-	}
+        if (orbdTemplate == null) {
+            POA newPOA = createPOA( poaAID ) ;
+            org.omg.CORBA.Object obj = newPOA.create_reference( "" ) ;
+            orbdTemplate = otf.init( obj ) ;
+            orbdTemplates.put( poaAID, orbdTemplate ) ;
+        }
 
-	// policies may change: reregister every time
-	AdapterID orbdAID = orbdTemplate.get_adapter_id() ;
-	poaTemplates.put( orbdAID, poaTemplate ) ;
-	    
-	return orbdTemplate ;
+        // policies may change: reregister every time
+        AdapterID orbdAID = orbdTemplate.get_adapter_id() ;
+        poaTemplates.put( orbdAID, poaTemplate ) ;
+            
+        return orbdTemplate ;
     }
 
     public ObjectTemplate lookup_poa_template( AdapterID poaAID ) 
     {
-	return (ObjectTemplate)(poaTemplates.get( poaAID ) ) ;
+        return (ObjectTemplate)(poaTemplates.get( poaAID ) ) ;
     }
 }
 
@@ -164,14 +164,14 @@ class ORBDRequestInterceptor implements ServerRequestInterceptor {
     }
 
     void receive_request( ServerRequestInfo sri ) throws ForwardRequest {
-	byte[] adapterID = sri.adapter_id() ;
-	ObjectTemplate iort = activator.lookup_poa_template( adapterID ) ;
-	byte[] objectID = sri.object_id() ;
-	org.omg.CORBA.Object obj = iort.make_object( objectID ) ;
-	PortableInterceptor.Current pic = <resolve from init refs> ;
-	Any any = orb.create_any() ;
-	any.insert_object( obj ) ;
-	pic.set_slot( MY_SLOT_ID, any ) ;
+        byte[] adapterID = sri.adapter_id() ;
+        ObjectTemplate iort = activator.lookup_poa_template( adapterID ) ;
+        byte[] objectID = sri.object_id() ;
+        org.omg.CORBA.Object obj = iort.make_object( objectID ) ;
+        PortableInterceptor.Current pic = <resolve from init refs> ;
+        Any any = orb.create_any() ;
+        any.insert_object( obj ) ;
+        pic.set_slot( MY_SLOT_ID, any ) ;
     }
 
     void send_reply( ServerRequestInfo ri ) 
@@ -187,44 +187,44 @@ class ORBDRequestInterceptor implements ServerRequestInterceptor {
     }
 }
 
-	Servant locator:
-	    preinvoke( )
-	    {
-		PortableInterceptor.Current pic = <resolve from init refs> ;
-		Any any = pic.get_slot( MY_SLOT_ID ) ;
-		org.omg.CORBA.Object obj = any.extract_object() ;
-		ForwardReqest fr = new ForwardRequest( obj ) ;
-		throw fr ;
-	    }
+        Servant locator:
+            preinvoke( )
+            {
+                PortableInterceptor.Current pic = <resolve from init refs> ;
+                Any any = pic.get_slot( MY_SLOT_ID ) ;
+                org.omg.CORBA.Object obj = any.extract_object() ;
+                ForwardReqest fr = new ForwardRequest( obj ) ;
+                throw fr ;
+            }
 
     AdapterActivator:
-	- this is installed in the ORBD root POA
+        - this is installed in the ORBD root POA
 
-	unknown_adapter( POA parent, String name ) {
-	    POA poa = parent.create_poa( name, parent.the_POAManager, policies ) ;
-	    // Policies should be:
-	    //	PERSISTENT,
-	    //	UNIQUE_ID,
-	    //	USER_ID,
-	    //	NO_IMPLICIT_ACTIVATION,
-	    //	NON_RETAIN, 
-	    //	USE_SERVANT_MANAGER, 
+        unknown_adapter( POA parent, String name ) {
+            POA poa = parent.create_poa( name, parent.the_POAManager, policies ) ;
+            // Policies should be:
+            //  PERSISTENT,
+            //  UNIQUE_ID,
+            //  USER_ID,
+            //  NO_IMPLICIT_ACTIVATION,
+            //  NON_RETAIN, 
+            //  USE_SERVANT_MANAGER, 
 
-	    poa.set_servant_manager( orbdServantLocator ) ;
-	    return true ;
-	}
+            poa.set_servant_manager( orbdServantLocator ) ;
+            return true ;
+        }
 
 Server:
     // This interceptor must run last OR add another point!
     IORInterceptor: // Only do this for persistent POAs (How?) !
-	establish_components( IORInfo info ) {
-	    IORInfoExt extInfo = IORInfoExtHelper.narrow( info ) ;
-	    ObjectTemplate otemp = extInfo.get_object_template() ;
-	    Activator act = <locate from NS>
-	    // may want sid, orbid too
-	    ObjectTemplate daemonTemplate = act.register_poa_template( otemp ) ; 
-	    info.set_object_template( daemonTemplate ) ;
-	}
+        establish_components( IORInfo info ) {
+            IORInfoExt extInfo = IORInfoExtHelper.narrow( info ) ;
+            ObjectTemplate otemp = extInfo.get_object_template() ;
+            Activator act = <locate from NS>
+            // may want sid, orbid too
+            ObjectTemplate daemonTemplate = act.register_poa_template( otemp ) ; 
+            info.set_object_template( daemonTemplate ) ;
+        }
 
 Server startup:
     Activator passes appropriate org.omg.PortableInterceptor.ORBInitializer.XXX arguments

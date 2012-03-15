@@ -37,16 +37,16 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
 
 import java.nio.ByteBuffer;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.protocol.RequestId;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.protocol.RequestId;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.protocol.RequestIdImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.protocol.RequestIdImpl;
 
 public class Message_1_2 extends Message_1_1
 {
@@ -88,15 +88,15 @@ public class Message_1_2 extends Message_1_1
     }
 
     public void write(org.omg.CORBA.portable.OutputStream ostream) {
-	if (getEncodingVersion() == ORBConstants.CDR_ENC_VERSION) {
-	    super.write(ostream);
-	    return;
-	}
-	GIOPVersion gv = GIOP_version; // save
-	GIOP_version = GIOPVersion.getInstance(GIOPVersion.V13_XX.getMajor(),
-					       getEncodingVersion());
-	super.write(ostream);
-	GIOP_version = gv; // restore
+        if (getEncodingVersion() == ORBConstants.CDR_ENC_VERSION) {
+            super.write(ostream);
+            return;
+        }
+        GIOPVersion gv = GIOP_version; // save
+        GIOP_version = GIOPVersion.getInstance(GIOPVersion.V13_XX.getMajor(),
+                                               getEncodingVersion());
+        super.write(ostream);
+        GIOP_version = gv; // restore
     }
 
     public RequestId getCorbaRequestId() {

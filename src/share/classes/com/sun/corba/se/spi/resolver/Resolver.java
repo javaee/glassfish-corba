@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.resolver ;
+package com.sun.corba.ee.spi.resolver ;
 
 /** Resolver defines the operations needed to support ORB operations for 
  * resolve_initial_references and list_initial_services.

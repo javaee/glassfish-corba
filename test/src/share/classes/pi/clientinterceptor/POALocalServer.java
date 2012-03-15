@@ -47,8 +47,8 @@ import org.omg.PortableServer.*;
 import org.omg.PortableServer.POAPackage.*;
 import org.omg.PortableInterceptor.*;
 import corba.framework.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.interceptors.*;
 
 import java.util.*;
 import java.io.*;
@@ -63,15 +63,15 @@ public class POALocalServer {
     
     private POA rootPOA;
     
-    private com.sun.corba.se.spi.orb.ORB orb;
+    private com.sun.corba.ee.spi.orb.ORB orb;
 
-    public void run( com.sun.corba.se.spi.orb.ORB orb, java.lang.Object syncObject, 
-		     Properties environment, String args[], PrintStream out, 
-		     PrintStream err, Hashtable extra) 
+    public void run( com.sun.corba.ee.spi.orb.ORB orb, java.lang.Object syncObject, 
+                     Properties environment, String args[], PrintStream out, 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
-	this.out = out;
-	this.orb = orb;
+        this.out = out;
+        this.orb = orb;
 
         // Get the root POA:
         rootPOA = null;
@@ -93,16 +93,16 @@ public class POALocalServer {
         //out.println("Server is ready.");
         //out.flush();
 
-	// notify client to wake up:
+        // notify client to wake up:
         synchronized( syncObject ) {
-	    syncObject.notifyAll();
+            syncObject.notifyAll();
         }
 
-	// wait for invocations from clients
-	java.lang.Object sync = new java.lang.Object();
-	synchronized (sync) {
-	    sync.wait();
-	}
+        // wait for invocations from clients
+        java.lang.Object sync = new java.lang.Object();
+        synchronized (sync) {
+            sync.wait();
+        }
 
     }
     
@@ -110,24 +110,24 @@ public class POALocalServer {
      * Implementation borrowed from corba.socket.HelloServer test
      */
     public void createAndBind (String name)
-	throws Exception
+        throws Exception
     {
-	// create servant and register it with the ORB
-	helloServant helloRef = new helloServant( out );
+        // create servant and register it with the ORB
+        helloServant helloRef = new helloServant( out );
       
-	byte[] id = rootPOA.activate_object(helloRef);
-	org.omg.CORBA.Object ref = rootPOA.id_to_reference(id);
+        byte[] id = rootPOA.activate_object(helloRef);
+        org.omg.CORBA.Object ref = rootPOA.id_to_reference(id);
       
-	// get the root naming context
-	org.omg.CORBA.Object objRef = 
-	    orb.resolve_initial_references("NameService");
-	NamingContext ncRef = NamingContextHelper.narrow(objRef);
+        // get the root naming context
+        org.omg.CORBA.Object objRef = 
+            orb.resolve_initial_references("NameService");
+        NamingContext ncRef = NamingContextHelper.narrow(objRef);
       
-	// bind the Object Reference in Naming
-	NameComponent nc = new NameComponent(name, "");
-	NameComponent path[] = {nc};
+        // bind the Object Reference in Naming
+        NameComponent nc = new NameComponent(name, "");
+        NameComponent path[] = {nc};
             
-	ncRef.rebind(path, ref);
+        ncRef.rebind(path, ref);
     }
 
 }

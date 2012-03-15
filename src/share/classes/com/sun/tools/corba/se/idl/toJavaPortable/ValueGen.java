@@ -218,29 +218,29 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
     if (((ValueEntry)v).supports ().size () > 0) {
       if (!impl)
       {
-	stream.print (" implements ");
-	impl = true;
+        stream.print (" implements ");
+        impl = true;
       }
       else
-	stream.print (", ");
+        stream.print (", ");
 
       InterfaceEntry s =(InterfaceEntry)((ValueEntry)v).supports().elementAt(0);
       // abstract supported classes don't have "Operations"
       if (s.isAbstract ())
          stream.print (Util.javaName (s));
       else
-	  stream.print (Util.javaName (s) + "Operations");
+          stream.print (Util.javaName (s) + "Operations");
       }
 
 //  <d59418> Custom valuetypes implement org.omg.CORBA.CustomMarshal.
     if ( ((ValueEntry)v).isCustom ()) {
       if (!impl)
       {
-	stream.print (" implements ");
-	impl = true;
+        stream.print (" implements ");
+        impl = true;
       }
       else
-	stream.print (", ");
+        stream.print (", ");
 
       stream.print ("org.omg.CORBA.CustomMarshal ");
       }
@@ -288,7 +288,7 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
    // Per Simon, 9/3/98, emit a protected default constructor
    if (!v.isAbstract () && !explicitDefaultInit) { // <d57067 - klr>
         stream.println ("  protected " + v.name () + " () {}");
-	stream.println ();
+        stream.println ();
     }
   } // writeConstructor
 
@@ -300,9 +300,9 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
    // Per Simon, 4/6/98, emit _truncatable_ids()
    if (!v.isAbstract ()) {
         stream.println ("  public String[] _truncatable_ids() {");
-	stream.println ("      return " + Util.helperName(v, true) + ".get_instance().get_truncatable_base_ids();"); // <d61056>
-	stream.println ("  }");
-	stream.println ();
+        stream.println ("      return " + Util.helperName(v, true) + ".get_instance().get_truncatable_base_ids();"); // <d61056>
+        stream.println ("  }");
+        stream.println ();
     }
   } // writeTruncatable
 
@@ -346,7 +346,7 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
         element.valueMethod (true);
         ((MethodGen) element.generator ()). interfaceMethod (symbolTable, element, stream);
         if (element.parameters ().isEmpty ()) // <d57067-klr>
-	  explicitDefaultInit = true;
+          explicitDefaultInit = true;
       }
     }
   } // writeInitializers
@@ -373,12 +373,12 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
       }
       else 
       {
-	// Generate the type referenced by the typedef.
-	if (contained instanceof TypedefEntry)
+        // Generate the type referenced by the typedef.
+        if (contained instanceof TypedefEntry)
           contained.type ().generate (symbolTable, stream);
 
-	// Note that we also need to generate the typedef itself if
-	// contained is a typedef.
+        // Note that we also need to generate the typedef itself if
+        // contained is a typedef.
         contained.generate (symbolTable, stream);
       }
     }
@@ -568,7 +568,7 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
   public void helperRead (String entryName, SymtabEntry entry, PrintWriter stream)
   {
   // <d59418 - KLR> per Simon, make "static" read call istream.read_value.
-  //		    put real marshalling code in read_value.
+  //                put real marshalling code in read_value.
 
     if (((ValueEntry)entry).isAbstract ())
     {
@@ -594,13 +594,13 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
     else
       if (((ValueEntry)entry).isCustom ())
       {
-	stream.println ("    throw new org.omg.CORBA.BAD_OPERATION (\"custom values should use unmarshal()\");");
+        stream.println ("    throw new org.omg.CORBA.BAD_OPERATION (\"custom values should use unmarshal()\");");
       }
       else
       {
-	stream.println ("    " + entryName + " value = new " + entryName + " ();");
-	read (0, "    ", "value", entry, stream);
-	stream.println ("    return value;");
+        stream.println ("    " + entryName + " value = new " + entryName + " ();");
+        read (0, "    ", "value", entry, stream);
+        stream.println ("    return value;");
       }
     stream.println ("  }");
     stream.println ();
@@ -627,7 +627,7 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
         return index;
       // Per Simon, 4/6/99 - call parent read. <d60929>
       if (! Util.javaQualifiedName(parent).equals ("java.io.Serializable")) // <d60929>
-	  stream.println(indent + Util.helperName (parent, true) + ".read (istream, value);"); // <d60929> // <d61056>
+          stream.println(indent + Util.helperName (parent, true) + ".read (istream, value);"); // <d60929> // <d61056>
     }
 
     Vector vMembers = ((ValueEntry) entry).state ();
@@ -654,7 +654,7 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
           returnType = Util.javaName (mType);
         stream.println ("    " + name + '.' + memberName + " = (" + returnType +
                         ") ((org.omg.CORBA_2_3.portable.InputStream)istream).read_value (" + Util.helperName (mType, true) +  // <d61056>
-			".get_instance ());"); // <d61056>
+                        ".get_instance ());"); // <d61056>
       }
       else
         stream.println (indent + name + '.' + memberName + " = " +
@@ -667,14 +667,14 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
   public void helperWrite (SymtabEntry entry, PrintWriter stream)
   {
     // <d59418 - KLR> per Simon, make "static" write call istream.write_value.
-    //		    put real marshalling code in write_value.
+    //              put real marshalling code in write_value.
     stream.println ("    ((org.omg.CORBA_2_3.portable.OutputStream) ostream).write_value (value, get_instance());"); // <d60929>
     stream.println ("  }");
     stream.println ();
 
     // <d62062>
     // per Simon, 4/27/99, add static _write that marshals the state of this 
-    //	value for non-custom valuetypes
+    //  value for non-custom valuetypes
     if (!((ValueEntry)entry).isCustom ())
     {
        stream.println ("  public static void _write (org.omg.CORBA.portable.OutputStream ostream, " + Util.javaName (entry) + " value)"); 
@@ -712,7 +712,7 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
       // Per Simon, 4/06/99 - call parent write. <d60929>
       // Per Simon, 4/27/99 - call parent _write. <d62062>
       if (! Util.javaQualifiedName(parent).equals ("java.io.Serializable")) // <d60929>
-	  stream.println(indent + Util.helperName (parent, true) + "._write (ostream, value);"); // <d60929> <d61056> <d62062>
+          stream.println(indent + Util.helperName (parent, true) + "._write (ostream, value);"); // <d60929> <d61056> <d62062>
     }
 
     Vector vMembers = ((ValueEntry) entry ).state ();
@@ -731,7 +731,7 @@ public class ValueGen implements com.sun.tools.corba.se.idl.ValueGen, JavaGenera
         index = ((JavaGenerator)member.generator ()).write (index, indent, name + '.' + memberName, member, stream);
       else
         stream.println (indent + Util.helperName (mType, true) + // <d61056>
-	                      ".write (ostream, " + name + '.' + memberName + ");");
+                              ".write (ostream, " + name + '.' + memberName + ");");
     }
 
     return index;

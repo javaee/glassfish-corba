@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
 /**
  * @author Harold Carr

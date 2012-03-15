@@ -93,12 +93,12 @@ public abstract class ThreadProcess implements InternalProcess, Runnable
 
     public void stop()
     {
-	/*
-	  If not finished:
+        /*
+          If not finished:
           Set the exit value to STOPPED, and set the stopped flag to true
           Wait until the executing thread calls setFinished (it knows to
           do so because now stopped() returns true).
-	*/
+        */
 
         synchronized(lockObj) {
 

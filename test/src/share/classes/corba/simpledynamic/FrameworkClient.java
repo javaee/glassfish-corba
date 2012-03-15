@@ -41,7 +41,7 @@
 package corba.simpledynamic;
 
 import org.glassfish.pfl.basic.func.NullaryFunction;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
+import com.sun.corba.ee.impl.orbutil.newtimer.generated.TimingPoints;
 import org.glassfish.pfl.tf.timer.spi.TimerManager;
 import org.glassfish.pfl.tf.timer.spi.TimerGroup;
 import org.glassfish.pfl.tf.timer.spi.LogEventHandler;
@@ -64,9 +64,9 @@ import org.testng.annotations.BeforeGroups ;
   
 import corba.nortel.NortelSocketFactory ;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 import corba.misc.Buck ;
 
@@ -83,63 +83,63 @@ public class FrameworkClient extends Framework {
     private static final String GROUP_5161 = "5161_group" ;
 
     private Echo makeServant( String name ) {
-	try {
-	    return new EchoImpl( name ) ;
-	} catch (RemoteException rex) {
-	    Assert.fail( "Unexpected remote exception " + rex ) ;
-	    return null ; // never reached
-	}
+        try {
+            return new EchoImpl( name ) ;
+        } catch (RemoteException rex) {
+            Assert.fail( "Unexpected remote exception " + rex ) ;
+            return null ; // never reached
+        }
     }
 
     private void msg( String msg ) {
-	System.out.println( "+++FrameworkClient: " + msg ) ;
+        System.out.println( "+++FrameworkClient: " + msg ) ;
     }
 
     @BeforeGroups( { TESTREF_GROUP } ) 
     public void initTestRef() {
-	bindServant( makeServant( SERVER_NAME ), Echo.class, TEST_REF_NAME ) ;
+        bindServant( makeServant( SERVER_NAME ), Echo.class, TEST_REF_NAME ) ;
     }
 
     @Test( groups = { TESTREF_GROUP } ) 
     public void firstTest() {
-	try {
-	    InterceptorTester.theTester.clear() ;
-	    Echo servant = makeServant( CLIENT_NAME ) ;
-	    connectServant( servant, getClientORB() ) ;
+        try {
+            InterceptorTester.theTester.clear() ;
+            Echo servant = makeServant( CLIENT_NAME ) ;
+            connectServant( servant, getClientORB() ) ;
 
-	    System.out.println( "Creating first echoref" ) ;
-	    Echo ref = toStub( servant, Echo.class ) ;
+            System.out.println( "Creating first echoref" ) ;
+            Echo ref = toStub( servant, Echo.class ) ;
 
-	    System.out.println( "Hello?" ) ;
-	    System.out.println( "Looking up second echoref" ) ;
-	    Echo sref = findStub( Echo.class, TEST_REF_NAME ) ;
-	    Assert.assertEquals( sref.name(), SERVER_NAME ) ;
+            System.out.println( "Hello?" ) ;
+            System.out.println( "Looking up second echoref" ) ;
+            Echo sref = findStub( Echo.class, TEST_REF_NAME ) ;
+            Assert.assertEquals( sref.name(), SERVER_NAME ) ;
 
-	    if (RUN_FRAGMENT_TEST) {
-		System.out.println( "Running test for bug 6578707" ) ;
-		testFragmentation( sref ) ;
-	    }
+            if (RUN_FRAGMENT_TEST) {
+                System.out.println( "Running test for bug 6578707" ) ;
+                testFragmentation( sref ) ;
+            }
 
-	    System.out.println( "Echoing first echoref" ) ;
-	    Echo rref = sref.say( ref ) ;
-	    Assert.assertEquals( rref.name(), CLIENT_NAME ) ;
+            System.out.println( "Echoing first echoref" ) ;
+            Echo rref = sref.say( ref ) ;
+            Assert.assertEquals( rref.name(), CLIENT_NAME ) ;
 
-	    System.out.println( "Echoing second echoref" ) ;
-	    Echo r2ref = rref.say( sref ) ;
-	    Assert.assertEquals( r2ref.name(), SERVER_NAME ) ;
+            System.out.println( "Echoing second echoref" ) ;
+            Echo r2ref = rref.say( sref ) ;
+            Assert.assertEquals( r2ref.name(), SERVER_NAME ) ;
 
-	    System.out.println( "Echoing third echoref" ) ;
-	    Echo ref2 = ref.say( ref ) ;
-	    Assert.assertEquals( ref2.name(), ref.name() ) ;
-	} catch (Exception exc) {
-	    System.out.println( "Caught exception " + exc ) ;
-	    exc.printStackTrace() ;
-	}
+            System.out.println( "Echoing third echoref" ) ;
+            Echo ref2 = ref.say( ref ) ;
+            Assert.assertEquals( ref2.name(), ref.name() ) ;
+        } catch (Exception exc) {
+            System.out.println( "Caught exception " + exc ) ;
+            exc.printStackTrace() ;
+        }
     }
 
     @Override
     protected Properties extraServerProperties() {
-	Properties result = new Properties() ;
+        Properties result = new Properties() ;
         result.setProperty( ORBConstants.TIMING_POINTS_ENABLED, "true" ) ;
 
         result.setProperty( ORBConstants.DEBUG_PROPERTY, "valueHandler,streamFormatVersion,cdr" ) ;
@@ -149,190 +149,190 @@ public class FrameworkClient extends Framework {
 
     @Override
     protected Properties extraClientProperties() {
-	Properties result = new Properties() ;
+        Properties result = new Properties() ;
 
         result.setProperty( ORBConstants.TIMING_POINTS_ENABLED, "true" ) ;
 
         result.setProperty( ORBConstants.DEBUG_PROPERTY, "valueHandler,streamFormatVersion,cdr" ) ;
-	
-	// register nortel socket factory
-	result.setProperty( ORBConstants.SOCKET_FACTORY_CLASS_PROPERTY, 
-	    NortelSocketFactory.class.getName() ) ;
-	
-	// register ORBInitializer
-	result.setProperty( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX + 
-	    InterceptorTester.class.getName(), "true" ) ;
+        
+        // register nortel socket factory
+        result.setProperty( ORBConstants.SOCKET_FACTORY_CLASS_PROPERTY, 
+            NortelSocketFactory.class.getName() ) ;
+        
+        // register ORBInitializer
+        result.setProperty( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX + 
+            InterceptorTester.class.getName(), "true" ) ;
 
-	// result.setProperty( ORBConstants.DEBUG_PROPERTY, 
-	    // "transport" ) ;
-	
-	result.setProperty( ORBConstants.TRANSPORT_TCP_CONNECT_TIMEOUTS_PROPERTY,
-	    "100:2000:100" ) ;
+        // result.setProperty( ORBConstants.DEBUG_PROPERTY, 
+            // "transport" ) ;
+        
+        result.setProperty( ORBConstants.TRANSPORT_TCP_CONNECT_TIMEOUTS_PROPERTY,
+            "100:2000:100" ) ;
 
-	return result ;
+        return result ;
     }
 
     private static class Fragment implements java.io.Serializable {
-	String str;
+        String str;
 
-	Fragment(int  size) {
-	    str="";
-	    for(int i=0;i<size;i++) {
-		str+="B";
-	    }
-	}
+        Fragment(int  size) {
+            str="";
+            for(int i=0;i<size;i++) {
+                str+="B";
+            }
+        }
     }
 
     private static class Wrapper implements java.io.Serializable{
-	Fragment f = null;
-	java.util.Vector vec = null;
+        Fragment f = null;
+        java.util.Vector vec = null;
 
-	public Wrapper(int len, java.util.Vector vec){
-	    this.vec = vec;
-	    f = new Fragment(len);
-	}
+        public Wrapper(int len, java.util.Vector vec){
+            this.vec = vec;
+            f = new Fragment(len);
+        }
 
-	private void readObject(java.io.ObjectInputStream is
-	    ) throws java.io.IOException,  ClassNotFoundException{
+        private void readObject(java.io.ObjectInputStream is
+            ) throws java.io.IOException,  ClassNotFoundException{
 
-	    is.defaultReadObject();
-	}
+            is.defaultReadObject();
+        }
 
-	private void writeObject(java.io.ObjectOutputStream is
-	    ) throws java.io.IOException{
+        private void writeObject(java.io.ObjectOutputStream is
+            ) throws java.io.IOException{
 
-	    is.defaultWriteObject();
-	}
+            is.defaultWriteObject();
+        }
     }
 
     public void testFragmentation( Echo sref ) {
-	Throwable t = new Throwable();
-	java.util.Vector v = new java.util.Vector();
-	v.add(t);
-	for (int i = 0; i < 1024; i++){
-	    try {
-		System.out.println("Hello call " + i);
-		Wrapper w = new Wrapper(i, v);
-		sref.sayHello(w);
-	    } catch (Exception exc) {
-		System.out.println( "Caught exception " + exc ) ;
-		exc.printStackTrace() ;
-	    }
-	}
+        Throwable t = new Throwable();
+        java.util.Vector v = new java.util.Vector();
+        v.add(t);
+        for (int i = 0; i < 1024; i++){
+            try {
+                System.out.println("Hello call " + i);
+                Wrapper w = new Wrapper(i, v);
+                sref.sayHello(w);
+            } catch (Exception exc) {
+                System.out.println( "Caught exception " + exc ) ;
+                exc.printStackTrace() ;
+            }
+        }
     }
 
     private int[] makeIntArray( int size ) {
-	int[] result = new int[size] ;
-	for (int ctr=0; ctr<size; ctr++)
-	    result[ctr] = ctr ;
-	return result ;
+        int[] result = new int[size] ;
+        for (int ctr=0; ctr<size; ctr++)
+            result[ctr] = ctr ;
+        return result ;
     }
 
     private void testWriteFailure( int[] arg ) {
-	try {
-	    msg( "testWriteFailure with " + arg.length + " ints" ) ;
-	    InterceptorTester.theTester.clear() ;
-	    Echo sref = findStub( Echo.class, TEST_REF_NAME ) ;
-	    sref.echo( arg ) ;
+        try {
+            msg( "testWriteFailure with " + arg.length + " ints" ) ;
+            InterceptorTester.theTester.clear() ;
+            Echo sref = findStub( Echo.class, TEST_REF_NAME ) ;
+            sref.echo( arg ) ;
 
-	    NortelSocketFactory.disconnectSocket() ;
-	    NortelSocketFactory.simulateConnectionDown() ;
-	    InterceptorTester.theTester.setExceptionExpected() ;
+            NortelSocketFactory.disconnectSocket() ;
+            NortelSocketFactory.simulateConnectionDown() ;
+            InterceptorTester.theTester.setExceptionExpected() ;
 
-	    msg( "******* Start Test with disconnected connection *******" ) ; 
-	    // getClientORB().setDebugFlag( "transport" ) ;
-	    sref.echo( arg ) ;
-	    // getClientORB().clearDebugFlag( "transport" ) ;
-	    msg( "******* End test with disconnected connection *******" ) ; 
-	} catch (MarshalException exc) {
-	    msg( "Caught expected MarshalException" ) ;
-	} catch (Exception exc) {
-	    exc.printStackTrace() ;
-	    Assert.fail( "Unexpected exception " + exc ) ;
-	} finally {
-	    NortelSocketFactory.simulateConnectionUp() ;
-	    Assert.assertEquals( InterceptorTester.theTester.getErrors(), 0 ) ;
-	}
+            msg( "******* Start Test with disconnected connection *******" ) ; 
+            // getClientORB().setDebugFlag( "transport" ) ;
+            sref.echo( arg ) ;
+            // getClientORB().clearDebugFlag( "transport" ) ;
+            msg( "******* End test with disconnected connection *******" ) ; 
+        } catch (MarshalException exc) {
+            msg( "Caught expected MarshalException" ) ;
+        } catch (Exception exc) {
+            exc.printStackTrace() ;
+            Assert.fail( "Unexpected exception " + exc ) ;
+        } finally {
+            NortelSocketFactory.simulateConnectionUp() ;
+            Assert.assertEquals( InterceptorTester.theTester.getErrors(), 0 ) ;
+        }
     }
 
     @Test( groups = { TESTREF_GROUP } ) 
     public void testWriteFailureFragment() {
-	testWriteFailure( makeIntArray( 50000 ) ) ;
+        testWriteFailure( makeIntArray( 50000 ) ) ;
     }
 
     @Test( groups = { TESTREF_GROUP } ) 
     public void testWriteFailureNoFragment() {
-	testWriteFailure( makeIntArray( 50 ) ) ;
+        testWriteFailure( makeIntArray( 50 ) ) ;
     }
 
     private static class RCTest implements Serializable {
-	byte[] front ;
-	Throwable thr ;
+        byte[] front ;
+        Throwable thr ;
 
-	void setPrefixSize( int size ) {
-	    front = new byte[size] ;
-	    for (int ctr=0; ctr<size; ctr++ ) {
-		front[ctr] = (byte)(ctr & 255) ;
-	    }
-	}
+        void setPrefixSize( int size ) {
+            front = new byte[size] ;
+            for (int ctr=0; ctr<size; ctr++ ) {
+                front[ctr] = (byte)(ctr & 255) ;
+            }
+        }
 
-	RCTest( Throwable thr ) {
-	    setPrefixSize( 0 ) ;
-	    this.thr = thr ;
-	}
+        RCTest( Throwable thr ) {
+            setPrefixSize( 0 ) ;
+            this.thr = thr ;
+        }
 
-	private void readObject( ObjectInputStream is ) throws IOException, ClassNotFoundException {
-	    is.defaultReadObject() ;
-	}
+        private void readObject( ObjectInputStream is ) throws IOException, ClassNotFoundException {
+            is.defaultReadObject() ;
+        }
 
-	private void writeObject( ObjectOutputStream os ) throws IOException {
-	    os.defaultWriteObject() ;
-	}
+        private void writeObject( ObjectOutputStream os ) throws IOException {
+            os.defaultWriteObject() ;
+        }
     }
 
     @Test()
     public void testRecursiveTypeCode() {
-	int ctr=0 ;
-	try {
-	    msg( "Start recursive TypeCode test" ) ;
-	    Throwable thr = new Throwable( "Top level" ) ;
-	    Throwable cause = new Throwable( "The cause" ) ;
-	    thr.initCause( cause ) ;
-	    RCTest rct = new RCTest( thr ) ;
-	    Echo sref = findStub( Echo.class, TEST_REF_NAME ) ;
+        int ctr=0 ;
+        try {
+            msg( "Start recursive TypeCode test" ) ;
+            Throwable thr = new Throwable( "Top level" ) ;
+            Throwable cause = new Throwable( "The cause" ) ;
+            thr.initCause( cause ) ;
+            RCTest rct = new RCTest( thr ) ;
+            Echo sref = findStub( Echo.class, TEST_REF_NAME ) ;
 
-	    // getClientORB().setDebugFlag( "giop" ) ;
-	    for (ctr=0; ctr<4096; ctr+=256) {
-		rct.setPrefixSize( ctr ) ;
-		sref.echo( rct ) ;
-	    }
-	    // getClientORB().clearDebugFlag( "giop" ) ;
+            // getClientORB().setDebugFlag( "giop" ) ;
+            for (ctr=0; ctr<4096; ctr+=256) {
+                rct.setPrefixSize( ctr ) ;
+                sref.echo( rct ) ;
+            }
+            // getClientORB().clearDebugFlag( "giop" ) ;
 
-	} catch (Exception exc) {
-	    exc.printStackTrace() ;
-	    Assert.fail( "Unexpected exception in testRecursiveTypeCode for ctr = " + ctr + " :" + exc ) ;
-	}
+        } catch (Exception exc) {
+            exc.printStackTrace() ;
+            Assert.fail( "Unexpected exception in testRecursiveTypeCode for ctr = " + ctr + " :" + exc ) ;
+        }
     }
 
     @Test()
     public void testCorbalocRir() {
-	msg( "corbaloc:rir URL test" ) ;
-	String name = "UseThisName" ;
-	String url = "corbaloc:rir:/" + name ;
-	ORB orb = getClientORB() ;
-	try {
-	    Echo serv = makeServant( "purple" ) ;
-	    connectServant( serv, getClientORB() ) ;
-	    Echo stub = toStub( serv, Echo.class ) ;
-	    getClientORB().register_initial_reference( name, 
+        msg( "corbaloc:rir URL test" ) ;
+        String name = "UseThisName" ;
+        String url = "corbaloc:rir:/" + name ;
+        ORB orb = getClientORB() ;
+        try {
+            Echo serv = makeServant( "purple" ) ;
+            connectServant( serv, getClientORB() ) ;
+            Echo stub = toStub( serv, Echo.class ) ;
+            getClientORB().register_initial_reference( name, 
                 (org.omg.CORBA.Object)stub ) ;
 
-	    Echo echo = narrow( orb.string_to_object( url ), Echo.class ) ;
-	    Assert.assertFalse( echo == null ) ;
-	} catch (Exception exc) {
-	    exc.printStackTrace() ;
-	    Assert.fail( "Unexpected exception in testCorbalocRir: " + exc ) ;
-	}
+            Echo echo = narrow( orb.string_to_object( url ), Echo.class ) ;
+            Assert.assertFalse( echo == null ) ;
+        } catch (Exception exc) {
+            exc.printStackTrace() ;
+            Assert.fail( "Unexpected exception in testCorbalocRir: " + exc ) ;
+        }
     }
 
     private static class CDRTimerContext {
@@ -457,10 +457,10 @@ public class FrameworkClient extends Framework {
 
         OutputStream out = (OutputStream)orb.create_output_stream();
 
-	out.write_value(bpal) ;
-	out.write_value(bpv) ;
+        out.write_value(bpal) ;
+        out.write_value(bpv) ;
 
-	InputStream in = (InputStream)out.create_input_stream();
+        InputStream in = (InputStream)out.create_input_stream();
 
         BuckPasserAL bpal2 = (BuckPasserAL)in.read_value() ;
         BuckPasserV bpv2 = (BuckPasserV)in.read_value() ;
@@ -482,7 +482,7 @@ public class FrameworkClient extends Framework {
     }
 
     public static void main( String[] args ) {
-	Class[] classes = { FrameworkClient.class } ;
-	Framework.run( "gen/corba/simpledynamic/test-output", classes ) ;
+        Class[] classes = { FrameworkClient.class } ;
+        Framework.run( "gen/corba/simpledynamic/test-output", classes ) ;
     }
 }

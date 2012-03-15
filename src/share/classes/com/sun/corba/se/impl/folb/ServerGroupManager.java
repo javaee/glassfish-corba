@@ -42,9 +42,9 @@
 // Last Modified : 2005 Sep 28 (Wed) 09:40:45 by Harold Carr.
 //
 
-package com.sun.corba.se.impl.folb;
+package com.sun.corba.ee.impl.folb;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.server.UID;
@@ -73,23 +73,23 @@ import org.omg.PortableInterceptor.ORBInitInfo;
 import org.omg.PortableInterceptor.ServerRequestInterceptor;
 import org.omg.PortableInterceptor.ServerRequestInfo;
 
-import com.sun.corba.se.spi.folb.GroupInfoService;
-import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
-import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
-import com.sun.corba.se.spi.folb.SocketInfo;
+import com.sun.corba.ee.spi.folb.GroupInfoService;
+import com.sun.corba.ee.spi.folb.GroupInfoServiceObserver;
+import com.sun.corba.ee.spi.folb.ClusterInstanceInfo;
+import com.sun.corba.ee.spi.folb.SocketInfo;
 
-import com.sun.corba.se.spi.ior.iiop.ClusterInstanceInfoComponent ;
-import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
-import com.sun.corba.se.spi.legacy.interceptor.ServerRequestInfoExt;
+import com.sun.corba.ee.spi.ior.iiop.ClusterInstanceInfoComponent ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPFactories ;
+import com.sun.corba.ee.spi.legacy.interceptor.ServerRequestInfoExt;
 
-import com.sun.corba.se.spi.oa.rfm.ReferenceFactory;
-import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager;
-import com.sun.corba.se.spi.orb.ORBConfigurator ;
-import com.sun.corba.se.spi.orb.DataCollector ;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.oa.rfm.ReferenceFactory;
+import com.sun.corba.ee.spi.oa.rfm.ReferenceFactoryManager;
+import com.sun.corba.ee.spi.orb.ORBConfigurator ;
+import com.sun.corba.ee.spi.orb.DataCollector ;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.trace.Folb;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.trace.Folb;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
@@ -100,11 +100,11 @@ public class ServerGroupManager
     extends
         org.omg.CORBA.LocalObject
     implements 
-	GroupInfoServiceObserver,
-	IORInterceptor,
-	ORBConfigurator,
-	ORBInitializer,
-	ServerRequestInterceptor
+        GroupInfoServiceObserver,
+        IORInterceptor,
+        ORBConfigurator,
+        ORBInitializer,
+        ServerRequestInterceptor
 {
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
@@ -120,7 +120,7 @@ public class ServerGroupManager
 
     private enum MembershipChangeState { IDLE, DOING_WORK, RETRY_REQUIRED };
     private MembershipChangeState membershipChangeState =
-	MembershipChangeState.IDLE;
+        MembershipChangeState.IDLE;
 
     private ReferenceFactoryManager referenceFactoryManager;
     private Codec codec;
@@ -128,8 +128,8 @@ public class ServerGroupManager
 
     // REVISIT - the app server identifies socket "types" with
     // these strings.  Should be an official API.
-    private static final String SSL = com.sun.corba.se.spi.transport.SocketInfo.SSL_PREFIX ;
-    private static final String CLEAR = com.sun.corba.se.spi.transport.SocketInfo.IIOP_CLEAR_TEXT ;
+    private static final String SSL = com.sun.corba.ee.spi.transport.SocketInfo.SSL_PREFIX ;
+    private static final String CLEAR = com.sun.corba.ee.spi.transport.SocketInfo.IIOP_CLEAR_TEXT ;
 
     @InfoMethod
     private void alreadyInitialized() { }
@@ -137,49 +137,49 @@ public class ServerGroupManager
     @Folb
     private void initialize() {
 
-	if (initialized) {
+        if (initialized) {
             alreadyInitialized();
-	    return;
-	}
+            return;
+        }
 
-	try {
-	    initialized = true;
+        try {
+            initialized = true;
 
-	    updateMembershipLabel();
+            updateMembershipLabel();
 
-	    CodecFactory codecFactory =
-		CodecFactoryHelper.narrow(
-		  orb.resolve_initial_references(
+            CodecFactory codecFactory =
+                CodecFactoryHelper.narrow(
+                  orb.resolve_initial_references(
                       ORBConstants.CODEC_FACTORY_NAME));
 
-	    codec = codecFactory.create_codec(
+            codec = codecFactory.create_codec(
                 new Encoding((short)0, (byte)1, (byte)2));
 
-	    referenceFactoryManager = (ReferenceFactoryManager)
-		orb.resolve_initial_references(
-	            ORBConstants.REFERENCE_FACTORY_MANAGER);
-
-	    gis = (GroupInfoService) PortableRemoteObject.narrow(
+            referenceFactoryManager = (ReferenceFactoryManager)
                 orb.resolve_initial_references(
-	            ORBConstants.FOLB_SERVER_GROUP_INFO_SERVICE),
-		GroupInfoService.class);
+                    ORBConstants.REFERENCE_FACTORY_MANAGER);
 
-	    gis.addObserver(this);
+            gis = (GroupInfoService) PortableRemoteObject.narrow(
+                orb.resolve_initial_references(
+                    ORBConstants.FOLB_SERVER_GROUP_INFO_SERVICE),
+                GroupInfoService.class);
 
-	    try {
-		csiv2SSLTaggedComponentHandler =
-		    (CSIv2SSLTaggedComponentHandler)
-		    orb.resolve_initial_references(
+            gis.addObserver(this);
+
+            try {
+                csiv2SSLTaggedComponentHandler =
+                    (CSIv2SSLTaggedComponentHandler)
+                    orb.resolve_initial_references(
                         ORBConstants.CSI_V2_SSL_TAGGED_COMPONENT_HANDLER);
-	    } catch (InvalidName e) {
-		csiv2SSLTaggedComponentHandler = null;
+            } catch (InvalidName e) {
+                csiv2SSLTaggedComponentHandler = null;
                 wrapper.noCSIV2Handler( e ) ;
-	    }
-	} catch (InvalidName e) {
+            }
+        } catch (InvalidName e) {
             wrapper.serverGroupManagerException( e ) ;
-	} catch (UnknownEncoding e) {
+        } catch (UnknownEncoding e) {
             wrapper.serverGroupManagerException( e ) ;
-	}
+        }
     }
 
     ////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ public class ServerGroupManager
     //
 
     public String name() {
-	return baseMsg; 
+        return baseMsg; 
     }
 
     public void destroy() {
@@ -225,48 +225,48 @@ public class ServerGroupManager
 
     @Folb
     public void establish_components(IORInfo iorInfo) {
-	try {
-	    initialize();
+        try {
+            initialize();
 
-	    // Only handle ReferenceFactory adapters.
-	    String[] adapterName = 
-	        ((com.sun.corba.se.impl.interceptors.IORInfoImpl)iorInfo)
-	            .getObjectAdapter().getAdapterTemplate().adapter_name();
+            // Only handle ReferenceFactory adapters.
+            String[] adapterName = 
+                ((com.sun.corba.ee.impl.interceptors.IORInfoImpl)iorInfo)
+                    .getObjectAdapter().getAdapterTemplate().adapter_name();
 
             adapterName( adapterName ) ;
 
-	    ReferenceFactory rf = referenceFactoryManager.find(adapterName);
-	    if (rf == null) {
-	        if (gis.shouldAddAddressesToNonReferenceFactory(adapterName)) {
+            ReferenceFactory rf = referenceFactoryManager.find(adapterName);
+            if (rf == null) {
+                if (gis.shouldAddAddressesToNonReferenceFactory(adapterName)) {
                     addingAddresses() ;
-		} else {
+                } else {
                     notAddingAddress();
-		    return;
-		}
-	    }
+                    return;
+                }
+            }
 
-	    // Get all addressing information.
+            // Get all addressing information.
 
-	    // both CLEAR and SSL
-	    List<ClusterInstanceInfo> info = 
-		gis.getClusterInstanceInfo(adapterName);
+            // both CLEAR and SSL
+            List<ClusterInstanceInfo> info = 
+                gis.getClusterInstanceInfo(adapterName);
 
-	    // Let security handle SSL infomation.
-	    if (csiv2SSLTaggedComponentHandler != null) {
-		TaggedComponent csiv2 = 
-		    csiv2SSLTaggedComponentHandler.insert(iorInfo, info);
-		if (csiv2 != null) {
-		    iorInfo.add_ior_component(csiv2);
-		}
-	    }
+            // Let security handle SSL infomation.
+            if (csiv2SSLTaggedComponentHandler != null) {
+                TaggedComponent csiv2 = 
+                    csiv2SSLTaggedComponentHandler.insert(iorInfo, info);
+                if (csiv2 != null) {
+                    iorInfo.add_ior_component(csiv2);
+                }
+            }
 
-	    // Handle CLEAR_TEXT addresses.
-	    for (ClusterInstanceInfo clusterInstanceInfo : info) {
+            // Handle CLEAR_TEXT addresses.
+            for (ClusterInstanceInfo clusterInstanceInfo : info) {
                 addingInstanceInfoFor( clusterInstanceInfo.name(),
                     clusterInstanceInfo.weight() ) ;
 
-		List<SocketInfo> listOfSocketInfo = 
-		    new LinkedList<SocketInfo>();
+                List<SocketInfo> listOfSocketInfo = 
+                    new LinkedList<SocketInfo>();
 
                 for (SocketInfo sinfo : clusterInstanceInfo.endpoints()) {
                     if (sinfo.type().startsWith( SSL )) {
@@ -289,22 +289,22 @@ public class ServerGroupManager
                         ninfo ) ;
 
                 iorInfo.add_ior_component( comp.getIOPComponent(orb) ) ;
-	    }
+            }
 
-	    // Handle membership label.
-	    if (gis.shouldAddMembershipLabel(adapterName)) {
-		TaggedComponent tc = new TaggedComponent(
+            // Handle membership label.
+            if (gis.shouldAddMembershipLabel(adapterName)) {
+                TaggedComponent tc = new TaggedComponent(
                     ORBConstants.FOLB_MEMBERSHIP_LABEL_TAGGED_COMPONENT_ID,
-		    membershipLabel.getBytes());
+                    membershipLabel.getBytes());
 
                 addingMembershipLabel( membershipLabel );
-		iorInfo.add_ior_component(tc);
-	    } else {
+                iorInfo.add_ior_component(tc);
+            } else {
                 notAddingMembershipLabel();
-	    }
-	} catch (RuntimeException e) {
+            }
+        } catch (RuntimeException e) {
             wrapper.serverGroupManagerException(e);
-	}
+        }
     }
 
     public void components_established( IORInfo iorInfo ) {
@@ -333,49 +333,49 @@ public class ServerGroupManager
 
     @Folb
     public void membershipChange() {
-	try {
-	    synchronized (this) {
-		if (membershipChangeState == MembershipChangeState.IDLE) {
-		    membershipChangeState = MembershipChangeState.DOING_WORK;
-		} else {
-		    // State is DOING_WORK or RETRY_REQUIRED.
-		    membershipChangeState = MembershipChangeState.RETRY_REQUIRED;
+        try {
+            synchronized (this) {
+                if (membershipChangeState == MembershipChangeState.IDLE) {
+                    membershipChangeState = MembershipChangeState.DOING_WORK;
+                } else {
+                    // State is DOING_WORK or RETRY_REQUIRED.
+                    membershipChangeState = MembershipChangeState.RETRY_REQUIRED;
                     alreadyChangingMembership();
-		    return;
-		}
-	    }
+                    return;
+                }
+            }
 
-	    boolean loop;
+            boolean loop;
 
-	    do {
-		loop = false;
+            do {
+                loop = false;
 
-		restartFactories();
+                restartFactories();
 
-		synchronized (this) {
-		    if (membershipChangeState == MembershipChangeState.RETRY_REQUIRED) {
-			membershipChangeState = MembershipChangeState.DOING_WORK;
-			// One or more notifies arrived while processing
-			// this notify.  Therefore do the restart again.
-			loop = true;
+                synchronized (this) {
+                    if (membershipChangeState == MembershipChangeState.RETRY_REQUIRED) {
+                        membershipChangeState = MembershipChangeState.DOING_WORK;
+                        // One or more notifies arrived while processing
+                        // this notify.  Therefore do the restart again.
+                        loop = true;
                         loopingForMembershipChange();
-		    } else if (membershipChangeState == MembershipChangeState.DOING_WORK) {
-			membershipChangeState = MembershipChangeState.IDLE;
-		    } else if (membershipChangeState == MembershipChangeState.IDLE) {
+                    } else if (membershipChangeState == MembershipChangeState.DOING_WORK) {
+                        membershipChangeState = MembershipChangeState.IDLE;
+                    } else if (membershipChangeState == MembershipChangeState.IDLE) {
                         unexpectedStateForMembershipChange();
-		    }
-		}
-	    } while (loop);
-	    
-	} catch (RuntimeException e) {
+                    }
+                }
+            } while (loop);
+            
+        } catch (RuntimeException e) {
             wrapper.serverGroupManagerException(e);
 
-	    // If we get an exception we need to ensure that we do not
-	    // lock out further changes.
-	    synchronized (this) {
-		membershipChangeState = MembershipChangeState.IDLE;
-	    }
-	}
+            // If we get an exception we need to ensure that we do not
+            // lock out further changes.
+            synchronized (this) {
+                membershipChangeState = MembershipChangeState.IDLE;
+            }
+        }
     }
 
 
@@ -421,45 +421,45 @@ public class ServerGroupManager
 
     @Folb
     private void restartFactories() {
-	//
-	// REVISIT
-	//
-	// restart gets exception since a remote call is coming
-	// in on a non-ReferenceFactory POA.  The ORB does not
-	// discriminate the granularity of restart.
-	// See ORBImpl.isDuringDispatch
-	//
-	// Workaround by using a different thread.
-	//
-	// Note: this is only a problem in the test because
-	// the test client sends an "add" message that
-	// is serviced by a server worker thread that calls
-	// membershipChange.  This method calls restartFactories
-	// that calls destory POA that calls isDuringDispatch.
-	// isDuringDispatch uses a thread local to determine
-	// it is a  dispatch.  Using another thread fools 
-	// isDuringDispatch into letting this chain proceed.
-	//
-	
-	final ReferenceFactoryManager rfm = referenceFactoryManager;
+        //
+        // REVISIT
+        //
+        // restart gets exception since a remote call is coming
+        // in on a non-ReferenceFactory POA.  The ORB does not
+        // discriminate the granularity of restart.
+        // See ORBImpl.isDuringDispatch
+        //
+        // Workaround by using a different thread.
+        //
+        // Note: this is only a problem in the test because
+        // the test client sends an "add" message that
+        // is serviced by a server worker thread that calls
+        // membershipChange.  This method calls restartFactories
+        // that calls destory POA that calls isDuringDispatch.
+        // isDuringDispatch uses a thread local to determine
+        // it is a  dispatch.  Using another thread fools 
+        // isDuringDispatch into letting this chain proceed.
+        //
+        
+        final ReferenceFactoryManager rfm = referenceFactoryManager;
 
-	Thread worker = new WorkerThread() ;
-	
-	worker.start();
-	
-	// Make sure the worker terminates before we continue
+        Thread worker = new WorkerThread() ;
+        
+        worker.start();
+        
+        // Make sure the worker terminates before we continue
         waitingForWorkerTermination();
-	boolean tryAgain;
-	do {
-	    tryAgain = false;
+        boolean tryAgain;
+        do {
+            tryAgain = false;
 
-	    try { 
-		worker.join(); 
-	    } catch (InterruptedException e) { 
-		Thread.interrupted() ; 
-		tryAgain = true; 
-	    }
-	} while (tryAgain);
+            try { 
+                worker.join(); 
+            } catch (InterruptedException e) { 
+                Thread.interrupted() ; 
+                tryAgain = true; 
+            }
+        } while (tryAgain);
     }
 
     @InfoMethod
@@ -467,18 +467,18 @@ public class ServerGroupManager
 
     @Folb
     private void updateMembershipLabel() {
-	UID uid = new UID();
-	String hostAddress = null;
-	try {
-	    // REVISIT 
-	    // name could match GroupInfoService's idea of instance id/name.
-	    // Not necessary but easier to debug.
-	    hostAddress = InetAddress.getLocalHost().getHostAddress();
-	    membershipLabel = hostAddress + ":::" + uid;
+        UID uid = new UID();
+        String hostAddress = null;
+        try {
+            // REVISIT 
+            // name could match GroupInfoService's idea of instance id/name.
+            // Not necessary but easier to debug.
+            hostAddress = InetAddress.getLocalHost().getHostAddress();
+            membershipLabel = hostAddress + ":::" + uid;
             newMembershipLabel( membershipLabel );
-	} catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             wrapper.serverGroupManagerException(e);
-	}
+        }
     }
 
     ////////////////////////////////////////////////////
@@ -489,28 +489,28 @@ public class ServerGroupManager
     @Folb
     public void receive_request_service_contexts(ServerRequestInfo ri)
     {
-	initialize();
+        initialize();
     }
 
     @Folb
     public void receive_request(ServerRequestInfo ri)
     {
-	initialize();
+        initialize();
     }
 
     public void send_reply(ServerRequestInfo ri)
     {
-	send_star(".send_reply", ri);
+        send_star(".send_reply", ri);
     }
 
     public void send_exception(ServerRequestInfo ri)
     {
-	send_star(".send_exception", ri);
+        send_star(".send_exception", ri);
     }
 
     public void send_other(ServerRequestInfo ri)
     {
-	send_star(".send_other", ri);
+        send_star(".send_other", ri);
     }
 
     @InfoMethod
@@ -538,75 +538,75 @@ public class ServerGroupManager
     @Folb
     private void send_star(String point, ServerRequestInfo ri)
     {
-	String[] adapterName = null;
-	try {
-	    adapterName = ri.adapter_name();
+        String[] adapterName = null;
+        try {
+            adapterName = ri.adapter_name();
 
-	    if (referenceFactoryManager.getState() ==
-		ReferenceFactoryManager.RFMState.SUSPENDED) {
+            if (referenceFactoryManager.getState() ==
+                ReferenceFactoryManager.RFMState.SUSPENDED) {
 
                 rfmIsHolding();
-		return;
-	    }
+                return;
+            }
 
-	    ReferenceFactory referenceFactory = 
-		referenceFactoryManager.find(adapterName);
+            ReferenceFactory referenceFactory = 
+                referenceFactoryManager.find(adapterName);
 
-	    // Only handle RefenceFactory adapters.
-	    if (referenceFactory == null && 
+            // Only handle RefenceFactory adapters.
+            if (referenceFactory == null && 
                     !((ServerRequestInfoExt)ri).isNameService()) {
                 notManagedByReferenceFactory( adapterName ) ;
-		return;
-	    }
+                return;
+            }
 
-	    // Handle membership label from request.
-	    String requestMembershipLabel = null;
-	    try {
-		ServiceContext sc = ri.get_request_service_context(
+            // Handle membership label from request.
+            String requestMembershipLabel = null;
+            try {
+                ServiceContext sc = ri.get_request_service_context(
                     ORBConstants.FOLB_MEMBERSHIP_LABEL_SERVICE_CONTEXT_ID);
-		// REVISIT - internationalization
-		if (sc != null) {
-		    byte[] data = sc.context_data;
-		    requestMembershipLabel = new String(data);
+                // REVISIT - internationalization
+                if (sc != null) {
+                    byte[] data = sc.context_data;
+                    requestMembershipLabel = new String(data);
 
-		    if (membershipLabel.equals(requestMembershipLabel)) {
+                    if (membershipLabel.equals(requestMembershipLabel)) {
                         membershipLabelsEqual();
-			return;
-		    }
+                        return;
+                    }
                     membershipLabelsNotEqual();
-		}
-	    } catch (BAD_PARAM e) {
+                }
+            } catch (BAD_PARAM e) {
                 membershipLabelsNotPresent();
-		// REVISIT: CHECK: if not our ORB then return.  --
-	    }
+                // REVISIT: CHECK: if not our ORB then return.  --
+            }
 
-	    // Send IOR UPDATE
-	    //
-	    // At this point either the labels do not match
-	    // or our ORB has sent a request without a label (e.g., bootstrap).
-	    // Therefore send an updated IOR.
+            // Send IOR UPDATE
+            //
+            // At this point either the labels do not match
+            // or our ORB has sent a request without a label (e.g., bootstrap).
+            // Therefore send an updated IOR.
             sendingUpdatedIOR( adapterName ) ;
-	    
-	    byte[] objectId = ri.object_id();
-	    org.omg.CORBA.Object ref = 
-		referenceFactory.createReference(objectId);
-	    Any any = orb.create_any();
-	    // ForwardRequest is used for convenience.
-	    // This code has nothing to do with PortableInterceptor.
-	    ForwardRequest fr = new ForwardRequest(ref);
-	    ForwardRequestHelper.insert(any, fr);
-	    byte[] data = null;
-	    try {
-		data = codec.encode_value(any);
-	    } catch (InvalidTypeForEncoding e) {
+            
+            byte[] objectId = ri.object_id();
+            org.omg.CORBA.Object ref = 
+                referenceFactory.createReference(objectId);
+            Any any = orb.create_any();
+            // ForwardRequest is used for convenience.
+            // This code has nothing to do with PortableInterceptor.
+            ForwardRequest fr = new ForwardRequest(ref);
+            ForwardRequestHelper.insert(any, fr);
+            byte[] data = null;
+            try {
+                data = codec.encode_value(any);
+            } catch (InvalidTypeForEncoding e) {
                 wrapper.serverGroupManagerException(e);
-	    }
-	    ServiceContext sc = new ServiceContext(
+            }
+            ServiceContext sc = new ServiceContext(
                 ORBConstants.FOLB_IOR_UPDATE_SERVICE_CONTEXT_ID, data);
-	    ri.add_reply_service_context(sc, false);
-	} catch (RuntimeException e) {
+            ri.add_reply_service_context(sc, false);
+        } catch (RuntimeException e) {
             wrapper.serverGroupManagerException(e);
-	}
+        }
     }
 
     ////////////////////////////////////////////////////
@@ -620,12 +620,12 @@ public class ServerGroupManager
 
     @Folb
     public void post_init(ORBInitInfo info) {
-	try {
-	    info.add_ior_interceptor(this);
-	    info.add_server_request_interceptor(this);
-	} catch (Exception e) {
+        try {
+            info.add_ior_interceptor(this);
+            info.add_server_request_interceptor(this);
+        } catch (Exception e) {
             wrapper.serverGroupManagerException(e);
-	}
+        }
     }
 
     ////////////////////////////////////////////////////
@@ -636,10 +636,10 @@ public class ServerGroupManager
     @Folb
     public void configure(DataCollector collector, ORB orb) 
     {
-	this.orb = orb;
+        this.orb = orb;
 
-	// Setup for IOR and ServerRequest Interceptors
-	orb.getORBData().addORBInitializer(this);
+        // Setup for IOR and ServerRequest Interceptors
+        orb.getORBData().addORBInitializer(this);
     }
 }
 

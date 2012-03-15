@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.corba;
+package com.sun.corba.ee.impl.corba;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ import org.omg.CORBA.ORB;
 
 public class ContextListImpl extends ContextList 
 {
-    private final static int	 INITIAL_CAPACITY	= 2;
+    private final static int     INITIAL_CAPACITY       = 2;
 
     private org.omg.CORBA.ORB _orb;
     private List<String> _contexts;

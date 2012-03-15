@@ -60,7 +60,7 @@ public final class INVALID_ACTIVITY extends SystemException {
      * minor code set to 0 and CompletionStatus set to COMPLETED_NO.
      */
     public INVALID_ACTIVITY() {
-	this("");
+        this("");
     }
 
     /**

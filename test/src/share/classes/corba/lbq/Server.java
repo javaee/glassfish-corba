@@ -57,7 +57,7 @@ import org.omg.PortableServer.ImplicitActivationPolicyValue;
 import org.omg.PortableServer.ServantRetentionPolicyValue;
 import org.omg.PortableServer.RequestProcessingPolicyValue;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 /**
  * @author Harold Carr
@@ -70,72 +70,72 @@ public class Server
 
     public static void main(String[] av)
     {
-	try {
-	    Properties props = new Properties();
-	    // props.setProperty("com.sun.CORBA.ORBDebug","transport");
+        try {
+            Properties props = new Properties();
+            // props.setProperty("com.sun.CORBA.ORBDebug","transport");
 
-	    ORB orb = (ORB)org.omg.CORBA.ORB.init(av, props);
+            ORB orb = (ORB)org.omg.CORBA.ORB.init(av, props);
 
-	    POA rootPOA = (POA) orb.resolve_initial_references("RootPOA");
-	    Policy[] policies = new Policy[] {
-		rootPOA.create_lifespan_policy( 
-		    LifespanPolicyValue.PERSISTENT ),
-		rootPOA.create_id_uniqueness_policy( 
-		    IdUniquenessPolicyValue.UNIQUE_ID ),
-		rootPOA.create_id_assignment_policy( 
-		    IdAssignmentPolicyValue.USER_ID ),
-		rootPOA.create_implicit_activation_policy( 
-		    ImplicitActivationPolicyValue.NO_IMPLICIT_ACTIVATION ),
-		rootPOA.create_servant_retention_policy(
-		    ServantRetentionPolicyValue.RETAIN ),
-		rootPOA.create_request_processing_policy(
-		    RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY )
-	    } ;
+            POA rootPOA = (POA) orb.resolve_initial_references("RootPOA");
+            Policy[] policies = new Policy[] {
+                rootPOA.create_lifespan_policy( 
+                    LifespanPolicyValue.PERSISTENT ),
+                rootPOA.create_id_uniqueness_policy( 
+                    IdUniquenessPolicyValue.UNIQUE_ID ),
+                rootPOA.create_id_assignment_policy( 
+                    IdAssignmentPolicyValue.USER_ID ),
+                rootPOA.create_implicit_activation_policy( 
+                    ImplicitActivationPolicyValue.NO_IMPLICIT_ACTIVATION ),
+                rootPOA.create_servant_retention_policy(
+                    ServantRetentionPolicyValue.RETAIN ),
+                rootPOA.create_request_processing_policy(
+                    RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY )
+            } ;
 
-	    POA testPOA = rootPOA.create_POA( "testPOA", rootPOA.the_POAManager(), 
-		policies ) ;
+            POA testPOA = rootPOA.create_POA( "testPOA", rootPOA.the_POAManager(), 
+                policies ) ;
 
-	    rootPOA.the_POAManager().activate();
+            rootPOA.the_POAManager().activate();
 
-	    Servant servant = (Servant)
-		javax.rmi.CORBA.Util.getTie(new TestServant());
+            Servant servant = (Servant)
+                javax.rmi.CORBA.Util.getTie(new TestServant());
 
-	    createWithServantAndBind(Common.ReferenceName, servant, 
-				     testPOA, orb);
+            createWithServantAndBind(Common.ReferenceName, servant, 
+                                     testPOA, orb);
 
-	    System.out.println("--------------------------------------------");
-	    System.out.println("Server is ready.");
-	    System.out.println("--------------------------------------------");
+            System.out.println("--------------------------------------------");
+            System.out.println("Server is ready.");
+            System.out.println("--------------------------------------------");
 
-	    Thread.sleep(SERVER_RUN_LENGTH);
+            Thread.sleep(SERVER_RUN_LENGTH);
 
-	    System.out.println("--------------------------------------------");
-	    System.out.println("Server exiting correctly...");
-	    System.out.println("--------------------------------------------");
-	    System.exit(0);
+            System.out.println("--------------------------------------------");
+            System.out.println("Server exiting correctly...");
+            System.out.println("--------------------------------------------");
+            System.exit(0);
 
-	} catch (Exception e) {
-	    e.printStackTrace(System.out);
-	    System.out.println("--------------------------------------------");
-	    System.out.println("!!!! Server exiting INCORRECTLY...");
-	    System.out.println("--------------------------------------------");
-	    System.exit(1);
-	}
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+            System.out.println("--------------------------------------------");
+            System.out.println("!!!! Server exiting INCORRECTLY...");
+            System.out.println("--------------------------------------------");
+            System.exit(1);
+        }
     }
 
     public static org.omg.CORBA.Object 
-	createWithServantAndBind (String  name,
-				  Servant servant,
-				  POA     poa,
-				  ORB     orb)
-	throws
-	    Exception
+        createWithServantAndBind (String  name,
+                                  Servant servant,
+                                  POA     poa,
+                                  ORB     orb)
+        throws
+            Exception
     {
-	byte[] id = name.getBytes();
-	poa.activate_object_with_id(id, servant);
-	org.omg.CORBA.Object ref = poa.id_to_reference(id);
-	Common.rebind(name, ref, orb);
-	return ref;
+        byte[] id = name.getBytes();
+        poa.activate_object_with_id(id, servant);
+        org.omg.CORBA.Object ref = poa.id_to_reference(id);
+        Common.rebind(name, ref, orb);
+        return ref;
     }
 
 } 

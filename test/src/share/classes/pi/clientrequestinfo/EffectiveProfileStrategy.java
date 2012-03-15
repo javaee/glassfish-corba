@@ -40,7 +40,7 @@
 
 package pi.clientrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.IOP.*;
 
@@ -52,77 +52,77 @@ public class EffectiveProfileStrategy
 {
 
     public void send_request (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
         throws ForwardRequest
     {
-	super.send_request( interceptor, ri );
+        super.send_request( interceptor, ri );
 
-	try {
-	    testEffectiveProfile( "send_request", ri );
-	}
-	catch( Exception ex ) {
-	    failException( "send_request", ex );
-	}
+        try {
+            testEffectiveProfile( "send_request", ri );
+        }
+        catch( Exception ex ) {
+            failException( "send_request", ex );
+        }
     }
 
     public void send_poll (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
     {
-	super.send_poll( interceptor, ri );
-	// never executed in our orb.
+        super.send_poll( interceptor, ri );
+        // never executed in our orb.
     }
 
     public void receive_reply (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
     {
-	super.receive_reply( interceptor, ri );
+        super.receive_reply( interceptor, ri );
 
-	try {
-	    testEffectiveProfile( "receive_reply", ri );
-	}
-	catch( Exception ex ) {
-	    failException( "receive_reply", ex );
-	}
+        try {
+            testEffectiveProfile( "receive_reply", ri );
+        }
+        catch( Exception ex ) {
+            failException( "receive_reply", ex );
+        }
     }
 
 
     public void receive_exception (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
-	throws ForwardRequest
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
+        throws ForwardRequest
     {
-	super.receive_exception( interceptor, ri );
+        super.receive_exception( interceptor, ri );
 
-	try {
-	    testEffectiveProfile( "receive_exception", ri );
-	}
-	catch( Exception ex ) {
-	    failException( "receive_exception", ex );
-	}
+        try {
+            testEffectiveProfile( "receive_exception", ri );
+        }
+        catch( Exception ex ) {
+            failException( "receive_exception", ex );
+        }
     }
 
     public void receive_other (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
         throws ForwardRequest
     {
-	super.receive_other( interceptor, ri );
+        super.receive_other( interceptor, ri );
 
-	try {
-	    testEffectiveProfile( "receive_other", ri );
-	}
-	catch( Exception ex ) {
-	    failException( "receive_other", ex ); 
-	}
+        try {
+            testEffectiveProfile( "receive_other", ri );
+        }
+        catch( Exception ex ) {
+            failException( "receive_other", ex ); 
+        }
     }
 
     private void testEffectiveProfile( String methodName, 
-				       ClientRequestInfo ri ) 
+                                       ClientRequestInfo ri ) 
     {
-	String header = methodName + "(): ";
-	TaggedProfile profile = ri.effective_profile();
-	log( header + "effective_profile().tag = " + profile.tag );
-	if( profile.tag != TAG_INTERNET_IOP.value ) {
-	    fail( header + "tag is not TAG_INTERNET_IOP." );
-	}
+        String header = methodName + "(): ";
+        TaggedProfile profile = ri.effective_profile();
+        log( header + "effective_profile().tag = " + profile.tag );
+        if( profile.tag != TAG_INTERNET_IOP.value ) {
+            fail( header + "tag is not TAG_INTERNET_IOP." );
+        }
     }
 
 }

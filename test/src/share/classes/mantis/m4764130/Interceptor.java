@@ -56,16 +56,16 @@ import org.omg.PortableInterceptor.ORBInitInfo;
 import org.omg.PortableInterceptor.ORBInitializer;
 import org.omg.PortableInterceptor.ServerRequestInterceptor;
 import org.omg.PortableInterceptor.ServerRequestInfo;
-import com.sun.corba.se.spi.servicecontext.SendingContextServiceContext;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.servicecontext.SendingContextServiceContext;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class Interceptor
     extends
-	org.omg.CORBA.LocalObject
+        org.omg.CORBA.LocalObject
     implements
-	ClientRequestInterceptor,
-	ServerRequestInterceptor,
-	ORBInitializer
+        ClientRequestInterceptor,
+        ServerRequestInterceptor,
+        ORBInitializer
 {
     public int numberOfClientHelloInvocations = 0;
     //
@@ -74,7 +74,7 @@ public class Interceptor
 
     public String name() 
     {
-	return this.getClass().getName();
+        return this.getClass().getName();
     }
 
     public void destroy() 
@@ -86,16 +86,16 @@ public class Interceptor
     //
 
     public void send_request(ClientRequestInfo ri)
-	throws
-	    ForwardRequest
+        throws
+            ForwardRequest
     {
-	System.out.println(ri.operation());
-	if (ri.operation().equals("hello")) {
-	    numberOfClientHelloInvocations++;
-	    if (numberOfClientHelloInvocations == 1) {
-		throw new ForwardRequest(ri.target());
-	    }
-	}
+        System.out.println(ri.operation());
+        if (ri.operation().equals("hello")) {
+            numberOfClientHelloInvocations++;
+            if (numberOfClientHelloInvocations == 1) {
+                throw new ForwardRequest(ri.target());
+            }
+        }
     }
 
     public void send_poll(ClientRequestInfo ri)
@@ -120,15 +120,15 @@ public class Interceptor
 
     public void receive_request_service_contexts(ServerRequestInfo ri)
     {
-	System.out.println(ri.operation());
-	try {
-	    ServiceContext serviceContext =
-		ri.get_request_service_context(SendingContextServiceContext.SERVICE_CONTEXT_ID);
-	} catch (BAD_PARAM e) {
-	    // Not present.
-	    System.out.println("SendingContextServiceContext not present");
-	    System.exit(1);
-	}
+        System.out.println(ri.operation());
+        try {
+            ServiceContext serviceContext =
+                ri.get_request_service_context(SendingContextServiceContext.SERVICE_CONTEXT_ID);
+        } catch (BAD_PARAM e) {
+            // Not present.
+            System.out.println("SendingContextServiceContext not present");
+            System.exit(1);
+        }
     }
 
     public void receive_request(ServerRequestInfo ri)
@@ -153,16 +153,16 @@ public class Interceptor
 
     public void pre_init(ORBInitInfo info)
     {
-	System.out.println(this.getClass().getName() + " .pre_init");
-	try {
-	    // NOTE: The client only needs the client side points.
-	    // The server only needs the server side points.
-	    // It just saves me time just to write one interceptor/initializer.
-	    info.add_client_request_interceptor(new Interceptor());
-	    info.add_server_request_interceptor(new Interceptor());
-	} catch (Throwable t) {
-	    System.out.println("Cannot register interceptor: " + t);
-	}
+        System.out.println(this.getClass().getName() + " .pre_init");
+        try {
+            // NOTE: The client only needs the client side points.
+            // The server only needs the server side points.
+            // It just saves me time just to write one interceptor/initializer.
+            info.add_client_request_interceptor(new Interceptor());
+            info.add_server_request_interceptor(new Interceptor());
+        } catch (Throwable t) {
+            System.out.println("Cannot register interceptor: " + t);
+        }
     }
     
     public void post_init(ORBInitInfo info) {}

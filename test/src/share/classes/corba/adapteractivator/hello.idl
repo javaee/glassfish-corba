@@ -38,15 +38,15 @@
  * holder.
  */
 module corba {
-	module adapteractivator{
-		interface Hello {
-			string sayHello();
-		};
-								
-		interface Close {
-			oneway void shutdown();
-		};
-	}; //adapteractivator
+        module adapteractivator{
+                interface Hello {
+                        string sayHello();
+                };
+                                                                
+                interface Close {
+                        oneway void shutdown();
+                };
+        }; //adapteractivator
 }; // corba
 
 

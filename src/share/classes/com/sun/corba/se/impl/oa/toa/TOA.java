@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.oa.toa ;
+package com.sun.corba.ee.impl.oa.toa ;
 
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
+import com.sun.corba.ee.spi.oa.ObjectAdapter ;
 
 /** The Transient Object Adapter is used for standard RMI-IIOP and Java-IDL 
  * (legacy JDK 1.2) object implementations.  Its protocol for managing objects is very

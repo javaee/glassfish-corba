@@ -37,11 +37,11 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.trace.CdrWrite;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.trace.CdrWrite;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @CdrWrite
@@ -407,7 +407,7 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
     public void write_wchar_array(char[] value, int offset, int length)
     {
         if (value == null) {
-	    throw wrapper.nullParam();
+            throw wrapper.nullParam();
         }   
 
         CodeSetConversion.CTBConverter converter = getWCharConverter();
@@ -453,7 +453,7 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
     @Override
     public void write_wstring(String value) {
         if (value == null) {
-	    throw wrapper.nullParam();
+            throw wrapper.nullParam();
         }
 
         // In GIOP 1.2, wstrings are not terminated by a null.  The

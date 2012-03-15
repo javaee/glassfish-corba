@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)SpaceTest.java	1.4 99/06/07 */
+/* @(#)SpaceTest.java   1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -66,8 +66,8 @@ public class SpaceTest extends RemoteTest {
     private static final String servantClass = "ibmspace.server.SpaceConquestServer";
     private static final String[] compileEm =
     {
-	"ibmspace.server.SpaceConquestServer",
-	"ibmspace.server.GameViewServer"
+        "ibmspace.server.SpaceConquestServer",
+        "ibmspace.server.GameViewServer"
     };
 
     private static final int TIMING_ITERATIONS = 100;

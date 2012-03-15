@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior;
+package com.sun.corba.ee.spi.ior;
 
 public interface TaggedComponentFactoryFinder 
     extends IdentifiableFactoryFinder<TaggedComponent>
@@ -47,5 +47,5 @@ public interface TaggedComponentFactoryFinder
      * of a tagged component.  This is needed for portable interceptors.
      */
     TaggedComponent create( org.omg.CORBA.ORB orb,
-	org.omg.IOP.TaggedComponent comp ) ;
+        org.omg.IOP.TaggedComponent comp ) ;
 }

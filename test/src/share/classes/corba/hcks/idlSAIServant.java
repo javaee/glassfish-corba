@@ -48,7 +48,7 @@ import org.omg.CORBA.ORB;
 
 class idlSAIServant
     extends 
-	idlSAIPOA
+        idlSAIPOA
 {
     public ORB orb;
     public static String clazz = "idlSAIServant";
@@ -59,11 +59,11 @@ class idlSAIServant
     public String raiseSystemExceptionInIncarnate ( String a ) { return a; }
     public String makeColocatedCallFromServant ( )
     {
-	return C.makeColocatedCallFromServant(C.idlSAI2, orb, clazz);
+        return C.makeColocatedCallFromServant(C.idlSAI2, orb, clazz);
     }
     public String colocatedCallFromServant ( String a )
     {
-	return C.colocatedCallFromServant(a, orb, clazz);
+        return C.colocatedCallFromServant(a, orb, clazz);
     }
 }
 

@@ -63,14 +63,14 @@ public class PROImpl2 implements PROHello {
     }
 
     public Dog getDogValue () throws RemoteException {
-	return new DogImpl ("Bow wow!");
+        return new DogImpl ("Bow wow!");
     }
 
     public Dog getDogServer () throws RemoteException {
-	return new DogServer ("Yip Yip Yip!");
+        return new DogServer ("Yip Yip Yip!");
     }
 
     public void unexport () throws RemoteException {
-	PortableRemoteObject.unexportObject(this);
+        PortableRemoteObject.unexportObject(this);
     }
 }

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.misc;
+package com.sun.corba.ee.impl.misc;
 
 import java.security.AccessController;
 import java.security.PermissionCollection;
@@ -73,26 +73,26 @@ import org.omg.CORBA.TypeCodePackage.BadKind ;
 import org.omg.CORBA.portable.OutputStream ;
 import org.omg.CORBA.portable.InputStream ;
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orb.ORBVersion ;
-import com.sun.corba.se.spi.orb.ORBVersionFactory ;
-import com.sun.corba.se.spi.protocol.ClientDelegate ;
-import com.sun.corba.se.spi.protocol.MessageMediator;
-import com.sun.corba.se.spi.transport.ContactInfoList ;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
-import com.sun.corba.se.spi.misc.ORBClassLoader;
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORBVersion ;
+import com.sun.corba.ee.spi.orb.ORBVersionFactory ;
+import com.sun.corba.ee.spi.protocol.ClientDelegate ;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.transport.ContactInfoList ;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfile;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate;
+import com.sun.corba.ee.spi.misc.ORBClassLoader;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
-import com.sun.corba.se.impl.corba.CORBAObjectImpl ;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.logging.OMGSystemException ;
-import com.sun.corba.se.impl.ior.iiop.JavaSerializationComponent;
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
-import com.sun.corba.se.impl.io.ValueHandlerImpl;
+import com.sun.corba.ee.impl.corba.CORBAObjectImpl ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.OMGSystemException ;
+import com.sun.corba.ee.impl.ior.iiop.JavaSerializationComponent;
+import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
+import com.sun.corba.ee.impl.io.ValueHandlerImpl;
 
 /**
  *  Handy class full of static functions that don't belong in util.Utility for pure ORB reasons.
@@ -102,30 +102,30 @@ public final class ORBUtility {
      * method.
      */
     public static SocketChannel openSocketChannel( SocketAddress sa ) 
-	throws IOException {
+        throws IOException {
 
-	SocketChannel sc = SocketChannel.open() ;
+        SocketChannel sc = SocketChannel.open() ;
 
-	try {
-	    sc.connect( sa ) ;
-	    return sc ;
-	} catch (RuntimeException exc ) {
+        try {
+            sc.connect( sa ) ;
+            return sc ;
+        } catch (RuntimeException exc ) {
             try {
                 sc.close() ;
             } catch (IOException ioe) {
-		// Ignore this: close exceptions are useless.
+                // Ignore this: close exceptions are useless.
             }
 
             throw exc ;
-	} catch (IOException exc ) {
-	    try {
-		sc.close() ;
-	    } catch (IOException ioe) {
-		// Ignore this: close exceptions are useless.
-	    }
+        } catch (IOException exc ) {
+            try {
+                sc.close() ;
+            } catch (IOException ioe) {
+                // Ignore this: close exceptions are useless.
+            }
 
-	    throw exc ;
-	}
+            throw exc ;
+        }
     }
 
     private static final ThreadLocal<LinkedList<Byte>> encVersionThreadLocal =
@@ -136,13 +136,13 @@ public final class ORBUtility {
         };
 
     public static void pushEncVersionToThreadLocalState(byte value) {
-	LinkedList<Byte> stack = encVersionThreadLocal.get();
-	stack.addLast(value);
+        LinkedList<Byte> stack = encVersionThreadLocal.get();
+        stack.addLast(value);
     }
 
     public static void popEncVersionFromThreadLocalState() {
-	LinkedList<Byte> stack = encVersionThreadLocal.get();
-	stack.removeLast();
+        LinkedList<Byte> stack = encVersionThreadLocal.get();
+        stack.removeLast();
     }
 
     public static byte getEncodingVersion() {
@@ -160,7 +160,7 @@ public final class ORBUtility {
 
     public static byte[] getByteBufferArray(ByteBuffer byteBuffer) {
 
-	if (byteBuffer.hasArray()) {
+        if (byteBuffer.hasArray()) {
             byte[] buf = new byte[byteBuffer.limit()];
             System.arraycopy(byteBuffer.array(), byteBuffer.arrayOffset(),
                              buf, 0, buf.length);
@@ -169,52 +169,52 @@ public final class ORBUtility {
             // sliced ByteBuffer will return the entired backed array.
             // Not a byte array beginning at view buffer position 0.
             return buf;
-	}
+        }
 
-	byte[] buf = new byte[byteBuffer.limit()];
-	int pos = byteBuffer.position();
+        byte[] buf = new byte[byteBuffer.limit()];
+        int pos = byteBuffer.position();
         byteBuffer.position(0);
         byteBuffer.get(buf);
         byteBuffer.position(pos);
 
-	return buf;
+        return buf;
     }
 
     /**
      * @return the Java serialization encoding version.
      */
     public static byte chooseEncodingVersion(ORB orb, IOR ior, 
-					     GIOPVersion gv) {
+                                             GIOPVersion gv) {
 
-	// Is Java serialization enabled?
-	// Check the JavaSerializationComponent (tagged component)
-	// in the IIOPProfile. If present, the peer ORB's GIOP is capable
-	// of using Java serialization instead of CDR serialization.
-	// In such a case, use Java serialization, iff the java serialization
-	// versions match.
+        // Is Java serialization enabled?
+        // Check the JavaSerializationComponent (tagged component)
+        // in the IIOPProfile. If present, the peer ORB's GIOP is capable
+        // of using Java serialization instead of CDR serialization.
+        // In such a case, use Java serialization, iff the java serialization
+        // versions match.
 
-	if (orb.getORBData().isJavaSerializationEnabled() &&
-	       !(gv.lessThan(GIOPVersion.V1_2))) {
-	    IIOPProfile prof = ior.getProfile();
-	    IIOPProfileTemplate profTemp = 
-		(IIOPProfileTemplate) prof.getTaggedProfileTemplate();
-	    java.util.Iterator iter = profTemp.iteratorById(
-				  ORBConstants.TAG_JAVA_SERIALIZATION_ID);
-	    if (iter.hasNext()) {
-		JavaSerializationComponent jc = 
-		    (JavaSerializationComponent) iter.next();
-		byte jcVersion = jc.javaSerializationVersion();
-		if (jcVersion >= ORBConstants.JAVA_ENC_VERSION) {
-		    return ORBConstants.JAVA_ENC_VERSION;
-		} else if (jcVersion > ORBConstants.CDR_ENC_VERSION) {
-		    return jcVersion;
-		} else {
-		    // ERROR: encodingVersion is <= 0 (CDR_ENC_VERSION).
-		    wrapper.invalidJavaSerializationVersion(jc);
-		}
-	    }
-	}
-	return ORBConstants.CDR_ENC_VERSION; // default
+        if (orb.getORBData().isJavaSerializationEnabled() &&
+               !(gv.lessThan(GIOPVersion.V1_2))) {
+            IIOPProfile prof = ior.getProfile();
+            IIOPProfileTemplate profTemp = 
+                (IIOPProfileTemplate) prof.getTaggedProfileTemplate();
+            java.util.Iterator iter = profTemp.iteratorById(
+                                  ORBConstants.TAG_JAVA_SERIALIZATION_ID);
+            if (iter.hasNext()) {
+                JavaSerializationComponent jc = 
+                    (JavaSerializationComponent) iter.next();
+                byte jcVersion = jc.javaSerializationVersion();
+                if (jcVersion >= ORBConstants.JAVA_ENC_VERSION) {
+                    return ORBConstants.JAVA_ENC_VERSION;
+                } else if (jcVersion > ORBConstants.CDR_ENC_VERSION) {
+                    return jcVersion;
+                } else {
+                    // ERROR: encodingVersion is <= 0 (CDR_ENC_VERSION).
+                    wrapper.invalidJavaSerializationVersion(jc);
+                }
+            }
+        }
+        return ORBConstants.CDR_ENC_VERSION; // default
     }
 
     private ORBUtility() {}
@@ -270,14 +270,14 @@ public final class ORBUtility {
         out.write_long(ex.minor);
         out.write_long(ex.completed.value());
         any.read_value(out.create_input_stream(), 
-	    getSystemExceptionTypeCode(orb, repID, name));
+            getSystemExceptionTypeCode(orb, repID, name));
     }
 
     public static SystemException extractSystemException(Any any) {
         InputStream in = any.create_input_stream();
         ORB orb = (ORB)(in.orb());
         if ( ! isSystemExceptionTypeCode(any.type(), orb)) {
-	    throw wrapper.unknownDsiSysex();
+            throw wrapper.unknownDsiSysex();
         }
         return ORBUtility.readSystemException(in);
     }
@@ -366,7 +366,7 @@ public final class ORBUtility {
      */
     public static int hexOf( char x )
     {
-	int val;
+        int val;
 
         val = x - '0';
         if (val >=0 && val <= 9) {
@@ -383,7 +383,7 @@ public final class ORBUtility {
             return val;
         }
 
-	throw wrapper.badHexDigit() ;
+        throw wrapper.badHexDigit() ;
     }
 
     // method moved from util.Utility
@@ -394,9 +394,9 @@ public final class ORBUtility {
      */
     public static void writeSystemException(SystemException ex, OutputStream strm)
     {
-	String s;
+        String s;
 
-	s = repositoryIdOf(ex.getClass().getName());
+        s = repositoryIdOf(ex.getClass().getName());
         strm.write_string(s);
         strm.write_long(ex.minor);
         strm.write_long(ex.completed.value());
@@ -408,16 +408,16 @@ public final class ORBUtility {
      */
     public static SystemException readSystemException(InputStream strm)
     {
-	try {
-	    String name = classNameOf(strm.read_string());
-	    SystemException ex 
+        try {
+            String name = classNameOf(strm.read_string());
+            SystemException ex 
                 = (SystemException)ORBClassLoader.loadClass(name).newInstance();
-	    ex.minor = strm.read_long();
-	    ex.completed = CompletionStatus.from_int(strm.read_long());
-	    return ex;
-	} catch ( Exception ex ) {
-	    throw wrapper.unknownSysex( ex );
-	}
+            ex.minor = strm.read_long();
+            ex.completed = CompletionStatus.from_int(strm.read_long());
+            return ex;
+        } catch ( Exception ex ) {
+            throw wrapper.unknownSysex( ex );
+        }
     }
 
     /**
@@ -429,14 +429,14 @@ public final class ORBUtility {
      */
     public static String classNameOf(String repositoryId)
     {
-	String className=null;
+        String className=null;
 
-	className = (String) exceptionClassNames.get(repositoryId);
-	if (className == null) {
+        className = (String) exceptionClassNames.get(repositoryId);
+        if (className == null) {
             className = "org.omg.CORBA.UNKNOWN";
         }
 
-	return className;
+        return className;
     }
 
     /**
@@ -445,9 +445,9 @@ public final class ORBUtility {
      */
     public static boolean isSystemException(String repositoryId)
     {
-	String className=null;
+        String className=null;
 
-	className = (String) exceptionClassNames.get(repositoryId);
+        className = (String) exceptionClassNames.get(repositoryId);
         return className != null ;
     }
     
@@ -459,14 +459,14 @@ public final class ORBUtility {
      */
     public static String repositoryIdOf(String name)
     {
-	String id;
+        String id;
 
-	id = (String) exceptionRepositoryIds.get(name);
-	if (id == null) {
+        id = (String) exceptionRepositoryIds.get(name);
+        if (id == null) {
             id = "IDL:omg.org/CORBA/UNKNOWN:1.0";
         }
 
-	return id;
+        return id;
     }
 
     private static final Hashtable exceptionClassNames = new Hashtable();
@@ -474,80 +474,80 @@ public final class ORBUtility {
 
     static {
 
-	//
-	// construct repositoryId -> className hashtable
-	//
-	exceptionClassNames.put("IDL:omg.org/CORBA/BAD_CONTEXT:1.0",
-				"org.omg.CORBA.BAD_CONTEXT");
-	exceptionClassNames.put("IDL:omg.org/CORBA/BAD_INV_ORDER:1.0",
-				"org.omg.CORBA.BAD_INV_ORDER");
-	exceptionClassNames.put("IDL:omg.org/CORBA/BAD_OPERATION:1.0",
-				"org.omg.CORBA.BAD_OPERATION");
-	exceptionClassNames.put("IDL:omg.org/CORBA/BAD_PARAM:1.0",
-				"org.omg.CORBA.BAD_PARAM");
-	exceptionClassNames.put("IDL:omg.org/CORBA/BAD_TYPECODE:1.0",
-				"org.omg.CORBA.BAD_TYPECODE");
-	exceptionClassNames.put("IDL:omg.org/CORBA/COMM_FAILURE:1.0",
-				"org.omg.CORBA.COMM_FAILURE");
-	exceptionClassNames.put("IDL:omg.org/CORBA/DATA_CONVERSION:1.0",
-				"org.omg.CORBA.DATA_CONVERSION");
-	exceptionClassNames.put("IDL:omg.org/CORBA/IMP_LIMIT:1.0",
-				"org.omg.CORBA.IMP_LIMIT");
-	exceptionClassNames.put("IDL:omg.org/CORBA/INTF_REPOS:1.0",
-				"org.omg.CORBA.INTF_REPOS");
-	exceptionClassNames.put("IDL:omg.org/CORBA/INTERNAL:1.0",
-				"org.omg.CORBA.INTERNAL");
-	exceptionClassNames.put("IDL:omg.org/CORBA/INV_FLAG:1.0",
-				"org.omg.CORBA.INV_FLAG");
-	exceptionClassNames.put("IDL:omg.org/CORBA/INV_IDENT:1.0",
-				"org.omg.CORBA.INV_IDENT");
-	exceptionClassNames.put("IDL:omg.org/CORBA/INV_OBJREF:1.0",
-				"org.omg.CORBA.INV_OBJREF");
-	exceptionClassNames.put("IDL:omg.org/CORBA/MARSHAL:1.0",
-				"org.omg.CORBA.MARSHAL");
-	exceptionClassNames.put("IDL:omg.org/CORBA/NO_MEMORY:1.0",
-				"org.omg.CORBA.NO_MEMORY");
-	exceptionClassNames.put("IDL:omg.org/CORBA/FREE_MEM:1.0",
-				"org.omg.CORBA.FREE_MEM");
-	exceptionClassNames.put("IDL:omg.org/CORBA/NO_IMPLEMENT:1.0",
-				"org.omg.CORBA.NO_IMPLEMENT");
-	exceptionClassNames.put("IDL:omg.org/CORBA/NO_PERMISSION:1.0",
-				"org.omg.CORBA.NO_PERMISSION");
-	exceptionClassNames.put("IDL:omg.org/CORBA/NO_RESOURCES:1.0",
-				"org.omg.CORBA.NO_RESOURCES");
-	exceptionClassNames.put("IDL:omg.org/CORBA/NO_RESPONSE:1.0",
-				"org.omg.CORBA.NO_RESPONSE");
-	exceptionClassNames.put("IDL:omg.org/CORBA/OBJ_ADAPTER:1.0",
-				"org.omg.CORBA.OBJ_ADAPTER");
-	exceptionClassNames.put("IDL:omg.org/CORBA/INITIALIZE:1.0",
-				"org.omg.CORBA.INITIALIZE");
-	exceptionClassNames.put("IDL:omg.org/CORBA/PERSIST_STORE:1.0",
-				"org.omg.CORBA.PERSIST_STORE");
-	exceptionClassNames.put("IDL:omg.org/CORBA/TRANSIENT:1.0",
-				"org.omg.CORBA.TRANSIENT");
-	exceptionClassNames.put("IDL:omg.org/CORBA/UNKNOWN:1.0",
-				"org.omg.CORBA.UNKNOWN");
-	exceptionClassNames.put("IDL:omg.org/CORBA/OBJECT_NOT_EXIST:1.0",
-				"org.omg.CORBA.OBJECT_NOT_EXIST");
+        //
+        // construct repositoryId -> className hashtable
+        //
+        exceptionClassNames.put("IDL:omg.org/CORBA/BAD_CONTEXT:1.0",
+                                "org.omg.CORBA.BAD_CONTEXT");
+        exceptionClassNames.put("IDL:omg.org/CORBA/BAD_INV_ORDER:1.0",
+                                "org.omg.CORBA.BAD_INV_ORDER");
+        exceptionClassNames.put("IDL:omg.org/CORBA/BAD_OPERATION:1.0",
+                                "org.omg.CORBA.BAD_OPERATION");
+        exceptionClassNames.put("IDL:omg.org/CORBA/BAD_PARAM:1.0",
+                                "org.omg.CORBA.BAD_PARAM");
+        exceptionClassNames.put("IDL:omg.org/CORBA/BAD_TYPECODE:1.0",
+                                "org.omg.CORBA.BAD_TYPECODE");
+        exceptionClassNames.put("IDL:omg.org/CORBA/COMM_FAILURE:1.0",
+                                "org.omg.CORBA.COMM_FAILURE");
+        exceptionClassNames.put("IDL:omg.org/CORBA/DATA_CONVERSION:1.0",
+                                "org.omg.CORBA.DATA_CONVERSION");
+        exceptionClassNames.put("IDL:omg.org/CORBA/IMP_LIMIT:1.0",
+                                "org.omg.CORBA.IMP_LIMIT");
+        exceptionClassNames.put("IDL:omg.org/CORBA/INTF_REPOS:1.0",
+                                "org.omg.CORBA.INTF_REPOS");
+        exceptionClassNames.put("IDL:omg.org/CORBA/INTERNAL:1.0",
+                                "org.omg.CORBA.INTERNAL");
+        exceptionClassNames.put("IDL:omg.org/CORBA/INV_FLAG:1.0",
+                                "org.omg.CORBA.INV_FLAG");
+        exceptionClassNames.put("IDL:omg.org/CORBA/INV_IDENT:1.0",
+                                "org.omg.CORBA.INV_IDENT");
+        exceptionClassNames.put("IDL:omg.org/CORBA/INV_OBJREF:1.0",
+                                "org.omg.CORBA.INV_OBJREF");
+        exceptionClassNames.put("IDL:omg.org/CORBA/MARSHAL:1.0",
+                                "org.omg.CORBA.MARSHAL");
+        exceptionClassNames.put("IDL:omg.org/CORBA/NO_MEMORY:1.0",
+                                "org.omg.CORBA.NO_MEMORY");
+        exceptionClassNames.put("IDL:omg.org/CORBA/FREE_MEM:1.0",
+                                "org.omg.CORBA.FREE_MEM");
+        exceptionClassNames.put("IDL:omg.org/CORBA/NO_IMPLEMENT:1.0",
+                                "org.omg.CORBA.NO_IMPLEMENT");
+        exceptionClassNames.put("IDL:omg.org/CORBA/NO_PERMISSION:1.0",
+                                "org.omg.CORBA.NO_PERMISSION");
+        exceptionClassNames.put("IDL:omg.org/CORBA/NO_RESOURCES:1.0",
+                                "org.omg.CORBA.NO_RESOURCES");
+        exceptionClassNames.put("IDL:omg.org/CORBA/NO_RESPONSE:1.0",
+                                "org.omg.CORBA.NO_RESPONSE");
+        exceptionClassNames.put("IDL:omg.org/CORBA/OBJ_ADAPTER:1.0",
+                                "org.omg.CORBA.OBJ_ADAPTER");
+        exceptionClassNames.put("IDL:omg.org/CORBA/INITIALIZE:1.0",
+                                "org.omg.CORBA.INITIALIZE");
+        exceptionClassNames.put("IDL:omg.org/CORBA/PERSIST_STORE:1.0",
+                                "org.omg.CORBA.PERSIST_STORE");
+        exceptionClassNames.put("IDL:omg.org/CORBA/TRANSIENT:1.0",
+                                "org.omg.CORBA.TRANSIENT");
+        exceptionClassNames.put("IDL:omg.org/CORBA/UNKNOWN:1.0",
+                                "org.omg.CORBA.UNKNOWN");
+        exceptionClassNames.put("IDL:omg.org/CORBA/OBJECT_NOT_EXIST:1.0",
+                                "org.omg.CORBA.OBJECT_NOT_EXIST");
 
-	// SystemExceptions from OMG Transactions Service Spec
-	exceptionClassNames.put("IDL:omg.org/CORBA/INVALID_TRANSACTION:1.0",
-				"org.omg.CORBA.INVALID_TRANSACTION");
-	exceptionClassNames.put("IDL:omg.org/CORBA/TRANSACTION_REQUIRED:1.0",
-				"org.omg.CORBA.TRANSACTION_REQUIRED");
-	exceptionClassNames.put("IDL:omg.org/CORBA/TRANSACTION_ROLLEDBACK:1.0",
-				"org.omg.CORBA.TRANSACTION_ROLLEDBACK");
+        // SystemExceptions from OMG Transactions Service Spec
+        exceptionClassNames.put("IDL:omg.org/CORBA/INVALID_TRANSACTION:1.0",
+                                "org.omg.CORBA.INVALID_TRANSACTION");
+        exceptionClassNames.put("IDL:omg.org/CORBA/TRANSACTION_REQUIRED:1.0",
+                                "org.omg.CORBA.TRANSACTION_REQUIRED");
+        exceptionClassNames.put("IDL:omg.org/CORBA/TRANSACTION_ROLLEDBACK:1.0",
+                                "org.omg.CORBA.TRANSACTION_ROLLEDBACK");
 
-	// from portability RTF 98-07-01.txt
-	exceptionClassNames.put("IDL:omg.org/CORBA/INV_POLICY:1.0",
-				"org.omg.CORBA.INV_POLICY");
+        // from portability RTF 98-07-01.txt
+        exceptionClassNames.put("IDL:omg.org/CORBA/INV_POLICY:1.0",
+                                "org.omg.CORBA.INV_POLICY");
 
-	// from orbrev/00-09-01 (CORBA 2.4 Draft Specification)
-	exceptionClassNames.
-	    put("IDL:omg.org/CORBA/TRANSACTION_UNAVAILABLE:1.0",
-				"org.omg.CORBA.TRANSACTION_UNAVAILABLE");
-	exceptionClassNames.put("IDL:omg.org/CORBA/TRANSACTION_MODE:1.0",
-				"org.omg.CORBA.TRANSACTION_MODE");
+        // from orbrev/00-09-01 (CORBA 2.4 Draft Specification)
+        exceptionClassNames.
+            put("IDL:omg.org/CORBA/TRANSACTION_UNAVAILABLE:1.0",
+                                "org.omg.CORBA.TRANSACTION_UNAVAILABLE");
+        exceptionClassNames.put("IDL:omg.org/CORBA/TRANSACTION_MODE:1.0",
+                                "org.omg.CORBA.TRANSACTION_MODE");
 
         // Exception types introduced between CORBA 2.4 and 3.0
         exceptionClassNames.put("IDL:omg.org/CORBA/CODESET_INCOMPATIBLE:1.0",
@@ -561,108 +561,108 @@ public final class ORBUtility {
 
         // Exception types introduced in CORBA 3.0
         exceptionClassNames.put("IDL:omg.org/CORBA/INVALID_ACTIVITY:1.0",
-				"org.omg.CORBA.INVALID_ACTIVITY");
+                                "org.omg.CORBA.INVALID_ACTIVITY");
         exceptionClassNames.put("IDL:omg.org/CORBA/ACTIVITY_COMPLETED:1.0",
-				"org.omg.CORBA.ACTIVITY_COMPLETED");
+                                "org.omg.CORBA.ACTIVITY_COMPLETED");
         exceptionClassNames.put("IDL:omg.org/CORBA/ACTIVITY_REQUIRED:1.0",
-				"org.omg.CORBA.ACTIVITY_REQUIRED");        
+                                "org.omg.CORBA.ACTIVITY_REQUIRED");        
 
-	//
-	// construct className -> repositoryId hashtable
-	//
-	Enumeration keys = exceptionClassNames.keys();
-	java.lang.Object s;
-	String rId;
-	String cName;
+        //
+        // construct className -> repositoryId hashtable
+        //
+        Enumeration keys = exceptionClassNames.keys();
+        java.lang.Object s;
+        String rId;
+        String cName;
 
-	try{
+        try{
             while (keys.hasMoreElements()) {
                 s = keys.nextElement();
-	        rId = (String) s;
-	        cName = (String) exceptionClassNames.get(rId);
-	        exceptionRepositoryIds.put (cName, rId);
-	    }
-	} catch (NoSuchElementException e) { }
+                rId = (String) s;
+                cName = (String) exceptionClassNames.get(rId);
+                exceptionRepositoryIds.put (cName, rId);
+            }
+        } catch (NoSuchElementException e) { }
     }
 
     /** Parse a version string such as "1.1.6" or "jdk1.2fcs" into
-	a version array of integers {1, 1, 6} or {1, 2}.
-	A string of "n." or "n..m" is equivalent to "n.0" or "n.0.m" respectively.
+        a version array of integers {1, 1, 6} or {1, 2}.
+        A string of "n." or "n..m" is equivalent to "n.0" or "n.0.m" respectively.
     */
     public static int[] parseVersion(String version) {
-	if (version == null) {
+        if (version == null) {
             return new int[0];
         }
-	char[] s = version.toCharArray();
-	//find the maximum span of the string "n.n.n..." where n is an integer
-	int start = 0;
-	for (; start < s.length  && (s[start] < '0' || s[start] > '9'); ++start) {
+        char[] s = version.toCharArray();
+        //find the maximum span of the string "n.n.n..." where n is an integer
+        int start = 0;
+        for (; start < s.length  && (s[start] < '0' || s[start] > '9'); ++start) {
             if (start == s.length) {
                 return new int[0];
             }
         }
-	int end = start + 1;
-	int size = 1;
-	for (; end < s.length; ++end) {
+        int end = start + 1;
+        int size = 1;
+        for (; end < s.length; ++end) {
             if (s[end] == '.') {
                 ++size;
             } else if (s[end] < '0' || s[end] > '9') {
                 break;
             }
         }
-	int[] val = new int[size];
-	for (int i = 0; i < size; ++i) {
-	    int dot = version.indexOf('.', start);
-	    if (dot == -1 || dot > end) {
+        int[] val = new int[size];
+        for (int i = 0; i < size; ++i) {
+            int dot = version.indexOf('.', start);
+            if (dot == -1 || dot > end) {
                 dot = end;
             }
-	    if (start >= dot) {
+            if (start >= dot) {
                 val[i] = 0;
-            }	//convert equivalent to "n.0" or "n.0.m"
-	    else {
+            }   //convert equivalent to "n.0" or "n.0.m"
+            else {
                 val[i] =
                     Integer.parseInt(version.substring(start, dot));
             }
-	    start = dot + 1;
-	}
-	return val;
+            start = dot + 1;
+        }
+        return val;
     }
 
     /** Compare two version arrays.
-	Return 1, 0 or -1 if v1 is greater than, equal to, or less than v2.
+        Return 1, 0 or -1 if v1 is greater than, equal to, or less than v2.
     */
     public static int compareVersion(int[] v1, int[] v2) {
-	if (v1 == null) {
+        if (v1 == null) {
             v1 = new int[0];
         }
-	if (v2 == null) {
+        if (v2 == null) {
             v2 = new int[0];
         }
-	for (int i = 0; i < v1.length; ++i) {
-	    if (i >= v2.length || v1[i] > v2[i]) {
+        for (int i = 0; i < v1.length; ++i) {
+            if (i >= v2.length || v1[i] > v2[i]) {
                 return 1;
             }
-	    if (v1[i] < v2[i]) {
+            if (v1[i] < v2[i]) {
                 return -1;
             }
-	}
-	return v1.length == v2.length ? 0 : -1;
+        }
+        return v1.length == v2.length ? 0 : -1;
     }
 
     /** Compare two version strings.
-	Return 1, 0 or -1 if v1 is greater than, equal to, or less than v2.
+        Return 1, 0 or -1 if v1 is greater than, equal to, or less than v2.
     */
     public static synchronized int compareVersion(String v1, String v2) {
-	return compareVersion(parseVersion(v1), parseVersion(v2));
+        return compareVersion(parseVersion(v1), parseVersion(v2));
     }
 
     private static String compressClassName( String name )
     {
-	// Note that this must end in . in order to be renamed correctly.
-	String prefix = "com.sun.corba.se." ;
-	if (name.startsWith( prefix ) ) {
-	    return "(ORB)." + name.substring( prefix.length() ) ;
-	} else {
+        // Note that this must end in . in order to be renamed correctly.
+        String prefix = "com.sun.corba.ee." ;
+        if (name.startsWith( prefix ) ) {
+            return "(ORB)." + name.substring( prefix.length() ) ;
+        } else {
             return name;
         }
     }
@@ -672,31 +672,31 @@ public final class ORBUtility {
     // we need a short unambiguous name for such threads.
     public static String getThreadName( Thread thr ) 
     {
-	if (thr == null) {
+        if (thr == null) {
             return "null";
         }
 
-	// This depends on the formatting in SelectReaderThread and CorbaConnectionImpl.
-	// Pattern for SelectReaderThreads:
-	// SelectReaderThread CorbaConnectionImpl[ <host> <post> <state>]
-	// Any other pattern in the Thread's name is just returned.
-	String name = thr.getName() ;
-	StringTokenizer st = new StringTokenizer( name ) ;
-	int numTokens = st.countTokens() ;
-	if (numTokens != 5) {
+        // This depends on the formatting in SelectReaderThread and CorbaConnectionImpl.
+        // Pattern for SelectReaderThreads:
+        // SelectReaderThread CorbaConnectionImpl[ <host> <post> <state>]
+        // Any other pattern in the Thread's name is just returned.
+        String name = thr.getName() ;
+        StringTokenizer st = new StringTokenizer( name ) ;
+        int numTokens = st.countTokens() ;
+        if (numTokens != 5) {
             return name;
         }
 
-	String[] tokens = new String[numTokens] ;
-	for (int ctr=0; ctr<numTokens; ctr++ ) {
+        String[] tokens = new String[numTokens] ;
+        for (int ctr=0; ctr<numTokens; ctr++ ) {
             tokens[ctr] = st.nextToken();
         }
 
-	if( !tokens[0].equals("SelectReaderThread")) {
+        if( !tokens[0].equals("SelectReaderThread")) {
             return name;
         }
 
-	return "SelectReaderThread[" + tokens[2] + ":" + tokens[3] + "]" ;
+        return "SelectReaderThread[" + tokens[2] + ":" + tokens[3] + "]" ;
     }
 
     private static String formatStackTraceElement( StackTraceElement ste ) 
@@ -710,47 +710,47 @@ public final class ORBUtility {
 
     private static void printStackTrace( StackTraceElement[] trace ) 
     {
-	System.out.println( "    Stack Trace:" ) ;
-	// print the stack trace, ommitting the zeroth element, which is
-	// always this method.
-	for ( int ctr = 1; ctr < trace.length; ctr++ ) {
-	    System.out.print( "        >" ) ;
-	    System.out.println( formatStackTraceElement( trace[ctr] ) ) ;
-	}
+        System.out.println( "    Stack Trace:" ) ;
+        // print the stack trace, ommitting the zeroth element, which is
+        // always this method.
+        for ( int ctr = 1; ctr < trace.length; ctr++ ) {
+            System.out.print( "        >" ) ;
+            System.out.println( formatStackTraceElement( trace[ctr] ) ) ;
+        }
     }
 
     //
     // Implements all dprint calls in this package.
     //
     public static synchronized void dprint(java.lang.Object obj, String msg) {
-	System.out.println(
-	    compressClassName( obj.getClass().getName() ) + "("  +
-	    getThreadName( Thread.currentThread() ) + "): " + msg);
+        System.out.println(
+            compressClassName( obj.getClass().getName() ) + "("  +
+            getThreadName( Thread.currentThread() ) + "): " + msg);
     }
 
     public static synchronized void dprint(String className, String msg) {
-	System.out.println(
-	    compressClassName( className ) + "("  +
-	    getThreadName( Thread.currentThread() ) + "): " + msg);
+        System.out.println(
+            compressClassName( className ) + "("  +
+            getThreadName( Thread.currentThread() ) + "): " + msg);
     }
 
     public synchronized void dprint(String msg) {
-	ORBUtility.dprint(this, msg);
+        ORBUtility.dprint(this, msg);
     }
 
     public static synchronized void dprintTrace(Object obj, String msg) {
-	ORBUtility.dprint(obj, msg);
+        ORBUtility.dprint(obj, msg);
 
-	Throwable thr = new Throwable() ;
-	printStackTrace( thr.getStackTrace() ) ;
+        Throwable thr = new Throwable() ;
+        printStackTrace( thr.getStackTrace() ) ;
     }
 
     public static synchronized void dprint(java.lang.Object caller, 
-	String msg, Throwable t) 
+        String msg, Throwable t) 
     { 
         System.out.println(
-	    compressClassName( caller.getClass().getName() ) + 
-	    '(' + Thread.currentThread() + "): " + msg);
+            compressClassName( caller.getClass().getName() ) + 
+            '(' + Thread.currentThread() + "): " + msg);
 
         if (t != null) {
             printStackTrace(t.getStackTrace());
@@ -759,12 +759,12 @@ public final class ORBUtility {
 
     public static String[] concatenateStringArrays( String[] arr1, String[] arr2 ) 
     {
-	String[] result = new String[ 
-	    arr1.length + arr2.length ] ;
+        String[] result = new String[ 
+            arr1.length + arr2.length ] ;
         System.arraycopy(arr1, 0, result, 0, arr1.length);
         System.arraycopy(arr2, 0, result, arr1.length, arr2.length);
 
-	return result ;
+        return result ;
     }
 
     /**
@@ -780,7 +780,7 @@ public final class ORBUtility {
      * 2) We need to pick up the correct minor code from OMGSystemException.
      */
     public static void throwNotSerializableForCorba(String className) {
-	throw omgWrapper.notSerializable( className ) ;
+        throw omgWrapper.notSerializable( className ) ;
     }
 
     /**
@@ -799,64 +799,64 @@ public final class ORBUtility {
 
     public static ClientDelegate makeClientDelegate( IOR ior )
     {
-	ORB orb = ior.getORB() ;
-	ContactInfoList ccil = orb.getCorbaContactInfoListFactory().create( ior ) ;
-	ClientDelegate del = orb.getClientDelegateFactory().create(ccil);
-	return del ;
+        ORB orb = ior.getORB() ;
+        ContactInfoList ccil = orb.getCorbaContactInfoListFactory().create( ior ) ;
+        ClientDelegate del = orb.getClientDelegateFactory().create(ccil);
+        return del ;
     }
 
     /** This method is used to create untyped object references.
     */
-    public static org.omg.CORBA.Object makeObjectReference( IOR ior )	
+    public static org.omg.CORBA.Object makeObjectReference( IOR ior )   
     {
-	ClientDelegate del = makeClientDelegate( ior ) ;
-	org.omg.CORBA.Object objectImpl = new CORBAObjectImpl() ;
-	StubAdapter.setDelegate( objectImpl, del ) ;
-	return objectImpl ;
+        ClientDelegate del = makeClientDelegate( ior ) ;
+        org.omg.CORBA.Object objectImpl = new CORBAObjectImpl() ;
+        StubAdapter.setDelegate( objectImpl, del ) ;
+        return objectImpl ;
     }
 
     public static void setDaemon(Thread thread)
     {
-	// Catch exceptions since setDaemon can cause a
+        // Catch exceptions since setDaemon can cause a
         // security exception to be thrown under netscape
         // in the Applet mode
-	final Thread finalThread = thread;
+        final Thread finalThread = thread;
         try {
             AccessController.doPrivileged(new PrivilegedAction() {
-		    public java.lang.Object run() {
-			finalThread.setDaemon(true);
-			return null;
-		    }
-		});
+                    public java.lang.Object run() {
+                        finalThread.setDaemon(true);
+                        return null;
+                    }
+                });
         } catch (Exception e) {
-	    // REVISIT: Object to get static method. Ignore it.
-	    dprint(new Object(), "setDaemon: Exception: " + e);
-	}
+            // REVISIT: Object to get static method. Ignore it.
+            dprint(new Object(), "setDaemon: Exception: " + e);
+        }
     }
 
     public static String operationNameAndRequestId(MessageMediator m)
     {
-	return "op/" + m.getOperationName() + " id/" + m.getRequestId();
+        return "op/" + m.getOperationName() + " id/" + m.getRequestId();
     }
 
     public static boolean isPrintable(char c)
     {
-	if (Character.isJavaIdentifierStart(c)) {
-	    // Letters and $ _
-	    return true;
-	}
-	if (Character.isDigit(c)) {
-	    return true;
-	}
-	switch (Character.getType(c)) {
-	    case Character.MODIFIER_SYMBOL : return true; // ` ^
-	    case Character.DASH_PUNCTUATION : return true; // -
-	    case Character.MATH_SYMBOL : return true; // = ~ + | < >
-	    case Character.OTHER_PUNCTUATION : return true; // !@#%&*;':",./?
-	    case Character.START_PUNCTUATION : return true; // ( [ {
-	    case Character.END_PUNCTUATION : return true; // ) ] }
-	}
-	return false;
+        if (Character.isJavaIdentifierStart(c)) {
+            // Letters and $ _
+            return true;
+        }
+        if (Character.isDigit(c)) {
+            return true;
+        }
+        switch (Character.getType(c)) {
+            case Character.MODIFIER_SYMBOL : return true; // ` ^
+            case Character.DASH_PUNCTUATION : return true; // -
+            case Character.MATH_SYMBOL : return true; // = ~ + | < >
+            case Character.OTHER_PUNCTUATION : return true; // !@#%&*;':",./?
+            case Character.START_PUNCTUATION : return true; // ( [ {
+            case Character.END_PUNCTUATION : return true; // ) ] }
+        }
+        return false;
     }
 
     /** Given some hex data, extract it and put it into a byte buffer.
@@ -871,43 +871,43 @@ public final class ORBUtility {
      * </OL>
      */
     public static byte[] getBuffer( String[] data ) {
-	// Estimate size of result
-	int numChar = 0 ;
-	for (String str : data) {
+        // Estimate size of result
+        int numChar = 0 ;
+        for (String str : data) {
             numChar += str.length();
         }
-	// Maximum result size is 1/2 the number of characters.
-	// Usually smaller due to comments and white space.
-	int maxSize = numChar/2 ;
+        // Maximum result size is 1/2 the number of characters.
+        // Usually smaller due to comments and white space.
+        int maxSize = numChar/2 ;
 
-	byte[] result = new byte[maxSize] ;
-	int index = 0 ;
-	int value = 0;
+        byte[] result = new byte[maxSize] ;
+        int index = 0 ;
+        int value = 0;
         boolean startByte = true ;
 
-	for (String str : data ) {
-	    for (int ctr = 0; ctr<str.length(); ctr++) {
-		char ch = str.charAt(ctr) ;
-		if (!Character.isWhitespace( ch )) {
-		    if (ch == '#') {
+        for (String str : data ) {
+            for (int ctr = 0; ctr<str.length(); ctr++) {
+                char ch = str.charAt(ctr) ;
+                if (!Character.isWhitespace( ch )) {
+                    if (ch == '#') {
                         break;
                     } else {
-			value = 16*value + hexOf( ch ) ;
-			if (!startByte) {
-			    result[index++] = (byte)value ;	
-			    value = 0 ;
-			}
-			startByte = !startByte ;
-		    }
-		}
+                        value = 16*value + hexOf( ch ) ;
+                        if (!startByte) {
+                            result[index++] = (byte)value ;     
+                            value = 0 ;
+                        }
+                        startByte = !startByte ;
+                    }
+                }
 
-		if (!startByte) {
+                if (!startByte) {
                     throw new RuntimeException();
                 }
-	    }
-	}
+            }
+        }
 
-	return result ;
+        return result ;
     }
 
     public static String dumpBinary( byte[] data ) {
@@ -918,7 +918,7 @@ public final class ORBUtility {
     }
 
     private static void dumpBinary( StringBuffer sbuf, ByteBuffer buffer ) {
-	int length = buffer.position() ;
+        int length = buffer.position() ;
         char[] charBuf = new char[16];
         for (int i = 0; i < length; i += 16) {
             int j = 0;
@@ -972,13 +972,13 @@ public final class ORBUtility {
     * @param ps The PrintStream to use for the display.
     */
     public static void printBuffer(String msg, 
-	ByteBuffer buffer, PrintStream ps ) 
+        ByteBuffer buffer, PrintStream ps ) 
     {
-	StringBuffer sbuf = new StringBuffer() ;
-	int length = buffer.position() ;
-	sbuf.append( "--------------------------------------------------------\n\n" ) ;
-	sbuf.append(msg).append( "\n") ;
-	sbuf.append( "\n" ) ;
+        StringBuffer sbuf = new StringBuffer() ;
+        int length = buffer.position() ;
+        sbuf.append( "--------------------------------------------------------\n\n" ) ;
+        sbuf.append(msg).append( "\n") ;
+        sbuf.append( "\n" ) ;
         sbuf.append("Total length (ByteBuffer position) : ").append(length).append( "\n");
         sbuf.append("Byte Buffer capacity               : ").
             append(buffer.capacity()).append( "\n\n");
@@ -989,54 +989,54 @@ public final class ORBUtility {
             t.printStackTrace();
         }
 
-	sbuf.append( "--------------------------------------------------------\n" ) ;
-	ps.println( sbuf.toString() ) ;
+        sbuf.append( "--------------------------------------------------------\n" ) ;
+        ps.println( sbuf.toString() ) ;
     }
 
     public static String getClassSecurityInfo(final Class cl)
     {
-	// Returns a String which looks similar to:
-	// PermissionCollection java.security.Permissions@1053693 ... 
-	// (java.io.FilePermission <<ALL FILES>> ....)
-	// (java.io.FilePermission /export0/sunwappserv/lib/- ...)
-	// ... other permissions ...
-	// Domain ProtectionDomain  (file:/export0/sunwappserv/lib-)
-	// java.security.Permissions@141fedb (
-	// (java.io.FilePermission <<ALL FILES>> ...)
-	// (java.io.FilePermission /var/tmp//- ...)
+        // Returns a String which looks similar to:
+        // PermissionCollection java.security.Permissions@1053693 ... 
+        // (java.io.FilePermission <<ALL FILES>> ....)
+        // (java.io.FilePermission /export0/sunwappserv/lib/- ...)
+        // ... other permissions ...
+        // Domain ProtectionDomain  (file:/export0/sunwappserv/lib-)
+        // java.security.Permissions@141fedb (
+        // (java.io.FilePermission <<ALL FILES>> ...)
+        // (java.io.FilePermission /var/tmp//- ...)
 
-	String result =
-	    (String)AccessController.doPrivileged(new PrivilegedAction() {
-	        public java.lang.Object run() {
-		    StringBuffer sb = new StringBuffer(500);
-		    ProtectionDomain pd = cl.getProtectionDomain();
+        String result =
+            (String)AccessController.doPrivileged(new PrivilegedAction() {
+                public java.lang.Object run() {
+                    StringBuffer sb = new StringBuffer(500);
+                    ProtectionDomain pd = cl.getProtectionDomain();
                     Policy policy = Policy.getPolicy();
-	            PermissionCollection pc = policy.getPermissions(pd);
-	            sb.append("\nPermissionCollection ");
-	            sb.append(pc.toString());
-		    // Don't need to add 'Protection Domain' string, it's
-		    // in ProtectionDomain.toString() already.
-	            sb.append(pd.toString());
+                    PermissionCollection pc = policy.getPermissions(pd);
+                    sb.append("\nPermissionCollection ");
+                    sb.append(pc.toString());
+                    // Don't need to add 'Protection Domain' string, it's
+                    // in ProtectionDomain.toString() already.
+                    sb.append(pd.toString());
                     return sb.toString();
-		}
+                }
             });
-	return result;
+        return result;
     }
 
     public static String formatStringArray(String[] a)
     {
-	if (a == null) {
-	    return "null";
-	}
+        if (a == null) {
+            return "null";
+        }
 
         StringBuilder result = new StringBuilder() ;
         result.append( "[" ) ;
-	for (int i = 0; i < a.length; ++i) {
-	    result.append( a[i] ) ;
+        for (int i = 0; i < a.length; ++i) {
+            result.append( a[i] ) ;
             result.append( " " ) ;
-	}
+        }
         result.append( "]" ) ;
-	return result.toString() ;
+        return result.toString() ;
     }
 }
 

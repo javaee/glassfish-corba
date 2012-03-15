@@ -63,7 +63,7 @@ public class WombatServer implements InternalProcess
     public void writeObjref(org.omg.CORBA.Object ref, 
                             String file,
                             String outputDir) throws java.io.IOException {
-	String fil = outputDir
+        String fil = outputDir
             + File.separator
             + file;
 

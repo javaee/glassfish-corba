@@ -42,15 +42,15 @@
 // Last Modified : 2005 Aug 29 (Mon) 14:09:31 by Harold Carr.
 //
 
-package com.sun.corba.se.impl.folb;
+package com.sun.corba.ee.impl.folb;
 
 import java.util.List;
 import org.omg.IOP.TaggedComponent;
 import org.omg.PortableInterceptor.IORInfo;
-import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
-import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.folb.ClusterInstanceInfo;
+import com.sun.corba.ee.spi.folb.ClusterInstanceInfo;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.transport.SocketInfo;
 
 /**
  * An implementation of this interface <code>org.omg.CORBA.LocalObject</code>.
@@ -72,7 +72,7 @@ public interface CSIv2SSLTaggedComponentHandler
      * added to IORs.
      */
     public TaggedComponent insert(IORInfo iorInfo, 
-				  List<ClusterInstanceInfo> clusterInstanceInfo);
+                                  List<ClusterInstanceInfo> clusterInstanceInfo);
 
     /** Extract is called on each invocation of the IOR, so that the security code can
      * run properly.

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi ;
+package com.sun.corba.ee.impl.presentation.rmi ;
 
 import java.rmi.Remote;
 
@@ -54,11 +54,11 @@ import org.omg.CORBA.portable.ResponseHandler;
 import org.omg.CORBA.portable.UnknownException;
 import org.omg.PortableServer.Servant;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
-import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
-import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationDefaults ;
+import com.sun.corba.ee.spi.presentation.rmi.DynamicMethodMarshaller ;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 import org.glassfish.pfl.basic.proxy.DynamicAccessPermission ;
 
@@ -80,25 +80,25 @@ public final class ReflectiveTie extends Servant implements Tie
             }
         }
 
-	this.pm = pm ;
+        this.pm = pm ;
     }
 
     public String[] _all_interfaces(org.omg.PortableServer.POA poa, 
-	byte[] objectId)
+        byte[] objectId)
     {
-	return classData.getTypeIds() ;
+        return classData.getTypeIds() ;
     }
 
     public void setTarget(Remote target) 
     {
         this.target = target;
 
-	if (target == null) {
-	    classData = null ;
-	} else {
-	    Class targetClass = target.getClass() ;
-	    classData = pm.getClassData( targetClass ) ;
-	}
+        if (target == null) {
+            classData = null ;
+        } else {
+            Class targetClass = target.getClass() ;
+            classData = pm.getClassData( targetClass ) ;
+        }
     }
     
     public Remote getTarget() 
@@ -114,13 +114,13 @@ public final class ReflectiveTie extends Servant implements Tie
     public void deactivate() 
     {
         try{
-	    _poa().deactivate_object(_poa().servant_to_id(this));
+            _poa().deactivate_object(_poa().servant_to_id(this));
         } catch (org.omg.PortableServer.POAPackage.WrongPolicy exception){
-	    // ignore 
+            // ignore 
         } catch (org.omg.PortableServer.POAPackage.ObjectNotActive exception){
-	    // ignore 
+            // ignore 
         } catch (org.omg.PortableServer.POAPackage.ServantNotActive exception){
-	    // ignore 
+            // ignore 
         }
     }
     
@@ -132,7 +132,7 @@ public final class ReflectiveTie extends Servant implements Tie
         try {
             ((org.omg.CORBA_2_3.ORB)orb).set_delegate(this);
         } catch (ClassCastException e) {
-	    throw wrapper.badOrbForServant( e ) ;
+            throw wrapper.badOrbForServant( e ) ;
         }
     }
    
@@ -141,56 +141,56 @@ public final class ReflectiveTie extends Servant implements Tie
 
         try {
             return javaMethod.invoke( target, args ) ;
-	} catch (IllegalAccessException ex) {
-	    throw wrapper.invocationErrorInReflectiveTie( ex, 
-		javaMethod.getName(), 
-		    javaMethod.getDeclaringClass().getName() ) ;
-	} catch (IllegalArgumentException ex) {
-	    throw wrapper.invocationErrorInReflectiveTie( ex, 
-		javaMethod.getName(), 
-		    javaMethod.getDeclaringClass().getName() ) ;
+        } catch (IllegalAccessException ex) {
+            throw wrapper.invocationErrorInReflectiveTie( ex, 
+                javaMethod.getName(), 
+                    javaMethod.getDeclaringClass().getName() ) ;
+        } catch (IllegalArgumentException ex) {
+            throw wrapper.invocationErrorInReflectiveTie( ex, 
+                javaMethod.getName(), 
+                    javaMethod.getDeclaringClass().getName() ) ;
         }
     }
 
     public org.omg.CORBA.portable.OutputStream  _invoke(String method, 
-	org.omg.CORBA.portable.InputStream _in, ResponseHandler reply) 
+        org.omg.CORBA.portable.InputStream _in, ResponseHandler reply) 
     {
-	Method javaMethod = null ;
-	DynamicMethodMarshaller dmm = null;
+        Method javaMethod = null ;
+        DynamicMethodMarshaller dmm = null;
 
         try {
             InputStream in = (InputStream) _in;
 
-	    javaMethod = classData.getIDLNameTranslator().getMethod( method ) ;
-	    if (javaMethod == null)
-		throw wrapper.methodNotFoundInTie( method, 
-		    target.getClass().getName() ) ;
+            javaMethod = classData.getIDLNameTranslator().getMethod( method ) ;
+            if (javaMethod == null)
+                throw wrapper.methodNotFoundInTie( method, 
+                    target.getClass().getName() ) ;
 
-	    dmm = pm.getDynamicMethodMarshaller( javaMethod ) ;
+            dmm = pm.getDynamicMethodMarshaller( javaMethod ) ;
 
-	    Object[] args = dmm.readArguments( in ) ;
+            Object[] args = dmm.readArguments( in ) ;
 
             Object result = dispatchToMethod( javaMethod, target, args ) ;
 
-	    OutputStream os = (OutputStream)reply.createReply() ;
+            OutputStream os = (OutputStream)reply.createReply() ;
 
-	    dmm.writeResult( os, result ) ; 
+            dmm.writeResult( os, result ) ; 
 
-	    return os ;
-	} catch (InvocationTargetException ex) {
-	    // Unwrap the actual exception so that it can be wrapped by an
-	    // UnknownException or thrown if it is a system exception.
-	    // This is expected in the server dispatcher code.
-	    Throwable thr = ex.getCause() ;
-	    if (thr instanceof SystemException)
-		throw (SystemException)thr ;
-	    else if ((thr instanceof Exception) && 
-		dmm.isDeclaredException( thr )) {
-		OutputStream os = (OutputStream)reply.createExceptionReply() ;
-		dmm.writeException( os, (Exception)thr ) ;
-		return os ;	
-	    } else
-		throw new UnknownException( thr ) ;
+            return os ;
+        } catch (InvocationTargetException ex) {
+            // Unwrap the actual exception so that it can be wrapped by an
+            // UnknownException or thrown if it is a system exception.
+            // This is expected in the server dispatcher code.
+            Throwable thr = ex.getCause() ;
+            if (thr instanceof SystemException)
+                throw (SystemException)thr ;
+            else if ((thr instanceof Exception) && 
+                dmm.isDeclaredException( thr )) {
+                OutputStream os = (OutputStream)reply.createExceptionReply() ;
+                dmm.writeException( os, (Exception)thr ) ;
+                return os ;     
+            } else
+                throw new UnknownException( thr ) ;
         }
     }
 }

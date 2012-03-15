@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
 import java.util.List;
 
-import com.sun.corba.se.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.IOR;
 
 public interface IORToSocketInfo
 {
@@ -52,7 +52,7 @@ public interface IORToSocketInfo
      * @return a list of SocketInfo.
      */
     public List<? extends SocketInfo> getSocketInfo(IOR ior, 
-	List<? extends SocketInfo> previous);
+        List<? extends SocketInfo> previous);
 }
 
 // End of file.

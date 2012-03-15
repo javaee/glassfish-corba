@@ -46,10 +46,10 @@ public class WombatImpl extends WombatPOA
     String name;
 
     public WombatImpl(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     public String squawk() {
-	return name;
+        return name;
     }
 }

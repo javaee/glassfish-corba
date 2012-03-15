@@ -48,8 +48,8 @@ public class TraceElement
 
     public TraceElement( boolean isEnter, MethodEvent event ) 
     {
-	this.isEnter = isEnter ;
-	this.event = event ;
+        this.isEnter = isEnter ;
+        this.event = event ;
     }
 
     public boolean isEnter() { return isEnter ; }
@@ -58,22 +58,22 @@ public class TraceElement
 
     public boolean equals( Object obj ) 
     {
-	if (!(obj instanceof TraceElement)) 
-	    return false ;
+        if (!(obj instanceof TraceElement)) 
+            return false ;
 
-	TraceElement other = (TraceElement)obj ;
+        TraceElement other = (TraceElement)obj ;
 
-	return (event.equals( other.event ) &&
-		isEnter == other.isEnter) ;
+        return (event.equals( other.event ) &&
+                isEnter == other.isEnter) ;
     }
 
     public int hashCode()
     {
-	return event.hashCode() + (isEnter ? 1711 : 0) ;
+        return event.hashCode() + (isEnter ? 1711 : 0) ;
     }
 
     public String toString() 
     {
-	return "TraceElement[isEnter=" + isEnter + " event=" + event + "]" ;
+        return "TraceElement[isEnter=" + isEnter + " event=" + event + "]" ;
     }
 }

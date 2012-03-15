@@ -114,7 +114,7 @@ public abstract class NamedValue {
     /**
      * Retrieves the name for this <code>NamedValue</code> object.
      *
-     * @return			a <code>String</code> object representing
+     * @return                  a <code>String</code> object representing
      *                    the name of this <code>NamedValue</code> object
      */
 
@@ -123,7 +123,7 @@ public abstract class NamedValue {
     /**
      * Retrieves the value for this <code>NamedValue</code> object.
      *
-     * @return			an <code>Any</code> object containing
+     * @return                  an <code>Any</code> object containing
      *                    the value of this <code>NamedValue</code> object
      */
 
@@ -132,7 +132,7 @@ public abstract class NamedValue {
     /**
      * Retrieves the argument mode flag for this <code>NamedValue</code> object.
      *
-     * @return			an <code>int</code> representing the argument
+     * @return                  an <code>int</code> representing the argument
      *                    mode for this <code>NamedValue</code> object
      */
 

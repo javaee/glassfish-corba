@@ -51,7 +51,7 @@ import corba.framework.Controller;
 import corba.hcks.C;
 import corba.hcks.U;
 
-import com.sun.corba.se.impl.protocol.MessageMediatorImpl;
+import com.sun.corba.ee.impl.protocol.MessageMediatorImpl;
 
 import java.lang.reflect.*;
 import org.omg.PortableInterceptor.*;
@@ -70,30 +70,30 @@ public class Client extends org.omg.CORBA.LocalObject
     public static void main(String[] av)
     {
         try {
-	    U.sop(main + " starting");
+            U.sop(main + " starting");
 
-	    if (! ColocatedClientServer.isColocated) {
-		U.sop(main + " : creating ORB.");
-		orb = ORB.init(av, null);
-		U.sop(main + " : creating InitialContext.");
-		initialContext = C.createInitialContext(orb);
-	    }
+            if (! ColocatedClientServer.isColocated) {
+                U.sop(main + " : creating ORB.");
+                orb = ORB.init(av, null);
+                U.sop(main + " : creating InitialContext.");
+                initialContext = C.createInitialContext(orb);
+            }
 
-	    rmiiIPOA = (rmiiI)
-		U.lookupAndNarrow(C.rmiiSL, rmiiI.class, initialContext);
+            rmiiIPOA = (rmiiI)
+                U.lookupAndNarrow(C.rmiiSL, rmiiI.class, initialContext);
 
-	    U.sop("CLIENT.fooA: " + rmiiIPOA.fooA((byte)5));
-	    rmiiIPOA.fooB();
-	    U.sop("CLIENT.fooB completed");
+            U.sop("CLIENT.fooA: " + rmiiIPOA.fooA((byte)5));
+            rmiiIPOA.fooB();
+            U.sop("CLIENT.fooB completed");
 
-	    orb.shutdown(true);
+            orb.shutdown(true);
 
         } catch (Exception e) {
             U.sopUnexpectedException(main + " : ", e);
-	    System.exit(1);
+            System.exit(1);
         }
-	U.sop(main + " ending successfully");
-	System.exit(Controller.SUCCESS);
+        U.sop(main + " ending successfully");
+        System.exit(Controller.SUCCESS);
     }
 
     ////////////////////////////////////////////////////
@@ -147,40 +147,40 @@ public class Client extends org.omg.CORBA.LocalObject
 
     public void receive_reply(ClientRequestInfo ri) 
     {    
-	String opName = ri.operation();
-	U.sop("receive_reply.opName: " + opName);
+        String opName = ri.operation();
+        U.sop("receive_reply.opName: " + opName);
 
-	if ( ! (opName.equals("fooA") || opName.equals("fooB")) ) {
-	    return;
-	}
+        if ( ! (opName.equals("fooA") || opName.equals("fooB")) ) {
+            return;
+        }
 
-	Class riClass = ri.getClass();
-	MessageMediatorImpl cri;
-	try {
-	    Field riMember = riClass.getDeclaredField("messageMediator");
-	    riMember.setAccessible(true);
-	    cri = (MessageMediatorImpl) riMember.get(ri);
-	} catch (Throwable e) { 
-	    e.printStackTrace(System.out); 
-	    throw new RuntimeException("impl class instrospection failed", e);
-	}
+        Class riClass = ri.getClass();
+        MessageMediatorImpl cri;
+        try {
+            Field riMember = riClass.getDeclaredField("messageMediator");
+            riMember.setAccessible(true);
+            cri = (MessageMediatorImpl) riMember.get(ri);
+        } catch (Throwable e) { 
+            e.printStackTrace(System.out); 
+            throw new RuntimeException("impl class instrospection failed", e);
+        }
 
-	// fooA.buffer: [header + padding + body (1 byte)]
-	// fooA.buffer: [header + body (1 byte)]
+        // fooA.buffer: [header + padding + body (1 byte)]
+        // fooA.buffer: [header + body (1 byte)]
 
-	// get header size
-	int size = cri.getReplyHeader().getSize();
-	U.sop("reply message size: " + size);
+        // get header size
+        int size = cri.getReplyHeader().getSize();
+        U.sop("reply message size: " + size);
 
-	if (opName.equals("fooA")) {
-	    if (size != 41) {
-		throw new RuntimeException("header padding error");
-	    }
-	} else { // opName == fooB
-	    if (size != 34) {
-		throw new RuntimeException("header padding error");
-	    }
-	}
+        if (opName.equals("fooA")) {
+            if (size != 41) {
+                throw new RuntimeException("header padding error");
+            }
+        } else { // opName == fooB
+            if (size != 34) {
+                throw new RuntimeException("header padding error");
+            }
+        }
     }
 
     public void receive_exception(ClientRequestInfo ri) throws ForwardRequest 

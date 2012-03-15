@@ -11,13 +11,13 @@ fstp> mput edu.* eclipsePlugin*
 fstp> quit
 
 Add releases via:
-	https://sourceforge.net/project/admin/editpackages.php?group_id=96405	
+        https://sourceforge.net/project/admin/editpackages.php?group_id=96405   
 
 
 release daily/candidate/final eclipse plugins
 
 From findbugs directory, do:
-	rsync -avz web/ username,findbugs@web.sourceforge.net:htdocs/
+        rsync -avz web/ username,findbugs@web.sourceforge.net:htdocs/
 
 For a full release, make a branch in the svn repository:
 

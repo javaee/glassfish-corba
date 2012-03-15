@@ -45,13 +45,13 @@
 
 package corba.tcpreadtimeout;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
 import corba.hcks.U;
 
 class idlIServantPOA
     extends 
-	idlIPOA
+        idlIPOA
 {
     public static final String baseMsg = idlIServantPOA.class.getName();
 
@@ -64,24 +64,24 @@ class idlIServantPOA
 
     public String o(String arg1)
     {
-	String result = arg1 + " (echo from server)";
-	U.sop(result);
-	return result;
+        String result = arg1 + " (echo from server)";
+        U.sop(result);
+        return result;
     }
 
     public String return_after_client_gives_up(String arg1)
     {
-	U.sop("return_after_client_gives_up about to wait");
-	try {
-	    Thread.sleep(4 * orb.getORBData().getWaitForResponseTimeout());
-	} catch (InterruptedException e) {
-	    RuntimeException rte = new RuntimeException();
-	    rte.initCause(e);
-	    throw rte;
-	}
-	String result = arg1 + " (echo from server)";
-	U.sop(result);
-	return result;
+        U.sop("return_after_client_gives_up about to wait");
+        try {
+            Thread.sleep(4 * orb.getORBData().getWaitForResponseTimeout());
+        } catch (InterruptedException e) {
+            RuntimeException rte = new RuntimeException();
+            rte.initCause(e);
+            throw rte;
+        }
+        String result = arg1 + " (echo from server)";
+        U.sop(result);
+        return result;
     }
 }
 

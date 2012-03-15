@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.corba;
+package com.sun.corba.ee.impl.corba;
 
 
 @SuppressWarnings({"deprecation"})
@@ -56,11 +56,11 @@ public class PrincipalImpl extends org.omg.CORBA.Principal
 
     public void name(byte[] value)
     {
-	this.value = value.clone();
+        this.value = value.clone();
     }
 
     public byte[] name()
     {
-	return value.clone() ;
+        return value.clone() ;
     }
 }

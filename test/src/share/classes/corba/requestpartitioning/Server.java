@@ -41,10 +41,10 @@
 package corba.requestpartitioning;
 
 import java.util.Properties;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.extension.RequestPartitioningPolicy;
-import com.sun.corba.se.spi.threadpool.ThreadPoolManager;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.extension.RequestPartitioningPolicy;
+import com.sun.corba.ee.spi.threadpool.ThreadPoolManager;
 
 import corba.framework.Options;
 import corba.hcks.U;
@@ -57,7 +57,7 @@ import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 
 //
-// Created	: 2004 June 2, 2004 by Charlie Hunt
+// Created      : 2004 June 2, 2004 by Charlie Hunt
 // Last Modified: 2004 June 2, 2004 by Charlie Hunt
 //
 
@@ -67,10 +67,10 @@ public class Server
 
     public static void main(String[] args)
     {
-	Properties props = System.getProperties();
-	try
-	{
-	    orb = (ORB)org.omg.CORBA.ORB.init(args, props);
+        Properties props = System.getProperties();
+        try
+        {
+            orb = (ORB)org.omg.CORBA.ORB.init(args, props);
 
             // set custom thread pool manager
             ThreadPoolManager threadPoolManager =
@@ -108,13 +108,13 @@ public class Server
             NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
             NameComponent[] path = null;
 
-	    POA[] poa = new POA[TestThreadPoolManager.NUMBER_OF_THREAD_POOLS_TO_CREATE];
+            POA[] poa = new POA[TestThreadPoolManager.NUMBER_OF_THREAD_POOLS_TO_CREATE];
             Policy policy[] = new Policy[1];
 
-	    for (int i = 0; i < poa.length; i++) {
-		policy[0] = new RequestPartitioningPolicy(i);
-		String poaName = "POA-Tester" + i;
-		poa[i] = rootPOA.create_POA(poaName, null, policy);
+            for (int i = 0; i < poa.length; i++) {
+                policy[0] = new RequestPartitioningPolicy(i);
+                String poaName = "POA-Tester" + i;
+                poa[i] = rootPOA.create_POA(poaName, null, policy);
                 poa[i].activate_object(testerImpl);
 
                 org.omg.CORBA.Object ref = 
@@ -126,11 +126,11 @@ public class Server
                 ncRef.rebind(path, testerRef);
 
                 poa[i].the_POAManager().activate();
-	    }
+            }
     
-	    // create one POA for default thread pool
-	    String specialPoaName = "POA-Default-Tester";
-	    POA specialPoa = rootPOA.create_POA(specialPoaName, null, null);
+            // create one POA for default thread pool
+            String specialPoaName = "POA-Default-Tester";
+            POA specialPoa = rootPOA.create_POA(specialPoaName, null, null);
             specialPoa.activate_object(testerImpl);
             org.omg.CORBA.Object sref = 
                        specialPoa.servant_to_reference(testerImpl);
@@ -140,15 +140,15 @@ public class Server
             ncRef.rebind(path, specialTesterRef);
             specialPoa.the_POAManager().activate();
 
-	    U.sop(Options.defServerHandshake);
+            U.sop(Options.defServerHandshake);
 
-	    orb.run();
+            orb.run();
 
-	} catch (Throwable t) {
-	    U.sop("Unexpected throwable...");
+        } catch (Throwable t) {
+            U.sop("Unexpected throwable...");
             t.printStackTrace();
             System.exit(1);
-	}
-	U.sop("Ending successfully...");
+        }
+        U.sop("Ending successfully...");
     }
 }

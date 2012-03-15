@@ -38,14 +38,14 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 /**
  * Encapsulations are supposed to explicitly define their
@@ -100,17 +100,17 @@ public class EncapsOutputStream extends CDROutputObject
     }
 
     public EncapsOutputStream(ORB orb,
-			      GIOPVersion version, 
-			      boolean isLittleEndian)
+                              GIOPVersion version, 
+                              boolean isLittleEndian)
     {
         super(orb, version, ORBUtility.getEncodingVersion(), isLittleEndian,
-	      BufferManagerFactory.newBufferManagerWrite(
+              BufferManagerFactory.newBufferManagerWrite(
                                         BufferManagerFactory.GROW,
-					ORBUtility.getEncodingVersion(),
-					orb),
-	      ORBConstants.STREAM_FORMAT_VERSION_1,
+                                        ORBUtility.getEncodingVersion(),
+                                        orb),
+              ORBConstants.STREAM_FORMAT_VERSION_1,
               usePooledByteBuffers,
-	      false); 
+              false); 
     }
 
     @Override
@@ -133,7 +133,7 @@ public class EncapsOutputStream extends CDROutputObject
     @Override
     protected CodeSetConversion.CTBConverter createWCharCTBConverter() {
         if (getGIOPVersion().equals(GIOPVersion.V1_0))
-	    throw wrapper.wcharDataInGiop10();            
+            throw wrapper.wcharDataInGiop10();            
 
         // In the case of GIOP 1.1, we take the byte order of the stream 
         // and don't use byte order markers since we're limited to a 2 byte

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
 /** Interface that supports capturing the GIOP messages for the
  * last non-co-located invocation in the current thread.

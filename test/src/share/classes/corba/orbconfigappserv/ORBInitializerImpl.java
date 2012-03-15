@@ -53,16 +53,16 @@ public class ORBInitializerImpl
     extends
         org.omg.CORBA.LocalObject
     implements
-	org.omg.PortableInterceptor.ORBInitializer
+        org.omg.PortableInterceptor.ORBInitializer
 {
     public void pre_init(ORBInitInfo info)
     {
-	System.out.println("ORBInitializerImpl.pre_init");
+        System.out.println("ORBInitializerImpl.pre_init");
     }
 
     public void post_init(ORBInitInfo info)
     {
-	System.out.println("ORBInitializerImpl.post_init");
+        System.out.println("ORBInitializerImpl.post_init");
     }
 }
 

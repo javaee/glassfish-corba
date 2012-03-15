@@ -38,13 +38,13 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
+import com.sun.corba.ee.spi.orb.ObjectKeyCacheEntry;
 
 /**
  * This implements the GIOP 1.1 LocateRequest header.
@@ -85,11 +85,11 @@ public final class LocateRequestMessage_1_1 extends Message_1_1
 
     public ObjectKeyCacheEntry getObjectKeyCacheEntry() {
         if (this.entry == null) {
-	    // this will raise a MARSHAL exception upon errors.
-	    this.entry = orb.extractObjectKeyCacheEntry(object_key);
+            // this will raise a MARSHAL exception upon errors.
+            this.entry = orb.extractObjectKeyCacheEntry(object_key);
         }
 
-	return this.entry;
+        return this.entry;
     }
 
     // IO methods

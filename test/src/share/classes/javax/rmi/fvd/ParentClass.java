@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ParentClass.java	1.4 99/06/07 */
+/* @(#)ParentClass.java 1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -54,10 +54,10 @@ import java.util.Random;
 public abstract class ParentClass implements java.io.Serializable {
 
     public long getTotal(){
-	return 0;
+        return 0;
     }
 
     public long getOriginalTotal(){
-	return 0;
+        return 0;
     }
 }

@@ -53,7 +53,7 @@ public final class Invalid
      * Constructs an <code>Invalid</code> object.
      */
     public Invalid() {
-	super();
+        super();
     }
 
     /**
@@ -62,6 +62,6 @@ public final class Invalid
      * regarding the bad parameter passed to a dynamic any operation.
      */
     public Invalid(String reason) {
-	super(reason);
+        super(reason);
     }
 }

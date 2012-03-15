@@ -50,17 +50,17 @@ import corba.framework.CORBATest;
 import corba.framework.Controller;
 import corba.framework.Options;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 /**
  * @author Harold Carr
  */
 public class RetryPluginTest
     extends
-	CORBATest
+        CORBATest
 {
     protected void doTest()
-	throws Exception
+        throws Exception
     {
         String thisPackage = RetryPluginTest.class.getPackage().getName();
 

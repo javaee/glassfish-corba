@@ -38,10 +38,10 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.trace.Transport;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.channels.SelectableChannel;
@@ -74,11 +74,11 @@ public class AcceptorLazyImpl extends AcceptorBase {
 
     @Transport
     public synchronized boolean initialize() {
-	if (initialized) {
-	    return false;
+        if (initialized) {
+            return false;
         }
 
-	orb.getCorbaTransportManager().getInboundConnectionCache(this);
+        orb.getCorbaTransportManager().getInboundConnectionCache(this);
 
         initialized = true ;
 

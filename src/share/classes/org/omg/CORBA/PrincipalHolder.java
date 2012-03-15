@@ -63,7 +63,7 @@ import org.omg.CORBA.portable.OutputStream;
  * the value stored in its <code>value</code> field can be accessed with
  * <code>myPrincipalHolder.value</code>.
  *
- * @version	1.14, 09/09/97
+ * @version     1.14, 09/09/97
  * @since       JDK1.2
  * @deprecated Deprecated by CORBA 2.2.
  */
@@ -92,19 +92,19 @@ public final class PrincipalHolder implements Streamable {
      */
     // @SuppressWarnings({"deprecation"})
     public PrincipalHolder(Principal initial) {
-	value = initial;
+        value = initial;
     }
 
     public void _read(InputStream input) {
-	value = input.read_Principal();
+        value = input.read_Principal();
     }
 
     public void _write(OutputStream output) {
-	output.write_Principal(value);
+        output.write_Principal(value);
     }
 
     public org.omg.CORBA.TypeCode _type() {
-	return ORB.init().get_primitive_tc(TCKind.tk_Principal);
+        return ORB.init().get_primitive_tc(TCKind.tk_Principal);
     }
 
 }

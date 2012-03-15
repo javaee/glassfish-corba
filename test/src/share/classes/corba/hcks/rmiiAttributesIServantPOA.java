@@ -49,42 +49,42 @@ import javax.rmi.PortableRemoteObject;
 
 public class rmiiAttributesIServantPOA
     extends 
-	PortableRemoteObject
+        PortableRemoteObject
     implements
-	rmiiAttributesI
+        rmiiAttributesI
 {
     public rmiiAttributesIServantPOA()
-	throws
-	    RemoteException {}
+        throws
+            RemoteException {}
 
     public Integer getInteger()
-	throws
-	    RemoteException { return null; }
+        throws
+            RemoteException { return null; }
 
     public void    setInteger(Integer x)
-	throws
-	    RemoteException { }
+        throws
+            RemoteException { }
 
     public boolean isTrue()
-	throws
-	    RemoteException { return true; }
+        throws
+            RemoteException { return true; }
 
     public boolean getTrue()
-	throws
-	    RemoteException { return true; }
+        throws
+            RemoteException { return true; }
 
     public void    setTrue(boolean x)
-	throws
-	    RemoteException { }
+        throws
+            RemoteException { }
 
     // Test that this is NOT a JavaBeans pattern.
     public Integer get()
-	throws
-	    RemoteException { return null; }
+        throws
+            RemoteException { return null; }
 
     public void set(Integer x)
-	throws
-	    RemoteException { }
+        throws
+            RemoteException { }
 
 }
 

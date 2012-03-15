@@ -51,39 +51,39 @@ import corba.hcks.U;
 
 public class rmiiIServantConnect
     extends 
-	PortableRemoteObject
+        PortableRemoteObject
     implements 
-	rmiiI
+        rmiiI
 {
     public static final String baseMsg = rmiiIServantConnect.class.getName();
 
     public rmiiIServantConnect ()
-	throws
-	    RemoteException 
+        throws
+            RemoteException 
     {
         super();
     }
 
     public void raiseSystemException(String x)
-	throws
-	    RemoteException
+        throws
+            RemoteException
     {
-	throw new FREE_MEM(x);
+        throw new FREE_MEM(x);
     }
 
     public void raiseUserException(String x)
-	throws
-	    RemoteException,
-	    rmiiException
+        throws
+            RemoteException,
+            rmiiException
     {
-	throw new rmiiException(x);
+        throw new rmiiException(x);
     }
 
     public void raiseRuntimeException(String x)
-	throws
-	    RemoteException
+        throws
+            RemoteException
     {
-	throw new RuntimeException(x);
+        throw new RuntimeException(x);
     }
 }
 

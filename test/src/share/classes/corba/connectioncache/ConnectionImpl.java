@@ -42,7 +42,7 @@ package corba.connectioncache ;
     
 // A simple implementation of Connection for testing.  No 
 
-import com.sun.corba.se.spi.transport.connection.Connection;
+import com.sun.corba.ee.spi.transport.connection.Connection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 // synchronization is required to use this class.  

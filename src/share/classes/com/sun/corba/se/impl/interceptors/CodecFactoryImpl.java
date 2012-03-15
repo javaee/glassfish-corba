@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.interceptors;
+package com.sun.corba.ee.impl.interceptors;
 
 import org.omg.IOP.Codec;
 import org.omg.IOP.CodecFactory;
@@ -46,7 +46,7 @@ import org.omg.IOP.CodecFactoryPackage.UnknownEncoding;
 import org.omg.IOP.Encoding;
 import org.omg.IOP.ENCODING_CDR_ENCAPS;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 import org.omg.CORBA.ORB;
 
@@ -78,13 +78,13 @@ public final class CodecFactoryImpl
     public CodecFactoryImpl( ORB orb ) {
         this.orb = orb;
 
-	// Precreate a codec for version 1.0 through 
-	// 1.(MAX_MINOR_VERSION_SUPPORTED).  This can be
-	// done since Codecs are immutable in their current implementation.
-	// This is an optimization that eliminates the overhead of creating
-	// a new Codec each time create_codec is called.
-	for( int minor = 0; minor <= MAX_MINOR_VERSION_SUPPORTED; minor++ ) {
-	    codecs[minor] = new CDREncapsCodec( orb, 1, minor );
+        // Precreate a codec for version 1.0 through 
+        // 1.(MAX_MINOR_VERSION_SUPPORTED).  This can be
+        // done since Codecs are immutable in their current implementation.
+        // This is an optimization that eliminates the overhead of creating
+        // a new Codec each time create_codec is called.
+        for( int minor = 0; minor <= MAX_MINOR_VERSION_SUPPORTED; minor++ ) {
+            codecs[minor] = new CDREncapsCodec( orb, 1, minor );
         }
     }
 
@@ -101,24 +101,24 @@ public final class CodecFactoryImpl
     {
         if( enc == null ) nullParam();
 
-	Codec result = null;
+        Codec result = null;
 
-	// This is the only format we can currently create codecs for:
-	if( (enc.format == ENCODING_CDR_ENCAPS.value) &&
+        // This is the only format we can currently create codecs for:
+        if( (enc.format == ENCODING_CDR_ENCAPS.value) &&
             (enc.major_version == 1) ) 
         {
-	    if( (enc.minor_version >= 0) && 
-		(enc.minor_version <= MAX_MINOR_VERSION_SUPPORTED) ) 
+            if( (enc.minor_version >= 0) && 
+                (enc.minor_version <= MAX_MINOR_VERSION_SUPPORTED) ) 
             {
-		result = codecs[enc.minor_version];
-	    }
-	}
+                result = codecs[enc.minor_version];
+            }
+        }
 
-	if( result == null ) {
-	    throw new UnknownEncoding();
-	}
+        if( result == null ) {
+            throw new UnknownEncoding();
+        }
 
-	return result;
+        return result;
     }
 
     /**
@@ -127,6 +127,6 @@ public final class CodecFactoryImpl
      */
     private void nullParam() 
     {
-	throw wrapper.nullParamNoComplete() ;
+        throw wrapper.nullParamNoComplete() ;
     }
 }

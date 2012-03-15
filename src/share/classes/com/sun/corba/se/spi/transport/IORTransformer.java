@@ -37,11 +37,11 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.transport ;
+package com.sun.corba.ee.spi.transport ;
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.impl.encoding.CDRInputObject ;
-import com.sun.corba.se.impl.encoding.CDROutputObject ;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.impl.encoding.CDRInputObject ;
+import com.sun.corba.ee.impl.encoding.CDROutputObject ;
 
 /** Interface that provides operations to transorm an IOR
  * between its programmatic representation and a representation

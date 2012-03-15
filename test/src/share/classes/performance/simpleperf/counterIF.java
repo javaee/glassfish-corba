@@ -38,7 +38,7 @@
  * holder.
  */
 /*
- * @(#)counterIF.java	1.4 99/10/29
+ * @(#)counterIF.java   1.4 99/10/29
  *
  * Copyright 1998, 1999 Sun Microsystems, Inc. All Rights Reserved.
  * 

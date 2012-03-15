@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ComplexTestObjectTwoDelta.java	1.3 99/06/07 */
+/* @(#)ComplexTestObjectTwoDelta.java   1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -75,17 +75,17 @@ public class ComplexTestObjectTwoDelta implements Serializable
     public boolean equals(Object o)
     {
         try
-	    {
-		ComplexTestObjectTwoDelta ctbo = (ComplexTestObjectTwoDelta)o;
-		return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) &&
-			(ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && (ctbo.fDouble == fDouble)
-			&& (ctbo.fOne.equals(fOne))
-			);
-	    }
+            {
+                ComplexTestObjectTwoDelta ctbo = (ComplexTestObjectTwoDelta)o;
+                return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) &&
+                        (ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && (ctbo.fDouble == fDouble)
+                        && (ctbo.fOne.equals(fOne))
+                        );
+            }
         catch(Exception e)
-	    {
-		return false;
-	    }
+            {
+                return false;
+            }
     }
 
     public String toString()
@@ -99,13 +99,13 @@ public class ComplexTestObjectTwoDelta implements Serializable
     private void writeObject(ObjectOutputStream s) throws IOException
     {
         try
-	    {
-		s.defaultWriteObject();
-	    }
+            {
+                s.defaultWriteObject();
+            }
         catch(IOException e)
-	    {
-		throw e;
-	    }
+            {
+                throw e;
+            }
     }
 
 }

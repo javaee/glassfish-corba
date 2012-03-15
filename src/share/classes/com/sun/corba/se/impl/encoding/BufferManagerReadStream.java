@@ -37,16 +37,16 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
-import com.sun.corba.se.spi.transport.ByteBufferPool;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.protocol.RequestCanceledException;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.spi.transport.ByteBufferPool;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.impl.protocol.RequestCanceledException;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.spi.trace.Transport;
 import java.util.LinkedList;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
@@ -71,7 +71,7 @@ public class BufferManagerReadStream
 
     BufferManagerReadStream( ORB orb ) 
     {
-	this.orb = orb ;
+        this.orb = orb ;
     }
 
     public void cancelProcessing(int requestId) {
@@ -125,21 +125,21 @@ public class BufferManagerReadStream
             while (fragmentQueue.size() == 0) {
 
                 if (endOfStream) {
-		    throw wrapper.endOfStream() ;
+                    throw wrapper.endOfStream() ;
                 }
 
-		boolean interrupted = false ;
+                boolean interrupted = false ;
                 try {
-		    // Bug 6372405
+                    // Bug 6372405
                     fragmentQueue.wait( 
                         orb.getORBData().fragmentReadTimeout() );
                 } catch (InterruptedException e) {
-		    interrupted = true ;
-		}
+                    interrupted = true ;
+                }
 
-		// Bug 6372405
-		if (!interrupted && fragmentQueue.size() == 0) {
-		    throw wrapper.bufferReadManagerTimeout() ;
+                // Bug 6372405
+                if (!interrupted && fragmentQueue.size() == 0) {
+                    throw wrapper.bufferReadManagerTimeout() ;
                 }
 
                 if (receivedCancel) {
@@ -162,7 +162,7 @@ public class BufferManagerReadStream
             // Release bbwi.byteBuffer to the ByteBufferPool only if
             // this BufferManagerStream is not marked for potential restore.
             if (markEngaged == false && bbwi != null && 
-		bbwi.getByteBuffer() != null) {
+                bbwi.getByteBuffer() != null) {
                 ByteBufferPool byteBufferPool = getByteBufferPool();
 
                 if (orb.transportDebugFlag) {
@@ -179,7 +179,7 @@ public class BufferManagerReadStream
         }
         return result;
       } finally {
-	  //System.out.println("EXIT underflow");
+          //System.out.println("EXIT underflow");
       }
     }
 
@@ -196,9 +196,9 @@ public class BufferManagerReadStream
     {
         int inputBbAddress = 0;
 
-	if (bbwi != null) {
-	    inputBbAddress = System.identityHashCode(bbwi.getByteBuffer());
-	}
+        if (bbwi != null) {
+            inputBbAddress = System.identityHashCode(bbwi.getByteBuffer());
+        }
         ByteBufferPool byteBufferPool = getByteBufferPool();
 
         // release ByteBuffers on fragmentQueue
@@ -240,7 +240,7 @@ public class BufferManagerReadStream
             //            on the stack. If one is found to equal, it will
             //            not be released to the ByteBufferPool.
 
-	    for (ByteBufferWithInfo abbwi : fragmentStack) {
+            for (ByteBufferWithInfo abbwi : fragmentStack) {
                 if (abbwi != null && abbwi.getByteBuffer() != null) {
                    int bbAddress = System.identityHashCode(abbwi.getByteBuffer());
                    if (inputBbAddress != bbAddress) {
@@ -252,7 +252,7 @@ public class BufferManagerReadStream
                        byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
                    }
                 }
-	    }
+            }
 
             fragmentStack = null;
         }
@@ -319,7 +319,7 @@ public class BufferManagerReadStream
         if (fragmentStack != null && fragmentStack.size() != 0) {
 
             synchronized(fragmentQueue) {
-		for (ByteBufferWithInfo bbwi : fragmentStack) {
+                for (ByteBufferWithInfo bbwi : fragmentStack) {
                     fragmentQueue.push(bbwi) ;
                 }
             }

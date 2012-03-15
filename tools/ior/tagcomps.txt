@@ -41,6 +41,6 @@
 
 1 org.omg.CONV_FRAME.CodeSetComponentInfoHelper
 25 tools.ior.CodeBaseHandler
-33 com.sun.corba.se.org.omg.CSIIOP.CompoundSecMechListHelper
-35 com.sun.corba.se.org.omg.CSIIOP.SECIOP_SEC_TRANSHelper
-36 com.sun.corba.se.org.omg.CSIIOP.TLS_SEC_TRANSHelper
+33 com.sun.corba.ee.org.omg.CSIIOP.CompoundSecMechListHelper
+35 com.sun.corba.ee.org.omg.CSIIOP.SECIOP_SEC_TRANSHelper
+36 com.sun.corba.ee.org.omg.CSIIOP.TLS_SEC_TRANSHelper

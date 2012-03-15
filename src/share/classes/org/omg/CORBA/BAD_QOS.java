@@ -58,7 +58,7 @@ public final class BAD_QOS extends SystemException {
      * minor code set to 0 and CompletionStatus set to COMPLETED_NO.
      */
     public BAD_QOS() {
-	this("");
+        this("");
     }
 
     /**

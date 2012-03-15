@@ -52,9 +52,9 @@ public class ApplicationException extends Exception {
      * @param ins the stream which contains the user exception data
      */
     public ApplicationException(String id,
-				InputStream ins) {
-	this.id = id;
-	this.ins = ins;
+                                InputStream ins) {
+        this.id = id;
+        this.ins = ins;
     }
 
     /**
@@ -63,7 +63,7 @@ public class ApplicationException extends Exception {
      * @return The CORBA repository ID of this exception
      */
     public String getId() {
-	return id;
+        return id;
     }
 
     /**
@@ -71,7 +71,7 @@ public class ApplicationException extends Exception {
      * @return The stream which contains the user exception data
      */
     public InputStream getInputStream() {
-	return ins;
+        return ins;
     }
 
     private String id;

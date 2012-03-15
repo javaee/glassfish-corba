@@ -47,15 +47,15 @@ public class EchoImpl extends PortableRemoteObject implements Echo {
     private String name ;
 
     public EchoImpl( String name ) throws RemoteException {
-	this.name = name ;
+        this.name = name ;
     }
 
     public Echo say( Echo echo ) {
-	return echo ;
+        return echo ;
     }
 
     public String name() {
-	return name ;
+        return name ;
     }
 }
 

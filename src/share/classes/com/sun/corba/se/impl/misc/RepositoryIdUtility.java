@@ -38,10 +38,10 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.misc;
+package com.sun.corba.ee.impl.misc;
 
 import org.omg.CORBA.ORB;
-import com.sun.corba.se.impl.util.RepositoryId;
+import com.sun.corba.ee.impl.util.RepositoryId;
 
 /**
  * Utility methods for working with repository IDs.

@@ -38,19 +38,19 @@
  * holder.
  */
 
-package com.sun.corba.se.internal.CosNaming;
+package com.sun.corba.ee.internal.CosNaming;
 
 import java.util.Properties;
 
 import java.io.File;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.resolver.Resolver ;
-import com.sun.corba.se.spi.resolver.LocalResolver ;
-import com.sun.corba.se.spi.resolver.ResolverDefault ;
+import com.sun.corba.ee.spi.resolver.Resolver ;
+import com.sun.corba.ee.spi.resolver.LocalResolver ;
+import com.sun.corba.ee.spi.resolver.ResolverDefault ;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 /**
  * Class BootstrapServer is the main entry point for the bootstrap server
@@ -72,73 +72,73 @@ public class BootstrapServer
      */
     public static final void main(String[] args)
     {
-	String propertiesFilename = null;
-	int initialPort = ORBConstants.DEFAULT_INITIAL_PORT;
+        String propertiesFilename = null;
+        int initialPort = ORBConstants.DEFAULT_INITIAL_PORT;
 
-	// Process arguments
-	for (int i=0;i<args.length;i++) {
-	    // Look for the filename
-	    if (args[i].equals("-InitialServicesFile") && i < args.length -1) {
-		propertiesFilename = args[i+1];
-	    }
+        // Process arguments
+        for (int i=0;i<args.length;i++) {
+            // Look for the filename
+            if (args[i].equals("-InitialServicesFile") && i < args.length -1) {
+                propertiesFilename = args[i+1];
+            }
 
-	    // Was the initial port specified? If so, override
-	    // This property normally is applied for the client side
-	    // configuration of resolvers.  Here we are using it to
-	    // define the server port that the with which the resolvers
-	    // communicate.
-	    if (args[i].equals("-ORBInitialPort") && i < args.length-1) {
-		initialPort = java.lang.Integer.parseInt(args[i+1]);
-	    }
-	}
+            // Was the initial port specified? If so, override
+            // This property normally is applied for the client side
+            // configuration of resolvers.  Here we are using it to
+            // define the server port that the with which the resolvers
+            // communicate.
+            if (args[i].equals("-ORBInitialPort") && i < args.length-1) {
+                initialPort = java.lang.Integer.parseInt(args[i+1]);
+            }
+        }
 
-	if (propertiesFilename == null) {
-	    System.out.println( 
+        if (propertiesFilename == null) {
+            System.out.println( 
                 "Bootstrapserver -InitialServicesFile <filename> "
                     + "-ORBInitialPort <num>" ) ;
-	    return;
-	}
+            return;
+        }
 
-	// Create a file
-	File file = new File(propertiesFilename);
+        // Create a file
+        File file = new File(propertiesFilename);
 
-	// Verify that if it exists, it is readable
-	if (file.exists() == true && file.canRead() == false) {
-	    System.err.println( "File " + file.getAbsolutePath() 
+        // Verify that if it exists, it is readable
+        if (file.exists() == true && file.canRead() == false) {
+            System.err.println( "File " + file.getAbsolutePath() 
                 + " is not readable" ) ;
-	    return;
-	}
+            return;
+        }
 
-	// Success: start up
-	System.out.println(
+        // Success: start up
+        System.out.println(
             "Bootstrapserver started on port " + Integer.toString(initialPort) 
                 + " wirh InitialServicesFile " + file.getAbsolutePath());
 
-	Properties props = new Properties() ;
+        Properties props = new Properties() ;
 
-	// Use the SERVER_PORT to create an Acceptor using the
-	// old legacy code in ORBConfiguratorImpl.  When (if?)
-	// the legacy support is removed, this code will need
-	// to create an Acceptor directly.
-	props.put( ORBConstants.SERVER_PORT_PROPERTY,  
-	    Integer.toString( initialPort ) ) ;
+        // Use the SERVER_PORT to create an Acceptor using the
+        // old legacy code in ORBConfiguratorImpl.  When (if?)
+        // the legacy support is removed, this code will need
+        // to create an Acceptor directly.
+        props.put( ORBConstants.SERVER_PORT_PROPERTY,  
+            Integer.toString( initialPort ) ) ;
 
-	ORB orb = (ORB) org.omg.CORBA.ORB.init(args,props);
+        ORB orb = (ORB) org.omg.CORBA.ORB.init(args,props);
 
-	LocalResolver lres = orb.getLocalResolver() ;
-	Resolver fres = ResolverDefault.makeFileResolver( orb, file ) ;
-	Resolver cres = ResolverDefault.makeCompositeResolver( fres, lres ) ;
-	LocalResolver sres = ResolverDefault.makeSplitLocalResolver( cres, lres ) ;
+        LocalResolver lres = orb.getLocalResolver() ;
+        Resolver fres = ResolverDefault.makeFileResolver( orb, file ) ;
+        Resolver cres = ResolverDefault.makeCompositeResolver( fres, lres ) ;
+        LocalResolver sres = ResolverDefault.makeSplitLocalResolver( cres, lres ) ;
 
-	orb.setLocalResolver( sres ) ;
+        orb.setLocalResolver( sres ) ;
 
-	try {
-	    // This causes the acceptors to start listening.
-	    orb.resolve_initial_references(ORBConstants.ROOT_POA_NAME);
-	} catch (org.omg.CORBA.ORBPackage.InvalidName e) {
-	    throw new RuntimeException("This should not happen", e);
-	}
+        try {
+            // This causes the acceptors to start listening.
+            orb.resolve_initial_references(ORBConstants.ROOT_POA_NAME);
+        } catch (org.omg.CORBA.ORBPackage.InvalidName e) {
+            throw new RuntimeException("This should not happen", e);
+        }
 
-	orb.run() ;
+        orb.run() ;
     }
 }

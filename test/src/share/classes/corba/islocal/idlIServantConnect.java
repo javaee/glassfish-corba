@@ -48,7 +48,7 @@ import corba.hcks.U;
 
 class idlIServantConnect
     extends 
-	_idlIImplBase 
+        _idlIImplBase 
 {
     public static final String baseMsg = idlIServantConnect.class.getName();
 
@@ -58,11 +58,11 @@ class idlIServantConnect
 
     public String o(String arg1)
     {
-	// REVISIT : IDL stubs do NOT have colocated branch yet.
-	//Server.checkThread(baseMsg);
-	String result = Server.filter(arg1, baseMsg);
-	U.sop(result);
-	return result;
+        // REVISIT : IDL stubs do NOT have colocated branch yet.
+        //Server.checkThread(baseMsg);
+        String result = Server.filter(arg1, baseMsg);
+        U.sop(result);
+        return result;
     }
 }
 

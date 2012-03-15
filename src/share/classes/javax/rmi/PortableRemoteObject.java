@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package javax.rmi;	
+package javax.rmi;      
 
 import java.lang.reflect.Method ;
 
@@ -64,7 +64,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.rmi.server.RMIClassLoader;
 
-import com.sun.corba.se.org.omg.CORBA.GetPropertyAction;
+import com.sun.corba.ee.org.omg.CORBA.GetPropertyAction;
 
 /**
  * Server implementation objects may either inherit from
@@ -88,7 +88,7 @@ public class PortableRemoteObject {
             "javax.rmi.CORBA.PortableRemoteObjectClass";
 
     private static final String defaultPortableRemoteObjectImplName =
-            "com.sun.corba.se.impl.javax.rmi.PortableRemoteObject";
+            "com.sun.corba.ee.impl.javax.rmi.PortableRemoteObject";
 
     static {
         proDelegate = (javax.rmi.CORBA.PortableRemoteObjectDelegate)
@@ -100,9 +100,9 @@ public class PortableRemoteObject {
      * @exception RemoteException if export fails.
      */
     protected PortableRemoteObject() throws RemoteException {
-	if (proDelegate != null) {
+        if (proDelegate != null) {
             PortableRemoteObject.exportObject((Remote)this);
-	}
+        }
     }
     
     /**
@@ -113,12 +113,12 @@ public class PortableRemoteObject {
      * @exception RemoteException if export fails.
      */
     public static void exportObject(Remote obj)
-	throws RemoteException {
+        throws RemoteException {
 
-	// Let the delegate do everything, including error handling.
-	if (proDelegate != null) {
-	    proDelegate.exportObject(obj);
-	}
+        // Let the delegate do everything, including error handling.
+        if (proDelegate != null) {
+            proDelegate.exportObject(obj);
+        }
     }
 
     /**
@@ -130,12 +130,12 @@ public class PortableRemoteObject {
      * @exception NoSuchObjectException if a stub cannot be located for the given server object.
      */
     public static Remote toStub (Remote obj) 
-	throws NoSuchObjectException {
+        throws NoSuchObjectException {
        
-	if (proDelegate != null) {
-	    return proDelegate.toStub(obj);
-	}
-	return null;
+        if (proDelegate != null) {
+            return proDelegate.toStub(obj);
+        }
+        return null;
     }
 
     /**
@@ -146,11 +146,11 @@ public class PortableRemoteObject {
      * currently exported.
      */
     public static void unexportObject(Remote obj) 
-	throws NoSuchObjectException {
-	    
-	if (proDelegate != null) {
-	    proDelegate.unexportObject(obj);
-	}
+        throws NoSuchObjectException {
+            
+        if (proDelegate != null) {
+            proDelegate.unexportObject(obj);
+        }
         
     }
 
@@ -164,13 +164,13 @@ public class PortableRemoteObject {
      */
     public static java.lang.Object narrow ( java.lang.Object narrowFrom,
                                             java.lang.Class narrowTo)
-	throws ClassCastException {
+        throws ClassCastException {
 
-	if (proDelegate != null) {
-	    return proDelegate.narrow(narrowFrom, narrowTo);
-	}
-	return null;
-	       
+        if (proDelegate != null) {
+            return proDelegate.narrow(narrowFrom, narrowTo);
+        }
+        return null;
+               
     }
  
     /**
@@ -186,11 +186,11 @@ public class PortableRemoteObject {
      * <code>source</code>.
      */
     public static void connect (Remote target, Remote source)
-	throws RemoteException {
+        throws RemoteException {
     
-	if (proDelegate != null) {
-	    proDelegate.connect(target, source);
-	}
+        if (proDelegate != null) {
+            proDelegate.connect(target, source);
+        }
  
     }
 
@@ -207,40 +207,40 @@ public class PortableRemoteObject {
                 className = props.getProperty(classKey);
             } 
         }
-	if (className == null) {
-		className = defaultPortableRemoteObjectImplName;
-	}
+        if (className == null) {
+                className = defaultPortableRemoteObjectImplName;
+        }
 
         try {
             return (Object) loadDelegateClass(className).newInstance();
         } catch (ClassNotFoundException ex) {
-	    INITIALIZE exc = new INITIALIZE( "Cannot instantiate " + className);
-	    exc.initCause( ex ) ;
-	    throw exc ;
+            INITIALIZE exc = new INITIALIZE( "Cannot instantiate " + className);
+            exc.initCause( ex ) ;
+            throw exc ;
         } catch (Exception ex) {
-	    INITIALIZE exc = new INITIALIZE( "Error while instantiating" + className);
-	    exc.initCause( ex ) ;
-	    throw exc ;
+            INITIALIZE exc = new INITIALIZE( "Error while instantiating" + className);
+            exc.initCause( ex ) ;
+            throw exc ;
         }
 
     }
 
     private static Class loadDelegateClass( String className )  throws ClassNotFoundException
     {
-	try {
-	    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-	    return Class.forName(className, false, loader);
-	} catch (ClassNotFoundException e) {
-	    // ignore, then try RMIClassLoader
-	}
+        try {
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            return Class.forName(className, false, loader);
+        } catch (ClassNotFoundException e) {
+            // ignore, then try RMIClassLoader
+        }
 
-	try {
-	    return RMIClassLoader.loadClass(className);
-	} catch (MalformedURLException e) {
-	    String msg = "Could not load " + className + ": " + e.toString();
-	    ClassNotFoundException exc = new ClassNotFoundException( msg ) ; 
-	    throw exc ;
-	}
+        try {
+            return RMIClassLoader.loadClass(className);
+        } catch (MalformedURLException e) {
+            String msg = "Could not load " + className + ": " + e.toString();
+            ClassNotFoundException exc = new ClassNotFoundException( msg ) ; 
+            throw exc ;
+        }
     }
 
     /**
@@ -258,37 +258,37 @@ class GetORBPropertiesFileAction implements PrivilegedAction {
     }
 
     private String getSystemProperty(final String name) {
-	// This will not throw a SecurityException because this
-	// class was loaded from rt.jar using the bootstrap classloader.
+        // This will not throw a SecurityException because this
+        // class was loaded from rt.jar using the bootstrap classloader.
         String propValue = (String) AccessController.doPrivileged(
-	    new PrivilegedAction() {
-		public java.lang.Object run() {
-	            return System.getProperty(name);
-	        }
+            new PrivilegedAction() {
+                public java.lang.Object run() {
+                    return System.getProperty(name);
+                }
             }
-	);
+        );
 
-	return propValue;
+        return propValue;
     }
 
     private void getPropertiesFromFile( Properties props, String fileName )
     {
         try {
-	    File file = new File( fileName ) ;
-	    if (!file.exists())
-		return ;
+            File file = new File( fileName ) ;
+            if (!file.exists())
+                return ;
 
             FileInputStream in = new FileInputStream( file ) ;
-	    
-	    try {
-		props.load( in ) ;
-	    } finally {
-		in.close() ;
-	    }
+            
+            try {
+                props.load( in ) ;
+            } finally {
+                in.close() ;
+            }
         } catch (Exception exc) {
             if (debug)
                 System.out.println( "ORB properties file " + fileName + 
-		    " not found: " + exc) ;
+                    " not found: " + exc) ;
         }
     }
 
@@ -296,19 +296,19 @@ class GetORBPropertiesFileAction implements PrivilegedAction {
     {
         Properties defaults = new Properties() ;
 
-	String javaHome = getSystemProperty( "java.home" ) ;
-	String fileName = javaHome + File.separator + "lib" + File.separator +
-	    "orb.properties" ;
+        String javaHome = getSystemProperty( "java.home" ) ;
+        String fileName = javaHome + File.separator + "lib" + File.separator +
+            "orb.properties" ;
 
-	getPropertiesFromFile( defaults, fileName ) ;
+        getPropertiesFromFile( defaults, fileName ) ;
 
-	Properties results = new Properties( defaults ) ;
+        Properties results = new Properties( defaults ) ;
 
         String userHome = getSystemProperty( "user.home" ) ;
         fileName = userHome + File.separator + "orb.properties" ;
 
-	getPropertiesFromFile( results, fileName ) ;
-	return results ;
+        getPropertiesFromFile( results, fileName ) ;
+        return results ;
     }
 }
 

@@ -44,7 +44,7 @@
 
 package corba.connectintercept_1_4;
 
-import com.sun.corba.se.spi.legacy.interceptor.RequestInfoExt;
+import com.sun.corba.ee.spi.legacy.interceptor.RequestInfoExt;
 import org.omg.PortableInterceptor.ServerRequestInfo;
 import org.omg.PortableInterceptor.ServerRequestInterceptor;
 
@@ -52,7 +52,7 @@ public class SRI
     extends
         org.omg.CORBA.LocalObject
     implements
-	ServerRequestInterceptor
+        ServerRequestInterceptor
 {
 
     public static final String baseMsg = SRI.class.getName();
@@ -63,42 +63,42 @@ public class SRI
 
     public void destroy() 
     {
-	if (balance != 0) {
-	    throw new RuntimeException(baseMsg + ": Interceptors not balanced.");
-	}
+        if (balance != 0) {
+            throw new RuntimeException(baseMsg + ": Interceptors not balanced.");
+        }
     }
 
     public void receive_request_service_contexts(ServerRequestInfo sri)
     {
-	balance++;
-	System.out.println(baseMsg + ".receive_request_service_contexts " +
-			   sri.operation());
-	System.out.println("    request on connection: " +
-			   ((RequestInfoExt)sri).connection());
+        balance++;
+        System.out.println(baseMsg + ".receive_request_service_contexts " +
+                           sri.operation());
+        System.out.println("    request on connection: " +
+                           ((RequestInfoExt)sri).connection());
     }
 
     public void receive_request(ServerRequestInfo sri)
     {
-	//balance++; // DO NOT DO THIS IN AN INTERMEDIATE POINT!
-	System.out.println(baseMsg + ".receive_request " + sri.operation());
+        //balance++; // DO NOT DO THIS IN AN INTERMEDIATE POINT!
+        System.out.println(baseMsg + ".receive_request " + sri.operation());
     }
 
     public void send_reply(ServerRequestInfo sri)
     {
-	balance--;
-	System.out.println(baseMsg + ".send_reply " + sri.operation());
+        balance--;
+        System.out.println(baseMsg + ".send_reply " + sri.operation());
     }
 
     public void send_exception(ServerRequestInfo sri)
     {
-	balance--;
-	System.out.println(baseMsg + ".send_exception " + sri.operation());
+        balance--;
+        System.out.println(baseMsg + ".send_exception " + sri.operation());
     }
 
     public void send_other(ServerRequestInfo sri)
     {
-	balance--;
-	System.out.println(baseMsg + ".send_other " + sri.operation());
+        balance--;
+        System.out.println(baseMsg + ".send_other " + sri.operation());
     }
 }
 

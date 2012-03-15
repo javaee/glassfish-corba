@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)LabeledBarControl.java	1.3 99/06/07 */
+/* @(#)LabeledBarControl.java   1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -73,109 +73,109 @@ public class LabeledBarControl extends JPanel
 
     public LabeledBarControl(String text)
     {
-	BorderLayout layout = new BorderLayout (5,5);
+        BorderLayout layout = new BorderLayout (5,5);
 
-	fLabel = new JLabel (text);
-	fLabel.setPreferredSize (new Dimension(80,20));
-	fLabel.setMinimumSize (new Dimension(80,20));
-	fLabel.setMaximumSize (new Dimension(80,20));
+        fLabel = new JLabel (text);
+        fLabel.setPreferredSize (new Dimension(80,20));
+        fLabel.setMinimumSize (new Dimension(80,20));
+        fLabel.setMaximumSize (new Dimension(80,20));
 
-	fBar = new BarControl (Color.blue);
-	fBar.setBorder (new EmptyBorder (3,2,3,2));
+        fBar = new BarControl (Color.blue);
+        fBar.setBorder (new EmptyBorder (3,2,3,2));
 
-	setPreferredSize (new Dimension(50,20));
-	setMinimumSize (new Dimension(500,20));
-	setMaximumSize (new Dimension(1000,20));
+        setPreferredSize (new Dimension(50,20));
+        setMinimumSize (new Dimension(500,20));
+        setMaximumSize (new Dimension(1000,20));
 
-	setLayout (layout);
-	add (fLabel, "West");
-	add (fBar, "Center");
+        setLayout (layout);
+        add (fLabel, "West");
+        add (fBar, "Center");
     }
 
     public LabeledBarControl(String text, byte orientation)
     {
-	BorderLayout layout = new BorderLayout (5,5);
+        BorderLayout layout = new BorderLayout (5,5);
 
-	fLabel = new JLabel (text);
-	//fLabel.setBorder (new EtchedBorder());
+        fLabel = new JLabel (text);
+        //fLabel.setBorder (new EtchedBorder());
 
-	fBar = new BarControl (Color.blue, orientation);
+        fBar = new BarControl (Color.blue, orientation);
 
-	setLayout (layout);
+        setLayout (layout);
 
-	add (fBar, "Center");
+        add (fBar, "Center");
 
-	switch ( orientation )
-	    {
-	    case BarControl.HORIZONTAL:
-		fLabel.setPreferredSize (new Dimension(80,20));
-		fLabel.setMinimumSize (new Dimension(80,20));
-		fBar.setBorder (new EmptyBorder (3,2,3,2));
-		add (fLabel, "West");
-		break;
-	    case BarControl.VERTICAL:
-		fLabel.setFont (new Font ("SansSerif", Font.PLAIN, 10));
-		fLabel.setPreferredSize (new Dimension(40,20));
-		fLabel.setMinimumSize (new Dimension(40,20));
-		fLabel.setMaximumSize (new Dimension(40,20));
-		fBar.setBorder (new EmptyBorder (2,12,2,12));
-		fLabel.setHorizontalAlignment (JLabel.CENTER);
-		fBar.setSize (new Dimension(20,80));
-		fBar.setMaximumSize (new Dimension(20,100));
-		fBar.setMinimumSize (new Dimension(20,50));
-		fBar.setPreferredSize (new Dimension(20,80));
-		add (fLabel, "South");
-		break;
-	    default:
-		break;
-	    }
+        switch ( orientation )
+            {
+            case BarControl.HORIZONTAL:
+                fLabel.setPreferredSize (new Dimension(80,20));
+                fLabel.setMinimumSize (new Dimension(80,20));
+                fBar.setBorder (new EmptyBorder (3,2,3,2));
+                add (fLabel, "West");
+                break;
+            case BarControl.VERTICAL:
+                fLabel.setFont (new Font ("SansSerif", Font.PLAIN, 10));
+                fLabel.setPreferredSize (new Dimension(40,20));
+                fLabel.setMinimumSize (new Dimension(40,20));
+                fLabel.setMaximumSize (new Dimension(40,20));
+                fBar.setBorder (new EmptyBorder (2,12,2,12));
+                fLabel.setHorizontalAlignment (JLabel.CENTER);
+                fBar.setSize (new Dimension(20,80));
+                fBar.setMaximumSize (new Dimension(20,100));
+                fBar.setMinimumSize (new Dimension(20,50));
+                fBar.setPreferredSize (new Dimension(20,80));
+                add (fLabel, "South");
+                break;
+            default:
+                break;
+            }
 
     }
 
     public void addActionListener (ActionListener listener)
     {
-	fBar.addActionListener (listener);
+        fBar.addActionListener (listener);
     }
 
     public void removeActionListener (ActionListener listener)
     {
-	fBar.removeActionListener (listener);
+        fBar.removeActionListener (listener);
     }
 
     public void setLabelText (String labelText)
     {
-	fLabel.setText (labelText);
+        fLabel.setText (labelText);
     }
 
     public String getLabelText ()
     {
-	return fLabel.getText ();
+        return fLabel.getText ();
     }
 
     public void setBarColor (Color color)
     {
-	fBar.setColor (color);
+        fBar.setColor (color);
     }
 
     public Color getBarColor ()
     {
-	return fBar.getColor ();
+        return fBar.getColor ();
     }
 
     public BarControl getBarControl ()
     {
-	return fBar;
+        return fBar;
     }
 
 
     public void setPercentage (double percentage)
     {
-	fBar.setPercentage (percentage);
+        fBar.setPercentage (percentage);
     }
 
     public double getPercentage ()
     {
-	return fBar.getPercentage ();
+        return fBar.getPercentage ();
     }
 
 }

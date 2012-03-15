@@ -52,11 +52,11 @@ public class Juliet implements org.omg.CORBA.portable.ValueBase
     public int value;
     public Juliet (int initial)
     {
-	value = initial;
+        value = initial;
     }
 
     public String[] _truncatable_ids() {
-	return fake.omega.JulietHelper.get_instance().get_truncatable_base_ids();
+        return fake.omega.JulietHelper.get_instance().get_truncatable_base_ids();
     }
 
 } // class Juliet

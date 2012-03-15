@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)Log.java	1.3 99/06/07 */
+/* @(#)Log.java 1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -51,7 +51,7 @@ package javax.rmi.fvd;
 
 public  interface Log
     extends java.rmi.Remote {
-	
+        
     public void log(String who, String what) throws java.rmi.RemoteException;
 
 }

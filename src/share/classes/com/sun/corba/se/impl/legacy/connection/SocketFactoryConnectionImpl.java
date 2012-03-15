@@ -38,18 +38,18 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.legacy.connection;
+package com.sun.corba.ee.impl.legacy.connection;
 
 
 
 
-import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.ContactInfo;
-import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.legacy.connection.GetEndPointInfoAgainException;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.transport.ConnectionImpl;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.impl.transport.ConnectionImpl;
+import com.sun.corba.ee.spi.trace.Transport;
 import java.net.Socket;
 
 /**
@@ -58,62 +58,62 @@ import java.net.Socket;
 @Transport
 public class SocketFactoryConnectionImpl
     extends
-	ConnectionImpl
+        ConnectionImpl
 {
     @Transport
     private void connectionCreated( Socket socket ) { }
 
     // Socket-factory client constructor.
     public SocketFactoryConnectionImpl(ORB orb,
-				       ContactInfo contactInfo,
-				       boolean useSelectThreadToWait,
-				       boolean useWorkerThread)
+                                       ContactInfo contactInfo,
+                                       boolean useSelectThreadToWait,
+                                       boolean useWorkerThread)
     {
-	super(orb, useSelectThreadToWait, useWorkerThread);
+        super(orb, useSelectThreadToWait, useWorkerThread);
 
-	// REVISIT - probably need a contact info for both
-	// client and server for removing connections from cache?
-	this.contactInfo = contactInfo;
+        // REVISIT - probably need a contact info for both
+        // client and server for removing connections from cache?
+        this.contactInfo = contactInfo;
 
-	boolean isBlocking = !useSelectThreadToWait;
-	SocketInfo socketInfo = 
-	    // REVISIT - case - needs interface method
-	    ((SocketFactoryContactInfoImpl)contactInfo).socketInfo;
-	try {
-	    socket = 
-		orb.getORBData().getLegacySocketFactory().createSocket(socketInfo);
-	    socketChannel = socket.getChannel();
-	    if (socketChannel != null) {
-		socketChannel.configureBlocking(isBlocking);
-	    } else {
-		// IMPORTANT: non-channel-backed sockets must use
-		// dedicated reader threads.
-		setUseSelectThreadToWait(false);
-	    }
+        boolean isBlocking = !useSelectThreadToWait;
+        SocketInfo socketInfo = 
+            // REVISIT - case - needs interface method
+            ((SocketFactoryContactInfoImpl)contactInfo).socketInfo;
+        try {
+            socket = 
+                orb.getORBData().getLegacySocketFactory().createSocket(socketInfo);
+            socketChannel = socket.getChannel();
+            if (socketChannel != null) {
+                socketChannel.configureBlocking(isBlocking);
+            } else {
+                // IMPORTANT: non-channel-backed sockets must use
+                // dedicated reader threads.
+                setUseSelectThreadToWait(false);
+            }
             connectionCreated( socket ) ;
-	} catch (GetEndPointInfoAgainException ex) {
-	    throw wrapper.connectFailure(
+        } catch (GetEndPointInfoAgainException ex) {
+            throw wrapper.connectFailure(
                 ex, socketInfo.getType(), socketInfo.getHost(),
-		Integer.toString(socketInfo.getPort())) ;
-	} catch (Exception ex) {
-	    throw wrapper.connectFailure(
+                Integer.toString(socketInfo.getPort())) ;
+        } catch (Exception ex) {
+            throw wrapper.connectFailure(
                 ex, socketInfo.getType(), socketInfo.getHost(),
-		Integer.toString(socketInfo.getPort())) ;
-	}
-	state = OPENING;
+                Integer.toString(socketInfo.getPort())) ;
+        }
+        state = OPENING;
     }
 
     public String toString()
     {
         synchronized ( stateEvent ){
             return 
-		"SocketFactoryConnectionImpl[" + " "
-		+ (socketChannel == null ?
-		   socket.toString() : socketChannel.toString()) + " "
-		+ getStateString( state ) + " "
-		+ shouldUseSelectThreadToWait() + " "
-		+ shouldUseWorkerThreadForEvent()
-		+ "]" ;
+                "SocketFactoryConnectionImpl[" + " "
+                + (socketChannel == null ?
+                   socket.toString() : socketChannel.toString()) + " "
+                + getStateString( state ) + " "
+                + shouldUseSelectThreadToWait() + " "
+                + shouldUseWorkerThreadForEvent()
+                + "]" ;
         }
     }
 }

@@ -38,16 +38,16 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
 
 
-import com.sun.corba.se.impl.encoding.BufferManagerWrite;
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.transport.ByteBufferPool;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.impl.encoding.BufferManagerWrite;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.transport.ByteBufferPool;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.trace.Transport;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 
@@ -75,16 +75,16 @@ public class ByteBufferWithInfo
                               ByteBuffer byteBuffer,
                               int index)
     {
-        this.orb = (com.sun.corba.se.spi.orb.ORB)orb;
-	this.setByteBuffer(byteBuffer);
+        this.orb = (com.sun.corba.ee.spi.orb.ORB)orb;
+        this.setByteBuffer(byteBuffer);
         position(index);
-	this.setNumberOfBytesNeeded(0);
+        this.setNumberOfBytesNeeded(0);
         this.setFragmented(false);
     }
 
     public ByteBufferWithInfo(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer)
     {
-	this(orb, byteBuffer, 0);
+        this(orb, byteBuffer, 0);
     }
 
     public ByteBufferWithInfo(org.omg.CORBA.ORB orb,
@@ -117,7 +117,7 @@ public class ByteBufferWithInfo
                               BufferManagerWrite bufferManager,
                               boolean usePooledByteBuffers)
     {
-        this.orb = (com.sun.corba.se.spi.orb.ORB)orb;
+        this.orb = (com.sun.corba.ee.spi.orb.ORB)orb;
 
         int bufferSize = bufferManager.getBufferSize();
 
@@ -141,15 +141,15 @@ public class ByteBufferWithInfo
     public ByteBufferWithInfo (ByteBufferWithInfo bbwi)
     {
         this.orb = bbwi.orb;
-	// IMPORTANT: Cannot simply assign the reference of
-	//            bbwi.byteBuffer to this.byteBuffer since
-	//            bbwi's can be restored via restore-able
-	//            stream in CDRInputObject_1_0.java. To
-	//            restore a bbwi, we must also keep the
-	//            bbwi's position and limit. If we use
-	//            ByteBuffer.duplicate() we'll get independent
-	//            positions and limits, but the same ByteBuffer,
-	//            (which is what we want).
+        // IMPORTANT: Cannot simply assign the reference of
+        //            bbwi.byteBuffer to this.byteBuffer since
+        //            bbwi's can be restored via restore-able
+        //            stream in CDRInputObject_1_0.java. To
+        //            restore a bbwi, we must also keep the
+        //            bbwi's position and limit. If we use
+        //            ByteBuffer.duplicate() we'll get independent
+        //            positions and limits, but the same ByteBuffer,
+        //            (which is what we want).
         this.setByteBuffer(bbwi.getByteBuffer().duplicate());
         this.setLength(bbwi.getLength());
         this.position(bbwi.position());
@@ -205,7 +205,7 @@ public class ByteBufferWithInfo
     // flip ByteBuffer (sets limit to position & position to 0)
     public void flip()
     {
-	getByteBuffer().flip();
+        getByteBuffer().flip();
     }
 
     // mutator to buffer's length
@@ -232,7 +232,7 @@ public class ByteBufferWithInfo
     
     // Grow byteBuffer to a size larger than position() + needed
     @Transport
-    public void growBuffer(com.sun.corba.se.spi.orb.ORB orb)
+    public void growBuffer(com.sun.corba.ee.spi.orb.ORB orb)
     {
         int newLength = getLength() * 2;
 
@@ -249,7 +249,7 @@ public class ByteBufferWithInfo
                 newbbAddress, ") from ByteBufferPool." );
         }
 
-	this.flip();
+        this.flip();
         newBB.put(getByteBuffer());
 
         // return 'old' byteBuffer reference to the ByteBuffer pool

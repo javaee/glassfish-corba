@@ -47,9 +47,9 @@ import org.omg.PortableServer.*;
 import org.omg.PortableServer.POAPackage.*;
 import org.omg.PortableServer.ServantLocatorPackage.*;
 import org.omg.PortableInterceptor.*;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import corba.framework.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import java.util.*;
 import java.io.*;
@@ -66,7 +66,7 @@ public abstract class RMIServer
     InitialContext initialNamingContext;
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
         try {
@@ -109,16 +109,16 @@ public abstract class RMIServer
      */
     public org.omg.CORBA.Object createAndBind ( String name, 
                                                 String symbol )
-	throws Exception
+        throws Exception
     {
-	// create and register it with RMI
-	helloRMIIIOP obj = new helloRMIIIOP( out, symbol, this );
-	initialNamingContext.rebind( name, obj );
+        // create and register it with RMI
+        helloRMIIIOP obj = new helloRMIIIOP( out, symbol, this );
+        initialNamingContext.rebind( name, obj );
 
-	java.lang.Object o = initialNamingContext.lookup( name );
-	helloIF helloRef = (helloIF)PortableRemoteObject.narrow( o, 
+        java.lang.Object o = initialNamingContext.lookup( name );
+        helloIF helloRef = (helloIF)PortableRemoteObject.narrow( o, 
             helloIF.class );
-	return (org.omg.CORBA.Object)helloRef;
+        return (org.omg.CORBA.Object)helloRef;
     }
 
     /**
@@ -132,55 +132,55 @@ public abstract class RMIServer
      * Passes in the appropriate valid and invalid repository ids for RMI
      */
     protected void testAttributesValid() 
-	throws Exception
+        throws Exception
     {
-	testAttributesValid( 
-	    "RMI:pi.serverrequestinfo.helloIF:0000000000000000",
-	    "RMI:pi.serverrequestinfo.goodbyeIF:0000000000000000" );
+        testAttributesValid( 
+            "RMI:pi.serverrequestinfo.helloIF:0000000000000000",
+            "RMI:pi.serverrequestinfo.goodbyeIF:0000000000000000" );
     }
 
     
     // ClientCallback interface for request info stack test:
     public String sayHello() {
-	String result = "";
+        String result = "";
 
         out.println( 
-	    "    + ClientCallback: resolving and invoking sayHello()..." );
-	try {
-	    helloIF helloRef = resolve( "Hello1" );
-	    result = helloRef.sayHello();
-	}
-	catch( Exception e ) {
-	    e.printStackTrace();
-	    throw new RuntimeException( "ClientCallback: Exception thrown." );
-	}
+            "    + ClientCallback: resolving and invoking sayHello()..." );
+        try {
+            helloIF helloRef = resolve( "Hello1" );
+            result = helloRef.sayHello();
+        }
+        catch( Exception e ) {
+            e.printStackTrace();
+            throw new RuntimeException( "ClientCallback: Exception thrown." );
+        }
 
-	return result;
+        return result;
     }
 
     public void saySystemException() {
         out.println( 
-	    "    + ClientCallback: resolving and invoking " + 
-	    "saySystemException()..." );
-	try {
-	    helloIF helloRef = resolve( "Hello1" );
-	    try {
-	        helloRef.saySystemException();
-	    }
-	    catch( RemoteException e ) {
-		throw e.detail;
-	    }
-	}
-	catch( SystemException e ) {
-	    // expected.
-	    throw e;
-	}
-	catch( Throwable e ) {
-	    System.err.println( "ClientCallback: Exception " + 
-		e.getClass().getName() + " thrown." );
-	    e.printStackTrace();
-	    throw new RuntimeException( "ClientCallback: Exception thrown." );
-	}
+            "    + ClientCallback: resolving and invoking " + 
+            "saySystemException()..." );
+        try {
+            helloIF helloRef = resolve( "Hello1" );
+            try {
+                helloRef.saySystemException();
+            }
+            catch( RemoteException e ) {
+                throw e.detail;
+            }
+        }
+        catch( SystemException e ) {
+            // expected.
+            throw e;
+        }
+        catch( Throwable e ) {
+            System.err.println( "ClientCallback: Exception " + 
+                e.getClass().getName() + " thrown." );
+            e.printStackTrace();
+            throw new RuntimeException( "ClientCallback: Exception thrown." );
+        }
     }
 
     /**

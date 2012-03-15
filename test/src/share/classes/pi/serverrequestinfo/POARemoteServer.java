@@ -47,9 +47,9 @@ import org.omg.PortableServer.*;
 import org.omg.PortableServer.POAPackage.*;
 import org.omg.PortableServer.ServantLocatorPackage.*;
 import org.omg.PortableInterceptor.*;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import corba.framework.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import java.util.*;
 import java.io.*;
@@ -60,33 +60,33 @@ public class POARemoteServer
     extends POAServer
 {
     public static void main(String args[]) {
-	try {
-	    (new POARemoteServer()).run( System.getProperties(),
-	                	         args, System.out, System.err, null );
-	}
-	catch( Exception e ) {
-	    e.printStackTrace( System.err );
-	    System.exit( 1 );
-	}
+        try {
+            (new POARemoteServer()).run( System.getProperties(),
+                                         args, System.out, System.err, null );
+        }
+        catch( Exception e ) {
+            e.printStackTrace( System.err );
+            System.exit( 1 );
+        }
     }
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
-	TestInitializer.out = out;
-	this.out = out;
-	this.err = err;
+        TestInitializer.out = out;
+        this.out = out;
+        this.err = err;
 
-	out.println( "=====================================" );
-	out.println( "Instantiating ORB for POA Remote test" );
-	out.println( "=====================================" );
+        out.println( "=====================================" );
+        out.println( "Instantiating ORB for POA Remote test" );
+        out.println( "=====================================" );
 
-	out.println( "+ Creating ORB..." );
-	Properties props = new Properties();
-	createORB( args, props );
+        out.println( "+ Creating ORB..." );
+        Properties props = new Properties();
+        createORB( args, props );
 
-	super.run( environment, args, out, err, extra );
+        super.run( environment, args, out, err, extra );
 
 
     }
@@ -97,15 +97,15 @@ public class POARemoteServer
     }
 
     void waitForClients() {
-	// wait for invocations from clients
-	java.lang.Object sync = new java.lang.Object();
-	synchronized (sync) {
-	    try {
-	        sync.wait();
-	    }
-	    catch( InterruptedException e ) {
-	    }
-	}
+        // wait for invocations from clients
+        java.lang.Object sync = new java.lang.Object();
+        synchronized (sync) {
+            try {
+                sync.wait();
+            }
+            catch( InterruptedException e ) {
+            }
+        }
     }
 
 }

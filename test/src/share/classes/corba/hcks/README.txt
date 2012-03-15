@@ -39,10 +39,10 @@
 //
 // Created       : 2000 Nov 26 (Sun) 09:54:31 by Harold Carr.
 // Last Modified : 2000 Nov 26 (Sun) 09:59:49 by Harold Carr.
-//	
+//      
 
 
-		hcks = Harold Carr's Kitchen Sink
+                hcks = Harold Carr's Kitchen Sink
 
 
 

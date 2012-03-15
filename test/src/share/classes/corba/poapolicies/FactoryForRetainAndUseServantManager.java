@@ -57,32 +57,32 @@ public class FactoryForRetainAndUseServantManager implements POAFactory {
 //    }
 
     public POA createPOA(POA parent)
-	throws AdapterAlreadyExists, InvalidPolicy
+        throws AdapterAlreadyExists, InvalidPolicy
     {
-	Policy[] policies = new Policy[2];
-	policies[0] =
-	    parent.create_servant_retention_policy(ServantRetentionPolicyValue.RETAIN);
-	policies[1] =
-	    parent.create_request_processing_policy(RequestProcessingPolicyValue.USE_SERVANT_MANAGER);
-	
-	POA p = parent.create_POA("RetainAndUseServantManager",
-				  null,
-				  policies);
-	try {
+        Policy[] policies = new Policy[2];
+        policies[0] =
+            parent.create_servant_retention_policy(ServantRetentionPolicyValue.RETAIN);
+        policies[1] =
+            parent.create_request_processing_policy(RequestProcessingPolicyValue.USE_SERVANT_MANAGER);
+        
+        POA p = parent.create_POA("RetainAndUseServantManager",
+                                  null,
+                                  policies);
+        try {
             ServantActivatorImpl smi = new ServantActivatorImpl();
             p.activate_object(smi);
             org.omg.CORBA.Object objRef = p.servant_to_reference(smi);
             ServantActivator sl = ServantActivatorHelper.narrow(objRef);
-	    p.set_servant_manager(sl);
-	} catch (WrongPolicy w) {
-	    System.err.println("Wrong policy in RetainAndUseServantManager POA");
-	} catch (Exception exp) {
-	    System.err.println("Exception RetainAndUseServantManager POA");
+            p.set_servant_manager(sl);
+        } catch (WrongPolicy w) {
+            System.err.println("Wrong policy in RetainAndUseServantManager POA");
+        } catch (Exception exp) {
+            System.err.println("Exception RetainAndUseServantManager POA");
         }
-	return p;
+        return p;
     }
 
     public String getObjectFactoryName() {
-	return "corba.poapolicies.ObjectFactoryUsingServantManager";
+        return "corba.poapolicies.ObjectFactoryUsingServantManager";
     }
 }

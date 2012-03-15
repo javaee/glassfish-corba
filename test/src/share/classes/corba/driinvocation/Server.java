@@ -42,9 +42,9 @@ package corba.driinvocation;
 import javax.rmi.PortableRemoteObject ;
 import java.rmi.RemoteException ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 import corba.adapteractivator.AdapterActivator;
 import corba.driinvocation.Echo ;
 import corba.driinvocation.EchoHelper ;
@@ -72,14 +72,14 @@ public class Server {
     public static void main(String args[])
     {
         try{
-	    // set debug flag
-	    if ( args.length > 0 && args[0].equals("-debug") )
-		debug = true;
+            // set debug flag
+            if ( args.length > 0 && args[0].equals("-debug") )
+                debug = true;
 
-	    if (debug) {
-		System.out.println("ENTER: Server");
-		System.out.flush();
-	    }
+            if (debug) {
+                System.out.println("ENTER: Server");
+                System.out.flush();
+            }
 
             // create and initialize the ORB
             Properties p = new Properties();
@@ -88,33 +88,33 @@ public class Server {
             p.put( ORBConstants.ORB_SERVER_ID_PROPERTY, "9999");
             ORB orb = (ORB) ORB.init(args, p);
 
-	    if (debug) {
-		System.out.println("Server: ORB initialized");
-		System.out.flush();
-	    }
+            if (debug) {
+                System.out.println("Server: ORB initialized");
+                System.out.flush();
+            }
 
             // get rootPOA, set the AdapterActivator, and activate RootPOA
             POA rootPOA = (POA)orb.resolve_initial_references("RootPOA");
             rootPOA.the_activator(new MyAdapterActivator(orb));
             rootPOA.the_POAManager().activate();
 
-	    if (debug) {
-		System.out.println("Server: RootPOA activator set");
-		System.out.flush();
-	    }
+            if (debug) {
+                System.out.println("Server: RootPOA activator set");
+                System.out.flush();
+            }
 
-	    POA poa = createPersistentPOA(orb, rootPOA);
-	    createEcho1(orb, poa);
-	    poa = createNonRetainPOA(orb, rootPOA);
-	    createEcho2(orb, poa);
-	    if (debug) {
-		System.out.println("Server: refs created");
-		System.out.flush();
-	    }
+            POA poa = createPersistentPOA(orb, rootPOA);
+            createEcho1(orb, poa);
+            poa = createNonRetainPOA(orb, rootPOA);
+            createEcho2(orb, poa);
+            if (debug) {
+                System.out.println("Server: refs created");
+                System.out.flush();
+            }
 
             // wait for invocations from clients
             System.out.println("Server is ready.");
-	    System.out.flush();
+            System.out.flush();
 
             orb.run();
 
@@ -123,15 +123,15 @@ public class Server {
             e.printStackTrace(System.out);
             System.exit(1);
         } finally {
-	    if (debug) {
-		System.out.println("EXIT: Server");
-		System.out.flush();
-	    }
-	}
+            if (debug) {
+                System.out.println("EXIT: Server");
+                System.out.flush();
+            }
+        }
     }
 
     static POA createPersistentPOA(ORB orb, POA rootPOA)
-	throws Exception
+        throws Exception
     {
         // create a persistent POA
         Policy[] tpolicy = new Policy[2];
@@ -144,27 +144,27 @@ public class Server {
         EchoServantActivator csa = new EchoServantActivator(orb);
         tpoa.set_servant_manager(csa);
         tpoa.the_POAManager().activate();
-	return tpoa;
+        return tpoa;
     }
 
     static Tie makeEchoServant( ORB orb ) 
     {
-	EchoImpl impl = null ;
+        EchoImpl impl = null ;
 
-	try {
-	    impl = new EchoImpl(orb, Server.debug);
-	} catch (RemoteException exc) {
-	    // ignore
-	}
+        try {
+            impl = new EchoImpl(orb, Server.debug);
+        } catch (RemoteException exc) {
+            // ignore
+        }
 
-	Tie tie = ORB.getPresentationManager().getTie() ;
-	tie.setTarget( impl ) ;
+        Tie tie = ORB.getPresentationManager().getTie() ;
+        tie.setTarget( impl ) ;
 
-	return tie ;
+        return tie ;
     }
 
     static void createEcho1(ORB orb, POA tpoa)
-	throws Exception
+        throws Exception
     {
         // create an objref using persistent POA
         byte[] id = Echo1Id.getBytes();
@@ -188,15 +188,15 @@ public class Server {
 
         // invoke on the local objref to test local invocations
         if ( Server.debug ) 
-	    System.out.println("\nTesting local invocation: Client thread is "
+            System.out.println("\nTesting local invocation: Client thread is "
                 +Thread.currentThread());
         int value = echoRef.double(1);
         if ( Server.debug ) 
-	    System.out.println(value);
+            System.out.println(value);
     }
 
     static POA createNonRetainPOA(ORB orb, POA rootPOA)
-	throws Exception
+        throws Exception
     {
         // create another persistent, non-retaining POA
         Policy[] tpolicy = new Policy[3];
@@ -212,11 +212,11 @@ public class Server {
         EchoServantLocator csl = new EchoServantLocator(orb);
         tpoa.set_servant_manager(csl);
         tpoa.the_POAManager().activate();
-	return tpoa;
+        return tpoa;
     }
 
     static void createEcho2(ORB orb, POA tpoa)
-	throws Exception
+        throws Exception
     {
         // create a servant and get an objref using persistent POA
         byte[] id = Echo2Id.getBytes();
@@ -224,13 +224,13 @@ public class Server {
         org.omg.CORBA.Object obj = tpoa.create_reference_with_id(id, intf ) ; 
         Echo echoRef = (Echo)PortableRemoteObject.narrow(obj, Echo.class );
 
-	// put objref in NameService
-	org.omg.CORBA.Object objRef = 
-	    orb.resolve_initial_references("NameService");
-	NamingContext ncRef = NamingContextHelper.narrow(objRef);
-	NameComponent nc = new NameComponent("Echo2", "");
-	NameComponent path[] = {nc};
-	ncRef.rebind(path, echoRef);
+        // put objref in NameService
+        org.omg.CORBA.Object objRef = 
+            orb.resolve_initial_references("NameService");
+        NamingContext ncRef = NamingContextHelper.narrow(objRef);
+        NameComponent nc = new NameComponent("Echo2", "");
+        NameComponent path[] = {nc};
+        ncRef.rebind(path, echoRef);
     }
 }
 
@@ -241,26 +241,26 @@ class MyAdapterActivator extends LocalObject implements AdapterActivator
 
     MyAdapterActivator(ORB orb)
     {
-	this.orb = orb;
+        this.orb = orb;
     }
 
     public boolean unknown_adapter(POA parent, String name)
     {
-	if ( Server.debug ) 
-	    System.out.println("\nIn MyAdapterActivator.unknown_adapter, parent = " +
-		parent.the_name()+" child = "+name);
+        if ( Server.debug ) 
+            System.out.println("\nIn MyAdapterActivator.unknown_adapter, parent = " +
+                parent.the_name()+" child = "+name);
 
-	try {
-	    if ( name.equals("PersistentPOA") )
-	        Server.createPersistentPOA(orb, parent);
-	    else if ( name.equals("NonRetainPOA") )
-	        Server.createNonRetainPOA(orb, parent);
-	    else 
-	        return false;
-	} catch (Exception ex) {
-	    ex.printStackTrace();
-	    return false;
-	}
+        try {
+            if ( name.equals("PersistentPOA") )
+                Server.createPersistentPOA(orb, parent);
+            else if ( name.equals("NonRetainPOA") )
+                Server.createNonRetainPOA(orb, parent);
+            else 
+                return false;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
 
         return true;
     }
@@ -279,18 +279,18 @@ class EchoServantActivator extends org.omg.CORBA.LocalObject implements ServantA
     public Servant incarnate(byte[] oid, POA adapter)
         throws org.omg.PortableServer.ForwardRequest
     {
-	Servant servant = Server.makeEchoServant( orb ) ;
+        Servant servant = Server.makeEchoServant( orb ) ;
 
         if ( Server.debug ) 
-	    System.out.println("\nIn EchoServantActivator.incarnate,   oid = "
-			       +oid
-			       +" poa = "+adapter.the_name()
-			       +" servant = "+servant);
+            System.out.println("\nIn EchoServantActivator.incarnate,   oid = "
+                               +oid
+                               +" poa = "+adapter.the_name()
+                               +" servant = "+servant);
         return servant;
     }
 
     public void etherealize(byte[] oid, POA adapter, Servant servant, 
-			    boolean cleanup_in_progress, boolean remaining_activations)
+                            boolean cleanup_in_progress, boolean remaining_activations)
     {
         if ( Server.debug ) 
             System.out.println("\nIn EchoServantActivator.etherealize, oid = "
@@ -316,41 +316,41 @@ class EchoServantLocator extends org.omg.CORBA.LocalObject implements ServantLoc
                              CookieHolder the_cookie)
         throws org.omg.PortableServer.ForwardRequest
     {
-	String sid = new String(oid);
+        String sid = new String(oid);
         String newidStr = "somethingdifferent";
 
         // Tests location forwards
-	if ( sid.equals(Server.Echo2Id) ) { 
-	    // construct a new objref to forward to.
+        if ( sid.equals(Server.Echo2Id) ) { 
+            // construct a new objref to forward to.
             byte[] id = newidStr.getBytes();
             org.omg.CORBA.Object obj = null;
-	    try {
-		String intf = makeEchoServant(orb)._all_interfaces(tpoa,id)[0] ; 
+            try {
+                String intf = makeEchoServant(orb)._all_interfaces(tpoa,id)[0] ; 
                 obj = adapter.create_reference_with_id(id, intf ) ;
-	    } catch ( Exception ex ) {}
+            } catch ( Exception ex ) {}
             Echo echoRef = (Echo)PortableRemoteObject.narrow(obj, Echo.class );
 
-	    System.out.println("\nEchoServantLocator.preinvoke forwarding ! "
-			       +"old oid ="+new String(oid)
-			       +"new id ="+new String(id));
+            System.out.println("\nEchoServantLocator.preinvoke forwarding ! "
+                               +"old oid ="+new String(oid)
+                               +"new id ="+new String(id));
 
-	    ForwardRequest fr = new ForwardRequest(obj);
-	    throw fr;
-	}
+            ForwardRequest fr = new ForwardRequest(obj);
+            throw fr;
+        }
 
-	String oidStr = new String(oid);
-	if ( !newidStr.equals(oidStr) )
-	    System.err.println("\tERROR !!!: preinvoke got wrong id:"+oidStr);
+        String oidStr = new String(oid);
+        if ( !newidStr.equals(oidStr) )
+            System.err.println("\tERROR !!!: preinvoke got wrong id:"+oidStr);
 
         MyCookie cookie = new MyCookie();
-	Servant servant = Server.makeEchoServant( orb ) ;
+        Servant servant = Server.makeEchoServant( orb ) ;
 
         if ( Server.debug ) 
-	    System.out.println("\nIn EchoServantLocator.preinvoke,  oid = "
-			       +oidStr
-			       +" poa = "+adapter.the_name()
-			       +" operation = " +operation
-			       +" cookie = "+cookie+" servant = "+servant);
+            System.out.println("\nIn EchoServantLocator.preinvoke,  oid = "
+                               +oidStr
+                               +" poa = "+adapter.the_name()
+                               +" operation = " +operation
+                               +" cookie = "+cookie+" servant = "+servant);
 
         the_cookie.value = cookie;
         return servant;

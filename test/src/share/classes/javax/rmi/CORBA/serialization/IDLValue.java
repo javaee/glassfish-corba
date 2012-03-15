@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)IDLValue.java	1.4 99/06/07 */
+/* @(#)IDLValue.java    1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -73,16 +73,16 @@ public class IDLValue implements org.omg.CORBA.portable.IDLEntity
     public boolean equals(Object o)
     {
         try
-	    {
-		IDLValue ctbo = (IDLValue)o;
-		return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) && 
-			(ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && 
-			(ctbo.fDouble == fDouble));
-	    }
+            {
+                IDLValue ctbo = (IDLValue)o;
+                return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) && 
+                        (ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && 
+                        (ctbo.fDouble == fDouble));
+            }
         catch(Exception e)
-	    {
-		return false;
-	    }
+            {
+                return false;
+            }
     }
 
     public String toString()

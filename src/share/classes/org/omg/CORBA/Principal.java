@@ -59,7 +59,7 @@ public class Principal {
      */
     // @Deprecated
     public void name(byte[] value) {
-	throw new org.omg.CORBA.NO_IMPLEMENT() ;
+        throw new org.omg.CORBA.NO_IMPLEMENT() ;
     }
 
     /**
@@ -69,6 +69,6 @@ public class Principal {
      */
     // @Deprecated
     public byte[] name() {
-	throw new org.omg.CORBA.NO_IMPLEMENT() ;
+        throw new org.omg.CORBA.NO_IMPLEMENT() ;
     }
 }

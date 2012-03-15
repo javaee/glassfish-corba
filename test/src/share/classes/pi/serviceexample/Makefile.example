@@ -51,32 +51,32 @@ IDLJ_FLAGS=-fall -td $(CLASSPATH) -verbose
 ORBD=${JAVA_HOME}/bin/orbd -ORBInitialPort ${ORB_INITIAL_PORT}
 
 build:
-	$(IDLJ) $(IDLJ_FLAGS) serviceexample.idl
-	$(JAVAC) -d $(CLASSPATH) *.java
-	$(JAVAC) pi/serviceexample/*.java
+        $(IDLJ) $(IDLJ_FLAGS) serviceexample.idl
+        $(JAVAC) -d $(CLASSPATH) *.java
+        $(JAVAC) pi/serviceexample/*.java
 
 runorbd:
-	$(ORBD)
+        $(ORBD)
 
 runloggingservice:
-	$(JAVA) -classpath $(CLASSPATH) pi.serviceexample.LoggingServiceImpl \
-		-ORBInitialPort ${ORB_INITIAL_PORT}
+        $(JAVA) -classpath $(CLASSPATH) pi.serviceexample.LoggingServiceImpl \
+                -ORBInitialPort ${ORB_INITIAL_PORT}
 
 runarbitraryobject:
-	$(JAVA) -classpath $(CLASSPATH) pi.serviceexample.ArbitraryObjectImpl \
-		-ORBInitialPort ${ORB_INITIAL_PORT}
+        $(JAVA) -classpath $(CLASSPATH) pi.serviceexample.ArbitraryObjectImpl \
+                -ORBInitialPort ${ORB_INITIAL_PORT}
 
 runcolocatedservers:
-	$(JAVA) -classpath $(CLASSPATH) pi.serviceexample.ColocatedServers \
-		-ORBInitialPort ${ORB_INITIAL_PORT}
+        $(JAVA) -classpath $(CLASSPATH) pi.serviceexample.ColocatedServers \
+                -ORBInitialPort ${ORB_INITIAL_PORT}
 
 runclient:
-	$(JAVA) -classpath $(CLASSPATH) pi.serviceexample.Client \
-		-ORBInitialPort ${ORB_INITIAL_PORT}
+        $(JAVA) -classpath $(CLASSPATH) pi.serviceexample.Client \
+                -ORBInitialPort ${ORB_INITIAL_PORT}
         
 clean: 
-	rm -rf pi
-	rm -rf orb.db
+        rm -rf pi
+        rm -rf orb.db
 
 # Order of steps:
 # Build:     clean build

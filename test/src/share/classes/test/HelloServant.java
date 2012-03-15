@@ -53,6 +53,6 @@ public class HelloServant extends javax.rmi.PortableRemoteObject implements Hell
 
     public HelloServant() throws java.rmi.RemoteException {}
     public String sayHello (String to) throws java.rmi.RemoteException {
-	return "Hello " + to;
+        return "Hello " + to;
     }
 }

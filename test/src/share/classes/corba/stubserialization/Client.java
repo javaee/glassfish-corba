@@ -82,7 +82,7 @@ import corba.framework.*;
 import java.util.*;
 import java.io.*;
 
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter ;
 
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
@@ -118,8 +118,8 @@ public class Client
     }
 
     public Client() throws Exception {
-	this.out = System.out;
-	this.err = System.err;
+        this.out = System.out;
+        this.err = System.err;
 
         orb = ORB.init( args, null );
 
@@ -137,23 +137,23 @@ public class Client
     @Test
     private void testRemoteSerializedInvocation()
     {
-	try {
-	    System.out.println( "Testing Remote Serialized Invocation: Start" );
-	    EchoServant echoServant = new EchoServant() ;
-	    Tie tie = Util.getTie( echoServant ) ;
-	    tie.orb( orb ) ;
-	    Remote stub = PortableRemoteObject.toStub( echoServant ) ;
-	    String fname = Constants.SERIALIZED_STUB_FILE_NAME + "2" ;
-	    serializeStub( fname, stub ) ;
-	    String result = hello.sayHelloToStub( fname ) ;
-	    if (!result.equals( Constants.HELLO ))
-		throw new Exception( "Bad return value" ) ;
-	    System.out.println( "Testing Remote Serialized Invocation: Complete" );
-	} catch (Throwable exc) {
+        try {
+            System.out.println( "Testing Remote Serialized Invocation: Start" );
+            EchoServant echoServant = new EchoServant() ;
+            Tie tie = Util.getTie( echoServant ) ;
+            tie.orb( orb ) ;
+            Remote stub = PortableRemoteObject.toStub( echoServant ) ;
+            String fname = Constants.SERIALIZED_STUB_FILE_NAME + "2" ;
+            serializeStub( fname, stub ) ;
+            String result = hello.sayHelloToStub( fname ) ;
+            if (!result.equals( Constants.HELLO ))
+                throw new Exception( "Bad return value" ) ;
+            System.out.println( "Testing Remote Serialized Invocation: Complete" );
+        } catch (Throwable exc) {
            System.err.println( "Exception in Remote Serialized Invocation Test :" + exc );
            exc.printStackTrace( );
            System.exit( 1 );
-	}
+        }
     }
 
     @Test
@@ -175,57 +175,57 @@ public class Client
     }
 
     public static File getFile( String fname ) {
-	File dir = new File( "gen" ) ;
-	dir.mkdir() ; // ensure that it exists
-	File file = new File( dir, fname ) ;
-	return file ;
+        File dir = new File( "gen" ) ;
+        dir.mkdir() ; // ensure that it exists
+        File file = new File( dir, fname ) ;
+        return file ;
     }
 
     @Test
     private void serializeStub( String fname, Remote stub ) 
     {
-	FileOutputStream fos = null ;
-	ObjectOutputStream oos = null ;
+        FileOutputStream fos = null ;
+        ObjectOutputStream oos = null ;
 
-	try {
-	    System.out.println(
-		"Serialing the Stub to FileOutputStream " + fname + 
-		    ": Start");
-	    fos = new FileOutputStream( getFile(fname) ) ;
-	    oos = new ObjectOutputStream(fos);
-	    oos.writeObject(stub); 
-	    System.out.println(
-		"Serializing the Stub to a FileOutputStream " + fname +
-		": Complete");
-	} catch( Exception e ) {
-	    System.err.println( "Exception in Stub Serialization : " + e );
-	    e.printStackTrace( );
-	    System.exit( 1 );
-	} finally {
-	    try {
-		if (oos != null)
-		    oos.close() ;
-		if (fos != null)
-		    fos.close() ;
-	    } catch (Exception exc) {
-		// ignore IOException on close.
-	    }
-	}
+        try {
+            System.out.println(
+                "Serialing the Stub to FileOutputStream " + fname + 
+                    ": Start");
+            fos = new FileOutputStream( getFile(fname) ) ;
+            oos = new ObjectOutputStream(fos);
+            oos.writeObject(stub); 
+            System.out.println(
+                "Serializing the Stub to a FileOutputStream " + fname +
+                ": Complete");
+        } catch( Exception e ) {
+            System.err.println( "Exception in Stub Serialization : " + e );
+            e.printStackTrace( );
+            System.exit( 1 );
+        } finally {
+            try {
+                if (oos != null)
+                    oos.close() ;
+                if (fos != null)
+                    fos.close() ;
+            } catch (Exception exc) {
+                // ignore IOException on close.
+            }
+        }
     }
 
     @Test
     private void deserializeStubandInvoke( String fname ) 
     {
-	FileInputStream fis = null ;
-	ObjectInputStream ois = null ;
+        FileInputStream fis = null ;
+        ObjectInputStream ois = null ;
 
-	try {
+        try {
            System.out.println(
                "DeSerializing the Stub from a FileStream Start");
            fis = new FileInputStream( getFile(fname) ) ;
-	   ois = new ObjectInputStream(fis);
-	   Object obj = ois.readObject(); 
-	   StubAdapter.connect( obj, orb ) ;
+           ois = new ObjectInputStream(fis);
+           Object obj = ois.readObject(); 
+           StubAdapter.connect( obj, orb ) ;
            System.out.println(
                "DeSerializing the Stub from a FileStream Complete");
            Hello helloAfterDeserialization = (Hello) obj;
@@ -245,14 +245,14 @@ public class Client
            e.printStackTrace( );
            System.exit( 1 );
        } finally {
-	    try {
-		if (ois != null)
-		   ois.close() ;
-		if (fis != null)
-		    fis.close() ;
-	    } catch (Exception exc) {
-		// ignore exception on close
-	    }
+            try {
+                if (ois != null)
+                   ois.close() ;
+                if (fis != null)
+                    fis.close() ;
+            } catch (Exception exc) {
+                // ignore exception on close
+            }
        }
     }
 
@@ -260,17 +260,17 @@ public class Client
     @Test
     public void testAppReturnValue() 
     {
-	try {
-	    TestAppReturnValue v1 = new TestAppReturnValue() ;
-	    TestAppReturnValue v2 = hello.getTARV() ;
-	    if (!v1.toString().equals( v2.toString() ))
-		throw new RuntimeException( "v1 and v2 are not equal" ) ;
-	} catch (Exception exc) {
+        try {
+            TestAppReturnValue v1 = new TestAppReturnValue() ;
+            TestAppReturnValue v2 = hello.getTARV() ;
+            if (!v1.toString().equals( v2.toString() ))
+                throw new RuntimeException( "v1 and v2 are not equal" ) ;
+        } catch (Exception exc) {
            System.err.println( 
                "Exception in TestAppReturnValue : " + exc );
            exc.printStackTrace( );
            System.exit( 1 );
-	}
+        }
     }
     */
 }

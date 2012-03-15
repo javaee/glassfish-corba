@@ -58,15 +58,15 @@ import sun.rmi.rmic.IndentingWriter;
  * InterfaceType is an abstract base representing any non-special
  * interface type.
  *
- * @version	1.0, 2/27/98
- * @author	Bryan Atsatt
+ * @version     1.0, 2/27/98
+ * @author      Bryan Atsatt
  */
 public abstract class InterfaceType extends CompoundType {
-	
+        
     //_____________________________________________________________________
     // Public Interfaces
     //_____________________________________________________________________
-	
+        
     /**
      * Print this type.
      * @param writer The stream to print to.
@@ -74,39 +74,39 @@ public abstract class InterfaceType extends CompoundType {
      * @param useIDLNames If true, print IDL names; otherwise, print java names.
      * @param globalIDLNames If true and useIDLNames true, prepends "::".
      */
-    public void print (	IndentingWriter writer,
-			boolean useQualifiedNames,
-			boolean useIDLNames,
-			boolean globalIDLNames) throws IOException {
-							
-	if (isInner()) {
-	    writer.p("// " + getTypeDescription() + " (INNER)");
-	} else {
-	    writer.p("// " + getTypeDescription() + "");
-	}
-	writer.pln(" (" + getRepositoryID() + ")\n");
-	printPackageOpen(writer,useIDLNames);
-		
-	if (!useIDLNames) {
-	    writer.p("public ");
-	}
-		
-	writer.p("interface " + getTypeName(false,useIDLNames,false));
-	printImplements(writer,"",useQualifiedNames,useIDLNames,globalIDLNames);
-	writer.plnI(" {");
-	printMembers(writer,useQualifiedNames,useIDLNames,globalIDLNames);
-	writer.pln();
-	printMethods(writer,useQualifiedNames,useIDLNames,globalIDLNames);
-	writer.pln();
+    public void print ( IndentingWriter writer,
+                        boolean useQualifiedNames,
+                        boolean useIDLNames,
+                        boolean globalIDLNames) throws IOException {
+                                                        
+        if (isInner()) {
+            writer.p("// " + getTypeDescription() + " (INNER)");
+        } else {
+            writer.p("// " + getTypeDescription() + "");
+        }
+        writer.pln(" (" + getRepositoryID() + ")\n");
+        printPackageOpen(writer,useIDLNames);
+                
+        if (!useIDLNames) {
+            writer.p("public ");
+        }
+                
+        writer.p("interface " + getTypeName(false,useIDLNames,false));
+        printImplements(writer,"",useQualifiedNames,useIDLNames,globalIDLNames);
+        writer.plnI(" {");
+        printMembers(writer,useQualifiedNames,useIDLNames,globalIDLNames);
+        writer.pln();
+        printMethods(writer,useQualifiedNames,useIDLNames,globalIDLNames);
+        writer.pln();
 
-	if (useIDLNames) {
-	    writer.pOln("};");
-	} else {
-	    writer.pOln("}");
-	}
-	printPackageClose(writer,useIDLNames);
+        if (useIDLNames) {
+            writer.pOln("};");
+        } else {
+            writer.pOln("}");
+        }
+        printPackageClose(writer,useIDLNames);
     }
-	
+        
     //_____________________________________________________________________
     // Subclass/Internal Interfaces
     //_____________________________________________________________________
@@ -119,7 +119,7 @@ public abstract class InterfaceType extends CompoundType {
         super(stack,typeCode,classDef); // Call special parent constructor.
             
         if ((typeCode & TM_INTERFACE) == 0 || ! classDef.isInterface()) {
-	    throw new CompilerError("Not an interface");
+            throw new CompilerError("Not an interface");
         }
     }
     
@@ -129,12 +129,12 @@ public abstract class InterfaceType extends CompoundType {
      * initialize(directInterfaces,directInterfaces,directConstants);
      */
     protected InterfaceType(ContextStack stack,
-			    ClassDefinition classDef,
-			    int typeCode) {
+                            ClassDefinition classDef,
+                            int typeCode) {
         super(stack,classDef,typeCode);
         
         if ((typeCode & TM_INTERFACE) == 0 || ! classDef.isInterface()) {
-	    throw new CompilerError("Not an interface");
+            throw new CompilerError("Not an interface");
         }
     }
 }

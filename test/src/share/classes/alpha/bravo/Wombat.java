@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)Wombat.java	1.5 99/06/07 */
+/* @(#)Wombat.java      1.5 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -78,8 +78,8 @@ public interface Wombat extends java.rmi.Remote,
     void    setBoo(boolean b)  throws java.rmi.RemoteException;
     void    passRemote()       throws java.rmi.RemoteException;
     java.rmi.Remote
-	passRemote( java.rmi.Remote r )
-	throws java.rmi.RemoteException;
+        passRemote( java.rmi.Remote r )
+        throws java.rmi.RemoteException;
     int     getChirp()         throws java.rmi.RemoteException;
     boolean isBLINT_CONSTANT() throws java.rmi.RemoteException;
 }

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.org.omg.CORBA ;
+package com.sun.corba.ee.org.omg.CORBA ;
 
 /**
  * A convenience class for retrieving the string value of a system
@@ -77,7 +77,7 @@ public class GetPropertyAction implements java.security.PrivilegedAction {
      * @param theProp the name of the system property.
      */
     public GetPropertyAction(String theProp) {
-	this.theProp = theProp;
+        this.theProp = theProp;
     }
 
     /**
@@ -88,8 +88,8 @@ public class GetPropertyAction implements java.security.PrivilegedAction {
      * @param defaulVal the default value.
      */
     public GetPropertyAction(String theProp, String defaultVal) {
-	this.theProp = theProp;
-	this.defaultVal = defaultVal;
+        this.theProp = theProp;
+        this.defaultVal = defaultVal;
     }
 
     /**
@@ -100,7 +100,7 @@ public class GetPropertyAction implements java.security.PrivilegedAction {
      *         or the default value if there is no property with that key.
      */
     public Object run() {
-	String value = System.getProperty(theProp);
-	return (value == null) ? defaultVal : value;
+        String value = System.getProperty(theProp);
+        return (value == null) ? defaultVal : value;
     }
 }

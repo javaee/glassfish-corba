@@ -51,7 +51,7 @@ package javax.rmi;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-// import com.sun.corba.se.impl.io.FVDCodeBaseImpl;
+// import com.sun.corba.ee.impl.io.FVDCodeBaseImpl;
 import javax.rmi.CORBA.*;
 import com.sun.org.omg.SendingContext.CodeBase;
 import rmic.OnlyRemoteServant;
@@ -65,7 +65,7 @@ public class ServantInner implements SInner {
     }
     
     public CodeBase getCodeBase() throws RemoteException {
-	javax.rmi.CORBA.ValueHandler vh = Util.createValueHandler();
+        javax.rmi.CORBA.ValueHandler vh = Util.createValueHandler();
         return (CodeBase) vh.getRunTimeCodeBase();
     }
     

@@ -67,38 +67,38 @@ public class Terraforming implements Investment, java.io.Serializable
 
     public Terraforming (PlanetImpl planet, double idealTemp)
     {
-	fPlanet = planet;
-	fIdealTemp = idealTemp;
+        fPlanet = planet;
+        fIdealTemp = idealTemp;
     }
 
     public String getName ()
     {
-	return "Terraforming";
+        return "Terraforming";
     }
 
     public void invest (long dollars)
     {
-	if ( dollars > 0 ) {
-	    double d = dollars;
-	    double temp = fPlanet.getTemp ();
-	    int diff = (int)(temp - fIdealTemp);
-	    int absdiff = Math.abs (diff);
-	    //int sign = diff/absdiff;
+        if ( dollars > 0 ) {
+            double d = dollars;
+            double temp = fPlanet.getTemp ();
+            int diff = (int)(temp - fIdealTemp);
+            int absdiff = Math.abs (diff);
+            //int sign = diff/absdiff;
 
-	    if ( absdiff == 0 ) {
-		fPlanet.setTemp (fIdealTemp);
-	    } else {
-		double efficiency = 1.0/absdiff;
-		double percentChange = d/1000.0 * 0.1 * efficiency;
+            if ( absdiff == 0 ) {
+                fPlanet.setTemp (fIdealTemp);
+            } else {
+                double efficiency = 1.0/absdiff;
+                double percentChange = d/1000.0 * 0.1 * efficiency;
 
-		if ( percentChange > 1 ) {
-		    percentChange = 1;
-		}
+                if ( percentChange > 1 ) {
+                    percentChange = 1;
+                }
 
-		double newTemp = temp*(1-percentChange) + fIdealTemp*percentChange;
-		fPlanet.setTemp (newTemp);
-	    }
-	}
+                double newTemp = temp*(1-percentChange) + fIdealTemp*percentChange;
+                fPlanet.setTemp (newTemp);
+            }
+        }
     }
 
 }

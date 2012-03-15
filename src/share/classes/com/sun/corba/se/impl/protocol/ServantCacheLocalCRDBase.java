@@ -38,18 +38,18 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
-import com.sun.corba.se.spi.protocol.ForwardException;
+import com.sun.corba.ee.spi.protocol.ForwardException;
 
-import com.sun.corba.se.spi.oa.OAInvocationInfo;
-import com.sun.corba.se.spi.oa.ObjectAdapter;
-import com.sun.corba.se.spi.oa.OADestroyed;
+import com.sun.corba.ee.spi.oa.OAInvocationInfo;
+import com.sun.corba.ee.spi.oa.ObjectAdapter;
+import com.sun.corba.ee.spi.oa.OADestroyed;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.trace.Subcontract;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.trace.Subcontract;
 
 @Subcontract
 public abstract class ServantCacheLocalCRDBase 
@@ -59,12 +59,12 @@ public abstract class ServantCacheLocalCRDBase
 
     protected ServantCacheLocalCRDBase( ORB orb, int scid, IOR ior )
     {
-	super( orb, scid, ior ) ;
+        super( orb, scid, ior ) ;
     }
 
     @Subcontract
     protected void cleanupAfterOADestroyed() {
-	cachedInfo = null ;
+        cachedInfo = null ;
     }
 
     @Subcontract

@@ -119,7 +119,7 @@ public class Server extends PortableRemoteObject implements Tester
     public void ping() {}
 
     public static void main(String[] args) {
-	try {
+        try {
 
             ORB orb = ORB.init(args, System.getProperties());
       
@@ -128,11 +128,11 @@ public class Server extends PortableRemoteObject implements Tester
             rootPOA.the_POAManager().activate();
 
             Server impl = new Server();
-	    javax.rmi.CORBA.Tie tie = javax.rmi.CORBA.Util.getTie( impl ) ; 
+            javax.rmi.CORBA.Tie tie = javax.rmi.CORBA.Util.getTie( impl ) ; 
 
-	    byte[] id = rootPOA.activate_object( 
-						 (org.omg.PortableServer.Servant)tie ) ;
-	    org.omg.CORBA.Object obj = rootPOA.id_to_reference( id ) ;
+            byte[] id = rootPOA.activate_object( 
+                                                 (org.omg.PortableServer.Servant)tie ) ;
+            org.omg.CORBA.Object obj = rootPOA.id_to_reference( id ) ;
 
             // get the root naming context
             org.omg.CORBA.Object objRef = 
@@ -156,10 +156,10 @@ public class Server extends PortableRemoteObject implements Tester
 //             Server p = new Server();
 //             rootContext.rebind("Tester", p);
 //             System.out.println("Server is ready.");
-	} catch (Throwable t) {
+        } catch (Throwable t) {
             t.printStackTrace();
             System.exit(1);
-	}
+        }
     }
 
 }

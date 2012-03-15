@@ -40,7 +40,7 @@
 
 package pi.clientrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 
 /**
@@ -53,21 +53,21 @@ abstract public class InvokeStrategy {
      * Invokes the method with the given name
      */
     protected void invokeMethod( String name ) throws Exception {
-	ClientCommon.client.invokeMethod( name );
+        ClientCommon.client.invokeMethod( name );
     }
 
     public void invoke() throws Exception {
-	// Reset the request interceptor to prepare for test:
-	SampleClientRequestInterceptor.enabled = true;
+        // Reset the request interceptor to prepare for test:
+        SampleClientRequestInterceptor.enabled = true;
         SampleClientRequestInterceptor.sendRequestEnabled = true;
         SampleClientRequestInterceptor.sendPollEnabled = true;
         SampleClientRequestInterceptor.receiveReplyEnabled = true;
         SampleClientRequestInterceptor.receiveExceptionEnabled = true;
         SampleClientRequestInterceptor.receiveOtherEnabled = true;
 
-	// Disable special flags:
-	SampleClientRequestInterceptor.exceptionRedirectToOther = false;
-	SampleClientRequestInterceptor.recursiveInvoke = false;
-	SampleClientRequestInterceptor.invokeOnForwardedObject = false;
+        // Disable special flags:
+        SampleClientRequestInterceptor.exceptionRedirectToOther = false;
+        SampleClientRequestInterceptor.recursiveInvoke = false;
+        SampleClientRequestInterceptor.invokeOnForwardedObject = false;
     }
 }

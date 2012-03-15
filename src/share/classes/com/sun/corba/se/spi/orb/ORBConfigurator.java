@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.orb ;
+package com.sun.corba.ee.spi.orb ;
 
 /** Interface used to configure an ORB instance.  The DataCollector dc has all
  * available config info available.  The configure method may constructor a 

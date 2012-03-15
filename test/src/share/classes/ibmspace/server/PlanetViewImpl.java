@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)PlanetViewImpl.java	1.4 99/06/07 */
+/* @(#)PlanetViewImpl.java      1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -70,8 +70,8 @@ public class PlanetViewImpl implements PlanetView, java.io.Serializable
 
     public PlanetViewImpl (Player player, PlanetImpl planet)
     {
-	fPlayer = player;
-	fPlanet = planet;
+        fPlayer = player;
+        fPlanet = planet;
     }
 
     //
@@ -80,22 +80,22 @@ public class PlanetViewImpl implements PlanetView, java.io.Serializable
 
     public ID getID ()
     {
-	return fPlanet.getID ();
+        return fPlanet.getID ();
     }
 
     public String getName ()
     {
-	return fPlanet.getName ();
+        return fPlanet.getName ();
     }
 
     public Point getCoordinates ()
     {
-	return fPlanet.getCoordinates ();
+        return fPlanet.getCoordinates ();
     }
 
     public boolean hasSatelites ()
     {
-	return fPlanet.hasSatelites ();
+        return fPlanet.hasSatelites ();
     }
 
 
@@ -105,67 +105,67 @@ public class PlanetViewImpl implements PlanetView, java.io.Serializable
 
     public boolean isOwned ()
     {
-	return ( fPlayer == fPlanet.getOwner() );
+        return ( fPlayer == fPlanet.getOwner() );
     }
 
     public long getMetal ()
     {
-	return fPlanet.getMetal ();
+        return fPlanet.getMetal ();
     }
 
     public long getPopulation ()
     {
-	if ( isOwned() ) {
-	    Settlement settlement = fPlanet.getSettlement ();
-	    if ( settlement != null ) {
-		return settlement.getPopulation().size ();
-	    } else {
-		return 0;
-	    }
-	} else {
-	    return -1;
-	}
+        if ( isOwned() ) {
+            Settlement settlement = fPlanet.getSettlement ();
+            if ( settlement != null ) {
+                return settlement.getPopulation().size ();
+            } else {
+                return 0;
+            }
+        } else {
+            return -1;
+        }
     }
 
     public long getIncome ()
     {
-	if ( isOwned() ) {
-	    Settlement settlement = fPlanet.getSettlement ();
-	    if ( settlement != null ) {
-		return settlement.getIncome ();
-	    } else {
-		return 0;
-	    }
-	} else {
-	    return -1;
-	}
+        if ( isOwned() ) {
+            Settlement settlement = fPlanet.getSettlement ();
+            if ( settlement != null ) {
+                return settlement.getIncome ();
+            } else {
+                return 0;
+            }
+        } else {
+            return -1;
+        }
     }
 
     public double getTemp ()
     {
-	if ( isOwned() ) {
-	    return fPlayer.getRelativeTempFor (fPlanet.getTemp());
-	} else {
-	    return -1;
-	}
+        if ( isOwned() ) {
+            return fPlayer.getRelativeTempFor (fPlanet.getTemp());
+        } else {
+            return -1;
+        }
     }
 
     public double getGravity ()
     {
-	if ( isOwned() ) {
-	    return fPlayer.getRelativeGravityFor (fPlanet.getGravity());
-	} else {
-	    return -1;
-	}
+        if ( isOwned() ) {
+            return fPlayer.getRelativeGravityFor (fPlanet.getGravity());
+        } else {
+            return -1;
+        }
     }
 
     public double getSuitability ()
     {
-	if ( isOwned() ) {
-	    return fPlanet.getSuitabilityFor (fPlayer);
-	} else {
-	    return -1;
-	}
+        if ( isOwned() ) {
+            return fPlanet.getSuitabilityFor (fPlayer);
+        } else {
+            return -1;
+        }
     }
 
 }

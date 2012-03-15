@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.io;
+package com.sun.corba.ee.impl.io;
 
 import org.omg.CORBA.ORB;
 
@@ -60,9 +60,9 @@ import com.sun.org.omg.CORBA.ValueDefPackage.FullValueDescription;
 
 import com.sun.org.omg.SendingContext._CodeBaseImplBase;
 
-import com.sun.corba.se.spi.logging.OMGSystemException;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
 
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
+import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
 
 /**
  * This class acts as the remote interface to receivers wishing to retrieve
@@ -72,7 +72,7 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
 {
     // Contains rep. ids as keys to FullValueDescriptions
     private static Map<String,FullValueDescription> fvds = 
-	new HashMap<String,FullValueDescription>();
+        new HashMap<String,FullValueDescription>();
 
     // Private ORBSingleton used when we need an ORB while not 
     // having a delegate set.  
@@ -88,103 +88,103 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
     private transient ValueHandlerImpl vhandler = null;
 
     public FVDCodeBaseImpl( ValueHandler vh ) {
-	// vhandler will never be null
-	this.vhandler = (com.sun.corba.se.impl.io.ValueHandlerImpl)vh ;  
+        // vhandler will never be null
+        this.vhandler = (com.sun.corba.ee.impl.io.ValueHandlerImpl)vh ;  
     }
 
     // Operation to obtain the IR from the sending context
     public com.sun.org.omg.CORBA.Repository get_ir (){
-	return null;
+        return null;
     }
 
     // Operations to obtain a URL to the implementation code
     public String implementation (String x){
-	try{
+        try{
             // Util.getCodebase may return null which would
             // cause a BAD_PARAM exception.
-	    String result = Util.getInstance().getCodebase(
+            String result = Util.getInstance().getCodebase(
                 vhandler.getClassFromType(x));
             if (result == null) {
                 return "";
             } else {
                 return result;
             }
-	} catch(ClassNotFoundException cnfe){
-	    throw wrapper.missingLocalValueImpl( cnfe ) ;
-	}
+        } catch(ClassNotFoundException cnfe){
+            throw wrapper.missingLocalValueImpl( cnfe ) ;
+        }
     }
 
     public String[] implementations (String[] x){
-	String result[] = new String[x.length];
+        String result[] = new String[x.length];
 
-	for (int i = 0; i < x.length; i++) {
+        for (int i = 0; i < x.length; i++) {
             result[i] = implementation(x[i]);
         }
 
-	return result;
+        return result;
     }
 
     // the same information
     public FullValueDescription meta (String x){
-	try{
-	    FullValueDescription result = fvds.get(x);
+        try{
+            FullValueDescription result = fvds.get(x);
 
-	    if (result == null) {
-		try{
-		    result = ValueUtility.translate(_orb(), 
-			ObjectStreamClass.lookup(vhandler.getAnyClassFromType(x)), vhandler);
-		} catch(Throwable t){
-		    if (orb == null) {
+            if (result == null) {
+                try{
+                    result = ValueUtility.translate(_orb(), 
+                        ObjectStreamClass.lookup(vhandler.getAnyClassFromType(x)), vhandler);
+                } catch(Throwable t){
+                    if (orb == null) {
                         orb = ORB.init();
                     }
 
-		    result = ValueUtility.translate(orb, 
-			ObjectStreamClass.lookup(vhandler.getAnyClassFromType(x)), vhandler);		
-		}
+                    result = ValueUtility.translate(orb, 
+                        ObjectStreamClass.lookup(vhandler.getAnyClassFromType(x)), vhandler);           
+                }
 
-		if (result != null){
-		    fvds.put(x, result);
-		} else {
-		    throw wrapper.missingLocalValueImpl();
-		}
-	    }
-				
-	    return result;
-	} catch(Throwable t){
-	    throw wrapper.incompatibleValueImpl(t);
-	}
+                if (result != null){
+                    fvds.put(x, result);
+                } else {
+                    throw wrapper.missingLocalValueImpl();
+                }
+            }
+                                
+            return result;
+        } catch(Throwable t){
+            throw wrapper.incompatibleValueImpl(t);
+        }
     }
 
     public FullValueDescription[] metas (String[] x){
-	FullValueDescription descriptions[] = new FullValueDescription[x.length];
+        FullValueDescription descriptions[] = new FullValueDescription[x.length];
 
-	for (int i = 0; i < x.length; i++) {
+        for (int i = 0; i < x.length; i++) {
             descriptions[i] = meta(x[i]);
         }
 
-	return descriptions;
+        return descriptions;
     }
 
     // information
     public String[] bases (String x){
-	try {
-	    Stack<String> repIds = new Stack<String>();
-	    Class parent = ObjectStreamClass.lookup(
+        try {
+            Stack<String> repIds = new Stack<String>();
+            Class parent = ObjectStreamClass.lookup(
                 vhandler.getClassFromType(x)).forClass().getSuperclass();
 
-	    while (!parent.equals(java.lang.Object.class)) {
-		repIds.push(vhandler.createForAnyType(parent));
-		parent = parent.getSuperclass();
-	    }
+            while (!parent.equals(java.lang.Object.class)) {
+                repIds.push(vhandler.createForAnyType(parent));
+                parent = parent.getSuperclass();
+            }
 
-	    String result[] = new String[repIds.size()];
-	    for (int i = result.length - 1; i >= 0; i++) {
+            String result[] = new String[repIds.size()];
+            for (int i = result.length - 1; i >= 0; i++) {
                 result[i] = repIds.pop();
             }
 
-	    return result;
-	} catch (Throwable t) {
-	    throw wrapper.missingLocalValueImpl( t );
-	}
+            return result;
+        } catch (Throwable t) {
+            throw wrapper.missingLocalValueImpl( t );
+        }
     }
 }

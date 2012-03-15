@@ -74,7 +74,7 @@ public final class ServiceInformationHolder
     public ServiceInformationHolder() {
         this(null);
     }
-	
+        
     /**
      * Constructs a new <code>ServiceInformationHolder</code> object with its
      * <code>value</code> field initialized to the given

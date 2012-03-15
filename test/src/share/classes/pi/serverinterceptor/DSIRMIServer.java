@@ -47,9 +47,9 @@ import org.omg.PortableServer.*;
 import org.omg.PortableServer.POAPackage.*;
 import org.omg.PortableServer.ServantLocatorPackage.*;
 import org.omg.PortableInterceptor.*;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import corba.framework.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import java.util.*;
 import java.io.*;
@@ -70,7 +70,7 @@ public abstract class DSIRMIServer
     private TestServantLocator servantLocator;
     
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
         try {
@@ -112,16 +112,16 @@ public abstract class DSIRMIServer
      */
     public org.omg.CORBA.Object createAndBind ( String name, 
                                                 String symbol )
-	throws Exception
+        throws Exception
     {
-	// create and register it with RMI
-	helloDSIDeprecatedServant obj = new helloDSIDeprecatedServant( 
-	    orb, out, symbol );
-	orb.connect( obj );
-	initialNamingContext.rebind( name, obj );
+        // create and register it with RMI
+        helloDSIDeprecatedServant obj = new helloDSIDeprecatedServant( 
+            orb, out, symbol );
+        orb.connect( obj );
+        initialNamingContext.rebind( name, obj );
 
-	java.lang.Object o = initialNamingContext.lookup( name );
-	return (org.omg.CORBA.Object)PortableRemoteObject.narrow( o, 
+        java.lang.Object o = initialNamingContext.lookup( name );
+        return (org.omg.CORBA.Object)PortableRemoteObject.narrow( o, 
             org.omg.CORBA.Object.class );
     }
 
@@ -138,23 +138,23 @@ public abstract class DSIRMIServer
     {
         // Rebind each time so that location forward information is
         // wiped out.  See CDRInputStream1_0 readObject.  This is necessary 
-	// because the local case will always return the exact same object
-	// on the client side otherwise.
+        // because the local case will always return the exact same object
+        // on the client side otherwise.
 
         // Set up hello object:
         out.println( "+ Creating and binding Hello1 object..." );
         TestInitializer.helloRef = createAndBind( "Hello1", 
-						  "[Hello1]" );
+                                                  "[Hello1]" );
 
         out.println( "+ Creating and binding Hello1Forward object..." );
         TestInitializer.helloRefForward = createAndBind( "Hello1Forward",
-							 "[Hello1Forward]" ); 
+                                                         "[Hello1Forward]" ); 
 
 
-	if( !methodName.equals( "sayOneway" ) ) {
-	    super.testInvocation( name, mode, correctOrder, methodName,
-				  correctMethodOrder, exceptionExpected );
-	}
+        if( !methodName.equals( "sayOneway" ) ) {
+            super.testInvocation( name, mode, correctOrder, methodName,
+                                  correctMethodOrder, exceptionExpected );
+        }
     }
 }
 

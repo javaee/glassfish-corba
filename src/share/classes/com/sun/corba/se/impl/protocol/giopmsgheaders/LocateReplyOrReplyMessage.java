@@ -37,10 +37,10 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
 import org.omg.CORBA.SystemException;
-import com.sun.corba.se.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.IOR;
 
 public interface LocateReplyOrReplyMessage extends Message {
 

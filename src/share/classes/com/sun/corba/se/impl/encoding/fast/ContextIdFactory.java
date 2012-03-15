@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 public final class ContextIdFactory {
     private ContextIdFactory() {}
@@ -51,9 +51,9 @@ public final class ContextIdFactory {
      * </ul>
      */
     public static long getContextId( Object obj ) {
-	/** Implementation to use for now.
-	 */
-	return EmergeCodeFactory.MESSAGE_CONTEXT_ID ;
+        /** Implementation to use for now.
+         */
+        return EmergeCodeFactory.MESSAGE_CONTEXT_ID ;
     }
 }
 

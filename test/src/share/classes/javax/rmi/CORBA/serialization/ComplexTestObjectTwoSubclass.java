@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ComplexTestObjectTwoSubclass.java	1.5 99/06/07 */
+/* @(#)ComplexTestObjectTwoSubclass.java        1.5 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -57,7 +57,7 @@ public class ComplexTestObjectTwoSubclass extends ComplexTestObjectTwo
 
     public ComplexTestObjectTwoSubclass()
     {
-	super();
+        super();
     }
 
 

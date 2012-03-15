@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)StockImpl.java	1.1 99/06/07 */
+/* @(#)StockImpl.java   1.1 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -62,36 +62,36 @@ public class StockImpl extends Stock
 
     public StockImpl (String arg0)
     {
-	//nk
-	symbol = arg0;
-	if (symbol.equals("Sun")) {
-	    current = 30.0f;
-	} else {
-	    // generate random stock price between 20 and 60
+        //nk
+        symbol = arg0;
+        if (symbol.equals("Sun")) {
+            current = 30.0f;
+        } else {
+            // generate random stock price between 20 and 60
             current = (float)(random.nextInt(40) + 20);
-	}
-	//nk
+        }
+        //nk
     }
 
     StockImpl() {}
 
     public float update()
     {
-	//nk
-	float change = ((float)(random.nextGaussian() * 1.0));
-	if (symbol.equals("Sun") && current < MAX_VALUE - 5)
-	    change = Math.abs(change);      // what did you expect?
+        //nk
+        float change = ((float)(random.nextGaussian() * 1.0));
+        if (symbol.equals("Sun") && current < MAX_VALUE - 5)
+            change = Math.abs(change);      // what did you expect?
 
-	float newCurrent = current + change;
+        float newCurrent = current + change;
 
-	// don't allow stock price to step outside range
-	if (newCurrent < 0 || newCurrent > MAX_VALUE)
-	    change = 0;
+        // don't allow stock price to step outside range
+        if (newCurrent < 0 || newCurrent > MAX_VALUE)
+            change = 0;
 
-	current += change;
+        current += change;
 
-	return change;
-	//nk
+        return change;
+        //nk
     }
 
 }

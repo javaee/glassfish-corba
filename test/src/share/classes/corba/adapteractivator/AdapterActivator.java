@@ -48,21 +48,21 @@ public class AdapterActivator extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-	Options.addServerArgs( "-ORBServerId 123 -ORBPersistentServerPort 15000" ) ;
+        Options.addServerArgs( "-ORBServerId 123 -ORBPersistentServerPort 15000" ) ;
 
         Controller client = createClient("corba.adapteractivator.AdapterActivatorClient");
         Controller server = createServer("corba.adapteractivator.AdapterActivatorServer");
-	Controller orbd = createORBD() ;
+        Controller orbd = createORBD() ;
 
-	orbd.start() ;
+        orbd.start() ;
         server.start();
 
-	client.start() ;
-	client.waitFor( 60000 ) ;
+        client.start() ;
+        client.waitFor( 60000 ) ;
         client.stop();
 
         server.stop();
-	orbd.stop() ;
+        orbd.stop() ;
     }
 }
 

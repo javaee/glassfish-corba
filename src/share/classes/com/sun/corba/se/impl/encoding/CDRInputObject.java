@@ -38,28 +38,28 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
 
 import com.sun.org.omg.SendingContext.CodeBase;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.Connection;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.logging.OMGSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.protocol.MessageMediator;
-import com.sun.corba.se.spi.trace.Transport;
-import com.sun.corba.se.spi.trace.MonitorRead ;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.trace.Transport;
+import com.sun.corba.ee.spi.trace.MonitorRead ;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import org.omg.CORBA.Any;
@@ -72,7 +72,7 @@ import org.omg.CORBA.TypeCode;
 @MonitorRead
 public class CDRInputObject 
     extends org.omg.CORBA_2_3.portable.InputStream
-    implements com.sun.corba.se.impl.encoding.MarshalInputStream,
+    implements com.sun.corba.ee.impl.encoding.MarshalInputStream,
                org.omg.CORBA.DataInputStream, org.omg.CORBA.portable.ValueInputStream
 {
     private static final ORBUtilSystemException wrapper =
@@ -102,8 +102,8 @@ public class CDRInputObject
 
     private static class InputStreamFactory {
         public static CDRInputStreamBase newInputStream(
-	        ORB orb, GIOPVersion version, byte encodingVersion,
-		boolean directRead) {
+                ORB orb, GIOPVersion version, byte encodingVersion,
+                boolean directRead) {
             switch(version.intValue()) {
                 case GIOPVersion.VERSION_1_0:
                     return new CDRInputStream_1_0();
@@ -112,7 +112,7 @@ public class CDRInputObject
                 case GIOPVersion.VERSION_1_2:
                     return new CDRInputStream_1_2();
                 default:
-		    throw wrapper.unsupportedGiopVersion( version ) ;
+                    throw wrapper.unsupportedGiopVersion( version ) ;
             }
         }
     }
@@ -126,8 +126,8 @@ public class CDRInputObject
     // 
     // REVISIT.
     public CDRInputObject() {
-	// ((com.sun.corba.se.spi.orb.ORB)org.omg.CORBA.ORB.init())
-	    // .getTimerManager().points() ;
+        // ((com.sun.corba.ee.spi.orb.ORB)org.omg.CORBA.ORB.init())
+            // .getTimerManager().points() ;
     }
 
      public CDRInputObject(CDRInputObject is) {
@@ -167,8 +167,8 @@ public class CDRInputObject
     public CDRInputObject(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, int size,
         boolean littleEndian, GIOPVersion version, byte encodingVersion, BufferManagerRead bufMgr) {
 
-	this(orb, byteBuffer, size, littleEndian, version, encodingVersion,
-	     bufMgr, true);
+        this(orb, byteBuffer, size, littleEndian, version, encodingVersion,
+             bufMgr, true);
     }
 
     public CDRInputObject(ORB orb, Connection corbaConnection,
@@ -177,11 +177,11 @@ public class CDRInputObject
         this(orb, byteBuffer, header.getSize(), header.isLittleEndian(),
               header.getGIOPVersion(), header.getEncodingVersion(),
               BufferManagerFactory.newBufferManagerRead(
-					  header.getGIOPVersion(),
-					  header.getEncodingVersion(),
-					  orb));
+                                          header.getGIOPVersion(),
+                                          header.getEncodingVersion(),
+                                          orb));
 
-	this.corbaConnection = corbaConnection;
+        this.corbaConnection = corbaConnection;
         this.header = header ;
 
         getBufferManager().init(header);
@@ -221,13 +221,13 @@ public class CDRInputObject
         // Unmarshal the extended GIOP message from the buffer.
 
         if (!unmarshaledHeader) {
-	    try {
-		getMessageHeader().read(this);
+            try {
+                getMessageHeader().read(this);
                 unmarshalledHeader( getMessageHeader() ) ;
-		unmarshaledHeader= true;
-	    } catch (RuntimeException e) {
-		throw e;
-	    }
+                unmarshaledHeader= true;
+            } catch (RuntimeException e) {
+                throw e;
+            }
         }
     }
 
@@ -333,7 +333,7 @@ public class CDRInputObject
 
     protected void dprint(String msg) 
     {
-	ORBUtility.dprint("CDRInputObject", msg);
+        ORBUtility.dprint("CDRInputObject", msg);
     }
     
     // org.omg.CORBA.portable.InputStream
@@ -515,7 +515,7 @@ public class CDRInputObject
 
     @Override
     public final org.omg.CORBA.ORB orb() {
-	return impl.orb();
+        return impl.orb();
     }
 
     // org.omg.CORBA_2_3.portable.InputStream
@@ -562,7 +562,7 @@ public class CDRInputObject
     public final java.lang.Object read_abstract_interface(java.lang.Class clz) {
         return impl.read_abstract_interface(clz);
     }
-    // com.sun.corba.se.impl.encoding.MarshalInputStream
+    // com.sun.corba.ee.impl.encoding.MarshalInputStream
 
     @MonitorRead
     public final void consumeEndian() {
@@ -570,7 +570,7 @@ public class CDRInputObject
     }
 
     public final int getPosition() {
-	return impl.getPosition();
+        return impl.getPosition();
     }
 
     // org.omg.CORBA.DataInputStream
@@ -676,7 +676,7 @@ public class CDRInputObject
 
     @Override
     public final int available() throws IOException {
-	return impl.available();
+        return impl.available();
     }
 
     @MonitorRead
@@ -709,7 +709,7 @@ public class CDRInputObject
     }
 
     public final boolean isLittleEndian() {
-	return impl.isLittleEndian();
+        return impl.isLittleEndian();
     }
 
     protected final ByteBuffer getByteBuffer() {

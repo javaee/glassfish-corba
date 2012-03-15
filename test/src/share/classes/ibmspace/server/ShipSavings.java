@@ -64,50 +64,50 @@ public class ShipSavings implements Investment, java.io.Serializable
 
     public ShipSavings (long initial)
     {
-	fSavings = initial;
-	fInterestRate = 0.07;
+        fSavings = initial;
+        fInterestRate = 0.07;
     }
 
     public ShipSavings ()
     {
-	fSavings = 0;
-	fInterestRate = 0.07;
+        fSavings = 0;
+        fInterestRate = 0.07;
     }
 
     public String getName ()
     {
-	return "Ship Savings";
+        return "Ship Savings";
     }
 
     public void setInterestRate (double rate)
     {
-	fInterestRate = rate;
+        fInterestRate = rate;
     }
 
     public double getInterestRate ()
     {
-	return fInterestRate;
+        return fInterestRate;
     }
 
     public long computeInterest ()
     {
-	return (long)(fSavings * fInterestRate);
+        return (long)(fSavings * fInterestRate);
     }
 
     public void invest (long investment)
     {
-	fSavings += computeInterest ();
-	fSavings += investment;
+        fSavings += computeInterest ();
+        fSavings += investment;
     }
 
     public long getSavings ()
     {
-	return fSavings;
+        return fSavings;
     }
 
     public void withdraw (long amount)
     {
-	fSavings -= amount;
+        fSavings -= amount;
     }
 
 

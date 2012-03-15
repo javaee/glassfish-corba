@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)DownloadB.java	1.7 99/07/16 */
+/* @(#)DownloadB.java   1.7 99/07/16 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -48,7 +48,7 @@
  */
 
 package javax.rmi.download.values;
-//import com.sun.corba.se.impl.util.JDKClassLoader;
+//import com.sun.corba.ee.impl.util.JDKClassLoader;
 
 public class DownloadB implements java.io.Serializable {
     public class Inner {}

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.legacy.interceptor;
+package com.sun.corba.ee.spi.legacy.interceptor;
 
 /** This extension is used to provide information about whether or not
  * the object to which the incoming request is dispatched is a name service

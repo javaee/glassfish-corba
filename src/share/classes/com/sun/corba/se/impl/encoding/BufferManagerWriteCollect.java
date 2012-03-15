@@ -37,18 +37,18 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.util.Iterator;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.transport.Connection;
-import com.sun.corba.se.spi.transport.ByteBufferPool;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.ByteBufferPool;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
 
 /**
  * Collect buffer manager.
@@ -189,24 +189,24 @@ public class BufferManagerWriteCollect extends BufferManagerWrite
 
     private Iterator iterator ()
     {
-	return new BufferManagerWriteCollectIterator();
+        return new BufferManagerWriteCollectIterator();
     }
 
     private class BufferManagerWriteCollectIterator implements Iterator
     {
-	public boolean hasNext ()
-	{
+        public boolean hasNext ()
+        {
             return queue.size() != 0;
-	}
+        }
 
-	public Object next ()
-	{
+        public Object next ()
+        {
             return queue.dequeue();
         }
 
-	public void remove ()
-	{
-	    throw new UnsupportedOperationException();
-	}
+        public void remove ()
+        {
+            throw new UnsupportedOperationException();
+        }
     }
 }

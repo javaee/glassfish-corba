@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport.connection;
+package com.sun.corba.ee.spi.transport.connection;
 
 /** A connection cache manages a group of connections which may be re-used
  * for sending and receiving messages.

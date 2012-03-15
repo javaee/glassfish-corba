@@ -68,37 +68,37 @@ public class ColocatedClientServer
     {
 
         Client.testName = ColocatedClientServer.class.getName() ;
-	isColocated = true; // Used by Client and Server.
+        isColocated = true; // Used by Client and Server.
 
-	try {
-	    // Share an ORB between a client and server.
-	    // So ClientDelegate.isLocal currently succeeds.
+        try {
+            // Share an ORB between a client and server.
+            // So ClientDelegate.isLocal currently succeeds.
 
-	    orb = C.createORB(args, fragmentSize);
-	    Server.orb = orb;
-	    Client.orb = orb;
-	    
-	    // Share a naming context between client and server
-	    // so StubAdapter.isLocal is true.
+            orb = C.createORB(args, fragmentSize);
+            Server.orb = orb;
+            Client.orb = orb;
+            
+            // Share a naming context between client and server
+            // so StubAdapter.isLocal is true.
 
-	    // Use the same ORB which has interceptor properties set.
-	    initialContext = C.createInitialContext(orb);
-	    Server.initialContext = initialContext;
-	    Client.initialContext = initialContext;
-	    
-	    ServerThread ServerThread = new ServerThread(args);
-	    ServerThread.start();
-	    synchronized (signal) {
-		try {
-		    signal.wait();
-		} catch (InterruptedException e) {
-		    ;
-		}
-	    }
-	    Client.main(args);
-	} catch (Exception e) {
-	    U.sopUnexpectedException(main, e);
-	}
+            // Use the same ORB which has interceptor properties set.
+            initialContext = C.createInitialContext(orb);
+            Server.initialContext = initialContext;
+            Client.initialContext = initialContext;
+            
+            ServerThread ServerThread = new ServerThread(args);
+            ServerThread.start();
+            synchronized (signal) {
+                try {
+                    signal.wait();
+                } catch (InterruptedException e) {
+                    ;
+                }
+            }
+            Client.main(args);
+        } catch (Exception e) {
+            U.sopUnexpectedException(main, e);
+        }
     }
 }
 
@@ -107,11 +107,11 @@ class ServerThread extends Thread
     String[] args;
     ServerThread (String[] args)
     {
-	this.args = args;
+        this.args = args;
     }
     public void run ()
     {
-	Server.main(args);
+        Server.main(args);
     }
 }
 

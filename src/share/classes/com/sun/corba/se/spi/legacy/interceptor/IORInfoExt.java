@@ -38,15 +38,15 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.legacy.interceptor;
+package com.sun.corba.ee.spi.legacy.interceptor;
 
-import com.sun.corba.se.spi.oa.ObjectAdapter;
+import com.sun.corba.ee.spi.oa.ObjectAdapter;
 
 public interface IORInfoExt
 {
     public int getServerPort(String type)
-	throws
-	    UnknownType;
+        throws
+            UnknownType;
 
     public ObjectAdapter getObjectAdapter();
 }

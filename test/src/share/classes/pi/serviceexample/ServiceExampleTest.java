@@ -49,51 +49,51 @@ import corba.framework.CORBATest;
 
 public class ServiceExampleTest
     extends
-	CORBATest
+        CORBATest
 {
     public static final String thisPackage =
-	ServiceExampleTest.class.getPackage().getName();
+        ServiceExampleTest.class.getPackage().getName();
 
     protected void doTest()
-	throws
-	    Throwable
+        throws
+            Throwable
     {
-	Controller orbd   = createORBD();
-	orbd.start();
+        Controller orbd   = createORBD();
+        orbd.start();
 
-	// Remote.
+        // Remote.
 
-	Controller loggingServer =
-	    createServer(thisPackage + ".LoggingServiceImpl",
-			 "loggingServer") ;
-	loggingServer.start();
+        Controller loggingServer =
+            createServer(thisPackage + ".LoggingServiceImpl",
+                         "loggingServer") ;
+        loggingServer.start();
 
-	Controller arbitraryObjectServer =
-	    createServer(thisPackage + ".ArbitraryObjectServiceImpl",
-			 "arbitraryObjectServer") ;
-	arbitraryObjectServer.start();
+        Controller arbitraryObjectServer =
+            createServer(thisPackage + ".ArbitraryObjectServiceImpl",
+                         "arbitraryObjectServer") ;
+        arbitraryObjectServer.start();
 
-	Controller client = createClient(thisPackage + ".Client",
-					 "client");
+        Controller client = createClient(thisPackage + ".Client",
+                                         "client");
 
-	client.start();
-	client.waitFor();
-	client.stop();
-	arbitraryObjectServer.stop();
-	loggingServer.stop();
+        client.start();
+        client.waitFor();
+        client.stop();
+        arbitraryObjectServer.stop();
+        loggingServer.stop();
 
-	// Colocated.
+        // Colocated.
 
-	Controller colocatedServers = 
-	    createServer(thisPackage + ".ColocatedServers",
-			 "colocatedClientServer");
-	colocatedServers.start();
-	client.start();
-	client.waitFor();
-	client.stop();
-	colocatedServers.stop();
+        Controller colocatedServers = 
+            createServer(thisPackage + ".ColocatedServers",
+                         "colocatedClientServer");
+        colocatedServers.start();
+        client.start();
+        client.waitFor();
+        client.stop();
+        colocatedServers.stop();
 
-	orbd.stop();
+        orbd.stop();
     }
 }
 

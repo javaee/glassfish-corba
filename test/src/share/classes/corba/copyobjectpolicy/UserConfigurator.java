@@ -42,12 +42,12 @@ package corba.copyobjectpolicy;
 
 import java.lang.reflect.Method ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orb.ORBConfigurator ;
-import com.sun.corba.se.spi.orb.DataCollector ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORBConfigurator ;
+import com.sun.corba.ee.spi.orb.DataCollector ;
 
-import com.sun.corba.se.spi.copyobject.CopierManager ;
-import com.sun.corba.se.spi.copyobject.CopyobjectDefaults ;
+import com.sun.corba.ee.spi.copyobject.CopierManager ;
+import com.sun.corba.ee.spi.copyobject.CopyobjectDefaults ;
 
 import corba.framework.TraceAccumulator ;
 import corba.framework.ProxyInterceptor ;
@@ -65,28 +65,28 @@ public class UserConfigurator implements ORBConfigurator
     // The TraceAccumular connected to the ProxyInterceptors 
     // used in this test.
     public static final TraceAccumulator traceAccum =
-	new TraceAccumulator() ;
+        new TraceAccumulator() ;
 
     public static final Method makeMethod ;
     
     static {
-	try {
-	    makeMethod = ObjectCopierFactory.class.
-		getDeclaredMethod( "make" ) ;
-	} catch (Exception exc) {
-	    throw new RuntimeException( 
-		"Cannot find ObjectCopierFactory.make() method", exc ) ;
-	}
+        try {
+            makeMethod = ObjectCopierFactory.class.
+                getDeclaredMethod( "make" ) ;
+        } catch (Exception exc) {
+            throw new RuntimeException( 
+                "Cannot find ObjectCopierFactory.make() method", exc ) ;
+        }
     } 
 
     private ProxyInterceptor makePI( String name, ObjectCopierFactory factory ) 
     {
-	ProxyInterceptor result = ProxyInterceptor.make(
-	    name,  new Class[] { ObjectCopierFactory.class }, factory ) ;
-	result.addListener( traceAccum ) ;
-	result.addMethod( makeMethod ) ;
+        ProxyInterceptor result = ProxyInterceptor.make(
+            name,  new Class[] { ObjectCopierFactory.class }, factory ) ;
+        result.addListener( traceAccum ) ;
+        result.addMethod( makeMethod ) ;
 
-	return result ;
+        return result ;
     }
 
     /** Set up two copiers: the value copier, and the reference
@@ -94,23 +94,23 @@ public class UserConfigurator implements ORBConfigurator
      */
     public void configure( DataCollector dc, ORB orb ) 
     {
-	CopierManager cm = orb.getCopierManager() ;
-	cm.setDefaultId( VALUE_INDEX ) ;
+        CopierManager cm = orb.getCopierManager() ;
+        cm.setDefaultId( VALUE_INDEX ) ;
 
-	ObjectCopierFactory value =
-	    CopyobjectDefaults.makeORBStreamObjectCopierFactory( orb ) ;
-	ProxyInterceptor valuePI = makePI( VALUE_NAME,
-	    value ) ;
-	cm.registerObjectCopierFactory( 
-	    (ObjectCopierFactory)valuePI.getActual(), 
-	    VALUE_INDEX ) ;
+        ObjectCopierFactory value =
+            CopyobjectDefaults.makeORBStreamObjectCopierFactory( orb ) ;
+        ProxyInterceptor valuePI = makePI( VALUE_NAME,
+            value ) ;
+        cm.registerObjectCopierFactory( 
+            (ObjectCopierFactory)valuePI.getActual(), 
+            VALUE_INDEX ) ;
 
-	ObjectCopierFactory reference =
-	    CopyobjectDefaults.getReferenceObjectCopierFactory( ) ;
-	ProxyInterceptor referencePI = makePI( REFERENCE_NAME,
-	    reference ) ;
-	cm.registerObjectCopierFactory( 
-	    (ObjectCopierFactory)referencePI.getActual(), 
-	    REFERENCE_INDEX ) ;
+        ObjectCopierFactory reference =
+            CopyobjectDefaults.getReferenceObjectCopierFactory( ) ;
+        ProxyInterceptor referencePI = makePI( REFERENCE_NAME,
+            reference ) ;
+        cm.registerObjectCopierFactory( 
+            (ObjectCopierFactory)referencePI.getActual(), 
+            REFERENCE_INDEX ) ;
     }
 }

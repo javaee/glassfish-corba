@@ -69,13 +69,13 @@ public class DirectoryLoader extends ClassLoader {
      * Constructor.
      */
     public DirectoryLoader (File rootDir) {
-	cache = new Hashtable();
-	if (rootDir == null || !rootDir.isDirectory()) {
-	    throw new IllegalArgumentException();
-	}
-	root = rootDir;
+        cache = new Hashtable();
+        if (rootDir == null || !rootDir.isDirectory()) {
+            throw new IllegalArgumentException();
+        }
+        root = rootDir;
     }
-	
+        
     private DirectoryLoader () {}
 
     /**
@@ -91,7 +91,7 @@ public class DirectoryLoader extends ClassLoader {
      * FindClassFromClass.
      */
     public synchronized Class loadClass(String className, boolean resolve)
-	throws ClassNotFoundException {
+        throws ClassNotFoundException {
         Class result;
         byte  classData[];
 
@@ -101,39 +101,39 @@ public class DirectoryLoader extends ClassLoader {
 
         if (result == null) {
             
-	    // Nope, can we get if from the system class loader?
+            // Nope, can we get if from the system class loader?
 
-	    try {
-	            
-		result = super.findSystemClass(className);
-	            
-	    } catch (ClassNotFoundException e) {
-	            
-    	        // No, so try loading it...
+            try {
+                    
+                result = super.findSystemClass(className);
+                    
+            } catch (ClassNotFoundException e) {
+                    
+                // No, so try loading it...
 
-    	        classData = getClassFileData(className);
+                classData = getClassFileData(className);
 
-    	        if (classData == null) {
-    	            throw new ClassNotFoundException();
-    	        }
+                if (classData == null) {
+                    throw new ClassNotFoundException();
+                }
 
-    	        // Parse the class file data...
+                // Parse the class file data...
 
-    	        result = defineClass(classData, 0, classData.length);
+                result = defineClass(classData, 0, classData.length);
 
-    	        if (result == null) {
-    	            throw new ClassFormatError();
-    	        }
+                if (result == null) {
+                    throw new ClassFormatError();
+                }
 
-		// Resolve it...
+                // Resolve it...
 
-    	        if (resolve) resolveClass(result);
+                if (resolve) resolveClass(result);
 
-		// Add to cache...
+                // Add to cache...
 
-    	        cache.put(className, result);
-	    }
-	}
+                cache.put(className, result);
+            }
+        }
 
         return result;
     }
@@ -145,7 +145,7 @@ public class DirectoryLoader extends ClassLoader {
     private byte[] getClassFileData (String className) {
         
         byte result[] = null;
-	FileInputStream stream = null;
+        FileInputStream stream = null;
 
         // Get the file...
 
@@ -158,20 +158,20 @@ public class DirectoryLoader extends ClassLoader {
             result = new byte[stream.available()];
             stream.read(result);
         } catch(ThreadDeath death) {
-	    throw death;
-	} catch (Throwable e) {
+            throw death;
+        } catch (Throwable e) {
         }
 
-	finally {
-	    if (stream != null) {
-		try {
-		    stream.close();
-		} catch(ThreadDeath death) {
-		    throw death;
-		} catch (Throwable e) {
-		}
-	    }
-	}
+        finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch(ThreadDeath death) {
+                    throw death;
+                } catch (Throwable e) {
+                }
+            }
+        }
 
         return result;
     }

@@ -60,20 +60,20 @@ public class AttributeMode implements org.omg.CORBA.portable.IDLEntity
 
     public int value ()
     {
-	return __value;
+        return __value;
     }
 
     public static com.sun.org.omg.CORBA.AttributeMode from_int (int value)
     {
-	if (value >= 0 && value < __size)
-	    return __array[value];
-	else
-	    throw new org.omg.CORBA.BAD_PARAM ();
+        if (value >= 0 && value < __size)
+            return __array[value];
+        else
+            throw new org.omg.CORBA.BAD_PARAM ();
     }
 
     protected AttributeMode (int value)
     {
-	__value = value;
-	__array[__value] = this;
+        __value = value;
+        __array[__value] = this;
     }
 } // class AttributeMode

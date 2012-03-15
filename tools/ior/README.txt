@@ -43,7 +43,7 @@ This requires an ORB that supports the CodecFactory
 through resolve_initial_references.  Also, if you want
 to see CSIv2 related information, adjust the two
 tag files appropriately.  Currently, they look for
-com.sun.corba.se.org.omg.CSIIOP files (renamed to
+com.sun.corba.ee.org.omg.CSIIOP files (renamed to
 ee).
 
 Of course, you'll want to use the generated IDL files

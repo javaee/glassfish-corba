@@ -48,10 +48,10 @@ module ClientRequestInfo
         string saySystemException();
         void sayUserException() raises (ExampleException);
         oneway void sayOneway();
-	string sayArguments( in string arg1, in long arg2, in boolean arg3 );
+        string sayArguments( in string arg1, in long arg2, in boolean arg3 );
         void clearInvoked();
         boolean wasInvoked();
-	void resetServant();
+        void resetServant();
     };
 };
 

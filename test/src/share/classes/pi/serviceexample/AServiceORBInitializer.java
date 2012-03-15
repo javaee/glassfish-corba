@@ -62,49 +62,49 @@ public class AServiceORBInitializer
 
     public void pre_init(ORBInitInfo info)
     {
-	try {
-	    int id = info.allocate_slot_id();
+        try {
+            int id = info.allocate_slot_id();
 
-	    aServiceInterceptor = new AServiceInterceptor(id);
+            aServiceInterceptor = new AServiceInterceptor(id);
 
-	    info.add_client_request_interceptor(aServiceInterceptor);
-	    info.add_server_request_interceptor(aServiceInterceptor);
+            info.add_client_request_interceptor(aServiceInterceptor);
+            info.add_server_request_interceptor(aServiceInterceptor);
 
-	    // Create and register a reference to the service to be
-	    // used by client code.
+            // Create and register a reference to the service to be
+            // used by client code.
 
-	    aServiceImpl = new AServiceImpl(id);
+            aServiceImpl = new AServiceImpl(id);
 
-	    info.register_initial_reference("AService", aServiceImpl);
+            info.register_initial_reference("AService", aServiceImpl);
 
-	} catch (Throwable t) {
-	    System.out.println("Exception handling not shown.");
-	}
+        } catch (Throwable t) {
+            System.out.println("Exception handling not shown.");
+        }
     }
 
     public void post_init(ORBInitInfo info)
     {
-	try {
+        try {
 
-	    Current piCurrent =
-		CurrentHelper.narrow(
-		    info.resolve_initial_references("PICurrent"));
-	    aServiceImpl.setPICurrent(piCurrent);
+            Current piCurrent =
+                CurrentHelper.narrow(
+                    info.resolve_initial_references("PICurrent"));
+            aServiceImpl.setPICurrent(piCurrent);
 
-	    CodecFactory codecFactory =
-		CodecFactoryHelper.narrow(
-	            info.resolve_initial_references("CodecFactory"));
-	    Encoding encoding = new Encoding((short)0, (byte)1, (byte)2);
-	    Codec codec = codecFactory.create_codec(encoding);
-	    aServiceInterceptor.setCodec(codec);
-	    
-	    AServiceIORInterceptor aServiceIORInterceptor =
-		new AServiceIORInterceptor(codec);
-	    info.add_ior_interceptor(aServiceIORInterceptor);
+            CodecFactory codecFactory =
+                CodecFactoryHelper.narrow(
+                    info.resolve_initial_references("CodecFactory"));
+            Encoding encoding = new Encoding((short)0, (byte)1, (byte)2);
+            Codec codec = codecFactory.create_codec(encoding);
+            aServiceInterceptor.setCodec(codec);
+            
+            AServiceIORInterceptor aServiceIORInterceptor =
+                new AServiceIORInterceptor(codec);
+            info.add_ior_interceptor(aServiceIORInterceptor);
 
-	} catch (Throwable t) {
-	    System.out.println("Exception handling not shown.");
-	}
+        } catch (Throwable t) {
+            System.out.println("Exception handling not shown.");
+        }
     }
 
 }

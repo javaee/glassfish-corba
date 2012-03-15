@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)DateValueFactory.java	1.1 99/06/07 */
+/* @(#)DateValueFactory.java    1.1 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0

@@ -40,7 +40,7 @@
 
 package pi.ort;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import IORInterceptorTest.*;    // for IDL
 import corba.framework.InternalProcess;
 import java.io.PrintStream;
@@ -70,17 +70,17 @@ public class Server
     private JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
 
     public static void main(String args[]) {
-	try {
-	    (new Server()).run( System.getProperties(),
-	                	args, System.out, System.err, null );
-	} catch( Exception e ) {
-	    e.printStackTrace( System.err );
-	    System.exit( 1 );
-	}
+        try {
+            (new Server()).run( System.getProperties(),
+                                args, System.out, System.err, null );
+        } catch( Exception e ) {
+            e.printStackTrace( System.err );
+            System.exit( 1 );
+        }
     }
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
         try {

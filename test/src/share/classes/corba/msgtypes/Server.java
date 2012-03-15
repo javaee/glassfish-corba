@@ -39,12 +39,12 @@
  */
 package corba.msgtypes;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.protocol.ForwardException;
-import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
-import com.sun.corba.se.impl.ior.IORImpl;
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.ObjectKey;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.protocol.ForwardException;
+import com.sun.corba.ee.impl.oa.poa.BadServerIdHandler;
+import com.sun.corba.ee.impl.ior.IORImpl;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.ObjectKey;
 import java.io.FileOutputStream;
 
 import java.util.Properties;
@@ -98,9 +98,9 @@ public class Server extends LocalObject implements ORBInitializer {
             System.out.println("ServerRequestHandler received a request");
 
             // create an IOR to return back
-            IOR ior = new IORImpl((com.sun.corba.se.spi.orb.ORB) orb);
+            IOR ior = new IORImpl((com.sun.corba.ee.spi.orb.ORB) orb);
             throw new ForwardException(
-		(com.sun.corba.se.spi.orb.ORB)orb, ior);
+                (com.sun.corba.ee.spi.orb.ORB)orb, ior);
         }
     }
 
@@ -179,22 +179,22 @@ public class Server extends LocalObject implements ORBInitializer {
 
     public static void main(String args[]) {
         try {
-	    Properties props = new Properties( System.getProperties() ) ;
-	    String className = ServerRequestHandler.class.getName() ;
-	    props.setProperty( 
-		ORBConstants.BAD_SERVER_ID_HANDLER_CLASS_PROPERTY,
-		className ) ;
-	    
+            Properties props = new Properties( System.getProperties() ) ;
+            String className = ServerRequestHandler.class.getName() ;
+            props.setProperty( 
+                ORBConstants.BAD_SERVER_ID_HANDLER_CLASS_PROPERTY,
+                className ) ;
+            
             ORB orb = ORB.init(args, System.getProperties());
 
-            com.sun.corba.se.spi.orb.ORB ourORB
-                = (com.sun.corba.se.spi.orb.ORB)orb;
+            com.sun.corba.ee.spi.orb.ORB ourORB
+                = (com.sun.corba.ee.spi.orb.ORB)orb;
 
             System.out.println("==== Server GIOP version "
                                + ourORB.getORBData().getGIOPVersion()
                                + " with strategy "
                                + ourORB.getORBData().getGIOPBuffMgrStrategy(
-			           ourORB.getORBData().getGIOPVersion())
+                                   ourORB.getORBData().getGIOPVersion())
                                + "====");
 
             // Get rootPOA
@@ -205,7 +205,7 @@ public class Server extends LocalObject implements ORBInitializer {
             javax.rmi.CORBA.Tie tie = javax.rmi.CORBA.Util.getTie( impl ) ;
 
             byte[] id = rootPOA.activate_object(
-		(org.omg.PortableServer.Servant)tie ) ;
+                (org.omg.PortableServer.Servant)tie ) ;
                                                  
             org.omg.CORBA.Object obj = rootPOA.id_to_reference( id ) ;
 

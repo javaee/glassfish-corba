@@ -38,13 +38,13 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport.connection;
+package com.sun.corba.ee.spi.transport.connection;
 
 
-import com.sun.corba.se.impl.transport.connection.OutboundConnectionCacheBlockingImpl ;
-import com.sun.corba.se.impl.transport.connection.OutboundConnectionCacheImpl ;
-import com.sun.corba.se.impl.transport.connection.InboundConnectionCacheBlockingImpl ;
-import com.sun.corba.se.impl.transport.connection.InboundConnectionCacheImpl ;
+import com.sun.corba.ee.impl.transport.connection.OutboundConnectionCacheBlockingImpl ;
+import com.sun.corba.ee.impl.transport.connection.OutboundConnectionCacheImpl ;
+import com.sun.corba.ee.impl.transport.connection.InboundConnectionCacheBlockingImpl ;
+import com.sun.corba.ee.impl.transport.connection.InboundConnectionCacheImpl ;
 
 /** A factory class for creating connections caches.
  * Note that a rather unusual syntax is needed for calling these methods:
@@ -59,31 +59,31 @@ public final class ConnectionCacheFactory {
 
     public static <C extends Connection> OutboundConnectionCache<C>
     makeBlockingOutboundConnectionCache( String cacheType, int highWaterMark,
-	int numberToReclaim, int maxParallelConnections, int ttl ) {
+        int numberToReclaim, int maxParallelConnections, int ttl ) {
 
-	return new OutboundConnectionCacheBlockingImpl<C>( cacheType, highWaterMark,
-	    numberToReclaim, maxParallelConnections, ttl ) ;
+        return new OutboundConnectionCacheBlockingImpl<C>( cacheType, highWaterMark,
+            numberToReclaim, maxParallelConnections, ttl ) ;
     }
 
     public static <C extends Connection> OutboundConnectionCache<C>
     makeNonBlockingOutboundConnectionCache( String cacheType, int highWaterMark,
-	int numberToReclaim, int maxParallelConnections, int ttl ) {
+        int numberToReclaim, int maxParallelConnections, int ttl ) {
 
-	return new OutboundConnectionCacheImpl<C>( cacheType, highWaterMark,
-	    numberToReclaim, maxParallelConnections, ttl ) ;
+        return new OutboundConnectionCacheImpl<C>( cacheType, highWaterMark,
+            numberToReclaim, maxParallelConnections, ttl ) ;
     }
 
     public static <C extends Connection> InboundConnectionCache<C>
     makeBlockingInboundConnectionCache( String cacheType, int highWaterMark,
-	int numberToReclaim, int ttl ) {
-	return new InboundConnectionCacheBlockingImpl<C>( cacheType,
-	    highWaterMark, numberToReclaim, ttl ) ;
+        int numberToReclaim, int ttl ) {
+        return new InboundConnectionCacheBlockingImpl<C>( cacheType,
+            highWaterMark, numberToReclaim, ttl ) ;
     }
 
     public static <C extends Connection> InboundConnectionCache<C> 
     makeNonBlockingInboundConnectionCache( String cacheType, int highWaterMark,
-	int numberToReclaim, int ttl ) {
-	return new InboundConnectionCacheImpl<C>( cacheType,
-	    highWaterMark, numberToReclaim, ttl ) ;
+        int numberToReclaim, int ttl ) {
+        return new InboundConnectionCacheImpl<C>( cacheType,
+            highWaterMark, numberToReclaim, ttl ) ;
     }
 }

@@ -60,12 +60,12 @@ import org.omg.CORBA.ContextList ;
 
 import org.omg.CORBA_2_3.portable.Delegate ;
 
-import com.sun.corba.se.spi.transport.ContactInfoList ;
+import com.sun.corba.ee.spi.transport.ContactInfoList ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
-import com.sun.corba.se.spi.protocol.ClientDelegate ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcher ;
+import com.sun.corba.ee.spi.protocol.ClientDelegate ;
 
 import corba.dynamicrmiiiop.testclasses.TieTestImpl ;
 
@@ -82,259 +82,259 @@ public class TestClientDelegate extends ClientDelegate
 
     private int invocationState = INVALID ;
 
-    private static final int INVALID		= 0 ;
-    private static final int START		= 1 ;
-    private static final int USE_LOCAL_TRUE	= 2 ;
-    private static final int USE_LOCAL_FALSE	= 3 ;
-    private static final int PREINVOKE_CALLED	= 3 ;
-    private static final int POSTINVOKE_CALLED	= 4 ;
-    private static final int REQUEST_CALLED	= 5 ;
-    private static final int INVOKE_CALLED	= 6 ;
+    private static final int INVALID            = 0 ;
+    private static final int START              = 1 ;
+    private static final int USE_LOCAL_TRUE     = 2 ;
+    private static final int USE_LOCAL_FALSE    = 3 ;
+    private static final int PREINVOKE_CALLED   = 3 ;
+    private static final int POSTINVOKE_CALLED  = 4 ;
+    private static final int REQUEST_CALLED     = 5 ;
+    private static final int INVOKE_CALLED      = 6 ;
     private static final int RELEASE_CALLED     = 7 ;
 
     private void checkState( int expected, int next )
     {
-	if (invocationState != expected)
-	    throw new RuntimeException( "Expected state " + expected +
-		" but was in state " + invocationState ) ;
+        if (invocationState != expected)
+            throw new RuntimeException( "Expected state " + expected +
+                " but was in state " + invocationState ) ;
 
-	invocationState = next ;
+        invocationState = next ;
     }
 
     public TestClientDelegate( ORB orb, TestTransport transport, 
-	final TieTestImpl impl, Tie tie, ResponseHandler rhandler )
+        final TieTestImpl impl, Tie tie, ResponseHandler rhandler )
     {
-	this.transport = transport ;
-	this.impl = impl ;
-	this.tie = tie ;
-	this.rhandler = rhandler ;
-	this.orb = orb ;
+        this.transport = transport ;
+        this.impl = impl ;
+        this.tie = tie ;
+        this.rhandler = rhandler ;
+        this.orb = orb ;
 
-	lcrd = new LocalClientRequestDispatcher() {
-	    public boolean useLocalInvocation( org.omg.CORBA.Object self )
-	    {
-		if (isLocal)
-		    checkState( START, USE_LOCAL_TRUE ) ;
-		else
-		    checkState( START, USE_LOCAL_FALSE ) ;
+        lcrd = new LocalClientRequestDispatcher() {
+            public boolean useLocalInvocation( org.omg.CORBA.Object self )
+            {
+                if (isLocal)
+                    checkState( START, USE_LOCAL_TRUE ) ;
+                else
+                    checkState( START, USE_LOCAL_FALSE ) ;
 
-		return isLocal ;
-	    }
+                return isLocal ;
+            }
 
-	    public boolean is_local( org.omg.CORBA.Object self ) 
-	    {
-		return isLocal ;
-	    }
+            public boolean is_local( org.omg.CORBA.Object self ) 
+            {
+                return isLocal ;
+            }
 
-	    public ServantObject servant_preinvoke( org.omg.CORBA.Object self,
-		String operation, Class expectedType ) 
-	    {
-		checkState( USE_LOCAL_TRUE, PREINVOKE_CALLED ) ;
+            public ServantObject servant_preinvoke( org.omg.CORBA.Object self,
+                String operation, Class expectedType ) 
+            {
+                checkState( USE_LOCAL_TRUE, PREINVOKE_CALLED ) ;
 
-		ServantObject result = new ServantObject() ;
-		result.servant = impl ;
-		return result ;
-	    }
+                ServantObject result = new ServantObject() ;
+                result.servant = impl ;
+                return result ;
+            }
 
-	    public void servant_postinvoke( org.omg.CORBA.Object self,
-		ServantObject servant )
-	    {
-		checkState( PREINVOKE_CALLED, POSTINVOKE_CALLED ) ;
-	    }
-	} ;
+            public void servant_postinvoke( org.omg.CORBA.Object self,
+                ServantObject servant )
+            {
+                checkState( PREINVOKE_CALLED, POSTINVOKE_CALLED ) ;
+            }
+        } ;
     }
 
     public org.omg.CORBA.Object get_interface_def(
         org.omg.CORBA.Object self)
     {
-	return null ;
+        return null ;
     }
 
     public org.omg.CORBA.Object duplicate(org.omg.CORBA.Object obj)
     {
-	return obj ;
+        return obj ;
     }
 
     public void release(org.omg.CORBA.Object obj)
     {
-	// NO-OP
+        // NO-OP
     }
 
     public boolean is_a(org.omg.CORBA.Object obj, String repository_id)
     {
-	// Not needed for test
-	return false ;
+        // Not needed for test
+        return false ;
     }
 
     public boolean non_existent(org.omg.CORBA.Object obj)
     {
-	// Always exists for test
-	return false ;
+        // Always exists for test
+        return false ;
     }
 
     public boolean is_equivalent(org.omg.CORBA.Object obj,
-					  org.omg.CORBA.Object other)
+                                          org.omg.CORBA.Object other)
     {
-	return obj == other ;
+        return obj == other ;
     }
 
     public int hash(org.omg.CORBA.Object obj, int max)
     {
-	return hashCode( obj ) % max ;
+        return hashCode( obj ) % max ;
     }
 
     public Request request(org.omg.CORBA.Object obj, String operation)
     {
-	return null ;
+        return null ;
     }
 
     public Request create_request(org.omg.CORBA.Object obj,
-				           Context ctx,
-				           String operation,
-				           NVList arg_list,
-				           NamedValue result)
+                                           Context ctx,
+                                           String operation,
+                                           NVList arg_list,
+                                           NamedValue result)
     {
-	return null ;
+        return null ;
     }
 
     public Request create_request(org.omg.CORBA.Object obj,
-				           Context ctx,
-				           String operation,
-				           NVList arg_list,
-				           NamedValue result,
-				           ExceptionList exclist,
-				           ContextList ctxlist)
+                                           Context ctx,
+                                           String operation,
+                                           NVList arg_list,
+                                           NamedValue result,
+                                           ExceptionList exclist,
+                                           ContextList ctxlist)
     {
-	return null ;
+        return null ;
     }
 
     public org.omg.CORBA.ORB orb(org.omg.CORBA.Object obj) {
-	return orb ;
+        return orb ;
     }
 
     public boolean is_local(org.omg.CORBA.Object self) 
     {
-	return lcrd.is_local( self ) ;
+        return lcrd.is_local( self ) ;
     }
 
     public ServantObject servant_preinvoke( org.omg.CORBA.Object self, 
-	String operation, Class expectedType) 
+        String operation, Class expectedType) 
     {
-	return lcrd.servant_preinvoke( self, operation, expectedType ) ;
+        return lcrd.servant_preinvoke( self, operation, expectedType ) ;
     }
 
     public void servant_postinvoke( org.omg.CORBA.Object self, 
-	ServantObject servant) 
+        ServantObject servant) 
     {
-	lcrd.servant_postinvoke( self, servant ) ;
+        lcrd.servant_postinvoke( self, servant ) ;
     }
 
     public OutputStream request(org.omg.CORBA.Object self,
-				String operation,
-				boolean responseExpected) 
+                                String operation,
+                                boolean responseExpected) 
     {
-	checkState( USE_LOCAL_FALSE, REQUEST_CALLED ) ;
-	
-	return transport.makeRequest( operation ) ;
+        checkState( USE_LOCAL_FALSE, REQUEST_CALLED ) ;
+        
+        return transport.makeRequest( operation ) ;
     }
 
     public InputStream invoke(org.omg.CORBA.Object self, 
-	OutputStream output)
-	throws ApplicationException, RemarshalException 
+        OutputStream output)
+        throws ApplicationException, RemarshalException 
     {
-	checkState( REQUEST_CALLED, INVOKE_CALLED ) ;
-	InputStream is = transport.getInputStream( (org.omg.CORBA_2_3.portable.OutputStream)output ) ; 
-	String mname = transport.readRequestHeader( (org.omg.CORBA_2_3.portable.InputStream)is ) ;
-	OutputStream os = (OutputStream)tie._invoke( mname, is, rhandler ) ;
-	InputStream result = transport.getInputStream( (org.omg.CORBA_2_3.portable.OutputStream)os ) ;
-	transport.readReplyHeader( (org.omg.CORBA_2_3.portable.InputStream)result ) ; 
-	// readReplyHeader throws ApplicationException on exceptions
-	return result ;
+        checkState( REQUEST_CALLED, INVOKE_CALLED ) ;
+        InputStream is = transport.getInputStream( (org.omg.CORBA_2_3.portable.OutputStream)output ) ; 
+        String mname = transport.readRequestHeader( (org.omg.CORBA_2_3.portable.InputStream)is ) ;
+        OutputStream os = (OutputStream)tie._invoke( mname, is, rhandler ) ;
+        InputStream result = transport.getInputStream( (org.omg.CORBA_2_3.portable.OutputStream)os ) ;
+        transport.readReplyHeader( (org.omg.CORBA_2_3.portable.InputStream)result ) ; 
+        // readReplyHeader throws ApplicationException on exceptions
+        return result ;
     }
 
     public void releaseReply( org.omg.CORBA.Object self, 
-	InputStream input) 
+        InputStream input) 
     {
-	checkState( INVOKE_CALLED, RELEASE_CALLED ) ;
+        checkState( INVOKE_CALLED, RELEASE_CALLED ) ;
     }
 
     // From ClientDelegate:
 
     public ORB getBroker()
     {
-	return null ;
+        return null ;
     }
 
     public ContactInfoList getContactInfoList()
     {
-	return new ContactInfoList() {
-	    public Iterator iterator()
-	    {
-		return null ;
-	    }
+        return new ContactInfoList() {
+            public Iterator iterator()
+            {
+                return null ;
+            }
 
-	    
-	    public void setTargetIOR(IOR ior)
-	    {
-		// NO-OP
-	    }
+            
+            public void setTargetIOR(IOR ior)
+            {
+                // NO-OP
+            }
 
-	    public IOR getTargetIOR()
-	    {
-		return null ;
-	    }
-
-
-	    public void setEffectiveTargetIOR(IOR locatedIor)
-	    {
-		// NO-OP
-	    }
-
-	    public IOR getEffectiveTargetIOR()
-	    {
-		return null ;
-	    }
+            public IOR getTargetIOR()
+            {
+                return null ;
+            }
 
 
-	    public long getEffectiveTargetIORTimestamp()
-	    {
-		return 0 ;
-	    }
+            public void setEffectiveTargetIOR(IOR locatedIor)
+            {
+                // NO-OP
+            }
+
+            public IOR getEffectiveTargetIOR()
+            {
+                return null ;
+            }
 
 
-	    public LocalClientRequestDispatcher 
-		getLocalClientRequestDispatcher()
-	    {
-		return lcrd ;
-	    }
+            public long getEffectiveTargetIORTimestamp()
+            {
+                return 0 ;
+            }
 
 
-	    public int hashCode()
-	    {
-		return 0 ;
-	    }
-	} ;
+            public LocalClientRequestDispatcher 
+                getLocalClientRequestDispatcher()
+            {
+                return lcrd ;
+            }
+
+
+            public int hashCode()
+            {
+                return 0 ;
+            }
+        } ;
     }
 
     // Test methods:
 
     public void startLocalTest()
     {
-	isLocal = true ;
-	invocationState = START ;
+        isLocal = true ;
+        invocationState = START ;
     }
 
     public void startRemoteTest() 
     {
-	isLocal = false ;
-	invocationState = START ;
+        isLocal = false ;
+        invocationState = START ;
     }
 
     public void checkForError()
     {
-	if (isLocal)
-	    checkState( POSTINVOKE_CALLED, INVALID ) ;
-	else
-	    checkState( RELEASE_CALLED, INVALID ) ;
+        if (isLocal)
+            checkState( POSTINVOKE_CALLED, INVALID ) ;
+        else
+            checkState( RELEASE_CALLED, INVALID ) ;
     }
 }

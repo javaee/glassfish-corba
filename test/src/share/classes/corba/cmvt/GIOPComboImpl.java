@@ -53,7 +53,7 @@ public class GIOPComboImpl extends PortableRemoteObject implements GIOPCombo
     }
 
     public int sayHello(int invalue)
-	throws RemoteException
+        throws RemoteException
     {
 
         System.out.println("\nHello world !! invalue = "+invalue+"\n");
@@ -62,8 +62,8 @@ public class GIOPComboImpl extends PortableRemoteObject implements GIOPCombo
 
     public void throwError( Error it ) throws java.rmi.RemoteException
     {
-	System.out.println( "Throwing error " + it ) ;
-	throw it ;
+        System.out.println( "Throwing error " + it ) ;
+        throw it ;
     }
 
     public String  echo( String string) 

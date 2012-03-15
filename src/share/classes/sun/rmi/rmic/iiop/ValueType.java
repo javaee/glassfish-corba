@@ -65,8 +65,8 @@ import java.io.ObjectStreamField;
  * The static forValue(...) method must be used to obtain an instance, and
  * will return null if the ClassDefinition is non-conforming.
  *
- * @version	1.0, 2/27/98
- * @author	Bryan Atsatt
+ * @version     1.0, 2/27/98
+ * @author      Bryan Atsatt
  */
 public class ValueType extends ClassType {
 
@@ -84,25 +84,25 @@ public class ValueType extends ClassType {
      * supplied BatchEnvironment.
      */
     public static ValueType forValue(ClassDefinition classDef,
-				     ContextStack stack,
-				     boolean quiet) {
+                                     ContextStack stack,
+                                     boolean quiet) {
 
-	if (stack.anyErrors()) return null;
+        if (stack.anyErrors()) return null;
 
-    	// Do we already have it?
+        // Do we already have it?
 
-	sun.tools.java.Type theType = classDef.getType();
-	String typeKey = theType.toString();
-	Type existing = getType(typeKey,stack);
+        sun.tools.java.Type theType = classDef.getType();
+        String typeKey = theType.toString();
+        Type existing = getType(typeKey,stack);
 
-	if (existing != null) {
+        if (existing != null) {
 
-	    if (!(existing instanceof ValueType)) return null; // False hit.
+            if (!(existing instanceof ValueType)) return null; // False hit.
 
-	    // Yep, so return it...
+            // Yep, so return it...
 
-	    return (ValueType) existing;
-	}
+            return (ValueType) existing;
+        }
 
         // Is this java.lang.Class?
  
@@ -115,15 +115,15 @@ public class ValueType extends ClassType {
             
             javaLangClass = true;
             BatchEnvironment env = stack.getEnv();
-	    ClassDeclaration decl = env.getClassDeclaration(idClassDesc);
-	    ClassDefinition def = null;
-    		
-	    try {
-		def = decl.getClassDefinition(env);
-	    } catch (ClassNotFound ex) {
-		classNotFound(stack,ex);
-		return null;
-	    }
+            ClassDeclaration decl = env.getClassDeclaration(idClassDesc);
+            ClassDefinition def = null;
+                
+            try {
+                def = decl.getClassDefinition(env);
+            } catch (ClassNotFound ex) {
+                classNotFound(stack,ex);
+                return null;
+            }
             
             classDef = def;
         }
@@ -134,18 +134,18 @@ public class ValueType extends ClassType {
             
             // Yes, so check it...
             
-	    ValueType it = new ValueType(classDef,stack,javaLangClass);
-	    putType(typeKey,it,stack);
-	    stack.push(it);
+            ValueType it = new ValueType(classDef,stack,javaLangClass);
+            putType(typeKey,it,stack);
+            stack.push(it);
 
-	    if (it.initialize(stack,quiet)) {
-		stack.pop(true);
-		return it;
-	    } else {
-    	    	removeType(typeKey,stack);
-		stack.pop(false);
-		return null;
-	    }
+            if (it.initialize(stack,quiet)) {
+                stack.pop(true);
+                return it;
+            } else {
+                removeType(typeKey,stack);
+                stack.pop(false);
+                return null;
+            }
         } else {
             return null;
         }
@@ -156,14 +156,14 @@ public class ValueType extends ClassType {
      * Return a string describing this type.
      */
     public String getTypeDescription () {
-	String result = addExceptionDescription("Value");
-	if (isCustom) {
-	    result = "Custom " + result;
-	}
-	if (isIDLEntity) {
-	    result = result + " [IDLEntity]"; 
-	}
-	return result;
+        String result = addExceptionDescription("Value");
+        if (isCustom) {
+            result = "Custom " + result;
+        }
+        if (isIDLEntity) {
+            result = result + " [IDLEntity]"; 
+        }
+        return result;
     }
 
     /**
@@ -212,27 +212,27 @@ public class ValueType extends ClassType {
     private static boolean couldBeValue(ContextStack stack, ClassDefinition classDef) {
         
         boolean result = false;
-	ClassDeclaration classDecl = classDef.getClassDeclaration();
+        ClassDeclaration classDecl = classDef.getClassDeclaration();
         BatchEnvironment env = stack.getEnv();
         
-	try {
-	    // Make sure it's not remote...
+        try {
+            // Make sure it's not remote...
 
-	    if (env.defRemote.implementedBy(env, classDecl)) {
-		failedConstraint(10,false,stack,classDef.getName());
-	    } else {
+            if (env.defRemote.implementedBy(env, classDecl)) {
+                failedConstraint(10,false,stack,classDef.getName());
+            } else {
 
-		// Make sure it's Serializable...
+                // Make sure it's Serializable...
 
-    	        if (!env.defSerializable.implementedBy(env, classDecl)) {
-		    failedConstraint(11,false,stack,classDef.getName());
-    	        } else {
-    	            result = true;   
-    	        }
-    	    }
-	} catch (ClassNotFound e) {
-	    classNotFound(stack,e);
-	}
+                if (!env.defSerializable.implementedBy(env, classDecl)) {
+                    failedConstraint(11,false,stack,classDef.getName());
+                } else {
+                    result = true;   
+                }
+            }
+        } catch (ClassNotFound e) {
+            classNotFound(stack,e);
+        }
            
         return result;
     }
@@ -242,43 +242,43 @@ public class ValueType extends ClassType {
      */
     private boolean initialize (ContextStack stack, boolean quiet) {
 
-	ClassDefinition ourDef = getClassDefinition();
-	ClassDeclaration ourDecl = getClassDeclaration();
+        ClassDefinition ourDef = getClassDefinition();
+        ClassDeclaration ourDecl = getClassDeclaration();
 
-	try {
+        try {
 
-	    // Make sure our parentage is ok...
+            // Make sure our parentage is ok...
 
-	    if (!initParents(stack)) {
-		failedConstraint(12,quiet,stack,getQualifiedName());
+            if (!initParents(stack)) {
+                failedConstraint(12,quiet,stack,getQualifiedName());
                 return false;
-	    }
+            }
 
 
             // We're ok, so make up our collections...
 
-	    Vector directInterfaces = new Vector();
-	    Vector directMethods = new Vector();
-	    Vector directMembers = new Vector();
+            Vector directInterfaces = new Vector();
+            Vector directMethods = new Vector();
+            Vector directMembers = new Vector();
 
-	    // Get interfaces...
+            // Get interfaces...
 
-	    if (addNonRemoteInterfaces(directInterfaces,stack) != null) {
+            if (addNonRemoteInterfaces(directInterfaces,stack) != null) {
 
-		// Get methods...
+                // Get methods...
 
-		if (addAllMethods(ourDef,directMethods,false,false,stack) != null) {
+                if (addAllMethods(ourDef,directMethods,false,false,stack) != null) {
 
                     // Update parent class methods
                     if (updateParentClassMethods(ourDef,directMethods,false,stack) != null) {
 
                     // Get constants and members...
 
-		    if (addAllMembers(directMembers,false,false,stack)) {
+                    if (addAllMembers(directMembers,false,false,stack)) {
 
-			// We're ok, so pass 'em up...
+                        // We're ok, so pass 'em up...
 
-			if (!initialize(directInterfaces,directMethods,directMembers,stack,quiet)) {
+                        if (!initialize(directInterfaces,directMethods,directMembers,stack,quiet)) {
                             return false;
                         }
 
@@ -307,51 +307,51 @@ public class ValueType extends ClassType {
                         //  private void writeObject(java.io.ObjectOutputStream out);
                         // 
                         
-    	                if (externalizable) {
-    	                    isCustom = true;   
-    	                } else {
-    	                    for (MemberDefinition member = ourDef.getFirstMember();
-    	                         member != null;
-    	                         member = member.getNextMember()) {
-    	                            
-    	                        if (member.isMethod() &&
-    	                            !member.isInitializer() &&
-    	                            member.isPrivate() &&
-    	                            member.getName().toString().equals("writeObject")) {
+                        if (externalizable) {
+                            isCustom = true;   
+                        } else {
+                            for (MemberDefinition member = ourDef.getFirstMember();
+                                 member != null;
+                                 member = member.getNextMember()) {
+                                    
+                                if (member.isMethod() &&
+                                    !member.isInitializer() &&
+                                    member.isPrivate() &&
+                                    member.getName().toString().equals("writeObject")) {
 
                                     // Check return type, arguments and exceptions...
                                     
-				    sun.tools.java.Type methodType = member.getType();
-				    sun.tools.java.Type rtnType = methodType.getReturnType();
+                                    sun.tools.java.Type methodType = member.getType();
+                                    sun.tools.java.Type rtnType = methodType.getReturnType();
 
-				    if (rtnType == sun.tools.java.Type.tVoid) {
-			                        
-					// Return type is correct. How about arguments?
-			                            
-					sun.tools.java.Type[] args = methodType.getArgumentTypes();
-					if (args.length == 1 &&
-					    args[0].getTypeSignature().equals("Ljava/io/ObjectOutputStream;")) {
-			                            
-					    // Arguments are correct, so it is a custom
-					    // value type...
-			                                
-					    isCustom = true;
-					}
-				    }
+                                    if (rtnType == sun.tools.java.Type.tVoid) {
+                                                
+                                        // Return type is correct. How about arguments?
+                                                    
+                                        sun.tools.java.Type[] args = methodType.getArgumentTypes();
+                                        if (args.length == 1 &&
+                                            args[0].getTypeSignature().equals("Ljava/io/ObjectOutputStream;")) {
+                                                    
+                                            // Arguments are correct, so it is a custom
+                                            // value type...
+                                                        
+                                            isCustom = true;
+                                        }
+                                    }
                                 }
                             }
                         }
                         }
                         
-			return true;
-		    }
-		}
-	    }
-	} catch (ClassNotFound e) {
-	    classNotFound(stack,e);
-	}
+                        return true;
+                    }
+                }
+            }
+        } catch (ClassNotFound e) {
+            classNotFound(stack,e);
+        }
 
-	return false;
+        return false;
     }
 
 
@@ -393,7 +393,7 @@ public class ValueType extends ClassType {
                     
                 if (elementType != null &&
                     elementType.getQualifiedName().equals(
-							  "java.io.ObjectStreamField")
+                                                          "java.io.ObjectStreamField")
                     ) {
                     
                     if (member.isStatic() &&
@@ -408,8 +408,8 @@ public class ValueType extends ClassType {
                             
                         // Bad signature...
                             
-			failedConstraint(4,quiet,stack,getQualifiedName());
-			return false;
+                        failedConstraint(4,quiet,stack,getQualifiedName());
+                        return false;
                     }
                 }
             }
@@ -457,7 +457,7 @@ public class ValueType extends ClassType {
                     // No, so error...
                     
                     result = false;
-		    failedConstraint(2,quiet,stack,fieldName,getQualifiedName());
+                    failedConstraint(2,quiet,stack,fieldName,getQualifiedName());
                 }
             }
         }
@@ -468,7 +468,7 @@ public class ValueType extends ClassType {
         if (result && fields.size() > 0) {
             
             result = false;
-	    failedConstraint(9,quiet,stack,getQualifiedName());
+            failedConstraint(9,quiet,stack,getQualifiedName());
         }   
         
         // Return result...

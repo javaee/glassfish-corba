@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.protocol;
+package com.sun.corba.ee.spi.protocol;
 
 import org.omg.CORBA.portable.ServantObject;
 
@@ -78,11 +78,11 @@ public interface LocalClientRequestDispatcher
      * The method must return null if the servant is not of the expected type.
      */
     public ServantObject servant_preinvoke(org.omg.CORBA.Object self,
-					   String operation,
-					   Class expectedType);
+                                           String operation,
+                                           Class expectedType);
 
     public void servant_postinvoke(org.omg.CORBA.Object self,
-				   ServantObject servant); 
+                                   ServantObject servant); 
 }
 
 // End of file.

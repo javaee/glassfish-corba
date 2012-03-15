@@ -41,6 +41,6 @@ package corba.rmic;
 
 public class CImpl implements C {
     public void f() throws ClassNotFoundException, java.rmi.RemoteException {
-	throw new ClassNotFoundException(" Yahoooo");
+        throw new ClassNotFoundException(" Yahoooo");
     }
 }

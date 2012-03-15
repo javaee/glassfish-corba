@@ -54,7 +54,7 @@ public final class InvalidSeq
      * Constructs an <code>InvalidSeq</code> object.
      */
     public InvalidSeq() {
-	super();
+        super();
     }
 
     /**
@@ -63,6 +63,6 @@ public final class InvalidSeq
      * regarding the exception.
      */
     public InvalidSeq(String reason) {
-	super(reason);
+        super(reason);
     }
 }

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,12 +69,12 @@ import org.omg.CORBA.TypeCodePackage.BadKind ;
 import org.omg.CORBA_2_3.portable.InputStream;
 import org.omg.CORBA_2_3.portable.OutputStream;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.impl.corba.TypeCodeImpl;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.se.impl.encoding.MarshalInputStream;
-import com.sun.corba.se.impl.encoding.CodeSetConversion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.impl.corba.TypeCodeImpl;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.impl.encoding.OSFCodeSetRegistry;
+import com.sun.corba.ee.impl.encoding.MarshalInputStream;
+import com.sun.corba.ee.impl.encoding.CodeSetConversion;
 
 public interface TypeCodeReader extends MarshalInputStream {
     public void addTypeCodeAtPosition(TypeCodeImpl tc, int position);

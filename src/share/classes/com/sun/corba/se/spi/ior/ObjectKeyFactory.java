@@ -38,12 +38,12 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior;
+package com.sun.corba.ee.spi.ior;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
 
-import com.sun.corba.se.spi.ior.ObjectKey ;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
+import com.sun.corba.ee.spi.ior.ObjectKey ;
+import com.sun.corba.ee.spi.ior.ObjectKeyTemplate ;
 
 /** Construct ObjectKey and ObjectKeyTemplate instances from their
  * CDR-marshalled representation.

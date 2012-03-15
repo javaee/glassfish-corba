@@ -38,16 +38,16 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
 import java.util.Iterator;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.protocol.ClientInvocationInfo;
-import com.sun.corba.se.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.protocol.ClientInvocationInfo;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
 
-import com.sun.corba.se.spi.protocol.ClientRequestDispatcher;
+import com.sun.corba.ee.spi.protocol.ClientRequestDispatcher;
 
 /**
  * @author Harold Carr
@@ -64,53 +64,53 @@ public class InvocationInfo implements ClientInvocationInfo
     
     public InvocationInfo()
     {
-	isRetryInvocation = false;
-	entryCount = 0;
+        isRetryInvocation = false;
+        entryCount = 0;
     }
     
     public Iterator getContactInfoListIterator() 
     {
-	return contactInfoListIterator;
+        return contactInfoListIterator;
     }
     
     public void setContactInfoListIterator(Iterator contactInfoListIterator)
     {
-	this.contactInfoListIterator = contactInfoListIterator;
+        this.contactInfoListIterator = contactInfoListIterator;
     }
     
     public boolean isRetryInvocation() 
     {
-	return isRetryInvocation;
+        return isRetryInvocation;
     }
     
     public void setIsRetryInvocation(boolean isRetryInvocation) 
     {
-	this.isRetryInvocation = isRetryInvocation;
+        this.isRetryInvocation = isRetryInvocation;
     }
     
     public int getEntryCount() 
     {
-	return entryCount;
+        return entryCount;
     }
     
     public void incrementEntryCount() 
     {
-	entryCount++;
+        entryCount++;
     }
     
     public void decrementEntryCount() 
     {
-	entryCount--;
+        entryCount--;
     }
     
     public void setClientRequestDispatcher(ClientRequestDispatcher clientRequestDispatcher)
     {
-	this.clientRequestDispatcher = clientRequestDispatcher;
+        this.clientRequestDispatcher = clientRequestDispatcher;
     }
 
     public ClientRequestDispatcher getClientRequestDispatcher()
     {
-	return clientRequestDispatcher;
+        return clientRequestDispatcher;
     }
 
     public void setMessageMediator(MessageMediator messageMediator)

@@ -89,7 +89,7 @@ public interface StubDelegate {
      * Delegation call for {@link Stub#connect}.
      */
     void connect(Stub self, ORB orb)
-	throws RemoteException;
+        throws RemoteException;
  
     // _REVISIT_ cannot link to Stub.readObject directly... why not?
     /**

@@ -38,23 +38,23 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi.codegen ;
+package com.sun.corba.ee.impl.presentation.rmi.codegen ;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
 
-import com.sun.corba.se.impl.presentation.rmi.StubFactoryFactoryDynamicBase ;
+import com.sun.corba.ee.impl.presentation.rmi.StubFactoryFactoryDynamicBase ;
 
 public class StubFactoryFactoryCodegenImpl extends StubFactoryFactoryDynamicBase 
 {
     public StubFactoryFactoryCodegenImpl()
     {
-	super() ;
+        super() ;
     }
 
     public PresentationManager.StubFactory makeDynamicStubFactory( 
-	PresentationManager pm, PresentationManager.ClassData classData, 
-	ClassLoader classLoader ) 
+        PresentationManager pm, PresentationManager.ClassData classData, 
+        ClassLoader classLoader ) 
     {
-	return new StubFactoryCodegenImpl( pm, classData, classLoader ) ;
+        return new StubFactoryCodegenImpl( pm, classData, classLoader ) ;
     }
 }

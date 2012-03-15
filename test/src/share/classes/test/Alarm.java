@@ -64,10 +64,10 @@ public class Alarm implements Runnable
 {
     private static Vector   fgAlarms;
     private static Thread   fgThread;
-    private static boolean	fgStarted;
+    private static boolean      fgStarted;
 
-    private AlarmHandler	fHandler;
-    private long			fWakeupTime;
+    private AlarmHandler        fHandler;
+    private long                        fWakeupTime;
 
     /**
      * Constructor.
@@ -76,8 +76,8 @@ public class Alarm implements Runnable
      */
     public Alarm (AlarmHandler handler, long wakeupTime)
     {
-	fHandler = handler;
-	fWakeupTime = wakeupTime;
+        fHandler = handler;
+        fWakeupTime = wakeupTime;
     }
 
     /**
@@ -85,7 +85,7 @@ public class Alarm implements Runnable
      */
     public boolean isBefore (Alarm alarm)
     {
-	return fWakeupTime < alarm.fWakeupTime;
+        return fWakeupTime < alarm.fWakeupTime;
     }
 
     /**
@@ -93,7 +93,7 @@ public class Alarm implements Runnable
      */
     public AlarmHandler getHandler ()
     {
-	return fHandler;
+        return fHandler;
     }
 
     /**
@@ -101,7 +101,7 @@ public class Alarm implements Runnable
      */
     public void setHandler (AlarmHandler handler)
     {
-	fHandler = handler;
+        fHandler = handler;
     }
 
     /**
@@ -109,7 +109,7 @@ public class Alarm implements Runnable
      */
     public long getWakeupTime ()
     {
-	return fWakeupTime;
+        return fWakeupTime;
     }
 
     /**
@@ -117,7 +117,7 @@ public class Alarm implements Runnable
      */
     public void setWakeupTime (long wakeupTime)
     {
-	fWakeupTime = wakeupTime;
+        fWakeupTime = wakeupTime;
     }
 
     /**
@@ -129,7 +129,7 @@ public class Alarm implements Runnable
      */
     public static Alarm scheduleWakeupFromNow (AlarmHandler handler, long wakeupDeltaMillis)
     {
-	return scheduleWakeup(new Alarm(handler,System.currentTimeMillis() + wakeupDeltaMillis));
+        return scheduleWakeup(new Alarm(handler,System.currentTimeMillis() + wakeupDeltaMillis));
     }
 
     /**
@@ -141,8 +141,8 @@ public class Alarm implements Runnable
      */
     public static Alarm scheduleWakeupFromNow (Alarm theAlarm, long wakeupDeltaMillis)
     {
-	theAlarm.setWakeupTime(System.currentTimeMillis() + wakeupDeltaMillis);
-	return scheduleWakeup(theAlarm);
+        theAlarm.setWakeupTime(System.currentTimeMillis() + wakeupDeltaMillis);
+        return scheduleWakeup(theAlarm);
     }
 
     /**
@@ -154,64 +154,64 @@ public class Alarm implements Runnable
      */
     public static Alarm scheduleWakeup (Alarm theAlarm)
     {
-	synchronized (fgAlarms)
-	    {
-		// Start our thread if needed...
+        synchronized (fgAlarms)
+            {
+                // Start our thread if needed...
 
-		if (fgStarted == false)
-		    {
-			fgStarted = true;
-			fgThread.start();
-		    }
+                if (fgStarted == false)
+                    {
+                        fgStarted = true;
+                        fgThread.start();
+                    }
 
-		// Insert alarm such that the next alarm is at the lowest index.
-		// Do binary search till gap is 2 or less...
+                // Insert alarm such that the next alarm is at the lowest index.
+                // Do binary search till gap is 2 or less...
 
-		int low = 0;
-		int high = fgAlarms.size();
+                int low = 0;
+                int high = fgAlarms.size();
 
-		while (high - low > 2)
-		    {
-			int middle = (low + high) / 2;
+                while (high - low > 2)
+                    {
+                        int middle = (low + high) / 2;
 
-			if (theAlarm.isBefore( (Alarm)fgAlarms.elementAt(middle)) )
-			    {
-				// Shift to low half of array...
+                        if (theAlarm.isBefore( (Alarm)fgAlarms.elementAt(middle)) )
+                            {
+                                // Shift to low half of array...
 
-				high = middle;
-			    }
-			else
-			    {
-				// Shift to high half of array...
+                                high = middle;
+                            }
+                        else
+                            {
+                                // Shift to high half of array...
 
-				low = middle + 1;
-			    }
-		    }
+                                low = middle + 1;
+                            }
+                    }
 
-		// Do linear search on remaining...
+                // Do linear search on remaining...
 
-		while (low < high)
-		    {
-			if (((Alarm)fgAlarms.elementAt(low)).isBefore(theAlarm))
-			    {
-				low++;
-			    }
-			else
-			    {
-				break;
-			    }
-		    }
+                while (low < high)
+                    {
+                        if (((Alarm)fgAlarms.elementAt(low)).isBefore(theAlarm))
+                            {
+                                low++;
+                            }
+                        else
+                            {
+                                break;
+                            }
+                    }
 
-		// Ok, do insert...
+                // Ok, do insert...
 
-		fgAlarms.insertElementAt(theAlarm,low);
+                fgAlarms.insertElementAt(theAlarm,low);
 
-		// Notify the alarm thread...
+                // Notify the alarm thread...
 
-		fgAlarms.notify();
-	    }
+                fgAlarms.notify();
+            }
 
-	return theAlarm;
+        return theAlarm;
     }
 
     /**
@@ -222,31 +222,31 @@ public class Alarm implements Runnable
      */
     public static boolean cancelWakeup (Alarm theAlarm)
     {
-	boolean result = false;
+        boolean result = false;
 
-	synchronized (fgAlarms)
-	    {
-		// Is the alarm in the queue?
+        synchronized (fgAlarms)
+            {
+                // Is the alarm in the queue?
 
-		int count = fgAlarms.size();
+                int count = fgAlarms.size();
 
-		for (int index = 0; index < count; index++)
-		    {
-			if (fgAlarms.elementAt(index) == theAlarm)
-			    {
-				// Found it. Do remove...
+                for (int index = 0; index < count; index++)
+                    {
+                        if (fgAlarms.elementAt(index) == theAlarm)
+                            {
+                                // Found it. Do remove...
 
-				fgAlarms.removeElementAt(index);
+                                fgAlarms.removeElementAt(index);
 
-				// Set result and notify the alarm thread.
+                                // Set result and notify the alarm thread.
 
-				result = true;
-				fgAlarms.notify();
-			    }
-		    }
-	    }
+                                result = true;
+                                fgAlarms.notify();
+                            }
+                    }
+            }
 
-	return result;
+        return result;
     }
 
     /**
@@ -254,7 +254,7 @@ public class Alarm implements Runnable
      */
     private void wakeup (long nextWakeupTime)
     {
-	fHandler.wakeup(this, nextWakeupTime);
+        fHandler.wakeup(this, nextWakeupTime);
     }
 
     /**
@@ -265,73 +265,73 @@ public class Alarm implements Runnable
      */
     public void run()
     {
-	while (true)
-	    {
-		synchronized (fgAlarms)
-		    {
-				// Wait till we have something to schedule...
+        while (true)
+            {
+                synchronized (fgAlarms)
+                    {
+                                // Wait till we have something to schedule...
 
-			while (fgAlarms.isEmpty())
-			    {
-				try
-				    {
-					fgAlarms.wait();
-				    }
-				catch (Throwable e){}
-			    }
-		    }
+                        while (fgAlarms.isEmpty())
+                            {
+                                try
+                                    {
+                                        fgAlarms.wait();
+                                    }
+                                catch (Throwable e){}
+                            }
+                    }
 
-		// Wait till wakeup time of first element. Note that the lock is deliberately
-		// released inside the loop in order to provide access to scheduleWakeup()...
+                // Wait till wakeup time of first element. Note that the lock is deliberately
+                // released inside the loop in order to provide access to scheduleWakeup()...
 
-		while (true)
-		    {
-			synchronized (fgAlarms)
-			    {
-				if (fgAlarms.isEmpty()) break; // Can happen if canceled.
+                while (true)
+                    {
+                        synchronized (fgAlarms)
+                            {
+                                if (fgAlarms.isEmpty()) break; // Can happen if canceled.
 
-				Alarm theAlarm = (Alarm) fgAlarms.firstElement();
+                                Alarm theAlarm = (Alarm) fgAlarms.firstElement();
 
-				long delta = theAlarm.getWakeupTime() - System.currentTimeMillis();
+                                long delta = theAlarm.getWakeupTime() - System.currentTimeMillis();
 
-				if (delta > 0)
-				    {
-					try
-					    {
-						fgAlarms.wait(delta);
-					    }
-					catch (Throwable e){}
-				    }
-				else
-				    {
-					// Time to wakeup...
+                                if (delta > 0)
+                                    {
+                                        try
+                                            {
+                                                fgAlarms.wait(delta);
+                                            }
+                                        catch (Throwable e){}
+                                    }
+                                else
+                                    {
+                                        // Time to wakeup...
 
-					try
-					    {
-						// Remove the current alarm...
+                                        try
+                                            {
+                                                // Remove the current alarm...
 
-						fgAlarms.removeElementAt(0);
+                                                fgAlarms.removeElementAt(0);
 
-						// Get the next wakeup time, if any...
+                                                // Get the next wakeup time, if any...
 
-						long nextWakeup = 0;
+                                                long nextWakeup = 0;
 
-						if (fgAlarms.isEmpty() == false)
-						    {
-							nextWakeup = ((Alarm) fgAlarms.firstElement()).getWakeupTime();
-						    }
+                                                if (fgAlarms.isEmpty() == false)
+                                                    {
+                                                        nextWakeup = ((Alarm) fgAlarms.firstElement()).getWakeupTime();
+                                                    }
 
-						// Wake 'em up...
+                                                // Wake 'em up...
 
-						theAlarm.wakeup(nextWakeup);
-					    }
-					catch (Throwable e){}
+                                                theAlarm.wakeup(nextWakeup);
+                                            }
+                                        catch (Throwable e){}
 
-					break;	 // Break out of loop.
-				    }
-			    }
-		    }
-	    }
+                                        break;   // Break out of loop.
+                                    }
+                            }
+                    }
+            }
     }
 
     // Only for fgThread...
@@ -344,9 +344,9 @@ public class Alarm implements Runnable
 
     static
     {
-	fgAlarms = new Vector();
-	fgThread = new Thread(new Alarm(),"AlarmThread");
-	fgThread.setDaemon(true);
-	fgStarted = false;
+        fgAlarms = new Vector();
+        fgThread = new Thread(new Alarm(),"AlarmThread");
+        fgThread.setDaemon(true);
+        fgStarted = false;
     }
 }

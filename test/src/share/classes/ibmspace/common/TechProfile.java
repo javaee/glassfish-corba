@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)TechProfile.java	1.4 99/06/07 */
+/* @(#)TechProfile.java 1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -67,48 +67,48 @@ public class TechProfile implements java.io.Serializable
 
     public TechProfile (int r, int sp, int w, int sh, int m)
     {
-	fRange = r;
-	fSpeed = sp;
-	fWeapons = w;
-	fShields = sh;
-	fMini = m;
+        fRange = r;
+        fSpeed = sp;
+        fWeapons = w;
+        fShields = sh;
+        fMini = m;
     }
 
     public int getRange ()
     {
-	return fRange;
+        return fRange;
     }
 
     public int getSpeed ()
     {
-	return fSpeed;
+        return fSpeed;
     }
 
     public int getWeapons ()
     {
-	return fWeapons;
+        return fWeapons;
     }
 
     public int getShields ()
     {
-	return fShields;
+        return fShields;
     }
 
     public int getMini ()
     {
-	return fMini;
+        return fMini;
     }
 
     public String toString ()
     {
-	String s = "(";
-	s += String.valueOf (fRange) + ",";
-	s += String.valueOf (fSpeed) + ",";
-	s += String.valueOf (fWeapons) + ",";
-	s += String.valueOf (fShields) + ",";
-	s += String.valueOf (fMini) + ",";
-	s += ")";
-	return s;
+        String s = "(";
+        s += String.valueOf (fRange) + ",";
+        s += String.valueOf (fSpeed) + ",";
+        s += String.valueOf (fWeapons) + ",";
+        s += String.valueOf (fShields) + ",";
+        s += String.valueOf (fMini) + ",";
+        s += ")";
+        return s;
     }
 
 }

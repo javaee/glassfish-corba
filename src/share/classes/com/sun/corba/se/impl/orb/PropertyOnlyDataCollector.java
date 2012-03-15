@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.orb ;
+package com.sun.corba.ee.impl.orb ;
 
 import java.net.InetAddress ;
 
@@ -50,19 +50,19 @@ import org.omg.CORBA.CompletionStatus ;
 public class PropertyOnlyDataCollector extends DataCollectorBase 
 {
     public PropertyOnlyDataCollector( Properties props, 
-	String localHostName, String configurationHostName ) 
+        String localHostName, String configurationHostName ) 
     {
-	super( props, localHostName, configurationHostName ) ;
+        super( props, localHostName, configurationHostName ) ;
     }
 
     public boolean isApplet() 
     {
-	return false ;
+        return false ;
     }
 
     protected void collect()
     {
-	checkPropertyDefaults() ;
+        checkPropertyDefaults() ;
 
         findPropertiesFromProperties() ;
     }

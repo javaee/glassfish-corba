@@ -48,21 +48,21 @@ import java.util.Properties;
 import org.omg.PortableServer.*;
 import java.io.*;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
 public class Server
 {
     public static void writeObjref(org.omg.CORBA.Object ref, String file, org.omg.CORBA.ORB orb) {
-	String fil = System.getProperty("output.dir")+System.getProperty("file.separator")+file;
-	try {
-	    java.io.DataOutputStream out = new 
-		java.io.DataOutputStream(new FileOutputStream(fil));
-	    out.writeBytes(orb.object_to_string(ref));
-	} catch (java.io.IOException e) {
-	    System.err.println("Unable to open file "+fil);
-	    System.exit(1);
-	}
+        String fil = System.getProperty("output.dir")+System.getProperty("file.separator")+file;
+        try {
+            java.io.DataOutputStream out = new 
+                java.io.DataOutputStream(new FileOutputStream(fil));
+            out.writeBytes(orb.object_to_string(ref));
+        } catch (java.io.IOException e) {
+            System.err.println("Unable to open file "+fil);
+            System.exit(1);
+        }
     }
 
     public static void main(String args[])
@@ -71,14 +71,14 @@ public class Server
       
             ORB orb = ORB.init(args, System.getProperties());
 
-            com.sun.corba.se.spi.orb.ORB ourORB
-                = (com.sun.corba.se.spi.orb.ORB)orb;
+            com.sun.corba.ee.spi.orb.ORB ourORB
+                = (com.sun.corba.ee.spi.orb.ORB)orb;
 
             System.out.println("==== Server GIOP version "
                                + ourORB.getORBData().getGIOPVersion()
                                + " with strategy "
                                + ourORB.getORBData().getGIOPBuffMgrStrategy(
-				    ourORB.getORBData().getGIOPVersion())
+                                    ourORB.getORBData().getGIOPVersion())
                                + "====");
       
             // Get rootPOA
@@ -86,11 +86,11 @@ public class Server
             rootPOA.the_POAManager().activate();
 
             GIOPComboImpl impl = new GIOPComboImpl();
-	    javax.rmi.CORBA.Tie tie = javax.rmi.CORBA.Util.getTie( impl ) ; 
+            javax.rmi.CORBA.Tie tie = javax.rmi.CORBA.Util.getTie( impl ) ; 
 
-	    byte[] id = rootPOA.activate_object( 
-						 (org.omg.PortableServer.Servant)tie ) ;
-	    org.omg.CORBA.Object obj = rootPOA.id_to_reference( id ) ;
+            byte[] id = rootPOA.activate_object( 
+                                                 (org.omg.PortableServer.Servant)tie ) ;
+            org.omg.CORBA.Object obj = rootPOA.id_to_reference( id ) ;
 
 
             writeObjref(obj, "IOR", orb);

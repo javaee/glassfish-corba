@@ -57,7 +57,7 @@ Server:
     ports show above.
 
 Client: Without sticky:
-	
+        
   - Looks up a reference to I.
   - Tells the server to unregister (kill) its IIOP_CLEAR_TEST server
     port followed by the W, X, and Y ports.  It leaves the Z port open.

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)Population.java	1.4 99/06/07 */
+/* @(#)Population.java  1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -66,48 +66,48 @@ public class Population implements java.io.Serializable
 
     public Population (PlanetImpl planet, long initialSize)
     {
-	fPlanet = planet;
+        fPlanet = planet;
 
-	if ( initialSize <= 40 ) {
-	    fChildren = 0;
-	    fAdults = initialSize;
-	    fSeniors = 0;
-	    fWillDie = 0;
-	} else {
-	    fChildren = initialSize / 4;
-	    fAdults = initialSize / 4;
-	    fSeniors = initialSize / 4;
-	    fWillDie = initialSize - (fChildren + fAdults + fSeniors);
-	}
+        if ( initialSize <= 40 ) {
+            fChildren = 0;
+            fAdults = initialSize;
+            fSeniors = 0;
+            fWillDie = 0;
+        } else {
+            fChildren = initialSize / 4;
+            fAdults = initialSize / 4;
+            fSeniors = initialSize / 4;
+            fWillDie = initialSize - (fChildren + fAdults + fSeniors);
+        }
     }
 
     public long size ()
     {
-	return (fChildren + fAdults + fSeniors + fWillDie);
+        return (fChildren + fAdults + fSeniors + fWillDie);
     }
 
     public long getIdealIncome ()
     {
-	return (long)((fAdults+fSeniors)/8);
+        return (long)((fAdults+fSeniors)/8);
     }
 
 
     public void  grow (double suitability)
     {
-	long s = size ();
-	double offspring = Math.min(Math.max(1.0+(double)(50000*suitability /size()),1.01),1.6);
+        long s = size ();
+        double offspring = Math.min(Math.max(1.0+(double)(50000*suitability /size()),1.01),1.6);
 
-	fChildren = (long)(fAdults * offspring);
-	fSeniors = (long)(fAdults * suitability);
-	fAdults = (long)(fChildren * suitability);
-	fWillDie = (long)(fSeniors * suitability);
+        fChildren = (long)(fAdults * offspring);
+        fSeniors = (long)(fAdults * suitability);
+        fAdults = (long)(fChildren * suitability);
+        fWillDie = (long)(fSeniors * suitability);
 
-	if ( size() < 10 ) {
-	    fChildren = 0;
-	    fAdults = 10;
-	    fSeniors = 0;
-	    fWillDie = 0;
-	}
+        if ( size() < 10 ) {
+            fChildren = 0;
+            fAdults = 10;
+            fSeniors = 0;
+            fWillDie = 0;
+        }
     }
 
 }

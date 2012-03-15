@@ -38,20 +38,20 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orb ;
+package com.sun.corba.ee.spi.orb ;
 
 import org.omg.PortableInterceptor.ORBInitializer ;
 
-import com.sun.corba.se.spi.transport.Acceptor;
+import com.sun.corba.ee.spi.transport.Acceptor;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
-import com.sun.corba.se.spi.transport.ContactInfoListFactory;
-import com.sun.corba.se.spi.transport.IORToSocketInfo;
-import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
-import com.sun.corba.se.spi.transport.TcpTimeouts;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion ;
+import com.sun.corba.ee.spi.transport.ContactInfoListFactory;
+import com.sun.corba.ee.spi.transport.IORToSocketInfo;
+import com.sun.corba.ee.spi.transport.IIOPPrimaryToContactInfo;
+import com.sun.corba.ee.spi.transport.TcpTimeouts;
 
-import com.sun.corba.se.impl.legacy.connection.USLPort;
-import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
+import com.sun.corba.ee.impl.legacy.connection.USLPort;
+import com.sun.corba.ee.impl.encoding.CodeSetComponentInfo ;
 
 import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.ManagedAttribute ;
@@ -95,11 +95,11 @@ public interface ORBData {
 
     @ManagedAttribute
     @Description( "The implementation of the legacy ORBSocketFactory interface in use (if any)" ) 
-    public com.sun.corba.se.spi.legacy.connection.ORBSocketFactory getLegacySocketFactory () ;
+    public com.sun.corba.ee.spi.legacy.connection.ORBSocketFactory getLegacySocketFactory () ;
 
     @ManagedAttribute
     @Description( "The implementation of the ORBSocketFactory interface in use (if any)" ) 
-    public com.sun.corba.se.spi.transport.ORBSocketFactory getSocketFactory();
+    public com.sun.corba.ee.spi.transport.ORBSocketFactory getSocketFactory();
 
     @ManagedAttribute
     @Description( "Return the user-specified listen ports, on which the ORB listens for incoming requests" ) 
@@ -120,7 +120,7 @@ public interface ORBData {
 
     // XXX Make the setter visible to JMX?
     public void                     setIIOPPrimaryToContactInfo(
-						  IIOPPrimaryToContactInfo x);
+                                                  IIOPPrimaryToContactInfo x);
 
     @ManagedAttribute
     @Description( "Return the configured ORB ID" ) 

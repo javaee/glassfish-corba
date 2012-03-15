@@ -42,7 +42,7 @@ package naming.instest;
 
 import java.util.Properties;
 import java.util.Hashtable;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import java.io.PrintStream;
 import org.omg.CORBA.ORB;
 
@@ -71,13 +71,13 @@ public class INSServer
             System.out.println("ORB class: "
                                + environment.getProperty("org.omg.CORBA.ORBClass"));
 
-	    // environment.setProperty( "com.sun.corba.se.ORBDebug", 
-		// "subcontract,transport,naming,serviceContext,transientObjectManager" ) ;
+            // environment.setProperty( "com.sun.corba.ee.ORBDebug", 
+                // "subcontract,transport,naming,serviceContext,transientObjectManager" ) ;
             ORB orb = ORB.init(args, environment);
 
             HelloImpl helloRef = new HelloImpl( );
             orb.connect( helloRef );
-            ((com.sun.corba.se.spi.orb.ORB)orb).register_initial_reference( 
+            ((com.sun.corba.ee.spi.orb.ORB)orb).register_initial_reference( 
                 TestConstants.INSServiceName, helloRef );
 
             //handshake:

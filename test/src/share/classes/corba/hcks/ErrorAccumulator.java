@@ -69,60 +69,60 @@ public class ErrorAccumulator
 
     public ErrorAccumulator() 
     {
-	numberOfErrors = 0; 
-	errors = new ArrayList<MessageAndException>();
+        numberOfErrors = 0; 
+        errors = new ArrayList<MessageAndException>();
         startTest() ;
     }
 
     public void add(String errorMessage, Throwable t)
     {
-	MessageAndException mae = new MessageAndException(errorMessage, t);
-	numberOfErrors++;
-	errors.add( mae );
+        MessageAndException mae = new MessageAndException(errorMessage, t);
+        numberOfErrors++;
+        errors.add( mae );
         numberOfErrorsInTest++ ;
         errorsInTest.add( mae ) ;
     }
 
     public int getNumberOfErrors()
     {
-	return numberOfErrors;
+        return numberOfErrors;
     }
 
     public Collection getErrors()
     {
-	return errors;
+        return errors;
     }
 
     public void reportErrors(boolean printErrors, boolean printStackTrace)
     {
-	U.lf();
-	U.sop("==================================================");
-	U.sop("Number of errors: " + numberOfErrors);
-	U.sop("==================================================");
-	U.lf();
+        U.lf();
+        U.sop("==================================================");
+        U.sop("Number of errors: " + numberOfErrors);
+        U.sop("==================================================");
+        U.lf();
 
-	if (printErrors) {
-	    Iterator iterator = errors.iterator();
-	    while (iterator.hasNext()) {
-		MessageAndException messageAndException = 
-		    (MessageAndException) iterator.next();
-		U.reportError(printStackTrace,
-			      messageAndException.getMessage(),
-			      messageAndException.getException());
-	    }
-	}
+        if (printErrors) {
+            Iterator iterator = errors.iterator();
+            while (iterator.hasNext()) {
+                MessageAndException messageAndException = 
+                    (MessageAndException) iterator.next();
+                U.reportError(printStackTrace,
+                              messageAndException.getMessage(),
+                              messageAndException.getException());
+            }
+        }
     }
 
     public class MessageAndException extends Pair<String,Throwable> {
-	public MessageAndException(String message, Throwable exception) {
+        public MessageAndException(String message, Throwable exception) {
             super( message, exception ) ;
-	}
+        }
 
-	public String getMessage() {
+        public String getMessage() {
             return first() ;
         }
 
-	public Throwable getException() { 
+        public Throwable getException() { 
             return second() ; 
         }
     }

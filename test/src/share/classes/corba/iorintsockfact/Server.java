@@ -78,17 +78,17 @@ public class Server
     {
         try {
 
-	    Properties props = System.getProperties();
+            Properties props = System.getProperties();
 
-	    props.setProperty("org.omg.PortableInterceptor.ORBInitializerClass." + ServerORBInitializer.class.getName(),
-			      "dummy");
+            props.setProperty("org.omg.PortableInterceptor.ORBInitializerClass." + ServerORBInitializer.class.getName(),
+                              "dummy");
 
             props.put(Common.SOCKET_FACTORY_CLASS_PROPERTY,
-		      Common.CUSTOM_FACTORY_CLASS);
+                      Common.CUSTOM_FACTORY_CLASS);
 
             orb = ORB.init(av, props);
 
-	    createAndBind(Common.serverName1);
+            createAndBind(Common.serverName1);
       
             System.out.println ("Server is ready.");
 
@@ -102,35 +102,35 @@ public class Server
     }
 
     public static void createAndBind (String name)
-	throws
-	    Exception
+        throws
+            Exception
     {
         if (rootPoa == null) {
 
-	    // Get rootPOA
+            // Get rootPOA
 
             rootPoa = (POA)
-		orb.resolve_initial_references("RootPOA");
-	    rootPoa.the_POAManager().activate();
+                orb.resolve_initial_references("RootPOA");
+            rootPoa.the_POAManager().activate();
 
-	    // Create child POAs.
+            // Create child POAs.
 
             Policy[] policies = new Policy[1];
 
-	    // Create child POA
+            // Create child POA
             policies[0] =
-		rootPoa.create_lifespan_policy(LifespanPolicyValue.TRANSIENT);
+                rootPoa.create_lifespan_policy(LifespanPolicyValue.TRANSIENT);
             childPoa = rootPoa.create_POA("childPoa", null, policies);
             childPoa.the_POAManager().activate();
-	}
+        }
 
-	// create servant and register it with the ORB
+        // create servant and register it with the ORB
 
-	IServant iServant = new IServant();
-	byte[] id = childPoa.activate_object(iServant);
-	org.omg.CORBA.Object ref = childPoa.id_to_reference(id);
+        IServant iServant = new IServant();
+        byte[] id = childPoa.activate_object(iServant);
+        org.omg.CORBA.Object ref = childPoa.id_to_reference(id);
 
-	Common.getNameService(orb).rebind(Common.makeNameComponent(name), ref);
+        Common.getNameService(orb).rebind(Common.makeNameComponent(name), ref);
     }
 }
 

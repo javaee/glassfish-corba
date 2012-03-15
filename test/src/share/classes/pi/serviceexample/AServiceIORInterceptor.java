@@ -61,7 +61,7 @@ public class AServiceIORInterceptor
 
     public AServiceIORInterceptor(Codec codec)
     {
-	this.codec = codec;
+        this.codec = codec;
     }
 
     //
@@ -70,7 +70,7 @@ public class AServiceIORInterceptor
 
     public String name() 
     {
-	return "AServiceInterceptor";
+        return "AServiceInterceptor";
     }
 
     public void destroy() 
@@ -83,25 +83,25 @@ public class AServiceIORInterceptor
 
     public void establish_components(IORInfo info)
     {
-	//
-	// Note: typically, rather than just inserting a tagged component
-	// this interceptor would check info.get_effective_policy(int)
-	// to determine if a tagged component reflecting that policy
-	// should be added to the IOR.  That is not shown in this example.
-	// 
+        //
+        // Note: typically, rather than just inserting a tagged component
+        // this interceptor would check info.get_effective_policy(int)
+        // to determine if a tagged component reflecting that policy
+        // should be added to the IOR.  That is not shown in this example.
+        // 
 
-	ASERVICE_COMPONENT aServiceComponent = new ASERVICE_COMPONENT(true);
-	Any any = ORB.init().create_any();
-	ASERVICE_COMPONENTHelper.insert(any, aServiceComponent);
-	byte[] value = null;
-	try {
-	    value = codec.encode_value(any);
-	} catch (InvalidTypeForEncoding e) {
-	    System.out.println("Exception handling not shown.");
-	}
-	TaggedComponent taggedComponent =
-	    new TaggedComponent(TAG_ASERVICE_COMPONENT.value, value);
-	info.add_ior_component(taggedComponent);
+        ASERVICE_COMPONENT aServiceComponent = new ASERVICE_COMPONENT(true);
+        Any any = ORB.init().create_any();
+        ASERVICE_COMPONENTHelper.insert(any, aServiceComponent);
+        byte[] value = null;
+        try {
+            value = codec.encode_value(any);
+        } catch (InvalidTypeForEncoding e) {
+            System.out.println("Exception handling not shown.");
+        }
+        TaggedComponent taggedComponent =
+            new TaggedComponent(TAG_ASERVICE_COMPONENT.value, value);
+        info.add_ior_component(taggedComponent);
     }
 
 }

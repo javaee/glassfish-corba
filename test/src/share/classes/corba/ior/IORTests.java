@@ -43,7 +43,7 @@ import test.Test;
 import corba.framework.*;
 import java.util.*;
 
-import com.sun.corba.se.impl.ior.*;
+import com.sun.corba.ee.impl.ior.*;
 
 /**
  */

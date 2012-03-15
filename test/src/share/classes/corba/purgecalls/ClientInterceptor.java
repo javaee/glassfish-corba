@@ -44,7 +44,7 @@
 
 package corba.purgecalls;
 
-import com.sun.corba.se.spi.legacy.interceptor.RequestInfoExt;
+import com.sun.corba.ee.spi.legacy.interceptor.RequestInfoExt;
 import corba.hcks.U;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.SystemException;
@@ -55,7 +55,7 @@ public class ClientInterceptor
     extends
         org.omg.CORBA.LocalObject
     implements
-	ClientRequestInterceptor
+        ClientRequestInterceptor
 {
     public static final String baseMsg = ClientInterceptor.class.getName();
 
@@ -65,7 +65,7 @@ public class ClientInterceptor
 
     public String name() 
     {
-	return baseMsg; 
+        return baseMsg; 
     }
 
     public void destroy() 
@@ -78,31 +78,31 @@ public class ClientInterceptor
 
     public void send_request(ClientRequestInfo ri)
     {
-	sopCR(baseMsg, "send_request", ri);
-	Client.requestConnection = ((RequestInfoExt)ri).connection();
+        sopCR(baseMsg, "send_request", ri);
+        Client.requestConnection = ((RequestInfoExt)ri).connection();
     }
 
     public void send_poll(ClientRequestInfo ri)
     {
-	sopCR(baseMsg, "send_poll", ri);
+        sopCR(baseMsg, "send_poll", ri);
     }
 
     public void receive_reply(ClientRequestInfo ri)
     {
-	sopCR(baseMsg, "receive_reply", ri);
-	checkServiceContexts(ri);
+        sopCR(baseMsg, "receive_reply", ri);
+        checkServiceContexts(ri);
     }
 
     public void receive_exception(ClientRequestInfo ri)
     {
-	sopCR(baseMsg, "receive_exception", ri);
-	checkServiceContexts(ri);
+        sopCR(baseMsg, "receive_exception", ri);
+        checkServiceContexts(ri);
     }
 
     public void receive_other(ClientRequestInfo ri)
     {
-	sopCR(baseMsg, "receive_other", ri);
-	checkServiceContexts(ri);
+        sopCR(baseMsg, "receive_other", ri);
+        checkServiceContexts(ri);
     }
 
     //
@@ -111,22 +111,22 @@ public class ClientInterceptor
 
     public static void sopCR(String clazz, String point, ClientRequestInfo ri)
     {
-	try {
-	    U.sop(clazz + "." + point + " " + ri.operation());
-	} catch (SystemException e) {
-	    U.sopUnexpectedException(baseMsg + "." + point, e);
-	}
+        try {
+            U.sop(clazz + "." + point + " " + ri.operation());
+        } catch (SystemException e) {
+            U.sopUnexpectedException(baseMsg + "." + point, e);
+        }
     }
 
     public static void checkServiceContexts(ClientRequestInfo ri)
     {
-	// The number does not matter.
-	// Just want to ensure no null pointer exception after purge calls.
-	try {
-	    ri.get_reply_service_context(100);
-	} catch (BAD_PARAM e) {
-	    U.sop(baseMsg + " Expected: " + e);
-	}
+        // The number does not matter.
+        // Just want to ensure no null pointer exception after purge calls.
+        try {
+            ri.get_reply_service_context(100);
+        } catch (BAD_PARAM e) {
+            U.sop(baseMsg + " Expected: " + e);
+        }
     }
 }
 

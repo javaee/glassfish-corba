@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport.concurrent ;
+package com.sun.corba.ee.spi.transport.concurrent ;
 
 /** A class that provides a very simply unbounded queue.
  * The main requirement here is that the class support constant time (very fast)
@@ -54,17 +54,17 @@ public interface ConcurrentQueue<V> {
      * a ConcurrentQueue.
      */
     public interface Handle<V> {
-	/** Return the value that corresponds to this handle.
-	 */
-	V value() ;
+        /** Return the value that corresponds to this handle.
+         */
+        V value() ;
 
-	/** Delete the element corresponding to this handle 
-	 * from the queue.  Takes constant time.  Returns
-	 * true if the removal succeeded, or false if it failed.
-	 * which can occur if another thread has already called
-	 * poll or remove on this element.
-	 */
-	boolean remove() ;
+        /** Delete the element corresponding to this handle 
+         * from the queue.  Takes constant time.  Returns
+         * true if the removal succeeded, or false if it failed.
+         * which can occur if another thread has already called
+         * poll or remove on this element.
+         */
+        boolean remove() ;
 
         /** Time at which the element will expire 
          * 

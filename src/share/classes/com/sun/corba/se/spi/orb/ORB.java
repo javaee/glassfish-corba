@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orb;
+package com.sun.corba.ee.spi.orb;
 
 import java.util.Map ;
 import java.util.HashMap ;
@@ -56,81 +56,81 @@ import org.omg.PortableServer.Servant ;
 
 import org.omg.CORBA.portable.ObjectImpl;
 
-import com.sun.corba.se.spi.transport.ByteBufferPool;
+import com.sun.corba.ee.spi.transport.ByteBufferPool;
 
-import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
-import com.sun.corba.se.spi.protocol.ClientDelegateFactory ;
-import com.sun.corba.se.spi.protocol.ClientDelegate;
-import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
-import com.sun.corba.se.spi.protocol.PIHandler ;
-import com.sun.corba.se.spi.resolver.LocalResolver ;
-import com.sun.corba.se.spi.resolver.Resolver ;
-import com.sun.corba.se.spi.transport.ContactInfoListFactory ;
-import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
+import com.sun.corba.ee.spi.protocol.RequestDispatcherRegistry ;
+import com.sun.corba.ee.spi.protocol.ClientDelegateFactory ;
+import com.sun.corba.ee.spi.protocol.ClientDelegate;
+import com.sun.corba.ee.spi.protocol.ServerRequestDispatcher ;
+import com.sun.corba.ee.spi.protocol.PIHandler ;
+import com.sun.corba.ee.spi.resolver.LocalResolver ;
+import com.sun.corba.ee.spi.resolver.Resolver ;
+import com.sun.corba.ee.spi.transport.ContactInfoListFactory ;
+import com.sun.corba.ee.spi.legacy.connection.LegacyServerSocketManager;
 
-import com.sun.corba.se.spi.ior.IdentifiableFactoryFinder ;
-import com.sun.corba.se.spi.ior.TaggedComponentFactoryFinder ;
-import com.sun.corba.se.spi.ior.ObjectKey ;
-import com.sun.corba.se.spi.ior.ObjectKeyFactory ;
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.ior.IORFactories ;
-import com.sun.corba.se.spi.ior.TaggedProfile ;
-import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
+import com.sun.corba.ee.spi.ior.IdentifiableFactoryFinder ;
+import com.sun.corba.ee.spi.ior.TaggedComponentFactoryFinder ;
+import com.sun.corba.ee.spi.ior.ObjectKey ;
+import com.sun.corba.ee.spi.ior.ObjectKeyFactory ;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.IORFactories ;
+import com.sun.corba.ee.spi.ior.TaggedProfile ;
+import com.sun.corba.ee.spi.ior.TaggedProfileTemplate ;
 
-import com.sun.corba.se.spi.threadpool.ThreadPoolManager;
+import com.sun.corba.ee.spi.threadpool.ThreadPoolManager;
 
-import com.sun.corba.se.spi.oa.OAInvocationInfo ;
-import com.sun.corba.se.spi.transport.TransportManager;
+import com.sun.corba.ee.spi.oa.OAInvocationInfo ;
+import com.sun.corba.ee.spi.transport.TransportManager;
 
-import com.sun.corba.se.spi.copyobject.CopierManager ;
+import com.sun.corba.ee.spi.copyobject.CopierManager ;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
-import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
-import com.sun.corba.se.spi.presentation.rmi.InvocationInterceptor ;
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationDefaults ;
+import com.sun.corba.ee.spi.presentation.rmi.InvocationInterceptor ;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter ;
 
-import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry ;
-import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextFactoryRegistry ;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextsCache;
 
-import com.sun.corba.se.spi.transport.ContactInfoList;
+import com.sun.corba.ee.spi.transport.ContactInfoList;
 
-import com.sun.corba.se.impl.corba.TypeCodeImpl ;
-import com.sun.corba.se.impl.corba.TypeCodeFactory ;
+import com.sun.corba.ee.impl.corba.TypeCodeImpl ;
+import com.sun.corba.ee.impl.corba.TypeCodeFactory ;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
-import com.sun.corba.se.impl.oa.poa.BadServerIdHandler ;
+import com.sun.corba.ee.impl.oa.poa.BadServerIdHandler ;
 
-import com.sun.corba.se.impl.ior.WireObjectKeyTemplate;
+import com.sun.corba.ee.impl.ior.WireObjectKeyTemplate;
 
-import com.sun.corba.se.impl.transport.ByteBufferPoolImpl;
+import com.sun.corba.ee.impl.transport.ByteBufferPoolImpl;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.logging.OMGSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.OMGSystemException ;
 
-import com.sun.corba.se.spi.misc.ORBClassLoader;
+import com.sun.corba.ee.spi.misc.ORBClassLoader;
 
-import com.sun.corba.se.spi.protocol.ClientInvocationInfo;
-import com.sun.corba.se.spi.trace.Cdr;
+import com.sun.corba.ee.spi.protocol.ClientInvocationInfo;
+import com.sun.corba.ee.spi.trace.Cdr;
 
-import com.sun.corba.se.spi.trace.Folb;
-import com.sun.corba.se.spi.trace.Giop;
-import com.sun.corba.se.spi.trace.TraceInterceptor;
-import com.sun.corba.se.spi.trace.Naming;
-import com.sun.corba.se.spi.trace.OrbLifeCycle;
-import com.sun.corba.se.spi.trace.DynamicType ;
-import com.sun.corba.se.spi.trace.IsLocal;
-import com.sun.corba.se.spi.trace.Orbd;
-import com.sun.corba.se.spi.trace.Osgi;
-import com.sun.corba.se.spi.trace.Poa;
-import com.sun.corba.se.spi.trace.PoaFSM;
-import com.sun.corba.se.spi.trace.TraceServiceContext;
-import com.sun.corba.se.spi.trace.Shutdown;
-import com.sun.corba.se.spi.trace.StreamFormatVersion;
-import com.sun.corba.se.spi.trace.Subcontract;
-import com.sun.corba.se.spi.trace.TraceValueHandler;
-import com.sun.corba.se.spi.trace.TransientObjectManager;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.spi.trace.Folb;
+import com.sun.corba.ee.spi.trace.Giop;
+import com.sun.corba.ee.spi.trace.TraceInterceptor;
+import com.sun.corba.ee.spi.trace.Naming;
+import com.sun.corba.ee.spi.trace.OrbLifeCycle;
+import com.sun.corba.ee.spi.trace.DynamicType ;
+import com.sun.corba.ee.spi.trace.IsLocal;
+import com.sun.corba.ee.spi.trace.Orbd;
+import com.sun.corba.ee.spi.trace.Osgi;
+import com.sun.corba.ee.spi.trace.Poa;
+import com.sun.corba.ee.spi.trace.PoaFSM;
+import com.sun.corba.ee.spi.trace.TraceServiceContext;
+import com.sun.corba.ee.spi.trace.Shutdown;
+import com.sun.corba.ee.spi.trace.StreamFormatVersion;
+import com.sun.corba.ee.spi.trace.Subcontract;
+import com.sun.corba.ee.spi.trace.TraceValueHandler;
+import com.sun.corba.ee.spi.trace.TransientObjectManager;
+import com.sun.corba.ee.spi.trace.Transport;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 
@@ -158,11 +158,11 @@ import org.glassfish.pfl.tf.timer.spi.TimerManager;
 @ManagedObject
 @Description( "The Main ORB Implementation object" ) 
 @AMXMetadata( type="ORB-Root" )
-public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
+public abstract class ORB extends com.sun.corba.ee.org.omg.CORBA.ORB
     implements TypeCodeFactory
 {   
     static {
-        MethodMonitorFactoryDefaults.addPrefix( "com.sun.corba.se", "ORB" ) ;
+        MethodMonitorFactoryDefaults.addPrefix( "com.sun.corba.ee", "ORB" ) ;
     }
 
     // As much as possible, this class should be stateless.  However,
@@ -178,11 +178,11 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // This is not one of the xxxDebugFlags because it is used to debug the mechanism
     // that sets the xxxDebugFlags!
     public static final boolean orbInitDebug = AccessController.doPrivileged( 
-	new PrivilegedAction<Boolean>() {
-	    public Boolean run() {
-		return Boolean.getBoolean( ORBConstants.INIT_DEBUG_PROPERTY );
-	    }
-	}
+        new PrivilegedAction<Boolean>() {
+            public Boolean run() {
+                return Boolean.getBoolean( ORBConstants.INIT_DEBUG_PROPERTY );
+            }
+        }
     ) ;
 
     // Currently defined debug flags.  Any additions must be called xxxDebugFlag.
@@ -329,19 +329,19 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
             fld.set( this, value ) ;
 
             Annotation[] annots = fld.getAnnotations() ;
-	    for (Annotation anno : annots) {
-		Class<? extends Annotation> annoClass = anno.annotationType() ;
+            for (Annotation anno : annots) {
+                Class<? extends Annotation> annoClass = anno.annotationType() ;
 
-		if (annoClass.isAnnotationPresent(
-		    MethodMonitorGroup.class )) {
-		    if (value) {
-			MethodMonitorRegistry.register( annoClass,
-			    MethodMonitorFactoryDefaults.dprint() );
-		    } else {
-			MethodMonitorRegistry.clear( annoClass ) ;
-		    }
-		}
-	    }
+                if (annoClass.isAnnotationPresent(
+                    MethodMonitorGroup.class )) {
+                    if (value) {
+                        MethodMonitorRegistry.register( annoClass,
+                            MethodMonitorFactoryDefaults.dprint() );
+                    } else {
+                        MethodMonitorRegistry.clear( annoClass ) ;
+                    }
+                }
+            }
 
             return DebugFlagResult.OK ;
         } catch (Exception exc) {
@@ -394,7 +394,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // places where no ORB is available, so the PresentationManager
     // must be global.  It is initialized here as well.
     private static final PresentationManager globalPM = 
-	PresentationDefaults.makeOrbPresentationManager() ;
+        PresentationDefaults.makeOrbPresentationManager() ;
 
     private UnaryFunction<String,Class<?>> classNameResolver = defaultClassNameResolver ;
     private ClassCodeBaseHandler ccbHandler = null ;
@@ -414,19 +414,19 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     @Description( "The presentation manager, which handles stub creation" ) 
     public static PresentationManager getPresentationManager() 
     {
-	return globalPM ;
+        return globalPM ;
     }
 
     /** Get the appropriate StubFactoryFactory.  This 
      * will be dynamic or static depending on whether
-     * com.sun.corba.se.ORBUseDynamicStub is true or false.
+     * com.sun.corba.ee.ORBUseDynamicStub is true or false.
      * @return The stub factory factory.
      */
     public static PresentationManager.StubFactoryFactory 
-	getStubFactoryFactory()
+        getStubFactoryFactory()
     {
-	boolean useDynamicStubs = globalPM.useDynamicStubs() ;
-	return globalPM.getStubFactoryFactory( useDynamicStubs ) ;
+        boolean useDynamicStubs = globalPM.useDynamicStubs() ;
+        return globalPM.getStubFactoryFactory( useDynamicStubs ) ;
     }
 
     /** Obtain the InvocationInterceptor for this ORB instance.
@@ -441,14 +441,14 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
      * @param interceptor The InvocationInterceptor to add.
      */
     public abstract void setInvocationInterceptor( 
-	InvocationInterceptor interceptor ) ;
+        InvocationInterceptor interceptor ) ;
     
     protected ORB()
     {
 
-	typeCodeMap = new HashMap<String,TypeCodeImpl>();
+        typeCodeMap = new HashMap<String,TypeCodeImpl>();
 
-	wireObjectKeyTemplate = new WireObjectKeyTemplate(this);
+        wireObjectKeyTemplate = new WireObjectKeyTemplate(this);
     }
 
     private <T> T makeInstance( Class<T> cls, TimerFactory tf ) {
@@ -466,8 +466,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         final boolean enabled = getORBData() != null
             && getORBData().timingPointsEnabled() ;
 
-	TimerManager<T> timerManager = 
-	    new TimerManager<T>( mom().getObjectRegistrationManager(), orbId ) ;
+        TimerManager<T> timerManager = 
+            new TimerManager<T>( mom().getObjectRegistrationManager(), orbId ) ;
 
         T tp = makeInstance( tpClass, timerManager.factory() ) ;
 
@@ -477,51 +477,51 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     }
 
     protected void initializePrimitiveTypeCodeConstants() {
-	primitiveTypeCodeConstants = new TypeCodeImpl[] {
-	    new TypeCodeImpl(this, TCKind._tk_null),	
-	    new TypeCodeImpl(this, TCKind._tk_void),
-	    new TypeCodeImpl(this, TCKind._tk_short),		
-	    new TypeCodeImpl(this, TCKind._tk_long),	
-	    new TypeCodeImpl(this, TCKind._tk_ushort),	
-	    new TypeCodeImpl(this, TCKind._tk_ulong),	
-	    new TypeCodeImpl(this, TCKind._tk_float),	
-	    new TypeCodeImpl(this, TCKind._tk_double),	
-	    new TypeCodeImpl(this, TCKind._tk_boolean),	
-	    new TypeCodeImpl(this, TCKind._tk_char),	
-	    new TypeCodeImpl(this, TCKind._tk_octet),
-	    new TypeCodeImpl(this, TCKind._tk_any),	
-	    new TypeCodeImpl(this, TCKind._tk_TypeCode),	
-	    new TypeCodeImpl(this, TCKind._tk_Principal),
-	    new TypeCodeImpl(this, TCKind._tk_objref),	
-	    null,	// tk_struct    
-	    null,	// tk_union     
-	    null,	// tk_enum      
-	    new TypeCodeImpl(this, TCKind._tk_string),		
-	    null,	// tk_sequence  
-	    null,	// tk_array     
-	    null,	// tk_alias     
-	    null,	// tk_except    
-	    new TypeCodeImpl(this, TCKind._tk_longlong),	
-	    new TypeCodeImpl(this, TCKind._tk_ulonglong),
-	    new TypeCodeImpl(this, TCKind._tk_longdouble),
-	    new TypeCodeImpl(this, TCKind._tk_wchar),		
-	    new TypeCodeImpl(this, TCKind._tk_wstring),	
-	    new TypeCodeImpl(this, TCKind._tk_fixed),	
-	    new TypeCodeImpl(this, TCKind._tk_value),	
-	    new TypeCodeImpl(this, TCKind._tk_value_box),
-	    new TypeCodeImpl(this, TCKind._tk_native),	
-	    new TypeCodeImpl(this, TCKind._tk_abstract_interface)
-	} ;
+        primitiveTypeCodeConstants = new TypeCodeImpl[] {
+            new TypeCodeImpl(this, TCKind._tk_null),    
+            new TypeCodeImpl(this, TCKind._tk_void),
+            new TypeCodeImpl(this, TCKind._tk_short),           
+            new TypeCodeImpl(this, TCKind._tk_long),    
+            new TypeCodeImpl(this, TCKind._tk_ushort),  
+            new TypeCodeImpl(this, TCKind._tk_ulong),   
+            new TypeCodeImpl(this, TCKind._tk_float),   
+            new TypeCodeImpl(this, TCKind._tk_double),  
+            new TypeCodeImpl(this, TCKind._tk_boolean), 
+            new TypeCodeImpl(this, TCKind._tk_char),    
+            new TypeCodeImpl(this, TCKind._tk_octet),
+            new TypeCodeImpl(this, TCKind._tk_any),     
+            new TypeCodeImpl(this, TCKind._tk_TypeCode),        
+            new TypeCodeImpl(this, TCKind._tk_Principal),
+            new TypeCodeImpl(this, TCKind._tk_objref),  
+            null,       // tk_struct    
+            null,       // tk_union     
+            null,       // tk_enum      
+            new TypeCodeImpl(this, TCKind._tk_string),          
+            null,       // tk_sequence  
+            null,       // tk_array     
+            null,       // tk_alias     
+            null,       // tk_except    
+            new TypeCodeImpl(this, TCKind._tk_longlong),        
+            new TypeCodeImpl(this, TCKind._tk_ulonglong),
+            new TypeCodeImpl(this, TCKind._tk_longdouble),
+            new TypeCodeImpl(this, TCKind._tk_wchar),           
+            new TypeCodeImpl(this, TCKind._tk_wstring), 
+            new TypeCodeImpl(this, TCKind._tk_fixed),   
+            new TypeCodeImpl(this, TCKind._tk_value),   
+            new TypeCodeImpl(this, TCKind._tk_value_box),
+            new TypeCodeImpl(this, TCKind._tk_native),  
+            new TypeCodeImpl(this, TCKind._tk_abstract_interface)
+        } ;
     }
 
     // Typecode support: needed in both ORBImpl and ORBSingleton
     public TypeCodeImpl get_primitive_tc(int kind) 
     {
-	try {
-	    return primitiveTypeCodeConstants[kind] ;
-	} catch (Throwable t) {
-	    throw wrapper.invalidTypecodeKind( t, kind ) ;
-	}
+        try {
+            return primitiveTypeCodeConstants[kind] ;
+        } catch (Throwable t) {
+            throw wrapper.invalidTypecodeKind( t, kind ) ;
+        }
     }
 
     public synchronized void setTypeCode(String id, TypeCodeImpl code) 
@@ -667,12 +667,12 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     @ManagedAttribute
     @Description( "Finder of Factories for TaggedProfiles of IORs" )
     public abstract IdentifiableFactoryFinder<TaggedProfile> 
-	getTaggedProfileFactoryFinder() ;
+        getTaggedProfileFactoryFinder() ;
 
     @ManagedAttribute
     @Description( "Finder of Factories for TaggedProfileTemplates of IORs" )
     public abstract IdentifiableFactoryFinder<TaggedProfileTemplate> 
-	getTaggedProfileTemplateFactoryFinder() ;
+        getTaggedProfileTemplateFactoryFinder() ;
 
     @ManagedAttribute
     @Description( "Factory for creating ObjectKeys" )
@@ -684,7 +684,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     public static Logger getLogger( String name ) 
     {
-	return Logger.getLogger( name, ORBConstants.LOG_RESOURCE_FILE ) ;
+        return Logger.getLogger( name, ORBConstants.LOG_RESOURCE_FILE ) ;
     }
 
     // get a reference to a ByteBufferPool, a pool of NIO ByteBuffers
@@ -702,7 +702,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     }
 
     public WireObjectKeyTemplate getWireObjectKeyTemplate() {
-	return wireObjectKeyTemplate;
+        return wireObjectKeyTemplate;
     }
 
     public abstract void setThreadPoolManager(ThreadPoolManager mgr);
@@ -722,7 +722,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
      */
     @NameValue
     public String getUniqueOrbId()  {
-	return "###DEFAULT_UNIQUE_ORB_ID###" ;
+        return "###DEFAULT_UNIQUE_ORB_ID###" ;
     }
     
     // Interfaces used only to define InheritedAttributes for other classes
@@ -774,8 +774,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
         mom.setRuntimeDebug( mbeanRuntimeDebugFlag ) ;
 
-        mom.stripPrefix( "com.sun.corba.se", "com.sun.corba.se.spi", "com.sun.corba.se.spi.orb", 
-            "com.sun.corba.se.impl" ) ;
+        mom.stripPrefix( "com.sun.corba.ee", "com.sun.corba.ee.spi", "com.sun.corba.ee.spi.orb", 
+            "com.sun.corba.ee.impl" ) ;
 
         mom.suspendJMXRegistration() ;
 
@@ -795,47 +795,47 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // Throws BAD_PARAM if obj is a local object
     protected IOR getIOR( org.omg.CORBA.Object obj ) 
     {
-	if (obj == null)
-	    throw wrapper.nullObjectReference() ;
+        if (obj == null)
+            throw wrapper.nullObjectReference() ;
 
-	IOR ior = null ;
-	if (StubAdapter.isStub(obj)) {
-	    org.omg.CORBA.portable.Delegate del = StubAdapter.getDelegate( 
-		obj ) ;
+        IOR ior = null ;
+        if (StubAdapter.isStub(obj)) {
+            org.omg.CORBA.portable.Delegate del = StubAdapter.getDelegate( 
+                obj ) ;
 
-	    if (del instanceof ClientDelegate) {
-		ClientDelegate cdel = (ClientDelegate)del ;
-		ContactInfoList ccil = cdel.getContactInfoList() ;
+            if (del instanceof ClientDelegate) {
+                ClientDelegate cdel = (ClientDelegate)del ;
+                ContactInfoList ccil = cdel.getContactInfoList() ;
                 ior = ccil.getTargetIOR() ;
                 if (ior == null)
                     throw wrapper.nullIor() ;
 
                 return ior ;
-	    } 
+            } 
 
-	    if (obj instanceof ObjectImpl) {
-		// Get the ORB instance of obj so we can use that ORB
-		// to marshal the object.
-		ObjectImpl oi = ObjectImpl.class.cast( obj ) ;
-		org.omg.CORBA.ORB oiorb = oi._orb() ;
+            if (obj instanceof ObjectImpl) {
+                // Get the ORB instance of obj so we can use that ORB
+                // to marshal the object.
+                ObjectImpl oi = ObjectImpl.class.cast( obj ) ;
+                org.omg.CORBA.ORB oiorb = oi._orb() ;
 
-		// obj is implemented by a foreign ORB, because the Delegate is not a
-		// CorbaClientDelegate.  Here we need to marshal obj to an output stream,
-		// then read the IOR back in.  Note that the output stream MUST be
-		// created by the ORB to which obj is attached, otherwise we get an
-		// infinite recursion between this code and 
-		// CDROutputStream_1_0.write_Object.
-		org.omg.CORBA.portable.OutputStream os = oiorb.create_output_stream() ;
-		os.write_Object( obj ) ;
-		org.omg.CORBA.portable.InputStream is = os.create_input_stream() ;
-		ior = IORFactories.makeIOR( this,  
-		    org.omg.CORBA_2_3.portable.InputStream.class.cast( is ) ) ; 
-		return ior ;
-	    } else {
-		throw wrapper.notAnObjectImpl() ;
-	    }
-	} else
-	    throw wrapper.localObjectNotAllowed() ;
+                // obj is implemented by a foreign ORB, because the Delegate is not a
+                // CorbaClientDelegate.  Here we need to marshal obj to an output stream,
+                // then read the IOR back in.  Note that the output stream MUST be
+                // created by the ORB to which obj is attached, otherwise we get an
+                // infinite recursion between this code and 
+                // CDROutputStream_1_0.write_Object.
+                org.omg.CORBA.portable.OutputStream os = oiorb.create_output_stream() ;
+                os.write_Object( obj ) ;
+                org.omg.CORBA.portable.InputStream is = os.create_input_stream() ;
+                ior = IORFactories.makeIOR( this,  
+                    org.omg.CORBA_2_3.portable.InputStream.class.cast( is ) ) ; 
+                return ior ;
+            } else {
+                throw wrapper.notAnObjectImpl() ;
+            }
+        } else
+            throw wrapper.localObjectNotAllowed() ;
     }
 
 
@@ -849,15 +849,15 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
      * @exception SystemException (localObjectNotAllowed) of obj is a local CORBA object.
      */
     public IOR getIOR( org.omg.CORBA.Object obj, boolean connectIfNecessary ) {
-	// Note: this version ignores connectIfNecessary, since an objref can only
-	// be connected to an ORBImpl, not an ORBSingleton.
-	return getIOR( obj ) ;
+        // Note: this version ignores connectIfNecessary, since an objref can only
+        // be connected to an ORBImpl, not an ORBSingleton.
+        return getIOR( obj ) ;
     }
 
     /** The singleton ORB does not need the cache, so just return null here.
      */
     public ObjectKeyCacheEntry extractObjectKeyCacheEntry(byte[] objKey) {
-	return null ;
+        return null ;
     }
 
     /** Return whether or not the ORB is shutdown.  A shutdown ORB cannot process

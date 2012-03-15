@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package com.sun.corba.ee.impl.dynamicany;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.TCKind;
@@ -51,7 +51,7 @@ import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 abstract class DynAnyComplexImpl extends DynAnyConstructedImpl
 {
@@ -121,7 +121,7 @@ abstract class DynAnyComplexImpl extends DynAnyConstructedImpl
                org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         if( ! checkInitComponents() || index < 0 || index >= names.length) {
             throw new InvalidValue();
@@ -134,7 +134,7 @@ abstract class DynAnyComplexImpl extends DynAnyConstructedImpl
                org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         if( ! checkInitComponents() || index < 0 || index >= components.length) {
             throw new InvalidValue();
@@ -148,7 +148,7 @@ abstract class DynAnyComplexImpl extends DynAnyConstructedImpl
                org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         if (value == null || value.length == 0) {
             clearData();
@@ -222,7 +222,7 @@ abstract class DynAnyComplexImpl extends DynAnyConstructedImpl
                org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         if (value == null || value.length == 0) {
             clearData();

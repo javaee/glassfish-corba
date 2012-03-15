@@ -45,7 +45,7 @@ import org.omg.CORBA.*;
 import java.util.* ;
 import java.rmi.RemoteException;
 import java.io.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 class Tester extends Thread{
     FragmentTester tester;
@@ -129,18 +129,18 @@ public class Client
     // size must be divisible by four
 
     public static org.omg.CORBA.Object readObjref(String file, org.omg.CORBA.ORB orb) {
-	String fil = System.getProperty("output.dir")+System.getProperty("file.separator")+file;
-	try {
-	    java.io.DataInputStream in = 
-		new java.io.DataInputStream(new FileInputStream(fil));
-	    String ior = in.readLine();
-	    System.out.println("IOR: "+ior);
-	    return orb.string_to_object(ior);
-	} catch (java.io.IOException e) {
-	    System.err.println("Unable to open file "+fil);
-	    System.exit(1);
-	}
-	return null;
+        String fil = System.getProperty("output.dir")+System.getProperty("file.separator")+file;
+        try {
+            java.io.DataInputStream in = 
+                new java.io.DataInputStream(new FileInputStream(fil));
+            String ior = in.readLine();
+            System.out.println("IOR: "+ior);
+            return orb.string_to_object(ior);
+        } catch (java.io.IOException e) {
+            System.err.println("Unable to open file "+fil);
+            System.exit(1);
+        }
+        return null;
     }
 
     public static void main(String args[])

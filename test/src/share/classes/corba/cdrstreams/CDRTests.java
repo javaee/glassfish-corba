@@ -42,7 +42,7 @@ package corba.cdrstreams;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
 public class CDRTests extends CORBATest
 {

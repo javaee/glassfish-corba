@@ -82,8 +82,8 @@ public class Client
     }
 
     public Client() throws Exception {
-	this.out = System.out;
-	this.err = System.err;
+        this.out = System.out;
+        this.err = System.err;
 
         orb = ORB.init( args, null );
 

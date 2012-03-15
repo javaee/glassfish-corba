@@ -60,13 +60,13 @@ import corba.hcks.U;
 
 public class MyServantLocator
     extends
-	org.omg.CORBA.LocalObject
+        org.omg.CORBA.LocalObject
     implements
-	ServantLocator
+        ServantLocator
 {
     public static final String baseMsg = MyServantLocator.class.getName();
     public static final String thisPackage = 
-	MyServantLocator.class.getPackage().getName();
+        MyServantLocator.class.getPackage().getName();
 
 
     public ORB orb;
@@ -74,65 +74,65 @@ public class MyServantLocator
     public MyServantLocator(ORB orb) { this.orb = orb; }
 
     public Servant preinvoke(byte[] oid, POA poa, String operation,
-			     CookieHolder cookieHolder)
-	throws
-	    ForwardRequest
+                             CookieHolder cookieHolder)
+        throws
+            ForwardRequest
     {
-	ClassLoader classLoader      = null;
-	Class rmiiIServantPOAClass   = null;
-	Object rmiiIServantPOAObject = null;
-	Tie tie                      = null;
-	try {
-	    classLoader = new CustomClassLoader();
-	    rmiiIServantPOAClass = 
-		classLoader.loadClass(thisPackage + ".rmiiIServantPOA");
-	    rmiiIServantPOAObject = rmiiIServantPOAClass.newInstance();
-	    classLoader = rmiiIServantPOAObject.getClass().getClassLoader();
-	    System.out.println("rmiiIServantPOAClass: "
-			       + rmiiIServantPOAClass);
-	    System.out.println("rmiiIServantPOAObject classLoader: " +
-			       classLoader);
-	    System.out.println("rmiiIServantPOAObject: " +
-			       rmiiIServantPOAObject);
-	    //tie = javax.rmi.CORBA.Util.getTie(rmiiIServantPOAObject);
-	    tie = (Tie) Class.forName(thisPackage + "._rmiiIServantPOA_Tie")
-		.newInstance();
-	    reflect(tie.getClass());
-	    reflect(java.rmi.Remote.class);
-	    reflect(rmiiIServantPOAObject.getClass());
-	    tie.setTarget((java.rmi.Remote)rmiiIServantPOAObject);
-	    return (Servant) tie;
-	} catch (Throwable t) {
-	    U.sopUnexpectedException("preinvoke", t);
-	    System.exit(-1);
-	}
-	return null;
+        ClassLoader classLoader      = null;
+        Class rmiiIServantPOAClass   = null;
+        Object rmiiIServantPOAObject = null;
+        Tie tie                      = null;
+        try {
+            classLoader = new CustomClassLoader();
+            rmiiIServantPOAClass = 
+                classLoader.loadClass(thisPackage + ".rmiiIServantPOA");
+            rmiiIServantPOAObject = rmiiIServantPOAClass.newInstance();
+            classLoader = rmiiIServantPOAObject.getClass().getClassLoader();
+            System.out.println("rmiiIServantPOAClass: "
+                               + rmiiIServantPOAClass);
+            System.out.println("rmiiIServantPOAObject classLoader: " +
+                               classLoader);
+            System.out.println("rmiiIServantPOAObject: " +
+                               rmiiIServantPOAObject);
+            //tie = javax.rmi.CORBA.Util.getTie(rmiiIServantPOAObject);
+            tie = (Tie) Class.forName(thisPackage + "._rmiiIServantPOA_Tie")
+                .newInstance();
+            reflect(tie.getClass());
+            reflect(java.rmi.Remote.class);
+            reflect(rmiiIServantPOAObject.getClass());
+            tie.setTarget((java.rmi.Remote)rmiiIServantPOAObject);
+            return (Servant) tie;
+        } catch (Throwable t) {
+            U.sopUnexpectedException("preinvoke", t);
+            System.exit(-1);
+        }
+        return null;
     }
 
     public void postinvoke(byte[] oid, POA poa, String operation,
-			   java.lang.Object cookie, Servant servant)
+                           java.lang.Object cookie, Servant servant)
     {
     }
 
     private void reflect(Class c)
     {
-	reflect(c, 0);
+        reflect(c, 0);
     }
 
     private void reflect(Class c, int indent)
     {
-	for (int i = 0; i < indent; i++) {
-	    System.out.print(" ");
-	}
-	System.out.println(c + " " + c.getClassLoader());
+        for (int i = 0; i < indent; i++) {
+            System.out.print(" ");
+        }
+        System.out.println(c + " " + c.getClassLoader());
 
-	Class[] interfaces = c.getInterfaces();
-	for (int j = 0; j < interfaces.length; j++) {
-	    reflect(interfaces[j], indent + 2);
-	}
-	if (c.getSuperclass() != null) {
-	    reflect(c.getSuperclass(), indent + 2);
-	}
+        Class[] interfaces = c.getInterfaces();
+        for (int j = 0; j < interfaces.length; j++) {
+            reflect(interfaces[j], indent + 2);
+        }
+        if (c.getSuperclass() != null) {
+            reflect(c.getSuperclass(), indent + 2);
+        }
     }
 }
 

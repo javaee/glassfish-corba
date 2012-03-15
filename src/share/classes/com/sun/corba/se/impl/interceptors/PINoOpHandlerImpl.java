@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.interceptors;
+package com.sun.corba.ee.impl.interceptors;
 
              
 import org.omg.CORBA.Any;
@@ -55,17 +55,17 @@ import org.omg.PortableInterceptor.Current;
 import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName ;
 
 
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
+import com.sun.corba.ee.spi.ior.ObjectKeyTemplate;
 
-import com.sun.corba.se.spi.oa.ObjectAdapter;
+import com.sun.corba.ee.spi.oa.ObjectAdapter;
 
 
-import com.sun.corba.se.spi.protocol.PIHandler;
-import com.sun.corba.se.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.protocol.PIHandler;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
 
-import com.sun.corba.se.impl.corba.RequestImpl;
+import com.sun.corba.ee.impl.corba.RequestImpl;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage;
 
 /** 
  * This is No-Op implementation of PIHandler. It is used in ORBConfigurator
@@ -92,12 +92,12 @@ public class PINoOpHandlerImpl implements PIHandler
     }
 
     public void adapterManagerStateChanged( int managerId,
-	short newState )
+        short newState )
     {
     }
 
     public void adapterStateChanged( ObjectReferenceTemplate[] 
-	templates, short newState )
+        templates, short newState )
     {
     }
 
@@ -172,12 +172,12 @@ public class PINoOpHandlerImpl implements PIHandler
     }
 
     public void initializeServerPIInfo( MessageMediator request,
-	ObjectAdapter oa, byte[] objectId, ObjectKeyTemplate oktemp ) 
+        ObjectAdapter oa, byte[] objectId, ObjectKeyTemplate oktemp ) 
     {
     }
     
     public void setServerPIInfo( java.lang.Object servant, 
-				          String targetMostDerivedInterface ) 
+                                          String targetMostDerivedInterface ) 
     {
     }
 
@@ -185,7 +185,7 @@ public class PINoOpHandlerImpl implements PIHandler
     }
     
     public void register_interceptor( Interceptor interceptor, int type ) 
-	throws DuplicateName
+        throws DuplicateName
     {
     }
 

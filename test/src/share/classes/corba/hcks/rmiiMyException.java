@@ -46,7 +46,7 @@ package corba.hcks;
 
 public class rmiiMyException
     extends
-	Exception
+        Exception
 {
 }
 

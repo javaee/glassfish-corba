@@ -60,8 +60,8 @@ import sun.tools.java.ClassNotFound;
  * <p>
  * The static forRemote(...) method must be used to obtain an instance, and will
  * return null if the ClassDefinition is non-conforming.
- * @version	1.0, 2/25/98
- * @author	Bryan Atsatt
+ * @version     1.0, 2/25/98
+ * @author      Bryan Atsatt
  */
 public class RemoteType extends InterfaceType {
 
@@ -77,51 +77,51 @@ public class RemoteType extends InterfaceType {
      * supplied BatchEnvironment.
      */
     public static RemoteType forRemote(ClassDefinition classDef,
-				       ContextStack stack,
-				       boolean quiet) {
-		
-	if (stack.anyErrors()) return null;
-    	
-    	boolean doPop = false;
-    	RemoteType result = null;
-    	
-    	try {
-	    // Do we already have it?
-			
-	    sun.tools.java.Type theType = classDef.getType();		
-	    Type existing = getType(theType,stack);
-			
-	    if (existing != null) {
-				
-		if (!(existing instanceof RemoteType)) return null; // False hit.
-				
-				// Yep, so return it...
-				
-		return (RemoteType) existing;
-	    }
-			
-	    // Could this be a remote type?
-			
-	    if (couldBeRemote(quiet,stack,classDef)) {
-			
-		// Yes, so check it...
-			    
-    	    	RemoteType it = new RemoteType(stack,classDef);
-    	    	putType(theType,it,stack);
-    	    	stack.push(it);
-    	    	doPop = true;
+                                       ContextStack stack,
+                                       boolean quiet) {
+                
+        if (stack.anyErrors()) return null;
+        
+        boolean doPop = false;
+        RemoteType result = null;
+        
+        try {
+            // Do we already have it?
+                        
+            sun.tools.java.Type theType = classDef.getType();           
+            Type existing = getType(theType,stack);
+                        
+            if (existing != null) {
+                                
+                if (!(existing instanceof RemoteType)) return null; // False hit.
+                                
+                                // Yep, so return it...
+                                
+                return (RemoteType) existing;
+            }
+                        
+            // Could this be a remote type?
+                        
+            if (couldBeRemote(quiet,stack,classDef)) {
+                        
+                // Yes, so check it...
+                            
+                RemoteType it = new RemoteType(stack,classDef);
+                putType(theType,it,stack);
+                stack.push(it);
+                doPop = true;
 
-    	    	if (it.initialize(quiet,stack)) {
-    	    	    stack.pop(true);
-    	    	    result = it;
-    	    	} else {
-		    removeType(theType,stack);
-    	    	    stack.pop(false);
-    	    	}
-    	    }
-	} catch (CompilerError e) {
-	    if (doPop) stack.pop(false);
-    	}
+                if (it.initialize(quiet,stack)) {
+                    stack.pop(true);
+                    result = it;
+                } else {
+                    removeType(theType,stack);
+                    stack.pop(false);
+                }
+            }
+        } catch (CompilerError e) {
+            if (doPop) stack.pop(false);
+        }
         
         return result;
     }
@@ -130,7 +130,7 @@ public class RemoteType extends InterfaceType {
      * Return a string describing this type.
      */
     public String getTypeDescription () {
-	return "Remote interface";
+        return "Remote interface";
     }
 
     //_____________________________________________________________________
@@ -142,7 +142,7 @@ public class RemoteType extends InterfaceType {
      * object is not yet completely initialized.
      */
     protected RemoteType(ContextStack stack, ClassDefinition classDef) {
-	super(stack,classDef,TYPE_REMOTE | TM_INTERFACE | TM_COMPOUND);
+        super(stack,classDef,TYPE_REMOTE | TM_INTERFACE | TM_COMPOUND);
     }
    
     /**
@@ -150,7 +150,7 @@ public class RemoteType extends InterfaceType {
      * object is not yet completely initialized.
      */
     protected RemoteType(ContextStack stack, ClassDefinition classDef, int typeCode) {
-	super(stack,classDef,typeCode);
+        super(stack,classDef,typeCode);
     }
 
     //_____________________________________________________________________
@@ -159,7 +159,7 @@ public class RemoteType extends InterfaceType {
 
     
     private static boolean couldBeRemote (boolean quiet, ContextStack stack,
-					  ClassDefinition classDef) {
+                                          ClassDefinition classDef) {
         
         boolean result = false;
         BatchEnvironment env = stack.getEnv();
@@ -168,7 +168,7 @@ public class RemoteType extends InterfaceType {
             if (!classDef.isInterface()) {
                 failedConstraint(16,quiet,stack,classDef.getName());
             } else {
-            	result = env.defRemote.implementedBy(env,classDef.getClassDeclaration());
+                result = env.defRemote.implementedBy(env,classDef.getClassDeclaration());
                 if (!result) failedConstraint(1,quiet,stack,classDef.getName());
             }
         } catch (ClassNotFound e) {
@@ -184,26 +184,26 @@ public class RemoteType extends InterfaceType {
      */
     private boolean initialize (boolean quiet,ContextStack stack) {
        
-    	boolean result = false;
-    	
+        boolean result = false;
+        
         // Go check it out and gather up the info we need...
         
         Vector directInterfaces = new Vector();
         Vector directMethods = new Vector();
         Vector directConstants = new Vector();
 
-	if (isConformingRemoteInterface(directInterfaces,
-					directMethods,
-					directConstants,
-					quiet,
-					stack)){
-		
-	    // We're ok, so pass 'em up...
-			
-	    result = initialize(directInterfaces,directMethods,directConstants,stack,quiet);
-	}
-	    
-	return result;
+        if (isConformingRemoteInterface(directInterfaces,
+                                        directMethods,
+                                        directConstants,
+                                        quiet,
+                                        stack)){
+                
+            // We're ok, so pass 'em up...
+                        
+            result = initialize(directInterfaces,directMethods,directConstants,stack,quiet);
+        }
+            
+        return result;
     }
 
     /**
@@ -219,49 +219,49 @@ public class RemoteType extends InterfaceType {
      * @param quiet True if should not report constraint failures.
      * @return true if constraints satisfied, false otherwise.
      */
-    private boolean isConformingRemoteInterface (	Vector directInterfaces,
-							Vector directMethods,
-							Vector directConstants,
-							boolean quiet,
-							ContextStack stack) {
+    private boolean isConformingRemoteInterface (       Vector directInterfaces,
+                                                        Vector directMethods,
+                                                        Vector directConstants,
+                                                        boolean quiet,
+                                                        ContextStack stack) {
 
         ClassDefinition theInterface = getClassDefinition();
 
         try {
 
-	    // Get all remote interfaces...
+            // Get all remote interfaces...
 
-	    if (addRemoteInterfaces(directInterfaces,false,stack) == null ) {
-		return false;
-	    }
+            if (addRemoteInterfaces(directInterfaces,false,stack) == null ) {
+                return false;
+            }
 
-	    // Make sure all constants are conforming...
+            // Make sure all constants are conforming...
 
-	    if (!addAllMembers(directConstants,true,quiet,stack)) {
-		return false;
-	    }
+            if (!addAllMembers(directConstants,true,quiet,stack)) {
+                return false;
+            }
 
-	    // Now, collect up all methods...
+            // Now, collect up all methods...
 
             if (addAllMethods(theInterface,directMethods,true,quiet,stack) == null) {
                 // Failed a constraint check...
                 return false;
             }
 
-	    // Now walk 'em, ensuring each is a valid remote method...
+            // Now walk 'em, ensuring each is a valid remote method...
 
-	    boolean methodsConform = true;
-	    for (int i = 0; i < directMethods.size(); i++) {
-		if (! isConformingRemoteMethod((Method) directMethods.elementAt(i),quiet)) {
-		    methodsConform = false;
-		}
-	    }
-	    if (!methodsConform) {
-		return false;
-	    }
+            boolean methodsConform = true;
+            for (int i = 0; i < directMethods.size(); i++) {
+                if (! isConformingRemoteMethod((Method) directMethods.elementAt(i),quiet)) {
+                    methodsConform = false;
+                }
+            }
+            if (!methodsConform) {
+                return false;
+            }
         } catch (ClassNotFound e) {
             classNotFound(stack,e);
-    	    return false;
+            return false;
         }
 
         return true;

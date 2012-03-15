@@ -118,7 +118,7 @@ public class TestObjectSuper implements Serializable
     private void readObject(java.io.ObjectInputStream is)
         throws IOException, ClassNotFoundException 
     {
-	is.defaultReadObject();
+        is.defaultReadObject();
 
         try {
             is.defaultReadObject();

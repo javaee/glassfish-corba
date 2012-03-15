@@ -195,8 +195,8 @@ abstract public class ORB {
     // properties or applet parameters. Change these values to
     // vendor-specific class names.
     //
-    private static final String defaultORB = "com.sun.corba.se.impl.orb.ORBImpl";
-    private static final String defaultORBSingleton = "com.sun.corba.se.impl.orb.ORBSingleton";
+    private static final String defaultORB = "com.sun.corba.ee.impl.orb.ORBImpl";
+    private static final String defaultORBSingleton = "com.sun.corba.ee.impl.orb.ORBSingleton";
 
     //
     // The global instance of the singleton ORB implementation which
@@ -211,73 +211,73 @@ abstract public class ORB {
     // Get System property
     private static String getSystemProperty(final String name) {
 
-	// This will not throw a SecurityException because this
-	// class was loaded from rt.jar using the bootstrap classloader.
+        // This will not throw a SecurityException because this
+        // class was loaded from rt.jar using the bootstrap classloader.
         String propValue = (String)AccessController.doPrivileged(
-	    new PrivilegedAction() {
-		public java.lang.Object run() {
-	            return System.getProperty(name);
-	        }
+            new PrivilegedAction() {
+                public java.lang.Object run() {
+                    return System.getProperty(name);
+                }
             }
-	) ;
+        ) ;
 
-	return propValue;
+        return propValue;
     }
 
     // Get property from orb.properties in either <user.home> or <java-home>/lib
     // directories.
     private static String getPropertyFromFile(final String name) {
-	// This will not throw a SecurityException because this
-	// class was loaded from rt.jar using the bootstrap classloader.
+        // This will not throw a SecurityException because this
+        // class was loaded from rt.jar using the bootstrap classloader.
 
         String propValue = (String)AccessController.doPrivileged(
-	    new PrivilegedAction() {
-		private Properties getFileProperties( String fileName ) {
-		    try {
-			File propFile = new File( fileName ) ;
-			if (!propFile.exists())
-			    return null ;
+            new PrivilegedAction() {
+                private Properties getFileProperties( String fileName ) {
+                    try {
+                        File propFile = new File( fileName ) ;
+                        if (!propFile.exists())
+                            return null ;
 
-			Properties props = new Properties() ;
-			FileInputStream fis = new FileInputStream(propFile);
-			try {
-			    props.load( fis );
-			} finally {
-			    fis.close() ;
-			}
+                        Properties props = new Properties() ;
+                        FileInputStream fis = new FileInputStream(propFile);
+                        try {
+                            props.load( fis );
+                        } finally {
+                            fis.close() ;
+                        }
 
-			return props ;
-		    } catch (Exception exc) {
-			return null ;
-		    }
-		}
+                        return props ;
+                    } catch (Exception exc) {
+                        return null ;
+                    }
+                }
 
-		public java.lang.Object run() {
-		    String userHome = System.getProperty("user.home");
-		    String fileName = userHome + File.separator + 
-			"orb.properties" ;
-		    Properties props = getFileProperties( fileName ) ;
+                public java.lang.Object run() {
+                    String userHome = System.getProperty("user.home");
+                    String fileName = userHome + File.separator + 
+                        "orb.properties" ;
+                    Properties props = getFileProperties( fileName ) ;
 
-		    if (props != null) {
-			String value = props.getProperty( name ) ;
-			if (value != null) 
-			    return value ;
-		    }
-			
-		    String javaHome = System.getProperty("java.home");
-		    fileName = javaHome + File.separator
-			+ "lib" + File.separator + "orb.properties";
-		    props = getFileProperties( fileName ) ;
+                    if (props != null) {
+                        String value = props.getProperty( name ) ;
+                        if (value != null) 
+                            return value ;
+                    }
+                        
+                    String javaHome = System.getProperty("java.home");
+                    fileName = javaHome + File.separator
+                        + "lib" + File.separator + "orb.properties";
+                    props = getFileProperties( fileName ) ;
 
-		    if (props == null) 
-			return null ;
-		    else
-			return props.getProperty( name ) ;
-		}	
-	    }
-	);
+                    if (props == null) 
+                        return null ;
+                    else
+                        return props.getProperty( name ) ;
+                }       
+            }
+        );
 
-	return propValue;
+        return propValue;
     }
 
     /**
@@ -315,7 +315,7 @@ abstract public class ORB {
 
             singleton = create_impl(className);
         }
-	return singleton;
+        return singleton;
     }
 
     private static ORB create_impl(String className) {
@@ -327,10 +327,10 @@ abstract public class ORB {
         try {
             return (ORB) Class.forName(className, true, cl).newInstance();
         } catch (Throwable ex) {
-	    SystemException systemException = new INITIALIZE(
+            SystemException systemException = new INITIALIZE(
                "can't instantiate default ORB implementation " + className);
-	    systemException.initCause(ex);
-	    throw systemException;
+            systemException.initCause(ex);
+            throw systemException;
         }
     }
 
@@ -345,30 +345,30 @@ abstract public class ORB {
      * @return the newly-created ORB instance
      */
     public static ORB init(String[] args, Properties props) {
-	//
-	// Note that there is no standard command-line argument for
-	// specifying the default ORB implementation. For an
-	// application you can choose an implementation either by
-	// setting the CLASSPATH to pick a different org.omg.CORBA
-	// and it's baked-in ORB implementation default or by
-	// setting an entry in the properties object or in the
-	// system properties.
-	//
+        //
+        // Note that there is no standard command-line argument for
+        // specifying the default ORB implementation. For an
+        // application you can choose an implementation either by
+        // setting the CLASSPATH to pick a different org.omg.CORBA
+        // and it's baked-in ORB implementation default or by
+        // setting an entry in the properties object or in the
+        // system properties.
+        //
         String className = null;
-	ORB orb;
+        ORB orb;
 
-	if (props != null)
-	    className = props.getProperty(ORBClassKey);
-	if (className == null)
-	    className = getSystemProperty(ORBClassKey);
-	if (className == null)
+        if (props != null)
+            className = props.getProperty(ORBClassKey);
+        if (className == null)
+            className = getSystemProperty(ORBClassKey);
+        if (className == null)
             className = getPropertyFromFile(ORBClassKey);
         if (className == null)
             className = defaultORB;
 
-	orb = create_impl(className);
-	orb.set_parameters(args, props);
-	return orb;
+        orb = create_impl(className);
+        orb.set_parameters(args, props);
+        return orb;
     }
 
 
@@ -382,21 +382,21 @@ abstract public class ORB {
      */
     public static ORB init(Applet app, Properties props) {
         String className;
-	ORB orb;
+        ORB orb;
 
         className = app.getParameter(ORBClassKey);
-	if (className == null && props != null)
-	    className = props.getProperty(ORBClassKey);
-	if (className == null)
-	    className = getSystemProperty(ORBClassKey);
-	if (className == null)
+        if (className == null && props != null)
+            className = props.getProperty(ORBClassKey);
+        if (className == null)
+            className = getSystemProperty(ORBClassKey);
+        if (className == null)
             className = getPropertyFromFile(ORBClassKey);
         if (className == null)
             className = defaultORB;
 
         orb = create_impl(className);
         orb.set_parameters(app, props);
-	return orb;
+        return orb;
     }
 
     /**
@@ -444,7 +444,7 @@ abstract public class ORB {
      * @param obj The servant object reference
      */
     public void connect(org.omg.CORBA.Object obj) {
-	throw new NO_IMPLEMENT();
+        throw new NO_IMPLEMENT();
     }
 
     /**
@@ -466,7 +466,7 @@ abstract public class ORB {
      * @throws org.omg.CORBA.BAD_INV_ORDER if the current thread is servicing an invocation
      */
     public void destroy( ) {
-	throw new NO_IMPLEMENT();
+        throw new NO_IMPLEMENT();
     }
 
     /**
@@ -488,7 +488,7 @@ abstract public class ORB {
      * @param obj The servant object to be disconnected from the ORB
      */
     public void disconnect(org.omg.CORBA.Object obj) {
-	throw new NO_IMPLEMENT();
+        throw new NO_IMPLEMENT();
     }
 
     //
@@ -524,7 +524,7 @@ abstract public class ORB {
      *                         known service
      */
     abstract public org.omg.CORBA.Object resolve_initial_references(String object_name)
-	throws InvalidName;
+        throws InvalidName;
 
     /**
      * Converts the given CORBA object reference to a string.
@@ -574,8 +574,8 @@ abstract public class ORB {
      * original IDL operation definition, which makes it possible for the list
      * to be used in dynamic invocation requests.
      *
-     * @param oper	the <code>OperationDef</code> object to use to create the list
-     * @return		a newly-created <code>NVList</code> object containing
+     * @param oper      the <code>OperationDef</code> object to use to create the list
+     * @return          a newly-created <code>NVList</code> object containing
      * descriptions of the arguments to the method described in the given
      * <code>OperationDef</code> object
      *
@@ -583,32 +583,32 @@ abstract public class ORB {
      */
     public NVList create_operation_list(org.omg.CORBA.Object oper)
     {
-	// If we came here, it means that the actual ORB implementation
-	// did not override the create_operation_list(CORBA.Object oper) method,
-	// so lets check if it has a create_operation_list(OperationDef oper)
-	// method.
-	try {
-	    // First try to load the OperationDef class
-	    String opDefClassName = "org.omg.CORBA.OperationDef";
-	    Class opDefClass = null;
+        // If we came here, it means that the actual ORB implementation
+        // did not override the create_operation_list(CORBA.Object oper) method,
+        // so lets check if it has a create_operation_list(OperationDef oper)
+        // method.
+        try {
+            // First try to load the OperationDef class
+            String opDefClassName = "org.omg.CORBA.OperationDef";
+            Class opDefClass = null;
 
-	    ClassLoader cl = Thread.currentThread().getContextClassLoader();
-	    if ( cl == null )
-		cl = ClassLoader.getSystemClassLoader();
-	    // if this throws a ClassNotFoundException, it will be caught below.
-	    opDefClass = Class.forName(opDefClassName, true, cl);
-	    
-	    Class[] args = { opDefClass } ;
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            if ( cl == null )
+                cl = ClassLoader.getSystemClassLoader();
+            // if this throws a ClassNotFoundException, it will be caught below.
+            opDefClass = Class.forName(opDefClassName, true, cl);
+            
+            Class[] args = { opDefClass } ;
             java.lang.reflect.Method meth = 
                 this.getClass().getMethod("create_operation_list", 
-		    args );
+                    args );
 
-	    Object[] args2 = { oper } ;
-	    // The following line causes a warning on JDK 1.5 and later
-	    // because invoke is a varargs method and this is not 
-	    // a varargs call.  But using varargs here causes rmic -iiop
-	    // to fail!  Fixing rmic requires rewriting the IIOP 
-	    // backend to avoid using the old sun.tools code.
+            Object[] args2 = { oper } ;
+            // The following line causes a warning on JDK 1.5 and later
+            // because invoke is a varargs method and this is not 
+            // a varargs call.  But using varargs here causes rmic -iiop
+            // to fail!  Fixing rmic requires rewriting the IIOP 
+            // backend to avoid using the old sun.tools code.
             return (org.omg.CORBA.NVList)meth.invoke(this, args2);
         } catch( java.lang.reflect.InvocationTargetException exs ) {
             Throwable t = exs.getTargetException();
@@ -620,8 +620,8 @@ abstract public class ORB {
                 throw new org.omg.CORBA.NO_IMPLEMENT();
             }
         } catch( RuntimeException ex ) {
-	    throw ex;
-	} catch( Exception exr ) {
+            throw ex;
+        } catch( Exception exr ) {
             throw new org.omg.CORBA.NO_IMPLEMENT();
         }
     }
@@ -643,7 +643,7 @@ abstract public class ORB {
      * <code>ARG_IN.value</code>, <code>ARG_OUT.value</code>,
      * or <code>ARG_INOUT.value</code>.
      *
-     * @return	the newly-created <code>NamedValue</code> object
+     * @return  the newly-created <code>NamedValue</code> object
      * @see NamedValue
      */
     abstract public NamedValue create_named_value(String s, Any any, int flags);
@@ -651,14 +651,14 @@ abstract public class ORB {
     /**
      * Creates an empty <code>ExceptionList</code> object.
      *
-     * @return	the newly-created <code>ExceptionList</code> object
+     * @return  the newly-created <code>ExceptionList</code> object
      */
     abstract public ExceptionList create_exception_list();
 
     /**
      * Creates an empty <code>ContextList</code> object.
      *
-     * @return	the newly-created <code>ContextList</code> object
+     * @return  the newly-created <code>ContextList</code> object
      * @see ContextList
      * @see Context
      */
@@ -675,7 +675,7 @@ abstract public class ORB {
     /**
      * Creates an <code>Environment</code> object.
      *
-     * @return	the newly-created <code>Environment</code> object
+     * @return  the newly-created <code>Environment</code> object
      * @see Environment
      */
     abstract public Environment create_environment();
@@ -683,7 +683,7 @@ abstract public class ORB {
     /**
      * Creates a new <code>org.omg.CORBA.portable.OutputStream</code> into which
      * IDL method parameters can be marshalled during method invocation.
-     * @return		the newly-created
+     * @return          the newly-created
      *              <code>org.omg.CORBA.portable.OutputStream</code> object
      */
     abstract public org.omg.CORBA.portable.OutputStream create_output_stream();
@@ -693,14 +693,14 @@ abstract public class ORB {
      * any responses. Note that oneway invocations are not guaranteed to
      * reach the server.
      *
-     * @param req		an array of request objects
+     * @param req               an array of request objects
      */
     abstract public void send_multiple_requests_oneway(Request[] req);
 
     /**
      * Sends multiple dynamic (DII) requests asynchronously.
      *
-     * @param req		an array of <code>Request</code> objects
+     * @param req               an array of <code>Request</code> objects
      */
     abstract public void send_multiple_requests_deferred(Request[] req);
 
@@ -716,7 +716,7 @@ abstract public class ORB {
      * Gets the next <code>Request</code> instance for which a response
      * has been received.
      *
-     * @return		the next <code>Request</code> object ready with a response
+     * @return          the next <code>Request</code> object ready with a response
      * @exception WrongTransaction if the method <code>get_next_response</code>
      * is called from a transaction scope different
      * from the one from which the original request was sent. See the
@@ -728,9 +728,9 @@ abstract public class ORB {
      * Retrieves the <code>TypeCode</code> object that represents
      * the given primitive IDL type.
      *
-     * @param tcKind	the <code>TCKind</code> instance corresponding to the
+     * @param tcKind    the <code>TCKind</code> instance corresponding to the
      *                  desired primitive type
-     * @return		the requested <code>TypeCode</code> object
+     * @return          the requested <code>TypeCode</code> object
      */
     abstract public TypeCode get_primitive_tc(TCKind tcKind);
 
@@ -739,40 +739,40 @@ abstract public class ORB {
      * The <code>TypeCode</code> object is initialized with the given id,
      * name, and members.
      *
-     * @param id	the repository id for the <code>struct</code>
-     * @param name	the name of the <code>struct</code>
-     * @param members	an array describing the members of the <code>struct</code>
-     * @return		a newly-created <code>TypeCode</code> object describing
+     * @param id        the repository id for the <code>struct</code>
+     * @param name      the name of the <code>struct</code>
+     * @param members   an array describing the members of the <code>struct</code>
+     * @return          a newly-created <code>TypeCode</code> object describing
      *              an IDL <code>struct</code>
      */
     abstract public TypeCode create_struct_tc(String id, String name,
-					      StructMember[] members);
+                                              StructMember[] members);
 
     /**
      * Creates a <code>TypeCode</code> object representing an IDL <code>union</code>.
      * The <code>TypeCode</code> object is initialized with the given id,
      * name, discriminator type, and members.
      *
-     * @param id	the repository id of the <code>union</code>
-     * @param name	the name of the <code>union</code>
-     * @param discriminator_type	the type of the <code>union</code> discriminator
-     * @param members	an array describing the members of the <code>union</code>
-     * @return		a newly-created <code>TypeCode</code> object describing
+     * @param id        the repository id of the <code>union</code>
+     * @param name      the name of the <code>union</code>
+     * @param discriminator_type        the type of the <code>union</code> discriminator
+     * @param members   an array describing the members of the <code>union</code>
+     * @return          a newly-created <code>TypeCode</code> object describing
      *              an IDL <code>union</code>
      */
     abstract public TypeCode create_union_tc(String id, String name,
-					     TypeCode discriminator_type,
-					     UnionMember[] members);
+                                             TypeCode discriminator_type,
+                                             UnionMember[] members);
 
     /**
      * Creates a <code>TypeCode</code> object representing an IDL <code>enum</code>.
      * The <code>TypeCode</code> object is initialized with the given id,
      * name, and members.
      *
-     * @param id	the repository id for the <code>enum</code>
-     * @param name	the name for the <code>enum</code>
-     * @param members	an array describing the members of the <code>enum</code>
-     * @return		a newly-created <code>TypeCode</code> object describing
+     * @param id        the repository id for the <code>enum</code>
+     * @param name      the name for the <code>enum</code>
+     * @param members   an array describing the members of the <code>enum</code>
+     * @return          a newly-created <code>TypeCode</code> object describing
      *              an IDL <code>enum</code>
      */
     abstract public TypeCode create_enum_tc(String id, String name, String[] members);
@@ -783,39 +783,39 @@ abstract public class ORB {
      * The <code>TypeCode</code> object is initialized with the given id,
      * name, and original type.
      *
-     * @param id	the repository id for the alias
-     * @param name	the name for the alias
+     * @param id        the repository id for the alias
+     * @param name      the name for the alias
      * @param original_type
-     * 			the <code>TypeCode</code> object describing the original type
+     *                  the <code>TypeCode</code> object describing the original type
      *          for which this is an alias
-     * @return		a newly-created <code>TypeCode</code> object describing
+     * @return          a newly-created <code>TypeCode</code> object describing
      *              an IDL <code>alias</code>
      */
     abstract public TypeCode create_alias_tc(String id, String name,
-					     TypeCode original_type);
+                                             TypeCode original_type);
 
     /**
      * Creates a <code>TypeCode</code> object representing an IDL <code>exception</code>.
      * The <code>TypeCode</code> object is initialized with the given id,
      * name, and members.
      *
-     * @param id	the repository id for the <code>exception</code>
-     * @param name	the name for the <code>exception</code>
-     * @param members	an array describing the members of the <code>exception</code>
-     * @return		a newly-created <code>TypeCode</code> object describing
+     * @param id        the repository id for the <code>exception</code>
+     * @param name      the name for the <code>exception</code>
+     * @param members   an array describing the members of the <code>exception</code>
+     * @return          a newly-created <code>TypeCode</code> object describing
      *              an IDL <code>exception</code>
      */
     abstract public TypeCode create_exception_tc(String id, String name,
-						 StructMember[] members);
+                                                 StructMember[] members);
 
     /**
      * Creates a <code>TypeCode</code> object representing an IDL <code>interface</code>.
      * The <code>TypeCode</code> object is initialized with the given id
      * and name.
      *
-     * @param id	the repository id for the interface
-     * @param name	the name for the interface
-     * @return		a newly-created <code>TypeCode</code> object describing
+     * @param id        the repository id for the interface
+     * @param name      the name for the interface
+     * @return          a newly-created <code>TypeCode</code> object describing
      *              an IDL <code>interface</code>
      */
 
@@ -828,8 +828,8 @@ abstract public class ORB {
      * which represents the maximum length of the string. Zero indicates
      * that the string described by this type code is unbounded.
      *
-     * @param bound	the bound for the <code>string</code>; cannot be negative
-     * @return		a newly-created <code>TypeCode</code> object describing
+     * @param bound     the bound for the <code>string</code>; cannot be negative
+     * @return          a newly-created <code>TypeCode</code> object describing
      *              a bounded IDL <code>string</code>
      * @exception BAD_PARAM if bound is a negative value
      */
@@ -843,8 +843,8 @@ abstract public class ORB {
      * which represents the maximum length of the wide string. Zero indicates
      * that the string described by this type code is unbounded.
      *
-     * @param bound	the bound for the <code>wstring</code>; cannot be negative
-     * @return		a newly-created <code>TypeCode</code> object describing
+     * @param bound     the bound for the <code>wstring</code>; cannot be negative
+     * @return          a newly-created <code>TypeCode</code> object describing
      *              a bounded IDL <code>wstring</code>
      * @exception BAD_PARAM if bound is a negative value
      */
@@ -855,11 +855,11 @@ abstract public class ORB {
      * The <code>TypeCode</code> object is initialized with the given bound and
      * element type.
      *
-     * @param bound	the bound for the <code>sequence</code>, 0 if unbounded
+     * @param bound     the bound for the <code>sequence</code>, 0 if unbounded
      * @param element_type
-     *			the <code>TypeCode</code> object describing the elements
+     *                  the <code>TypeCode</code> object describing the elements
      *          contained in the <code>sequence</code>
-     * @return		a newly-created <code>TypeCode</code> object describing
+     * @return          a newly-created <code>TypeCode</code> object describing
      *              an IDL <code>sequence</code>
      */
     abstract public TypeCode create_sequence_tc(int bound, TypeCode element_type);
@@ -877,10 +877,10 @@ abstract public class ORB {
      *    };
      * </PRE>
      *
-     * @param bound	the bound for the sequence, 0 if unbounded
-     * @param offset	the index to the enclosing <code>TypeCode</code> object
+     * @param bound     the bound for the sequence, 0 if unbounded
+     * @param offset    the index to the enclosing <code>TypeCode</code> object
      *                  that describes the elements of this sequence
-     * @return		a newly-created <code>TypeCode</code> object describing
+     * @return          a newly-created <code>TypeCode</code> object describing
      *                   a recursive sequence
      * @deprecated Use a combination of create_recursive_tc and create_sequence_tc instead
      * @see #create_recursive_tc(String) create_recursive_tc
@@ -894,10 +894,10 @@ abstract public class ORB {
      * The <code>TypeCode</code> object is initialized with the given length and
      * element type.
      *
-     * @param length	the length of the <code>array</code>
+     * @param length    the length of the <code>array</code>
      * @param element_type  a <code>TypeCode</code> object describing the type
      *                      of element contained in the <code>array</code>
-     * @return		a newly-created <code>TypeCode</code> object describing
+     * @return          a newly-created <code>TypeCode</code> object describing
      *              an IDL <code>array</code>
      */
     abstract public TypeCode create_array_tc(int length, TypeCode element_type);
@@ -923,8 +923,8 @@ abstract public class ORB {
      * @return          the requested TypeCode.
      */
     public org.omg.CORBA.TypeCode create_abstract_interface_tc(
-							       String id,
-							       String name)
+                                                               String id,
+                                                               String name)
     {
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }
@@ -964,10 +964,10 @@ abstract public class ORB {
      * @return                   the requested TypeCode
      */
     public org.omg.CORBA.TypeCode create_value_tc(String id,
-						  String name,
-						  short type_modifier,
-						  TypeCode concrete_base,
-						  ValueMember[] members)
+                                                  String name,
+                                                  short type_modifier,
+                                                  TypeCode concrete_base,
+                                                  ValueMember[] members)
     {
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }
@@ -1025,8 +1025,8 @@ abstract public class ORB {
      * @return                   the requested TypeCode
      */
     public org.omg.CORBA.TypeCode create_value_box_tc(String id,
-						      String name,
-						      TypeCode boxed_type)
+                                                      String name,
+                                                      TypeCode boxed_type)
     {
         // implemented in subclass
         throw new org.omg.CORBA.NO_IMPLEMENT();
@@ -1039,7 +1039,7 @@ abstract public class ORB {
      * contain a <code>Typecode</code> object whose <code>kind</code> field
      * is set to <code>TCKind.tc_null</code>.
      *
-     * @return		a newly-created <code>Any</code> object
+     * @return          a newly-created <code>Any</code> object
      */
     abstract public Any create_any();
 
@@ -1054,7 +1054,7 @@ abstract public class ORB {
      * @see <a href="package-summary.html#unimpl"><code>CORBA</code> package
      *      comments for unimplemented features</a>
      *
-     * @return		a newly-created <code>Current</code> object
+     * @return          a newly-created <code>Current</code> object
      * @deprecated      use <code>resolve_initial_references</code>.
      */
     // @Deprecated
@@ -1164,7 +1164,7 @@ abstract public class ORB {
      *      comments for unimplemented features</a>
      */
     public boolean get_service_information(short service_type,
-					   ServiceInformationHolder service_info)
+                                           ServiceInformationHolder service_info)
     {
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }
@@ -1332,7 +1332,7 @@ abstract public class ORB {
     public org.omg.CORBA.Policy create_policy(int type, org.omg.CORBA.Any val)
         throws org.omg.CORBA.PolicyError
     {
-	// Currently not implemented until PIORB.
+        // Currently not implemented until PIORB.
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }
 }

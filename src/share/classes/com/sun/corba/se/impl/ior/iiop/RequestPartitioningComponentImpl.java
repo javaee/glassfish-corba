@@ -37,15 +37,15 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.ior.iiop;
+package com.sun.corba.ee.impl.ior.iiop;
 
 import org.omg.CORBA_2_3.portable.OutputStream;
 
-import com.sun.corba.se.spi.ior.TaggedComponentBase;
-import com.sun.corba.se.spi.ior.iiop.RequestPartitioningComponent;
+import com.sun.corba.ee.spi.ior.TaggedComponentBase;
+import com.sun.corba.ee.spi.ior.iiop.RequestPartitioningComponent;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class RequestPartitioningComponentImpl extends TaggedComponentBase 
     implements RequestPartitioningComponent
@@ -58,26 +58,26 @@ public class RequestPartitioningComponentImpl extends TaggedComponentBase
     @Override
     public boolean equals(Object obj)
     {
-	if (!(obj instanceof RequestPartitioningComponentImpl)) {
+        if (!(obj instanceof RequestPartitioningComponentImpl)) {
             return false;
         }
 
-	RequestPartitioningComponentImpl other = 
-	    (RequestPartitioningComponentImpl)obj ;
+        RequestPartitioningComponentImpl other = 
+            (RequestPartitioningComponentImpl)obj ;
 
-	return partitionToUse == other.partitionToUse ;
+        return partitionToUse == other.partitionToUse ;
     }
 
     @Override
     public int hashCode()
     {
-	return partitionToUse;
+        return partitionToUse;
     }
 
     @Override
     public String toString()
     {
-	return "RequestPartitioningComponentImpl[partitionToUse=" + partitionToUse + "]" ;
+        return "RequestPartitioningComponentImpl[partitionToUse=" + partitionToUse + "]" ;
     }
 
     public RequestPartitioningComponentImpl()
@@ -86,19 +86,19 @@ public class RequestPartitioningComponentImpl extends TaggedComponentBase
     }
 
     public RequestPartitioningComponentImpl(int thePartitionToUse) {
-	if (thePartitionToUse < ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID ||
-	    thePartitionToUse > ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID) {
-	    throw wrapper.invalidRequestPartitioningComponentValue(
+        if (thePartitionToUse < ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID ||
+            thePartitionToUse > ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID) {
+            throw wrapper.invalidRequestPartitioningComponentValue(
                     thePartitionToUse,
                     ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID,
                     ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID);
-	}
+        }
         partitionToUse = thePartitionToUse;
     }
 
     public int getRequestPartitioningId()
     {
-	return partitionToUse;
+        return partitionToUse;
     }
 
     public void writeContents(OutputStream os) 
@@ -108,6 +108,6 @@ public class RequestPartitioningComponentImpl extends TaggedComponentBase
     
     public int getId() 
     {
-	return ORBConstants.TAG_REQUEST_PARTITIONING_ID;
+        return ORBConstants.TAG_REQUEST_PARTITIONING_ID;
     }
 }

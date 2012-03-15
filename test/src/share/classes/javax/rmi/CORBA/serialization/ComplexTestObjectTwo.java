@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ComplexTestObjectTwo.java	1.5 99/06/07 */
+/* @(#)ComplexTestObjectTwo.java        1.5 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -75,17 +75,17 @@ public class ComplexTestObjectTwo implements Serializable
     public boolean equals(Object o)
     {
         try
-	    {
-		ComplexTestObjectTwo ctbo = (ComplexTestObjectTwo)o;
-		return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) &&
-			(ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && (ctbo.fDouble == fDouble)
-			&& (ctbo.fOne.equals(fOne))
-			);
-	    }
+            {
+                ComplexTestObjectTwo ctbo = (ComplexTestObjectTwo)o;
+                return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) &&
+                        (ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && (ctbo.fDouble == fDouble)
+                        && (ctbo.fOne.equals(fOne))
+                        );
+            }
         catch(Exception e)
-	    {
-		return false;
-	    }
+            {
+                return false;
+            }
     }
 
     public String toString()
@@ -99,18 +99,18 @@ public class ComplexTestObjectTwo implements Serializable
     private void writeObject(ObjectOutputStream s) throws IOException
     {
         try
-	    {
-		s.writeInt(fInt);
-    		s.writeLong(fLong);
-    		s.writeFloat(fFloat);
-    		s.writeDouble(fDouble);
-		s.writeObject(fString);
-		s.writeObject(fOne);
-	    }
+            {
+                s.writeInt(fInt);
+                s.writeLong(fLong);
+                s.writeFloat(fFloat);
+                s.writeDouble(fDouble);
+                s.writeObject(fString);
+                s.writeObject(fOne);
+            }
         catch(IOException e)
-	    {
-		throw e;
-	    }
+            {
+                throw e;
+            }
     }
 
     /**
@@ -120,18 +120,18 @@ public class ComplexTestObjectTwo implements Serializable
     ClassNotFoundException
     {
         try
-	    {
-		fInt = s.readInt();
-		fLong = s.readLong();
-		fFloat = s.readFloat();
-		fDouble = s.readDouble();
-		fString = (String)s.readObject();
-		fOne = (ComplexTestObjectOne)s.readObject();
-	    }
+            {
+                fInt = s.readInt();
+                fLong = s.readLong();
+                fFloat = s.readFloat();
+                fDouble = s.readDouble();
+                fString = (String)s.readObject();
+                fOne = (ComplexTestObjectOne)s.readObject();
+            }
         catch(IOException e)
-	    {
-		throw e;
-	    }
+            {
+                throw e;
+            }
 
     }
 

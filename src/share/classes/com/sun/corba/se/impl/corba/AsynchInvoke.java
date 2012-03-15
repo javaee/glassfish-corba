@@ -46,9 +46,9 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.corba;
+package com.sun.corba.ee.impl.corba;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 ///////////////////////////////////////////////////////////////////////////
 // helper class for deferred invocations
@@ -69,9 +69,9 @@ public class AsynchInvoke implements Runnable {
 
     public AsynchInvoke (ORB o, RequestImpl reqToInvokeOn, boolean n)
     {
-	_orb = o;
-	_req = reqToInvokeOn;
-	_notifyORB = n;
+        _orb = o;
+        _req = reqToInvokeOn;
+        _notifyORB = n;
     };
 
 
@@ -90,9 +90,9 @@ public class AsynchInvoke implements Runnable {
             _req.doInvocation();
         }
     
-	// for the asynchronous case, note that the response has been
-	// received.
-	synchronized (_req) {
+        // for the asynchronous case, note that the response has been
+        // received.
+        synchronized (_req) {
             // update local boolean indicator
             _req.gotResponse = true;
 
@@ -100,9 +100,9 @@ public class AsynchInvoke implements Runnable {
             _req.notify();
         }
       
-	if (_notifyORB == true) {
-	    _orb.notifyORB() ;
-	}
+        if (_notifyORB == true) {
+            _orb.notifyORB() ;
+        }
     }
 
 };

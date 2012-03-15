@@ -426,7 +426,7 @@ public interface DynAny extends org.omg.CORBA.Object
      *            of the accessed component in this <code>DynAny</code> object
      */
     public void insert_val(java.io.Serializable value)
-	throws org.omg.CORBA.DynAnyPackage.InvalidValue;
+        throws org.omg.CORBA.DynAnyPackage.InvalidValue;
 
     /**
      * Retrieves the <code>java.io.Serializable</code> object contained
@@ -440,7 +440,7 @@ public interface DynAny extends org.omg.CORBA.Object
      *               the type code for a <code>java.io.Serializable</code> object
      */               
     public java.io.Serializable get_val()
-	throws org.omg.CORBA.DynAnyPackage.TypeMismatch;
+        throws org.omg.CORBA.DynAnyPackage.TypeMismatch;
     
     // orbos 98-01-18: Objects By Value -- end
 
@@ -706,10 +706,10 @@ public interface DynAny extends org.omg.CORBA.Object
      * The appropriate <code>get</code> method
      * can be called on the resulting <code>DynAny</code> object
      * to extract the value of the component.
-	 *
-	 * @return a <code>DynAny</code> object reference that can be
-	 *         used to retrieve or set the value of the component currently
-	 *         accessed
+         *
+         * @return a <code>DynAny</code> object reference that can be
+         *         used to retrieve or set the value of the component currently
+         *         accessed
      */
     public org.omg.CORBA.DynAny current_component() ;
 

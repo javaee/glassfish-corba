@@ -42,7 +42,7 @@
     <Match>
         <!-- The ORB shutdown method is doing what it needs to do,
              so we can ignore this warning. -->
-        <Class name="com.sun.corba.se.impl.orb.ORBImpl"/>
+        <Class name="com.sun.corba.ee.impl.orb.ORBImpl"/>
         <Method name="shutdown"/>
         <Bug code="TLW"/>
     </Match>
@@ -51,7 +51,7 @@
              get method and release the lock in the release method.
              Users of this class should call CachedData.release in a 
              finally block. -->
-        <Class name="com.sun.corba.se.spi.orbutil.generic.CachedData"/>
+        <Class name="com.sun.corba.ee.spi.orbutil.generic.CachedData"/>
         <Bug code="UL"/>
     </Match>
     <Match>
@@ -59,16 +59,16 @@
              to the correct functioning of IIOP: different instances of a
              String must unmarshal to different instances! -->
         <Or>
-            <Class name="com.sun.corba.se.impl.encoding.CDRInputStream_1_0"/>
-            <Class name="com.sun.corba.se.impl.encoding.CDRInputStream_1_1"/>
-            <Class name="com.sun.corba.se.impl.encoding.CDRInputStream_1_2"/>
+            <Class name="com.sun.corba.ee.impl.encoding.CDRInputStream_1_0"/>
+            <Class name="com.sun.corba.ee.impl.encoding.CDRInputStream_1_1"/>
+            <Class name="com.sun.corba.ee.impl.encoding.CDRInputStream_1_2"/>
         </Or>
         <Bug code="Dm"/>
     </Match>
     <Match>
         <!-- This one is strange: wrapper IS used, and not set to null.
              Excluding because the FindBugs results seems to be in error. -->
-        <Class name="com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage_1_1"/>
+        <Class name="com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage_1_1"/>
         <Bug code="UwF"/>
     </Match>
     <Match>
@@ -77,23 +77,23 @@
              also catches RuntimeException.  But this is the main method in 
              the standalone tnameserver class, which should catch Exceptions
              and report the error, rather than just dumping a stack trace. -->
-        <Class name="com.sun.corba.se.impl.naming.cosnaming.TransientNameServer"/>
+        <Class name="com.sun.corba.ee.impl.naming.cosnaming.TransientNameServer"/>
         <Bug code="REC"/>
     </Match>
     <Match>
         <!-- Excluded because read_value and read_Value MUST both be included,
              as unfortunately they are defined in CORBA standards. -->
         <Or>
-            <Class name="com.sun.corba.se.impl.encoding.CDRInputObject"/>
-            <Class name="com.sun.corba.se.impl.encoding.CDROutputObject"/>
-            <Class name="com.sun.corba.se.spi.orb.ORB"/>
+            <Class name="com.sun.corba.ee.impl.encoding.CDRInputObject"/>
+            <Class name="com.sun.corba.ee.impl.encoding.CDROutputObject"/>
+            <Class name="com.sun.corba.ee.spi.orb.ORB"/>
         </Or>
         <Bug code="Nm"/>
     </Match>
     <Match>
         <!-- This is an error in findbugs: the classCopierFactory field is clearly
              used. -->
-        <Class name="com.sun.corba.se.impl.orbutil.copyobject.ClassCopierOrdinaryImpl"/>
+        <Class name="com.sun.corba.ee.impl.orbutil.copyobject.ClassCopierOrdinaryImpl"/>
         <Bug code="UrF"/>
     </Match>
 
@@ -107,45 +107,45 @@
         <Package name="~org.osgi.*"/>
     </Match>
     <Match>
-        <Package name="~com.sun.corba.se.impl.activation"/>
+        <Package name="~com.sun.corba.ee.impl.activation"/>
     </Match>
     <Match>
-        <Package name="~com.sun.corba.se.impl.naming.pcosnaming"/>
+        <Package name="~com.sun.corba.ee.impl.naming.pcosnaming"/>
     </Match>
     <Match>
-	<Package name="~sun.rmi.*"/>
+        <Package name="~sun.rmi.*"/>
     </Match>
     <Match>
-	<Package name="~com.sun.tools.corba.se.idl.*"/>
+        <Package name="~com.sun.tools.corba.se.idl.*"/>
     </Match>
     <Match>
-	<Package name="~com.sun.corba.se.org.omg.*"/>
+        <Package name="~com.sun.corba.ee.org.omg.*"/>
     </Match>
     <Match>
-	<Package name="~com.sun.org.omg.*"/>
+        <Package name="~com.sun.org.omg.*"/>
     </Match>
     <Match>
-	<Package name="~org.omg.*"/>
+        <Package name="~org.omg.*"/>
     </Match>
     <Match>
-	<Package name="~com.sun.corba.se.spi.activation.*"/>
+        <Package name="~com.sun.corba.ee.spi.activation.*"/>
     </Match>
     <Match>
-	<Package name="~com.sun.corba.se.impl.orbutil.newtimer.generated"/>
+        <Package name="~com.sun.corba.ee.impl.orbutil.newtimer.generated"/>
     </Match>
     <Match>
-	<Package name="~com.sun.corba.se.impl.osgi.main"/>
+        <Package name="~com.sun.corba.ee.impl.osgi.main"/>
     </Match>
     <Match>
-	<Package name="~com.sun.corba.se.spi.osgi"/>
+        <Package name="~com.sun.corba.ee.spi.osgi"/>
     </Match>
     <Match>
-	<Package name="~com.sun.corba.se.impl.presentation.rmi.proxy"/>
+        <Package name="~com.sun.corba.ee.impl.presentation.rmi.proxy"/>
     </Match>
     <Match>
-	<Package name="~com.sun.corba.se.impl.txpoa"/>
+        <Package name="~com.sun.corba.ee.impl.txpoa"/>
     </Match>
     <Match>
-	<Package name="~javax.rmi.*"/>
+        <Package name="~javax.rmi.*"/>
     </Match>
 </FindBugsFilter>

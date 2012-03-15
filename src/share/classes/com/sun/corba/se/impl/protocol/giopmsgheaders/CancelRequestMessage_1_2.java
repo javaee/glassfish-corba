@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.protocol.RequestId;
-import com.sun.corba.se.impl.protocol.RequestIdImpl;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.protocol.RequestId;
+import com.sun.corba.ee.impl.protocol.RequestIdImpl;
 
 /**
  * This implements the GIOP 1.2 CancelRequest header.

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.osgi.loader ;
+package com.sun.corba.ee.impl.osgi.loader ;
 
 import java.util.Dictionary;
 import java.util.Map;
@@ -52,10 +52,10 @@ import org.osgi.framework.ServiceReference ;
 import org.osgi.service.packageadmin.PackageAdmin ;
 import org.osgi.service.packageadmin.ExportedPackage ;
 
-import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
+import com.sun.corba.ee.spi.orb.ClassCodeBaseHandler ;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.trace.Osgi;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.trace.Osgi;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;

@@ -63,21 +63,21 @@ public class Client
     public static void main(String[] av)
     {
         try {
-	    U.sop(main + " starting");
+            U.sop(main + " starting");
 
-	    orb = ORB.init(av, null);
-	    idlIPOA     = idlIHelper.narrow(U.resolve(Server.idlIPOA,    orb));
+            orb = ORB.init(av, null);
+            idlIPOA     = idlIHelper.narrow(U.resolve(Server.idlIPOA,    orb));
 
-	    U.sop(idlIPOA.o(idlIPOAArgO));
-	    U.sop(idlIPOA.return_after_client_gives_up(idlIPOAArgN));
+            U.sop(idlIPOA.o(idlIPOAArgO));
+            U.sop(idlIPOA.return_after_client_gives_up(idlIPOAArgN));
 
-	    orb.shutdown(true);
+            orb.shutdown(true);
         } catch (Exception e) {
             U.sopUnexpectedException(main + " : ", e);
-	    System.exit(1);
+            System.exit(1);
         }
-	U.sop(main + " ending successfully");
-	System.exit(Controller.SUCCESS);
+        U.sop(main + " ending successfully");
+        System.exit(Controller.SUCCESS);
     }
 }
 

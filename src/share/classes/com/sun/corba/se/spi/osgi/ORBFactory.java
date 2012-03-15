@@ -38,19 +38,19 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.osgi;
+package com.sun.corba.ee.spi.osgi;
 
 import java.util.Properties ;
 
 import org.glassfish.external.amx.AMXGlassfish ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ClassCodeBaseHandler ;
 
-import com.sun.corba.se.impl.orb.ORBImpl ;
+import com.sun.corba.ee.impl.orb.ORBImpl ;
 
-import com.sun.corba.se.impl.osgi.loader.OSGIListener;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.osgi.loader.OSGIListener;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 /** A simple factory for creating our ORB that avoids the ClassLoader
  * problems with org.omg.CORBA.ORB.init, which must load the ORB impl class.

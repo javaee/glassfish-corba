@@ -60,7 +60,7 @@ public final class TRANSACTION_REQUIRED extends SystemException {
      * and a null description.
      */
     public TRANSACTION_REQUIRED() {
-	this("");
+        this("");
     }
 
     /**

@@ -42,9 +42,9 @@ package pi.clientrequestinfo;
 
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.corba.AnyImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import corba.framework.*;
 
@@ -73,37 +73,37 @@ public class RMIClient
     public static final String NAME2 = "hello2Forward";
 
     public static void main(String args[]) {
-	try {
-	    (new RMIClient()).run( System.getProperties(),
-		                args, System.out, System.err, null );
-	}
-	catch( Exception e ) {
-	    e.printStackTrace( System.err );
-	    System.exit( 1 );
-	}
+        try {
+            (new RMIClient()).run( System.getProperties(),
+                                args, System.out, System.err, null );
+        }
+        catch( Exception e ) {
+            e.printStackTrace( System.err );
+            System.exit( 1 );
+        }
     }
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
-	TestInitializer.out = out;
-	this.out = out;
-	this.err = err;
+        TestInitializer.out = out;
+        this.out = out;
+        this.err = err;
 
-	out.println( "===================================" );
-	out.println( "Instantiating ORB for RMI/IIOP test" );
-	out.println( "===================================" );
+        out.println( "===================================" );
+        out.println( "Instantiating ORB for RMI/IIOP test" );
+        out.println( "===================================" );
 
-	out.println( "+ Creating ORB..." );
-	createORB( args );
+        out.println( "+ Creating ORB..." );
+        createORB( args );
 
-	// Inform the JNDI provider of the ORB to use and create intial
-	// naming context:
+        // Inform the JNDI provider of the ORB to use and create intial
+        // naming context:
         out.println( "+ Creating initial naming context..." );
-	Hashtable env = new Hashtable();
-	env.put( "java.naming.corba.orb", orb );
-	initialNamingContext = new InitialContext( env );
+        Hashtable env = new Hashtable();
+        env.put( "java.naming.corba.orb", orb );
+        initialNamingContext = new InitialContext( env );
 
         try {
             // Test ClientInterceptor
@@ -117,10 +117,10 @@ public class RMIClient
      * Clear invocation flags of helloRef and helloRefForward
      */
     protected void clearInvoked() 
-	throws Exception
+        throws Exception
     {
-	helloRef.clearInvoked();
-	helloRefForward.clearInvoked();
+        helloRef.clearInvoked();
+        helloRefForward.clearInvoked();
     }
 
     /**
@@ -129,34 +129,34 @@ public class RMIClient
     protected void invokeMethod( String methodName )
         throws Exception
     {
-	try {
-	    // Make an invocation:
-	    if( methodName.equals( "sayHello" ) ) {
-		helloRef.sayHello();
-	    }
-	    else if( methodName.equals( "saySystemException" ) ) {
-		helloRef.saySystemException();
-	    }
-	    else if( methodName.equals( "sayUserException" ) ) {
-		helloRef.sayUserException();
-	    }
-	    else if( methodName.equals( "sayOneway" ) ) {
-		helloRef.sayOneway();
-	    }
-	    else if( methodName.equals( "sayArguments" ) ) {
-		helloRef.sayArguments( "one", 2, true );
-	    }
-	}
-	catch( RemoteException e ) {
-	    throw (Exception)e.detail;
-	}
+        try {
+            // Make an invocation:
+            if( methodName.equals( "sayHello" ) ) {
+                helloRef.sayHello();
+            }
+            else if( methodName.equals( "saySystemException" ) ) {
+                helloRef.saySystemException();
+            }
+            else if( methodName.equals( "sayUserException" ) ) {
+                helloRef.sayUserException();
+            }
+            else if( methodName.equals( "sayOneway" ) ) {
+                helloRef.sayOneway();
+            }
+            else if( methodName.equals( "sayArguments" ) ) {
+                helloRef.sayArguments( "one", 2, true );
+            }
+        }
+        catch( RemoteException e ) {
+            throw (Exception)e.detail;
+        }
     }
 
     /**
      * Return true if the method was invoked
      */
     protected boolean wasInvoked() 
-	throws Exception 
+        throws Exception 
     {
         return helloRef.wasInvoked();
     }
@@ -165,7 +165,7 @@ public class RMIClient
      * Return true if the method was forwarded
      */
     protected boolean didForward() 
-	throws Exception
+        throws Exception
     {
         return helloRefForward.wasInvoked();
     }
@@ -174,7 +174,7 @@ public class RMIClient
      * Perform ClientRequestInfo tests
      */
     protected void testClientRequestInfo() 
-	throws Exception 
+        throws Exception 
     {
         super.testClientRequestInfo();
     }
@@ -183,7 +183,7 @@ public class RMIClient
      * One-way test not applicable for RMI case.  Override it.
      */
     protected void testOneWay() throws Exception {
-	out.println( "+ OneWay test not applicable for RMI.  Skipping..." );
+        out.println( "+ OneWay test not applicable for RMI.  Skipping..." );
     }
 
     /**
@@ -191,23 +191,23 @@ public class RMIClient
      * from the last invocation
      */
     protected void resolveReferences() 
-	throws Exception 
+        throws Exception 
     {
         out.println( "    + resolving references..." );
         out.println( "      - disabling interceptors..." );
         SampleClientRequestInterceptor.enabled = false;
         // Resolve the hello object.
-	out.println( "      - " + NAME1 );
+        out.println( "      - " + NAME1 );
         helloRef = resolve( NAME1 );
         // The initializer will store the location the interceptors should
         // use during a normal request:
         TestInitializer.helloRef = (org.omg.CORBA.Object)helloRef;
-	out.println( "      - " + NAME2 );
+        out.println( "      - " + NAME2 );
         helloRefForward = resolve( NAME2 );
         // The initializer will store the location the interceptors should
         // use during a forward request:
         TestInitializer.helloRefForward = 
-	    (org.omg.CORBA.Object)helloRefForward;
+            (org.omg.CORBA.Object)helloRefForward;
         out.println( "      - enabling interceptors..." );
         SampleClientRequestInterceptor.enabled = true;
     }
@@ -216,11 +216,11 @@ public class RMIClient
      * Implementation borrwed from corba.socket.HelloClient.java test
      */
     private helloIF resolve(String name)
-	throws Exception
+        throws Exception
     {
-	java.lang.Object obj = initialNamingContext.lookup( name );
-	helloIF helloRef = (helloIF)PortableRemoteObject.narrow( 
-	    obj, helloIF.class );
+        java.lang.Object obj = initialNamingContext.lookup( name );
+        helloIF helloRef = (helloIF)PortableRemoteObject.narrow( 
+            obj, helloIF.class );
         
         return helloRef;
     }

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)OBVTestObjectOneImpl.java	1.1 99/06/07 */
+/* @(#)OBVTestObjectOneImpl.java        1.1 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -82,16 +82,16 @@ public class OBVTestObjectOneImpl extends OBVTestObjectOne
     public boolean equals(Object o)
     {
         try
-	    {
-		OBVTestObjectOne ctbo = (OBVTestObjectOne)o;
-		return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) &&
-			(ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && (ctbo.fDouble == fDouble)
-			);
-	    }
+            {
+                OBVTestObjectOne ctbo = (OBVTestObjectOne)o;
+                return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) &&
+                        (ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && (ctbo.fDouble == fDouble)
+                        );
+            }
         catch(Exception e)
-	    {
-		return false;
-	    }
+            {
+                return false;
+            }
     }
 
     public String toString()

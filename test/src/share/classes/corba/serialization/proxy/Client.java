@@ -50,10 +50,10 @@ public class Client
 {
     public static void main(String args[])
     {
-	FrobnicatorProvider test = null;
-	try {
-	    System.setSecurityManager(new NoSecurityManager());
-	    Context initialNamingContext = new InitialContext();
+        FrobnicatorProvider test = null;
+        try {
+            System.setSecurityManager(new NoSecurityManager());
+            Context initialNamingContext = new InitialContext();
             Object myLook = initialNamingContext.lookup("DynamicProxyBug1368");
 
             //System.out.println("Lookup = " + initialNamingContext );
@@ -64,14 +64,14 @@ public class Client
                              myLook ,
                              FrobnicatorProvider.class);
             Frobnicator frobnicator = test.getFrobnicator();
-	    //toString operation will cause proxy invocation
+            //toString operation will cause proxy invocation
             //System.out.println("My frob= " + frobnicator);
             //System.out.println("remoting..");
             frobnicator.frobnicate();
-	} catch (Throwable t) {
-	    t.printStackTrace();
-	    System.out.println("Error: DynamicProxyBug1368 Failed");
+        } catch (Throwable t) {
+            t.printStackTrace();
+            System.out.println("Error: DynamicProxyBug1368 Failed");
             System.exit(1);
-	}
+        }
     }
 }

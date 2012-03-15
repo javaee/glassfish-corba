@@ -56,12 +56,12 @@ public class TransactionRequiredException extends java.rmi.RemoteException
 {
     public TransactionRequiredException()
     {
-	super();
+        super();
     }
 
     public TransactionRequiredException(String msg)
     {
-	super(msg);
+        super(msg);
     }
 }
 

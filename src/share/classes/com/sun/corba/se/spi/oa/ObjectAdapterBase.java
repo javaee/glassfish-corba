@@ -37,22 +37,22 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.oa ;
+package com.sun.corba.ee.spi.oa ;
 
 import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 
 import org.omg.CORBA.Policy ;
 
-import com.sun.corba.se.spi.ior.IORFactories ;
-import com.sun.corba.se.spi.ior.IORTemplate ;
-import com.sun.corba.se.spi.ior.ObjectAdapterId;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.protocol.PIHandler ;
+import com.sun.corba.ee.spi.ior.IORFactories ;
+import com.sun.corba.ee.spi.ior.IORTemplate ;
+import com.sun.corba.ee.spi.ior.ObjectAdapterId;
+import com.sun.corba.ee.spi.ior.ObjectKeyTemplate ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.protocol.PIHandler ;
 
-import com.sun.corba.se.spi.logging.POASystemException ;
-import com.sun.corba.se.impl.oa.poa.Policies;
+import com.sun.corba.ee.spi.logging.POASystemException ;
+import com.sun.corba.ee.impl.oa.poa.Policies;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory;
@@ -79,11 +79,11 @@ abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject
     private boolean isNameService = false ;
    
     public ObjectAdapterBase( ORB orb ) {
-	this.orb = orb ;
+        this.orb = orb ;
     }
 
     public final POASystemException wrapper() {
-	return wrapper ;
+        return wrapper ;
     }
 
     /*
@@ -91,56 +91,56 @@ abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject
      * When it is done, reference creation can proceed.
      */
     final public void initializeTemplate( ObjectKeyTemplate oktemp,
-	boolean notifyORB, Policies policies, String codebase,
-	String objectAdapterManagerId, ObjectAdapterId objectAdapterId)
+        boolean notifyORB, Policies policies, String codebase,
+        String objectAdapterManagerId, ObjectAdapterId objectAdapterId)
     {
-	adapterId = oktemp.getAdapterId() ;
+        adapterId = oktemp.getAdapterId() ;
 
-	iortemp = IORFactories.makeIORTemplate(oktemp) ;
+        iortemp = IORFactories.makeIORTemplate(oktemp) ;
 
-	// This calls acceptors which create profiles and may
-	// add tagged components to those profiles.
-	orb.getCorbaTransportManager().addToIORTemplate(
+        // This calls acceptors which create profiles and may
+        // add tagged components to those profiles.
+        orb.getCorbaTransportManager().addToIORTemplate(
             iortemp, policies,
-	    codebase, objectAdapterManagerId, objectAdapterId);
+            codebase, objectAdapterManagerId, objectAdapterId);
 
-	adapterTemplate = IORFactories.makeObjectReferenceTemplate( orb, 
-	    iortemp ) ;
-	currentFactory = adapterTemplate ;
+        adapterTemplate = IORFactories.makeObjectReferenceTemplate( orb, 
+            iortemp ) ;
+        currentFactory = adapterTemplate ;
 
-	if (notifyORB) {
-	    PIHandler pih = orb.getPIHandler() ;
-	    if (pih != null) {
+        if (notifyORB) {
+            PIHandler pih = orb.getPIHandler() ;
+            if (pih != null) {
                 pih.objectAdapterCreated(this);
             }
-	}
+        }
 
-	iortemp.makeImmutable() ;
+        iortemp.makeImmutable() ;
     }
 
     final public org.omg.CORBA.Object makeObject( String repId, byte[] oid )
     {
-	if (repId == null) {
-	    throw wrapper.nullRepositoryId();
-	}
-	return currentFactory.make_object( repId, oid ) ;
+        if (repId == null) {
+            throw wrapper.nullRepositoryId();
+        }
+        return currentFactory.make_object( repId, oid ) ;
     }
 
     final public byte[] getAdapterId() 
     {
-	return adapterId ;
+        return adapterId ;
     }
 
     final public ORB getORB() 
     {
-	return orb ;
+        return orb ;
     }
 
     abstract public Policy getEffectivePolicy( int type ) ;
 
     final public IORTemplate getIORTemplate() 
     {
-	return iortemp ;
+        return iortemp ;
     }
 
     abstract public int getManagerId() ;
@@ -163,17 +163,17 @@ abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject
 
     final public ObjectReferenceTemplate getAdapterTemplate()
     {
-	return adapterTemplate ;
+        return adapterTemplate ;
     }
 
     final public ObjectReferenceFactory getCurrentFactory()
     {
-	return currentFactory ;
+        return currentFactory ;
     }
 
     final public void setCurrentFactory( ObjectReferenceFactory factory )
     {
-	currentFactory = factory ;
+        currentFactory = factory ;
     }
 
     abstract public org.omg.CORBA.Object getLocalServant( byte[] objectId ) ;
@@ -192,9 +192,9 @@ abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject
     // but overriding it would make sense for OAs that use a different InvocationInfo.
     public OAInvocationInfo makeInvocationInfo( byte[] objectId )
     {
-	OAInvocationInfo info = new OAInvocationInfo( this, objectId ) ;
-	info.setCopierFactory( getObjectCopierFactory() ) ;
-	return info ;
+        OAInvocationInfo info = new OAInvocationInfo( this, objectId ) ;
+        info.setCopierFactory( getObjectCopierFactory() ) ;
+        return info ;
     }
 
     abstract public String[] getInterfaces( Object servant, byte[] objectId ) ;

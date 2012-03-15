@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
@@ -55,31 +55,31 @@ import java.util.WeakHashMap;
 class CodeSetCache
 {
     private ThreadLocal<WeakHashMap<String,CharsetEncoder>> ctbMapLocal =
-	new ThreadLocal<WeakHashMap<String,CharsetEncoder>>() {
-	    protected WeakHashMap<String,CharsetEncoder> initialValue() {
-		return new WeakHashMap<String,CharsetEncoder>() ;
-	    }
-	} ;
+        new ThreadLocal<WeakHashMap<String,CharsetEncoder>>() {
+            protected WeakHashMap<String,CharsetEncoder> initialValue() {
+                return new WeakHashMap<String,CharsetEncoder>() ;
+            }
+        } ;
 
     private ThreadLocal<WeakHashMap<String,CharsetDecoder>> btcMapLocal =
-	new ThreadLocal<WeakHashMap<String,CharsetDecoder>>() {
-	    protected WeakHashMap<String,CharsetDecoder> initialValue() {
-		return new WeakHashMap<String,CharsetDecoder>() ;
-	    }
-	} ;
+        new ThreadLocal<WeakHashMap<String,CharsetDecoder>>() {
+            protected WeakHashMap<String,CharsetDecoder> initialValue() {
+                return new WeakHashMap<String,CharsetDecoder>() ;
+            }
+        } ;
 
     /**
      * Retrieve a CharsetDecoder from the Map using the given key.
      */
     CharsetDecoder getByteToCharConverter(String key) {
-	return btcMapLocal.get().get( key ) ;
+        return btcMapLocal.get().get( key ) ;
     }
 
     /**
      * Retrieve a CharsetEncoder from the Map using the given key.
      */
     CharsetEncoder getCharToByteConverter(String key) {
-	return ctbMapLocal.get().get( key ) ;
+        return ctbMapLocal.get().get( key ) ;
     }
 
     /**
@@ -87,7 +87,7 @@ class CodeSetCache
      * and returns the same converter.
      */
     CharsetDecoder setConverter(String key, CharsetDecoder converter) {
-	btcMapLocal.get().put( key, converter ) ;
+        btcMapLocal.get().put( key, converter ) ;
         return converter;
     }
 
@@ -96,7 +96,7 @@ class CodeSetCache
      * and returns the same converter.
      */
     CharsetEncoder setConverter(String key, CharsetEncoder converter) {
-	ctbMapLocal.get().put( key, converter ) ;
+        ctbMapLocal.get().put( key, converter ) ;
         return converter;
     }
 }

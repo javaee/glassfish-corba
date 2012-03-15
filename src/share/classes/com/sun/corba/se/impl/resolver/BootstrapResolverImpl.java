@@ -37,28 +37,28 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.resolver ;
+package com.sun.corba.ee.impl.resolver ;
 
 import org.omg.CORBA.portable.InputStream ;
 import org.omg.CORBA.portable.OutputStream ;
 import org.omg.CORBA.portable.ApplicationException ;
 import org.omg.CORBA.portable.RemarshalException ;
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.ior.IORFactories ;
-import com.sun.corba.se.spi.ior.IORTemplate ;
-import com.sun.corba.se.spi.ior.ObjectKey ;
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
-import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.resolver.Resolver ;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.IORFactories ;
+import com.sun.corba.ee.spi.ior.IORTemplate ;
+import com.sun.corba.ee.spi.ior.ObjectKey ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPAddress ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPFactories ;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.resolver.Resolver ;
 
-import com.sun.corba.se.impl.ior.ObjectIdImpl;
-import com.sun.corba.se.impl.ior.ObjectKeyImpl;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.impl.misc.ORBUtility ;
+import com.sun.corba.ee.impl.ior.ObjectIdImpl;
+import com.sun.corba.ee.impl.ior.ObjectKeyImpl;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.impl.misc.ORBUtility ;
 import java.util.Set;
 
 public class BootstrapResolverImpl implements Resolver {
@@ -67,21 +67,21 @@ public class BootstrapResolverImpl implements Resolver {
         ORBUtilSystemException.self ;
 
     public BootstrapResolverImpl(ORB orb, String host, int port) {
-	// Create a new IOR with the magic of INIT
-	byte[] initialKey = "INIT".getBytes();
-	ObjectKey okey = new ObjectKeyImpl(orb.getWireObjectKeyTemplate(),
-					   new ObjectIdImpl(initialKey));
+        // Create a new IOR with the magic of INIT
+        byte[] initialKey = "INIT".getBytes();
+        ObjectKey okey = new ObjectKeyImpl(orb.getWireObjectKeyTemplate(),
+                                           new ObjectIdImpl(initialKey));
 
-	IIOPAddress addr = IIOPFactories.makeIIOPAddress( host, port ) ;
-	IIOPProfileTemplate ptemp = IIOPFactories.makeIIOPProfileTemplate(
-	    orb, GIOPVersion.V1_0, addr);
-	    
-	IORTemplate iortemp = IORFactories.makeIORTemplate( okey.getTemplate() ) ;
-	iortemp.add( ptemp ) ;
+        IIOPAddress addr = IIOPFactories.makeIIOPAddress( host, port ) ;
+        IIOPProfileTemplate ptemp = IIOPFactories.makeIIOPProfileTemplate(
+            orb, GIOPVersion.V1_0, addr);
+            
+        IORTemplate iortemp = IORFactories.makeIORTemplate( okey.getTemplate() ) ;
+        iortemp.add( ptemp ) ;
 
-	IOR initialIOR = iortemp.makeIOR( orb, "", okey.getId() ) ;
+        IOR initialIOR = iortemp.makeIOR( orb, "", okey.getId() ) ;
 
-	bootstrapDelegate = ORBUtility.makeClientDelegate( initialIOR ) ;	
+        bootstrapDelegate = ORBUtility.makeClientDelegate( initialIOR ) ;       
     }
 
     /**
@@ -94,86 +94,86 @@ public class BootstrapResolverImpl implements Resolver {
      */
     private InputStream invoke( String operationName, String parameter )
     { 
-	boolean remarshal = true;
+        boolean remarshal = true;
 
-	// Invoke.
+        // Invoke.
 
-	InputStream inStream = null;
+        InputStream inStream = null;
 
-	// If there is a location forward then you will need
-	// to invoke again on the updated information.
-	// Just calling this same routine with the same host/port
-	// does not take the location forward info into account.
+        // If there is a location forward then you will need
+        // to invoke again on the updated information.
+        // Just calling this same routine with the same host/port
+        // does not take the location forward info into account.
 
-	while (remarshal) {
-	    org.omg.CORBA.Object objref = null ;
-	    remarshal = false;
+        while (remarshal) {
+            org.omg.CORBA.Object objref = null ;
+            remarshal = false;
 
-	    OutputStream os = bootstrapDelegate.request(objref, operationName,
+            OutputStream os = bootstrapDelegate.request(objref, operationName,
                 true);
 
             if ( parameter != null ) {
                 os.write_string( parameter );
             }
 
-	    try {
-		// The only reason a null objref is passed is to get the version of
-		// invoke used by streams.  Otherwise the PortableInterceptor
-		// call stack will become unbalanced since the version of
-		// invoke which only takes the stream does not call 
-		// PortableInterceptor ending points.
-		// Note that the first parameter is ignored inside invoke.
+            try {
+                // The only reason a null objref is passed is to get the version of
+                // invoke used by streams.  Otherwise the PortableInterceptor
+                // call stack will become unbalanced since the version of
+                // invoke which only takes the stream does not call 
+                // PortableInterceptor ending points.
+                // Note that the first parameter is ignored inside invoke.
 
-		inStream = bootstrapDelegate.invoke( objref, os);
-	    } catch (ApplicationException e) {
-		throw wrapper.bootstrapApplicationException( e ) ;
-	    } catch (RemarshalException e) {
+                inStream = bootstrapDelegate.invoke( objref, os);
+            } catch (ApplicationException e) {
+                throw wrapper.bootstrapApplicationException( e ) ;
+            } catch (RemarshalException e) {
                 wrapper.bootstrapRemarshalException( e ) ;
-		remarshal = true;
-	    }
-	}
+                remarshal = true;
+            }
+        }
 
         return inStream;
     }
 
     public org.omg.CORBA.Object resolve( String identifier ) 
     {
-	InputStream inStream = null ;
-	org.omg.CORBA.Object result = null ;
+        InputStream inStream = null ;
+        org.omg.CORBA.Object result = null ;
 
-	try { 
-	    inStream = invoke( "get", identifier ) ;
+        try { 
+            inStream = invoke( "get", identifier ) ;
 
-	    result = inStream.read_Object();
+            result = inStream.read_Object();
 
-	    // NOTE: do note trap and ignore errors.
-	    // Let them flow out.
-	} finally {
-	    bootstrapDelegate.releaseReply( null, inStream ) ;
-	}
+            // NOTE: do note trap and ignore errors.
+            // Let them flow out.
+        } finally {
+            bootstrapDelegate.releaseReply( null, inStream ) ;
+        }
 
-	return result ;
+        return result ;
     }
 
     public Set<String> list()
     {
-	InputStream inStream = null ;
-	java.util.Set result = new java.util.HashSet() ;
+        InputStream inStream = null ;
+        java.util.Set result = new java.util.HashSet() ;
 
-	try {
-	    inStream = invoke( "list", null ) ;
+        try {
+            inStream = invoke( "list", null ) ;
 
-	    int count =	inStream.read_long();
-	    for (int i=0; i < count; i++) {
+            int count = inStream.read_long();
+            for (int i=0; i < count; i++) {
                 result.add(inStream.read_string());
             }
 
-	    // NOTE: do note trap and ignore errors.
-	    // Let them flow out.
-	} finally {
-	    bootstrapDelegate.releaseReply( null, inStream ) ;
-	}
+            // NOTE: do note trap and ignore errors.
+            // Let them flow out.
+        } finally {
+            bootstrapDelegate.releaseReply( null, inStream ) ;
+        }
 
-	return result ;
+        return result ;
     }
 }

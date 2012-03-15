@@ -47,7 +47,7 @@
  */
 
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
 
 
@@ -61,43 +61,43 @@ import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
 import org.omg.CORBA.portable.UnknownException;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orb.ORBVersion;
-import com.sun.corba.se.spi.orb.ORBVersionFactory;
-import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.ior.ObjectKey;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
-import com.sun.corba.se.spi.ior.ObjectAdapterId;
-import com.sun.corba.se.spi.oa.ObjectAdapterFactory;
-import com.sun.corba.se.spi.oa.ObjectAdapter;
-import com.sun.corba.se.spi.oa.OAInvocationInfo;
-import com.sun.corba.se.spi.oa.OADestroyed;
-import com.sun.corba.se.spi.oa.NullServant;
-import com.sun.corba.se.spi.protocol.MessageMediator;
-import com.sun.corba.se.spi.protocol.ServerRequestDispatcher;
-import com.sun.corba.se.spi.protocol.ForwardException ;
-import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
-import com.sun.corba.se.spi.transport.Connection;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORBVersion;
+import com.sun.corba.ee.spi.orb.ORBVersionFactory;
+import com.sun.corba.ee.spi.orb.ObjectKeyCacheEntry;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.ObjectKey;
+import com.sun.corba.ee.spi.ior.ObjectKeyTemplate;
+import com.sun.corba.ee.spi.ior.ObjectAdapterId;
+import com.sun.corba.ee.spi.oa.ObjectAdapterFactory;
+import com.sun.corba.ee.spi.oa.ObjectAdapter;
+import com.sun.corba.ee.spi.oa.OAInvocationInfo;
+import com.sun.corba.ee.spi.oa.OADestroyed;
+import com.sun.corba.ee.spi.oa.NullServant;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.protocol.ServerRequestDispatcher;
+import com.sun.corba.ee.spi.protocol.ForwardException ;
+import com.sun.corba.ee.spi.protocol.RequestDispatcherRegistry;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
-import com.sun.corba.se.spi.servicecontext.ServiceContext;
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.spi.servicecontext.UEInfoServiceContext;
-import com.sun.corba.se.spi.servicecontext.CodeSetServiceContext;
-import com.sun.corba.se.spi.servicecontext.SendingContextServiceContext;
-import com.sun.corba.se.spi.servicecontext.ORBVersionServiceContext;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextDefaults;
+import com.sun.corba.ee.spi.servicecontext.ServiceContext;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.spi.servicecontext.UEInfoServiceContext;
+import com.sun.corba.ee.spi.servicecontext.CodeSetServiceContext;
+import com.sun.corba.ee.spi.servicecontext.SendingContextServiceContext;
+import com.sun.corba.ee.spi.servicecontext.ORBVersionServiceContext;
 
-import com.sun.corba.se.impl.corba.ServerRequestImpl ;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.impl.encoding.MarshalInputStream;
-import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
-import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.logging.POASystemException;
-import com.sun.corba.se.spi.trace.Subcontract;
+import com.sun.corba.ee.impl.corba.ServerRequestImpl ;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.impl.encoding.MarshalInputStream;
+import com.sun.corba.ee.impl.encoding.CodeSetComponentInfo;
+import com.sun.corba.ee.impl.encoding.OSFCodeSetRegistry;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.POASystemException;
+import com.sun.corba.ee.spi.trace.Subcontract;
 import org.glassfish.pfl.basic.logex.OperationTracer;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
@@ -114,7 +114,7 @@ public class ServerRequestDispatcherImpl
 
     public ServerRequestDispatcherImpl(ORB orb)
     {
-	this.orb = orb;
+        this.orb = orb;
     }
 
     /** Called from ORB.locate when a LocateRequest arrives.
@@ -144,7 +144,7 @@ public class ServerRequestDispatcherImpl
         findObjectAdapter(oktemp);
 
         return null ;
-    }		
+    }           
 
     @InfoMethod
     private void generalMessage( String msg ) { }
@@ -390,88 +390,88 @@ public class ServerRequestDispatcherImpl
     protected void consumeServiceContexts(MessageMediator request) {
         operationAndId(request.getOperationName(), request.getRequestId());
 
-	    ServiceContexts ctxts = request.getRequestServiceContexts();
-	    ServiceContext sc ;
-	    GIOPVersion giopVersion = request.getGIOPVersion();
+            ServiceContexts ctxts = request.getRequestServiceContexts();
+            ServiceContext sc ;
+            GIOPVersion giopVersion = request.getGIOPVersion();
 
-	    // we cannot depend on this since for our local case, we do not send
-	    // in this service context.  Can we rely on just the CodeSetServiceContext?
-	    // boolean rtSC = false; // Runtime ServiceContext
+            // we cannot depend on this since for our local case, we do not send
+            // in this service context.  Can we rely on just the CodeSetServiceContext?
+            // boolean rtSC = false; // Runtime ServiceContext
 
-	    boolean hasCodeSetContext = processCodeSetContext(request, ctxts);
+            boolean hasCodeSetContext = processCodeSetContext(request, ctxts);
 
             objectInfo( "GIOP version", giopVersion ) ;
             objectInfo( "Has code set context?" , hasCodeSetContext ) ;
 
-	    sc = ctxts.get(
-		SendingContextServiceContext.SERVICE_CONTEXT_ID ) ;
+            sc = ctxts.get(
+                SendingContextServiceContext.SERVICE_CONTEXT_ID ) ;
 
-	    if (sc != null) {
-		SendingContextServiceContext scsc =
-		    (SendingContextServiceContext)sc ;
-		IOR ior = scsc.getIOR() ;
+            if (sc != null) {
+                SendingContextServiceContext scsc =
+                    (SendingContextServiceContext)sc ;
+                IOR ior = scsc.getIOR() ;
 
-		try {
-		    request.getConnection().setCodeBaseIOR(ior);
-		} catch (ThreadDeath td) {
-		    throw td ;
-		} catch (Throwable t) {
-		    throw wrapper.badStringifiedIor( t ) ;
-		}
-	    }
+                try {
+                    request.getConnection().setCodeBaseIOR(ior);
+                } catch (ThreadDeath td) {
+                    throw td ;
+                } catch (Throwable t) {
+                    throw wrapper.badStringifiedIor( t ) ;
+                }
+            }
 
-	    // the RTSC is sent only once during session establishment.  We
-	    // need to find out if the CodeBaseRef is already set.  If yes,
-	    // then also the rtSC flag needs to be set to true
-	    // this is not possible for the LocalCase since there is no
-	    // IIOPConnection for the LocalCase
+            // the RTSC is sent only once during session establishment.  We
+            // need to find out if the CodeBaseRef is already set.  If yes,
+            // then also the rtSC flag needs to be set to true
+            // this is not possible for the LocalCase since there is no
+            // IIOPConnection for the LocalCase
 
-	    // used for a case where we have JDK 1.3 supporting 1.0 protocol,
-	    // but sending 2 service contexts, that is not normal as per
-	    // GIOP rules, based on above information, we figure out that we
-	    // are talking to the legacy ORB and set the ORB Version Accordingly.
+            // used for a case where we have JDK 1.3 supporting 1.0 protocol,
+            // but sending 2 service contexts, that is not normal as per
+            // GIOP rules, based on above information, we figure out that we
+            // are talking to the legacy ORB and set the ORB Version Accordingly.
 
-	    // this special case tell us that it is legacy SUN orb
-	    // and not a foreign one
-	    // rtSC is not available for localcase due to which this generic
-	    // path would fail if relying on rtSC
-	    //if (giopVersion.equals(GIOPVersion.V1_0) && hasCodeSetContext && rtSC)
-	    boolean isForeignORB = false;
+            // this special case tell us that it is legacy SUN orb
+            // and not a foreign one
+            // rtSC is not available for localcase due to which this generic
+            // path would fail if relying on rtSC
+            //if (giopVersion.equals(GIOPVersion.V1_0) && hasCodeSetContext && rtSC)
+            boolean isForeignORB = false;
 
-	    if (giopVersion.equals(GIOPVersion.V1_0) && hasCodeSetContext) {
+            if (giopVersion.equals(GIOPVersion.V1_0) && hasCodeSetContext) {
                 generalMessage("Old Sun ORB");
-		orb.setORBVersion(ORBVersionFactory.getOLD()) ;
-		// System.out.println("setting legacy ORB version");
-	    } else {
-		// If it didn't include our ORB version service context (below),
-		// then it must be a foreign ORB.
-		isForeignORB = true;
-	    }
+                orb.setORBVersion(ORBVersionFactory.getOLD()) ;
+                // System.out.println("setting legacy ORB version");
+            } else {
+                // If it didn't include our ORB version service context (below),
+                // then it must be a foreign ORB.
+                isForeignORB = true;
+            }
 
-	    // try to get the ORBVersion sent as part of the ServiceContext
-	    // if any
-	    sc = ctxts.get( ORBVersionServiceContext.SERVICE_CONTEXT_ID ) ;
-	    if (sc != null) {
-		ORBVersionServiceContext ovsc =
-		   (ORBVersionServiceContext) sc;
+            // try to get the ORBVersion sent as part of the ServiceContext
+            // if any
+            sc = ctxts.get( ORBVersionServiceContext.SERVICE_CONTEXT_ID ) ;
+            if (sc != null) {
+                ORBVersionServiceContext ovsc =
+                   (ORBVersionServiceContext) sc;
 
-		ORBVersion version = ovsc.getVersion();
-		orb.setORBVersion(version);
+                ORBVersion version = ovsc.getVersion();
+                orb.setORBVersion(version);
 
-		isForeignORB = false;
-	    }
+                isForeignORB = false;
+            }
 
-	    if (isForeignORB) {
+            if (isForeignORB) {
                 generalMessage("Foreign ORB" ) ;
-		orb.setORBVersion(ORBVersionFactory.getFOREIGN());
-	    }
+                orb.setORBVersion(ORBVersionFactory.getFOREIGN());
+            }
     }
     
     @Subcontract
     protected MessageMediator dispatchToServant(
         java.lang.Object servant, 
-	MessageMediator req,
-	byte[] objectId, ObjectAdapter objectAdapter) 
+        MessageMediator req,
+        byte[] objectId, ObjectAdapter objectAdapter) 
     {
         try {
             if (orb.operationTraceDebugFlag) {
@@ -483,63 +483,63 @@ public class ServerRequestDispatcherImpl
             operationAndId( req.getOperationName(), req.getRequestId());
             objectInfo( "Servant info", servant ) ;
 
-	    MessageMediator response = null ;
+            MessageMediator response = null ;
 
-	    String operation = req.getOperationName() ;
+            String operation = req.getOperationName() ;
 
-	    SpecialMethod method = SpecialMethod.getSpecialMethod(operation) ;
-	    if (method != null) {
+            SpecialMethod method = SpecialMethod.getSpecialMethod(operation) ;
+            if (method != null) {
                 objectInfo( "Handling special method", method.getName() ) ;
 
-		response = method.invoke(servant, req, objectId, objectAdapter);
-		return response ;
-	    } 
-	    
-	    // Invoke on the servant using the portable DSI skeleton
-	    if (servant instanceof org.omg.CORBA.DynamicImplementation) {
+                response = method.invoke(servant, req, objectId, objectAdapter);
+                return response ;
+            } 
+            
+            // Invoke on the servant using the portable DSI skeleton
+            if (servant instanceof org.omg.CORBA.DynamicImplementation) {
                 generalMessage( "Handling old style DSI type servant") ;
 
-		org.omg.CORBA.DynamicImplementation dynimpl = 
-		    (org.omg.CORBA.DynamicImplementation)servant;
-		ServerRequestImpl sreq = new ServerRequestImpl(req, orb);
+                org.omg.CORBA.DynamicImplementation dynimpl = 
+                    (org.omg.CORBA.DynamicImplementation)servant;
+                ServerRequestImpl sreq = new ServerRequestImpl(req, orb);
 
-		// Note: When/if dynimpl.invoke calls arguments() or
-		// set_exception() then intermediate points are run.
-		dynimpl.invoke(sreq);
-		
-		response = handleDynamicResult(sreq, req);
-	    } else if (servant instanceof org.omg.PortableServer.DynamicImplementation) {
+                // Note: When/if dynimpl.invoke calls arguments() or
+                // set_exception() then intermediate points are run.
+                dynimpl.invoke(sreq);
+                
+                response = handleDynamicResult(sreq, req);
+            } else if (servant instanceof org.omg.PortableServer.DynamicImplementation) {
                 generalMessage( "Handling POA DSI type servant" ) ;
-		org.omg.PortableServer.DynamicImplementation dynimpl = 
-		    (org.omg.PortableServer.DynamicImplementation)servant;
-		ServerRequestImpl sreq = new ServerRequestImpl(req, orb);
+                org.omg.PortableServer.DynamicImplementation dynimpl = 
+                    (org.omg.PortableServer.DynamicImplementation)servant;
+                ServerRequestImpl sreq = new ServerRequestImpl(req, orb);
 
-		// Note: When/if dynimpl.invoke calls arguments() or
-		// set_exception() then intermediate points are run.
-		dynimpl.invoke(sreq);
-		
-		response = handleDynamicResult(sreq, req);
-	    } else {
+                // Note: When/if dynimpl.invoke calls arguments() or
+                // set_exception() then intermediate points are run.
+                dynimpl.invoke(sreq);
+                
+                response = handleDynamicResult(sreq, req);
+            } else {
                 generalMessage( "Handling invoke handler type servant" ) ;
-		InvokeHandler invhandle = (InvokeHandler)servant ;
+                InvokeHandler invhandle = (InvokeHandler)servant ;
 
-		OutputStream stream = null;
-		try {
-		    stream = invhandle._invoke(operation,
+                OutputStream stream = null;
+                try {
+                    stream = invhandle._invoke(operation,
                         (org.omg.CORBA.portable.InputStream) req.getInputObject(),
                         req);
-		} catch (BAD_OPERATION e) {
-		    wrapper.badOperationFromInvoke(e, operation);
-		    throw e;
-		}
-		response = ((CDROutputObject)stream).getMessageMediator();
-	    }
+                } catch (BAD_OPERATION e) {
+                    wrapper.badOperationFromInvoke(e, operation);
+                    throw e;
+                }
+                response = ((CDROutputObject)stream).getMessageMediator();
+            }
 
-	    return response ;
-	} finally {
+            return response ;
+        } finally {
             OperationTracer.disable() ;
             OperationTracer.finish( ) ;
-	}
+        }
     }
 
     @Subcontract
@@ -625,7 +625,7 @@ public class ServerRequestDispatcherImpl
      */
     @Subcontract
     protected boolean processCodeSetContext(
-	MessageMediator request, ServiceContexts contexts) {
+        MessageMediator request, ServiceContexts contexts) {
 
         ServiceContext sc = contexts.get(
             CodeSetServiceContext.SERVICE_CONTEXT_ID);

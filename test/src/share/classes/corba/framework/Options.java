@@ -43,8 +43,8 @@ import test.Test;
 import test.Util;
 import java.io.*;
 import java.util.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion ;
 
 /** Static library class to provide access to test configuration data.
  * This thing need to be further re-written to a class that is instantiated,
@@ -124,8 +124,8 @@ public class Options {
         else
             activationPort = new Port(Integer.parseInt(prop));
 
-	emmaFile = props.getProperty("emma.coverage.out.file", "") ;
-        orbClass = props.getProperty("org.omg.CORBA.ORBClass", "com.sun.corba.se.impl.orb.ORBImpl" );
+        emmaFile = props.getProperty("emma.coverage.out.file", "") ;
+        orbClass = props.getProperty("org.omg.CORBA.ORBClass", "com.sun.corba.ee.impl.orb.ORBImpl" );
 
         props.setProperty( "java.naming.factory.initial", "com.sun.jndi.cosnaming.CNCtxFactory" ) ;
     }
@@ -168,8 +168,8 @@ public class Options {
         serverExtra = new Hashtable(10);
         clientExtra = new Hashtable(10);
 
-	orbdExtra.put(ExternalExec.HANDSHAKE_KEY, defORBDHandshake);
-	serverExtra.put(ExternalExec.HANDSHAKE_KEY, defServerHandshake);
+        orbdExtra.put(ExternalExec.HANDSHAKE_KEY, defORBDHandshake);
+        serverExtra.put(ExternalExec.HANDSHAKE_KEY, defServerHandshake);
         
         rmicArgs = new Vector(10);
         idlCompilerArgs = new Vector(10);
@@ -209,7 +209,7 @@ public class Options {
         props.setProperty( "output.dir", outdir ) ;
 
         javaIDLHome = outdir + "JavaIDLHome" ;
-        props.setProperty( "com.sun.corba.se.JavaIDLHome", javaIDLHome ) ;
+        props.setProperty( "com.sun.corba.ee.JavaIDLHome", javaIDLHome ) ;
 
         activationDbDirName = javaIDLHome + File.separator + "db.dir" ;
         props.setProperty( ORBConstants.DB_DIR_PROPERTY, activationDbDirName ) ;

@@ -206,7 +206,7 @@ class Target {
     
         // Parse the <inputclass>=<outputclass>[,<outputclass>] format...
    
-	StringTokenizer s = new StringTokenizer(entry,"=,");
+        StringTokenizer s = new StringTokenizer(entry,"=,");
         int count = s.countTokens() - 1;
         output = new String[count];
         inputClass = s.nextToken().trim();

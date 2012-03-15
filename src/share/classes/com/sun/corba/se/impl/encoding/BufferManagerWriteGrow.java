@@ -38,17 +38,17 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.transport.Connection;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.orb.ORB;
 
 public class BufferManagerWriteGrow extends BufferManagerWrite
 {
     BufferManagerWriteGrow( ORB orb )
     {
-	super(orb) ;
+        super(orb) ;
     }
 
     public boolean sentFragment() {
@@ -65,7 +65,7 @@ public class BufferManagerWriteGrow extends BufferManagerWrite
 
     public void overflow (ByteBufferWithInfo bbwi)
     {
-	// The code that once lived directly in CDROutputStream.grow()
+        // The code that once lived directly in CDROutputStream.grow()
         // has been moved ByteBufferWithInfo.growBuffer().
 
         // Grow ByteBufferWithInfo to a larger size.

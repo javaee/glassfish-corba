@@ -55,9 +55,9 @@ import corba.framework.Options;
 import corba.hcks.C;
 import corba.hcks.U;
 
-import com.sun.corba.se.spi.transport.TransportManager;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.protocol.MessageMediatorImpl;
+import com.sun.corba.ee.spi.transport.TransportManager;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.impl.protocol.MessageMediatorImpl;
 
 import java.lang.reflect.*;
 import org.omg.PortableInterceptor.*;
@@ -68,10 +68,10 @@ public class Server extends org.omg.CORBA.LocalObject
     public static final String baseMsg = Server.class.getName();
     public static final String main = baseMsg + ".main";
     public static final String thisPackage = 
-	Server.class.getPackage().getName();
+        Server.class.getPackage().getName();
 
     public static final String rmiiIServantPOA_Tie = 
-	thisPackage + "._rmiiIServantPOA_Tie";
+        thisPackage + "._rmiiIServantPOA_Tie";
 
     public static final String SLPOA = "SLPOA";
 
@@ -83,47 +83,47 @@ public class Server extends org.omg.CORBA.LocalObject
 
     public static void main(String[] av) {
         try {
-	    U.sop(main + " starting");
+            U.sop(main + " starting");
 
-	    if (! ColocatedClientServer.isColocated) {
-		U.sop(main + " : creating ORB.");
-		orb = (ORB) ORB.init(av, null);
-		U.sop(main + " : creating InitialContext.");
-		initialContext = C.createInitialContext(orb);
-	    }
+            if (! ColocatedClientServer.isColocated) {
+                U.sop(main + " : creating ORB.");
+                orb = (ORB) ORB.init(av, null);
+                U.sop(main + " : creating InitialContext.");
+                initialContext = C.createInitialContext(orb);
+            }
 
-	    rootPOA = U.getRootPOA(orb);
+            rootPOA = U.getRootPOA(orb);
             rootPOA.the_POAManager().activate();
 
-	    Policy[] policies = U.createUseServantManagerPolicies(
-				     rootPOA, 
-				     ServantRetentionPolicyValue.NON_RETAIN);
+            Policy[] policies = U.createUseServantManagerPolicies(
+                                     rootPOA, 
+                                     ServantRetentionPolicyValue.NON_RETAIN);
 
-	    slPOA = U.createPOAWithServantManager(
-				     rootPOA, SLPOA, policies, 
-				     new ServantLocator());
+            slPOA = U.createPOAWithServantManager(
+                                     rootPOA, SLPOA, policies, 
+                                     new ServantLocator());
 
-	    U.createRMIPOABind(C.rmiiSL, rmiiIServantPOA_Tie, slPOA, orb, 
-			       initialContext);
+            U.createRMIPOABind(C.rmiiSL, rmiiIServantPOA_Tie, slPOA, orb, 
+                               initialContext);
 
-	    U.sop(main + " ready");
-	    U.sop(Options.defServerHandshake);
-	    System.out.flush();
+            U.sop(main + " ready");
+            U.sop(Options.defServerHandshake);
+            System.out.flush();
 
-	    synchronized (ColocatedClientServer.signal) {
-		ColocatedClientServer.signal.notifyAll();
-	    }
-	    
-	    orb.run();
+            synchronized (ColocatedClientServer.signal) {
+                ColocatedClientServer.signal.notifyAll();
+            }
+            
+            orb.run();
 
         } catch (Exception e) {
-	    U.sopUnexpectedException(main, e);
-	    System.exit(1);
+            U.sopUnexpectedException(main, e);
+            System.exit(1);
         }
-	U.sop(main + " ending successfully");
-	System.exit(Controller.SUCCESS);
+        U.sop(main + " ending successfully");
+        System.exit(Controller.SUCCESS);
     }
-	
+        
     // ORBInitializer interface implementation.
 
     public void pre_init(ORBInitInfo info) {}
@@ -147,70 +147,70 @@ public class Server extends org.omg.CORBA.LocalObject
     // implementation of the ServerInterceptor interface.
 
     public void receive_request_service_contexts(ServerRequestInfo ri)
-	throws ForwardRequest {
-	
-	String opName = ri.operation();
-	U.sop("receive_request_service_contexts.opName: " + opName);
+        throws ForwardRequest {
+        
+        String opName = ri.operation();
+        U.sop("receive_request_service_contexts.opName: " + opName);
 
-	if ( ! (opName.equals("fooA") || opName.equals("fooB")) ) {
-	    return;
-	}
+        if ( ! (opName.equals("fooA") || opName.equals("fooB")) ) {
+            return;
+        }
 
-	Class riClass = ri.getClass();
-	MessageMediatorImpl cri;
-	try {
-	    Field riMember = riClass.getDeclaredField("request");
-	    riMember.setAccessible(true);
-	    cri = (MessageMediatorImpl) riMember.get(ri);
-	} catch (Throwable e) { 
-	    e.printStackTrace(System.out);
-	    throw new RuntimeException("impl class instrospection failed", e);
-	}
+        Class riClass = ri.getClass();
+        MessageMediatorImpl cri;
+        try {
+            Field riMember = riClass.getDeclaredField("request");
+            riMember.setAccessible(true);
+            cri = (MessageMediatorImpl) riMember.get(ri);
+        } catch (Throwable e) { 
+            e.printStackTrace(System.out);
+            throw new RuntimeException("impl class instrospection failed", e);
+        }
 
-	// fooA.buffer: [header + padding + body (1 byte)]
-	// fooA.buffer: [header + body (1 byte)]
+        // fooA.buffer: [header + padding + body (1 byte)]
+        // fooA.buffer: [header + body (1 byte)]
 
-	// get header size
-	int size = cri.getRequestHeader().getSize();
-	U.sop("request message size: " + size);
+        // get header size
+        int size = cri.getRequestHeader().getSize();
+        U.sop("request message size: " + size);
 
-	if (! ColocatedClientServer.isColocated) {
-	    if (opName.equals("fooA")) {
-		if (size != 153) {
-		    throw new RuntimeException("header padding error");
-		}
-	    } else { // opName == fooB
-		if (size != 146) {
-		    throw new RuntimeException("header padding error");
-		}
-	    }
-	} else {
-	    if (opName.equals("fooA")) {
-		if (size != 129) {
-		    throw new RuntimeException("header padding error");
-		}
-	    } else { // opName == fooB
-		if (size != 126) {
-		    throw new RuntimeException("header padding error");
-		}
-	    }
-	}
+        if (! ColocatedClientServer.isColocated) {
+            if (opName.equals("fooA")) {
+                if (size != 153) {
+                    throw new RuntimeException("header padding error");
+                }
+            } else { // opName == fooB
+                if (size != 146) {
+                    throw new RuntimeException("header padding error");
+                }
+            }
+        } else {
+            if (opName.equals("fooA")) {
+                if (size != 129) {
+                    throw new RuntimeException("header padding error");
+                }
+            } else { // opName == fooB
+                if (size != 126) {
+                    throw new RuntimeException("header padding error");
+                }
+            }
+        }
     }
 
     public void receive_request(ServerRequestInfo ri) throws ForwardRequest {
-	U.sop("receive_request called : " + ri.operation());
+        U.sop("receive_request called : " + ri.operation());
     }
 
     public void send_reply(ServerRequestInfo ri) {
-	U.sop("send_reply called : " + ri.operation());
+        U.sop("send_reply called : " + ri.operation());
     }
 
     public void send_exception(ServerRequestInfo ri) throws ForwardRequest {
-	U.sop("send_exception called : " + ri.operation());
+        U.sop("send_exception called : " + ri.operation());
     }
 
     public void send_other(ServerRequestInfo ri) throws ForwardRequest {
-	U.sop("send_other called : " + ri.operation());
+        U.sop("send_other called : " + ri.operation());
     }
 }
 

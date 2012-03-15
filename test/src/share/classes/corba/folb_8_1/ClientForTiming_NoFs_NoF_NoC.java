@@ -51,7 +51,7 @@ public class ClientForTiming_NoFs_NoF_NoC
 {
     public static void main(String[] av)
     {
-	ClientForTiming.main(av);
+        ClientForTiming.main(av);
     }
 }
 

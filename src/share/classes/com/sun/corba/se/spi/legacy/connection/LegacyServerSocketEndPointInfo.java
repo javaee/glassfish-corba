@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.legacy.connection;
+package com.sun.corba.ee.spi.legacy.connection;
 
 /**
  * LegacyServerSocketEndPointInfo is an abstraction of a port.

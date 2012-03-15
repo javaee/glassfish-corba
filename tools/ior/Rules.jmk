@@ -44,8 +44,8 @@ TOOLS_OUTPUTDIR=./build
 
 IDLJ_CLASS=com.sun.tools.corba.se.idl.toJavaPortable.Compile
 
-ORB_CLASS=com.sun.corba.se.impl.orb.ORBImpl
-ORBSINGLETON_CLASS=com.sun.corba.se.impl.orb.ORBSingleton
+ORB_CLASS=com.sun.corba.ee.impl.orb.ORBImpl
+ORBSINGLETON_CLASS=com.sun.corba.ee.impl.orb.ORBSingleton
 
 ORB_PROPS=-Dorg.omg.CORBA.ORBClass=$(ORB_CLASS) -Dorg.omg.CORBA.ORBSingletonClass=$(ORBSINGLETON_CLASS)
 

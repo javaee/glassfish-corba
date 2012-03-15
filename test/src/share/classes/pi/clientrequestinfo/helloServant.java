@@ -52,32 +52,32 @@ import ClientRequestInfo.*; // hello interface
  * Servant implementation.  
  */
 public class helloServant 
-	extends helloPOA 
+        extends helloPOA 
 {
     // contains implementations of methods.
     private helloDelegate delegate;
 
     public helloServant( PrintStream out ) {
-	super();
-	delegate = new helloDelegate( out );
+        super();
+        delegate = new helloDelegate( out );
     }
 
     public String sayHello() {
-	return delegate.sayHello();
+        return delegate.sayHello();
     }
     
     public String saySystemException() {
-	return delegate.saySystemException();
+        return delegate.saySystemException();
     }
     
     public void sayUserException() 
-	throws ExampleException 
+        throws ExampleException 
     {
-	delegate.sayUserException();
+        delegate.sayUserException();
     }
     
     public void sayOneway() {
-	delegate.sayOneway();
+        delegate.sayOneway();
     }
 
     public String sayArguments( String arg1, int arg2, boolean arg3 ) {
@@ -85,14 +85,14 @@ public class helloServant
     }
 
     public void clearInvoked() {
-	delegate.clearInvoked();
+        delegate.clearInvoked();
     }
     
     public boolean wasInvoked() {
-	return delegate.wasInvoked();
+        return delegate.wasInvoked();
     }
 
     public void resetServant() {
-	delegate.resetServant();
+        delegate.resetServant();
     }
 }

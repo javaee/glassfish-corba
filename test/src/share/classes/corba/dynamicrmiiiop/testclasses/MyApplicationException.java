@@ -43,7 +43,7 @@ public class MyApplicationException extends MyApplicationExceptionBase
 {
     public MyApplicationException( String msg )
     {
-	super( msg ) ;
+        super( msg ) ;
     }
 }
 

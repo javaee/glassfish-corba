@@ -65,52 +65,52 @@ class AServiceImpl
 
     public AServiceImpl(int slotId)
     {
-	this.slotId = slotId;
-	NOT_IN_EFFECT = ORB.init().create_any();
+        this.slotId = slotId;
+        NOT_IN_EFFECT = ORB.init().create_any();
     }
 
     // Package protected so the AService ORBInitializer can access this
     // non-IDL defined method.
     void setPICurrent(Current piCurrent)
     {
-	this.piCurrent = piCurrent;
+        this.piCurrent = piCurrent;
     }
 
     public void begin()
     {
-	Any any = ORB.init().create_any();
-	any.insert_long(++currentServiceId);
-	setSlot(any);
+        Any any = ORB.init().create_any();
+        any.insert_long(++currentServiceId);
+        setSlot(any);
     }
 
     public void end()
     {
-	setSlot(NOT_IN_EFFECT);
+        setSlot(NOT_IN_EFFECT);
     }
 
     public void verify()
     {
-	try {
-	    Any any = piCurrent.get_slot(slotId);
-	    if (any.type().kind().equals(TCKind.tk_long)) {
-		System.out.println("Service present: " + any.extract_long());
-	    } else {
-		System.out.println("Service not present");
-	    }
-	} catch (InvalidSlot e) {
-	    System.out.println("Exception handling not shown.");
-	}
+        try {
+            Any any = piCurrent.get_slot(slotId);
+            if (any.type().kind().equals(TCKind.tk_long)) {
+                System.out.println("Service present: " + any.extract_long());
+            } else {
+                System.out.println("Service not present");
+            }
+        } catch (InvalidSlot e) {
+            System.out.println("Exception handling not shown.");
+        }
     }
 
     // Synchronized because two threads in the same ORB could be
     // sharing this object.
     synchronized private void setSlot(Any any)
     {
-	try {
-	    piCurrent.set_slot(slotId, any);
-	} catch (InvalidSlot e) {
-	    System.out.println("Exception handling not shown.");
-	}
+        try {
+            piCurrent.set_slot(slotId, any);
+        } catch (InvalidSlot e) {
+            System.out.println("Exception handling not shown.");
+        }
     }
 }
 

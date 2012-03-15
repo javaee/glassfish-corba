@@ -121,10 +121,10 @@ interface ServerReporter extends Remote {
 Namespace:
 root
     control (namespace)
-	LBControl
-	Client
-	servers (namespace)
-	    // contains one objref for ServerControl for each server
+        LBControl
+        Client
+        servers (namespace)
+            // contains one objref for ServerControl for each server
 
 Note that all of these control objects are implemented with a separate
 ORB that does not use any of the various plugins that are being tested
@@ -152,10 +152,10 @@ first 3*N requests: normal LB over 3 servers
 next 2*M requests: only server1 and server3 handle requests; server2
     continuously rejects requests.  I think this will result in the
     following behavior:
-	client invokes, LB to S1: handled
-	client invokes, LB to S2: forwarded back to self, so:
-	    client invokes, LB to S3: handled
-	client invokes, LB to S1: handled
+        client invokes, LB to S1: handled
+        client invokes, LB to S2: forwarded back to self, so:
+            client invokes, LB to S3: handled
+        client invokes, LB to S1: handled
     since each forwarded request should result in a new connection
 next 2*P requests: LB only sends requests to server1 and server3
 next 2*Q requests: LB to all servers again

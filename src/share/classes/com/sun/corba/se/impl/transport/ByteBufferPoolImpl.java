@@ -38,13 +38,13 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 import java.nio.ByteBuffer;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.ByteBufferPool;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.ByteBufferPool;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 /**
  * @author Charlie Hunt
@@ -121,8 +121,8 @@ public class ByteBufferPoolImpl implements ByteBufferPool {
     */
     public void releaseByteBuffer(ByteBuffer buffer) {
         // nothing to do here other than help the garbage collector
-	// Remove this, as it is not useful, and gets flagged by findbugs.
-	// This method is important if we are using direct ByteBuffers.
+        // Remove this, as it is not useful, and gets flagged by findbugs.
+        // This method is important if we are using direct ByteBuffers.
         // buffer = null;
     }
 

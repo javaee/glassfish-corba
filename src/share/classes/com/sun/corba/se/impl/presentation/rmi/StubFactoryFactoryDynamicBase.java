@@ -38,21 +38,21 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi;
+package com.sun.corba.ee.impl.presentation.rmi;
 
 import javax.rmi.CORBA.Tie ;
 
 import org.omg.CORBA.CompletionStatus;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
+import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.impl.misc.ClassInfoCache ;
+import com.sun.corba.ee.impl.misc.ClassInfoCache ;
 
 public abstract class StubFactoryFactoryDynamicBase extends 
     StubFactoryFactoryBase
@@ -64,47 +64,47 @@ public abstract class StubFactoryFactoryDynamicBase extends
     }
 
     public PresentationManager.StubFactory createStubFactory(
-	String className, boolean isIDLStub, String remoteCodeBase, 
-	Class expectedClass, ClassLoader classLoader)
+        String className, boolean isIDLStub, String remoteCodeBase, 
+        Class expectedClass, ClassLoader classLoader)
     {
-	Class cls = null ;
+        Class cls = null ;
 
-	try {
-	    cls = Util.getInstance().loadClass( className, remoteCodeBase, 
-		classLoader ) ;
-	} catch (ClassNotFoundException exc) {
-	    throw wrapper.classNotFound3( exc, className ) ;
-	}
+        try {
+            cls = Util.getInstance().loadClass( className, remoteCodeBase, 
+                classLoader ) ;
+        } catch (ClassNotFoundException exc) {
+            throw wrapper.classNotFound3( exc, className ) ;
+        }
 
-	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
-	PresentationManager pm = ORB.getPresentationManager() ;
+        ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
+        PresentationManager pm = ORB.getPresentationManager() ;
 
-	if (cinfo.isAIDLEntity(cls) && !cinfo.isARemote(cls)) {
-	    // IDL stubs must always use static factories.
-	    PresentationManager.StubFactoryFactory sff = 
-		pm.getStubFactoryFactory( false ) ; 
-	    PresentationManager.StubFactory sf = 
-		sff.createStubFactory( className, true, remoteCodeBase, 
-		    expectedClass, classLoader ) ;
-	    return sf ;
-	} else {
-	    PresentationManager.ClassData classData = pm.getClassData( cls ) ;
-	    return makeDynamicStubFactory( pm, classData, classLoader ) ;
-	}
+        if (cinfo.isAIDLEntity(cls) && !cinfo.isARemote(cls)) {
+            // IDL stubs must always use static factories.
+            PresentationManager.StubFactoryFactory sff = 
+                pm.getStubFactoryFactory( false ) ; 
+            PresentationManager.StubFactory sf = 
+                sff.createStubFactory( className, true, remoteCodeBase, 
+                    expectedClass, classLoader ) ;
+            return sf ;
+        } else {
+            PresentationManager.ClassData classData = pm.getClassData( cls ) ;
+            return makeDynamicStubFactory( pm, classData, classLoader ) ;
+        }
     }
 
     public abstract PresentationManager.StubFactory makeDynamicStubFactory( 
-	PresentationManager pm, PresentationManager.ClassData classData, 
-	ClassLoader classLoader ) ;
+        PresentationManager pm, PresentationManager.ClassData classData, 
+        ClassLoader classLoader ) ;
 
     public Tie getTie( Class cls )
     {
-	PresentationManager pm = ORB.getPresentationManager() ;
-	return new ReflectiveTie( pm ) ;
+        PresentationManager pm = ORB.getPresentationManager() ;
+        return new ReflectiveTie( pm ) ;
     }
 
     public boolean createsDynamicStubs() 
     {
-	return true ;
+        return true ;
     }
 }

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)PercentLayout.java	1.3 99/06/07 */
+/* @(#)PercentLayout.java       1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -78,38 +78,38 @@ public class PercentLayout implements LayoutManager2
 
     public PercentLayout (int align)
     {
-	fAlign = align;
-	fComponents = new Vector ();
+        fAlign = align;
+        fComponents = new Vector ();
     }
 
     public void addLayoutComponent (Component c, Object constraints)
     {
-	fComponents.addElement (new ComponentInfo(c,(Float)constraints));
+        fComponents.addElement (new ComponentInfo(c,(Float)constraints));
     }
 
     public void addLayoutComponent(String name, Component c)
     {
-	// Not supported
+        // Not supported
     }
   
     public void removeLayoutComponent (Component c)
     {
-	for (int i=0; i<fComponents.size(); i++) {
-	    ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
-	    if ( ci.fComponent == c) {
-		fComponents.removeElement (ci);
-	    }
-	}
+        for (int i=0; i<fComponents.size(); i++) {
+            ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
+            if ( ci.fComponent == c) {
+                fComponents.removeElement (ci);
+            }
+        }
     }
 
     public float getLayoutAlignmentX (Container target)
     {
-	return target.getAlignmentX ();
+        return target.getAlignmentX ();
     }
 
     public float getLayoutAlignmentY (Container target)
     {
-	return target.getAlignmentY ();
+        return target.getAlignmentY ();
     }
 
     public void invalidateLayout (Container target)
@@ -118,102 +118,102 @@ public class PercentLayout implements LayoutManager2
 
     public Dimension preferredLayoutSize(Container target)
     {
-	Dimension size = new Dimension (0,0);
+        Dimension size = new Dimension (0,0);
 
-	if ( fAlign == VERT ) {
-	    for (int i=0; i<fComponents.size(); i++) {
-		ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
-		Component c = ci.fComponent;
-		Dimension cSize = c.getPreferredSize ();
-		size.setSize (Math.max(size.width,cSize.width), size.height+cSize.height);
-	    }
-	} else {
-	    for (int i=0; i<fComponents.size(); i++) {
-		ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
-		Component c = ci.fComponent;
-		Dimension cSize = c.getPreferredSize ();
-		size.setSize (size.width+cSize.width, Math.max(size.height,cSize.height));
-	    }
-	}
+        if ( fAlign == VERT ) {
+            for (int i=0; i<fComponents.size(); i++) {
+                ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
+                Component c = ci.fComponent;
+                Dimension cSize = c.getPreferredSize ();
+                size.setSize (Math.max(size.width,cSize.width), size.height+cSize.height);
+            }
+        } else {
+            for (int i=0; i<fComponents.size(); i++) {
+                ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
+                Component c = ci.fComponent;
+                Dimension cSize = c.getPreferredSize ();
+                size.setSize (size.width+cSize.width, Math.max(size.height,cSize.height));
+            }
+        }
 
-	return size;
+        return size;
     }
 
     public Dimension minimumLayoutSize(Container target)
     {
-	Dimension size = new Dimension (0,0);
+        Dimension size = new Dimension (0,0);
 
-	if ( fAlign == VERT ) {
-	    for (int i=0; i<fComponents.size(); i++) {
-		ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
-		Component c = ci.fComponent;
-		Dimension cSize = c.getMinimumSize ();
-		size.setSize (Math.max(size.width,cSize.width), size.height+cSize.height);
-	    }
-	} else {
-	    for (int i=0; i<fComponents.size(); i++) {
-		ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
-		Component c = ci.fComponent;
-		Dimension cSize = c.getMinimumSize ();
-		size.setSize (size.width+cSize.width, Math.max(size.height,cSize.height));
-	    }
-	}
+        if ( fAlign == VERT ) {
+            for (int i=0; i<fComponents.size(); i++) {
+                ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
+                Component c = ci.fComponent;
+                Dimension cSize = c.getMinimumSize ();
+                size.setSize (Math.max(size.width,cSize.width), size.height+cSize.height);
+            }
+        } else {
+            for (int i=0; i<fComponents.size(); i++) {
+                ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
+                Component c = ci.fComponent;
+                Dimension cSize = c.getMinimumSize ();
+                size.setSize (size.width+cSize.width, Math.max(size.height,cSize.height));
+            }
+        }
 
-	return size;
+        return size;
     }
 
     public Dimension maximumLayoutSize (Container target)
     {
-	Dimension size = new Dimension (0,0);
+        Dimension size = new Dimension (0,0);
 
-	if ( fAlign == VERT ) {
-	    for (int i=0; i<fComponents.size(); i++) {
-		ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
-		Component c = ci.fComponent;
-		Dimension cSize = c.getMaximumSize ();
-		size.setSize (Math.max(size.width,cSize.width), size.height+cSize.height);
-	    }
-	} else {
-	    for (int i=0; i<fComponents.size(); i++) {
-		ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
-		Component c = ci.fComponent;
-		Dimension cSize = c.getMaximumSize ();
-		size.setSize (size.width+cSize.width, Math.max(size.height,cSize.height));
-	    }
-	}
+        if ( fAlign == VERT ) {
+            for (int i=0; i<fComponents.size(); i++) {
+                ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
+                Component c = ci.fComponent;
+                Dimension cSize = c.getMaximumSize ();
+                size.setSize (Math.max(size.width,cSize.width), size.height+cSize.height);
+            }
+        } else {
+            for (int i=0; i<fComponents.size(); i++) {
+                ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
+                Component c = ci.fComponent;
+                Dimension cSize = c.getMaximumSize ();
+                size.setSize (size.width+cSize.width, Math.max(size.height,cSize.height));
+            }
+        }
 
-	return size;
+        return size;
     }
   
     public void layoutContainer (Container target)
     {
-	Insets insets = target.getInsets();
-	int x = insets.left;
-	int y = insets.top;
-	int width = target.getSize().width - (insets.left + insets.right);
-	int height = target.getSize().height - (insets.top + insets.bottom);
+        Insets insets = target.getInsets();
+        int x = insets.left;
+        int y = insets.top;
+        int width = target.getSize().width - (insets.left + insets.right);
+        int height = target.getSize().height - (insets.top + insets.bottom);
 
-	if ( fAlign == VERT ) {
-	    for (int i=0; i<fComponents.size(); i++) {
-		ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
-		Component c = ci.fComponent;
-		float p = ci.fPercentage;
-		int ch = (int)(height*p);
-		c.setLocation (x, y);
-		c.setSize (width, ch);
-		y += ch;
-	    }
-	} else {
-	    for (int i=0; i<fComponents.size(); i++) {
-		ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
-		Component c = ci.fComponent;
-		float p = ci.fPercentage;
-		int cw = (int)(width*p);
-		c.setLocation(x, y);
-		c.setSize (cw, height);
-		x += cw;
-	    }
-	}
+        if ( fAlign == VERT ) {
+            for (int i=0; i<fComponents.size(); i++) {
+                ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
+                Component c = ci.fComponent;
+                float p = ci.fPercentage;
+                int ch = (int)(height*p);
+                c.setLocation (x, y);
+                c.setSize (width, ch);
+                y += ch;
+            }
+        } else {
+            for (int i=0; i<fComponents.size(); i++) {
+                ComponentInfo ci = (ComponentInfo)fComponents.elementAt (i);
+                Component c = ci.fComponent;
+                float p = ci.fPercentage;
+                int cw = (int)(width*p);
+                c.setLocation(x, y);
+                c.setSize (cw, height);
+                x += cw;
+            }
+        }
 
     }
 
@@ -227,7 +227,7 @@ class ComponentInfo
 
     public ComponentInfo (Component c, Float p)
     {
-	fComponent = c;
-	fPercentage = p.floatValue ();
+        fComponent = c;
+        fPercentage = p.floatValue ();
     }
 }

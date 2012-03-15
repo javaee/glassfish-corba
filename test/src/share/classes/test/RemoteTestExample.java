@@ -102,7 +102,7 @@ public class RemoteTestExample extends RemoteTest {
         // Start up our servant. (The 'iiop' flag is set to true by RemoteTest
         // unless the -jrmp flag was used).
 
-	Remote remote = context.startServant(servantClass,publishName,true,iiop);
+        Remote remote = context.startServant(servantClass,publishName,true,iiop);
 
         if (remote == null) {
             throw new Exception ("Could not start servant: " + servantClass);

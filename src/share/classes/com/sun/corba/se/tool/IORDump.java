@@ -37,21 +37,21 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.tool ;
+package com.sun.corba.ee.tool ;
 
 import org.omg.CORBA.portable.ObjectImpl ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.protocol.ClientDelegate ;
-import com.sun.corba.se.spi.transport.ContactInfoList ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.protocol.ClientDelegate ;
+import com.sun.corba.ee.spi.transport.ContactInfoList ;
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.impl.ior.GenericIdentifiable ;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
-import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
-import com.sun.corba.se.spi.ior.TaggedProfile ;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
-import com.sun.corba.se.spi.ior.TaggedComponent ;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.impl.ior.GenericIdentifiable ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate ;
+import com.sun.corba.ee.spi.ior.TaggedProfileTemplate ;
+import com.sun.corba.ee.spi.ior.TaggedProfile ;
+import com.sun.corba.ee.spi.ior.ObjectKeyTemplate ;
+import com.sun.corba.ee.spi.ior.TaggedComponent ;
 import org.glassfish.pfl.basic.algorithm.Printer;
 
 public class IORDump {

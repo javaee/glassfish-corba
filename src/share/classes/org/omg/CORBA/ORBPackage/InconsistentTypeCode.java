@@ -54,7 +54,7 @@ public final class InconsistentTypeCode
      * with no reason message.
     */
     public InconsistentTypeCode() {
-	super();
+        super();
     }
 
     /**
@@ -63,6 +63,6 @@ public final class InconsistentTypeCode
     * @param reason The String containing a reason message
     */
     public InconsistentTypeCode(String reason) {
-	super(reason);
+        super(reason);
     }
 }

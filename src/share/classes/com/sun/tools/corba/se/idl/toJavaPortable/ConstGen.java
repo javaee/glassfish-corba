@@ -134,8 +134,8 @@ public class ConstGen implements com.sun.tools.corba.se.idl.ConstGen
     Util.writePackage (stream, c);
     Util.writeProlog (stream, ((GenFileStream)stream).name ());
     stream.println ("public interface " + c.name ()); 
-	// should not be done according to the mapping
-	// + " extends org.omg.CORBA.portable.IDLEntity");
+        // should not be done according to the mapping
+        // + " extends org.omg.CORBA.portable.IDLEntity");
     stream.println ("{");
   } // writeHeading
 
@@ -155,7 +155,7 @@ public class ConstGen implements com.sun.tools.corba.se.idl.ConstGen
     if (c.comment () != null)
       c.comment ().generate ("  ", stream);
     if (c.container () instanceof ModuleEntry) {
-	
+        
       stream.print ("  public static final " + Util.javaName (c.type ()) + " value = ");
     } else {
       stream.print ("  public static final " + Util.javaName (c.type ()) + ' ' + c.name () + " = ");

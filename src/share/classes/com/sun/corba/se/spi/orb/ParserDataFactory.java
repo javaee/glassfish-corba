@@ -37,26 +37,26 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.orb ;
+package com.sun.corba.ee.spi.orb ;
 
-import com.sun.corba.se.impl.orb.NormalParserData ;
-import com.sun.corba.se.impl.orb.PrefixParserData ;
+import com.sun.corba.ee.impl.orb.NormalParserData ;
+import com.sun.corba.ee.impl.orb.PrefixParserData ;
 import org.glassfish.pfl.basic.contain.Pair;
 
 public class ParserDataFactory {
     public static ParserData make( String  propertyName,
-	Operation operation, String fieldName, Object defaultValue,
-	Object testValue, String testData )
+        Operation operation, String fieldName, Object defaultValue,
+        Object testValue, String testData )
     {
-	return new NormalParserData( propertyName, operation, fieldName,
-	    defaultValue, testValue, testData ) ;
+        return new NormalParserData( propertyName, operation, fieldName,
+            defaultValue, testValue, testData ) ;
     }
 
     public static ParserData make( String  propertyName,
-	Operation operation, String fieldName, Object defaultValue,
-	Object testValue, Pair<String,String>[] testData, Class componentType )
+        Operation operation, String fieldName, Object defaultValue,
+        Object testValue, Pair<String,String>[] testData, Class componentType )
     {
-	return new PrefixParserData( propertyName, operation, fieldName,
-	    defaultValue, testValue, testData, componentType ) ;
+        return new PrefixParserData( propertyName, operation, fieldName,
+            defaultValue, testValue, testData, componentType ) ;
     }
 }

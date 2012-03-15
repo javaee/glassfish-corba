@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.javax.rmi.CORBA; // Util (sed marker, don't remove!)
+package com.sun.corba.ee.impl.javax.rmi.CORBA; // Util (sed marker, don't remove!)
 
 import java.rmi.RemoteException;
 import java.rmi.UnexpectedException;
@@ -107,21 +107,21 @@ import org.omg.CORBA.portable.OutputStream;
 // This means that any of the following com.sun.corba classes
 // must only occur in contexts that also handle the non-Sun case.
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orb.ORBVersionFactory;
-import com.sun.corba.se.spi.protocol.ClientDelegate;
-import com.sun.corba.se.spi.transport.ContactInfoList ;
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
-import com.sun.corba.se.spi.copyobject.CopierManager ;
-import com.sun.corba.se.impl.io.ValueHandlerImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.logging.OMGSystemException;
-import com.sun.corba.se.impl.util.Utility;
-import com.sun.corba.se.impl.util.JDKBridge;
-import com.sun.corba.se.spi.logging.UtilSystemException;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORBVersionFactory;
+import com.sun.corba.ee.spi.protocol.ClientDelegate;
+import com.sun.corba.ee.spi.transport.ContactInfoList ;
+import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcher ;
+import com.sun.corba.ee.spi.copyobject.CopierManager ;
+import com.sun.corba.ee.impl.io.ValueHandlerImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
+import com.sun.corba.ee.impl.util.Utility;
+import com.sun.corba.ee.impl.util.JDKBridge;
+import com.sun.corba.ee.spi.logging.UtilSystemException;
 
-import com.sun.corba.se.impl.misc.ClassInfoCache ;
+import com.sun.corba.ee.impl.misc.ClassInfoCache ;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import org.glassfish.pfl.basic.logex.OperationTracer;
@@ -179,11 +179,11 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     public Util() { }
 
     public static synchronized Util getInstance() {
-	if (instance == null) {
-	    instance = new Util() ;
-	}
+        if (instance == null) {
+            instance = new Util() ;
+        }
 
-	return instance ;
+        return instance ;
     }
 
     // Used by TOAFactory.shutdown to unexport all targets for this
@@ -210,8 +210,8 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
                     }
                 }
             } catch (SystemException se) {
-	        utilWrapper.handleSystemException(se);
-	    }
+                utilWrapper.handleSystemException(se);
+            }
         }
     }
 
@@ -228,7 +228,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
                 return new ServerError("Error occurred in server thread",(Error)orig);
             } else if (orig instanceof RemoteException) {
                 return new ServerException("RemoteException occurred in server thread",
-		    (Exception)orig);
+                    (Exception)orig);
             } else if (orig instanceof RuntimeException) {
                 throw (RuntimeException) orig;
             }
@@ -239,18 +239,18 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
         String corbaName = name.substring(name.lastIndexOf('.')+1);
         String status;
         switch (ex.completed.value()) {
-	    case CompletionStatus._COMPLETED_YES:
-		status = "Yes";
-		break;
-	    case CompletionStatus._COMPLETED_NO:
-		status = "No";
-		break;
-	    case CompletionStatus._COMPLETED_MAYBE:
-	    default:
-		status = "Maybe";
-		break;
+            case CompletionStatus._COMPLETED_YES:
+                status = "Yes";
+                break;
+            case CompletionStatus._COMPLETED_NO:
+                status = "No";
+                break;
+            case CompletionStatus._COMPLETED_MAYBE:
+            default:
+                status = "Maybe";
+                break;
         }
-	
+        
         String message = "CORBA " + corbaName + " " + ex.minor + " " + status;
 
         // Now map to the correct RemoteException type...
@@ -294,7 +294,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
                     inner = new NotSerializableException();
                 }
 
-		inner.initCause( ex ) ;
+                inner.initCause( ex ) ;
             }
 
             return new MarshalException(message,inner);
@@ -304,7 +304,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
             return new ActivityCompletedException( message, ex ) ;
         } else if (ex instanceof INVALID_ACTIVITY) {
             return new InvalidActivityException( message, ex ) ;
-	}
+        }
 
         // Just map to a generic RemoteException...
         return new RemoteException(message, ex);
@@ -323,16 +323,16 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
         // Make sure we have a connected object...
         java.lang.Object newObj = Utility.autoConnect(obj, orb, false);
 
-	// In JSG (Java Serialization with GIOP) we avoid using Any and
-	// Typecode implementations, as they are not necessary for
-	// serialization using Java. Further, the current Typecode IO
-	// stream objects are error-prone, and they tend to use encoding
-	// specific details such as indirections, etc. 
-	if (ORBUtility.getEncodingVersion() != ORBConstants.CDR_ENC_VERSION) {
-	    ((org.omg.CORBA_2_3.portable.OutputStream)out).
-					write_abstract_interface(newObj);
-	    return;
-	}
+        // In JSG (Java Serialization with GIOP) we avoid using Any and
+        // Typecode implementations, as they are not necessary for
+        // serialization using Java. Further, the current Typecode IO
+        // stream objects are error-prone, and they tend to use encoding
+        // specific details such as indirections, etc. 
+        if (ORBUtility.getEncodingVersion() != ORBConstants.CDR_ENC_VERSION) {
+            ((org.omg.CORBA_2_3.portable.OutputStream)out).
+                                        write_abstract_interface(newObj);
+            return;
+        }
 
         // Create Any
         Any any = orb.create_any();
@@ -384,11 +384,11 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
                                     org.omg.CORBA.Any any,
                                     org.omg.CORBA.ORB orb) {
 
-        if (any instanceof com.sun.corba.se.impl.corba.AnyImpl &&
+        if (any instanceof com.sun.corba.ee.impl.corba.AnyImpl &&
             orb instanceof ORB) {
 
-            com.sun.corba.se.impl.corba.AnyImpl anyImpl
-                = (com.sun.corba.se.impl.corba.AnyImpl)any;
+            com.sun.corba.ee.impl.corba.AnyImpl anyImpl
+                = (com.sun.corba.ee.impl.corba.AnyImpl)any;
 
             ORB ourORB = (ORB)orb;
 
@@ -438,17 +438,17 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
      */
     public Object readAny(InputStream in) 
     {
-	// In JSG (Java Serialization with GIOP) we avoid using Any and
-	// Typecode implementations, as they are not necessary for
-	// serialization using Java. Further, the current Typecode IO
-	// stream objects are error-prone, and they tend to use encoding
-	// specific details such as indirections, etc. 
-	if (ORBUtility.getEncodingVersion() != ORBConstants.CDR_ENC_VERSION) {
-	    return ((org.omg.CORBA_2_3.portable.InputStream)in).
-		                          read_abstract_interface();
-	}
+        // In JSG (Java Serialization with GIOP) we avoid using Any and
+        // Typecode implementations, as they are not necessary for
+        // serialization using Java. Further, the current Typecode IO
+        // stream objects are error-prone, and they tend to use encoding
+        // specific details such as indirections, etc. 
+        if (ORBUtility.getEncodingVersion() != ORBConstants.CDR_ENC_VERSION) {
+            return ((org.omg.CORBA_2_3.portable.InputStream)in).
+                                          read_abstract_interface();
+        }
 
-	Any any = in.read_any();
+        Any any = in.read_any();
         if ( any.type().kind().value() == TCKind._tk_objref ) {
             return any.extract_Object();
         } else {
@@ -471,7 +471,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
         // write it out...
     
         Object newObj = Utility.autoConnect(obj,out.orb(),false);
-	out.write_Object((org.omg.CORBA.Object)newObj);
+        out.write_Object((org.omg.CORBA.Object)newObj);
     }
     
     /**
@@ -513,11 +513,11 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
                     // Yes. Instantiate our keep-alive thread and start
                     // it up...
                     keepAlive = (KeepAlive)AccessController.doPrivileged(
-			new PrivilegedAction<Object>() {
-			    public java.lang.Object run() {
-				return new KeepAlive();
-			    }
-			});
+                        new PrivilegedAction<Object>() {
+                            public java.lang.Object run() {
+                                return new KeepAlive();
+                            }
+                        });
                     keepAlive.start();
                 }
             }
@@ -537,11 +537,11 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
             if (cachedTie != null) {
                 exportedServants.remove(target);
                 Utility.purgeStubForTie(cachedTie);
-		Utility.purgeTieAndServant(cachedTie);
+                Utility.purgeTieAndServant(cachedTie);
                 try {
                     cleanUpTie(cachedTie);
                 } catch (BAD_OPERATION e) {
-		    // ignore
+                    // ignore
                 } catch (org.omg.CORBA.OBJ_ADAPTER e) {
                     // This can happen when the target was never associated with a POA.
                     // We can safely ignore this case.
@@ -608,7 +608,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     public String getCodebase(java.lang.Class clz) {
         String annot ;
         synchronized (annotObj) {
-	    annot = annotationMap.get(clz);
+            annot = annotationMap.get(clz);
         }
 
         if (annot == null) {
@@ -633,8 +633,8 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
      * @return the <code>Class</code> object representing the loaded class.
      * @exception ClassNotFoundException if class cannot be loaded.
      */
-    public Class loadClass( String className, String remoteCodebase,	
-	ClassLoader loader) throws ClassNotFoundException 
+    public Class loadClass( String className, String remoteCodebase,    
+        ClassLoader loader) throws ClassNotFoundException 
     {
         return JDKBridge.loadClass(className,remoteCodebase,loader);                                
     }
@@ -661,26 +661,26 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
      */
     public boolean isLocal(javax.rmi.CORBA.Stub stub) throws RemoteException 
     {
-	boolean result = false ;
+        boolean result = false ;
 
         try {
-	    org.omg.CORBA.portable.Delegate delegate = stub._get_delegate() ;
-	    if (delegate instanceof ClientDelegate) {
-		// For the Sun ORB
-		ClientDelegate cdel = (ClientDelegate)delegate ;
-		ContactInfoList cil = cdel.getContactInfoList() ;
+            org.omg.CORBA.portable.Delegate delegate = stub._get_delegate() ;
+            if (delegate instanceof ClientDelegate) {
+                // For the Sun ORB
+                ClientDelegate cdel = (ClientDelegate)delegate ;
+                ContactInfoList cil = cdel.getContactInfoList() ;
                 LocalClientRequestDispatcher lcs =
                     cil.getLocalClientRequestDispatcher() ;
                 result = lcs.useLocalInvocation( null ) ;
-	    } else {
-		// For a non-Sun ORB
-		result = delegate.is_local( stub ) ;
-	    }
+            } else {
+                // For a non-Sun ORB
+                result = delegate.is_local( stub ) ;
+            }
         } catch (SystemException e) {
             throw mapSystemException(e);
         }
 
-	return result ;
+        return result ;
     }
     
     /**
@@ -694,17 +694,17 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
         if (orig instanceof SystemException) {
             return mapSystemException((SystemException)orig);
         }
-    	
-    	if (orig instanceof Error) {
-    	    return new ServerError("Error occurred in server thread",(Error)orig);   
-    	} else if (orig instanceof RemoteException) {
-	    return new ServerException("RemoteException occurred in server thread",
-				       (Exception)orig);   
-    	} else if (orig instanceof RuntimeException) {
-            throw (RuntimeException) orig;
-    	}    	
         
-	if (orig instanceof Exception) {
+        if (orig instanceof Error) {
+            return new ServerError("Error occurred in server thread",(Error)orig);   
+        } else if (orig instanceof RemoteException) {
+            return new ServerException("RemoteException occurred in server thread",
+                                       (Exception)orig);   
+        } else if (orig instanceof RuntimeException) {
+            throw (RuntimeException) orig;
+        }       
+        
+        if (orig instanceof Exception) {
             return new UnexpectedException(orig.toString(),
                 (Exception) orig);
         } else {
@@ -722,22 +722,22 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
      * @exception RemoteException if any object could not be copied or connected.
      */
     public Object[] copyObjects (Object[] obj, org.omg.CORBA.ORB orb)
-	throws RemoteException 
+        throws RemoteException 
     {
-	if (obj == null) {
+        if (obj == null) {
             throw new NullPointerException();
         }
 
-	Class<?> compType = obj.getClass().getComponentType() ;
-	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( compType ) ;
-	if (cinfo.isARemote(compType) && cinfo.isInterface()) {
-	    // obj is an array of remote impl types.  This
-	    // causes problems with stream copier, so we copy
-	    // it over to an array of Remotes instead.
-	    Remote[] result = new Remote[obj.length] ;
-	    System.arraycopy( (Object)obj, 0, (Object)result, 0, obj.length ) ;
-	    return (Object[])copyObject( result, orb ) ;
-	} else {
+        Class<?> compType = obj.getClass().getComponentType() ;
+        ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( compType ) ;
+        if (cinfo.isARemote(compType) && cinfo.isInterface()) {
+            // obj is an array of remote impl types.  This
+            // causes problems with stream copier, so we copy
+            // it over to an array of Remotes instead.
+            Remote[] result = new Remote[obj.length] ;
+            System.arraycopy( (Object)obj, 0, (Object)result, 0, obj.length ) ;
+            return (Object[])copyObject( result, orb ) ;
+        } else {
             return (Object[]) copyObject( obj, orb );
         }
     }
@@ -751,7 +751,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
      * @exception RemoteException if the object could not be copied or connected.
      */
     public Object copyObject (Object obj, org.omg.CORBA.ORB orb)
-	throws RemoteException 
+        throws RemoteException 
     {
         try {
             if (((ORB)orb).operationTraceDebugFlag) {

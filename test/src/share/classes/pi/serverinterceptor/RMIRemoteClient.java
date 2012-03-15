@@ -42,9 +42,9 @@ package pi.serverinterceptor;
 
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.corba.AnyImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.IOP.*;
 import org.omg.IOP.CodecPackage.*;
@@ -63,27 +63,27 @@ public class RMIRemoteClient
     extends RMIClient 
 {
     public static void main(String args[]) {
-	try {
-	    (new RMIRemoteClient()).run( System.getProperties(),
-		                         args, System.out, System.err, null );
-	}
-	catch( Exception e ) {
-	    e.printStackTrace( System.err );
-	    System.exit( 1 );
-	}
+        try {
+            (new RMIRemoteClient()).run( System.getProperties(),
+                                         args, System.out, System.err, null );
+        }
+        catch( Exception e ) {
+            e.printStackTrace( System.err );
+            System.exit( 1 );
+        }
     }
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
-	out.println( "============================================" );
-	out.println( "Instantiating Client ORB for RMI Remote test" );
-	out.println( "============================================" );
+        out.println( "============================================" );
+        out.println( "Instantiating Client ORB for RMI Remote test" );
+        out.println( "============================================" );
 
-	out.println( "+ Creating ORB..." );
-	createORB( args );
+        out.println( "+ Creating ORB..." );
+        createORB( args );
 
-	super.run( environment, args, out, err, extra );
+        super.run( environment, args, out, err, extra );
     }
 }

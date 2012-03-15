@@ -49,31 +49,31 @@ import corba.framework.CORBATest;
 
 public class ConnectIntercept_1_4Test
     extends
-	CORBATest
+        CORBATest
 {
     public static final String thisPackage =
-	ConnectIntercept_1_4Test.class.getPackage().getName();
+        ConnectIntercept_1_4Test.class.getPackage().getName();
 
     protected void doTest()
-	throws
-	    Throwable
+        throws
+            Throwable
     {
-	Controller orbd   = createORBD();
-	orbd.start();
+        Controller orbd   = createORBD();
+        orbd.start();
 
-	Controller server = createServer(thisPackage + "." + "ServerTransient",
-					 "ServerTransient");
-	Controller client = createClient(thisPackage + "." + "Client",
-					 "ClientTransient");
-	server.start();
-	client.start();
-	client.waitFor(120000);
-	client.stop();
-	server.stop();
-	orbd.stop();
+        Controller server = createServer(thisPackage + "." + "ServerTransient",
+                                         "ServerTransient");
+        Controller client = createClient(thisPackage + "." + "Client",
+                                         "ClientTransient");
+        server.start();
+        client.start();
+        client.waitFor(120000);
+        client.stop();
+        server.stop();
+        orbd.stop();
 
-	// REVISIT:
-	// Need to do integrate persistent test into test framework.
+        // REVISIT:
+        // Need to do integrate persistent test into test framework.
     }
 }
 

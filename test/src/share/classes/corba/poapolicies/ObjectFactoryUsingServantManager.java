@@ -46,20 +46,20 @@ public class ObjectFactoryUsingServantManager extends BasicObjectFactoryImpl {
 
     @Override
     public org.omg.CORBA.Object create(String intfName,
-				       String implName,
-				       CreationMethods how) {
+                                       String implName,
+                                       CreationMethods how) {
         
         String objectId = "ObjectID" + idNum++;
 
-	try {
+        try {
             byte[] id = objectId.getBytes();
 
-	    return poa.create_reference_with_id(id, intfName);
-	} catch (Exception e) {
+            return poa.create_reference_with_id(id, intfName);
+        } catch (Exception e) {
             System.err.println("ObjectFactoryUsingServantManager");
-	    e.printStackTrace();
-	    System.exit(1);
-	}
-	return null;
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return null;
     }
 }

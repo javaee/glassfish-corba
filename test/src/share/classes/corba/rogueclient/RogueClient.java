@@ -40,17 +40,17 @@
 
 package corba.rogueclient;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
-import com.sun.corba.se.spi.protocol.ClientDelegate;
-import com.sun.corba.se.spi.transport.ContactInfoList;
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.IIOPAddress;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfile;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter;
+import com.sun.corba.ee.spi.protocol.ClientDelegate;
+import com.sun.corba.ee.spi.transport.ContactInfoList;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 
 
 import corba.hcks.U;
@@ -80,10 +80,10 @@ public class RogueClient extends Thread
     private static final byte HEX_O = (byte)0x4f;
     private static final byte HEX_P = (byte)0x50;
     private static final byte[] BOGUS_BYTES = new byte[] {
-	0x00,0x00,0x00,0x06,0x03,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x02,0x00,0x00,0x00,0x19,-0x51,-0x55,-0x35,0x00,
+        0x00,0x00,0x00,0x06,0x03,0x00,0x00,0x00,0x00,0x00,
+        0x00,0x02,0x00,0x00,0x00,0x19,-0x51,-0x55,-0x35,0x00,
         0x00,0x00,0x00,0x02,0x7a,-0x24,0x1d,-0x69,0x00,0x00,
-	0x00,0x08,0x00,0x00,0x00,0x01 };
+        0x00,0x08,0x00,0x00,0x00,0x01 };
 
     // unique to each instance of a RogueClient
     private String itsHostname = null;
@@ -120,20 +120,20 @@ public class RogueClient extends Thread
     private void handleException(Exception ex) throws Exception {
         numFailures.incrementAndGet() ;
 
-	U.sop("Unexpected exception -> " + ex);
+        U.sop("Unexpected exception -> " + ex);
 
         StackTraceElement[] ste = ex.getStackTrace();
         for (int i = 0; i < ste.length; i++) {
             U.sop(ste[i].toString());
         }
 
-	helper.fail( ex ) ;
+        helper.fail( ex ) ;
 
         throw ex ;
     }
 
     private void printBuffer(ByteBuffer byteBuffer) {
-	U.sop("+++++++ GIOP Buffer ++++++++\n");
+        U.sop("+++++++ GIOP Buffer ++++++++\n");
         U.sop("Current position: " + byteBuffer.position());
         U.sop("Total length : " + byteBuffer.limit() + "\n");
 
@@ -171,7 +171,7 @@ public class RogueClient extends Thread
                 // Now output the ASCII equivalents.  Non-ASCII
                 // characters are shown as periods.
                 int x = 0;
-		while (x < 16 && x + i < byteBuffer.position()) {
+                while (x < 16 && x + i < byteBuffer.position()) {
                     if (ORBUtility.isPrintable((char)byteBuffer.get(i + x)))
                         charBuf[x] = (char)byteBuffer.get(i + x);
                     else
@@ -188,173 +188,173 @@ public class RogueClient extends Thread
 
     private void getHostnameAndPort(Tester tester)
     {
-	// Get the host and port number of server
-	U.sop("RogueClient.getHostnameAndPort()");
-	ClientDelegate delegate =
-	    (ClientDelegate)StubAdapter.getDelegate(tester);
-	ContactInfoList ccil =
-	    (ContactInfoList)delegate.getContactInfoList();
-	IOR effectiveTargetIOR = ccil.getEffectiveTargetIOR();
-	IIOPProfile iiopProfile = effectiveTargetIOR.getProfile();
+        // Get the host and port number of server
+        U.sop("RogueClient.getHostnameAndPort()");
+        ClientDelegate delegate =
+            (ClientDelegate)StubAdapter.getDelegate(tester);
+        ContactInfoList ccil =
+            (ContactInfoList)delegate.getContactInfoList();
+        IOR effectiveTargetIOR = ccil.getEffectiveTargetIOR();
+        IIOPProfile iiopProfile = effectiveTargetIOR.getProfile();
         IIOPProfileTemplate iiopProfileTemplate =
-	    (IIOPProfileTemplate)iiopProfile.getTaggedProfileTemplate() ;
-	IIOPAddress primary = iiopProfileTemplate.getPrimaryAddress() ;
+            (IIOPProfileTemplate)iiopProfile.getTaggedProfileTemplate() ;
+        IIOPAddress primary = iiopProfileTemplate.getPrimaryAddress() ;
 
-	itsHostname = primary.getHost().toLowerCase();
-	itsPort = primary.getPort();
-	
-	String testerIOR = tester.toString();
-	U.sop("\tRemote object, Tester " + testerIOR);
-	U.sop("\tCan be found at:");
-	U.sop("\tHostname -> " + itsHostname);
-	U.sop("\tPort -> " + itsPort);
-	U.sop("Successful");
+        itsHostname = primary.getHost().toLowerCase();
+        itsPort = primary.getPort();
+        
+        String testerIOR = tester.toString();
+        U.sop("\tRemote object, Tester " + testerIOR);
+        U.sop("\tCan be found at:");
+        U.sop("\tHostname -> " + itsHostname);
+        U.sop("\tPort -> " + itsPort);
+        U.sop("Successful");
     } 
 
     private void createConnectionToServer() throws Exception {
         start( "createConnectionToServer",
             createConnectionToServerCallCounter++ ) ;
         
-	// create SocketChannel to server
-	try {
-	    InetSocketAddress isa = new InetSocketAddress(itsHostname, itsPort);
-	    itsSocketChannel = ORBUtility.openSocketChannel(isa);
-	}
-	catch (Exception ex) {
-	    handleException(ex);
-	}
+        // create SocketChannel to server
+        try {
+            InetSocketAddress isa = new InetSocketAddress(itsHostname, itsPort);
+            itsSocketChannel = ORBUtility.openSocketChannel(isa);
+        }
+        catch (Exception ex) {
+            handleException(ex);
+        }
 
         handlePass() ;
     }
 
     private void write_octet(byte[] theBuf, int index, byte theValue) {
-	theBuf[index] = theValue;
+        theBuf[index] = theValue;
     }
 
     private void buildGIOPHeader(byte[] theBuf, int theMessageSize)
     {
-	int index = 0;
+        int index = 0;
 
-	// write GIOP string, always written big endian
-	write_octet(theBuf, index++, HEX_G);
-	write_octet(theBuf, index++, HEX_I);
-	write_octet(theBuf, index++, HEX_O);
-	write_octet(theBuf, index++, HEX_P);
+        // write GIOP string, always written big endian
+        write_octet(theBuf, index++, HEX_G);
+        write_octet(theBuf, index++, HEX_I);
+        write_octet(theBuf, index++, HEX_O);
+        write_octet(theBuf, index++, HEX_P);
 
-	// write GIOP version 1.2, bytes 5,6
-	write_octet(theBuf, index++, GIOPVersion.DEFAULT_VERSION.getMajor());
-	write_octet(theBuf, index++, GIOPVersion.DEFAULT_VERSION.getMinor());
+        // write GIOP version 1.2, bytes 5,6
+        write_octet(theBuf, index++, GIOPVersion.DEFAULT_VERSION.getMajor());
+        write_octet(theBuf, index++, GIOPVersion.DEFAULT_VERSION.getMinor());
 
-	// write endian-ness and no fragment bit (either 0x00 or 0x01)
-	// byte 6, bits 0 & 1
-	if (itsBigEndian) {
-	    write_octet(theBuf, index++, Message.FLAG_NO_FRAG_BIG_ENDIAN);
-	} else {
-	    write_octet(theBuf, index++, Message.LITTLE_ENDIAN_BIT);
-	}
+        // write endian-ness and no fragment bit (either 0x00 or 0x01)
+        // byte 6, bits 0 & 1
+        if (itsBigEndian) {
+            write_octet(theBuf, index++, Message.FLAG_NO_FRAG_BIG_ENDIAN);
+        } else {
+            write_octet(theBuf, index++, Message.LITTLE_ENDIAN_BIT);
+        }
 
-	// write GIOPRequest type, byte 8
-	write_octet(theBuf, index++, Message.GIOPRequest);
+        // write GIOPRequest type, byte 8
+        write_octet(theBuf, index++, Message.GIOPRequest);
 
-	// write message size
-	write_message_size(theBuf, index, theMessageSize);
+        // write message size
+        write_message_size(theBuf, index, theMessageSize);
     }
 
     private void write_message_size(byte[] theBuf, int index, int theMessageSize) {
-	// write message size, bytes 9,10,11,12
-	if (itsBigEndian) {
-	    write_octet(theBuf, index++, (byte)((theMessageSize >>> 24) & 0xFF));
-	    write_octet(theBuf, index++, (byte)((theMessageSize >>> 16) & 0xFF));
-	    write_octet(theBuf, index++, (byte)((theMessageSize >>> 8) & 0xFF));
-	    write_octet(theBuf, index++, (byte)(theMessageSize & 0xFF));
-	} else {
-	    write_octet(theBuf, index++, (byte)(theMessageSize & 0xFF));
-	    write_octet(theBuf, index++, (byte)((theMessageSize >>> 8) & 0xFF));
-	    write_octet(theBuf, index++, (byte)((theMessageSize >>> 16) & 0xFF));
-	    write_octet(theBuf, index++, (byte)((theMessageSize >>> 24) & 0xFF));
-	}
+        // write message size, bytes 9,10,11,12
+        if (itsBigEndian) {
+            write_octet(theBuf, index++, (byte)((theMessageSize >>> 24) & 0xFF));
+            write_octet(theBuf, index++, (byte)((theMessageSize >>> 16) & 0xFF));
+            write_octet(theBuf, index++, (byte)((theMessageSize >>> 8) & 0xFF));
+            write_octet(theBuf, index++, (byte)(theMessageSize & 0xFF));
+        } else {
+            write_octet(theBuf, index++, (byte)(theMessageSize & 0xFF));
+            write_octet(theBuf, index++, (byte)((theMessageSize >>> 8) & 0xFF));
+            write_octet(theBuf, index++, (byte)((theMessageSize >>> 16) & 0xFF));
+            write_octet(theBuf, index++, (byte)((theMessageSize >>> 24) & 0xFF));
+        }
     }
 
     private void sendData(ByteBuffer byteBuffer, int numBytesToWrite)
-	throws Exception { 
+        throws Exception { 
 
-	int bytesWrit = 0;
-	do {
-	    bytesWrit = itsSocketChannel.write(byteBuffer);
-	} while (bytesWrit < numBytesToWrite);
+        int bytesWrit = 0;
+        do {
+            bytesWrit = itsSocketChannel.write(byteBuffer);
+        } while (bytesWrit < numBytesToWrite);
     }
 
     private ByteBuffer createGIOPMessage() {
 
-	// create a GIOP header
-	byte[] request = new byte[Message.defaultBufferSize];
+        // create a GIOP header
+        byte[] request = new byte[Message.defaultBufferSize];
 
-	// build GIOP header
-	buildGIOPHeader(request, request.length - Message.GIOPMessageHeaderLength);
+        // build GIOP header
+        buildGIOPHeader(request, request.length - Message.GIOPMessageHeaderLength);
 
-	// add some bogus junk to a rogue request
-	for (int i = 0; i < BOGUS_BYTES.length; i++) {
-	    write_octet(request,
-		        i+Message.GIOPMessageHeaderLength,
-			BOGUS_BYTES[i]);
-	}
+        // add some bogus junk to a rogue request
+        for (int i = 0; i < BOGUS_BYTES.length; i++) {
+            write_octet(request,
+                        i+Message.GIOPMessageHeaderLength,
+                        BOGUS_BYTES[i]);
+        }
 
-	ByteBuffer byteBuffer = ByteBuffer.wrap(request);
-	byteBuffer.position(0);
-	byteBuffer.limit(Message.GIOPMessageHeaderLength+BOGUS_BYTES.length);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(request);
+        byteBuffer.position(0);
+        byteBuffer.limit(Message.GIOPMessageHeaderLength+BOGUS_BYTES.length);
 
-	if (dprint) {
-	    ByteBuffer viewBuffer = byteBuffer.asReadOnlyBuffer();
-	    viewBuffer.position(Message.GIOPMessageHeaderLength+BOGUS_BYTES.length);
-	    printBuffer(viewBuffer);
-	}
+        if (dprint) {
+            ByteBuffer viewBuffer = byteBuffer.asReadOnlyBuffer();
+            viewBuffer.position(Message.GIOPMessageHeaderLength+BOGUS_BYTES.length);
+            printBuffer(viewBuffer);
+        }
 
-	return byteBuffer;
+        return byteBuffer;
     }
 
     private void runValidHeaderSlowBody() throws Exception {
         start( "runValidHeaderSlowBody" ) ;
 
-	ByteBuffer byteBuffer = createGIOPMessage();
+        ByteBuffer byteBuffer = createGIOPMessage();
 
-	// send full, valid GIOP header
-	ByteBuffer b = ByteBuffer.allocateDirect(Message.GIOPMessageHeaderLength);
-	for (int i = 0; i < Message.GIOPMessageHeaderLength; i++) {
-	    b.put(byteBuffer.get(i));
-	}
-	b.flip();
+        // send full, valid GIOP header
+        ByteBuffer b = ByteBuffer.allocateDirect(Message.GIOPMessageHeaderLength);
+        for (int i = 0; i < Message.GIOPMessageHeaderLength; i++) {
+            b.put(byteBuffer.get(i));
+        }
+        b.flip();
 
-	try {
-	    sendData(b, Message.GIOPMessageHeaderLength);
-	    
-	    // send message body 1 byte a time with a delay between them
-	    for (int i = Message.GIOPMessageHeaderLength; i < byteBuffer.limit(); i++) {
-		b = ByteBuffer.allocateDirect(1);
-		b.put(byteBuffer.get(i));
-		b.flip();
-		sendData(b, 1);
-		Thread.sleep(250);
-	    }
-	    Thread.sleep(5000);
-	} catch (IOException ioe) {
-	    // We expect Server to complain with an IOException.
-	    // So, we must close the connection and re-open it.
-	    U.sop("\tReceived expected IOException: " + ioe.toString());
-	    U.sop("\tWill attempt to re-establish connection to server..");
-	    try {
-		itsSocketChannel.close();
-	    } catch (IOException ioex) {
-		handleException(ioex);
+        try {
+            sendData(b, Message.GIOPMessageHeaderLength);
+            
+            // send message body 1 byte a time with a delay between them
+            for (int i = Message.GIOPMessageHeaderLength; i < byteBuffer.limit(); i++) {
+                b = ByteBuffer.allocateDirect(1);
+                b.put(byteBuffer.get(i));
+                b.flip();
+                sendData(b, 1);
+                Thread.sleep(250);
+            }
+            Thread.sleep(5000);
+        } catch (IOException ioe) {
+            // We expect Server to complain with an IOException.
+            // So, we must close the connection and re-open it.
+            U.sop("\tReceived expected IOException: " + ioe.toString());
+            U.sop("\tWill attempt to re-establish connection to server..");
+            try {
+                itsSocketChannel.close();
+            } catch (IOException ioex) {
+                handleException(ioex);
                 throw ioex ;
-	    }
+            }
 
             handleException( ioe ) ;
-	    createConnectionToServer();
+            createConnectionToServer();
             throw ioe ;
-	} catch (Exception ex) {
-	    handleException(ex);
+        } catch (Exception ex) {
+            handleException(ex);
             throw ex ;
-	}
+        }
 
         handlePass() ;
     }
@@ -362,35 +362,35 @@ public class RogueClient extends Thread
     private void runSlowGIOPHeader() throws Exception {
         start( "runSlowGIOPHeader" ) ;
 
-	ByteBuffer byteBuffer = createGIOPMessage();
+        ByteBuffer byteBuffer = createGIOPMessage();
 
-	// send GIOP header
-	try {
-	    // send 1 byte a time with a delay between them
-	    for (int i = 0; i < byteBuffer.limit(); i++) {
-		ByteBuffer b = ByteBuffer.allocateDirect(1);
-		b.put(byteBuffer.get(i));
-		b.flip();
-		sendData(b, 1);
-		Thread.sleep(500);
-	    }
-	    Thread.sleep(5000);
-	} catch (IOException ioe) {
-	    // We expect Server to complain with an IOException.
-	    // So, we must close the connection and re-open it.
-	    U.sop("\tReceived expected IOException: " + ioe.toString());
-	    U.sop("\tWill attempt to re-establish connection to server...");
-	    try {
-		itsSocketChannel.close();
-	    } catch (IOException ioex) {
-		handleException(ioex);
+        // send GIOP header
+        try {
+            // send 1 byte a time with a delay between them
+            for (int i = 0; i < byteBuffer.limit(); i++) {
+                ByteBuffer b = ByteBuffer.allocateDirect(1);
+                b.put(byteBuffer.get(i));
+                b.flip();
+                sendData(b, 1);
+                Thread.sleep(500);
+            }
+            Thread.sleep(5000);
+        } catch (IOException ioe) {
+            // We expect Server to complain with an IOException.
+            // So, we must close the connection and re-open it.
+            U.sop("\tReceived expected IOException: " + ioe.toString());
+            U.sop("\tWill attempt to re-establish connection to server...");
+            try {
+                itsSocketChannel.close();
+            } catch (IOException ioex) {
+                handleException(ioex);
                 throw ioex ;
-	    }
-	    createConnectionToServer();
-	} catch (Exception ex) {
-	    handleException(ex);
+            }
+            createConnectionToServer();
+        } catch (Exception ex) {
+            handleException(ex);
             throw ex ;
-	}
+        }
 
         handlePass() ;
     }
@@ -398,19 +398,19 @@ public class RogueClient extends Thread
     private void runValidHeaderBogusLength() throws Exception {
         start( "runValidHeaderBogusLength" ) ;
 
-	ByteBuffer byteBuffer = createGIOPMessage();
-	write_message_size(byteBuffer.array(),8,byteBuffer.limit() + 50);
+        ByteBuffer byteBuffer = createGIOPMessage();
+        write_message_size(byteBuffer.array(),8,byteBuffer.limit() + 50);
 
-	try {
-	    // send valid header with bogus message length
-	    sendData(byteBuffer, byteBuffer.limit());
-	    Thread.sleep(10000);
-	} catch (Exception ex) {
-	    handleException(ex);
-	}
+        try {
+            // send valid header with bogus message length
+            sendData(byteBuffer, byteBuffer.limit());
+            Thread.sleep(10000);
+        } catch (Exception ex) {
+            handleException(ex);
+        }
 
         handlePass() ;
-	U.sop("PASSED");
+        U.sop("PASSED");
     }
 
 
@@ -461,18 +461,18 @@ public class RogueClient extends Thread
     }
 
     private void runSaneTest(Tester tester)
-       	throws RemoteException
+        throws RemoteException
     {
-	// call a method on the Tester object
-	U.sop("RogueClient.runSaneTest()");
-	String desc = tester.getDescription();
-	U.sop("\tGot 'Tester' description: " + desc);
-	U.sop("PASSED");
+        // call a method on the Tester object
+        U.sop("RogueClient.runSaneTest()");
+        String desc = tester.getDescription();
+        U.sop("\tGot 'Tester' description: " + desc);
+        U.sop("PASSED");
     }
 
     @Override
     public void run() {
-	try {
+        try {
             U.sop("Finding Tester ...");
             InitialContext rootContext = new InitialContext();
             U.sop("Looking up Tester...");
@@ -481,14 +481,14 @@ public class RogueClient extends Thread
             Tester tester 
                 = (Tester)PortableRemoteObject.narrow(tst,
                                                       Tester.class);
-	    getHostnameAndPort(tester);
-	    createConnectionToServer();
-	    runSaneTest(tester);
-	    runValidHeaderBogusLength();
-	    runSaneTest(tester);
-	    runSlowGIOPHeader();
-	    runSaneTest(tester);
-	    runValidHeaderSlowBody();
+            getHostnameAndPort(tester);
+            createConnectionToServer();
+            runSaneTest(tester);
+            runValidHeaderBogusLength();
+            runSaneTest(tester);
+            runSlowGIOPHeader();
+            runSaneTest(tester);
+            runValidHeaderSlowBody();
             runSendMessageAndCloseConnection();
         } catch (org.omg.CORBA.COMM_FAILURE c) {
             StackTraceElement[] ste = c.getStackTrace();
@@ -499,7 +499,7 @@ public class RogueClient extends Thread
             U.sop("Received an expected org.omg.COMM_FAILURE: " + c.toString()
                     + " stack trace :\n" + sb.toString());
         } catch (Throwable t) {
-    	    U.sop("Unexpected throwable!!!");
+            U.sop("Unexpected throwable!!!");
             t.printStackTrace();
             helper.done() ;
             System.exit(1) ;
@@ -511,25 +511,25 @@ public class RogueClient extends Thread
     public static void main(String args[]) {
         U.sop("Beginning test...");
 
-	if (dprint) {
-	    Properties props = new Properties();
-	    props.put(ORBConstants.DEBUG_PROPERTY, "transport,giop");
-	}
+        if (dprint) {
+            Properties props = new Properties();
+            props.put(ORBConstants.DEBUG_PROPERTY, "transport,giop");
+        }
 
-	// run a single RogueClient
-	RogueClient rogueClient = new RogueClient();
-	try {
-	    rogueClient.start();
-	    rogueClient.join();
+        // run a single RogueClient
+        RogueClient rogueClient = new RogueClient();
+        try {
+            rogueClient.start();
+            rogueClient.join();
 
             useHelper = false ;
 
-	    // run a bunch of RogueClients
-	    rogueClient.runRogueConnectManyTests();
+            // run a bunch of RogueClients
+            rogueClient.runRogueConnectManyTests();
 
-	} catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace() ;
-	} 
+        } 
 
         int failures = numFailures.get() ;
         if (failures == 0) 

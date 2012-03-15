@@ -47,8 +47,8 @@ import java.util.Properties;
 public class ProxySerializationTest extends CORBATest {
     protected void doTest() throws Throwable
     {
-	//DEBUG: release commnet here
-	//test.Test.debug=true;
+        //DEBUG: release commnet here
+        //test.Test.debug=true;
         Options.addServerArg("-debug");
         Controller orbd = createORBD();
  

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi ;
+package com.sun.corba.ee.impl.presentation.rmi ;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA_2_3.portable.OutputStream ;

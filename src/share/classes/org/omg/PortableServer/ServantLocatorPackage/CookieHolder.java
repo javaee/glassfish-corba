@@ -55,7 +55,7 @@ final public class CookieHolder implements org.omg.CORBA.portable.Streamable
     public CookieHolder() { }
 
     public CookieHolder(java.lang.Object initial) {
-	value = initial;
+        value = initial;
     }
 
     public void _read( org.omg.CORBA.portable.InputStream is) {

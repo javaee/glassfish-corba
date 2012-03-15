@@ -110,7 +110,7 @@ public abstract class Delegate {
      * @return true if the objects are CORBA-equivalent.
      */
     public abstract boolean is_equivalent(org.omg.CORBA.Object obj,
-					  org.omg.CORBA.Object other);
+                                          org.omg.CORBA.Object other);
 
     /**
      * Returns an ORB-internal identifier (hashcode) for this object reference.
@@ -144,10 +144,10 @@ public abstract class Delegate {
      *
      */
     public abstract Request create_request(org.omg.CORBA.Object obj,
-				           Context ctx,
-				           String operation,
-				           NVList arg_list,
-				           NamedValue result);
+                                           Context ctx,
+                                           String operation,
+                                           NVList arg_list,
+                                           NamedValue result);
 
     /**
      * Creates a Request instance for use in the Dynamic Invocation Interface.
@@ -167,12 +167,12 @@ public abstract class Delegate {
      * @return                 The created Request object.
      */
     public abstract Request create_request(org.omg.CORBA.Object obj,
-				           Context ctx,
-				           String operation,
-				           NVList arg_list,
-				           NamedValue result,
-				           ExceptionList exclist,
-				           ContextList ctxlist);
+                                           Context ctx,
+                                           String operation,
+                                           NVList arg_list,
+                                           NamedValue result,
+                                           ExceptionList exclist,
+                                           ContextList ctxlist);
 
     /**
      * Provides a reference to the orb associated with its parameter.
@@ -202,7 +202,7 @@ public abstract class Delegate {
      * package comments for unimplemented features</a>
      */
     public org.omg.CORBA.Policy get_policy(org.omg.CORBA.Object self,
-					   int policy_type) {
+                                           int policy_type) {
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }
 
@@ -222,8 +222,8 @@ public abstract class Delegate {
      * package comments for unimplemented features</a>
      */
     public org.omg.CORBA.DomainManager[] get_domain_managers(
-							     org.omg.CORBA.Object
-							     self) {
+                                                             org.omg.CORBA.Object
+                                                             self) {
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }
 
@@ -248,8 +248,8 @@ public abstract class Delegate {
      * package comments for unimplemented features</a>
      */
     public org.omg.CORBA.Object set_policy_override(org.omg.CORBA.Object self,
-						    org.omg.CORBA.Policy[] policies,
-						    org.omg.CORBA.SetOverrideType set_add) {
+                                                    org.omg.CORBA.Policy[] policies,
+                                                    org.omg.CORBA.SetOverrideType set_add) {
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }
 
@@ -295,7 +295,7 @@ public abstract class Delegate {
      */
     public ServantObject servant_preinvoke(org.omg.CORBA.Object self,
                                            String operation,
-					   Class expectedType) {
+                                           Class expectedType) {
         return null;
     }
 
@@ -313,7 +313,7 @@ public abstract class Delegate {
      *  the servant_preinvoke() method.
      */
     public void servant_postinvoke(org.omg.CORBA.Object self,
-				   ServantObject servant) {
+                                   ServantObject servant) {
     }
 
     /**
@@ -334,8 +334,8 @@ public abstract class Delegate {
      * package comments for unimplemented features</a>
      */
     public OutputStream request(org.omg.CORBA.Object self,
-				String operation,
-				boolean responseExpected) {
+                                String operation,
+                                boolean responseExpected) {
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }
 
@@ -359,9 +359,9 @@ public abstract class Delegate {
      * package comments for unimplemented features</a>
      */
     public InputStream invoke(org.omg.CORBA.Object self,
-			      OutputStream output)
-	throws ApplicationException, RemarshalException {
-	throw new org.omg.CORBA.NO_IMPLEMENT();
+                              OutputStream output)
+        throws ApplicationException, RemarshalException {
+        throw new org.omg.CORBA.NO_IMPLEMENT();
     }
 
     /**
@@ -378,8 +378,8 @@ public abstract class Delegate {
      * package comments for unimplemented features</a>
      */
     public void releaseReply(org.omg.CORBA.Object self,
-			     InputStream input) {
-	throw new org.omg.CORBA.NO_IMPLEMENT();
+                             InputStream input) {
+        throw new org.omg.CORBA.NO_IMPLEMENT();
     }
 
     /**

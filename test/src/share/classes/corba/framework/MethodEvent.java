@@ -54,14 +54,14 @@ public class MethodEvent
 
     public static MethodEvent make( String id, Method method ) 
     {
-	return new MethodEvent( id, method ) ;
+        return new MethodEvent( id, method ) ;
     }
 
     private MethodEvent( String id, Method method ) 
     {
-	this.threadId = Thread.currentThread().toString() ;
-	this.id = id ;
-	this.method = method ;
+        this.threadId = Thread.currentThread().toString() ;
+        this.id = id ;
+        this.method = method ;
     }
 
     public String getThreadId() { return threadId ; }
@@ -72,23 +72,23 @@ public class MethodEvent
 
     public boolean equals( Object obj ) 
     {
-	if (!(obj instanceof MethodEvent))
-	    return false ;
+        if (!(obj instanceof MethodEvent))
+            return false ;
 
-	MethodEvent other = (MethodEvent)obj ;
+        MethodEvent other = (MethodEvent)obj ;
 
-	return (id.equals( other.id ) &&
-		method.equals( other.method )) ;
+        return (id.equals( other.id ) &&
+                method.equals( other.method )) ;
     }
 
     public int hashCode()
     {
-	return id.hashCode() ^ method.hashCode() ;
+        return id.hashCode() ^ method.hashCode() ;
     }
 
     public String toString() 
     {
-	return "MethodEvent[threadId=" + threadId + " id=" + id + 
-	    " method=" + method + "]" ;
+        return "MethodEvent[threadId=" + threadId + " id=" + id + 
+            " method=" + method + "]" ;
     }
 }

@@ -106,7 +106,7 @@ public class Server extends PortableRemoteObject implements Tester
     private static InitialContext rootContext ;
 
     public static void main(String[] args) {
-	try {
+        try {
             System.setSecurityManager(new NoSecurityManager());
 
             Server.tryLoadingClasses();
@@ -116,10 +116,10 @@ public class Server extends PortableRemoteObject implements Tester
 
             rootContext.rebind("Tester", p);
             System.out.println("Server is ready.");
-	} catch (Throwable t) {
+        } catch (Throwable t) {
             t.printStackTrace();
             System.exit(1);
-	}
+        }
     }
 }
 

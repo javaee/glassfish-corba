@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 import java.io.ObjectOutputStream ;
 import java.io.ObjectInputStream ;
@@ -61,10 +61,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 // Needed for (at least) translateFields.
-import com.sun.corba.se.impl.io.ObjectStreamClass ;
+import com.sun.corba.ee.impl.io.ObjectStreamClass ;
 
 // This seems to be just what we need here.
-import com.sun.corba.se.impl.io.ObjectStreamField ;
+import com.sun.corba.ee.impl.io.ObjectStreamField ;
 
 import sun.corba.Bridge ;
 
@@ -78,23 +78,23 @@ import sun.corba.Bridge ;
  * serialization support from this class.
  *
  * @Author      Ken Cavanaugh
- * @author	Mike Warres
- * @author	Roger Riggs
+ * @author      Mike Warres
+ * @author      Roger Riggs
  * @version 1.98 02/02/00
  */
 public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
     private static final Bridge bridge = 
-	AccessController.doPrivileged(
-	    new PrivilegedAction<Bridge>() {
-		public Bridge run() {
-		    return Bridge.get() ;
-		}
-	    } 
-	) ;
+        AccessController.doPrivileged(
+            new PrivilegedAction<Bridge>() {
+                public Bridge run() {
+                    return Bridge.get() ;
+                }
+            } 
+        ) ;
 
     /** serialPersistentFields value indicating no serializable fields */
     public static final ObjectStreamField[] NO_FIELDS = 
-	new ObjectStreamField[0];
+        new ObjectStreamField[0];
     
     /** class associated with this descriptor (if any) */
     private Class<T> cl;
@@ -135,44 +135,44 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
     private ClassAnalyzer<?> superClassAnalyzer;
     
     public String getName() {
-	return name;
+        return name;
     }
 
     public char[] getNameAsCharArray() {
-	return nameChar ;
+        return nameChar ;
     }
 
     /**
      * Return the class in the local VM that this version is mapped to.  Null
      * is returned if there is no corresponding local class.
      *
-     * @return	the <code>Class</code> instance that this descriptor represents
+     * @return  the <code>Class</code> instance that this descriptor represents
      */
     public Class<T> forClass() {
-	return cl;
+        return cl;
     }
     
     /**
      * Return an array of the fields of this serializable class.
      *
-     * @return	an array containing an element for each persistent field of
-     * 		this class. Returns an array of length zero if there are no
-     * 		fields.
+     * @return  an array containing an element for each persistent field of
+     *          this class. Returns an array of length zero if there are no
+     *          fields.
      * @since 1.2
      */
     public ObjectStreamField[] getFields() {
-	return getFields(true);
+        return getFields(true);
     }
 
     /**
      * Get the field of this class by name.
      *
-     * @param	name the name of the data field to look for
-     * @return	The ObjectStreamField object of the named field or null if
-     * 		there is no such named field.
+     * @param   name the name of the data field to look for
+     * @return  The ObjectStreamField object of the named field or null if
+     *          there is no such named field.
      */
     public ObjectStreamField getField(String name) {
-	return getField(name, null);
+        return getField(name, null);
     }
 
     /**
@@ -180,75 +180,75 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      */
     @Override
     public String toString() {
-	return name ;
+        return name ;
     }
 
     public ClassAnalyzer<?> getSuperClassAnalyzer() {
-	return superClassAnalyzer ;
+        return superClassAnalyzer ;
     }
 
     /**
      * Creates local class descriptor representing given class.
      */
     public ClassAnalyzerImpl(final LookupTable<Class<?>,ClassMarshaler<?>> lt,
-	final Class<T> cl) {
+        final Class<T> cl) {
 
-	this.cl = cl;
-	name = cl.getName();
-	nameChar = name.toCharArray();
-	isProxy = Proxy.isProxyClass(cl);
-	isEnum = Enum.class.isAssignableFrom(cl);
-	isSerializable = Serializable.class.isAssignableFrom(cl);
-	isExternalizable  = Externalizable.class.isAssignableFrom(cl);
+        this.cl = cl;
+        name = cl.getName();
+        nameChar = name.toCharArray();
+        isProxy = Proxy.isProxyClass(cl);
+        isEnum = Enum.class.isAssignableFrom(cl);
+        isSerializable = Serializable.class.isAssignableFrom(cl);
+        isExternalizable  = Externalizable.class.isAssignableFrom(cl);
 
-	Class<?> superCl = cl.getSuperclass();
+        Class<?> superCl = cl.getSuperclass();
 
-	if ((superCl != null) && (superCl.isAssignableFrom( Serializable.class ))) {
-	    superClassAnalyzer = lt.lookup(null, superCl).getClassAnalyzer() ;
-	}
+        if ((superCl != null) && (superCl.isAssignableFrom( Serializable.class ))) {
+            superClassAnalyzer = lt.lookup(null, superCl).getClassAnalyzer() ;
+        }
 
-	if (isSerializable) {
-	    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-		public Object run() {
-		    if (isEnum) {
-			suid = new Long(0);
-			fields = NO_FIELDS;
-			return null;
-		    }
+        if (isSerializable) {
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                public Object run() {
+                    if (isEnum) {
+                        suid = new Long(0);
+                        fields = NO_FIELDS;
+                        return null;
+                    }
 
-		    // XXX suid = getDeclaredSUID(cl);
+                    // XXX suid = getDeclaredSUID(cl);
 
-		    try {
-			fields = getSerialFields(cl);
-		    } catch (InvalidClassException e) {
+                    try {
+                        fields = getSerialFields(cl);
+                    } catch (InvalidClassException e) {
                         Exceptions.self.noSerialFields( cl, e ) ;
-		    }
-		    
-		    if (isExternalizable ) {
-			cons = getExternalizableConstructor(cl);
-		    } else {
-			cons = getSerializableConstructor(cl);
-			writeObjectMethod = getPrivateMethod(cl, "writeObject", 
-			    new Class[] { ObjectOutputStream.class }, 
-			    Void.TYPE);
-			readObjectMethod = getPrivateMethod(cl, "readObject", 
-			    new Class[] { ObjectInputStream.class }, 
-			    Void.TYPE);
-			readObjectNoDataMethod = getPrivateMethod(
-			    cl, "readObjectNoData", 
-			    new Class[0], Void.TYPE);
-		    }
-		    writeReplaceMethod = getInheritableMethod(
-			cl, "writeReplace", new Class[0], Object.class);
-		    readResolveMethod = getInheritableMethod(
-			cl, "readResolve", new Class[0], Object.class);
-		    return null;
-		}
-	    });
-	} else {
-	    suid = new Long(0);
-	    fields = NO_FIELDS;
-	}
+                    }
+                    
+                    if (isExternalizable ) {
+                        cons = getExternalizableConstructor(cl);
+                    } else {
+                        cons = getSerializableConstructor(cl);
+                        writeObjectMethod = getPrivateMethod(cl, "writeObject", 
+                            new Class[] { ObjectOutputStream.class }, 
+                            Void.TYPE);
+                        readObjectMethod = getPrivateMethod(cl, "readObject", 
+                            new Class[] { ObjectInputStream.class }, 
+                            Void.TYPE);
+                        readObjectNoDataMethod = getPrivateMethod(
+                            cl, "readObjectNoData", 
+                            new Class[0], Void.TYPE);
+                    }
+                    writeReplaceMethod = getInheritableMethod(
+                        cl, "writeReplace", new Class[0], Object.class);
+                    readResolveMethod = getInheritableMethod(
+                        cl, "readResolve", new Class[0], Object.class);
+                    return null;
+                }
+            });
+        } else {
+            suid = new Long(0);
+            fields = NO_FIELDS;
+        }
     }
 
     /**
@@ -258,7 +258,7 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * returned.
      */
     ObjectStreamField[] getFields(boolean copy) {
-	return copy ? fields.clone() : fields;
+        return copy ? fields.clone() : fields;
     }
     
     /**
@@ -268,38 +268,38 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * types only.  Returns matching field, or null if no match found.
      */
     ObjectStreamField getField(String name, Class<?> type) {
-	for (int i = 0; i < fields.length; i++) {
-	    ObjectStreamField f = fields[i];
-	    if (f.getName().equals(name)) {
-		if (type == null || 
-		    (type == Object.class && !f.isPrimitive()))
-		{
-		    return f;
-		}
+        for (int i = 0; i < fields.length; i++) {
+            ObjectStreamField f = fields[i];
+            if (f.getName().equals(name)) {
+                if (type == null || 
+                    (type == Object.class && !f.isPrimitive()))
+                {
+                    return f;
+                }
 
-		Class<?> ftype = f.getType();
-		if (ftype != null && type.isAssignableFrom(ftype)) {
-		    return f;
-		}
-	    }
-	}
-	return null;
+                Class<?> ftype = f.getType();
+                if (ftype != null && type.isAssignableFrom(ftype)) {
+                    return f;
+                }
+            }
+        }
+        return null;
     }
 
     public boolean isProxy() {
-	return isProxy;
+        return isProxy;
     }
     
     public boolean isEnum() {
-	return isEnum;
+        return isEnum;
     }
     
     public boolean isExternalizable() {
-	return isExternalizable ;
+        return isExternalizable ;
     }
     
     public boolean isSerializable() {
-	return isSerializable;
+        return isSerializable;
     }
 
     /**
@@ -310,7 +310,7 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * accessible no-arg constructor.  Otherwise, returns false.
      */
     public boolean isInstantiable() {
-	return (cons != null);
+        return (cons != null);
     }
     
     /**
@@ -319,7 +319,7 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * returns false.
      */
     public boolean hasWriteObjectMethod() {
-	return (writeObjectMethod != null);
+        return (writeObjectMethod != null);
     }
     
     /**
@@ -328,7 +328,7 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * returns false.
      */
     public boolean hasReadObjectMethod() {
-	return (readObjectMethod != null);
+        return (readObjectMethod != null);
     }
     
     /**
@@ -337,7 +337,7 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * Otherwise, returns false.
      */
     public boolean hasReadObjectNoDataMethod() {
-	return (readObjectNoDataMethod != null);
+        return (readObjectNoDataMethod != null);
     }
     
     /**
@@ -345,7 +345,7 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * defines a conformant writeReplace method.  Otherwise, returns false.
      */
     public boolean hasWriteReplaceMethod() {
-	return (writeReplaceMethod != null);
+        return (writeReplaceMethod != null);
     }
     
     /**
@@ -353,7 +353,7 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * defines a conformant readResolve method.  Otherwise, returns false.
      */
     public boolean hasReadResolveMethod() {
-	return (readResolveMethod != null);
+        return (readResolveMethod != null);
     }
 
     /**
@@ -366,21 +366,21 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * inaccessible/unavailable.
      */
     public Object newInstance()
-	throws InstantiationException, InvocationTargetException,
-	       UnsupportedOperationException
+        throws InstantiationException, InvocationTargetException,
+               UnsupportedOperationException
     {
-	if (cons != null) {
-	    try {
-		return cons.newInstance();
-	    } catch (IllegalAccessException ex) {
-		// should not occur, as access checks have been suppressed
-		throw new InternalError();
-	    }
-	} else {
-	    throw new UnsupportedOperationException();
-	}
+        if (cons != null) {
+            try {
+                return cons.newInstance();
+            } catch (IllegalAccessException ex) {
+                // should not occur, as access checks have been suppressed
+                throw new InternalError();
+            }
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
-	       
+               
     /**
      * Invokes the writeObject method of the represented serializable class.
      * Throws UnsupportedOperationException if this class descriptor is not
@@ -388,25 +388,25 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * non-serializable or does not define writeObject.
      */
     public void invokeWriteObject(Object obj, ObjectOutputStream out)
-	throws IOException, UnsupportedOperationException
+        throws IOException, UnsupportedOperationException
     {
-	if (writeObjectMethod != null) {
-	    try {
-		writeObjectMethod.invoke(obj, new Object[]{ out });
-	    } catch (InvocationTargetException ex) {
-		Throwable th = ex.getTargetException();
-		if (th instanceof IOException) {
-		    throw (IOException) th;
-		} else {
-		    throwMiscException(th);
-		}
-	    } catch (IllegalAccessException ex) {
-		// should not occur, as access checks have been suppressed
-		throw new InternalError();
-	    }
-	} else {
-	    throw new UnsupportedOperationException();
-	}
+        if (writeObjectMethod != null) {
+            try {
+                writeObjectMethod.invoke(obj, new Object[]{ out });
+            } catch (InvocationTargetException ex) {
+                Throwable th = ex.getTargetException();
+                if (th instanceof IOException) {
+                    throw (IOException) th;
+                } else {
+                    throwMiscException(th);
+                }
+            } catch (IllegalAccessException ex) {
+                // should not occur, as access checks have been suppressed
+                throw new InternalError();
+            }
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
     
     /**
@@ -416,28 +416,28 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * non-serializable or does not define readObject.
      */
     public void invokeReadObject(Object obj, ObjectInputStream in)
-	throws ClassNotFoundException, IOException, 
-	       UnsupportedOperationException
+        throws ClassNotFoundException, IOException, 
+               UnsupportedOperationException
     {
-	if (readObjectMethod != null) {
-	    try {
-		readObjectMethod.invoke(obj, new Object[]{ in });
-	    } catch (InvocationTargetException ex) {
-		Throwable th = ex.getTargetException();
-		if (th instanceof ClassNotFoundException) {
-		    throw (ClassNotFoundException) th;
-		} else if (th instanceof IOException) {
-		    throw (IOException) th;
-		} else {
-		    throwMiscException(th);
-		}
-	    } catch (IllegalAccessException ex) {
-		// should not occur, as access checks have been suppressed
-		throw new InternalError();
-	    }
-	} else {
-	    throw new UnsupportedOperationException();
-	}
+        if (readObjectMethod != null) {
+            try {
+                readObjectMethod.invoke(obj, new Object[]{ in });
+            } catch (InvocationTargetException ex) {
+                Throwable th = ex.getTargetException();
+                if (th instanceof ClassNotFoundException) {
+                    throw (ClassNotFoundException) th;
+                } else if (th instanceof IOException) {
+                    throw (IOException) th;
+                } else {
+                    throwMiscException(th);
+                }
+            } catch (IllegalAccessException ex) {
+                // should not occur, as access checks have been suppressed
+                throw new InternalError();
+            }
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     /**
@@ -447,25 +447,25 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * non-serializable or does not define readObjectNoData.
      */
     public void invokeReadObjectNoData(Object obj)
-	throws IOException, UnsupportedOperationException
+        throws IOException, UnsupportedOperationException
     {
-	if (readObjectNoDataMethod != null) {
-	    try {
-		readObjectNoDataMethod.invoke(obj);
-	    } catch (InvocationTargetException ex) {
-		Throwable th = ex.getTargetException();
-		if (th instanceof ObjectStreamException) {
-		    throw (ObjectStreamException) th;
-		} else {
-		    throwMiscException(th);
-		}
-	    } catch (IllegalAccessException ex) {
-		// should not occur, as access checks have been suppressed
-		throw new InternalError();
-	    }
-	} else {
-	    throw new UnsupportedOperationException();
-	}
+        if (readObjectNoDataMethod != null) {
+            try {
+                readObjectNoDataMethod.invoke(obj);
+            } catch (InvocationTargetException ex) {
+                Throwable th = ex.getTargetException();
+                if (th instanceof ObjectStreamException) {
+                    throw (ObjectStreamException) th;
+                } else {
+                    throwMiscException(th);
+                }
+            } catch (IllegalAccessException ex) {
+                // should not occur, as access checks have been suppressed
+                throw new InternalError();
+            }
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     /**
@@ -475,26 +475,26 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * non-serializable or does not define writeReplace.
      */
     public Object invokeWriteReplace(Object obj)
-	throws IOException, UnsupportedOperationException
+        throws IOException, UnsupportedOperationException
     {
-	if (writeReplaceMethod != null) {
-	    try {
-		return writeReplaceMethod.invoke(obj);
-	    } catch (InvocationTargetException ex) {
-		Throwable th = ex.getTargetException();
-		if (th instanceof ObjectStreamException) {
-		    throw (ObjectStreamException) th;
-		} else {
-		    throwMiscException(th);
-		    throw new InternalError();	// never reached
-		}
-	    } catch (IllegalAccessException ex) {
-		// should not occur, as access checks have been suppressed
-		throw new InternalError();
-	    }
-	} else {
-	    throw new UnsupportedOperationException();
-	}
+        if (writeReplaceMethod != null) {
+            try {
+                return writeReplaceMethod.invoke(obj);
+            } catch (InvocationTargetException ex) {
+                Throwable th = ex.getTargetException();
+                if (th instanceof ObjectStreamException) {
+                    throw (ObjectStreamException) th;
+                } else {
+                    throwMiscException(th);
+                    throw new InternalError();  // never reached
+                }
+            } catch (IllegalAccessException ex) {
+                // should not occur, as access checks have been suppressed
+                throw new InternalError();
+            }
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     /**
@@ -504,26 +504,26 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * non-serializable or does not define readResolve.
      */
     public Object invokeReadResolve(Object obj)
-	throws IOException, UnsupportedOperationException
+        throws IOException, UnsupportedOperationException
     {
-	if (readResolveMethod != null) {
-	    try {
-		return readResolveMethod.invoke(obj);
-	    } catch (InvocationTargetException ex) {
-		Throwable th = ex.getTargetException();
-		if (th instanceof ObjectStreamException) {
-		    throw (ObjectStreamException) th;
-		} else {
-		    throwMiscException(th);
-		    throw new InternalError();	// never reached
-		}
-	    } catch (IllegalAccessException ex) {
-		// should not occur, as access checks have been suppressed
-		throw new InternalError();
-	    }
-	} else {
-	    throw new UnsupportedOperationException();
-	}
+        if (readResolveMethod != null) {
+            try {
+                return readResolveMethod.invoke(obj);
+            } catch (InvocationTargetException ex) {
+                Throwable th = ex.getTargetException();
+                if (th instanceof ObjectStreamException) {
+                    throw (ObjectStreamException) th;
+                } else {
+                    throwMiscException(th);
+                    throw new InternalError();  // never reached
+                }
+            } catch (IllegalAccessException ex) {
+                // should not occur, as access checks have been suppressed
+                throw new InternalError();
+            }
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     /**
@@ -532,15 +532,15 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * the defining class may still be non-public.
      */
     private Constructor<T> getExternalizableConstructor(Class<T> cl) {
-	try {
-	    Constructor<T> lcons = cl.getDeclaredConstructor();
-	    lcons.setAccessible(true);
-	    return ((lcons.getModifiers() & Modifier.PUBLIC) != 0) ?
-		lcons : null;
-	} catch (NoSuchMethodException ex) {
+        try {
+            Constructor<T> lcons = cl.getDeclaredConstructor();
+            lcons.setAccessible(true);
+            return ((lcons.getModifiers() & Modifier.PUBLIC) != 0) ?
+                lcons : null;
+        } catch (NoSuchMethodException ex) {
             Exceptions.self.noExternalizableConstructor( cl, ex ) ;
-	    return null;
-	}
+            return null;
+        }
     }
 
     /**
@@ -549,28 +549,28 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * returned constructor (if any).
      */
     private Constructor<T> getSerializableConstructor(Class<T> cl) {
-	Class<?> initCl = cl;
-	while (Serializable.class.isAssignableFrom(initCl)) {
-	    if ((initCl = initCl.getSuperclass()) == null) {
-		return null;
-	    }
-	}
-	try {
-	    final Constructor<?> lcons = initCl.getDeclaredConstructor();
-	    final int mods = lcons.getModifiers();
-	    if ((mods & Modifier.PRIVATE) != 0 ||
-		((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) == 0 &&
-		 !packageEquals(cl, initCl)))
-	    {
-		return null;
-	    }
-	    final Constructor<T> result =
+        Class<?> initCl = cl;
+        while (Serializable.class.isAssignableFrom(initCl)) {
+            if ((initCl = initCl.getSuperclass()) == null) {
+                return null;
+            }
+        }
+        try {
+            final Constructor<?> lcons = initCl.getDeclaredConstructor();
+            final int mods = lcons.getModifiers();
+            if ((mods & Modifier.PRIVATE) != 0 ||
+                ((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) == 0 &&
+                 !packageEquals(cl, initCl)))
+            {
+                return null;
+            }
+            final Constructor<T> result =
                 bridge.newConstructorForSerialization(cl, lcons) ;
-	    result.setAccessible(true);
-	    return result;
-	} catch (NoSuchMethodException ex) {
-	    return null;
-	}
+            result.setAccessible(true);
+            return result;
+        } catch (NoSuchMethodException ex) {
+            return null;
+        }
     }
 
     /**
@@ -580,34 +580,34 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * method (if any).
      */
     private Method getInheritableMethod(Class<?> cl, String name,
-					       Class<?>[] argTypes,
-					       Class<?> returnType)
+                                               Class<?>[] argTypes,
+                                               Class<?> returnType)
     {
-	Method meth = null;
-	Class<?> defCl = cl;
-	while (defCl != null) {
-	    try {
-		meth = defCl.getDeclaredMethod(name, argTypes);
-		break;
-	    } catch (NoSuchMethodException ex) {
-		defCl = defCl.getSuperclass();
-	    }
-	}
+        Method meth = null;
+        Class<?> defCl = cl;
+        while (defCl != null) {
+            try {
+                meth = defCl.getDeclaredMethod(name, argTypes);
+                break;
+            } catch (NoSuchMethodException ex) {
+                defCl = defCl.getSuperclass();
+            }
+        }
 
-	if ((meth == null) || (meth.getReturnType() != returnType)) {
-	    return null;
-	}
-	meth.setAccessible(true);
-	int mods = meth.getModifiers();
-	if ((mods & (Modifier.STATIC | Modifier.ABSTRACT)) != 0) {
-	    return null;
-	} else if ((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) != 0) {
-	    return meth;
-	} else if ((mods & Modifier.PRIVATE) != 0) {
-	    return (cl == defCl) ? meth : null;
-	} else {
-	    return packageEquals(cl, defCl) ? meth : null;
-	}
+        if ((meth == null) || (meth.getReturnType() != returnType)) {
+            return null;
+        }
+        meth.setAccessible(true);
+        int mods = meth.getModifiers();
+        if ((mods & (Modifier.STATIC | Modifier.ABSTRACT)) != 0) {
+            return null;
+        } else if ((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) != 0) {
+            return meth;
+        } else if ((mods & Modifier.PRIVATE) != 0) {
+            return (cl == defCl) ? meth : null;
+        } else {
+            return packageEquals(cl, defCl) ? meth : null;
+        }
     }
 
     /**
@@ -616,19 +616,19 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * returned method (if any).
      */
     private Method getPrivateMethod(Class<?> cl, String name,
-					   Class<?>[] argTypes,
-					   Class<?> returnType)
+                                           Class<?>[] argTypes,
+                                           Class<?> returnType)
     {
-	try {
-	    Method meth = cl.getDeclaredMethod(name, argTypes);
-	    meth.setAccessible(true);
-	    int mods = meth.getModifiers();
-	    return ((meth.getReturnType() == returnType) &&
-		    ((mods & Modifier.STATIC) == 0) &&
-		    ((mods & Modifier.PRIVATE) != 0)) ? meth : null;
-	} catch (NoSuchMethodException ex) {
-	    return null;
-	}
+        try {
+            Method meth = cl.getDeclaredMethod(name, argTypes);
+            meth.setAccessible(true);
+            int mods = meth.getModifiers();
+            return ((meth.getReturnType() == returnType) &&
+                    ((mods & Modifier.STATIC) == 0) &&
+                    ((mods & Modifier.PRIVATE) != 0)) ? meth : null;
+        } catch (NoSuchMethodException ex) {
+            return null;
+        }
     }
 
     /**
@@ -636,21 +636,21 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * otherwise.
      */
     private boolean packageEquals(Class<?> cl1, Class<?> cl2) {
-	return (cl1.getClassLoader() == cl2.getClassLoader() &&
-		getPackageName(cl1).equals(getPackageName(cl2)));
+        return (cl1.getClassLoader() == cl2.getClassLoader() &&
+                getPackageName(cl1).equals(getPackageName(cl2)));
     }
 
     /**
      * Returns package name of given class.
      */
     private String getPackageName(Class<?> cl) {
-	String s = cl.getName();
-	int i = s.lastIndexOf('[');
-	if (i >= 0) {
-	    s = s.substring(i + 2);
-	}
-	i = s.lastIndexOf('.');
-	return (i >= 0) ? s.substring(0, i) : "";
+        String s = cl.getName();
+        int i = s.lastIndexOf('[');
+        if (i >= 0) {
+            s = s.substring(i + 2);
+        }
+        i = s.lastIndexOf('.');
+        return (i >= 0) ? s.substring(0, i) : "";
     }
 
     /**
@@ -658,9 +658,9 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * if class names equal, false otherwise.
      */
     private boolean classNamesEqual(String name1, String name2) {
-	final String n1 = name1.substring(name1.lastIndexOf('.') + 1);
-	final String n2 = name2.substring(name2.lastIndexOf('.') + 1);
-	return n1.equals(n2);
+        final String n1 = name1.substring(name1.lastIndexOf('.') + 1);
+        final String n2 = name2.substring(name2.lastIndexOf('.') + 1);
+        return n1.equals(n2);
     }
     
     /**
@@ -669,13 +669,13 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * wrapped inside an IOException).
      */
     private void throwMiscException(Throwable th) throws IOException {
-	if (th instanceof RuntimeException) {
-	    throw (RuntimeException) th;
-	} else if (th instanceof Error) {
-	    throw (Error) th;
-	} else {
-	    throw new IOException("unexpected exception type", th);
-	}
+        if (th instanceof RuntimeException) {
+            throw (RuntimeException) th;
+        } else if (th instanceof Error) {
+            throw (Error) th;
+        } else {
+            throw new IOException("unexpected exception type", th);
+        }
     }
 
     /**
@@ -686,22 +686,22 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * declared) serializable fields are invalid.
      */
     private ObjectStreamField[] getSerialFields(Class<?> cl)
-	throws InvalidClassException
+        throws InvalidClassException
     {
-	ObjectStreamField[] lfields;
-	if (Serializable.class.isAssignableFrom(cl) &&
-	    !Externalizable.class.isAssignableFrom(cl) &&
-	    !Proxy.isProxyClass(cl) &&
-	    !cl.isInterface())
-	{
-	    if ((lfields = getDeclaredSerialFields(cl)) == null) {
-		lfields = getDefaultSerialFields(cl);
-	    }
-	    Arrays.sort(lfields);
-	} else {
-	    lfields = NO_FIELDS;
-	}
-	return lfields;
+        ObjectStreamField[] lfields;
+        if (Serializable.class.isAssignableFrom(cl) &&
+            !Externalizable.class.isAssignableFrom(cl) &&
+            !Proxy.isProxyClass(cl) &&
+            !cl.isInterface())
+        {
+            if ((lfields = getDeclaredSerialFields(cl)) == null) {
+                lfields = getDefaultSerialFields(cl);
+            }
+            Arrays.sort(lfields);
+        } else {
+            lfields = NO_FIELDS;
+        }
+        return lfields;
     }
     
     /**
@@ -716,63 +716,63 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * invalid--e.g., if multiple fields share the same name.
      */
     private ObjectStreamField[] getDeclaredSerialFields(Class<?> cl)
-	throws InvalidClassException
+        throws InvalidClassException
     {
-	ObjectStreamField[] serialPersistentFields = null;
-	try {
-	    Field f = cl.getDeclaredField("serialPersistentFields");
-	    int mask = Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL;
-	    if ((f.getModifiers() & mask) == mask) {
-		f.setAccessible(true);
-		java.io.ObjectStreamField[] javaSPF = 
-		    (java.io.ObjectStreamField[])f.get(null) ;
-		serialPersistentFields =
+        ObjectStreamField[] serialPersistentFields = null;
+        try {
+            Field f = cl.getDeclaredField("serialPersistentFields");
+            int mask = Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL;
+            if ((f.getModifiers() & mask) == mask) {
+                f.setAccessible(true);
+                java.io.ObjectStreamField[] javaSPF = 
+                    (java.io.ObjectStreamField[])f.get(null) ;
+                serialPersistentFields =
                     ObjectStreamClass.translateFields( javaSPF ) ;
-	    }
-	} catch (Exception ex) {
+            }
+        } catch (Exception ex) {
             Exceptions.self.noSerialPersistentFields( cl, ex ) ;
-	}
+        }
 
-	if (serialPersistentFields == null) {
-	    return null;
-	} else if (serialPersistentFields.length == 0) {
-	    return NO_FIELDS;
-	}
-	
-	ObjectStreamField[] boundFields = 
-	    new ObjectStreamField[serialPersistentFields.length];
-	Set<String> fieldNames = new HashSet<String>(
+        if (serialPersistentFields == null) {
+            return null;
+        } else if (serialPersistentFields.length == 0) {
+            return NO_FIELDS;
+        }
+        
+        ObjectStreamField[] boundFields = 
+            new ObjectStreamField[serialPersistentFields.length];
+        Set<String> fieldNames = new HashSet<String>(
             serialPersistentFields.length);
 
-	for (int i = 0; i < serialPersistentFields.length; i++) {
-	    ObjectStreamField spf = serialPersistentFields[i];
+        for (int i = 0; i < serialPersistentFields.length; i++) {
+            ObjectStreamField spf = serialPersistentFields[i];
 
-	    String fname = spf.getName();
-	    if (fieldNames.contains(fname)) {
-		throw new InvalidClassException(
-		    "multiple serializable fields named " + fname);
-	    }
-	    fieldNames.add(fname);
+            String fname = spf.getName();
+            if (fieldNames.contains(fname)) {
+                throw new InvalidClassException(
+                    "multiple serializable fields named " + fname);
+            }
+            fieldNames.add(fname);
 
             Field f = null ;
-	    try {
-		f = cl.getDeclaredField(fname);
-		if ((f.getType() == spf.getType()) &&
-		    ((f.getModifiers() & Modifier.STATIC) == 0))
-		{
-		    boundFields[i] = 
-			new ObjectStreamField(f) ;
-		}
-	    } catch (NoSuchFieldException ex) {
+            try {
+                f = cl.getDeclaredField(fname);
+                if ((f.getType() == spf.getType()) &&
+                    ((f.getModifiers() & Modifier.STATIC) == 0))
+                {
+                    boundFields[i] = 
+                        new ObjectStreamField(f) ;
+                }
+            } catch (NoSuchFieldException ex) {
                 Exceptions.self.fieldNotFound( f, cl, ex ) ;
-	    }
+            }
 
-	    if (boundFields[i] == null) {
-		boundFields[i] = new ObjectStreamField(
-		    fname, spf.getType() ) ;
-	    }
-	}
-	return boundFields;
+            if (boundFields[i] == null) {
+                boundFields[i] = new ObjectStreamField(
+                    fname, spf.getType() ) ;
+            }
+        }
+        return boundFields;
     }
 
     /**
@@ -782,17 +782,17 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
      * serializable fields exist, NO_FIELDS is returned.
      */
     private ObjectStreamField[] getDefaultSerialFields(Class<?> cl) {
-	Field[] clFields = cl.getDeclaredFields();
-	ArrayList<ObjectStreamField> list = new ArrayList<ObjectStreamField>();
-	int mask = Modifier.STATIC | Modifier.TRANSIENT;
+        Field[] clFields = cl.getDeclaredFields();
+        ArrayList<ObjectStreamField> list = new ArrayList<ObjectStreamField>();
+        int mask = Modifier.STATIC | Modifier.TRANSIENT;
 
-	for (int i = 0; i < clFields.length; i++) {
-	    if ((clFields[i].getModifiers() & mask) == 0) {
-		list.add(new ObjectStreamField(clFields[i]));
-	    }
-	}
-	int size = list.size();
-	return (size == 0) ? NO_FIELDS :
-	    list.toArray(new ObjectStreamField[size]);
+        for (int i = 0; i < clFields.length; i++) {
+            if ((clFields[i].getModifiers() & mask) == 0) {
+                list.add(new ObjectStreamField(clFields[i]));
+            }
+        }
+        int size = list.size();
+        return (size == 0) ? NO_FIELDS :
+            list.toArray(new ObjectStreamField[size]);
     }
 }

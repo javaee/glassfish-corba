@@ -85,23 +85,23 @@ public class TestInitializer
      * Called after all references are registered
      */
     public void post_init (org.omg.PortableInterceptor.ORBInitInfo info) {
-	ServerRequestInterceptor interceptor1;
-	ServerRequestInterceptor interceptor2;
-	ServerRequestInterceptor interceptor3;
+        ServerRequestInterceptor interceptor1;
+        ServerRequestInterceptor interceptor2;
+        ServerRequestInterceptor interceptor3;
 
-	interceptor1 = new SampleServerRequestInterceptor( "1" );
-	interceptor2 = new SampleServerRequestInterceptor( "2" );
-	interceptor3 = new SampleServerRequestInterceptor( "3" );
+        interceptor1 = new SampleServerRequestInterceptor( "1" );
+        interceptor2 = new SampleServerRequestInterceptor( "2" );
+        interceptor3 = new SampleServerRequestInterceptor( "3" );
 
-	try {
-	    out.println( "    - post_init: adding 3 server interceptors..." );
-	    info.add_server_request_interceptor( interceptor1 );
-	    info.add_server_request_interceptor( interceptor2 );
-	    info.add_server_request_interceptor( interceptor3 );
+        try {
+            out.println( "    - post_init: adding 3 server interceptors..." );
+            info.add_server_request_interceptor( interceptor1 );
+            info.add_server_request_interceptor( interceptor2 );
+            info.add_server_request_interceptor( interceptor3 );
         }
-	catch( DuplicateName e ) {
-	    out.println( "    - post_init: received DuplicateName!" );
-	}
+        catch( DuplicateName e ) {
+            out.println( "    - post_init: received DuplicateName!" );
+        }
     }
 
 }

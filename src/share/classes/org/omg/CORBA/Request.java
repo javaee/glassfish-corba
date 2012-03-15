@@ -85,7 +85,7 @@ public abstract class Request {
     /**
      * Retrieves the the target object reference.
      *
-     * @return			the object reference that points to the
+     * @return                  the object reference that points to the
      *                    object implementation for the method
      *                    to be invoked
      */
@@ -95,7 +95,7 @@ public abstract class Request {
     /**
      * Retrieves the name of the method to be invoked.
      *
-     * @return			the name of the method to be invoked
+     * @return                  the name of the method to be invoked
      */
 
     public abstract String operation();
@@ -106,8 +106,8 @@ public abstract class Request {
      * <code>NamedValue</code> objects, with each one describing an argument
      * to the method.
      *
-     * @return	the <code>NVList</code> object containing the arguments
-     *			for the method
+     * @return  the <code>NVList</code> object containing the arguments
+     *                  for the method
      *
      */
 
@@ -117,8 +117,8 @@ public abstract class Request {
      * Retrieves the <code>NamedValue</code> object containing the return
      * value for the method.
      *
-     * @return		the <code>NamedValue</code> object containing the result
-     *				of the method
+     * @return          the <code>NamedValue</code> object containing the result
+     *                          of the method
      */
 
     public abstract NamedValue result();
@@ -129,7 +129,7 @@ public abstract class Request {
      * thrown (after the invocation returns).
      *
      *
-     * @return	the <code>Environment</code> object for this request
+     * @return  the <code>Environment</code> object for this request
      */
 
     public abstract Environment env();
@@ -139,7 +139,7 @@ public abstract class Request {
      * This list contains <code>TypeCode</code> objects describing the
      * exceptions that may be thrown by the method being invoked.
      *
-     * @return	the <code>ExceptionList</code> object describing the exceptions
+     * @return  the <code>ExceptionList</code> object describing the exceptions
      *            that may be thrown by the method being invoked
      */
 
@@ -151,9 +151,9 @@ public abstract class Request {
      * be resolved and sent with the invocation.
      *
      *
-     * @return			the list of context strings whose values
-     *				need to be resolved and sent with the
-     *				invocation.
+     * @return                  the list of context strings whose values
+     *                          need to be resolved and sent with the
+     *                          invocation.
      */
 
     public abstract ContextList contexts();
@@ -163,9 +163,9 @@ public abstract class Request {
      * This is a list of properties giving information about the
      * client, the environment, or the circumstances of this request.
      *
-     * @return		the <code>Context</code> object that is to be used
-     *				to resolve any context strings whose
-     *				values need to be sent with the invocation
+     * @return          the <code>Context</code> object that is to be used
+     *                          to resolve any context strings whose
+     *                          values need to be sent with the invocation
      */
 
     public abstract Context ctx();
@@ -173,8 +173,8 @@ public abstract class Request {
     /**
      * Sets this request's <code>Context</code> object to the one given.
      *
-     * @param c		the new <code>Context</code> object to be used for
-     *				resolving context strings
+     * @param c         the new <code>Context</code> object to be used for
+     *                          resolving context strings
      */
 
     public abstract void ctx(Context c);
@@ -184,7 +184,7 @@ public abstract class Request {
      * Creates an input argument and adds it to this <code>Request</code>
      * object.
      *
-     * @return		an <code>Any</code> object that contains the
+     * @return          an <code>Any</code> object that contains the
      *                value and typecode for the input argument added
      */
 
@@ -194,8 +194,8 @@ public abstract class Request {
      * Creates an input argument with the given name and adds it to
      * this <code>Request</code> object.
      *
-     * @param name		the name of the argument being added
-     * @return		an <code>Any</code> object that contains the
+     * @param name              the name of the argument being added
+     * @return          an <code>Any</code> object that contains the
      *                value and typecode for the input argument added
      */
 
@@ -204,7 +204,7 @@ public abstract class Request {
     /**
      * Adds an input/output argument to this <code>Request</code> object.
      *
-     * @return		an <code>Any</code> object that contains the
+     * @return          an <code>Any</code> object that contains the
      *                value and typecode for the input/output argument added
      */
 
@@ -214,8 +214,8 @@ public abstract class Request {
      * Adds an input/output argument with the given name to this
      * <code>Request</code> object.
      *
-     * @param name		the name of the argument being added
-     * @return		an <code>Any</code> object that contains the
+     * @param name              the name of the argument being added
+     * @return          an <code>Any</code> object that contains the
      *                value and typecode for the input/output argument added
      */
 
@@ -225,7 +225,7 @@ public abstract class Request {
     /**
      * Adds an output argument to this <code>Request</code> object.
      *
-     * @return		an <code>Any</code> object that contains the
+     * @return          an <code>Any</code> object that contains the
      *                value and typecode for the output argument added
      */
 
@@ -235,8 +235,8 @@ public abstract class Request {
      * Adds an output argument with the given name to this
      * <code>Request</code> object.
      *
-     * @param name		the name of the argument being added
-     * @return		an <code>Any</code> object that contains the
+     * @param name              the name of the argument being added
+     * @return          an <code>Any</code> object that contains the
      *                value and typecode for the output argument added
      */
 
@@ -246,7 +246,7 @@ public abstract class Request {
      * Sets the typecode for the return
      * value of the method.
      *
-     * @param tc			the <code>TypeCode</code> object containing type information
+     * @param tc                        the <code>TypeCode</code> object containing type information
      *                   for the return value
      */
 
@@ -256,7 +256,7 @@ public abstract class Request {
      * Returns the <code>Any</code> object that contains the value for the
      * result of the method.
      *
-     * @return			an <code>Any</code> object containing the value and
+     * @return                  an <code>Any</code> object containing the value and
      *                   typecode for the return value
      */
 
@@ -295,8 +295,8 @@ public abstract class Request {
      * whether a response has been received for the invocation triggered
      * earlier with the <code>send_deferred</code> method.
      *
-     * @return		<code>true</code> if the method response has
-     * 				been received; <code>false</code> otherwise
+     * @return          <code>true</code> if the method response has
+     *                          been received; <code>false</code> otherwise
      */
 
     public abstract boolean poll_response();

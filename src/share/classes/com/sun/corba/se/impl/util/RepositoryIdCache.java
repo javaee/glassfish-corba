@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.util;
+package com.sun.corba.ee.impl.util;
 
 import java.util.Stack;
 import java.util.Hashtable;
@@ -60,7 +60,7 @@ public class RepositoryIdCache extends Hashtable {
         if (repId != null) {
             return repId;
         } else {
-	    repId = new RepositoryId(key);
+            repId = new RepositoryId(key);
             put(key, repId);
             return repId;
         }

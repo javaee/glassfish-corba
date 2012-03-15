@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)IDLValueHelper.java	1.4 99/06/07 */
+/* @(#)IDLValueHelper.java      1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -106,14 +106,14 @@ public abstract class IDLValueHelper
     public static IDLValue read (org.omg.CORBA.portable.InputStream istream)
     {
         IDLValue value = new IDLValue();
-	value.fInt = istream.read_long();
+        value.fInt = istream.read_long();
         value.fLong = istream.read_longlong();
         value.fFloat = istream.read_float();
         value.fDouble = istream.read_double();
         value.fString = istream.read_string();
-	return value;
+        return value;
     }
-	
+        
     public static void write (org.omg.CORBA.portable.OutputStream ostream, IDLValue value)
     {
         ostream.write_long(value.fInt);
@@ -122,5 +122,5 @@ public abstract class IDLValueHelper
         ostream.write_double(value.fDouble);
         ostream.write_string(value.fString);
     }
-	
+        
 }

@@ -79,7 +79,7 @@ public class IndirectionException extends SystemException {
      * @param offset the stream offset where recursion is detected.
      */
     public IndirectionException(int offset){
-	super("", 0, org.omg.CORBA.CompletionStatus.COMPLETED_MAYBE);
-	this.offset = offset;
+        super("", 0, org.omg.CORBA.CompletionStatus.COMPLETED_MAYBE);
+        this.offset = offset;
     }
 }

@@ -48,11 +48,11 @@ import java.util.Properties;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.*;
 import org.omg.PortableServer.POA;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 class HelloImpl
     extends
-	HelloPOA
+        HelloPOA
 {
     public HelloImpl() 
     {
@@ -68,37 +68,37 @@ public class Server
 {
     public static void main(String[] args)
     {
-	try{
-	    Properties props = new Properties();
-	    props.setProperty(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
-			      Interceptor.class.getName(),
-			      "dummy");
-	    ORB orb = ORB.init(args, props);
+        try{
+            Properties props = new Properties();
+            props.setProperty(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
+                              Interceptor.class.getName(),
+                              "dummy");
+            ORB orb = ORB.init(args, props);
 
-	    // Get rootPOA
+            // Get rootPOA
             POA rootPOA = (POA)orb.resolve_initial_references("RootPOA");
-	    rootPOA.the_POAManager().activate();
+            rootPOA.the_POAManager().activate();
 
             HelloImpl hello = new HelloImpl();
-	    byte[] id = rootPOA.activate_object(hello);
-	    org.omg.CORBA.Object ref = rootPOA.id_to_reference(id);
+            byte[] id = rootPOA.activate_object(hello);
+            org.omg.CORBA.Object ref = rootPOA.id_to_reference(id);
 
-	    NamingContext namingContext = 
-		NamingContextHelper.narrow(orb.resolve_initial_references(
- 	            "NameService"));
-	    NameComponent nc = new NameComponent("Server", "");
-	    NameComponent path[] = { nc };
-	    namingContext.rebind( path , ref );
+            NamingContext namingContext = 
+                NamingContextHelper.narrow(orb.resolve_initial_references(
+                    "NameService"));
+            NameComponent nc = new NameComponent("Server", "");
+            NameComponent path[] = { nc };
+            namingContext.rebind( path , ref );
 
             System.out.println("Server is ready.");
 
-	    orb.run();
+            orb.run();
 
-	} catch (Exception ex) {
-	    System.err.println("ERROR: " + ex);
-	    ex.printStackTrace();
+        } catch (Exception ex) {
+            System.err.println("ERROR: " + ex);
+            ex.printStackTrace();
             System.exit(1);
-	}
+        }
     }
 }
 

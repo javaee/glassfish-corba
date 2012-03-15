@@ -46,9 +46,9 @@ import org.omg.CosNaming.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POAPackage.*;
 import org.omg.PortableInterceptor.*;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import corba.framework.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import java.util.*;
 import java.io.*;
@@ -67,7 +67,7 @@ public abstract class DSIPOAServer
 
     // To be invoked by subclass after orb is created.
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
         try {
@@ -122,60 +122,60 @@ public abstract class DSIPOAServer
      * _non_existent.
      */
     void testSpecialOps()
-	throws Exception
+        throws Exception
     {
-	out.println();
-	out.println( "Running Special Operations Tests" );
-	out.println( "================================" );
+        out.println();
+        out.println( "Running Special Operations Tests" );
+        out.println( "================================" );
 
-	out.println( "+ Testing _is_a..." );
-	SampleServerRequestInterceptor.dontIgnoreIsA = true;
-	testInvocation( "testInvocationIsA",
-	    SampleServerRequestInterceptor.MODE_NORMAL,
-	    "rs1rs2rs3rr1rr2rr3sr3sr2sr1",
-	    "_is_a", "", false );
+        out.println( "+ Testing _is_a..." );
+        SampleServerRequestInterceptor.dontIgnoreIsA = true;
+        testInvocation( "testInvocationIsA",
+            SampleServerRequestInterceptor.MODE_NORMAL,
+            "rs1rs2rs3rr1rr2rr3sr3sr2sr1",
+            "_is_a", "", false );
 
-	// We do not implement this interface in our ORB. 
-	// Thus, the send_exception.  We pass in false for exception
-	// expected because this is not the exception we normally look for.
-	out.println( "+ Testing _get_interface_def..." );
-	testInvocation( "testInvocationGetInterfaceDef",
-	    SampleServerRequestInterceptor.MODE_NORMAL,
-	    "rs1rs2rs3rr1rr2rr3se3se2se1",
-	    "_get_interface_def", "", false );
+        // We do not implement this interface in our ORB. 
+        // Thus, the send_exception.  We pass in false for exception
+        // expected because this is not the exception we normally look for.
+        out.println( "+ Testing _get_interface_def..." );
+        testInvocation( "testInvocationGetInterfaceDef",
+            SampleServerRequestInterceptor.MODE_NORMAL,
+            "rs1rs2rs3rr1rr2rr3se3se2se1",
+            "_get_interface_def", "", false );
 
-	out.println( "+ Testing _non_existent..." );
-	testInvocation( "testInvocationNonExistent",
-	    SampleServerRequestInterceptor.MODE_NORMAL,
-	    "rs1rs2rs3rr1rr2rr3sr3sr2sr1",
-	    "_non_existent", "", false );
+        out.println( "+ Testing _non_existent..." );
+        testInvocation( "testInvocationNonExistent",
+            SampleServerRequestInterceptor.MODE_NORMAL,
+            "rs1rs2rs3rr1rr2rr3sr3sr2sr1",
+            "_non_existent", "", false );
     }
 
     /**
      * Implementation borrowed from corba.socket.HelloServer test
      */
     public org.omg.CORBA.Object createAndBind ( POA poa, String name, 
-	                                        String symbol )
-	throws Exception
+                                                String symbol )
+        throws Exception
     {
-	// create servant and register it with the ORB
-	helloDSIServant helloRef = new helloDSIServant( orb, out, symbol );
+        // create servant and register it with the ORB
+        helloDSIServant helloRef = new helloDSIServant( orb, out, symbol );
 
-	byte[] id = poa.activate_object(helloRef);
-	org.omg.CORBA.Object ref = poa.id_to_reference(id);
+        byte[] id = poa.activate_object(helloRef);
+        org.omg.CORBA.Object ref = poa.id_to_reference(id);
       
-	// get the root naming context
-	org.omg.CORBA.Object objRef = 
-	    orb.resolve_initial_references("NameService");
-	NamingContext ncRef = NamingContextHelper.narrow(objRef);
+        // get the root naming context
+        org.omg.CORBA.Object objRef = 
+            orb.resolve_initial_references("NameService");
+        NamingContext ncRef = NamingContextHelper.narrow(objRef);
       
-	// bind the Object Reference in Naming
-	NameComponent nc = new NameComponent(name, "");
-	NameComponent path[] = {nc};
+        // bind the Object Reference in Naming
+        NameComponent nc = new NameComponent(name, "");
+        NameComponent path[] = {nc};
             
-	ncRef.rebind(path, ref);
+        ncRef.rebind(path, ref);
 
-	return ref;
+        return ref;
     }
 
 }

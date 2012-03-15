@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.oa ;
+package com.sun.corba.ee.spi.oa ;
 
 import org.omg.CORBA.SystemException ;
 

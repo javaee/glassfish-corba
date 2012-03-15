@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)NotSerializableChild.java	1.4 99/06/07 */
+/* @(#)NotSerializableChild.java        1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -51,8 +51,8 @@ package javax.rmi.CORBA.serialization;
 
 public class NotSerializableChild extends IsSerializable {
     int Int2 = 333;
-	
+        
     public NotSerializableChild(){
-	super("Not a serializable child");
+        super("Not a serializable child");
     }
 }

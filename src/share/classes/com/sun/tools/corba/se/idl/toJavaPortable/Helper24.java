@@ -98,18 +98,18 @@ public class Helper24 extends Helper
       entry.comment ().generate ("", stream);
 
     if (entry instanceof ValueBoxEntry) {
-	stream.print   ("public final class " + helperClass);
-	stream.println (" implements org.omg.CORBA.portable.BoxedValueHelper");
+        stream.print   ("public final class " + helperClass);
+        stream.println (" implements org.omg.CORBA.portable.BoxedValueHelper");
     }
     else
-	stream.println ("abstract public class " + helperClass);
+        stream.println ("abstract public class " + helperClass);
     stream.println ('{');
   }
 
   /**
    * Generate the instance variables.
    * <d62023> - no helper instance except for boxed valuetypes.
-   *	      - move truncatable_ids to mapped class.
+   *          - move truncatable_ids to mapped class.
    **/
   protected void writeInstVars ()
   {
@@ -118,8 +118,8 @@ public class Helper24 extends Helper
     {
       stream.println ();
       if (entry instanceof ValueBoxEntry) {
-	  stream.println ("  private static " + helperClass + " _instance = new " + helperClass + " ();");
-	  stream.println ();
+          stream.println ("  private static " + helperClass + " _instance = new " + helperClass + " ();");
+          stream.println ();
       }
     }
     stream.println ();
@@ -129,12 +129,12 @@ public class Helper24 extends Helper
    * <d62023> generate members of BoxedValueHelper interface if boxed
    *
    * <d62023> Hook in here to write factory methods for non-boxed ValueTypes 
-   *	      into Helper.
+   *          into Helper.
    **/
   protected void writeValueHelperInterface ()
   {
     if (entry instanceof ValueBoxEntry) {
-	writeGetID ();
+        writeGetID ();
     } else if (entry instanceof ValueEntry) {
         writeHelperFactories ();
     }
@@ -160,15 +160,15 @@ public class Helper24 extends Helper
 
   /**
    * <d62023> Generate constructors only for boxed valuetype helpers
-   *		All other helpers are abstract.
+   *            All other helpers are abstract.
    **/
   protected void writeCtors ()
   {
     if (entry instanceof ValueBoxEntry) {
-	stream.println ("  public " + helperClass + "()");
-	stream.println ("  {");
-	stream.println ("  }");
-	stream.println ();
+        stream.println ("  public " + helperClass + "()");
+        stream.println ("  {");
+        stream.println ("  }");
+        stream.println ();
     }
   } // writeCtors
 }

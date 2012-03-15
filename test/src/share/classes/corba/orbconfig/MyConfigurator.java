@@ -39,9 +39,9 @@
  */
 package corba.orbconfig ;
 
-import com.sun.corba.se.spi.orb.DataCollector ;
-import com.sun.corba.se.spi.orb.ORBConfigurator ;
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.DataCollector ;
+import com.sun.corba.ee.spi.orb.ORBConfigurator ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 public class MyConfigurator implements ORBConfigurator
 {
@@ -49,6 +49,6 @@ public class MyConfigurator implements ORBConfigurator
 
     public void configure( DataCollector dc, ORB orb ) 
     {
-	wasCalled = true ;
+        wasCalled = true ;
     }
 }

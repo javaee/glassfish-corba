@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.interceptors;
+package com.sun.corba.ee.impl.interceptors;
 
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.Policy;
@@ -52,12 +52,12 @@ import org.omg.PortableInterceptor.ServerRequestInterceptor;
 import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
 import org.omg.PortableInterceptor.ORBInitInfoPackage.InvalidName;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.legacy.interceptor.ORBInitInfoExt ;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.legacy.interceptor.ORBInitInfoExt ;
 
-import com.sun.corba.se.spi.logging.InterceptorsSystemException;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.logging.OMGSystemException;
+import com.sun.corba.ee.spi.logging.InterceptorsSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
 
 /**
  * ORBInitInfoImpl is the implementation of the ORBInitInfo class to be
@@ -100,7 +100,7 @@ public final class ORBInitInfoImpl
 
     // The description for the OBJECT_NOT_EXIST exception in STAGE_CLOSED
     private static final String MESSAGE_ORBINITINFO_INVALID =
-	"ORBInitInfo object is only valid during ORB_init";
+        "ORBInitInfo object is only valid during ORB_init";
  
     /**
      * Creates a new ORBInitInfoImpl object (scoped to package)
@@ -108,12 +108,12 @@ public final class ORBInitInfoImpl
      * @param args The arguments passed to ORB_init.
      */
     ORBInitInfoImpl( ORB orb, String[] args, 
-	String orbId, CodecFactory codecFactory ) 
+        String orbId, CodecFactory codecFactory ) 
     {
-	this.orb = orb;
-	this.args = args;
-	this.orbId = orbId;
-	this.codecFactory = codecFactory;
+        this.orb = orb;
+        this.args = args;
+        this.orbId = orbId;
+        this.codecFactory = codecFactory;
     }
 
     /** Return the ORB behind this ORBInitInfo.  This is defined in the
@@ -121,7 +121,7 @@ public final class ORBInitInfoImpl
      */
     public ORB getORB()
     {
-	return orb ;
+        return orb ;
     }
 
     /**
@@ -129,7 +129,7 @@ public final class ORBInitInfoImpl
      * functionality.
      */
     void setStage( int stage ) {
-	this.stage = stage;
+        this.stage = stage;
     }
 
     /**
@@ -139,9 +139,9 @@ public final class ORBInitInfoImpl
      * are completed.
      */
     private void checkStage() {
-	if( stage == STAGE_CLOSED ) {
-	    throw wrapper.orbinitinfoInvalid() ;
-	}
+        if( stage == STAGE_CLOSED ) {
+            throw wrapper.orbinitinfoInvalid() ;
+        }
     }
 
     /*
@@ -154,16 +154,16 @@ public final class ORBInitInfoImpl
      * or may not contain the ORB's arguments
      */
     public String[] arguments () {
-	checkStage();
-	return args.clone() ;
+        checkStage();
+        return args.clone() ;
     }
 
     /**
      * This attribute is the ID of the ORB being initialized
      */
     public String orb_id () {
-	checkStage();
-	return orbId;
+        checkStage();
+        return orbId;
     }
 
     /**
@@ -174,8 +174,8 @@ public final class ORBInitInfoImpl
      * obtaining a Codec is necessary during ORB intialization.
      */
     public CodecFactory codec_factory () {
-	checkStage();
-	return codecFactory;
+        checkStage();
+        return codecFactory;
     }
 
     /**
@@ -188,31 +188,31 @@ public final class ORBInitInfoImpl
      * This method may not be called during post_init.
      */
     public void register_initial_reference( String id, 
-	                                    org.omg.CORBA.Object obj )
+                                            org.omg.CORBA.Object obj )
         throws InvalidName
     {
-	checkStage();
-	if( id == null ) nullParam();
+        checkStage();
+        if( id == null ) nullParam();
 
-	// As per CORBA 3.0 section 21.8.1, 
-	// if null is passed as the obj parameter,
-	// throw BAD_PARAM with minor code OMGSystemException.RIR_WITH_NULL_OBJECT.
-	// Though the spec is talking about IDL null, we will address both
-	// Java null and IDL null:
-	// Note: Local Objects can never be nil!
-	if( obj == null ) {
-	    throw omgWrapper.rirWithNullObject() ;
-	}
+        // As per CORBA 3.0 section 21.8.1, 
+        // if null is passed as the obj parameter,
+        // throw BAD_PARAM with minor code OMGSystemException.RIR_WITH_NULL_OBJECT.
+        // Though the spec is talking about IDL null, we will address both
+        // Java null and IDL null:
+        // Note: Local Objects can never be nil!
+        if( obj == null ) {
+            throw omgWrapper.rirWithNullObject() ;
+        }
 
-	// Delegate to ORB.  If ORB version throws InvalidName, convert to
-	// equivalent Portable Interceptors InvalidName.
-	try {
-	    orb.register_initial_reference( id, obj );
-	} catch( org.omg.CORBA.ORBPackage.InvalidName e ) {
-	    InvalidName exc = new InvalidName( e.getMessage() );
-	    exc.initCause( e ) ;
-	    throw exc ;
-	}
+        // Delegate to ORB.  If ORB version throws InvalidName, convert to
+        // equivalent Portable Interceptors InvalidName.
+        try {
+            orb.register_initial_reference( id, obj );
+        } catch( org.omg.CORBA.ORBPackage.InvalidName e ) {
+            InvalidName exc = new InvalidName( e.getMessage() );
+            exc.initCause( e ) ;
+            throw exc ;
+        }
     }
 
     /**
@@ -227,39 +227,39 @@ public final class ORBInitInfoImpl
      * This method may not be called during pre_init.
      */
     public org.omg.CORBA.Object resolve_initial_references (String id) 
-	throws InvalidName
+        throws InvalidName
     {
-	checkStage();
-	if( id == null ) nullParam();
+        checkStage();
+        if( id == null ) nullParam();
 
-	if( stage == STAGE_PRE_INIT ) {
-	    // Initializer is not allowed to invoke this method during 
-	    // this stage.
+        if( stage == STAGE_PRE_INIT ) {
+            // Initializer is not allowed to invoke this method during 
+            // this stage.
 
-	    // _REVISIT_ Spec issue: What exception should really be 
-	    // thrown here?
-	    throw wrapper.rirInvalidPreInit() ;
-	}
-
-	org.omg.CORBA.Object objRef = null;
-	
-	try {
-	    objRef = orb.resolve_initial_references( id );
+            // _REVISIT_ Spec issue: What exception should really be 
+            // thrown here?
+            throw wrapper.rirInvalidPreInit() ;
         }
-	catch( org.omg.CORBA.ORBPackage.InvalidName e ) {
-	    // Convert PIDL to IDL exception:
-	    throw new InvalidName();
-	}
 
-	return objRef;
+        org.omg.CORBA.Object objRef = null;
+        
+        try {
+            objRef = orb.resolve_initial_references( id );
+        }
+        catch( org.omg.CORBA.ORBPackage.InvalidName e ) {
+            // Convert PIDL to IDL exception:
+            throw new InvalidName();
+        }
+
+        return objRef;
     }
 
     // New method from CORBA 3.1
     public void add_client_request_interceptor_with_policy ( 
-	ClientRequestInterceptor interceptor, Policy[] policies ) 
+        ClientRequestInterceptor interceptor, Policy[] policies ) 
         throws DuplicateName
     {
-	add_client_request_interceptor( interceptor ) ;
+        add_client_request_interceptor( interceptor ) ;
     }
 
     /**
@@ -270,22 +270,22 @@ public final class ORBInitInfoImpl
      * with this Interceptor's name, DuplicateName is raised.
      */
     public void add_client_request_interceptor ( 
-	ClientRequestInterceptor interceptor) 
+        ClientRequestInterceptor interceptor) 
         throws DuplicateName
     {
-	checkStage();
-	if( interceptor == null ) nullParam();
+        checkStage();
+        if( interceptor == null ) nullParam();
 
-	orb.getPIHandler().register_interceptor( interceptor, 
-	    InterceptorList.INTERCEPTOR_TYPE_CLIENT );
+        orb.getPIHandler().register_interceptor( interceptor, 
+            InterceptorList.INTERCEPTOR_TYPE_CLIENT );
     }
 
     // New method from CORBA 3.1
     public void add_server_request_interceptor_with_policy ( 
-	ServerRequestInterceptor interceptor, Policy[] policies ) 
+        ServerRequestInterceptor interceptor, Policy[] policies ) 
         throws DuplicateName, PolicyError
     {
-	add_server_request_interceptor( interceptor ) ;
+        add_server_request_interceptor( interceptor ) ;
     }
 
     /**
@@ -296,22 +296,22 @@ public final class ORBInitInfoImpl
      * with this Interceptor's name, DuplicateName is raised.
      */
     public void add_server_request_interceptor (
-	ServerRequestInterceptor interceptor) 
+        ServerRequestInterceptor interceptor) 
         throws DuplicateName
     {
-	checkStage();
-	if( interceptor == null ) nullParam();
-	
-	orb.getPIHandler().register_interceptor( interceptor, 
-	    InterceptorList.INTERCEPTOR_TYPE_SERVER );
+        checkStage();
+        if( interceptor == null ) nullParam();
+        
+        orb.getPIHandler().register_interceptor( interceptor, 
+            InterceptorList.INTERCEPTOR_TYPE_SERVER );
     }
 
     // New method from CORBA 3.1
     public void add_ior_interceptor_with_policy ( 
-	IORInterceptor interceptor, Policy[] policies ) 
+        IORInterceptor interceptor, Policy[] policies ) 
         throws DuplicateName, PolicyError
     {
-	add_ior_interceptor( interceptor ) ;
+        add_ior_interceptor( interceptor ) ;
     }
 
     /**
@@ -322,14 +322,14 @@ public final class ORBInitInfoImpl
      * with this Interceptor's name, DuplicateName is raised.
      */
     public void add_ior_interceptor (
-	IORInterceptor interceptor ) 
+        IORInterceptor interceptor ) 
         throws DuplicateName
     {
-	checkStage();
-	if( interceptor == null ) nullParam();
+        checkStage();
+        if( interceptor == null ) nullParam();
 
-	orb.getPIHandler().register_interceptor( interceptor, 
-	    InterceptorList.INTERCEPTOR_TYPE_IOR );
+        orb.getPIHandler().register_interceptor( interceptor, 
+            InterceptorList.INTERCEPTOR_TYPE_IOR );
     }
 
     /**
@@ -339,7 +339,7 @@ public final class ORBInitInfoImpl
      * @return The index to the slot which has been allocated.
      */
     public int allocate_slot_id () {
-	checkStage();
+        checkStage();
 
         return ((PICurrent)orb.getPIHandler().getPICurrent()).allocateSlotId( );
 
@@ -352,10 +352,10 @@ public final class ORBInitInfoImpl
      * BAD_INV_ORDER is raised with a minor code of TBD_BIO+2.
      */
     public void register_policy_factory( int type, 
-	                                 PolicyFactory policy_factory )
+                                         PolicyFactory policy_factory )
     {
-	checkStage();
-	if( policy_factory == null ) nullParam();
+        checkStage();
+        if( policy_factory == null ) nullParam();
         orb.getPIHandler().registerPolicyFactory( type, policy_factory );
     }
 
@@ -367,6 +367,6 @@ public final class ORBInitInfoImpl
     private void nullParam() 
         throws BAD_PARAM 
     {
-	throw orbutilWrapper.nullParam() ;
+        throw orbutilWrapper.nullParam() ;
     }
 }

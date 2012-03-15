@@ -49,19 +49,19 @@ import java.rmi.RemoteException;
 
 public interface RemoteInterface 
     extends 
-	Remote 
+        Remote 
 {
     public Struct[] method(Struct[] in)
-	throws RemoteException;
+        throws RemoteException;
 
     public void block()
-	throws RemoteException;
+        throws RemoteException;
 
     public void resume()
-	throws RemoteException;
+        throws RemoteException;
 
     public String testMonitoring()
-	throws RemoteException;
+        throws RemoteException;
 }
 
 // End of file.

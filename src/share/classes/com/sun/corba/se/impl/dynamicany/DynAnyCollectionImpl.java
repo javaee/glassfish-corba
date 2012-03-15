@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package com.sun.corba.ee.impl.dynamicany;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
@@ -48,7 +48,7 @@ import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 abstract class DynAnyCollectionImpl extends DynAnyConstructedImpl
 {
@@ -118,7 +118,7 @@ abstract class DynAnyCollectionImpl extends DynAnyConstructedImpl
 
     public org.omg.CORBA.Any[] get_elements () {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         return (checkInitComponents() ? anys : null);
     }
@@ -137,7 +137,7 @@ abstract class DynAnyCollectionImpl extends DynAnyConstructedImpl
                org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         checkValue(value);
 
@@ -173,7 +173,7 @@ abstract class DynAnyCollectionImpl extends DynAnyConstructedImpl
 
     public org.omg.DynamicAny.DynAny[] get_elements_as_dyn_any () {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         return (checkInitComponents() ? components : null);
     }
@@ -184,7 +184,7 @@ abstract class DynAnyCollectionImpl extends DynAnyConstructedImpl
                org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         checkValue(value);
 

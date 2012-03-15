@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.cosnaming;
+package com.sun.corba.ee.impl.naming.cosnaming;
 
 import org.omg.CosNaming.NameComponent;
 
@@ -65,53 +65,53 @@ public class InternalBindingKey
     {
         idLen = 0;
         kindLen = 0;
-	setup(n);
+        setup(n);
     }
 
     // Setup the object
     protected void setup(NameComponent n) {
-	this.name = n;
-	// Precompute lengths and values since they will not change
+        this.name = n;
+        // Precompute lengths and values since they will not change
         if( this.name.id != null ) {
-	    idLen = this.name.id.length();
+            idLen = this.name.id.length();
         }
         if( this.name.kind != null ) {
-	    kindLen = this.name.kind.length();
+            kindLen = this.name.kind.length();
         }
-	hashVal = 0;
-	if (idLen > 0)
-	    hashVal += this.name.id.hashCode();
-	if (kindLen > 0)
-	    hashVal += this.name.kind.hashCode();
+        hashVal = 0;
+        if (idLen > 0)
+            hashVal += this.name.id.hashCode();
+        if (kindLen > 0)
+            hashVal += this.name.kind.hashCode();
     }
 
     // Compare the keys by comparing name's id and kind
     public boolean equals(java.lang.Object o) {
-	if (o == null)
-	    return false;
-	if (o instanceof InternalBindingKey) {
-	    InternalBindingKey that = (InternalBindingKey)o;
-	    // Both lengths must match
-	    if (this.idLen != that.idLen || this.kindLen != that.kindLen) {
-		return false;
-	    }
-	    // If id is set is must be equal
-	    if (this.idLen > 0 && this.name.id.equals(that.name.id) == false) {
-		return false;
-	    }
-	    // If kind is set it must be equal
-	    if (this.kindLen > 0 && this.name.kind.equals(that.name.kind) == false) {
-		return false;
-	    }
-	    // Must be the same
-	    return true;
-	} else {
-	    return false;
-	}
+        if (o == null)
+            return false;
+        if (o instanceof InternalBindingKey) {
+            InternalBindingKey that = (InternalBindingKey)o;
+            // Both lengths must match
+            if (this.idLen != that.idLen || this.kindLen != that.kindLen) {
+                return false;
+            }
+            // If id is set is must be equal
+            if (this.idLen > 0 && this.name.id.equals(that.name.id) == false) {
+                return false;
+            }
+            // If kind is set it must be equal
+            if (this.kindLen > 0 && this.name.kind.equals(that.name.kind) == false) {
+                return false;
+            }
+            // Must be the same
+            return true;
+        } else {
+            return false;
+        }
     }
     // Return precomputed value
     public int hashCode() {
-	return this.hashVal;
+        return this.hashVal;
     }
 }
 

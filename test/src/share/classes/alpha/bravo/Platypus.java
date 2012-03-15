@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)Platypus.java	1.6 99/06/07 */
+/* @(#)Platypus.java    1.6 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -70,11 +70,11 @@ public class Platypus implements java.io.Serializable {
     public java.util.Hashtable aHashtable;
 
     class Marsupial /* implements java.io.Serializable */ {
-	public int pouch;
+        public int pouch;
     }
 
     class M$em implements java.io.Serializable {
-	public int p$rice;
+        public int p$rice;
     }
 
     public int jack;

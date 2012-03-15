@@ -70,7 +70,7 @@ public class IORInterceptorTest
 
         client.stop();
 
-	server.stop();
+        server.stop();
 
         orbd.stop();
     }

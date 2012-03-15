@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)GameUI.java	1.3 99/06/07 */
+/* @(#)GameUI.java      1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -101,61 +101,61 @@ public class GameUI implements ActionListener
 
     public GameUI(SpaceFrame frame, GameSurrogate game)
     {
-	fFrame = frame;
-	fGame = game;
-	fGame.addActionListener (this);
-	fGame.joinGame ();
-	fGame.updatePlanetMap ();
-	fSelection = fGame.getHome ();
+        fFrame = frame;
+        fGame = game;
+        fGame.addActionListener (this);
+        fGame.joinGame ();
+        fGame.updatePlanetMap ();
+        fSelection = fGame.getHome ();
     }
 
     public void init ()
     {
-	System.out.println ("GameUI initializing...");
-	handleNewTurn ();
-	fFrame.setEnabled (false);
-	fFrame.setEnabled (true);
+        System.out.println ("GameUI initializing...");
+        handleNewTurn ();
+        fFrame.setEnabled (false);
+        fFrame.setEnabled (true);
 
     }
 
     public synchronized void beginTurn ()
     {
-	try { wait (1000); } catch (Exception e) {};
-	fGame.takeTurn ();
+        try { wait (1000); } catch (Exception e) {};
+        fGame.takeTurn ();
 
-	Vector messages = fGame.getMessages ();
-	if ( messages != null ) {
-	    for (int i=0; i<messages.size(); i++) {
-		String message = (String)messages.elementAt (i);
-		if ( message != null ) {
-		    JOptionPane.showMessageDialog (fFrame, message, "Turn Results",
-						   JOptionPane.INFORMATION_MESSAGE );
-		}
-	    }
-	}
+        Vector messages = fGame.getMessages ();
+        if ( messages != null ) {
+            for (int i=0; i<messages.size(); i++) {
+                String message = (String)messages.elementAt (i);
+                if ( message != null ) {
+                    JOptionPane.showMessageDialog (fFrame, message, "Turn Results",
+                                                   JOptionPane.INFORMATION_MESSAGE );
+                }
+            }
+        }
 
     }
 
     public synchronized void endTurn ()
     {
-	//fFrame.setEnabled (true);
-	fTurnButton.setEnabled (true);
-	fTurnButton.setFont (new Font ("SansSerif", Font.BOLD, 20));
-	fTurnButton.setForeground (Color.blue);
-	fTurnButton.setText ("Next Turn");
+        //fFrame.setEnabled (true);
+        fTurnButton.setEnabled (true);
+        fTurnButton.setFont (new Font ("SansSerif", Font.BOLD, 20));
+        fTurnButton.setForeground (Color.blue);
+        fTurnButton.setText ("Next Turn");
     }
 
 
     public synchronized void takeTurn ()
     {
-	//fFrame.setEnabled (false);
-	fTurnButton.setEnabled (false);
-	fTurnButton.setFont (new Font ("SansSerif", Font.ITALIC, 14));
-	fTurnButton.setForeground (Color.darkGray);
-	fTurnButton.setText ("Waiting for other players...");
-	pushBudgetSettings ();
-	TurnTaker t = new TurnTaker (this);
-	t.start ();
+        //fFrame.setEnabled (false);
+        fTurnButton.setEnabled (false);
+        fTurnButton.setFont (new Font ("SansSerif", Font.ITALIC, 14));
+        fTurnButton.setForeground (Color.darkGray);
+        fTurnButton.setText ("Waiting for other players...");
+        pushBudgetSettings ();
+        TurnTaker t = new TurnTaker (this);
+        t.start ();
     }
 
     //
@@ -164,524 +164,524 @@ public class GameUI implements ActionListener
 
     public Menu createDoMenu ()
     {
-	Menu mDo = new Menu ();
-	MenuItem miAbandonPlanet = new MenuItem ();
-	MenuItem miScrapFleet = new MenuItem ();
-	MenuItem miSurrender = new MenuItem ();
-	//MenuItem miArmageddon = new MenuItem ();
+        Menu mDo = new Menu ();
+        MenuItem miAbandonPlanet = new MenuItem ();
+        MenuItem miScrapFleet = new MenuItem ();
+        MenuItem miSurrender = new MenuItem ();
+        //MenuItem miArmageddon = new MenuItem ();
 
-	miAbandonPlanet.addActionListener(new AbandonPlanet());
-	miScrapFleet.addActionListener(new ScrapFleet());
-	miSurrender.addActionListener(new Surrender());
+        miAbandonPlanet.addActionListener(new AbandonPlanet());
+        miScrapFleet.addActionListener(new ScrapFleet());
+        miSurrender.addActionListener(new Surrender());
 
-	mDo.setLabel ("Do");
-	miAbandonPlanet.setLabel ("Abandon Planet");
-	miScrapFleet.setLabel("Scrap Fleet");
-	miSurrender.setLabel("Surrender");
-	//miArmageddon.setLabel("Armageddon");
+        mDo.setLabel ("Do");
+        miAbandonPlanet.setLabel ("Abandon Planet");
+        miScrapFleet.setLabel("Scrap Fleet");
+        miSurrender.setLabel("Surrender");
+        //miArmageddon.setLabel("Armageddon");
 
-	mDo.add(miAbandonPlanet);
-	mDo.add(miScrapFleet);
-	mDo.add(miSurrender);
-	//mDo.add(miArmageddon);
+        mDo.add(miAbandonPlanet);
+        mDo.add(miScrapFleet);
+        mDo.add(miSurrender);
+        //mDo.add(miArmageddon);
 
-	return mDo;
+        return mDo;
     }
 
     public Menu createBuildMenu ()
     {
-	Menu mBuild = new Menu ();
-	MenuItem miColonyShip = new MenuItem ();
-	MenuItem miScout = new MenuItem ();
-	MenuItem miFighters = new MenuItem ();
-	MenuItem miSatelites = new MenuItem ();
+        Menu mBuild = new Menu ();
+        MenuItem miColonyShip = new MenuItem ();
+        MenuItem miScout = new MenuItem ();
+        MenuItem miFighters = new MenuItem ();
+        MenuItem miSatelites = new MenuItem ();
 
-	mBuild.setLabel ("Build");
-	miColonyShip.setLabel ("Colony Ship...");
-	miColonyShip.addActionListener(new CreateShip(ShipDesign.COLONY_SHIP));
-	miScout.setLabel ("Scout...");
-	miScout.addActionListener(new CreateShip(ShipDesign.SCOUT));
-	miFighters.setLabel ("Fighters...");
-	miFighters.addActionListener(new CreateShip(ShipDesign.FIGHTER));
-	miSatelites.setLabel ("Satelites...");
-	miSatelites.addActionListener(new CreateShip(ShipDesign.SATELITE));
-	mBuild.add (miColonyShip);
-	mBuild.add (miScout);
-	mBuild.add (miFighters);
-	mBuild.add (miSatelites);
-	return mBuild;
+        mBuild.setLabel ("Build");
+        miColonyShip.setLabel ("Colony Ship...");
+        miColonyShip.addActionListener(new CreateShip(ShipDesign.COLONY_SHIP));
+        miScout.setLabel ("Scout...");
+        miScout.addActionListener(new CreateShip(ShipDesign.SCOUT));
+        miFighters.setLabel ("Fighters...");
+        miFighters.addActionListener(new CreateShip(ShipDesign.FIGHTER));
+        miSatelites.setLabel ("Satelites...");
+        miSatelites.addActionListener(new CreateShip(ShipDesign.SATELITE));
+        mBuild.add (miColonyShip);
+        mBuild.add (miScout);
+        mBuild.add (miFighters);
+        mBuild.add (miSatelites);
+        return mBuild;
     }
 
 
     public PieControl createPlanetSpendingUI ()
     {
-	System.out.println ("  planet spending pie control created");
-	fPlanetSpending = new PieControl ();
-	return fPlanetSpending;
+        System.out.println ("  planet spending pie control created");
+        fPlanetSpending = new PieControl ();
+        return fPlanetSpending;
     }
 
     public JButton createTurnButton ()
     {
-	System.out.println ("  turn button created");
-	fTurnButton = new JButton ("Take Turn");
-	fTurnButton.setFont (new Font ("SansSerif", Font.BOLD, 20));
-	fTurnButton.setForeground (Color.blue);
-	return fTurnButton;
+        System.out.println ("  turn button created");
+        fTurnButton = new JButton ("Take Turn");
+        fTurnButton.setFont (new Font ("SansSerif", Font.BOLD, 20));
+        fTurnButton.setForeground (Color.blue);
+        return fTurnButton;
     }
 
     public JComponent createShipListUI ()
     {
-	fShipListView = new ShipListPanel ();
-	return fShipListView;
+        fShipListView = new ShipListPanel ();
+        return fShipListView;
     }
 
     public BarGroup createBudgetUI ()
     {
-	System.out.println ("  main budget bar controls created");
-	fBudgetUI = new BarGroup ();
+        System.out.println ("  main budget bar controls created");
+        fBudgetUI = new BarGroup ();
 
-	fBudgetUI.setLayout(new BoxLayout(fBudgetUI, BoxLayout.Y_AXIS));
+        fBudgetUI.setLayout(new BoxLayout(fBudgetUI, BoxLayout.Y_AXIS));
 
-	fShipSavings = new LabeledBarControl("Ship Savings");
-	fTechSpending = new LabeledBarControl("Technology");
-	fShipSavings.getBarControl().setColor (Color.orange);
-	fTechSpending.getBarControl().setColor (Color.magenta);
+        fShipSavings = new LabeledBarControl("Ship Savings");
+        fTechSpending = new LabeledBarControl("Technology");
+        fShipSavings.getBarControl().setColor (Color.orange);
+        fTechSpending.getBarControl().setColor (Color.magenta);
 
-	fBudgetUI.addBar(fShipSavings);
-	fBudgetUI.addBar(fTechSpending);
-	return fBudgetUI;
+        fBudgetUI.addBar(fShipSavings);
+        fBudgetUI.addBar(fTechSpending);
+        return fBudgetUI;
     }
 
     public PlanetStatsView createPlanetStatsUI ()
     {
-	System.out.println ("  planet stats ui created");
-	fPlanetStatsUI = new PlanetStatsView ();
-	return fPlanetStatsUI;
+        System.out.println ("  planet stats ui created");
+        fPlanetStatsUI = new PlanetStatsView ();
+        return fPlanetStatsUI;
     }
 
     public JPanel createResourceLevelsUI ()
     {
-	fResourceLevels = new ResourceLevelsPanel ();
-	JPanel container = new JPanel ();
-	container.setLayout (new BorderLayout ());
-	container.add (fResourceLevels, BorderLayout.CENTER);
-	return container;
+        fResourceLevels = new ResourceLevelsPanel ();
+        JPanel container = new JPanel ();
+        container.setLayout (new BorderLayout ());
+        container.add (fResourceLevels, BorderLayout.CENTER);
+        return container;
     }
 
 
     public GalaxyView createGalaxyUI ()
     {
-	System.out.println ("  galaxy view created");
-	fGalaxyUI = new GalaxyView (this, fGame);
-	fGalaxyUI.addActionListener (this);
-	return fGalaxyUI;
+        System.out.println ("  galaxy view created");
+        fGalaxyUI = new GalaxyView (this, fGame);
+        fGalaxyUI.addActionListener (this);
+        return fGalaxyUI;
     }
 
 
     public JPanel createTechSpendingUI ()
     {
-	System.out.println ("  tech spending bar controls created");
+        System.out.println ("  tech spending bar controls created");
 
-	fTechSpendingUI = new BarGroup ();
-	fTechSpendingUI.setLayout (new FlowLayout());
+        fTechSpendingUI = new BarGroup ();
+        fTechSpendingUI.setLayout (new FlowLayout());
 
-	fRangeSpending = new LabeledBarControl ("Range", BarControl.VERTICAL);
-	fSpeedSpending = new LabeledBarControl ("Speed", BarControl.VERTICAL);
-	fWeaponsSpending = new LabeledBarControl ("Weapon", BarControl.VERTICAL);
-	fShieldsSpending = new LabeledBarControl ("Shield", BarControl.VERTICAL);
-	fMiniSpending = new LabeledBarControl ("Mini", BarControl.VERTICAL);
+        fRangeSpending = new LabeledBarControl ("Range", BarControl.VERTICAL);
+        fSpeedSpending = new LabeledBarControl ("Speed", BarControl.VERTICAL);
+        fWeaponsSpending = new LabeledBarControl ("Weapon", BarControl.VERTICAL);
+        fShieldsSpending = new LabeledBarControl ("Shield", BarControl.VERTICAL);
+        fMiniSpending = new LabeledBarControl ("Mini", BarControl.VERTICAL);
 
-	fRangeSpending.getBarControl().setColor (Color.magenta);
-	fSpeedSpending.getBarControl().setColor (Color.magenta);
-	fWeaponsSpending.getBarControl().setColor (Color.magenta);
-	fShieldsSpending.getBarControl().setColor (Color.magenta);
-	fMiniSpending.getBarControl().setColor (Color.magenta);
+        fRangeSpending.getBarControl().setColor (Color.magenta);
+        fSpeedSpending.getBarControl().setColor (Color.magenta);
+        fWeaponsSpending.getBarControl().setColor (Color.magenta);
+        fShieldsSpending.getBarControl().setColor (Color.magenta);
+        fMiniSpending.getBarControl().setColor (Color.magenta);
 
-	fTechSpendingUI.addBar (fRangeSpending);
-	fTechSpendingUI.addBar (fSpeedSpending);
-	fTechSpendingUI.addBar (fWeaponsSpending);
-	fTechSpendingUI.addBar (fShieldsSpending);
-	fTechSpendingUI.addBar (fMiniSpending);
+        fTechSpendingUI.addBar (fRangeSpending);
+        fTechSpendingUI.addBar (fSpeedSpending);
+        fTechSpendingUI.addBar (fWeaponsSpending);
+        fTechSpendingUI.addBar (fShieldsSpending);
+        fTechSpendingUI.addBar (fMiniSpending);
 
-	JPanel ui = new JPanel ();
+        JPanel ui = new JPanel ();
 
-	fTechLevels = new TechLevelsPanel ();
-	fTechLevels.setRange (6);
-	fTechLevels.setSpeed (2);
-	fTechLevels.setWeapons (2);
-	fTechLevels.setShields (2);
-	fTechLevels.setMini (1);
+        fTechLevels = new TechLevelsPanel ();
+        fTechLevels.setRange (6);
+        fTechLevels.setSpeed (2);
+        fTechLevels.setWeapons (2);
+        fTechLevels.setShields (2);
+        fTechLevels.setMini (1);
 
-	ui.setLayout (new PercentLayout(PercentLayout.HORZ));
-	ui.add (fTechLevels, new Float(.2f));
-	ui.add (fTechSpendingUI, new Float(.8f));
+        ui.setLayout (new PercentLayout(PercentLayout.HORZ));
+        ui.add (fTechLevels, new Float(.2f));
+        ui.add (fTechSpendingUI, new Float(.8f));
 
-	return ui;
+        return ui;
     }
 
     public void actionPerformed (ActionEvent event)
     {
-	if ( event.getActionCommand() == "Selection Changed" ) {
-	    handleSelectionChanged ((PlanetView)event.getSource ());
-	}
+        if ( event.getActionCommand() == "Selection Changed" ) {
+            handleSelectionChanged ((PlanetView)event.getSource ());
+        }
 
-	if ( event.getActionCommand() == "New Turn" ) {
-	    handleNewTurn ();
-	}
+        if ( event.getActionCommand() == "New Turn" ) {
+            handleNewTurn ();
+        }
 
     }
 
     protected void handleSelectionChanged (PlanetView planet)
     {
 
-	//
-	// Record current planet budget mix before swithing selection
-	//
+        //
+        // Record current planet budget mix before swithing selection
+        //
 
-	if ( fSelection != null ) {
-	    BudgetSummary budget = fGame.getPlanetBudget (fSelection);
-	    if ( budget != null ) {
-		double terraforming = fPlanetSpending.getFirstPercentage ();
-		double mining = fPlanetSpending.getSecondPercentage ();
-		budget.setPercentage ("Terraforming", terraforming);
-		budget.setPercentage ("Mining", mining);
-		//fGame.setPlanetBudget (fSelection, budget);
-	    }
-	}
+        if ( fSelection != null ) {
+            BudgetSummary budget = fGame.getPlanetBudget (fSelection);
+            if ( budget != null ) {
+                double terraforming = fPlanetSpending.getFirstPercentage ();
+                double mining = fPlanetSpending.getSecondPercentage ();
+                budget.setPercentage ("Terraforming", terraforming);
+                budget.setPercentage ("Mining", mining);
+                //fGame.setPlanetBudget (fSelection, budget);
+            }
+        }
 
-	//
-	// Switch selection and update planet stats
-	//
+        //
+        // Switch selection and update planet stats
+        //
 
-	if ( fPlanetStatsUI != null ) {
-	    fPlanetStatsUI.presentPlanet (planet);
-	    fSelection = planet.getID ();
-	}
+        if ( fPlanetStatsUI != null ) {
+            fPlanetStatsUI.presentPlanet (planet);
+            fSelection = planet.getID ();
+        }
 
-	//
-	// Set planet budget mix for new selection
-	//
+        //
+        // Set planet budget mix for new selection
+        //
 
-	if ( fSelection != null ) {
-	    BudgetSummary budget = fGame.getPlanetBudget (fSelection);
-	    if ( budget != null ) {
-		double terraforming = budget.getPercentage("Terraforming");
-		fPlanetSpending.setFirstPercentage (terraforming);
-		fPlanetSpending.setFirstColor (Color.green);
-		fPlanetSpending.setSecondColor (Color.blue);
-		fPlanetSpending.repaint ();
-	    } else {
-		fPlanetSpending.setFirstPercentage (0.5);
-		fPlanetSpending.setFirstColor (Color.black);
-		fPlanetSpending.setSecondColor (Color.black);
-		fPlanetSpending.repaint ();
-	    }
-	}
+        if ( fSelection != null ) {
+            BudgetSummary budget = fGame.getPlanetBudget (fSelection);
+            if ( budget != null ) {
+                double terraforming = budget.getPercentage("Terraforming");
+                fPlanetSpending.setFirstPercentage (terraforming);
+                fPlanetSpending.setFirstColor (Color.green);
+                fPlanetSpending.setSecondColor (Color.blue);
+                fPlanetSpending.repaint ();
+            } else {
+                fPlanetSpending.setFirstPercentage (0.5);
+                fPlanetSpending.setFirstColor (Color.black);
+                fPlanetSpending.setSecondColor (Color.black);
+                fPlanetSpending.repaint ();
+            }
+        }
 
-	//
-	// Update list of fleets
-	//
+        //
+        // Update list of fleets
+        //
 
-	updateShipListView ();
-	fGalaxyUI.fBackBuffer = null;
+        updateShipListView ();
+        fGalaxyUI.fBackBuffer = null;
 
     }
 
   
     protected void updateShipListView ()
     {
-	fShipListView.removeAll ();
-	if ( fSelection != null ) {
-	    ID[] fleets = fGame.getFleetsAt (fSelection);
-	    if ( fleets != null ) {
-		int size = Array.getLength (fleets);
-		for (int i=0; i<size; i++) {
-		    Fleet fleet = fGame.getFleet (fleets[i]);
-		    if ( fleet != null ) {
-			fShipListView.addItem (fleet);
-		    }
-		}
-	    }
-	}
-	fShipListView.repaint ();
+        fShipListView.removeAll ();
+        if ( fSelection != null ) {
+            ID[] fleets = fGame.getFleetsAt (fSelection);
+            if ( fleets != null ) {
+                int size = Array.getLength (fleets);
+                for (int i=0; i<size; i++) {
+                    Fleet fleet = fGame.getFleet (fleets[i]);
+                    if ( fleet != null ) {
+                        fShipListView.addItem (fleet);
+                    }
+                }
+            }
+        }
+        fShipListView.repaint ();
     }
 
     public ID getSelectedFleet ()
     {
-	Fleet[] sel = fShipListView.getSelection ();
-	if ( sel != null && Array.getLength(sel) == 1) {
-	    return sel[0].getID ();
-	} else {
-	    return null;
-	}
+        Fleet[] sel = fShipListView.getSelection ();
+        if ( sel != null && Array.getLength(sel) == 1) {
+            return sel[0].getID ();
+        } else {
+            return null;
+        }
     }
 
 
     public int getSelectedFleetRange ()
     {
-	Fleet[] sel = fShipListView.getSelection ();
+        Fleet[] sel = fShipListView.getSelection ();
 
-	if ( sel != null && Array.getLength(sel) == 1) {
-	    return sel[0].getCurrentRange ();
-	} else {
-	    return 0;
-	}
+        if ( sel != null && Array.getLength(sel) == 1) {
+            return sel[0].getCurrentRange ();
+        } else {
+            return 0;
+        }
     }
 
     protected void updateResourcesView ()
     {
-	fResourceLevels.setShipSavings (fGame.getShipSavings());
-	fResourceLevels.setShipMetal (fGame.getShipMetal());
-	fResourceLevels.setIncome (fGame.getIncome());
-	fResourceLevels.setIIOPCalls (fGame.getCalls());
-	fResourceLevels.repaint ();
+        fResourceLevels.setShipSavings (fGame.getShipSavings());
+        fResourceLevels.setShipMetal (fGame.getShipMetal());
+        fResourceLevels.setIncome (fGame.getIncome());
+        fResourceLevels.setIIOPCalls (fGame.getCalls());
+        fResourceLevels.repaint ();
     }
 
 
     protected void pushBudgetSettings ()
     {
-	BudgetSummary budget = null;
+        BudgetSummary budget = null;
 
-	//
-	// Main Budget
-	//
+        //
+        // Main Budget
+        //
 
-	budget = fGame.getMainBudget ();
-	LabeledBarControl[] bars = fBudgetUI.getBars ();
-	for (int i=0; i<Array.getLength(bars); i++) {
-	    LabeledBarControl bar = bars[i];
-	    budget.setPercentage (bar.getLabelText(), bar.getPercentage());
-	}
-	fGame.setMainBudget (budget);
+        budget = fGame.getMainBudget ();
+        LabeledBarControl[] bars = fBudgetUI.getBars ();
+        for (int i=0; i<Array.getLength(bars); i++) {
+            LabeledBarControl bar = bars[i];
+            budget.setPercentage (bar.getLabelText(), bar.getPercentage());
+        }
+        fGame.setMainBudget (budget);
 
-	//
-	// Planet Budget
-	//
+        //
+        // Planet Budget
+        //
 
 
-	if ( fSelection != null ) {
-	    budget = fGame.getPlanetBudget (fSelection);
-	    if ( budget != null ) {
-		double terraforming = fPlanetSpending.getFirstPercentage ();
-		double mining = fPlanetSpending.getSecondPercentage ();
-		budget.setPercentage ("Terraforming", terraforming);
-		budget.setPercentage ("Mining", mining);
-		fGame.setPlanetBudget (fSelection, budget);
-	    }
-	}
+        if ( fSelection != null ) {
+            budget = fGame.getPlanetBudget (fSelection);
+            if ( budget != null ) {
+                double terraforming = fPlanetSpending.getFirstPercentage ();
+                double mining = fPlanetSpending.getSecondPercentage ();
+                budget.setPercentage ("Terraforming", terraforming);
+                budget.setPercentage ("Mining", mining);
+                fGame.setPlanetBudget (fSelection, budget);
+            }
+        }
 
-	fGame.pushPlanetBudgetData ();
+        fGame.pushPlanetBudgetData ();
 
-	//
-	// Tech Budget
-	//
+        //
+        // Tech Budget
+        //
 
-	budget = fGame.getTechBudget ();
-	double range = fRangeSpending.getPercentage ();
-	double speed = fSpeedSpending.getPercentage ();
-	double weapons = fWeaponsSpending.getPercentage ();
-	double shields = fShieldsSpending.getPercentage ();
-	double mini = fMiniSpending.getPercentage ();
-	budget.setPercentage ("Range", range);
-	budget.setPercentage ("Speed", speed);
-	budget.setPercentage ("Weapons", weapons);
-	budget.setPercentage ("Shields",shields);
-	budget.setPercentage ("Mini", mini);
-	fGame.setTechBudget (budget);
+        budget = fGame.getTechBudget ();
+        double range = fRangeSpending.getPercentage ();
+        double speed = fSpeedSpending.getPercentage ();
+        double weapons = fWeaponsSpending.getPercentage ();
+        double shields = fShieldsSpending.getPercentage ();
+        double mini = fMiniSpending.getPercentage ();
+        budget.setPercentage ("Range", range);
+        budget.setPercentage ("Speed", speed);
+        budget.setPercentage ("Weapons", weapons);
+        budget.setPercentage ("Shields",shields);
+        budget.setPercentage ("Mini", mini);
+        fGame.setTechBudget (budget);
     }
 
     private void updateMainBudgetUI ()
     {
-	fBudgetUI.removeAll ();
-	BudgetSummary budget = fGame.getMainBudget ();
-	String[] names = budget.getNames ();
+        fBudgetUI.removeAll ();
+        BudgetSummary budget = fGame.getMainBudget ();
+        String[] names = budget.getNames ();
 
-	for (int i=0; i<Array.getLength(names); i++) {
-	    LabeledBarControl bar = new LabeledBarControl (names[i]);
-	    bar.setPercentage (budget.getPercentage (names[i]));
-	    String name = bar.getLabelText ();
-	    if ( name.equals ("Ship Savings") ) {
-		bar.setBarColor (Color.orange);
-	    } else if ( name.equals ("Technology") ) {
-		bar.setBarColor (Color.magenta);
-	    } else {
-		bar.setBarColor (Color.green);
-	    }
-	    fBudgetUI.addBar (bar);
-	}
-	fBudgetUI.revalidate ();
-	fBudgetUI.repaint ();
+        for (int i=0; i<Array.getLength(names); i++) {
+            LabeledBarControl bar = new LabeledBarControl (names[i]);
+            bar.setPercentage (budget.getPercentage (names[i]));
+            String name = bar.getLabelText ();
+            if ( name.equals ("Ship Savings") ) {
+                bar.setBarColor (Color.orange);
+            } else if ( name.equals ("Technology") ) {
+                bar.setBarColor (Color.magenta);
+            } else {
+                bar.setBarColor (Color.green);
+            }
+            fBudgetUI.addBar (bar);
+        }
+        fBudgetUI.revalidate ();
+        fBudgetUI.repaint ();
     }
 
     protected void handleNewTurn ()
     {
-	updateShipListView ();
-	fGame.updateJourneys ();
-	fGalaxyUI.refreshCache ();
-	fGalaxyUI.repaint();
+        updateShipListView ();
+        fGame.updateJourneys ();
+        fGalaxyUI.refreshCache ();
+        fGalaxyUI.repaint();
 
-	//
-	// Update planet spending control
-	//
+        //
+        // Update planet spending control
+        //
 
-	if ( fSelection != null ) {
-	    BudgetSummary budget = fGame.getPlanetBudget (fSelection);
-	    if ( budget != null ) {
-		double terraforming = budget.getPercentage("Terraforming");
-		fPlanetSpending.setFirstPercentage (terraforming);
-		fPlanetSpending.setFirstColor (Color.green);
-		fPlanetSpending.setSecondColor (Color.blue);
-		fPlanetSpending.repaint ();
-	    } else {
-		fPlanetSpending.setFirstPercentage (0.5);
-		fPlanetSpending.setFirstColor (Color.black);
-		fPlanetSpending.setSecondColor (Color.black);
-		fPlanetSpending.repaint ();
-	    }
-	}
-	fPlanetSpending.repaint ();
+        if ( fSelection != null ) {
+            BudgetSummary budget = fGame.getPlanetBudget (fSelection);
+            if ( budget != null ) {
+                double terraforming = budget.getPercentage("Terraforming");
+                fPlanetSpending.setFirstPercentage (terraforming);
+                fPlanetSpending.setFirstColor (Color.green);
+                fPlanetSpending.setSecondColor (Color.blue);
+                fPlanetSpending.repaint ();
+            } else {
+                fPlanetSpending.setFirstPercentage (0.5);
+                fPlanetSpending.setFirstColor (Color.black);
+                fPlanetSpending.setSecondColor (Color.black);
+                fPlanetSpending.repaint ();
+            }
+        }
+        fPlanetSpending.repaint ();
 
-	PlanetView planet = fGame.getPlanet (fSelection);
-	fPlanetStatsUI.presentPlanet (planet);
-	fPlanetStatsUI.repaint ();
+        PlanetView planet = fGame.getPlanet (fSelection);
+        fPlanetStatsUI.presentPlanet (planet);
+        fPlanetStatsUI.repaint ();
 
-	//
-	// Update tech profile
-	//
+        //
+        // Update tech profile
+        //
 
-	TechProfile tech = fGame.getTechProfile ();
-	fTechLevels.setRange (tech.getRange());
-	fTechLevels.setSpeed (tech.getSpeed());
-	fTechLevels.setWeapons (tech.getWeapons());
-	fTechLevels.setShields (tech.getShields());
-	fTechLevels.setMini (tech.getMini());
-
-
-	updateResourcesView ();
-
-	BudgetSummary budget = null;
+        TechProfile tech = fGame.getTechProfile ();
+        fTechLevels.setRange (tech.getRange());
+        fTechLevels.setSpeed (tech.getSpeed());
+        fTechLevels.setWeapons (tech.getWeapons());
+        fTechLevels.setShields (tech.getShields());
+        fTechLevels.setMini (tech.getMini());
 
 
-	//
-	// Update budget bars
-	//
+        updateResourcesView ();
 
-	updateMainBudgetUI ();
+        BudgetSummary budget = null;
 
-	fBudgetUI.validate ();
 
-	//
-	// Update technology budget bars
-	//
+        //
+        // Update budget bars
+        //
 
-	budget = fGame.getTechBudget ();
-	double range = budget.getPercentage("Range");
-	double speed = budget.getPercentage("Speed");
-	double weapons = budget.getPercentage("Weapons");
-	double shields = budget.getPercentage("Shields");
-	double mini = budget.getPercentage("Mini");
-	fRangeSpending.setPercentage (range);
-	fSpeedSpending.setPercentage (speed);
-	fWeaponsSpending.setPercentage (weapons);
-	fShieldsSpending.setPercentage (shields);
-	fMiniSpending.setPercentage (mini);
+        updateMainBudgetUI ();
+
+        fBudgetUI.validate ();
+
+        //
+        // Update technology budget bars
+        //
+
+        budget = fGame.getTechBudget ();
+        double range = budget.getPercentage("Range");
+        double speed = budget.getPercentage("Speed");
+        double weapons = budget.getPercentage("Weapons");
+        double shields = budget.getPercentage("Shields");
+        double mini = budget.getPercentage("Mini");
+        fRangeSpending.setPercentage (range);
+        fSpeedSpending.setPercentage (speed);
+        fWeaponsSpending.setPercentage (weapons);
+        fShieldsSpending.setPercentage (shields);
+        fMiniSpending.setPercentage (mini);
     }
 
     class CreateShip implements java.awt.event.ActionListener
     {
-	private int fType = 0;
+        private int fType = 0;
 
-	CreateShip (int type)
-	{
-	    fType = type;
-	}
+        CreateShip (int type)
+        {
+            fType = type;
+        }
 
-	public void actionPerformed (ActionEvent e)
-	{
-	    System.out.println ("Create ship");
-	    ShipDesign design = new ShipDesign ("", fType, fGame.getTechProfile());
-	    long cost = design.getCostPerShip();
-	    long metal = design.getMetalPerShip();
-	    long shipSavings = fGame.getShipSavings ();
-	    long shipMetal = fGame.getShipMetal ();
+        public void actionPerformed (ActionEvent e)
+        {
+            System.out.println ("Create ship");
+            ShipDesign design = new ShipDesign ("", fType, fGame.getTechProfile());
+            long cost = design.getCostPerShip();
+            long metal = design.getMetalPerShip();
+            long shipSavings = fGame.getShipSavings ();
+            long shipMetal = fGame.getShipMetal ();
 
-	    String message = "You can only build ships at a colonized planet!";
+            String message = "You can only build ships at a colonized planet!";
 
-	    PlanetView planet = fGame.getPlanet (fSelection);
-	    if ( planet != null ) {
-		if ( planet.isOwned() ) {
-		    if ( planet.getPopulation() > 0 ) {
-			message = "";
-		    }
-		}
-	    }
+            PlanetView planet = fGame.getPlanet (fSelection);
+            if ( planet != null ) {
+                if ( planet.isOwned() ) {
+                    if ( planet.getPopulation() > 0 ) {
+                        message = "";
+                    }
+                }
+            }
 
-	    if ( message.equals("") ) {
-		if ( cost > shipSavings || metal > shipMetal ) {
-		    message = "You do not have enough money or metal!";
-		} 
-	    }
+            if ( message.equals("") ) {
+                if ( cost > shipSavings || metal > shipMetal ) {
+                    message = "You do not have enough money or metal!";
+                } 
+            }
 
-	    if ( !message.equals("") ) {
-		JOptionPane.showMessageDialog (fFrame, message, "IBM Space Conquest",
-					       JOptionPane.OK_OPTION);
-		return;
-	    }
+            if ( !message.equals("") ) {
+                JOptionPane.showMessageDialog (fFrame, message, "IBM Space Conquest",
+                                               JOptionPane.OK_OPTION);
+                return;
+            }
 
-	    message = "Cost = " + cost + ", Metal = " + metal + ".";
-	    int build = JOptionPane.showConfirmDialog (fFrame, message, "IBM Space Conquest",
-						       JOptionPane.YES_NO_OPTION);
-	    if ( build == JOptionPane.YES_OPTION) {
-		fGame.buildFleet (design, 1, fSelection);
-	    }
-	    updateShipListView ();
-	    updateResourcesView ();
-	}
+            message = "Cost = " + cost + ", Metal = " + metal + ".";
+            int build = JOptionPane.showConfirmDialog (fFrame, message, "IBM Space Conquest",
+                                                       JOptionPane.YES_NO_OPTION);
+            if ( build == JOptionPane.YES_OPTION) {
+                fGame.buildFleet (design, 1, fSelection);
+            }
+            updateShipListView ();
+            updateResourcesView ();
+        }
     }
 
     class AbandonPlanet implements java.awt.event.ActionListener
     {
-	AbandonPlanet ()
-	{
-	}
+        AbandonPlanet ()
+        {
+        }
 
-	public void actionPerformed (ActionEvent e)
-	{
-	    fGame.abandonPlanet (fSelection);
-	    updateMainBudgetUI ();
-	}
+        public void actionPerformed (ActionEvent e)
+        {
+            fGame.abandonPlanet (fSelection);
+            updateMainBudgetUI ();
+        }
     }
 
     class Surrender implements java.awt.event.ActionListener
     {
-	Surrender ()
-	{
-	}
+        Surrender ()
+        {
+        }
 
-	public void actionPerformed (ActionEvent e)
-	{
-	    fGame.surrender ();
-	    fGame.updateJourneys ();
-	    updateMainBudgetUI ();
-	    updateShipListView ();
-	    updateResourcesView ();
-	    fGalaxyUI.refreshCache ();
-	    fGalaxyUI.repaint();
-	}
+        public void actionPerformed (ActionEvent e)
+        {
+            fGame.surrender ();
+            fGame.updateJourneys ();
+            updateMainBudgetUI ();
+            updateShipListView ();
+            updateResourcesView ();
+            fGalaxyUI.refreshCache ();
+            fGalaxyUI.repaint();
+        }
     }
 
     class ScrapFleet implements java.awt.event.ActionListener
     {
-	ScrapFleet ()
-	{
-	}
+        ScrapFleet ()
+        {
+        }
 
-	public void actionPerformed (ActionEvent e)
-	{
-	    fGame.scrapFleet (getSelectedFleet());
-	    updateShipListView ();
-	    updateResourcesView ();
-	}
+        public void actionPerformed (ActionEvent e)
+        {
+            fGame.scrapFleet (getSelectedFleet());
+            updateShipListView ();
+            updateResourcesView ();
+        }
     }
 
 

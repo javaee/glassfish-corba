@@ -38,26 +38,26 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.orb ;
+package com.sun.corba.ee.impl.orb ;
 
 import java.net.InetAddress;
 
 import org.omg.PortableInterceptor.ORBInitializer ;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
-import com.sun.corba.se.spi.orb.DataCollector ;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orb.ORBData ;
-import com.sun.corba.se.spi.orb.ParserImplTableBase ;
-import com.sun.corba.se.spi.transport.ContactInfoListFactory;
-import com.sun.corba.se.spi.transport.IORToSocketInfo;
-import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
-import com.sun.corba.se.spi.transport.TcpTimeouts;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion ;
+import com.sun.corba.ee.spi.orb.DataCollector ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORBData ;
+import com.sun.corba.ee.spi.orb.ParserImplTableBase ;
+import com.sun.corba.ee.spi.transport.ContactInfoListFactory;
+import com.sun.corba.ee.spi.transport.IORToSocketInfo;
+import com.sun.corba.ee.spi.transport.IIOPPrimaryToContactInfo;
+import com.sun.corba.ee.spi.transport.TcpTimeouts;
 
-import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
-import com.sun.corba.se.impl.legacy.connection.USLPort;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.transport.Acceptor;
+import com.sun.corba.ee.impl.encoding.CodeSetComponentInfo ;
+import com.sun.corba.ee.impl.legacy.connection.USLPort;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.transport.Acceptor;
 import org.glassfish.pfl.basic.contain.Pair;
 
 
@@ -71,8 +71,8 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private String ORBServerHost ; 
     private int ORBServerPort ; 
     private boolean listenOnAllInterfaces;
-    private com.sun.corba.se.spi.legacy.connection.ORBSocketFactory legacySocketFactory ; 
-    private com.sun.corba.se.spi.transport.ORBSocketFactory socketFactory;
+    private com.sun.corba.ee.spi.legacy.connection.ORBSocketFactory legacySocketFactory ; 
+    private com.sun.corba.ee.spi.transport.ORBSocketFactory socketFactory;
     private USLPort[] userSpecifiedListenPorts ; 
     private IORToSocketInfo iorToSocketInfo;
     private IIOPPrimaryToContactInfo iiopPrimaryToContactInfo;
@@ -81,7 +81,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private GIOPVersion giopVersion ; 
     private int highWaterMark ; 
     private int lowWaterMark ; 
-    private int numberToReclaim	; 
+    private int numberToReclaim ; 
     private int giopFragmentSize ; 
     private int giopBufferSize ; 
     private int giop11BuffMgr ; 
@@ -144,102 +144,102 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 
     public String getORBInitialHost() 
     { 
-	return ORBInitialHost; 
+        return ORBInitialHost; 
     }
 
     public int getORBInitialPort() 
     { 
-	return ORBInitialPort; 
+        return ORBInitialPort; 
     }
 
     public String getORBServerHost() 
     { 
-	return ORBServerHost; 
+        return ORBServerHost; 
     }
 
     public boolean getListenOnAllInterfaces()
     { 
-	return listenOnAllInterfaces;
+        return listenOnAllInterfaces;
     }
 
     public int getORBServerPort() 
     { 
-	return ORBServerPort; 
+        return ORBServerPort; 
     }
 
-    public com.sun.corba.se.spi.legacy.connection.ORBSocketFactory getLegacySocketFactory()
+    public com.sun.corba.ee.spi.legacy.connection.ORBSocketFactory getLegacySocketFactory()
     {
-	return legacySocketFactory;
+        return legacySocketFactory;
     }
 
-    public com.sun.corba.se.spi.transport.ORBSocketFactory getSocketFactory() 
+    public com.sun.corba.ee.spi.transport.ORBSocketFactory getSocketFactory() 
     { 
-	return socketFactory; 
+        return socketFactory; 
     }
 
     public USLPort[] getUserSpecifiedListenPorts () 
     { 
-	return userSpecifiedListenPorts; 
+        return userSpecifiedListenPorts; 
     }
 
     public IORToSocketInfo getIORToSocketInfo()
     {
-	return iorToSocketInfo;
+        return iorToSocketInfo;
     }
 
     public void setIORToSocketInfo(IORToSocketInfo x)
     {
-	iorToSocketInfo = x;
+        iorToSocketInfo = x;
     }
 
     public IIOPPrimaryToContactInfo getIIOPPrimaryToContactInfo()
     {
-	return iiopPrimaryToContactInfo;
+        return iiopPrimaryToContactInfo;
     }
 
     public void setIIOPPrimaryToContactInfo(IIOPPrimaryToContactInfo x)
     {
-	iiopPrimaryToContactInfo = x;
+        iiopPrimaryToContactInfo = x;
     }
 
     public String getORBId() 
     { 
-	return orbId; 
+        return orbId; 
     }
 
     public boolean isLocalOptimizationAllowed() 
     { 
-	return allowLocalOptimization ; 
+        return allowLocalOptimization ; 
     }
 
     public GIOPVersion getGIOPVersion() 
     { 
-	return giopVersion; 
+        return giopVersion; 
     }
 
     public int getHighWaterMark() 
     { 
-	return highWaterMark; 
+        return highWaterMark; 
     }
 
     public int getLowWaterMark() 
     { 
-	return lowWaterMark; 
+        return lowWaterMark; 
     }
 
     public int getNumberToReclaim() 
     { 
-	return numberToReclaim; 
+        return numberToReclaim; 
     }
 
     public int getGIOPFragmentSize() 
     { 
-	return giopFragmentSize; 
+        return giopFragmentSize; 
     }
 
     public int getGIOPBufferSize() 
     { 
-	return giopBufferSize; 
+        return giopBufferSize; 
     }
 
     public int getGIOPBuffMgrStrategy(GIOPVersion gv) 
@@ -266,52 +266,52 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
      */
     public short getGIOPTargetAddressPreference() 
     { 
-	return giopTargetAddressPreference; 
+        return giopTargetAddressPreference; 
     }
 
     public short getGIOPAddressDisposition() 
     { 
-	return giopAddressDisposition;    
+        return giopAddressDisposition;    
     }
 
     public boolean useByteOrderMarkers() 
     { 
-	return useByteOrderMarkers; 
+        return useByteOrderMarkers; 
     }
 
     public boolean useByteOrderMarkersInEncapsulations() 
     { 
-	return useByteOrderMarkersInEncaps; 
+        return useByteOrderMarkersInEncaps; 
     }
 
     public boolean alwaysSendCodeSetServiceContext() 
     { 
-	return alwaysSendCodeSetCtx; 
+        return alwaysSendCodeSetCtx; 
     }
 
     public boolean getPersistentPortInitialized() 
     { 
-	return persistentPortInitialized ; 
+        return persistentPortInitialized ; 
     }
 
     public int getPersistentServerPort()
     {
-	if ( persistentPortInitialized ) {
+        if ( persistentPortInitialized ) {
             return persistentServerPort;
         }
-	else {
-	    throw wrapper.persistentServerportNotSet( ) ;
-	}
+        else {
+            throw wrapper.persistentServerportNotSet( ) ;
+        }
     }
 
     public boolean getPersistentServerIdInitialized() 
     { 
-	return persistentServerIdInitialized; 
+        return persistentServerIdInitialized; 
     }
 
     /** Return the persistent-server-id of this server. This id is the same
      *  across multiple activations of this server. This is in contrast to
-     *  com.sun.corba.se.impl.iiop.ORB.getTransientServerId() which 
+     *  com.sun.corba.ee.impl.iiop.ORB.getTransientServerId() which 
      *  returns a transient id that is guaranteed to be different 
      *  across multiple activations of
      *  this server. The user/environment is required to supply the 
@@ -325,18 +325,18 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
         if ( persistentServerIdInitialized ) {
             return persistentServerId;
         } else {
-	    throw wrapper.persistentServeridNotSet( ) ;
-	}
+            throw wrapper.persistentServeridNotSet( ) ;
+        }
     }
 
     public boolean getServerIsORBActivated() 
     { 
-	return serverIsORBActivated ; 
+        return serverIsORBActivated ; 
     }
 
     public Class<?> getBadServerIdHandler()
     {
-	return badServerIdHandlerClass ;
+        return badServerIdHandlerClass ;
     }
 
      /**
@@ -345,108 +345,108 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
      */
     public CodeSetComponentInfo getCodeSetComponentInfo() 
     { 
-	return codesets; 
+        return codesets; 
     }
 
     public ORBInitializer[] getORBInitializers()
     {
-	return orbInitializers ;
+        return orbInitializers ;
     }
 
     public void addORBInitializer( ORBInitializer initializer ) 
     {
-	ORBInitializer[] arr = new ORBInitializer[orbInitializers.length+1] ;
+        ORBInitializer[] arr = new ORBInitializer[orbInitializers.length+1] ;
         System.arraycopy(orbInitializers, 0, arr, 0, orbInitializers.length);
-	arr[orbInitializers.length] = initializer ;
-	orbInitializers = arr ;
+        arr[orbInitializers.length] = initializer ;
+        orbInitializers = arr ;
     }
 
     public Pair<String,String>[] getORBInitialReferences()
     {
-	return orbInitialReferences ;
+        return orbInitialReferences ;
     }
 
     public String getORBDefaultInitialReference()
     {
-	return defaultInitRef ;
+        return defaultInitRef ;
     }
 
     public String[] getORBDebugFlags() 
     {
-	return debugFlags ;
+        return debugFlags ;
     }
 
     public Acceptor[] getAcceptors()
     {
-	return acceptors;
+        return acceptors;
     }
 
     public ContactInfoListFactory getCorbaContactInfoListFactory()
     {
-	return corbaContactInfoListFactory;
+        return corbaContactInfoListFactory;
     }
 
     public String acceptorSocketType()
     {
-	return acceptorSocketType;
+        return acceptorSocketType;
     }
     public boolean acceptorSocketUseSelectThreadToWait()
     {
-	return acceptorSocketUseSelectThreadToWait;
+        return acceptorSocketUseSelectThreadToWait;
     }
     public boolean acceptorSocketUseWorkerThreadForEvent()
     {
-	return acceptorSocketUseWorkerThreadForEvent;
+        return acceptorSocketUseWorkerThreadForEvent;
     }
     public String connectionSocketType()
     {
-	return connectionSocketType;
+        return connectionSocketType;
     }
     public boolean connectionSocketUseSelectThreadToWait()
     {
-	return connectionSocketUseSelectThreadToWait;
+        return connectionSocketUseSelectThreadToWait;
     }
     public boolean connectionSocketUseWorkerThreadForEvent()
     {
-	return connectionSocketUseWorkerThreadForEvent;
+        return connectionSocketUseWorkerThreadForEvent;
     }
     public boolean isJavaSerializationEnabled()
     {
-	return enableJavaSerialization;
+        return enableJavaSerialization;
     }
     public long getCommunicationsRetryTimeout()
     {
-	return communicationsRetryTimeout;
+        return communicationsRetryTimeout;
     }
     public long getWaitForResponseTimeout()
     {
-	return waitForResponseTimeout;
+        return waitForResponseTimeout;
     }
     public TcpTimeouts getTransportTcpTimeouts()
     {
-	return tcpTimeouts;
+        return tcpTimeouts;
     }
     public TcpTimeouts getTransportTcpConnectTimeouts()
     {
-	return tcpConnectTimeouts;
+        return tcpConnectTimeouts;
     }
     public boolean disableDirectByteBufferUse() 
     {
-	return disableDirectByteBufferUse ;
+        return disableDirectByteBufferUse ;
     }
     public boolean useRepId() 
     {
-	return useRepId;
+        return useRepId;
     }
 
     public boolean showInfoMessages()
     {
-	return showInfoMessages;
+        return showInfoMessages;
     }
     
     public boolean getServiceContextReturnsNull()
     {
-	return getServiceContextReturnsNull;
+        return getServiceContextReturnsNull;
     }
 
     public boolean isAppServerMode() 
@@ -487,44 +487,44 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 
     public ORBDataParserImpl( ORB orb, DataCollector coll )
     {
-	super( ParserTable.get( 
+        super( ParserTable.get( 
             ORB.defaultClassNameResolver() ).getParserData() ) ;
-	init( coll ) ;
+        init( coll ) ;
     }
 
     @Override
     public void complete() 
     {
         codesets = new CodeSetComponentInfo(charData, wcharData);
-	initializeServerHostInfo();
+        initializeServerHostInfo();
     }
 
     private void initializeServerHostInfo()
     {
         if (ORBServerHost == null || 
-	    ORBServerHost.equals("") ||
-	    ORBServerHost.equals("0.0.0.0") ||
-	    ORBServerHost.equals("::") ||
-	    ORBServerHost.toLowerCase().equals("::ffff:0.0.0.0"))
-	{
+            ORBServerHost.equals("") ||
+            ORBServerHost.equals("0.0.0.0") ||
+            ORBServerHost.equals("::") ||
+            ORBServerHost.toLowerCase().equals("::ffff:0.0.0.0"))
+        {
             try
-	    {
-	        ORBServerHost = InetAddress.getLocalHost().getHostAddress();
+            {
+                ORBServerHost = InetAddress.getLocalHost().getHostAddress();
             }
-	    catch (Exception ex)
-	    {
-		throw wrapper.getLocalHostFailed(ex);
+            catch (Exception ex)
+            {
+                throw wrapper.getLocalHostFailed(ex);
             }
             listenOnAllInterfaces = true;
-	}
-	else
-	{
+        }
+        else
+        {
             listenOnAllInterfaces = false;
-	}
+        }
     }
     public boolean timingPointsEnabled() 
     {
-	return timingPointsEnabled ;
+        return timingPointsEnabled ;
     }
 
     public boolean useEnumDesc() 

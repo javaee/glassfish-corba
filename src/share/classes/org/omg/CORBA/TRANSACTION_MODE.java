@@ -62,7 +62,7 @@ public final class TRANSACTION_MODE extends SystemException {
      * and a null description.
      */
     public TRANSACTION_MODE() {
-	this("");
+        this("");
     }
 
     /**

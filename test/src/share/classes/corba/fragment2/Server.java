@@ -51,15 +51,15 @@ import java.io.*;
 public class Server
 {
     public static void writeObjref(org.omg.CORBA.Object ref, String file, org.omg.CORBA.ORB orb) {
-	String fil = System.getProperty("output.dir")+System.getProperty("file.separator")+file;
-	try {
-	    java.io.DataOutputStream out = new 
-		java.io.DataOutputStream(new FileOutputStream(fil));
-	    out.writeBytes(orb.object_to_string(ref));
-	} catch (java.io.IOException e) {
-	    System.err.println("Unable to open file "+fil);
-	    System.exit(1);
-	}
+        String fil = System.getProperty("output.dir")+System.getProperty("file.separator")+file;
+        try {
+            java.io.DataOutputStream out = new 
+                java.io.DataOutputStream(new FileOutputStream(fil));
+            out.writeBytes(orb.object_to_string(ref));
+        } catch (java.io.IOException e) {
+            System.err.println("Unable to open file "+fil);
+            System.exit(1);
+        }
     }
 
     public static void main(String args[])
@@ -73,11 +73,11 @@ public class Server
             rootPOA.the_POAManager().activate();
 
             FragmentTesterImpl impl = new FragmentTesterImpl();
-	    javax.rmi.CORBA.Tie tie = javax.rmi.CORBA.Util.getTie( impl ) ; 
+            javax.rmi.CORBA.Tie tie = javax.rmi.CORBA.Util.getTie( impl ) ; 
 
-	    byte[] id = rootPOA.activate_object( 
-						 (org.omg.PortableServer.Servant)tie ) ;
-	    org.omg.CORBA.Object obj = rootPOA.id_to_reference( id ) ;
+            byte[] id = rootPOA.activate_object( 
+                                                 (org.omg.PortableServer.Servant)tie ) ;
+            org.omg.CORBA.Object obj = rootPOA.id_to_reference( id ) ;
 
             /*
 

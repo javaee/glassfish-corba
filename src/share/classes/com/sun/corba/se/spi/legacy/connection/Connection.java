@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.legacy.connection;
+package com.sun.corba.ee.spi.legacy.connection;
 
 /**
  * This interface represents the connection on which a request is made.

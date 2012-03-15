@@ -63,27 +63,27 @@ public class Client
             Properties props = new Properties();
 
             props.put(Common.SOCKET_FACTORY_CLASS_PROPERTY,
-		      Common.CUSTOM_FACTORY_CLASS);
+                      Common.CUSTOM_FACTORY_CLASS);
 
-	    ORB orb = ORB.init(args, props);
+            ORB orb = ORB.init(args, props);
 
-	    I iRef =
-		IHelper.narrow(
-	            Common.getNameService(orb)
-		    .resolve(Common.makeNameComponent(Common.serverName1)));
+            I iRef =
+                IHelper.narrow(
+                    Common.getNameService(orb)
+                    .resolve(Common.makeNameComponent(Common.serverName1)));
 
-	    System.out.println(iRef.m("Hello"));
+            System.out.println(iRef.m("Hello"));
 
-	    if (! foundAlternateIIOPAddressComponent) {
-		System.out.println("DID NOT FIND AlternateIIOPAddressComponent");
-		System.exit(1);
-	    }
+            if (! foundAlternateIIOPAddressComponent) {
+                System.out.println("DID NOT FIND AlternateIIOPAddressComponent");
+                System.exit(1);
+            }
 
-	    orb.shutdown(false);
-	    orb.destroy();
+            orb.shutdown(false);
+            orb.destroy();
 
-	    System.out.println();
-	    System.out.println(baseMsg + ".main: Test complete.");
+            System.out.println();
+            System.out.println(baseMsg + ".main: Test complete.");
 
         } catch (Exception e) {
             System.out.println(baseMsg + e) ;

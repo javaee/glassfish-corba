@@ -92,18 +92,18 @@ public class SpecialInterfaceType extends InterfaceType {
 
         if (stack.anyErrors()) return null;
         
-	// Do we already have it?
+        // Do we already have it?
         
         sun.tools.java.Type type = theClass.getType();
         Type existing = getType(type,stack);
         
         if (existing != null) {
           
-	    if (!(existing instanceof SpecialInterfaceType)) return null; // False hit.
+            if (!(existing instanceof SpecialInterfaceType)) return null; // False hit.
           
-	    // Yep, so return it...
+            // Yep, so return it...
           
-	    return (SpecialInterfaceType) existing;
+            return (SpecialInterfaceType) existing;
         }
   
         // Is it special?
@@ -132,7 +132,7 @@ public class SpecialInterfaceType extends InterfaceType {
      * Return a string describing this type.
      */
     public String getTypeDescription () {
-	return "Special interface";
+        return "Special interface";
     }
 
     //_____________________________________________________________________
@@ -143,7 +143,7 @@ public class SpecialInterfaceType extends InterfaceType {
      * Create an SpecialInterfaceType instance for the given class.
      */
     private SpecialInterfaceType(ContextStack stack, int typeCode,
-				 ClassDefinition theClass) {
+                                 ClassDefinition theClass) {
         super(stack,typeCode | TM_SPECIAL_INTERFACE | TM_INTERFACE | TM_COMPOUND, theClass);
         setNames(theClass.getName(),null,null); // Fixed in initialize.
     }
@@ -157,14 +157,14 @@ public class SpecialInterfaceType extends InterfaceType {
             if (id.equals(idRemote)) return true;
             if (id == idJavaIoSerializable) return true;
             if (id == idJavaIoExternalizable) return true;
-	    if (id == idCorbaObject) return true;
-	    if (id == idIDLEntity) return true;
+            if (id == idCorbaObject) return true;
+            if (id == idIDLEntity) return true;
             BatchEnvironment env = stack.getEnv();
-    	    try {
-    	        if (env.defCorbaObject.implementedBy(env,theClass.getClassDeclaration())) return true;
-	    } catch (ClassNotFound e) {
-		classNotFound(stack,e);
-	    }            
+            try {
+                if (env.defCorbaObject.implementedBy(env,theClass.getClassDeclaration())) return true;
+            } catch (ClassNotFound e) {
+                classNotFound(stack,e);
+            }            
         }
         return false;
     }
@@ -198,32 +198,32 @@ public class SpecialInterfaceType extends InterfaceType {
                 idlModuleName = IDL_ORG_OMG_CORBA_PORTABLE_MODULE;
             } else {
               
-		typeCode = TYPE_CORBA_OBJECT;
-    		    
-		// Is it exactly org.omg.CORBA.Object?
-    		    
-		if (id == idCorbaObject) {
-    		        
-		    // Yes, so special case...
-    		        
-		    idlName = IDLNames.getTypeName(typeCode,constant);
-		    idlModuleName = null;
-    		    
-		} else {
-    		        
-		    // No, so get the correct names...
-    		        
+                typeCode = TYPE_CORBA_OBJECT;
+                    
+                // Is it exactly org.omg.CORBA.Object?
+                    
+                if (id == idCorbaObject) {
+                        
+                    // Yes, so special case...
+                        
+                    idlName = IDLNames.getTypeName(typeCode,constant);
+                    idlModuleName = null;
+                    
+                } else {
+                        
+                    // No, so get the correct names...
+                        
                     try {
 
                         // These can fail if we get case-sensitive name matches...
 
-			idlName = IDLNames.getClassOrInterfaceName(id,env);
-			idlModuleName = IDLNames.getModuleNames(id,isBoxed(),env);
+                        idlName = IDLNames.getClassOrInterfaceName(id,env);
+                        idlModuleName = IDLNames.getModuleNames(id,isBoxed(),env);
 
-		    } catch (Exception e) {
-			failedConstraint(7,false,stack,id.toString(),e.getMessage());
-			throw new CompilerError("");
-		    }
+                    } catch (Exception e) {
+                        failedConstraint(7,false,stack,id.toString(),e.getMessage());
+                        throw new CompilerError("");
+                    }
                 }
             }
         }

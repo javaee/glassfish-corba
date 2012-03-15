@@ -62,12 +62,12 @@ public final class AttributeDescription implements org.omg.CORBA.portable.IDLEnt
 
     public AttributeDescription (String _name, String _id, String _defined_in, String _version, org.omg.CORBA.TypeCode _type, com.sun.org.omg.CORBA.AttributeMode _mode)
     {
-	name = _name;
-	id = _id;
-	defined_in = _defined_in;
-	version = _version;
-	type = _type;
-	mode = _mode;
+        name = _name;
+        id = _id;
+        defined_in = _defined_in;
+        version = _version;
+        type = _type;
+        mode = _mode;
     } // ctor
 
 } // class AttributeDescription

@@ -40,7 +40,7 @@
 
 package pi.clientrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 
 /**
@@ -51,13 +51,13 @@ public class OneWayStrategy
 {
 
     public void send_request (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
         throws ForwardRequest
     {
-	super.send_request( interceptor, ri );
+        super.send_request( interceptor, ri );
         
         try {
-	    checkResponseExpected( "send_request", ri );
+            checkResponseExpected( "send_request", ri );
         }
         catch( Exception e ) {
             failException( "send_request", e );
@@ -66,19 +66,19 @@ public class OneWayStrategy
 
 
     public void send_poll (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
     {
-	super.send_poll( interceptor, ri );
-	// never executed in our orb.
+        super.send_poll( interceptor, ri );
+        // never executed in our orb.
     }
 
     public void receive_reply (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
     {
-	super.receive_reply( interceptor, ri );
+        super.receive_reply( interceptor, ri );
         
         try {
-	    checkResponseExpected( "receive_reply", ri );
+            checkResponseExpected( "receive_reply", ri );
         }
         catch( Exception e ) {
             failException( "receive_reply", e );
@@ -87,16 +87,16 @@ public class OneWayStrategy
 
 
     private void checkResponseExpected( String method, ClientRequestInfo ri ) {
-	String operationName = ri.operation();
-	boolean responseExpected = ri.response_expected();
-	boolean validExpected = !operationName.equals( "sayOneway" );
+        String operationName = ri.operation();
+        boolean responseExpected = ri.response_expected();
+        boolean validExpected = !operationName.equals( "sayOneway" );
 
-	log( method + "(): Operation " + operationName + 
-	     ", response expected = " + responseExpected );
+        log( method + "(): Operation " + operationName + 
+             ", response expected = " + responseExpected );
 
-	if( responseExpected != validExpected ) {
-	    fail( "response_expected() invalid for this operation." );
-	}
+        if( responseExpected != validExpected ) {
+            fail( "response_expected() invalid for this operation." );
+        }
     }
 
 }

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package com.sun.corba.ee.impl.dynamicany;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
@@ -49,7 +49,7 @@ import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 import org.omg.DynamicAny.DynAny;
 import org.omg.DynamicAny.DynUnion;
 
@@ -212,7 +212,7 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
      */
     public org.omg.DynamicAny.DynAny get_discriminator () {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         return (checkInitComponents() ? discriminator : null);
     }
@@ -237,7 +237,7 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
         throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         if ( ! newDiscriminator.type().equal(discriminatorType())) {
             throw new TypeMismatch();
@@ -274,7 +274,7 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
         throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         int defaultIndex = defaultIndex();
         if (defaultIndex == -1) {
@@ -303,7 +303,7 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
         throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         // _REVISIT_ How does one check for "entire range of discriminator values"?
         if (defaultIndex() != -1) {
@@ -331,7 +331,7 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
     // values for explicit case labels returns false.
     public boolean has_no_active_member () {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         // _REVISIT_ How does one check for "entire range of discriminator values"?
         if (defaultIndex() != -1) {
@@ -343,7 +343,7 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
 
     public org.omg.CORBA.TCKind discriminator_kind () {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         return discriminatorType().kind();
     }
@@ -358,7 +358,7 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
         throws org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         if ( ! checkInitComponents() || currentMemberIndex == NO_INDEX) {
             throw new InvalidValue();
@@ -374,7 +374,7 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
         throws org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         if ( ! checkInitComponents() || currentMemberIndex == NO_INDEX) {
             throw new InvalidValue();
@@ -389,7 +389,7 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
         throws org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         if ( ! checkInitComponents() || currentMemberIndex == NO_INDEX) {
             throw new InvalidValue();

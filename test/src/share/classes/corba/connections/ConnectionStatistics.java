@@ -47,11 +47,11 @@ package corba.connections;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.Acceptor;
-import com.sun.corba.se.spi.transport.TransportManager;
-import com.sun.corba.se.spi.transport.ConnectionCache;
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.Acceptor;
+import com.sun.corba.ee.spi.transport.TransportManager;
+import com.sun.corba.ee.spi.transport.ConnectionCache;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter ;
 
 import corba.hcks.U;
 
@@ -105,35 +105,35 @@ public class ConnectionStatistics
     public String outbound(String msg, ORB orb) {
         ManagedObjectManager mom = orb.mom() ;
 
-	StringBuffer result = new StringBuffer("");
-	pac(result, "==================================================");
-	pac(result, msg + " OUTBOUND:");
+        StringBuffer result = new StringBuffer("");
+        pac(result, "==================================================");
+        pac(result, msg + " OUTBOUND:");
 
         for (ConnectionCache cache : ctm.getOutboundConnectionCaches() ) {
             handleConnectionCache( result, cache ) ;
         }
 
-	return result.toString();
+        return result.toString();
     }
 
     public String inbound(String msg, ORB orb) {
         ManagedObjectManager mom = orb.mom() ;
 
-	StringBuffer result = new StringBuffer("");
-	pac(result, "==================================================");
-	pac(result, msg + " INBOUND:");
+        StringBuffer result = new StringBuffer("");
+        pac(result, "==================================================");
+        pac(result, msg + " INBOUND:");
 
         for (ConnectionCache cache : ctm.getInboundConnectionCaches() ) {
             handleConnectionCache( result, cache ) ;
         }
 
-	return result.toString();
+        return result.toString();
     }
 
     // Print And Collect
     private void pac(StringBuffer result, String append) {
-	U.sop(append);
-	result.append(append).append('\n');
+        U.sop(append);
+        result.append(append).append('\n');
     }
 }
 

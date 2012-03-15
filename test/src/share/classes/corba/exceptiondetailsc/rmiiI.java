@@ -49,20 +49,20 @@ import java.rmi.RemoteException;
 
 public interface rmiiI
     extends 
-	Remote 
+        Remote 
 { 
     public void raiseSystemException(String x)
-	throws
-	    RemoteException; 
+        throws
+            RemoteException; 
 
     public void raiseUserException(String x)
-	throws
-	    RemoteException,
-	    rmiiException;
+        throws
+            RemoteException,
+            rmiiException;
 
     public void raiseRuntimeException(String x)
-	throws
-	    RemoteException; 
+        throws
+            RemoteException; 
 }
 
 // End of file.

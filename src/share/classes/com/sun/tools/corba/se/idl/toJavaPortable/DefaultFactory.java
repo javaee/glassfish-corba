@@ -144,9 +144,9 @@ public class DefaultFactory implements AuxGen
       entry.comment ().generate ("", stream);
     stream.print ("public class " + factoryClass + " implements ");
     if (hasFactoryMethods ())
-	stream.print (factoryInterface);
+        stream.print (factoryInterface);
     else
-	stream.print ("org.omg.CORBA.portable.ValueFactory");
+        stream.print ("org.omg.CORBA.portable.ValueFactory");
     stream.println (" {");
   } // writeHeading
 

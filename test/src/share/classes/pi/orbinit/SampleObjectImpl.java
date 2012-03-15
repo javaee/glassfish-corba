@@ -49,19 +49,19 @@ public class SampleObjectImpl
     private short _y;
 
     public short x () {
-	return _x;
+        return _x;
     }
 
     public void x (short newX) {
-	this._x = newX;
+        this._x = newX;
     }
 
     public short y () {
-	return _y;
+        return _y;
     }
 
     public void y (short newY) {
-	this._y = newY;
+        this._y = newY;
     }
 
 }

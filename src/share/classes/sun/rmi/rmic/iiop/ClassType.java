@@ -60,8 +60,8 @@ import java.io.IOException;
  * ClassType is an abstract base representing any non-special class
  * type.
  *
- * @version	1.0, 2/27/98
- * @author	Bryan Atsatt
+ * @version     1.0, 2/27/98
+ * @author      Bryan Atsatt
  */
 public abstract class ClassType extends CompoundType {
 
@@ -76,9 +76,9 @@ public abstract class ClassType extends CompoundType {
      * type is an interface or if there is no parent.
      */
     public ClassType getSuperclass() {
-	return parent;
+        return parent;
     }
-	
+        
    
     /**
      * Print this type.
@@ -87,42 +87,42 @@ public abstract class ClassType extends CompoundType {
      * @param useIDLNames If true, print IDL names; otherwise, print java names.
      * @param globalIDLNames If true and useIDLNames true, prepends "::".
      */
-    public void print (	IndentingWriter writer,
-			boolean useQualifiedNames,
-			boolean useIDLNames,
-			boolean globalIDLNames) throws IOException {
-							
-	if (isInner()) {
-	    writer.p("// " + getTypeDescription() + " (INNER)");
-	} else {
-	    writer.p("// " + getTypeDescription());
-	}
-	writer.pln(" (" + getRepositoryID() + ")\n");
-		
-	printPackageOpen(writer,useIDLNames);
-		
-	if (!useIDLNames) {
-	    writer.p("public ");
-	}
-		
-	String prefix = "";
-	writer.p("class " + getTypeName(false,useIDLNames,false));
-	if (printExtends(writer,useQualifiedNames,useIDLNames,globalIDLNames)) {
-	    prefix = ",";
-	}
-	printImplements(writer,prefix,useQualifiedNames,useIDLNames,globalIDLNames);
-	writer.plnI(" {");
-	printMembers(writer,useQualifiedNames,useIDLNames,globalIDLNames);
-	writer.pln();
-	printMethods(writer,useQualifiedNames,useIDLNames,globalIDLNames);
+    public void print ( IndentingWriter writer,
+                        boolean useQualifiedNames,
+                        boolean useIDLNames,
+                        boolean globalIDLNames) throws IOException {
+                                                        
+        if (isInner()) {
+            writer.p("// " + getTypeDescription() + " (INNER)");
+        } else {
+            writer.p("// " + getTypeDescription());
+        }
+        writer.pln(" (" + getRepositoryID() + ")\n");
+                
+        printPackageOpen(writer,useIDLNames);
+                
+        if (!useIDLNames) {
+            writer.p("public ");
+        }
+                
+        String prefix = "";
+        writer.p("class " + getTypeName(false,useIDLNames,false));
+        if (printExtends(writer,useQualifiedNames,useIDLNames,globalIDLNames)) {
+            prefix = ",";
+        }
+        printImplements(writer,prefix,useQualifiedNames,useIDLNames,globalIDLNames);
+        writer.plnI(" {");
+        printMembers(writer,useQualifiedNames,useIDLNames,globalIDLNames);
+        writer.pln();
+        printMethods(writer,useQualifiedNames,useIDLNames,globalIDLNames);
 
-	if (useIDLNames) {
-	    writer.pOln("};");
-	} else {
-	    writer.pOln("}");
-	}
-		
-	printPackageClose(writer,useIDLNames);
+        if (useIDLNames) {
+            writer.pOln("};");
+        } else {
+            writer.pOln("}");
+        }
+                
+        printPackageClose(writer,useIDLNames);
     }
     
 
@@ -131,15 +131,15 @@ public abstract class ClassType extends CompoundType {
     //_____________________________________________________________________
 
     protected void destroy () {
-	if (!destroyed) {
+        if (!destroyed) {
             super.destroy();
             if (parent != null) {
                 parent.destroy();
-		parent = null;
+                parent = null;
     }
     }
-	}
-	
+        }
+        
     /**
      * Create a ClassType instance for the given class. NOTE: This constructor
      * is ONLY for SpecialClassType.
@@ -147,7 +147,7 @@ public abstract class ClassType extends CompoundType {
     protected ClassType(ContextStack stack, int typeCode, ClassDefinition classDef) {
         super(stack,typeCode,classDef); // Call special parent constructor.
         if ((typeCode & TM_CLASS) == 0 && classDef.isInterface()) {
-	    throw new CompilerError("Not a class");
+            throw new CompilerError("Not a class");
         }
         parent = null;
     }
@@ -160,7 +160,7 @@ public abstract class ClassType extends CompoundType {
         super(stack,classDef,typeCode);
         
         if ((typeCode & TM_CLASS) == 0 && classDef.isInterface()) {
-	    throw new CompilerError("Not a class");
+            throw new CompilerError("Not a class");
         }
         parent = null;
     }
@@ -171,18 +171,18 @@ public abstract class ClassType extends CompoundType {
      * initialize(directInterfaces,directInterfaces,directConstants);
      */
     protected ClassType(ContextStack stack,
-			ClassDefinition classDef,
-			int typeCode) {
+                        ClassDefinition classDef,
+                        int typeCode) {
         super(stack,classDef,typeCode);
         if ((typeCode & TM_CLASS) == 0 && classDef.isInterface()) {
-	    throw new CompilerError("Not a class");
+            throw new CompilerError("Not a class");
         }
         parent = null;
     }
 
     /**
      * Convert all invalid types to valid ones.
-     */ 	
+     */         
     protected void swapInvalidTypes () {
         super.swapInvalidTypes();
         if (parent != null && parent.getStatus() != STATUS_VALID) {
@@ -194,14 +194,14 @@ public abstract class ClassType extends CompoundType {
      * Modify the type description with exception info.
      */
     public String addExceptionDescription (String typeDesc) {
-	if (isException) {
+        if (isException) {
             if (isCheckedException) {
-		typeDesc = typeDesc + " - Checked Exception";
+                typeDesc = typeDesc + " - Checked Exception";
             } else {
-		typeDesc = typeDesc + " - Unchecked Exception";
+                typeDesc = typeDesc + " - Unchecked Exception";
             }
-	}
-	return typeDesc;
+        }
+        return typeDesc;
     }
     
     
@@ -214,20 +214,20 @@ public abstract class ClassType extends CompoundType {
         
         boolean result = true;
         
-	try {
-	    ClassDeclaration parentDecl = getClassDefinition().getSuperClass(env);
-	    if (parentDecl != null) {
-		ClassDefinition parentDef = parentDecl.getClassDefinition(env);
-		parent = (ClassType) makeType(parentDef.getType(),parentDef,stack);
-		if (parent == null) {
-		    result = false;
-		}
-	    }
-	} catch (ClassNotFound e) {
+        try {
+            ClassDeclaration parentDecl = getClassDefinition().getSuperClass(env);
+            if (parentDecl != null) {
+                ClassDefinition parentDef = parentDecl.getClassDefinition(env);
+                parent = (ClassType) makeType(parentDef.getType(),parentDef,stack);
+                if (parent == null) {
+                    result = false;
+                }
+            }
+        } catch (ClassNotFound e) {
             classNotFound(stack,e);
-	    throw new CompilerError("ClassType constructor");
-	}
-		
-	return result;
+            throw new CompilerError("ClassType constructor");
+        }
+                
+        return result;
     }
 }

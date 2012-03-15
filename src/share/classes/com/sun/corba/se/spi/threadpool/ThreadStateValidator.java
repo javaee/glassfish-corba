@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.threadpool;
+package com.sun.corba.ee.spi.threadpool;
 
-import com.sun.corba.se.impl.threadpool.Exceptions ;
+import com.sun.corba.ee.impl.threadpool.Exceptions ;
 import java.util.ArrayList;
 import java.util.List;
 

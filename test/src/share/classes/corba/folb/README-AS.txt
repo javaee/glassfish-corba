@@ -53,10 +53,10 @@ DYNAMIC and STATIC:
     CSIv2SSLTaggedComponentHandler (via RIR)
     ClientGroupManager (via ORBConfigurator)
         ClientRequestInterceptor, (via ORBInitializer)
-	IIOPPrimaryToContactInfo, (via ORBData)
-	IORToSocketInfo (via ORBData)
-			(uses CSIv2SSLTaggedComponentHandler.extract)
-	Offers FOLB_CLIENT_GROUP_INFO_SERVICE (via RIR)
+        IIOPPrimaryToContactInfo, (via ORBData)
+        IORToSocketInfo (via ORBData)
+                        (uses CSIv2SSLTaggedComponentHandler.extract)
+        Offers FOLB_CLIENT_GROUP_INFO_SERVICE (via RIR)
     S1ASSerialContextFactory (via Property)
         Registers with FOLB_CLIENT_GROUP_INFO_SERVICE (via RIR)
 
@@ -65,14 +65,14 @@ DYNAMIC:
 
     com.sun.enterprise.ee.ejb.iiop.IiopFolbGmsClient (via RIR)
         Registers with GMS
-	Offers FOLB_SERVER_GROUP_INFO_SERVICE (via RIR)
+        Offers FOLB_SERVER_GROUP_INFO_SERVICE (via RIR)
     ServerGroupManager (via ORBConfigurator)
-	IORInterceptor (via ORBInitializer)
-		       (uses CSIv2SSLTaggedComponentHandler.insert)
-	ServerRequestInterceptor (via ORBInitializer)
-	Registers with FOLB_SERVER_GROUP_INFO_SERVICE (via RIR)
+        IORInterceptor (via ORBInitializer)
+                       (uses CSIv2SSLTaggedComponentHandler.insert)
+        ServerRequestInterceptor (via ORBInitializer)
+        Registers with FOLB_SERVER_GROUP_INFO_SERVICE (via RIR)
     TxSecIORInterceptor - disable adding CSIv2 addresses.
-			(via ORBInitializer)
+                        (via ORBInitializer)
 
 ------------------------------------------------------------------------------
 STATIC:

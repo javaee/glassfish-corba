@@ -60,13 +60,13 @@ import sun.tools.java.Identifier;
 public class MapType extends CompoundType {
 
     public static boolean resetTypesForEach = false;
-	
+        
     private MapType() {
-	super(null,0,null);
+        super(null,0,null);
     }
 
     public String getTypeDescription () {
-	return null;
+        return null;
     }
 
 
@@ -76,22 +76,22 @@ public class MapType extends CompoundType {
     
     public static Type getType (String className,
                                 ContextStack stack) {
-	    
-	if (MapType.resetTypesForEach) {
-	    stack.getEnv().reset();
-	}
-	    
-	Identifier classID = Identifier.lookup(className);
-	classID = stack.getEnv().resolvePackageQualifiedName(classID);
-	classID = Names.mangleClass(classID);
-	ClassDeclaration decl = stack.getEnv().getClassDeclaration(classID);
-	return makeType(decl.getType(), null, stack);
+            
+        if (MapType.resetTypesForEach) {
+            stack.getEnv().reset();
+        }
+            
+        Identifier classID = Identifier.lookup(className);
+        classID = stack.getEnv().resolvePackageQualifiedName(classID);
+        classID = Names.mangleClass(classID);
+        ClassDeclaration decl = stack.getEnv().getClassDeclaration(classID);
+        return makeType(decl.getType(), null, stack);
     }
 
     public static void main (String[] args) {
 
         int status = 0;
-	try {
+        try {
             resetTypesForEach = Boolean.valueOf(args[0]).booleanValue();
             int offset = Integer.parseInt(args[1]);
             TestEnv env = new TestEnv(new ClassPath(args[2]));
@@ -107,29 +107,29 @@ public class MapType extends CompoundType {
                     else if (line < 100) num = "   " + num;
                     else if (line < 1000) num = "  " + num;
                     else if (line < 10000) num = " " + num;
-		    System.out.print(num + " - " + className);
+                    System.out.print(num + " - " + className);
 
-		    Type result = getType(className,stack);
+                    Type result = getType(className,stack);
 
-		    if (result != null) {
-			if (env.nerrors > 0) {
-			    status = 1;
-			    System.out.println("!!!Failure: result = " + result.getTypeDescription());   
-			} else {
-			    System.out.println(" = " + result.getTypeDescription());
-			}
-		    }
-		} catch (Throwable e) {
+                    if (result != null) {
+                        if (env.nerrors > 0) {
+                            status = 1;
+                            System.out.println("!!!Failure: result = " + result.getTypeDescription());   
+                        } else {
+                            System.out.println(" = " + result.getTypeDescription());
+                        }
+                    }
+                } catch (Throwable e) {
                     if (e instanceof ThreadDeath) throw (ThreadDeath) e;
                     status = 1;
                     System.out.println("!!!Exception: " + className + " caught " + e);
                 }
             }
-	} catch (Throwable e) {
-    	    System.out.println("!!!Exception: caught " + e);
-    	    status = 1;
-	}
-		
+        } catch (Throwable e) {
+            System.out.println("!!!Exception: caught " + e);
+            status = 1;
+        }
+                
         System.exit(status);
     }
 }

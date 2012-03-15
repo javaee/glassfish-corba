@@ -38,20 +38,20 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
-import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextDefaults;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ObjectKeyCacheEntry;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
-import com.sun.corba.se.spi.trace.Transport ;
+import com.sun.corba.ee.spi.trace.Transport ;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 /**
  * This implements the GIOP 1.2 Request header.
@@ -81,7 +81,7 @@ public final class RequestMessage_1_2 extends Message_1_2
 
     RequestMessage_1_2(ORB orb) {
         this.orb = orb;
-	this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
+        this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
     }
 
     RequestMessage_1_2(ORB orb, int _request_id, byte _response_flags,
@@ -130,11 +130,11 @@ public final class RequestMessage_1_2 extends Message_1_2
 
     public ObjectKeyCacheEntry getObjectKeyCacheEntry() {
         if (this.entry == null) {
-	    // this will raise a MARSHAL exception upon errors.
-	    this.entry = MessageBase.extractObjectKeyCacheEntry(target, orb);
+            // this will raise a MARSHAL exception upon errors.
+            this.entry = MessageBase.extractObjectKeyCacheEntry(target, orb);
         }
 
-	return this.entry;
+        return this.entry;
     }
 
     public String getOperation() {

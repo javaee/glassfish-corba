@@ -61,8 +61,8 @@ import sun.tools.java.ClassDefinition;
  * The static forImplementation(...) method must be used to obtain an instance,
  * and will return null if the ClassDefinition is non-conforming.
  *
- * @version	1.0, 2/25/98
- * @author	Bryan Atsatt
+ * @version     1.0, 2/25/98
+ * @author      Bryan Atsatt
  */
 public class NCClassType extends ClassType {
 
@@ -78,53 +78,53 @@ public class NCClassType extends ClassType {
      * supplied BatchEnvironment.
      */
     public static NCClassType forNCClass(ClassDefinition classDef,
-					 ContextStack stack) {
-		
-	if (stack.anyErrors()) return null;
-				                            
-    	boolean doPop = false;
-    	try {
-	    // Do we already have it?
-			
-	    sun.tools.java.Type theType = classDef.getType();		
-	    Type existing = getType(theType,stack);
-			
-	    if (existing != null) {
-				
-		if (!(existing instanceof NCClassType)) return null; // False hit.
-				
-				// Yep, so return it...
-				
-		return (NCClassType) existing;
-				
-	    }
-			
-	    NCClassType it = new NCClassType(stack, classDef);
-	    putType(theType,it,stack);
-	    stack.push(it);
-	    doPop = true;
+                                         ContextStack stack) {
+                
+        if (stack.anyErrors()) return null;
+                                                            
+        boolean doPop = false;
+        try {
+            // Do we already have it?
+                        
+            sun.tools.java.Type theType = classDef.getType();           
+            Type existing = getType(theType,stack);
+                        
+            if (existing != null) {
+                                
+                if (!(existing instanceof NCClassType)) return null; // False hit.
+                                
+                                // Yep, so return it...
+                                
+                return (NCClassType) existing;
+                                
+            }
+                        
+            NCClassType it = new NCClassType(stack, classDef);
+            putType(theType,it,stack);
+            stack.push(it);
+            doPop = true;
 
-	    if (it.initialize(stack)) {
-		stack.pop(true);
-		return it;
-	    } else {
-		removeType(theType,stack);
-		stack.pop(false);
-		return null;
-	    }
-	} catch (CompilerError e) {
-    	    if (doPop) stack.pop(false);
-    	    return null;
-    	}
+            if (it.initialize(stack)) {
+                stack.pop(true);
+                return it;
+            } else {
+                removeType(theType,stack);
+                stack.pop(false);
+                return null;
+            }
+        } catch (CompilerError e) {
+            if (doPop) stack.pop(false);
+            return null;
+        }
     }
 
     /**
      * Return a string describing this type.
      */
     public String getTypeDescription () {
-	return addExceptionDescription("Non-conforming class");
+        return addExceptionDescription("Non-conforming class");
     }
-	
+        
     //_____________________________________________________________________
     // Internal/Subclass Interfaces
     //_____________________________________________________________________
@@ -134,7 +134,7 @@ public class NCClassType extends ClassType {
      * object is not yet completely initialized.
      */
     private NCClassType(ContextStack stack, ClassDefinition classDef) {
-	super(stack,classDef,TYPE_NC_CLASS | TM_CLASS | TM_COMPOUND);
+        super(stack,classDef,TYPE_NC_CLASS | TM_CLASS | TM_COMPOUND);
     }
 
     //_____________________________________________________________________
@@ -145,33 +145,33 @@ public class NCClassType extends ClassType {
      * Initialize this instance.
      */
     private boolean initialize (ContextStack stack) {
-	if (!initParents(stack)) {
-	    return false;
-	}
+        if (!initParents(stack)) {
+            return false;
+        }
 
-	if (stack.getEnv().getParseNonConforming()) {
-	    
-	    Vector directInterfaces = new Vector();
-	    Vector directMethods = new Vector();
-	    Vector directMembers = new Vector();
+        if (stack.getEnv().getParseNonConforming()) {
+            
+            Vector directInterfaces = new Vector();
+            Vector directMethods = new Vector();
+            Vector directMembers = new Vector();
 
-	    try {
+            try {
 
-		// Get methods...
+                // Get methods...
 
-		if (addAllMethods(getClassDefinition(),directMethods,false,false,stack) != null) {
+                if (addAllMethods(getClassDefinition(),directMethods,false,false,stack) != null) {
 
-		    // Update parent class methods...
+                    // Update parent class methods...
 
-		    if (updateParentClassMethods(getClassDefinition(),directMethods,false,stack) != null) {
+                    if (updateParentClassMethods(getClassDefinition(),directMethods,false,stack) != null) {
                         
                     // Get conforming constants...
 
-		    if (addConformingConstants(directMembers,false,stack)) {
+                    if (addConformingConstants(directMembers,false,stack)) {
 
-			// We're ok, so pass 'em up...
+                        // We're ok, so pass 'em up...
 
-			if (!initialize(directInterfaces,directMethods,directMembers,stack,false)) {
+                        if (!initialize(directInterfaces,directMethods,directMembers,stack,false)) {
                             return false;
                         }
                     }
@@ -179,9 +179,9 @@ public class NCClassType extends ClassType {
                 }
                 return true;
                 
-	    } catch (ClassNotFound e) {
-		classNotFound(stack,e);
-	    }
+            } catch (ClassNotFound e) {
+                classNotFound(stack,e);
+            }
             return false;
         } else {
             return initialize(null,null,null,stack,false);   

@@ -54,21 +54,21 @@ module corba
 
     interface I
     {
-	boolean unregister(in string socketType);
-	boolean register(in string socketType);
+        boolean unregister(in string socketType);
+        boolean register(in string socketType);
         string m(in string x);
         long n(in string x);
 
-	// This has NOTHING to do with failover.
-	// Just here to test the server-side stack trace shown on
-	// The client side.
-	long throwRuntimeException(in long x);
+        // This has NOTHING to do with failover.
+        // Just here to test the server-side stack trace shown on
+        // The client side.
+        long throwRuntimeException(in long x);
     };
 
     interface I2
     {
         long m(in string x);
-	Object n(in string x);
+        Object n(in string x);
         long foo(in long x);
     };
 

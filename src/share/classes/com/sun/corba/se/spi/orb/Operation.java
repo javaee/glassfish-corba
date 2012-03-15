@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.orb ;
+package com.sun.corba.ee.spi.orb ;
 
 /** A generic class representing a function that takes a value and returns
  * a value.  This is a building block for property parsing.

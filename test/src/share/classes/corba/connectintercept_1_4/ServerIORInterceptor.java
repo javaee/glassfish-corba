@@ -48,13 +48,13 @@ import org.omg.IOP.TaggedComponent;
 import org.omg.PortableInterceptor.IORInterceptor;
 import org.omg.PortableInterceptor.IORInfo;
 import org.omg.PortableInterceptor.ObjectReferenceTemplate;
-import com.sun.corba.se.spi.legacy.interceptor.IORInfoExt;
+import com.sun.corba.ee.spi.legacy.interceptor.IORInfoExt;
 
 public class ServerIORInterceptor
     extends
         org.omg.CORBA.LocalObject
     implements
-	IORInterceptor
+        IORInterceptor
 {
     public final String baseMsg = ServerIORInterceptor.class.getName();
     public final String estMsg  = baseMsg + ".establish_components";
@@ -63,29 +63,29 @@ public class ServerIORInterceptor
     public void   destroy() { }
     public void   establish_components(IORInfo iorInfo)
     {
-	IORInfoExt iorInfoExt = (IORInfoExt) iorInfo;
-	String componentData = Common.createComponentData(estMsg, iorInfoExt);
-	TaggedComponent taggedComponent =
-	    new TaggedComponent(Common.ListenPortsComponentID,
-				componentData.getBytes());
-	iorInfo.add_ior_component(taggedComponent);
-	System.out.println(estMsg + ": add_ior_component completed");
+        IORInfoExt iorInfoExt = (IORInfoExt) iorInfo;
+        String componentData = Common.createComponentData(estMsg, iorInfoExt);
+        TaggedComponent taggedComponent =
+            new TaggedComponent(Common.ListenPortsComponentID,
+                                componentData.getBytes());
+        iorInfo.add_ior_component(taggedComponent);
+        System.out.println(estMsg + ": add_ior_component completed");
     }
 
     public void components_established( IORInfo iorInfo )
     {
-	// NO-OP
+        // NO-OP
     }
 
     public void adapter_manager_state_changed( int managerId, short state )
     {
-	// NO-OP
+        // NO-OP
     }
 
     public void adapter_state_changed( ObjectReferenceTemplate[] templates,
-	short state ) 
+        short state ) 
     {
-	// NO-OP
+        // NO-OP
     }
 }
 

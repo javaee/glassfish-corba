@@ -49,10 +49,10 @@ import corba.framework.CORBATest;
 
 public class ExceptionDetailSCTest
     extends
-	CORBATest
+        CORBATest
 {
     public static final String thisPackage =
-	ExceptionDetailSCTest.class.getPackage().getName();
+        ExceptionDetailSCTest.class.getPackage().getName();
 
     protected void doTest() throws Throwable {
         Controller orbd   = createORBD();
@@ -75,17 +75,17 @@ public class ExceptionDetailSCTest
         String serverMainClass, String serverTestName, 
         String clientMainClass, String clientTestName) throws Throwable {
 
-	Controller server = createServer(thisPackage + "." + serverMainClass,
-					 serverTestName);
-	server.start();
+        Controller server = createServer(thisPackage + "." + serverMainClass,
+                                         serverTestName);
+        server.start();
 
-	Controller client = createClient(thisPackage + "." + clientMainClass,
-					 clientTestName);
-	client.start();
-	client.waitFor();
-	client.stop();
+        Controller client = createClient(thisPackage + "." + clientMainClass,
+                                         clientTestName);
+        client.start();
+        client.waitFor();
+        client.stop();
 
-	server.stop();
+        server.stop();
     }
 }
 

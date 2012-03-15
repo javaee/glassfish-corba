@@ -38,7 +38,7 @@
  * holder.
  */
 /*
- * @(#)GIOP.idl	1.0 00/05/21
+ * @(#)GIOP.idl 1.0 00/05/21
  *
  */
 
@@ -46,35 +46,35 @@
 
 module GIOP { // IDL extended for version 1.1 and 1.2
 
-	struct Version {
-		octet major;
-		octet minor;
-	};
+        struct Version {
+                octet major;
+                octet minor;
+        };
 
 
-	// GIOP 1.0
+        // GIOP 1.0
 
-	struct MessageHeader_1_0 { // Renamed from MessageHeader
-		char magic [4];
-		Version GIOP_version;
-		boolean byte_order;
-		octet message_type;
-		unsigned long message_size;
-	};
+        struct MessageHeader_1_0 { // Renamed from MessageHeader
+                char magic [4];
+                Version GIOP_version;
+                boolean byte_order;
+                octet message_type;
+                unsigned long message_size;
+        };
 
-	// GIOP 1.1
+        // GIOP 1.1
 
-	struct MessageHeader_1_1 {
-		char magic [4];
-		Version GIOP_version;
-		octet flags; // GIOP 1.1 change
-		octet message_type;
-		unsigned long message_size;
-	};
+        struct MessageHeader_1_1 {
+                char magic [4];
+                Version GIOP_version;
+                octet flags; // GIOP 1.1 change
+                octet message_type;
+                unsigned long message_size;
+        };
 
-	// GIOP 1.2
+        // GIOP 1.2
         // Same Header contents for 1.1 and 1.2
-	typedef MessageHeader_1_1 MessageHeader_1_2;
+        typedef MessageHeader_1_1 MessageHeader_1_2;
 
 
         // GIOP 1.0

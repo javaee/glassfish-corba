@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.txpoa;
+package com.sun.corba.ee.impl.txpoa;
 
 import org.omg.CORBA.TSIdentification;
 
@@ -54,9 +54,9 @@ public class TSIdentificationImpl extends org.omg.CORBA.LocalObject
         the registration has already been done previously.
     */
     public void
-	identify_sender(org.omg.CosTSPortability.Sender senderOTS)
-	throws org.omg.CORBA.TSIdentificationPackage.NotAvailable,
-	       org.omg.CORBA.TSIdentificationPackage.AlreadyIdentified
+        identify_sender(org.omg.CosTSPortability.Sender senderOTS)
+        throws org.omg.CORBA.TSIdentificationPackage.NotAvailable,
+               org.omg.CORBA.TSIdentificationPackage.AlreadyIdentified
     {
         if ( sender == null )
             sender = senderOTS;
@@ -71,9 +71,9 @@ public class TSIdentificationImpl extends org.omg.CORBA.LocalObject
         the registration has already been done previously.
     */
     public void
-	identify_receiver(org.omg.CosTSPortability.Receiver receiverOTS)
-	throws org.omg.CORBA.TSIdentificationPackage.NotAvailable,
-	       org.omg.CORBA.TSIdentificationPackage.AlreadyIdentified
+        identify_receiver(org.omg.CosTSPortability.Receiver receiverOTS)
+        throws org.omg.CORBA.TSIdentificationPackage.NotAvailable,
+               org.omg.CORBA.TSIdentificationPackage.AlreadyIdentified
     {
         if ( receiver == null )
             receiver = receiverOTS;
@@ -84,21 +84,21 @@ public class TSIdentificationImpl extends org.omg.CORBA.LocalObject
 
     /** getSender is not defined in the OTS spec. It is just a convenience
         method to allow the ORB to access the Sender subsequent to
-	initialization.
+        initialization.
     */
     public org.omg.CosTSPortability.Sender
-	getSender()
+        getSender()
     {
-	return sender;
+        return sender;
     }
 
     /** getReceiver is not defined in the OTS spec. It is just a convenience
         method to allow the ORB to access the Receiver subsequent to
-	initialization.
+        initialization.
     */
     public org.omg.CosTSPortability.Receiver
-	getReceiver()
+        getReceiver()
     {
-	return receiver;
+        return receiver;
     }
 }

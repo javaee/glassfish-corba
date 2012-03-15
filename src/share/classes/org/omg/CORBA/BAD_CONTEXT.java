@@ -61,7 +61,7 @@ public final class BAD_CONTEXT extends SystemException {
      * of 0 and a completion state of COMPLETED_NO.
      */
     public BAD_CONTEXT() {
-	this("");
+        this("");
     }
 
     /**
@@ -71,7 +71,7 @@ public final class BAD_CONTEXT extends SystemException {
      * @param s a <code>String</code> object containing a detail message
      */
     public BAD_CONTEXT(String s) {
-	this(s, 0, CompletionStatus.COMPLETED_NO);
+        this(s, 0, CompletionStatus.COMPLETED_NO);
     }
 
     /**

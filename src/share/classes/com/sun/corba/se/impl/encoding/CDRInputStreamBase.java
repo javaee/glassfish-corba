@@ -37,14 +37,14 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.org.omg.SendingContext.CodeBase;
 
 /**
@@ -118,7 +118,7 @@ abstract class CDRInputStreamBase extends java.io.InputStream
     public abstract java.lang.Object read_abstract_interface();
     public abstract java.lang.Object read_abstract_interface(java.lang.Class clz);
 
-    // com.sun.corba.se.impl.encoding.MarshalInputStream
+    // com.sun.corba.ee.impl.encoding.MarshalInputStream
     public abstract void consumeEndian();
     public abstract int getPosition();
 

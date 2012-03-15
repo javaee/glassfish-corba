@@ -238,7 +238,7 @@ public class Util extends com.sun.tools.corba.se.idl.Util
   {
       String name = doContainerFullName( container ) ;
       if (packageTranslation.size() > 0) 
-	  name = translate( name ) ;
+          name = translate( name ) ;
       return name ;
   }
 
@@ -252,15 +252,15 @@ public class Util extends com.sun.tools.corba.se.idl.Util
       // Check for package name translations, starting with the
       // most specific match.
       do {
-	  trname = (String)(packageTranslation.get( head )) ;
-	  if (trname != null)
-	      return trname + tail ;
+          trname = (String)(packageTranslation.get( head )) ;
+          if (trname != null)
+              return trname + tail ;
 
-	  index = head.lastIndexOf( '/' ) ;
-	  if (index >= 0) {
-	      tail = head.substring( index ) + tail ;
-	      head = head.substring( 0, index ) ;
-	  }
+          index = head.lastIndexOf( '/' ) ;
+          if (index >= 0) {
+              tail = head.substring( index ) + tail ;
+              head = head.substring( 0, index ) ;
+          }
       } while (index >= 0) ;
 
       return name ;
@@ -282,7 +282,7 @@ public class Util extends com.sun.tools.corba.se.idl.Util
         name = container.name ();
 
       if (container.container () != null && 
-	!container.container ().name ().equals (""))
+        !container.container ().name ().equals (""))
         name = doContainerFullName (container.container ()) + '/' + name;
     }
 
@@ -1428,16 +1428,16 @@ public class Util extends com.sun.tools.corba.se.idl.Util
   // <d62023>
   /**
    * @return true if the current setting of corbaLevel is within delta of 
-   *	the range min <= corbaLevel <= max
+   *    the range min <= corbaLevel <= max
    **/
   public static boolean corbaLevel (float min, float max)
   {
     float level = Compile.compiler.arguments.corbaLevel;
     float delta = 0.001f;
     if ((level - min + delta >= 0.0f) && (max - level + delta >= 0.0f))
-    	return true;
+        return true;
     else
-    	return false;
+        return false;
   } // corbaLevel
 
   static Hashtable symbolTable = new Hashtable ();

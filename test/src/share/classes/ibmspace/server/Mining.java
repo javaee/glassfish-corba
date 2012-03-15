@@ -66,34 +66,34 @@ public class Mining implements Investment, java.io.Serializable
 
     public Mining (PlanetImpl planet, Player player)
     {
-	fPlayer = player;
-	fPlanet = planet;
+        fPlayer = player;
+        fPlanet = planet;
     }
 
     public String getName ()
     {
-	return "Mining";
+        return "Mining";
     }
 
     public void invest (long dollars)
     {
-	long metal = 0;
+        long metal = 0;
 
-	if ( dollars > 0 ) {
-	    long total = fPlanet.getMetal ();
-	    if ( total > 0 ) {
-		double d = dollars;
-		double efficiency = total / 10000.0;
-		metal = (long)(d / MINING_COST * efficiency);
+        if ( dollars > 0 ) {
+            long total = fPlanet.getMetal ();
+            if ( total > 0 ) {
+                double d = dollars;
+                double efficiency = total / 10000.0;
+                metal = (long)(d / MINING_COST * efficiency);
 
-		if ( metal > total ) {
-		    metal = total;
-		}
+                if ( metal > total ) {
+                    metal = total;
+                }
 
-		fPlanet.removeMetal (metal);
-		fPlayer.addShipMetal (metal);
-	    }
-	}
+                fPlanet.removeMetal (metal);
+                fPlayer.addShipMetal (metal);
+            }
+        }
     }
 
 }

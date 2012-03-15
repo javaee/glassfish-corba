@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.resolver;
+package com.sun.corba.ee.impl.resolver;
 
 import java.util.List ;
 import java.util.Map ;
@@ -52,28 +52,28 @@ import org.omg.CosNaming.NamingContextExt ;
 import org.omg.CosNaming.NamingContextExtHelper ;
 import org.omg.CORBA.ORBPackage.InvalidName ;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.IORTemplate;
-import com.sun.corba.se.spi.ior.ObjectKey;
-import com.sun.corba.se.spi.ior.IORFactories;
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
-import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent;
-import com.sun.corba.se.spi.orb.Operation;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.IORTemplate;
+import com.sun.corba.ee.spi.ior.ObjectKey;
+import com.sun.corba.ee.spi.ior.IORFactories;
+import com.sun.corba.ee.spi.ior.iiop.IIOPAddress;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPFactories ;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.AlternateIIOPAddressComponent;
+import com.sun.corba.ee.spi.orb.Operation;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.impl.encoding.EncapsInputStream;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.logging.OMGSystemException ;
-import com.sun.corba.se.impl.naming.namingutil.INSURLHandler;
-import com.sun.corba.se.impl.naming.namingutil.IIOPEndpointInfo;
-import com.sun.corba.se.impl.naming.namingutil.INSURL;
-import com.sun.corba.se.impl.naming.namingutil.CorbalocURL;
-import com.sun.corba.se.impl.naming.namingutil.CorbanameURL;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.encoding.EncapsInputStream;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.OMGSystemException ;
+import com.sun.corba.ee.impl.naming.namingutil.INSURLHandler;
+import com.sun.corba.ee.impl.naming.namingutil.IIOPEndpointInfo;
+import com.sun.corba.ee.impl.naming.namingutil.INSURL;
+import com.sun.corba.ee.impl.naming.namingutil.CorbalocURL;
+import com.sun.corba.ee.impl.naming.namingutil.CorbanameURL;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 /** 
  * This class provides an Operation that converts from CORBA INS URL strings into
@@ -102,7 +102,7 @@ public class INSURLOperationImpl implements Operation
 
     public INSURLOperationImpl( ORB orb )
     {
-	this.orb = orb ;
+        this.orb = orb ;
     }
 
     private static final int NIBBLES_PER_BYTE = 2 ;
@@ -113,39 +113,39 @@ public class INSURLOperationImpl implements Operation
       */
     private org.omg.CORBA.Object getIORFromString( String str )
     {
-	// Length must be even for str to be valid
-	if ( (str.length() & 1) == 1 ) {
+        // Length must be even for str to be valid
+        if ( (str.length() & 1) == 1 ) {
             throw wrapper.badStringifiedIorLen();
         }
 
-	byte[] buf = new byte[(str.length() - ORBConstants.STRINGIFY_PREFIX.length()) / NIBBLES_PER_BYTE];
-	for (int i=ORBConstants.STRINGIFY_PREFIX.length(), j=0; i < str.length(); i +=NIBBLES_PER_BYTE, j++) {
-	     buf[j] = (byte)((ORBUtility.hexOf(str.charAt(i)) << UN_SHIFT) & 0xF0);
-	     buf[j] |= (byte)(ORBUtility.hexOf(str.charAt(i+1)) & 0x0F);
-	}
-	EncapsInputStream s = new EncapsInputStream(orb, buf, buf.length, 
-	    orb.getORBData().getGIOPVersion());
-	s.consumeEndian();
-	return s.read_Object() ;
+        byte[] buf = new byte[(str.length() - ORBConstants.STRINGIFY_PREFIX.length()) / NIBBLES_PER_BYTE];
+        for (int i=ORBConstants.STRINGIFY_PREFIX.length(), j=0; i < str.length(); i +=NIBBLES_PER_BYTE, j++) {
+             buf[j] = (byte)((ORBUtility.hexOf(str.charAt(i)) << UN_SHIFT) & 0xF0);
+             buf[j] |= (byte)(ORBUtility.hexOf(str.charAt(i+1)) & 0x0F);
+        }
+        EncapsInputStream s = new EncapsInputStream(orb, buf, buf.length, 
+            orb.getORBData().getGIOPVersion());
+        s.consumeEndian();
+        return s.read_Object() ;
     }
 
     public Object operate( Object arg ) 
     {
-	if (arg instanceof String) {
-	    String str = (String)arg ;
+        if (arg instanceof String) {
+            String str = (String)arg ;
 
-	    if (str.startsWith( ORBConstants.STRINGIFY_PREFIX )) {
+            if (str.startsWith( ORBConstants.STRINGIFY_PREFIX )) {
                 return getIORFromString(str);
             } else {
-		INSURL insURL = insURLHandler.parseURL( str ) ;
-		if (insURL == null) {
+                INSURL insURL = insURLHandler.parseURL( str ) ;
+                if (insURL == null) {
                     throw omgWrapper.soBadSchemeName(str);
                 }
-		return resolveINSURL( insURL ) ;
-	    }
-	}
+                return resolveINSURL( insURL ) ;
+            }
+        }
 
-	throw wrapper.stringExpected() ;
+        throw wrapper.stringExpected() ;
     }
 
     private org.omg.CORBA.Object resolveINSURL( INSURL theURLObject ) {
@@ -166,22 +166,22 @@ public class INSURLOperationImpl implements Operation
     {
         org.omg.CORBA.Object result = null;
         // If RIR flag is true use the Bootstrap protocol
-	// Bug 6678177 noticed that this is incorrect: rir means use 
+        // Bug 6678177 noticed that this is incorrect: rir means use 
         // resolve_initial_references on the local ORB!
         if( theCorbaLocObject.getRIRFlag( ) )  {
-	    String keyString = theCorbaLocObject.getKeyString() ;
-	    if (keyString.equals( "" )) {
+            String keyString = theCorbaLocObject.getKeyString() ;
+            if (keyString.equals( "" )) {
                 keyString = "NameService";
             }
 
-	    try {
-		result = orb.resolve_initial_references( keyString ) ;
-	    } catch (InvalidName exc) {
-		throw omgWrapper.soBadSchemaSpecific( exc, keyString ) ;
-	    }
-	} else {
-	    result = getIORUsingCorbaloc( theCorbaLocObject );
-	}
+            try {
+                result = orb.resolve_initial_references( keyString ) ;
+            } catch (InvalidName exc) {
+                throw omgWrapper.soBadSchemaSpecific( exc, keyString ) ;
+            }
+        } else {
+            result = getIORUsingCorbaloc( theCorbaLocObject );
+        }
 
         return result;
     }
@@ -218,12 +218,12 @@ public class INSURLOperationImpl implements Operation
                 // This means return the Root Naming context
                 return theNamingContext;
             } else {
-	        return theNamingContext.resolve_str( StringifiedName );
+                return theNamingContext.resolve_str( StringifiedName );
             }
         } catch( Exception e ) {
             clearRootNamingContextCache( );
             // Bug 6475580
-	    throw omgWrapper.soBadSchemaSpecific( e,
+            throw omgWrapper.soBadSchemaSpecific( e,
                 theCorbaName.getStringifiedName() ) ;
         }
      }
@@ -235,8 +235,8 @@ public class INSURLOperationImpl implements Operation
      */
     private org.omg.CORBA.Object getIORUsingCorbaloc( INSURL corbalocObject ) 
     {
-	Map	profileMap = new HashMap();
-	List	profileList1_0 = new ArrayList();
+        Map     profileMap = new HashMap();
+        List    profileList1_0 = new ArrayList();
 
         // corbalocObject cannot be null, because it's validated during
         // parsing. So no null check is required.
@@ -247,69 +247,69 @@ public class INSURLOperationImpl implements Operation
             return null;
         }
 
-	ObjectKey key = orb.getObjectKeyFactory().create( 
-	    theKeyString.getBytes() );
-	IORTemplate iortemp = IORFactories.makeIORTemplate( key.getTemplate() );
+        ObjectKey key = orb.getObjectKeyFactory().create( 
+            theKeyString.getBytes() );
+        IORTemplate iortemp = IORFactories.makeIORTemplate( key.getTemplate() );
 
         java.util.Iterator iterator = theEndpointInfo.iterator( );
         while( iterator.hasNext( ) ) {
-	    IIOPEndpointInfo element = 
+            IIOPEndpointInfo element = 
                 (IIOPEndpointInfo) iterator.next( );
             IIOPAddress addr = IIOPFactories.makeIIOPAddress( element.getHost(), 
                 element.getPort() );
-	    GIOPVersion giopVersion = GIOPVersion.getInstance( (byte)element.getMajor(), 
-					     (byte)element.getMinor());
-	    IIOPProfileTemplate profileTemplate = null;
-	    if (giopVersion.equals(GIOPVersion.V1_0)) {
-		profileTemplate = IIOPFactories.makeIIOPProfileTemplate(
-		    orb, giopVersion, addr);
-		profileList1_0.add(profileTemplate);
-	    } else {
-		if (profileMap.get(giopVersion) == null) {
-		    profileTemplate = IIOPFactories.makeIIOPProfileTemplate(
-		        orb, giopVersion, addr);
-		    profileMap.put(giopVersion, profileTemplate);
-		} else {
-		    profileTemplate = (IIOPProfileTemplate)profileMap.get(giopVersion);
-		    AlternateIIOPAddressComponent iiopAddressComponent =
-				IIOPFactories.makeAlternateIIOPAddressComponent(addr);
-		    profileTemplate.add(iiopAddressComponent);
-		}
-	    }
-	}
+            GIOPVersion giopVersion = GIOPVersion.getInstance( (byte)element.getMajor(), 
+                                             (byte)element.getMinor());
+            IIOPProfileTemplate profileTemplate = null;
+            if (giopVersion.equals(GIOPVersion.V1_0)) {
+                profileTemplate = IIOPFactories.makeIIOPProfileTemplate(
+                    orb, giopVersion, addr);
+                profileList1_0.add(profileTemplate);
+            } else {
+                if (profileMap.get(giopVersion) == null) {
+                    profileTemplate = IIOPFactories.makeIIOPProfileTemplate(
+                        orb, giopVersion, addr);
+                    profileMap.put(giopVersion, profileTemplate);
+                } else {
+                    profileTemplate = (IIOPProfileTemplate)profileMap.get(giopVersion);
+                    AlternateIIOPAddressComponent iiopAddressComponent =
+                                IIOPFactories.makeAlternateIIOPAddressComponent(addr);
+                    profileTemplate.add(iiopAddressComponent);
+                }
+            }
+        }
 
-	GIOPVersion giopVersion = orb.getORBData().getGIOPVersion();
-	IIOPProfileTemplate pTemplate = (IIOPProfileTemplate)profileMap.get(giopVersion);
-	if (pTemplate != null) {
-	    iortemp.add(pTemplate); // Add profile for GIOP version used by this ORB
-	    profileMap.remove(giopVersion); // Now remove this value from the map
-	}
+        GIOPVersion giopVersion = orb.getORBData().getGIOPVersion();
+        IIOPProfileTemplate pTemplate = (IIOPProfileTemplate)profileMap.get(giopVersion);
+        if (pTemplate != null) {
+            iortemp.add(pTemplate); // Add profile for GIOP version used by this ORB
+            profileMap.remove(giopVersion); // Now remove this value from the map
+        }
 
-	// Create a comparator that can sort in decending order (1.2, 1.1, ...)
-	Comparator comp = new Comparator() {
-	    public int compare(Object o1, Object o2) {
-		GIOPVersion gv1 = (GIOPVersion)o1;
-		GIOPVersion gv2 = (GIOPVersion)o2;
-		return (gv1.lessThan(gv2) ? 1 : (gv1.equals(gv2) ? 0 : -1));
-	    };
-	};
+        // Create a comparator that can sort in decending order (1.2, 1.1, ...)
+        Comparator comp = new Comparator() {
+            public int compare(Object o1, Object o2) {
+                GIOPVersion gv1 = (GIOPVersion)o1;
+                GIOPVersion gv2 = (GIOPVersion)o2;
+                return (gv1.lessThan(gv2) ? 1 : (gv1.equals(gv2) ? 0 : -1));
+            };
+        };
 
-	// Now sort using the above comparator
-	List list = new ArrayList(profileMap.keySet());
-	Collections.sort(list, comp);
+        // Now sort using the above comparator
+        List list = new ArrayList(profileMap.keySet());
+        Collections.sort(list, comp);
 
-	// Add the profiles in the sorted order
-	Iterator iter = list.iterator();
-	while (iter.hasNext()) {
-	    IIOPProfileTemplate pt = (IIOPProfileTemplate)profileMap.get(iter.next());
-	    iortemp.add(pt);
-	}
+        // Add the profiles in the sorted order
+        Iterator iter = list.iterator();
+        while (iter.hasNext()) {
+            IIOPProfileTemplate pt = (IIOPProfileTemplate)profileMap.get(iter.next());
+            iortemp.add(pt);
+        }
 
-	// Finally add the 1.0 profiles
-	iortemp.addAll(profileList1_0);
+        // Finally add the 1.0 profiles
+        iortemp.addAll(profileList1_0);
 
-	IOR ior = iortemp.makeIOR( orb, "", key.getId() ) ;
-	return ORBUtility.makeObjectReference( ior ) ;
+        IOR ior = iortemp.makeIOR( orb, "", key.getId() ) ;
+        return ORBUtility.makeObjectReference( ior ) ;
     }
 
     /**
@@ -324,17 +324,17 @@ public class INSURLOperationImpl implements Operation
      */
     private NamingContextExt getDefaultRootNamingContext( ) {
         synchronized( rootContextCacheLock ) {
-	    if( rootNamingContextExt == null ) {
-	        try {
-	            rootNamingContextExt =
-	  	        NamingContextExtHelper.narrow(
-		        orb.getLocalResolver().resolve( "NameService" ) );
-	        } catch( Exception e ) {
-	            rootNamingContextExt = null;
-	        }
+            if( rootNamingContextExt == null ) {
+                try {
+                    rootNamingContextExt =
+                        NamingContextExtHelper.narrow(
+                        orb.getLocalResolver().resolve( "NameService" ) );
+                } catch( Exception e ) {
+                    rootNamingContextExt = null;
+                }
             }
         }
-	return rootNamingContextExt;
+        return rootNamingContextExt;
     }
 
     /**

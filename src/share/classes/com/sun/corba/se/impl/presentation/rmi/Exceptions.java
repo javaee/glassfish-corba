@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi;
+package com.sun.corba.ee.impl.presentation.rmi;
 
-import com.sun.corba.se.spi.logex.stdcorba.StandardLogger;
+import com.sun.corba.ee.spi.logex.stdcorba.StandardLogger;
 import javax.naming.Context;
 import org.glassfish.pfl.basic.logex.Chain;
 import org.glassfish.pfl.basic.logex.ExceptionWrapper;

@@ -40,7 +40,7 @@
 
 package pi.serverinterceptor;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import corba.framework.InternalProcess;
 import java.io.PrintStream;
 import java.util.Properties;
@@ -54,7 +54,7 @@ public abstract class ServerCommon
     implements InternalProcess 
 {
     // Set from run()
-    com.sun.corba.se.spi.orb.ORB orb;
+    com.sun.corba.ee.spi.orb.ORB orb;
     
     // Set from run()
     PrintStream out;
@@ -90,7 +90,7 @@ public abstract class ServerCommon
     }
 
     /**
-     * Creates a com.sun.corba.se.spi.orb.ORB and notifies the TestInitializer of its presence
+     * Creates a com.sun.corba.ee.spi.orb.ORB and notifies the TestInitializer of its presence
      */
     void createORB( String[] args, Properties props ) {
         // create and initialize the ORB with initializer
@@ -99,8 +99,8 @@ public abstract class ServerCommon
                    System.getProperty("org.omg.CORBA.ORBClass"));
         props.put( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
                    testInitializer, "" );
-	// props.put( ORBConstants.DEBUG_PROPERTY, "subcontract" ) ;
-        this.orb = (com.sun.corba.se.spi.orb.ORB)ORB.init(args, props);
+        // props.put( ORBConstants.DEBUG_PROPERTY, "subcontract" ) ;
+        this.orb = (com.sun.corba.ee.spi.orb.ORB)ORB.init(args, props);
         TestInitializer.orb = this.orb;
     }
 
@@ -108,9 +108,9 @@ public abstract class ServerCommon
      * Perform ServerRequestInterceptor tests for server side
      */
     void testServerInterceptor() throws Exception {
-	out.println();
-	out.println( "Running common ServerRequestInterceptor tests" );
-	out.println( "=============================================" );
+        out.println();
+        out.println( "Running common ServerRequestInterceptor tests" );
+        out.println( "=============================================" );
         
         // Wait for client to synchronize with server for the first time.
         // We do this because we want testInvocation to wait for the client
@@ -144,122 +144,122 @@ public abstract class ServerCommon
         testInvocation( "testInvocationResultSystemException",
             SampleServerRequestInterceptor.MODE_NORMAL,
             "rs1rs2rs3rr1rr2rr3se3se2se1", "saySystemException", 
-	    "[Hello1]", true );
+            "[Hello1]", true );
 
         // USER_EXCEPTION thrown by method.  Should call 
         // receive_request_service_contexts, receive_request,
         // process sayUserException, and then send_exception on all 3
         // interceptors in the correct order.
-	// We pass in false for exception expected because it is not
-	// the exception we are checking for (which is a SystemException).
-	// The check is instead done in the client code during invocation.
+        // We pass in false for exception expected because it is not
+        // the exception we are checking for (which is a SystemException).
+        // The check is instead done in the client code during invocation.
         out.println( "+ Testing invocation resulting in USER_EXCEPTION..." );
         testInvocation( "testInvocationResultUserException",
             SampleServerRequestInterceptor.MODE_NORMAL,
             "rs1rs2rs3rr1rr2rr3se3se2se1", "sayUserException", 
-	    "[Hello1]", false );
+            "[Hello1]", false );
 
         // SYSTEM_EXCEPTION thrown in rrsc for second interceptor.
-	// Should result in rrsc being called for 1 and 2, but not
-	// 3, no intermediate points invoked, and send_exception
-	// called for 1 only.  The method sayHello should never be 
-	// invoked.
-	out.println( "+ Testing invocation where interceptor #2 " +
-	    "throws exception in rrsc." );
+        // Should result in rrsc being called for 1 and 2, but not
+        // 3, no intermediate points invoked, and send_exception
+        // called for 1 only.  The method sayHello should never be 
+        // invoked.
+        out.println( "+ Testing invocation where interceptor #2 " +
+            "throws exception in rrsc." );
         testInvocation( "testInvocationInterceptorExceptionRRSC",
-	    SampleServerRequestInterceptor.MODE_RRSC_SYSTEM_EXCEPTION,
-	    "rs1rs2se1", "sayHello", "", true );
+            SampleServerRequestInterceptor.MODE_RRSC_SYSTEM_EXCEPTION,
+            "rs1rs2se1", "sayHello", "", true );
 
         // ForwardRequest raised in rrsc for second interceptor.
-	// Should result in rrsc being called for 1 and 2, but not
-	// 3, no intermediate points invoked, and send_exception
-	// called for 1 only.  The method sayHello should be called
-	// on the second object.
-	out.println( "+ Testing invocation where interceptor #2 " +
-	    "raises ForwardRequest in rrsc." );
+        // Should result in rrsc being called for 1 and 2, but not
+        // 3, no intermediate points invoked, and send_exception
+        // called for 1 only.  The method sayHello should be called
+        // on the second object.
+        out.println( "+ Testing invocation where interceptor #2 " +
+            "raises ForwardRequest in rrsc." );
         testInvocation( "testInvocationInterceptorForwardRequestRRSC",
-	    SampleServerRequestInterceptor.MODE_RRSC_FORWARD_REQUEST,
-	    "rs1rs2so1rs1rs2rs3rr1rr2rr3sr3sr2sr1", "sayHello", 
-	    "[Hello1Forward]", false );
+            SampleServerRequestInterceptor.MODE_RRSC_FORWARD_REQUEST,
+            "rs1rs2so1rs1rs2rs3rr1rr2rr3sr3sr2sr1", "sayHello", 
+            "[Hello1Forward]", false );
 
         // SYSTEM_EXCEPTION thrown in rr for second interceptor.
-	// Should result in rrsc being called for all interceptors,
-	// intermediate points rr1 and rr2 but not rr3, and send_exception
-	// called for all points.  The method sayHello should never be 
-	// invoked.
-	out.println( "+ Testing invocation where interceptor #2 " +
-	    "throws exception in rr." );
+        // Should result in rrsc being called for all interceptors,
+        // intermediate points rr1 and rr2 but not rr3, and send_exception
+        // called for all points.  The method sayHello should never be 
+        // invoked.
+        out.println( "+ Testing invocation where interceptor #2 " +
+            "throws exception in rr." );
         testInvocation( "testInvocationInteceptorExceptionRR",
-	    SampleServerRequestInterceptor.MODE_RR_SYSTEM_EXCEPTION,
-	    "rs1rs2rs3rr1rr2se3se2se1", "sayHello", "", true );
+            SampleServerRequestInterceptor.MODE_RR_SYSTEM_EXCEPTION,
+            "rs1rs2rs3rr1rr2se3se2se1", "sayHello", "", true );
 
         // ForwardRequest raised in rr for second interceptor.
-	// Should result in rrsc being called for all interceptors,
-	// intermediate points rr1 and rr2 but not rr3, and 
-	// send_other for all interceptors.  The method sayHello should 
-	// be called on the second object.
-	out.println( "+ Testing invocation where interceptor #2 " +
-	    "raises ForwardRequest in rr." );
+        // Should result in rrsc being called for all interceptors,
+        // intermediate points rr1 and rr2 but not rr3, and 
+        // send_other for all interceptors.  The method sayHello should 
+        // be called on the second object.
+        out.println( "+ Testing invocation where interceptor #2 " +
+            "raises ForwardRequest in rr." );
         testInvocation( "testInvocationInterceptorForwardRequestRR",
-	    SampleServerRequestInterceptor.MODE_RR_FORWARD_REQUEST,
-	    "rs1rs2rs3rr1rr2so3so2so1rs1rs2rs3rr1rr2rr3sr3sr2sr1",
-	    "sayHello", "[Hello1Forward]", false );
+            SampleServerRequestInterceptor.MODE_RR_FORWARD_REQUEST,
+            "rs1rs2rs3rr1rr2so3so2so1rs1rs2rs3rr1rr2rr3sr3sr2sr1",
+            "sayHello", "[Hello1Forward]", false );
 
         // SYSTEM_EXCEPTION thrown in sr for second interceptor.
-	// Should result in rrsc being called for all interceptors,
-	// intermediate points for all, and send_reply for 1 and 2,
-	// then send_exception for 3. The method sayHello should have been
-	// invoked.
-	out.println( "+ Testing invocation where interceptor #2 " +
-	    "throws exception in sr." );
+        // Should result in rrsc being called for all interceptors,
+        // intermediate points for all, and send_reply for 1 and 2,
+        // then send_exception for 3. The method sayHello should have been
+        // invoked.
+        out.println( "+ Testing invocation where interceptor #2 " +
+            "throws exception in sr." );
         testInvocation( "testInvocationInterceptorExceptionSR",
-	    SampleServerRequestInterceptor.MODE_SR_SYSTEM_EXCEPTION,
-	    "rs1rs2rs3rr1rr2rr3sr3sr2se1", "sayHello", "[Hello1]", true );
+            SampleServerRequestInterceptor.MODE_SR_SYSTEM_EXCEPTION,
+            "rs1rs2rs3rr1rr2rr3sr3sr2se1", "sayHello", "[Hello1]", true );
 
         // SYSTEM_EXCEPTION thrown in se for second interceptor.
-	// Should result in rrsc being called for all interceptors,
-	// intermediate points for all, and send_exception for 1 and 2,
-	// then send_exception for 3. The method sayException should have been
-	// invoked.
-	out.println( "+ Testing invocation where interceptor #2 " +
-	    "throws exception in se." );
+        // Should result in rrsc being called for all interceptors,
+        // intermediate points for all, and send_exception for 1 and 2,
+        // then send_exception for 3. The method sayException should have been
+        // invoked.
+        out.println( "+ Testing invocation where interceptor #2 " +
+            "throws exception in se." );
         testInvocation( "testInvocationInterceptorExceptionSE",
-	    SampleServerRequestInterceptor.MODE_SE_SYSTEM_EXCEPTION,
-	    "rs1rs2rs3rr1rr2rr3se3se2se1", "saySystemException", 
-	    "[Hello1]", true );
+            SampleServerRequestInterceptor.MODE_SE_SYSTEM_EXCEPTION,
+            "rs1rs2rs3rr1rr2rr3se3se2se1", "saySystemException", 
+            "[Hello1]", true );
 
         // ForwardRequest thrown in se for second interceptor.
-	// Should result in rrsc being called for all interceptors,
-	// intermediate points for all, and send_reply for 1 and 2,
-	// then send_other for 3. The method sayException should have been
-	// invoked.  Then, sayHello is invoked again, on the forwarded
-	// object.
-	out.println( "+ Testing invocation where interceptor #2 " +
-	    "throws forward request in se." );
+        // Should result in rrsc being called for all interceptors,
+        // intermediate points for all, and send_reply for 1 and 2,
+        // then send_other for 3. The method sayException should have been
+        // invoked.  Then, sayHello is invoked again, on the forwarded
+        // object.
+        out.println( "+ Testing invocation where interceptor #2 " +
+            "throws forward request in se." );
         testInvocation( "testInvocationInterceptorForwardRequestSE",
-	    SampleServerRequestInterceptor.MODE_SE_FORWARD_REQUEST,
-	    "rs1rs2rs3rr1rr2rr3se3se2so1rs1rs2rs3rr1rr2rr3se3se2se1", 
-	    "saySystemException", "[Hello1][Hello1Forward]", true );
+            SampleServerRequestInterceptor.MODE_SE_FORWARD_REQUEST,
+            "rs1rs2rs3rr1rr2rr3se3se2so1rs1rs2rs3rr1rr2rr3se3se2se1", 
+            "saySystemException", "[Hello1][Hello1Forward]", true );
 
-	// _REVISIT_ The callCounter should be zero here.  However,
-	// when we check the count we have not executed the
-	// server interceptor reply points for the final message yet.
-	// Since there are 3 interceptors registered the call count
-	// is 3.  Any number other than three indicates an unbalanced
-	// PICurrent stack.
+        // _REVISIT_ The callCounter should be zero here.  However,
+        // when we check the count we have not executed the
+        // server interceptor reply points for the final message yet.
+        // Since there are 3 interceptors registered the call count
+        // is 3.  Any number other than three indicates an unbalanced
+        // PICurrent stack.
 
-	// Test call counter (all starting points should be matched by an
-	// ending point):
-	out.print(
-	    "- Checking call counter: " +
-	    SampleServerRequestInterceptor.callCounter + " " );
-	if( SampleServerRequestInterceptor.callCounter == 3 ) {
-	    out.println( "(ok)" );
-	}
-	else {
-	    out.println( "(error - should be 3)" );
-	    throw new RuntimeException( "Call counter was not 3" );
-	}
+        // Test call counter (all starting points should be matched by an
+        // ending point):
+        out.print(
+            "- Checking call counter: " +
+            SampleServerRequestInterceptor.callCounter + " " );
+        if( SampleServerRequestInterceptor.callCounter == 3 ) {
+            out.println( "(ok)" );
+        }
+        else {
+            out.println( "(error - should be 3)" );
+            throw new RuntimeException( "Call counter was not 3" );
+        }
     }
 
     /** 
@@ -403,32 +403,32 @@ public abstract class ServerCommon
         // present at the end of the actual invocation order.  Additionally,
         // the end of the previous syncWithServer should appear.  We will
         // check for the presence of these as well.
-	//
-	// Client                      Server
-	//   |                           |
-	//  [ ]     syncWithServer()     | 
-	//  [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
-	//  [ ]                         [ ]
-	//  [ ]     "sayHello"          [ ]   // order cleared here
-	//  [ ]<------------------------[ ]     sr3 sr2 sr1
-	//  [ ]                          |
-	//  [ ]     sayHello()           |    // <important>
-	//  [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
-	//  [ ]                         [ ]
-	//  [ ]     "hello there"       [ ]
-	//  [ ]<------------------------[ ]     sr3 sr2 sr1
-	//  [ ]                          |    // </important>
-	//  [ ]     syncWithServer()     |
-	//  [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
-	//  [ ]                         [ ] 
-	//  [ ]                         [ ]   // check order here
-	//  [ ]                         [ ]   // next test begins soon after.
-	//  ...                         ...
-	//
-	// Notice that at "check order here" our string is as follows:
-	// sr3sr2sr1rs1rs2rs3rr1rr2rr3sr3sr2sr1rs1rs2rs3rr1rr2rr3
-	// ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^~~~~~~~~~~~~~~~~~~
-	// [  junk ][     important info      ][     junk       ]
+        //
+        // Client                      Server
+        //   |                           |
+        //  [ ]     syncWithServer()     | 
+        //  [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
+        //  [ ]                         [ ]
+        //  [ ]     "sayHello"          [ ]   // order cleared here
+        //  [ ]<------------------------[ ]     sr3 sr2 sr1
+        //  [ ]                          |
+        //  [ ]     sayHello()           |    // <important>
+        //  [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
+        //  [ ]                         [ ]
+        //  [ ]     "hello there"       [ ]
+        //  [ ]<------------------------[ ]     sr3 sr2 sr1
+        //  [ ]                          |    // </important>
+        //  [ ]     syncWithServer()     |
+        //  [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
+        //  [ ]                         [ ] 
+        //  [ ]                         [ ]   // check order here
+        //  [ ]                         [ ]   // next test begins soon after.
+        //  ...                         ...
+        //
+        // Notice that at "check order here" our string is as follows:
+        // sr3sr2sr1rs1rs2rs3rr1rr2rr3sr3sr2sr1rs1rs2rs3rr1rr2rr3
+        // ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^~~~~~~~~~~~~~~~~~~
+        // [  junk ][     important info      ][     junk       ]
 
         String prependOrder = "sr3sr2sr1";
         String appendedOrder = "rs1rs2rs3rr1rr2rr3";
@@ -456,11 +456,11 @@ public abstract class ServerCommon
      * if they do not match.
      */
     private void checkMethodOrder( String correctMethodOrder, 
-				   String methodOrder ) 
+                                   String methodOrder ) 
         throws Exception 
     {
         out.println( "    - Expected method invocation order: " + 
-		     correctMethodOrder );
+                     correctMethodOrder );
         
         out.println( "    - Actual method invocation order: " + 
                      methodOrder );

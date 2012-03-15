@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,17 +51,17 @@ import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.MessageMediator;
-import com.sun.corba.se.spi.transport.Connection;
-import com.sun.corba.se.spi.transport.ResponseWaitingRoom;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.ResponseWaitingRoom;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.LocateReplyOrReplyMessage;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateReplyOrReplyMessage;
+import com.sun.corba.ee.spi.trace.Transport;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
@@ -70,14 +70,14 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 @Transport
 public class ResponseWaitingRoomImpl
     implements
-	ResponseWaitingRoom
+        ResponseWaitingRoom
 {
     final private static ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
 
     final static class OutCallDesc
     {
-	MessageMediator messageMediator;
+        MessageMediator messageMediator;
         SystemException exception;
         CDRInputObject inputObject;
         ReentrantLock lock = new ReentrantLock();
@@ -92,8 +92,8 @@ public class ResponseWaitingRoomImpl
 
     public ResponseWaitingRoomImpl(ORB orb, Connection connection)
     {
-	this.orb = orb;
-	this.connection = connection;
+        this.orb = orb;
+        this.connection = connection;
         this.out_calls = 
                Collections.synchronizedMap(new HashMap<Integer, OutCallDesc>());
     }
@@ -106,11 +106,11 @@ public class ResponseWaitingRoomImpl
         display( "messageMediator operation name",
             messageMediator.getOperationName() ) ;
 
-	Integer requestId = messageMediator.getRequestIdInteger();
+        Integer requestId = messageMediator.getRequestIdInteger();
         
-	OutCallDesc call = new OutCallDesc();
-	call.messageMediator = messageMediator;
-	OutCallDesc exists = out_calls.put(requestId, call);
+        OutCallDesc call = new OutCallDesc();
+        call.messageMediator = messageMediator;
+        OutCallDesc exists = out_calls.put(requestId, call);
         if (exists != null) {
             wrapper.duplicateRequestIdsInResponseWaitingRoom(
                        ORBUtility.operationNameAndRequestId(
@@ -122,13 +122,13 @@ public class ResponseWaitingRoomImpl
     @Transport
     public void unregisterWaiter(MessageMediator mediator)
     {
-	MessageMediator messageMediator = (MessageMediator) mediator;
+        MessageMediator messageMediator = (MessageMediator) mediator;
         display( "messageMediator request ID",
             messageMediator.getRequestId() ) ;
         display( "messageMediator operation name",
             messageMediator.getOperationName() ) ;
 
-	Integer requestId = messageMediator.getRequestIdInteger();
+        Integer requestId = messageMediator.getRequestIdInteger();
 
         out_calls.remove(requestId);
     }
@@ -231,9 +231,9 @@ public class ResponseWaitingRoomImpl
     @Transport
     public void responseReceived(CDRInputObject is)
     {
-	CDRInputObject inputObject = (CDRInputObject) is;
-	LocateReplyOrReplyMessage header = (LocateReplyOrReplyMessage)
-	    inputObject.getMessageHeader();
+        CDRInputObject inputObject = (CDRInputObject) is;
+        LocateReplyOrReplyMessage header = (LocateReplyOrReplyMessage)
+            inputObject.getMessageHeader();
         display( "requestId", header.getRequestId()) ;
         display( "header", header ) ;
 
@@ -250,7 +250,7 @@ public class ResponseWaitingRoomImpl
         if (call == null) {
             display( "No waiter" ) ;
             return;
-	}
+        }
 
         // Set the reply InputObject and signal the client thread
         // that the reply has been received.
@@ -269,9 +269,9 @@ public class ResponseWaitingRoomImpl
             display( "messageMediator operation name",
                 messageMediator.getOperationName() ) ;
 
-	    messageMediator.setReplyHeader(header);
-	    messageMediator.setInputObject(is);
-	    inputObject.setMessageMediator(messageMediator);
+            messageMediator.setReplyHeader(header);
+            messageMediator.setInputObject(is);
+            inputObject.setMessageMediator(messageMediator);
             call.inputObject = is;
             call.condition.signal();
         } finally {
@@ -281,7 +281,7 @@ public class ResponseWaitingRoomImpl
 
     public int numberRegistered()
     {
-	return out_calls.size();
+        return out_calls.size();
     }
 
     //////////////////////////////////////////////////
@@ -312,12 +312,12 @@ public class ResponseWaitingRoomImpl
     public MessageMediator getMessageMediator(int requestId)
     {
         OutCallDesc call = out_calls.get(requestId);
-	if (call == null) {
-	    // This can happen when getting early reply fragments for a
-	    // request which has completed (e.g., client marshaling error).
-	    return null;
-	}
-	return call.messageMediator;
+        if (call == null) {
+            // This can happen when getting early reply fragments for a
+            // request which has completed (e.g., client marshaling error).
+            return null;
+        }
+        return call.messageMediator;
     }
 }
 

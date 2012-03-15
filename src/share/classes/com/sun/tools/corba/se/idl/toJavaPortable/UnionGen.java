@@ -48,7 +48,7 @@
  * US Government Users Restricted Rights - Use, duplication or
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  *
- * @(#)UnionGen.java	1.10 01/01/09
+ * @(#)UnionGen.java    1.10 01/01/09
  */
 
 package com.sun.tools.corba.se.idl.toJavaPortable;
@@ -225,7 +225,7 @@ public class UnionGen implements com.sun.tools.corba.se.idl.UnionGen, JavaGenera
 
       stream.println ();
       stream.println ("  public void _default (" + Util.javaName(utype) +
-	" discriminator)");
+        " discriminator)");
       stream.println ("  {");
       stream.println ("    verifyDefault( discriminator ) ;" );
       stream.println ("    __discriminator = discriminator ;");
@@ -278,18 +278,18 @@ public class UnionGen implements com.sun.tools.corba.se.idl.UnionGen, JavaGenera
 
     stream.println( "" ) ;
     stream.println( "  private void verifyDefault( " + Util.javaName(utype) +
-	" value )" ) ;
+        " value )" ) ;
     stream.println( "  {" ) ;
 
     if (unionIsEnum)
-	stream.println( "    switch (value.value()) {" ) ;
+        stream.println( "    switch (value.value()) {" ) ;
     else
-	stream.println( "    switch (value) {" ) ;
+        stream.println( "    switch (value) {" ) ;
 
     Enumeration e = labels.elements() ;
     while (e.hasMoreElements()) {
-	String str = (String)(e.nextElement()) ;
-	stream.println( "      case " + str + ":" ) ;
+        String str = (String)(e.nextElement()) ;
+        stream.println( "      case " + str + ":" ) ;
     }
 
     stream.println( "        throw new org.omg.CORBA.BAD_OPERATION() ;" ) ;
@@ -306,13 +306,13 @@ public class UnionGen implements com.sun.tools.corba.se.idl.UnionGen, JavaGenera
     String ret = null;
     SymtabEntry utype = Util.typeOf (u.type ());
     if (utype instanceof PrimitiveEntry  && utype.name ().equals ("boolean")) {
-	// If it got this far, then:
-	// - there is only one branch;
-	// - that branch has only one label.
-	if (labels.contains ("true"))
-	    ret = "false";
-	else
-	    ret = "true";
+        // If it got this far, then:
+        // - there is only one branch;
+        // - that branch has only one label.
+        if (labels.contains ("true"))
+            ret = "false";
+        else
+            ret = "true";
     } else if (utype.name ().equals ("char")) {
         // This doesn't handle '\u0030' == '0'.  Unions are so
         // seldom used.  I don't have time to make this perfect.
@@ -399,15 +399,15 @@ public class UnionGen implements com.sun.tools.corba.se.idl.UnionGen, JavaGenera
       while (labels.hasMoreElements ())
       {
         Expression expr = (Expression)labels.nextElement ();
-	String str ;
+        String str ;
 
-	if (unionIsEnum)
-	  if (useIntsForEnums)
-	    str = typePackage + "_" + Util.parseExpression( expr ) ;
-	  else
-	    str = typePackage + Util.parseExpression( expr ) ;
-	else
-	  str = Util.parseExpression( expr ) ;
+        if (unionIsEnum)
+          if (useIntsForEnums)
+            str = typePackage + "_" + Util.parseExpression( expr ) ;
+          else
+            str = typePackage + Util.parseExpression( expr ) ;
+        else
+          str = Util.parseExpression( expr ) ;
 
         mergedLabels.addElement (str);
       }
@@ -588,9 +588,9 @@ public class UnionGen implements com.sun.tools.corba.se.idl.UnionGen, JavaGenera
     int size = 0 ;
     Vector branches = un.branches() ;
     for (int i = 0; i < branches.size (); ++i) {
-	UnionBranch branch = (UnionBranch)(branches.get(i)) ;
-	int branchSize = branch.labels.size() ;
-	size += ((branchSize == 0) ? 1 : branchSize) ;
+        UnionBranch branch = (UnionBranch)(branches.get(i)) ;
+        int branchSize = branch.labels.size() ;
+        size += ((branchSize == 0) ? 1 : branchSize) ;
     }
     return size ;
   }
@@ -606,11 +606,11 @@ public class UnionGen implements com.sun.tools.corba.se.idl.UnionGen, JavaGenera
     // Build discriminator tc
     stream.println (indent + "org.omg.CORBA.TypeCode " + discTypeCode + ';');
     index = ((JavaGenerator)u.type ().generator ()).type (index + 1, indent, 
-	innerOffsets, discTypeCode, u.type (), stream);
+        innerOffsets, discTypeCode, u.type (), stream);
     tcoffsets.bumpCurrentOffset (innerOffsets.currentOffset ());
 
     stream.println (indent + "org.omg.CORBA.UnionMember[] " + membersName + 
-	" = new org.omg.CORBA.UnionMember [" + unionLabelSize(u) + "];");
+        " = new org.omg.CORBA.UnionMember [" + unionLabelSize(u) + "];");
     String tcOfMembers = "_tcOf" + membersName;
     String anyOfMembers = "_anyOf" + membersName;
     stream.println (indent + "org.omg.CORBA.TypeCode " + tcOfMembers + ';');
@@ -625,256 +625,256 @@ public class UnionGen implements com.sun.tools.corba.se.idl.UnionGen, JavaGenera
         Vector labels = branch.labels;
         String memberName = Util.stripLeadingUnderscores (member.name ());
  
-	if (labels.size() == 0) {
-	    stream.println ();
-	    stream.println (indent + "// Branch for " + memberName + 
-		" (Default case)" );
-	    SymtabEntry utype = Util.typeOf (u.type ());
-	    stream.println (indent + anyOfMembers + " = org.omg.CORBA.ORB.init ().create_any ();");
-	    // For default member, label is the zero octet (per CORBA spec.)
+        if (labels.size() == 0) {
+            stream.println ();
+            stream.println (indent + "// Branch for " + memberName + 
+                " (Default case)" );
+            SymtabEntry utype = Util.typeOf (u.type ());
+            stream.println (indent + anyOfMembers + " = org.omg.CORBA.ORB.init ().create_any ();");
+            // For default member, label is the zero octet (per CORBA spec.)
             stream.println (indent + anyOfMembers + ".insert_octet ((byte)0); // default member label");
 
-	    // Build typecode
-	    innerOffsets.bumpCurrentOffset (4); // label value
-	    index = ((JavaGenerator)member.generator ()).type (index, indent, innerOffsets, tcOfMembers, member, stream);
-	    int offsetSoFar = innerOffsets.currentOffset ();
-	    innerOffsets = new TCOffsets ();
-	    innerOffsets.set (entry);
-	    innerOffsets.bumpCurrentOffset (offsetSoFar - offsetForUnion);
+            // Build typecode
+            innerOffsets.bumpCurrentOffset (4); // label value
+            index = ((JavaGenerator)member.generator ()).type (index, indent, innerOffsets, tcOfMembers, member, stream);
+            int offsetSoFar = innerOffsets.currentOffset ();
+            innerOffsets = new TCOffsets ();
+            innerOffsets.set (entry);
+            innerOffsets.bumpCurrentOffset (offsetSoFar - offsetForUnion);
       
-	    // Build union member
-	    stream.println (indent + membersName + '[' + i + "] = new org.omg.CORBA.UnionMember (");
-	    stream.println (indent + "  \"" + memberName + "\",");
-	    stream.println (indent + "  " + anyOfMembers + ',');
-	    stream.println (indent + "  " + tcOfMembers + ',');
-	    stream.println (indent + "  null);");
-	} else {
-	    Enumeration enumeration = labels.elements() ;
-	    while (enumeration.hasMoreElements()) {
-		Expression expr = (Expression)(enumeration.nextElement()) ;
-		String elem = Util.parseExpression( expr ) ;
+            // Build union member
+            stream.println (indent + membersName + '[' + i + "] = new org.omg.CORBA.UnionMember (");
+            stream.println (indent + "  \"" + memberName + "\",");
+            stream.println (indent + "  " + anyOfMembers + ',');
+            stream.println (indent + "  " + tcOfMembers + ',');
+            stream.println (indent + "  null);");
+        } else {
+            Enumeration enumeration = labels.elements() ;
+            while (enumeration.hasMoreElements()) {
+                Expression expr = (Expression)(enumeration.nextElement()) ;
+                String elem = Util.parseExpression( expr ) ;
 
-		stream.println ();
-		stream.println (indent + "// Branch for " + memberName + 
-		    " (case label " + elem + ")" );
-	  
-		SymtabEntry utype = Util.typeOf (u.type ());
-	  
-		// Build any
-		stream.println (indent + anyOfMembers + " = org.omg.CORBA.ORB.init ().create_any ();");
-	    
-		if (utype instanceof PrimitiveEntry)
-		    stream.println (indent + anyOfMembers + ".insert_" + 
-		    Util.collapseName (utype.name ()) + " ((" + Util.javaName (utype) + 
-			')' + elem + ");");
-		else { // it must be enum
-		    String enumClass = Util.javaName (utype);
-		    stream.println (indent + Util.helperName (utype, false) + ".insert (" + 
-			anyOfMembers + ", " + enumClass + '.' + elem + ");"); // <d61056>
-		}
+                stream.println ();
+                stream.println (indent + "// Branch for " + memberName + 
+                    " (case label " + elem + ")" );
+          
+                SymtabEntry utype = Util.typeOf (u.type ());
+          
+                // Build any
+                stream.println (indent + anyOfMembers + " = org.omg.CORBA.ORB.init ().create_any ();");
+            
+                if (utype instanceof PrimitiveEntry)
+                    stream.println (indent + anyOfMembers + ".insert_" + 
+                    Util.collapseName (utype.name ()) + " ((" + Util.javaName (utype) + 
+                        ')' + elem + ");");
+                else { // it must be enum
+                    String enumClass = Util.javaName (utype);
+                    stream.println (indent + Util.helperName (utype, false) + ".insert (" + 
+                        anyOfMembers + ", " + enumClass + '.' + elem + ");"); // <d61056>
+                }
 
-		// Build typecode
-		innerOffsets.bumpCurrentOffset (4); // label value
-		index = ((JavaGenerator)member.generator ()).type (index, indent, innerOffsets, tcOfMembers, member, stream);
-		int offsetSoFar = innerOffsets.currentOffset ();
-		innerOffsets = new TCOffsets ();
-		innerOffsets.set (entry);
-		innerOffsets.bumpCurrentOffset (offsetSoFar - offsetForUnion);
-	  
-		// Build union member
-		stream.println (indent + membersName + '[' + i + "] = new org.omg.CORBA.UnionMember (");
-		stream.println (indent + "  \"" + memberName + "\",");
-		stream.println (indent + "  " + anyOfMembers + ',');
-		stream.println (indent + "  " + tcOfMembers + ',');
-		stream.println (indent + "  null);");
-	    }
-	}
+                // Build typecode
+                innerOffsets.bumpCurrentOffset (4); // label value
+                index = ((JavaGenerator)member.generator ()).type (index, indent, innerOffsets, tcOfMembers, member, stream);
+                int offsetSoFar = innerOffsets.currentOffset ();
+                innerOffsets = new TCOffsets ();
+                innerOffsets.set (entry);
+                innerOffsets.bumpCurrentOffset (offsetSoFar - offsetForUnion);
+          
+                // Build union member
+                stream.println (indent + membersName + '[' + i + "] = new org.omg.CORBA.UnionMember (");
+                stream.println (indent + "  \"" + memberName + "\",");
+                stream.println (indent + "  " + anyOfMembers + ',');
+                stream.println (indent + "  " + tcOfMembers + ',');
+                stream.println (indent + "  null);");
+            }
+        }
     }
 
     tcoffsets.bumpCurrentOffset (innerOffsets.currentOffset ());
 
     // Build create_union_tc
     stream.println (indent + name + " = org.omg.CORBA.ORB.init ().create_union_tc (" + 
-	Util.helperName (u, true) + ".id (), \"" + entry.name () + "\", " + 
-	discTypeCode + ", " + membersName + ");"); 
+        Util.helperName (u, true) + ".id (), \"" + entry.name () + "\", " + 
+        discTypeCode + ", " + membersName + ");"); 
     return index;
   } // helperType
 
     public int type (int index, String indent, TCOffsets tcoffsets, String name, 
-	SymtabEntry entry, PrintWriter stream)
+        SymtabEntry entry, PrintWriter stream)
     {
-	stream.println (indent + name + " = " + Util.helperName (entry, true) + ".type ();"); 
-	return index;
+        stream.println (indent + name + " = " + Util.helperName (entry, true) + ".type ();"); 
+        return index;
     } 
 
     public void helperRead (String entryName, SymtabEntry entry, PrintWriter stream)
     {
-	stream.println ("    " + entryName + " value = new " + entryName + " ();");
-	read (0, "    ", "value", entry, stream);
-	stream.println ("    return value;");
+        stream.println ("    " + entryName + " value = new " + entryName + " ();");
+        read (0, "    ", "value", entry, stream);
+        stream.println ("    return value;");
     } 
 
     public void helperWrite (SymtabEntry entry, PrintWriter stream)
     {
-	write (0, "    ", "value", entry, stream);
+        write (0, "    ", "value", entry, stream);
     } 
 
     public int read (int index, String indent, String name, 
-	SymtabEntry entry, PrintWriter stream)
+        SymtabEntry entry, PrintWriter stream)
     {
-	UnionEntry u = (UnionEntry)entry;
-	String disName = "_dis" + index++;
-	SymtabEntry utype = Util.typeOf (u.type ());
-	Util.writeInitializer (indent, disName, "", utype, stream);
+        UnionEntry u = (UnionEntry)entry;
+        String disName = "_dis" + index++;
+        SymtabEntry utype = Util.typeOf (u.type ());
+        Util.writeInitializer (indent, disName, "", utype, stream);
 
-	if (utype instanceof PrimitiveEntry)
-	    index = ((JavaGenerator)utype.generator ()).read (index, indent, disName, utype, stream);
-	else
-	    stream.println (indent + disName + " = " + Util.helperName (utype, true) + ".read (istream);"); 
+        if (utype instanceof PrimitiveEntry)
+            index = ((JavaGenerator)utype.generator ()).read (index, indent, disName, utype, stream);
+        else
+            stream.println (indent + disName + " = " + Util.helperName (utype, true) + ".read (istream);"); 
 
-	if (utype.name ().equals ("boolean"))
-	    index = readBoolean (disName, index, indent, name, u, stream);
-	else
-	    index = readNonBoolean (disName, index, indent, name, u, stream);
+        if (utype.name ().equals ("boolean"))
+            index = readBoolean (disName, index, indent, name, u, stream);
+        else
+            index = readNonBoolean (disName, index, indent, name, u, stream);
 
-	return index;
+        return index;
     } 
 
     private int readBoolean (String disName, int index, String indent, 
-	String name, UnionEntry u, PrintWriter stream)
+        String name, UnionEntry u, PrintWriter stream)
     {
-	UnionBranch firstBranch = (UnionBranch)u.branches ().firstElement ();
-	UnionBranch secondBranch;
+        UnionBranch firstBranch = (UnionBranch)u.branches ().firstElement ();
+        UnionBranch secondBranch;
 
-	if (u.branches ().size () == 2)
-	    secondBranch = (UnionBranch)u.branches ().lastElement ();
-	else
-	    secondBranch = null;
+        if (u.branches ().size () == 2)
+            secondBranch = (UnionBranch)u.branches ().lastElement ();
+        else
+            secondBranch = null;
 
-	boolean firstBranchIsTrue = false;
-	boolean noCases = false;
-	try {
-	    if (u.branches ().size () == 1 && 
-		(u.defaultBranch () != null || firstBranch.labels.size () == 2)) {
-		noCases = true;
-	    } else {
-		Expression expr = (Expression)(firstBranch.labels.firstElement()) ;
-		Boolean bool = (Boolean)(expr.evaluate()) ;
-		firstBranchIsTrue = bool.booleanValue ();
-	    }
-	} catch (EvaluationException ex) {
-	    // no action
-	}
+        boolean firstBranchIsTrue = false;
+        boolean noCases = false;
+        try {
+            if (u.branches ().size () == 1 && 
+                (u.defaultBranch () != null || firstBranch.labels.size () == 2)) {
+                noCases = true;
+            } else {
+                Expression expr = (Expression)(firstBranch.labels.firstElement()) ;
+                Boolean bool = (Boolean)(expr.evaluate()) ;
+                firstBranchIsTrue = bool.booleanValue ();
+            }
+        } catch (EvaluationException ex) {
+            // no action
+        }
 
-	if (noCases) {
-	    // There is only a default label.  Since there are no cases,
-	    // there is no need for if...else branches.
+        if (noCases) {
+            // There is only a default label.  Since there are no cases,
+            // there is no need for if...else branches.
             index = readBranch (index, indent, firstBranch.typedef.name (), "",  firstBranch.typedef, stream);
-	} else {
-	    // If first branch is false, swap branches
-	    if (!firstBranchIsTrue) {
-		UnionBranch tmp = firstBranch;
-		firstBranch = secondBranch;
-		secondBranch = tmp;
-	    }
+        } else {
+            // If first branch is false, swap branches
+            if (!firstBranchIsTrue) {
+                UnionBranch tmp = firstBranch;
+                firstBranch = secondBranch;
+                secondBranch = tmp;
+            }
 
-	    stream.println (indent + "if (" + disName + ')');
+            stream.println (indent + "if (" + disName + ')');
 
-	    if (firstBranch == null)
-		stream.println (indent + "  throw new org.omg.CORBA.BAD_OPERATION ();");
-	    else {
-		stream.println (indent + '{');
-		index = readBranch (index, indent + "  ", firstBranch.typedef.name (), 
+            if (firstBranch == null)
+                stream.println (indent + "  throw new org.omg.CORBA.BAD_OPERATION ();");
+            else {
+                stream.println (indent + '{');
+                index = readBranch (index, indent + "  ", firstBranch.typedef.name (), 
                     disName, firstBranch.typedef, stream); 
-		stream.println (indent + '}');
-	    }
+                stream.println (indent + '}');
+            }
 
-	    stream.println (indent + "else");
+            stream.println (indent + "else");
 
-	    if (secondBranch == null)
-		stream.println (indent + "  throw new org.omg.CORBA.BAD_OPERATION ();");
-	    else {
-		stream.println (indent + '{');
-		index = readBranch (index, indent + "  ", secondBranch.typedef.name (), 
+            if (secondBranch == null)
+                stream.println (indent + "  throw new org.omg.CORBA.BAD_OPERATION ();");
+            else {
+                stream.println (indent + '{');
+                index = readBranch (index, indent + "  ", secondBranch.typedef.name (), 
                     disName, secondBranch.typedef, stream);
-		stream.println (indent + '}');
-	    }
-	}
+                stream.println (indent + '}');
+            }
+        }
 
-	return index;
+        return index;
     } 
 
     private int readNonBoolean (String disName, int index, String indent, 
-	String name, UnionEntry u, PrintWriter stream)
+        String name, UnionEntry u, PrintWriter stream)
     {
-	SymtabEntry utype = Util.typeOf (u.type ());
+        SymtabEntry utype = Util.typeOf (u.type ());
 
-	if (utype instanceof EnumEntry)
-	    stream.println (indent + "switch (" + disName + ".value ())");
-	else
-	    stream.println (indent + "switch (" + disName + ')');
+        if (utype instanceof EnumEntry)
+            stream.println (indent + "switch (" + disName + ".value ())");
+        else
+            stream.println (indent + "switch (" + disName + ')');
 
-	stream.println (indent + '{');
-	String typePackage = Util.javaQualifiedName (utype) + '.';
+        stream.println (indent + '{');
+        String typePackage = Util.javaQualifiedName (utype) + '.';
 
-	Enumeration e = u.branches ().elements ();
-	while (e.hasMoreElements ()) {
-	    UnionBranch branch = (UnionBranch)e.nextElement ();
-	    Enumeration labels = branch.labels.elements ();
+        Enumeration e = u.branches ().elements ();
+        while (e.hasMoreElements ()) {
+            UnionBranch branch = (UnionBranch)e.nextElement ();
+            Enumeration labels = branch.labels.elements ();
 
-	    while (labels.hasMoreElements ()) {
-		Expression label = (Expression)labels.nextElement ();
+            while (labels.hasMoreElements ()) {
+                Expression label = (Expression)labels.nextElement ();
 
-		if (utype instanceof EnumEntry) {
-		    String key = Util.parseExpression (label);
-		    stream.println (indent + "  case " + typePackage + '_' + key + ':');
-		} else
-		    stream.println (indent + "  case " + cast (label, utype) + ':');
-	    }
+                if (utype instanceof EnumEntry) {
+                    String key = Util.parseExpression (label);
+                    stream.println (indent + "  case " + typePackage + '_' + key + ':');
+                } else
+                    stream.println (indent + "  case " + cast (label, utype) + ':');
+            }
 
-	    if (!branch.typedef.equals (u.defaultBranch ())) {
-		index = readBranch (index, indent + "    ", branch.typedef.name (),
+            if (!branch.typedef.equals (u.defaultBranch ())) {
+                index = readBranch (index, indent + "    ", branch.typedef.name (),
                     branch.labels.size() > 1 ? disName : "" ,  
-		    branch.typedef, stream);
-		stream.println (indent + "    break;");
-	    }
-	}
+                    branch.typedef, stream);
+                stream.println (indent + "    break;");
+            }
+        }
 
-	// We need a default branch unless all of the case of the discriminator type
-	// are listed in the case branches.
-	if (!coversAll(u)) {
-	    stream.println( indent + "  default:") ;
+        // We need a default branch unless all of the case of the discriminator type
+        // are listed in the case branches.
+        if (!coversAll(u)) {
+            stream.println( indent + "  default:") ;
 
-	    if (u.defaultBranch () == null) {
-		// If the union does not have a default branch, we still need to initialize
-		// the discriminator.
-		stream.println( indent + "    value._default( " + disName + " ) ;" ) ;
-	    } else {
+            if (u.defaultBranch () == null) {
+                // If the union does not have a default branch, we still need to initialize
+                // the discriminator.
+                stream.println( indent + "    value._default( " + disName + " ) ;" ) ;
+            } else {
                 index = readBranch (index, indent + "    ", u.defaultBranch ().name (), disName,
-		    u.defaultBranch (), stream);
-	    }
-	
-	    stream.println (indent + "    break;");
-	}
+                    u.defaultBranch (), stream);
+            }
+        
+            stream.println (indent + "    break;");
+        }
 
-	stream.println (indent + '}');
+        stream.println (indent + '}');
 
-	return index;
+        return index;
     } 
 
     private int readBranch (int index, String indent, String name, String disName, TypedefEntry entry, PrintWriter stream)
     {
-	SymtabEntry type = entry.type ();
-	Util.writeInitializer (indent, '_' + name, "", entry, stream);
+        SymtabEntry type = entry.type ();
+        Util.writeInitializer (indent, '_' + name, "", entry, stream);
 
-	if (!entry.arrayInfo ().isEmpty () || 
-	    type instanceof SequenceEntry || 
-	    type instanceof PrimitiveEntry || 
-	    type instanceof StringEntry) {
-	    index = ((JavaGenerator)entry.generator ()).read (index, indent, '_' + name, entry, stream);
-	} else {
-	    stream.println (indent + '_' + name + " = " + Util.helperName (type, true) + ".read (istream);"); 
-	}
+        if (!entry.arrayInfo ().isEmpty () || 
+            type instanceof SequenceEntry || 
+            type instanceof PrimitiveEntry || 
+            type instanceof StringEntry) {
+            index = ((JavaGenerator)entry.generator ()).read (index, indent, '_' + name, entry, stream);
+        } else {
+            stream.println (indent + '_' + name + " = " + Util.helperName (type, true) + ".read (istream);"); 
+        }
 
         stream.print (indent + "value." + name + " ("); 
         if( disName == "" ) 
@@ -882,7 +882,7 @@ public class UnionGen implements com.sun.tools.corba.se.idl.UnionGen, JavaGenera
         else
             stream.println(disName + ", " + "_" + name + ");"); 
 
-	return index;
+        return index;
     } 
 
   /**

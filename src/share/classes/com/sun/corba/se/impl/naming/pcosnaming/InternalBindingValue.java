@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.pcosnaming;
+package com.sun.corba.ee.impl.naming.pcosnaming;
 
 import org.omg.CosNaming.BindingType;
 import java.io.Serializable;
@@ -49,7 +49,7 @@ import java.io.Serializable;
  * components associated with the binding.
  */
 public class InternalBindingValue
-		implements Serializable
+                implements Serializable
 {
     private static final long serialVersionUID = -2545360261776178726L;
 
@@ -67,19 +67,19 @@ public class InternalBindingValue
 
     // Normal constructor
     public InternalBindingValue(BindingType b, String o) {
-	// Objectreference or Context
-	theBindingType = b;
-	strObjectRef = o;
+        // Objectreference or Context
+        theBindingType = b;
+        strObjectRef = o;
     }
 
     public org.omg.CORBA.Object getObjectRef( )
     {
-	return theObjectRef;
+        return theObjectRef;
     }
 
     public void setObjectRef( org.omg.CORBA.Object ObjectRef )
     {
-	theObjectRef = ObjectRef;
+        theObjectRef = ObjectRef;
     }
     
 }

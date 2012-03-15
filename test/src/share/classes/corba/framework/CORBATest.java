@@ -39,7 +39,7 @@
  */
 package corba.framework;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -121,7 +121,7 @@ public abstract class CORBATest extends test.RemoteTest
     /**
      * Pass the ORBDebug settings into a controller.
      * Syntax is  -orbtrace name:flag1,flag2,...;name:flag1,...
-     * This sets the system property com.sun.corba.se.ORBDebug to the list
+     * This sets the system property com.sun.corba.ee.ORBDebug to the list
      * of flags for a controller named name
      */
     public static final String TRACE_FLAG = "-orbtrace" ;
@@ -166,7 +166,7 @@ public abstract class CORBATest extends test.RemoteTest
             Options.init(this);
 
             parseDebugExecFlags();
-	    parseTraceFlag() ;
+            parseTraceFlag() ;
         } catch (ThreadDeath death) {
             throw death;
         } catch (Throwable e) {
@@ -236,8 +236,8 @@ public abstract class CORBATest extends test.RemoteTest
     @Override
     public void run()
     {
-	CORBAUtil.mkdir( Options.getOutputDirectory() ) ;
-	CORBAUtil.mkdir( Options.getReportDirectory() ) ;
+        CORBAUtil.mkdir( Options.getOutputDirectory() ) ;
+        CORBAUtil.mkdir( Options.getReportDirectory() ) ;
         boolean errorOccured = false;
 
         try {
@@ -255,12 +255,12 @@ public abstract class CORBATest extends test.RemoteTest
             errorOccured = true;
             status = new Error("Caught " + out.toString());
         } finally {
-	    // Make sure processes are dead and streams are closed
+            // Make sure processes are dead and streams are closed
             cleanUp();
 
-	    // Make sure all exit values were Controller.SUCCESS
-	    // unless there was already an error (don't want to
-	    // overwrite the more specific error message).
+            // Make sure all exit values were Controller.SUCCESS
+            // unless there was already an error (don't want to
+            // overwrite the more specific error message).
             if (!errorOccured) {
                 handleExitValues();
             }
@@ -346,7 +346,7 @@ public abstract class CORBATest extends test.RemoteTest
      */
     private void getGenJavaFilesHelper(Vector files, File dir)
     {
-	// Create a filter that accepts directory names and .java files
+        // Create a filter that accepts directory names and .java files
         FileFilter dotJavaFilter = new FileFilter() {
             public boolean accept(File pathname) {
                 return ((pathname.isFile()
@@ -361,8 +361,8 @@ public abstract class CORBATest extends test.RemoteTest
             return;
         }
 
-	// Recurse down through any directories, gathering absolute paths
-	// of all .java files
+        // Recurse down through any directories, gathering absolute paths
+        // of all .java files
         for (int i = 0; i < fileArray.length; i++) {
             if (fileArray[i].isDirectory()) {
                 getGenJavaFilesHelper(files,
@@ -434,7 +434,7 @@ public abstract class CORBATest extends test.RemoteTest
         // Get any .java files that were generated
         Vector fileVector = getGeneratedJavaFiles();
 
-	// Add any subclass-specified files
+        // Add any subclass-specified files
         String userFiles[] = Options.getJavaFiles();
 
         if (userFiles != null) {
@@ -464,7 +464,7 @@ public abstract class CORBATest extends test.RemoteTest
         Properties props, Vector args, Hashtable extra ) throws Exception {
 
         Controller executionStrategy;
-	if (odebugProcessNames.contains(name)) {
+        if (odebugProcessNames.contains(name)) {
             executionStrategy = new ODebugExec();
         } else if (rdebugProcessNames.contains(name)) {
             executionStrategy = new RDebugExec();
@@ -500,12 +500,12 @@ public abstract class CORBATest extends test.RemoteTest
 
         props.setProperty( "corba.test.controller.name", name ) ;
 
-	String traceFlags = (String) traceMap.get(name) ;
-	if (traceFlags != null) {
+        String traceFlags = (String) traceMap.get(name) ;
+        if (traceFlags != null) {
             copy.setProperty(ORBConstants.DEBUG_PROPERTY, traceFlags);
         }
 
-	int emmaPort = EmmaControl.setCoverageProperties( copy ) ;
+        int emmaPort = EmmaControl.setCoverageProperties( copy ) ;
 
         Hashtable hash = new Hashtable( extra ) ;
 
@@ -539,7 +539,7 @@ public abstract class CORBATest extends test.RemoteTest
         Test.dprint("ORB initial port: " + Options.getORBInitialPort());
         Test.dprint("Activation port: " + Options.getActivationPort());
 
-        return createProcess( "com.sun.corba.se.impl.activation.ORBD", ControllerKind.ORBD,
+        return createProcess( "com.sun.corba.ee.impl.activation.ORBD", ControllerKind.ORBD,
             "ORBD", Options.getORBDProperties(), Options.getORBDArgs(),
             Options.getORBDExtra() ) ;
     }
@@ -715,7 +715,7 @@ public abstract class CORBATest extends test.RemoteTest
             cleanUpHelp(ctrl);
         }
 
-	EmmaControl.resetPortAllocator() ;
+        EmmaControl.resetPortAllocator() ;
         helper.done() ;
     }
 
@@ -748,7 +748,7 @@ public abstract class CORBATest extends test.RemoteTest
             }
 
             if (exitValue != Controller.SUCCESS &&
-		exitValue != Controller.STOPPED) {
+                exitValue != Controller.STOPPED) {
                 failedMsg.append(controller.getProcessName()).append("[")
                     .append(exitValue).append("]").append(lineSeparator);
                 failures++;
@@ -771,65 +771,65 @@ public abstract class CORBATest extends test.RemoteTest
         String processNames = (String)getArgs().get(DEBUG_STRATEGY_FLAG);
 
         if (processNames != null) {
-	    // The process names should be separated by commas
-	    StringTokenizer tokenizer = new StringTokenizer(processNames, ":");
+            // The process names should be separated by commas
+            StringTokenizer tokenizer = new StringTokenizer(processNames, ":");
 
-	    // Add the names
-	    while (tokenizer.hasMoreTokens()) {
+            // Add the names
+            while (tokenizer.hasMoreTokens()) {
                 debugProcessNames.add(tokenizer.nextToken());
             }
-	}
+        }
 
-	processNames = (String)getArgs().get(RDEBUG_STRATEGY_FLAG) ;
+        processNames = (String)getArgs().get(RDEBUG_STRATEGY_FLAG) ;
 
-	if (processNames != null) {
-	    // The process names should be separated by commas
-	    StringTokenizer tokenizer = new StringTokenizer(processNames, ":");
+        if (processNames != null) {
+            // The process names should be separated by commas
+            StringTokenizer tokenizer = new StringTokenizer(processNames, ":");
 
-	    // Add the names
-	    while (tokenizer.hasMoreTokens()) {
+            // Add the names
+            while (tokenizer.hasMoreTokens()) {
                 rdebugProcessNames.add(tokenizer.nextToken());
             }
-	}
+        }
 
-	processNames = (String)getArgs().get(ODEBUG_STRATEGY_FLAG) ;
+        processNames = (String)getArgs().get(ODEBUG_STRATEGY_FLAG) ;
 
-	if (processNames != null) {
-	    // The process names should be separated by commas
-	    StringTokenizer tokenizer = new StringTokenizer(processNames, ":");
+        if (processNames != null) {
+            // The process names should be separated by commas
+            StringTokenizer tokenizer = new StringTokenizer(processNames, ":");
 
-	    // Add the names
-	    while (tokenizer.hasMoreTokens()) {
+            // Add the names
+            while (tokenizer.hasMoreTokens()) {
                 odebugProcessNames.add(tokenizer.nextToken());
             }
-	}
+        }
     }
 
     private void parseTraceFlag()
     {
-	String traceData = (String)getArgs().get(TRACE_FLAG) ;
-	if (traceData == null) {
+        String traceData = (String)getArgs().get(TRACE_FLAG) ;
+        if (traceData == null) {
             return;
         }
 
-	// traceData should look like
-	// data == group ( ";" group ) *
-	// group == name ":" name ( "," name ) *
-	// name == [a-zA-Z0-9]+
+        // traceData should look like
+        // data == group ( ";" group ) *
+        // group == name ":" name ( "," name ) *
+        // name == [a-zA-Z0-9]+
 
-	StringTokenizer dataST = new StringTokenizer( traceData, ";" ) ;
-	while (dataST.hasMoreTokens()) {
-	    String group = dataST.nextToken() ;
-	    StringTokenizer groupST = new StringTokenizer( group, ":" ) ;
-	    if (groupST.countTokens() != 2) {
+        StringTokenizer dataST = new StringTokenizer( traceData, ";" ) ;
+        while (dataST.hasMoreTokens()) {
+            String group = dataST.nextToken() ;
+            StringTokenizer groupST = new StringTokenizer( group, ":" ) ;
+            if (groupST.countTokens() != 2) {
                 throw new IllegalArgumentException("Bad syntax in trace command");
             }
 
-	    String name = groupST.nextToken() ;
-	    String debugArgs = groupST.nextToken() ;
+            String name = groupST.nextToken() ;
+            String debugArgs = groupST.nextToken() ;
 
-	    traceMap.put( name, debugArgs ) ;
-	}
+            traceMap.put( name, debugArgs ) ;
+        }
     }
 
     /**
@@ -857,7 +857,7 @@ public abstract class CORBATest extends test.RemoteTest
     protected HashSet odebugProcessNames = new HashSet();
 
     /**
-     * Map from controller name to com.sun.corba.se.ORBDebug value.
+     * Map from controller name to com.sun.corba.ee.ORBDebug value.
      * This allows setting the ORB debug flags from the test
      * arguments.
      */

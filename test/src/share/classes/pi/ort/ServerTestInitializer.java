@@ -78,14 +78,14 @@ public class ServerTestInitializer
      * Called after all references are registered
      */
     public void post_init (org.omg.PortableInterceptor.ORBInitInfo info) {
-	IORInterceptor iorInterceptor = new SampleIORInterceptor( "test", out);
-	try {
-	    out.println( "    - post_init: adding Sample IOR Interceptor..." );
-	    info.add_ior_interceptor( iorInterceptor );
+        IORInterceptor iorInterceptor = new SampleIORInterceptor( "test", out);
+        try {
+            out.println( "    - post_init: adding Sample IOR Interceptor..." );
+            info.add_ior_interceptor( iorInterceptor );
         }
-	catch( DuplicateName e ) {
-	    out.println( "    - post_init: received DuplicateName!" );
-	}
+        catch( DuplicateName e ) {
+            out.println( "    - post_init: received DuplicateName!" );
+        }
     }
 
 }

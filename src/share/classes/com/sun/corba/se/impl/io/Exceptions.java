@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.io;
+package com.sun.corba.ee.impl.io;
 
-import com.sun.corba.se.spi.logex.stdcorba.StandardLogger;
+import com.sun.corba.ee.spi.logex.stdcorba.StandardLogger;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.NotSerializableException;

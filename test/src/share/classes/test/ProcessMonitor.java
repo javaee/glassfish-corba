@@ -55,8 +55,8 @@ import java.io.*;
  * ProcessMonitor provides a thread which will consume output from a
  * java.lang.Process and write it to the specified local streams.
  *
- * @version	1.0, 6/11/98
- * @author	Bryan Atsatt
+ * @version     1.0, 6/11/98
+ * @author      Bryan Atsatt
  *
  * Split into StreamReaders by Everett Anderson 8/1/2000.  Note that
  * the output streams will be closed at the end of the
@@ -75,8 +75,8 @@ public class ProcessMonitor {
      * @param err The stream to which to copy Process.getErrorStream() data.
      */
     public ProcessMonitor (Process theProcess,
-			   OutputStream out,
-			   OutputStream err) {
+                           OutputStream out,
+                           OutputStream err) {
 
         process = theProcess;
         
@@ -92,9 +92,9 @@ public class ProcessMonitor {
      * @param prefix String to prepend to all copied output lines.
      */
     public ProcessMonitor (Process theProcess,
-			   OutputStream out,
-			   OutputStream err,
-			   String handshake) {
+                           OutputStream out,
+                           OutputStream err,
+                           String handshake) {
         process = theProcess;
 
         outReader = new StreamReader(out,

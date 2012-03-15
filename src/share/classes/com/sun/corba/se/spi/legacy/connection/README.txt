@@ -58,9 +58,9 @@ act as a cookie for the factory if desired.
 
 Interfaces:
 
-	com.sun.corba.se.spi.legacy.connection.ORBSocketFactory
-	com.sun.corba.se.spi.legacy.connection.EndPointInfo
-	com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException
+        com.sun.corba.ee.spi.legacy.connection.ORBSocketFactory
+        com.sun.corba.ee.spi.legacy.connection.EndPointInfo
+        com.sun.corba.ee.spi.legacy.connection.GetEndPointInfoAgainException
 
 ==============================================================================
 Access to a request's socket:
@@ -73,8 +73,8 @@ RequestInfoExt interface.
 
 Interfaces:
 
-	com.sun.corba.se.spi.legacy.interceptor.RequestInfoExt
-	com.sun.corba.se.spi.legacy.connection.Connection
+        com.sun.corba.ee.spi.legacy.interceptor.RequestInfoExt
+        com.sun.corba.ee.spi.legacy.connection.Connection
 
 ==============================================================================
 Extending IORInfo to support the multiple server port API:
@@ -88,8 +88,8 @@ ORBSocketFactory.java.
 
 Interfaces:
 
-       com.sun.corba.se.spi.legacy.interceptor.IORInfoExt
-       com.sun.corba.se.spi.legacy.interceptor.UnknownType
+       com.sun.corba.ee.spi.legacy.interceptor.IORInfoExt
+       com.sun.corba.ee.spi.legacy.interceptor.UnknownType
 
 ;; End.
 

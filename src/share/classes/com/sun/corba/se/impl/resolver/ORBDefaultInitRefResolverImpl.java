@@ -37,11 +37,11 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.resolver ;
+package com.sun.corba.ee.impl.resolver ;
 
-import com.sun.corba.se.spi.resolver.Resolver ;
+import com.sun.corba.ee.spi.resolver.Resolver ;
 
-import com.sun.corba.se.spi.orb.Operation ;
+import com.sun.corba.ee.spi.orb.Operation ;
 import java.util.Set;
 
 public class ORBDefaultInitRefResolverImpl implements Resolver {
@@ -50,16 +50,16 @@ public class ORBDefaultInitRefResolverImpl implements Resolver {
 
     public ORBDefaultInitRefResolverImpl( Operation urlHandler, String orbDefaultInitRef ) 
     {
-	this.urlHandler = urlHandler ;
+        this.urlHandler = urlHandler ;
 
-	this.orbDefaultInitRef = orbDefaultInitRef ;
+        this.orbDefaultInitRef = orbDefaultInitRef ;
     }
 
     public org.omg.CORBA.Object resolve( String ident )
     {
         // If the ORBDefaultInitRef is not defined simply return null
         if( orbDefaultInitRef == null ) {
-	    return null;
+            return null;
         }
 
         String urlString;
@@ -73,11 +73,11 @@ public class ORBDefaultInitRefResolverImpl implements Resolver {
             urlString = orbDefaultInitRef + "#" + ident;
         }
 
-	return (org.omg.CORBA.Object)urlHandler.operate( urlString ) ;
+        return (org.omg.CORBA.Object)urlHandler.operate( urlString ) ;
     }
 
     public Set<String> list()
     {
-	return new java.util.HashSet() ;
+        return new java.util.HashSet() ;
     }
 }

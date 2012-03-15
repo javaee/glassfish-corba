@@ -61,32 +61,32 @@ public class helloRMIIIOP
     private helloDelegate delegate = null;
     
     public helloRMIIIOP( PrintStream out ) 
-	throws RemoteException 
+        throws RemoteException 
     {
-	super();
-	this.delegate = new helloDelegate( out );
+        super();
+        this.delegate = new helloDelegate( out );
     }
 
     public helloDelegate getDelegate() {
-	return delegate;
+        return delegate;
     }
 
     public String sayHello() {
-	return delegate.sayHello();
+        return delegate.sayHello();
     }
     
     public String saySystemException() {
-	return delegate.saySystemException();
+        return delegate.saySystemException();
     }
 
     public void sayUserException() 
-	throws ExampleException 
+        throws ExampleException 
     {
-	delegate.sayUserException();
+        delegate.sayUserException();
     }
     
     public void sayOneway() {
-	delegate.sayOneway();
+        delegate.sayOneway();
     }
 
     public String sayArguments( String arg1, int arg2, boolean arg3 ) {
@@ -94,14 +94,14 @@ public class helloRMIIIOP
     }
     
     public void clearInvoked() {
-	delegate.clearInvoked();
+        delegate.clearInvoked();
     }
     
     public boolean wasInvoked() {
-	return delegate.wasInvoked();
+        return delegate.wasInvoked();
     }
 
     public void resetServant() {
-	delegate.resetServant();
+        delegate.resetServant();
     }
 }

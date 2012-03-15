@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.oa.poa;
+package com.sun.corba.ee.impl.oa.poa;
 
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
@@ -46,34 +46,34 @@ import org.omg.PortableServer.*;
 final class IdAssignmentPolicyImpl
 extends org.omg.CORBA.LocalObject
 implements org.omg.PortableServer.IdAssignmentPolicy {
-	
+        
     public IdAssignmentPolicyImpl(IdAssignmentPolicyValue value) {
-	this.value = value;
+        this.value = value;
     }
 
     public IdAssignmentPolicyValue value() {
-	return value;
+        return value;
     }
 
     public int policy_type()
     {
-	return ID_ASSIGNMENT_POLICY_ID.value ;
+        return ID_ASSIGNMENT_POLICY_ID.value ;
     }
 
     public Policy copy() {
-	return new IdAssignmentPolicyImpl(value);
+        return new IdAssignmentPolicyImpl(value);
     }
 
     public void destroy() {
-	value = null;
+        value = null;
     }
 
     private IdAssignmentPolicyValue value;
 
     public String toString()
     {
-	return "IdAssignmentPolicy[" +
-	    ((value.value() == IdAssignmentPolicyValue._USER_ID) ?
-		"USER_ID" : "SYSTEM_ID" + "]") ;
+        return "IdAssignmentPolicy[" +
+            ((value.value() == IdAssignmentPolicyValue._USER_ID) ?
+                "USER_ID" : "SYSTEM_ID" + "]") ;
     }
 }

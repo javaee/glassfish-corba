@@ -119,8 +119,8 @@ public class InterfaceGen implements com.sun.tools.corba.se.idl.InterfaceGen, Ja
       if (! (i.isLocalSignature())) {
           // generate the stubs and skeletons for non-local interfaces
           if (! (i.isLocal())) {
-	      // for local servant case just generate the skeleton, but
-	      // for others generate the stubs also
+              // for local servant case just generate the skeleton, but
+              // for others generate the stubs also
               generateSkeleton ();
 
               // _REVISIT_, Whenever there is time restructure the code to
@@ -136,8 +136,8 @@ public class InterfaceGen implements com.sun.tools.corba.se.idl.InterfaceGen, Ja
                   theArguments.TIEServer = false;
                   // Generate the ImplBase class 
                   generateSkeleton (); 
-		  // Revert in case file contains multiple interfaces
-		  theArguments.TIEServer = true;
+                  // Revert in case file contains multiple interfaces
+                  theArguments.TIEServer = true;
               }
               generateStub ();
           }
@@ -322,9 +322,9 @@ public class InterfaceGen implements com.sun.tools.corba.se.idl.InterfaceGen, Ja
     } 
     else {
     // <d62310-klr> - end
-	// extends IDLEntity if there's only one default parent - CORBA.Object
-	if (i.derivedFrom ().size () == 1)
-	  stream.print (", org.omg.CORBA.portable.IDLEntity ");
+        // extends IDLEntity if there's only one default parent - CORBA.Object
+        if (i.derivedFrom ().size () == 1)
+          stream.print (", org.omg.CORBA.portable.IDLEntity ");
     }
   } // writeSignatureHeading
 
@@ -337,10 +337,10 @@ public class InterfaceGen implements com.sun.tools.corba.se.idl.InterfaceGen, Ja
     if ( !i.isAbstract ())
       stream.print ("Operations ");
     else {
-	// <d60929> - base abstract interfaces extend AbstractBase
-	// changed to IDLEntity by SCN per latest spec...
-	if (i.derivedFrom ().size () == 0)
-	  stream.print (" extends org.omg.CORBA.portable.IDLEntity");
+        // <d60929> - base abstract interfaces extend AbstractBase
+        // changed to IDLEntity by SCN per latest spec...
+        if (i.derivedFrom ().size () == 0)
+          stream.print (" extends org.omg.CORBA.portable.IDLEntity");
     }
 
     boolean firstTime = true;
@@ -644,7 +644,7 @@ public class InterfaceGen implements com.sun.tools.corba.se.idl.InterfaceGen, Ja
     stream.println (indent + "String " + stringName + " = istream.read_string ();");
     stream.println (indent + "try");
     stream.println (indent + "{");
-    stream.println (indent + "  " + name + " = (" + Util.javaStatefulName (entry) + ")com.sun.corba.se.iiop.ORB.getImpl (" + stringName + ".replace ('/', '.'));");
+    stream.println (indent + "  " + name + " = (" + Util.javaStatefulName (entry) + ")com.sun.corba.ee.iiop.ORB.getImpl (" + stringName + ".replace ('/', '.'));");
     stream.println (indent + "}");
     stream.println (indent + "catch (Exception e)");
     stream.println (indent + "{");
@@ -831,33 +831,33 @@ public class InterfaceGen implements com.sun.tools.corba.se.idl.InterfaceGen, Ja
   private boolean isPseudo(InterfaceEntry i) {
     java.lang.String fullname = i.fullName();
     if (fullname.equalsIgnoreCase("CORBA/TypeCode"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/Principal"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/ORB"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/Any"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/Context"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/ContextList"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/DynamicImplementation"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/Environment"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/ExceptionList"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/NVList"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/NamedValue"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/Request"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/ServerRequest"))
-	return true;
+        return true;
     if (fullname.equalsIgnoreCase("CORBA/UserException"))
-	return true;
+        return true;
     return false;
   }
 

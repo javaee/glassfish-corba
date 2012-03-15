@@ -67,7 +67,7 @@ public class Hotel implements org.omg.CORBA.portable.ValueBase
     }
 
     public String[] _truncatable_ids() {
-	return omega.HotelHelper.get_instance().get_truncatable_base_ids();
+        return omega.HotelHelper.get_instance().get_truncatable_base_ids();
     }
 
     public void dolength (int length)

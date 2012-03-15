@@ -42,9 +42,9 @@ package pi.clientinterceptor;
 
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.corba.AnyImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*; 
 import corba.framework.*;
 
@@ -70,67 +70,67 @@ public class DIIRMILocalClient
     private java.lang.Object syncObject;
 
     public static void main(String args[]) {
-	final String[] arguments = args;
+        final String[] arguments = args;
 
-	try {
-	    System.out.println( "====================================" );
-	    System.out.println( "Creating ORB for DII RMI Local test" );
-	    System.out.println( "====================================" );
+        try {
+            System.out.println( "====================================" );
+            System.out.println( "Creating ORB for DII RMI Local test" );
+            System.out.println( "====================================" );
 
-	    final DIIRMILocalClient client = new DIIRMILocalClient();
+            final DIIRMILocalClient client = new DIIRMILocalClient();
 
-	    TestInitializer.out = System.out;
-	    client.out = System.out;
-	    client.err = System.err;
+            TestInitializer.out = System.out;
+            client.out = System.out;
+            client.err = System.err;
 
-	    // For this test, start both the client and the server
-	    // using the same ORB.
-	    System.out.println( "+ Creating ORB for client and server..." );
-	    client.createORB( args );
+            // For this test, start both the client and the server
+            // using the same ORB.
+            System.out.println( "+ Creating ORB for client and server..." );
+            client.createORB( args );
 
-	    System.out.println( "+ Starting Server..." );
-	    client.syncObject = new java.lang.Object();
-	    new Thread() {
-		public void run() {
-		    try {
-			(new OldRMILocalServer()).run(
-						 client.orb, client.syncObject,
-						 System.getProperties(),
-						 arguments, System.out,
-						 System.err, null );
-		    }
-		    catch( Exception e ) {
-			System.err.println( "SERVER CRASHED:" );
-			e.printStackTrace( System.err );
-			System.exit( 1 );
-		    }
-		}
-	    }.start();
+            System.out.println( "+ Starting Server..." );
+            client.syncObject = new java.lang.Object();
+            new Thread() {
+                public void run() {
+                    try {
+                        (new OldRMILocalServer()).run(
+                                                 client.orb, client.syncObject,
+                                                 System.getProperties(),
+                                                 arguments, System.out,
+                                                 System.err, null );
+                    }
+                    catch( Exception e ) {
+                        System.err.println( "SERVER CRASHED:" );
+                        e.printStackTrace( System.err );
+                        System.exit( 1 );
+                    }
+                }
+            }.start();
 
-	    // Wait for server to start...
-	    synchronized( client.syncObject ) {
-		try {
-		    client.syncObject.wait();
-		}
-		catch( InterruptedException e ) {
-		    // ignore.
-		}
-	    }
+            // Wait for server to start...
+            synchronized( client.syncObject ) {
+                try {
+                    client.syncObject.wait();
+                }
+                catch( InterruptedException e ) {
+                    // ignore.
+                }
+            }
 
-	    // Start client:
-	    System.out.println( "+ Starting client..." );
-	    client.run( System.getProperties(),
-		        args, System.out, System.err, null );
+            // Start client:
+            System.out.println( "+ Starting client..." );
+            client.run( System.getProperties(),
+                        args, System.out, System.err, null );
             System.exit( 0 );
-	}
-	catch( Exception e ) {
-	    e.printStackTrace( System.err );
-	    System.exit( 1 );
-	}
+        }
+        catch( Exception e ) {
+            e.printStackTrace( System.err );
+            System.exit( 1 );
+        }
     }
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
         try {
@@ -145,44 +145,44 @@ public class DIIRMILocalClient
      * Clear invocation flags of helloRef and helloRefForward
      */
     protected void clearInvoked() 
-	throws Exception
+        throws Exception
     {
-	helloRef.clearInvoked();
-	helloRefForward.clearInvoked();
+        helloRef.clearInvoked();
+        helloRefForward.clearInvoked();
     }
 
     /**
      * Invoke the method with the given name on the object
      */
     protected void invokeMethod( String methodName ) 
-	throws Exception
+        throws Exception
     {
-	// Make an invocation:
-	if( methodName.equals( "sayHello" ) ) {
-	    helloRef.sayHello();
-	}
-	else if( methodName.equals( "sayException" ) ) {
-	    helloRef.saySystemException();
-	}
-	else if( methodName.equals( "sayOneway" ) ) {
-	    helloRef.sayOneway();
-	}
+        // Make an invocation:
+        if( methodName.equals( "sayHello" ) ) {
+            helloRef.sayHello();
+        }
+        else if( methodName.equals( "sayException" ) ) {
+            helloRef.saySystemException();
+        }
+        else if( methodName.equals( "sayOneway" ) ) {
+            helloRef.sayOneway();
+        }
     }
 
     /**
      * Return true if the method was invoked
      */
     protected boolean wasInvoked() 
-	throws Exception 
+        throws Exception 
     {
-	return helloRef.wasInvoked();
+        return helloRef.wasInvoked();
     }
 
     /**
      * Return true if the method was forwarded
      */
     protected boolean didForward() 
-	throws Exception 
+        throws Exception 
     {
         return helloRefForward.wasInvoked();
     }
@@ -191,9 +191,9 @@ public class DIIRMILocalClient
      * Perform ClientRequestInterceptor tests
      */
     protected void testClientInterceptor() 
-	throws Exception 
+        throws Exception 
     {
-	super.testClientInterceptor();
+        super.testClientInterceptor();
     }
 
     /**
@@ -201,15 +201,15 @@ public class DIIRMILocalClient
      * from the last invocation
      */
     protected void resolveReferences() 
-	throws Exception 
+        throws Exception 
     {
         out.println( "    + resolving references..." );
         out.println( "      - disabling interceptors..." );
         SampleClientRequestInterceptor.enabled = false;
         // Resolve the hello object.
-	out.println( "      - Hello1" );
+        out.println( "      - Hello1" );
         helloRef = resolve( orb, "Hello1" );
-	out.println( "      - Hello1Forward" );
+        out.println( "      - Hello1Forward" );
         helloRefForward = resolve( orb, "Hello1Forward" );
         // The initializer will store the location the interceptors should
         // use during a forward request:
@@ -222,7 +222,7 @@ public class DIIRMILocalClient
      * Implementation borrwed from corba.socket.HelloClient.java test
      */
     private helloDIIClientStub resolve(ORB orb, String name)
-	throws Exception
+        throws Exception
     {
         // Get the root naming context
         org.omg.CORBA.Object objRef = 
@@ -250,12 +250,12 @@ public class DIIRMILocalClient
                                    boolean forwardExpected )
         throws Exception
     {
-	super.testInvocation( name, mode, correctOrder, methodName,
-			      shouldInvokeTarget,
-			      exceptionExpected,
-			      forwardExpected );
+        super.testInvocation( name, mode, correctOrder, methodName,
+                              shouldInvokeTarget,
+                              exceptionExpected,
+                              forwardExpected );
 
-	// Reset the servant:
-	helloRef.resetServant();
+        // Reset the servant:
+        helloRef.resetServant();
     }
 }

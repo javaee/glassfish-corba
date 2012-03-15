@@ -40,7 +40,7 @@
 
 package pi.clientinterceptor;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import java.io.PrintStream;
 import java.util.Properties;
 import org.glassfish.pfl.test.JUnitReportHelper;
@@ -53,7 +53,7 @@ import org.omg.CORBA.UNKNOWN;
 abstract public class ClientCommon
 {
     // Set from run()
-    protected com.sun.corba.se.spi.orb.ORB orb;
+    protected com.sun.corba.ee.spi.orb.ORB orb;
     
     // Set from run()
     protected PrintStream out;
@@ -64,18 +64,18 @@ abstract public class ClientCommon
     private JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
 
     /**
-     * Creates a com.sun.corba.se.spi.orb.ORB and notifies the TestInitializer of its presence
+     * Creates a com.sun.corba.ee.spi.orb.ORB and notifies the TestInitializer of its presence
      */
     protected void createORB( String[] args ) {
-	// create and initialize the ORB with initializer
-	String testInitializer = "pi.clientinterceptor.TestInitializer";
-	Properties props = new Properties() ;
-	props.put( "org.omg.CORBA.ORBClass", 
+        // create and initialize the ORB with initializer
+        String testInitializer = "pi.clientinterceptor.TestInitializer";
+        Properties props = new Properties() ;
+        props.put( "org.omg.CORBA.ORBClass", 
                    System.getProperty("org.omg.CORBA.ORBClass"));
-	props.put( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
-	           testInitializer, "" );
-	this.orb = (com.sun.corba.se.spi.orb.ORB)ORB.init(args, props);
-	TestInitializer.orb = this.orb;
+        props.put( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
+                   testInitializer, "" );
+        this.orb = (com.sun.corba.ee.spi.orb.ORB)ORB.init(args, props);
+        TestInitializer.orb = this.orb;
     }
 
     protected void finish() {
@@ -86,9 +86,9 @@ abstract public class ClientCommon
      * Perform common ClientRequestInterceptor tests
      */
     protected void testClientInterceptor() throws Exception {
-	out.println();
-	out.println( "Running common ClientRequestInterceptor tests" );
-	out.println( "=============================================" );
+        out.println();
+        out.println( "Running common ClientRequestInterceptor tests" );
+        out.println( "=============================================" );
 
         // No exceptions thrown.  Should call send_request, sayHello, and
         // then receive_reply on all 3 interceptors in the correct order
@@ -178,18 +178,18 @@ abstract public class ClientCommon
         }
 
         // Check that call counter is zero (balanced starting points with
-	// ending points)
-	out.print(
-	    "- Checking call counter: " + 
-	    SampleClientRequestInterceptor.callCounter + " " );
+        // ending points)
+        out.print(
+            "- Checking call counter: " + 
+            SampleClientRequestInterceptor.callCounter + " " );
 
-	if( SampleClientRequestInterceptor.callCounter == 0 ) {
-	    out.println( "(ok)" );
-	}
-	else {
-	    out.println( "(error - should be 0)" );
-	    throw new RuntimeException( "Call counter should be 0!" );
-	}
+        if( SampleClientRequestInterceptor.callCounter == 0 ) {
+            out.println( "(ok)" );
+        }
+        else {
+            out.println( "(error - should be 0)" );
+            throw new RuntimeException( "Call counter should be 0!" );
+        }
     }
 
     /**
@@ -203,17 +203,17 @@ abstract public class ClientCommon
         out.println( "Running Special Operations Tests" );
         out.println( "================================" );
 
-	// Note: shouldInvoke is false because we have no hook code on
-	// the server for these operations so we cannot tell if it was
-	// actually invoked.
+        // Note: shouldInvoke is false because we have no hook code on
+        // the server for these operations so we cannot tell if it was
+        // actually invoked.
 
         out.println( "+ Testing _is_a..." );
         testInvocation( "isATest",
             SampleClientRequestInterceptor.MODE_NORMAL,
             "sr1sr2sr3rr3rr2rr1", "_is_a", false, false, false );
 
-	// Expected exception return value since we do not implement this
-	// method.
+        // Expected exception return value since we do not implement this
+        // method.
         out.println( "+ Testing _get_interface_def..." );
         testInvocation( "getInterfaceDefTest",
             SampleClientRequestInterceptor.MODE_NORMAL,

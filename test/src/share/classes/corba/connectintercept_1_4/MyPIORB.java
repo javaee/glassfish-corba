@@ -44,27 +44,27 @@
 
 package corba.connectintercept_1_4;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.impl.orb.ORBImpl;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.impl.orb.ORBImpl;
 
 public class MyPIORB 
     extends
         ORBImpl 
 {
     public static final String baseMsg = 
-	MyPIORB.class.getName() + ".objectReferenceCreated: ";
+        MyPIORB.class.getName() + ".objectReferenceCreated: ";
 
     protected IOR objectReferenceCreated (IOR ior) 
     {
-	String componentData = Common.createComponentData(baseMsg, this);
+        String componentData = Common.createComponentData(baseMsg, this);
 
-	// This test puts the information in the IOR via
-	// the ServerIORInterceptor. The example here is just to
-	// show how to use the old hooks to get the info.
-	// You would put that info in the given IOR similar to
-	// the ServerIORInterceptor code then return the augmented
-	// ior.
-	return ior ;
+        // This test puts the information in the IOR via
+        // the ServerIORInterceptor. The example here is just to
+        // show how to use the old hooks to get the info.
+        // You would put that info in the given IOR similar to
+        // the ServerIORInterceptor code then return the augmented
+        // ior.
+        return ior ;
     }
 }
  

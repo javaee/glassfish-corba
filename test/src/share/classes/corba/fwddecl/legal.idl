@@ -44,52 +44,52 @@
 
 module corba {
     module fwddecl {
-	// Old style recursive definition
-	struct Foo {
-	    long value ;
-	    sequence<Foo> chain ;
-	} ;
+        // Old style recursive definition
+        struct Foo {
+            long value ;
+            sequence<Foo> chain ;
+        } ;
 
-	interface Sample ;
+        interface Sample ;
 
-	// Equivalent with forward
-	struct NewFoo ;
-	typedef sequence<NewFoo> NewFooSeq ;
-	struct NewFoo {
-	    long value ;
-	    NewFooSeq chain ;
-	} ;
+        // Equivalent with forward
+        struct NewFoo ;
+        typedef sequence<NewFoo> NewFooSeq ;
+        struct NewFoo {
+            long value ;
+            NewFooSeq chain ;
+        } ;
 
-	// multiple level
-	union Bar ;
-	typedef sequence<Bar> BarSeq ;
-	union Bar switch(long) {
-	    case 0:
-		long l_mem ;
-	    case 1:
-		struct Foo {
-		    double d_mem ;
-		    BarSeq nested ;
-		} s_mem ;
-	} ;
+        // multiple level
+        union Bar ;
+        typedef sequence<Bar> BarSeq ;
+        union Bar switch(long) {
+            case 0:
+                long l_mem ;
+            case 1:
+                struct Foo {
+                    double d_mem ;
+                    BarSeq nested ;
+                } s_mem ;
+        } ;
 
-	struct MoreFoo ;
+        struct MoreFoo ;
 
-	typedef sequence<MoreFoo> MoreFooSeq ;
-	typedef sequence<MoreFooSeq> MoreFooTree ;
+        typedef sequence<MoreFoo> MoreFooSeq ;
+        typedef sequence<MoreFooSeq> MoreFooTree ;
 
-	struct MoreFoo {
-	    long l_mem ;
-	    Sample interf ;
-	    MoreFooSeq chain ;
-	    MoreFooTree tree ;
-	} ;
+        struct MoreFoo {
+            long l_mem ;
+            Sample interf ;
+            MoreFooSeq chain ;
+            MoreFooTree tree ;
+        } ;
 
-	interface Sample {
-	    MoreFooSeq op1() ;
-	    void op2(
-		in MoreFooTree t 
-	    ) ;
-	} ;
+        interface Sample {
+            MoreFooSeq op1() ;
+            void op2(
+                in MoreFooTree t 
+            ) ;
+        } ;
     } ;  
 } ;  

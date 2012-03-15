@@ -46,9 +46,9 @@ import java.rmi.Remote ;
 import java.rmi.RemoteException ;
 import javax.rmi.PortableRemoteObject ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.logging.UtilSystemException ;
+import com.sun.corba.ee.spi.logging.UtilSystemException ;
 
 import corba.misc.BuckPasserAL  ;
 import corba.misc.BuckPasserV  ;
@@ -87,19 +87,19 @@ public class EchoImpl extends PortableRemoteObject implements Echo {
     }
 
     public EchoImpl( String name ) throws RemoteException {
-	this.name = name ;
+        this.name = name ;
     }
 
     public String sayHello( Object obj ) throws RemoteException {
-	return "Hello " + obj ;
+        return "Hello " + obj ;
     }
 
     public Echo say( Echo echo ) {
-	return echo ;
+        return echo ;
     }
 
     public String name() {
-	return name ;
+        return name ;
     }
 
     public Object testExceptionContext() throws RemoteException {
@@ -111,11 +111,11 @@ public class EchoImpl extends PortableRemoteObject implements Echo {
     }
 
     public int[] echo( int[] arg ) {
-	return arg ;
+        return arg ;
     }
 
     public Object echo( Object arg ) {
-	return arg ;
+        return arg ;
     }
 
     public BuckPasserAL echo( BuckPasserAL arg ) {

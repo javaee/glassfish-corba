@@ -38,17 +38,17 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.protocol;
+package com.sun.corba.ee.spi.protocol;
 
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.portable.UnknownException;
 
-import com.sun.corba.se.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.IOR ;
 
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.LocateRequestMessage;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateRequestMessage;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.RequestMessage;
 
 /**
  * @author Harold Carr
@@ -56,10 +56,10 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
 public abstract interface ProtocolHandler
 {
     public void handleRequest(RequestMessage header, 
-			      MessageMediator messageMediator);
+                              MessageMediator messageMediator);
 
     public void handleRequest(LocateRequestMessage header, 
-			      MessageMediator messageMediator);
+                              MessageMediator messageMediator);
 
     public MessageMediator createResponse(
         MessageMediator messageMediator,
@@ -73,16 +73,16 @@ public abstract interface ProtocolHandler
     public MessageMediator createSystemExceptionResponse(
         MessageMediator messageMediator,
         SystemException ex,
-	ServiceContexts svc);
+        ServiceContexts svc);
     public MessageMediator createLocationForward(
         MessageMediator messageMediator,
         IOR ior, 
-	ServiceContexts svc);
+        ServiceContexts svc);
 
     public void handleThrowableDuringServerDispatch( 
         MessageMediator request,
-	Throwable exception,
-	CompletionStatus completionStatus);
+        Throwable exception,
+        CompletionStatus completionStatus);
 
     public boolean handleRequest(MessageMediator messageMediator);
 

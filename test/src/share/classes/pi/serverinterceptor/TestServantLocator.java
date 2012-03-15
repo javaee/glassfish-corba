@@ -69,36 +69,36 @@ public class TestServantLocator
      * Creates the servant locator.
      */
     public TestServantLocator( PrintStream out, ORB orb, 
-			       org.omg.CORBA.Object helloRefForward ) 
+                               org.omg.CORBA.Object helloRefForward ) 
     {
-	this.out = out;
-	this.orb = orb;
-	this.helloRefForward = helloRefForward;
-	this.firstTime = true;
+        this.out = out;
+        this.orb = orb;
+        this.helloRefForward = helloRefForward;
+        this.firstTime = true;
     } 
 
     public Servant preinvoke(byte[] oid, POA adapter, String operation,
                              CookieHolder the_cookie)
         throws org.omg.PortableServer.ForwardRequest
     {
-	out.println( "    - TestServantLocator.preinvoke called." );
-	if( firstTime ) {
-	    firstTime = false;
-	    out.println( "    - First time - raising ForwardRequest." );
-	    throw new org.omg.PortableServer.ForwardRequest( helloRefForward );
-	}
+        out.println( "    - TestServantLocator.preinvoke called." );
+        if( firstTime ) {
+            firstTime = false;
+            out.println( "    - First time - raising ForwardRequest." );
+            throw new org.omg.PortableServer.ForwardRequest( helloRefForward );
+        }
 
-	return new helloServant( out, "[Hello2]" );
+        return new helloServant( out, "[Hello2]" );
     }
 
     public void postinvoke(byte[] oid, POA adapter, String operation,
                            java.lang.Object cookie, Servant servant)
     {
-	out.println( "    - TestServantLocator.postinvoke called." );
+        out.println( "    - TestServantLocator.postinvoke called." );
     }
 
     void resetFirstTime() {
-	this.firstTime = true;
+        this.firstTime = true;
     }
 
 }

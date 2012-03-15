@@ -83,9 +83,9 @@ public class ObjectByValue implements java.io.Serializable {
         if (right instanceof ObjectByValue) {
             ObjectByValue other = (ObjectByValue)right;
             return  value1 == other.value1 &&
-		value2 == other.value2 &&
-		str1.equals(other.str1) &&
-		str2.equals(other.str2);
+                value2 == other.value2 &&
+                str1.equals(other.str1) &&
+                str2.equals(other.str2);
         } else {
             return false;
         }

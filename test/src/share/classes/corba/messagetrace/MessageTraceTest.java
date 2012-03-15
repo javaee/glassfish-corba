@@ -43,9 +43,9 @@ package corba.messagetrace;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class MessageTraceTest extends CORBATest
 {
@@ -55,15 +55,15 @@ public class MessageTraceTest extends CORBATest
             return;
         }
 
-	Controller client = createClient( "corba.messagetrace.Client" ) ;
+        Controller client = createClient( "corba.messagetrace.Client" ) ;
 
-	client.start();
+        client.start();
 
-	// Wait for the client to finish for up to 1 minute, then
-	// throw an exception.
-	client.waitFor(120000);
+        // Wait for the client to finish for up to 1 minute, then
+        // throw an exception.
+        client.waitFor(120000);
 
-	// Make sure all the processes are shut down.
-	client.stop();
+        // Make sure all the processes are shut down.
+        client.stop();
     }
 }

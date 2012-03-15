@@ -38,16 +38,16 @@
  * holder.
  */
 
-package com.sun.corba.se.internal.iiop;
+package com.sun.corba.ee.internal.iiop;
 
 /** 
  * Deprecated class for backward compatibility.
  */
-public class ORB extends /* 1.4 value: com.sun.corba.se.internal.corba.ORB */
-                           com.sun.corba.se.impl.orb.ORBImpl
+public class ORB extends /* 1.4 value: com.sun.corba.ee.internal.corba.ORB */
+                           com.sun.corba.ee.impl.orb.ORBImpl
 {
     public ORB() 
     {
-	super();
+        super();
     }
 } // Class ORB

@@ -42,18 +42,18 @@
 // Last Modified : 2005 Aug 09 (Tue) 16:31:38 by Harold Carr.
 //
 
-package com.sun.corba.se.impl.folb;
+package com.sun.corba.ee.impl.folb;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
+import com.sun.corba.ee.spi.folb.ClusterInstanceInfo;
 
-import com.sun.corba.se.spi.trace.Folb ;
+import com.sun.corba.ee.spi.trace.Folb ;
 
-import com.sun.corba.se.spi.folb.GroupInfoService;
-import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
+import com.sun.corba.ee.spi.folb.GroupInfoService;
+import com.sun.corba.ee.spi.folb.GroupInfoServiceObserver;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
@@ -65,11 +65,11 @@ public abstract class GroupInfoServiceBase
     implements GroupInfoService
 {
     private List<GroupInfoServiceObserver> observers =
-	new LinkedList<GroupInfoServiceObserver>();
+        new LinkedList<GroupInfoServiceObserver>();
 
     @Folb
     public boolean addObserver(GroupInfoServiceObserver x) {
-	return observers.add(x);
+        return observers.add(x);
     }
 
     @InfoMethod
@@ -77,10 +77,10 @@ public abstract class GroupInfoServiceBase
 
     @Folb
     public void notifyObservers() {
-	for (GroupInfoServiceObserver observer : observers) {
+        for (GroupInfoServiceObserver observer : observers) {
             observerInfo( observer ) ;
-	    observer.membershipChange();
-	}
+            observer.membershipChange();
+        }
     }
 
     @Folb

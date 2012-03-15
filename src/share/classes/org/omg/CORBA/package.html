@@ -471,11 +471,11 @@ like this:
 <P>
 <PRE>
         // create and initialize the ORB
-	ORB orb = ORB.init(args, null);
+        ORB orb = ORB.init(args, null);
 
         // get the root naming context
         org.omg.CORBA.Object objRef = 
-	    orb.resolve_initial_references("NameService");
+            orb.resolve_initial_references("NameService");
         // Use NamingContextExt instead of NamingContext. This is 
         // part of latest Inter-Operable naming Service.  
         NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
@@ -907,19 +907,19 @@ extensions and products.
 <tt>NO_IMPLEMENT</tt> exceptions for various reasons.  Among these reasons
 are:
 <P>
-	<UL>
-	<LI>In some cases, for example <tt>LocalObject</tt>, the complete
-	implementation according to the specification indicates that 
-	these API should throw <tt>NO_IMPLEMENT</tt>.
-	<P>
-	<LI>In most cases, for example methods in <tt>ORB.java</tt>, 
-	methods that throw  
-	<tt>NO_IMPLEMENT</tt> are actually implemented in subclasses
-	elsewhere in the ORB code.
-	<P>
-	<LI>In some cases, for example <tt>_get_interface_def()</tt> 
-	and <tt>_get_interface</tt>, API are really not yet implemented.
-	</UL>
+        <UL>
+        <LI>In some cases, for example <tt>LocalObject</tt>, the complete
+        implementation according to the specification indicates that 
+        these API should throw <tt>NO_IMPLEMENT</tt>.
+        <P>
+        <LI>In most cases, for example methods in <tt>ORB.java</tt>, 
+        methods that throw  
+        <tt>NO_IMPLEMENT</tt> are actually implemented in subclasses
+        elsewhere in the ORB code.
+        <P>
+        <LI>In some cases, for example <tt>_get_interface_def()</tt> 
+        and <tt>_get_interface</tt>, API are really not yet implemented.
+        </UL>
 
 
 

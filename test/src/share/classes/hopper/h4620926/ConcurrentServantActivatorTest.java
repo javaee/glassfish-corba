@@ -58,19 +58,19 @@ public class ConcurrentServantActivatorTest extends CORBATest
     // should have this.
     protected void doTest() throws Throwable
     {
-	Options.addIDLCompilerArgs( "-fall" ) ;
-	Options.setIDLFiles( idlFiles ) ;
+        Options.addIDLCompilerArgs( "-fall" ) ;
+        Options.setIDLFiles( idlFiles ) ;
         Options.setJavaFiles(javaFiles);
 
         // Run the compilers.
-	compileIDLFiles() ;
+        compileIDLFiles() ;
         compileJavaFiles();
 
-	Controller orbd = createORBD() ;
-	orbd.start() ;
+        Controller orbd = createORBD() ;
+        orbd.start() ;
 
-	Controller server = createServer( "hopper.h4620926.Server" ) ;
-	server.start() ;
+        Controller server = createServer( "hopper.h4620926.Server" ) ;
+        server.start() ;
 
         Controller client = createClient("hopper.h4620926.Client");
         client.start();
@@ -81,8 +81,8 @@ public class ConcurrentServantActivatorTest extends CORBATest
 
         // Make sure all the processes are shut down.
         client.stop();
-	server.stop() ;
-	orbd.stop() ;
+        server.stop() ;
+        orbd.stop() ;
     }
 }
 

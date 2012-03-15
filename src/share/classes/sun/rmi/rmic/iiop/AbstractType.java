@@ -60,8 +60,8 @@ import sun.tools.java.ClassDefinition;
  * <p>
  * The static forAbstract(...) method must be used to obtain an instance, and will
  * return null if the ClassDefinition is non-conforming.
- * @version	1.0, 2/25/98
- * @author	Bryan Atsatt
+ * @version     1.0, 2/25/98
+ * @author      Bryan Atsatt
  */
 public class AbstractType extends RemoteType {
 
@@ -77,51 +77,51 @@ public class AbstractType extends RemoteType {
      * supplied BatchEnvironment.
      */
     public static AbstractType forAbstract(ClassDefinition classDef,
-					   ContextStack stack,
-					   boolean quiet)
+                                           ContextStack stack,
+                                           boolean quiet)
     {
-    	boolean doPop = false;
-	AbstractType result = null;
-	    
-    	try {
-	
-	    // Do we already have it?
-			
-	    sun.tools.java.Type theType = classDef.getType();		
-	    Type existing = getType(theType,stack);
-			
-	    if (existing != null) {
-				
-		if (!(existing instanceof AbstractType)) return null; // False hit.
-				
-				// Yep, so return it...
-				
-		return (AbstractType) existing;
-				
-	    }
-	    	
-	    // Could this be an abstract?
-	    	
-	    if (couldBeAbstract(stack,classDef,quiet)) {
-    	    	
-    	    	// Yes, so try it...
-    	    	
-    	    	AbstractType it = new AbstractType(stack, classDef);
-    	    	putType(theType,it,stack);
-    	    	stack.push(it);
-    	    	doPop = true;
-        	
-    	    	if (it.initialize(quiet,stack)) {
-    	    	    stack.pop(true);
-    	    	    result = it;
-    	    	} else {
-		    removeType(theType,stack);
-    	    	    stack.pop(false);
-    	    	}
-    	    }
-    	} catch (CompilerError e) {
-    	    if (doPop) stack.pop(false);
-    	}
+        boolean doPop = false;
+        AbstractType result = null;
+            
+        try {
+        
+            // Do we already have it?
+                        
+            sun.tools.java.Type theType = classDef.getType();           
+            Type existing = getType(theType,stack);
+                        
+            if (existing != null) {
+                                
+                if (!(existing instanceof AbstractType)) return null; // False hit.
+                                
+                                // Yep, so return it...
+                                
+                return (AbstractType) existing;
+                                
+            }
+                
+            // Could this be an abstract?
+                
+            if (couldBeAbstract(stack,classDef,quiet)) {
+                
+                // Yes, so try it...
+                
+                AbstractType it = new AbstractType(stack, classDef);
+                putType(theType,it,stack);
+                stack.push(it);
+                doPop = true;
+                
+                if (it.initialize(quiet,stack)) {
+                    stack.pop(true);
+                    result = it;
+                } else {
+                    removeType(theType,stack);
+                    stack.pop(false);
+                }
+            }
+        } catch (CompilerError e) {
+            if (doPop) stack.pop(false);
+        }
         
         return result;
     }
@@ -130,7 +130,7 @@ public class AbstractType extends RemoteType {
      * Return a string describing this type.
      */
     public String getTypeDescription () {
-	return "Abstract interface";
+        return "Abstract interface";
     }
 
     //_____________________________________________________________________
@@ -142,7 +142,7 @@ public class AbstractType extends RemoteType {
      * object is not yet completely initialized.
      */
     private AbstractType(ContextStack stack, ClassDefinition classDef) {
-	super(stack,classDef,TYPE_ABSTRACT | TM_INTERFACE | TM_COMPOUND);
+        super(stack,classDef,TYPE_ABSTRACT | TM_INTERFACE | TM_COMPOUND);
     }
 
     //_____________________________________________________________________
@@ -151,8 +151,8 @@ public class AbstractType extends RemoteType {
 
     
     private static boolean couldBeAbstract(ContextStack stack, ClassDefinition classDef,
-					   boolean quiet) {
-			
+                                           boolean quiet) {
+                        
         // Return true if interface and not remote...
 
         boolean result = false;
@@ -163,9 +163,9 @@ public class AbstractType extends RemoteType {
             try {
                 result = ! env.defRemote.implementedBy(env, classDef.getClassDeclaration());
                 if (!result) failedConstraint(15,quiet,stack,classDef.getName());
-	    } catch (ClassNotFound e) {
-		classNotFound(stack,e);
-	    }
+            } catch (ClassNotFound e) {
+                classNotFound(stack,e);
+            }
         } else {
             failedConstraint(14,quiet,stack,classDef.getName());
         }
@@ -180,44 +180,44 @@ public class AbstractType extends RemoteType {
      */
     private boolean initialize (boolean quiet,ContextStack stack) {
 
-    	boolean result = false;
-	ClassDefinition self = getClassDefinition();
-		
-	try {
-			
+        boolean result = false;
+        ClassDefinition self = getClassDefinition();
+                
+        try {
+                        
             // Get methods...
-	        
-	    Vector directMethods = new Vector();
+                
+            Vector directMethods = new Vector();
 
             if (addAllMethods(self,directMethods,true,quiet,stack) != null) {
 
                 // Do we have any methods?
 
-		boolean validMethods = true;
+                boolean validMethods = true;
                 
                 if (directMethods.size() > 0) {
                     
-			        // Yes. Walk 'em, ensuring each is a valid remote method...
-			        
-		    for (int i = 0; i < directMethods.size(); i++) {
-			        	
-			if (! isConformingRemoteMethod((Method) directMethods.elementAt(i),true)) {
-			    validMethods = false;
-			}
-		    }
-		}
-				
-		if (validMethods) {
+                                // Yes. Walk 'em, ensuring each is a valid remote method...
+                                
+                    for (int i = 0; i < directMethods.size(); i++) {
+                                        
+                        if (! isConformingRemoteMethod((Method) directMethods.elementAt(i),true)) {
+                            validMethods = false;
+                        }
+                    }
+                }
+                                
+                if (validMethods) {
 
-		    // We're ok, so pass 'em up...
+                    // We're ok, so pass 'em up...
 
-		    result = initialize(null,directMethods,null,stack,quiet);
-		}
-	    }
-	} catch (ClassNotFound e) {
+                    result = initialize(null,directMethods,null,stack,quiet);
+                }
+            }
+        } catch (ClassNotFound e) {
             classNotFound(stack,e);
-	}
+        }
 
-	return result;
+        return result;
     }
 }

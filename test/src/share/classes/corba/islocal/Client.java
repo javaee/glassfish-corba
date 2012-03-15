@@ -51,7 +51,7 @@ import corba.framework.Controller;
 import corba.hcks.C;
 import corba.hcks.U;
 
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter ;
 
 public class Client 
 {
@@ -77,74 +77,74 @@ public class Client
     public static void main(String[] av)
     {
         try {
-	    U.sop(main + " starting");
+            U.sop(main + " starting");
 
-	    if (! ColocatedClientServer.isColocated) {
-		U.sop(main + " : creating ORB.");
-		orb = ORB.init(av, null);
-		U.sop(main + " : creating InitialContext.");
-		initialContext = C.createInitialContext(orb);
-	    }
+            if (! ColocatedClientServer.isColocated) {
+                U.sop(main + " : creating ORB.");
+                orb = ORB.init(av, null);
+                U.sop(main + " : creating InitialContext.");
+                initialContext = C.createInitialContext(orb);
+            }
 
-	    idlIConnect = idlIHelper.narrow(U.resolve(Server.idlIConnect,orb));
-	    idlIPOA     = idlIHelper.narrow(U.resolve(Server.idlIPOA,    orb));
+            idlIConnect = idlIHelper.narrow(U.resolve(Server.idlIConnect,orb));
+            idlIPOA     = idlIHelper.narrow(U.resolve(Server.idlIPOA,    orb));
 
-	    rmiiIConnect = (rmiiI)
-		U.lookupAndNarrow(Server.rmiiIConnect,
-				  rmiiI.class, initialContext);
+            rmiiIConnect = (rmiiI)
+                U.lookupAndNarrow(Server.rmiiIConnect,
+                                  rmiiI.class, initialContext);
 
-	    /*
-	    rmiiIPOA = (rmiiI)
-		U.lookupAndNarrow(C.rmiiSL, rmiiI.class, initialContext);
-	    */
+            /*
+            rmiiIPOA = (rmiiI)
+                U.lookupAndNarrow(C.rmiiSL, rmiiI.class, initialContext);
+            */
 
 
-	    U.sop("-----------isLocal-------------");
+            U.sop("-----------isLocal-------------");
 
-	    boolean is_local_result = StubAdapter.isLocal( rmiiIConnect ) ;
-	    U.sop("is_local: " + is_local_result);
-	    if (is_local_result != ColocatedClientServer.isColocated) {
-		    errors++;
-		    U.sop("!!! is_local value incorrect !!!");
-	    }
+            boolean is_local_result = StubAdapter.isLocal( rmiiIConnect ) ;
+            U.sop("is_local: " + is_local_result);
+            if (is_local_result != ColocatedClientServer.isColocated) {
+                    errors++;
+                    U.sop("!!! is_local value incorrect !!!");
+            }
 
-	    /* REVISIT - you cannot call StubAdapter.isLocal outside of stub.
-	       It HAS state.
-	    boolean isLocalResult = 
-		StubAdapter.isLocal((javax.rmi.CORBA.Stub)rmiiIConnect);
-	    U.sop("StubAdapter.isLocal: " + isLocalResult);
-	    if (isLocalResult != ColocatedClientServer.isColocated) {
-		    errors++;
-		    U.sop("!!! StubAdapter.isLocal value incorrect !!!");
-	    }
-	    */
+            /* REVISIT - you cannot call StubAdapter.isLocal outside of stub.
+               It HAS state.
+            boolean isLocalResult = 
+                StubAdapter.isLocal((javax.rmi.CORBA.Stub)rmiiIConnect);
+            U.sop("StubAdapter.isLocal: " + isLocalResult);
+            if (isLocalResult != ColocatedClientServer.isColocated) {
+                    errors++;
+                    U.sop("!!! StubAdapter.isLocal value incorrect !!!");
+            }
+            */
 
-	    U.sop("-----------calls-------------");
+            U.sop("-----------calls-------------");
 
-	    if (ColocatedClientServer.isColocated) {
-		clientThread = Thread.currentThread();
-	    }
+            if (ColocatedClientServer.isColocated) {
+                clientThread = Thread.currentThread();
+            }
 
-	    U.sop("CLIENT: " + idlIConnect.o(idlIConnectArg));
-	    U.sop("CLIENT: " + idlIPOA.o(idlIPOAArg));
-	    U.sop("CLIENT: " + rmiiIConnect.m(rmiiIConnectArg));
-	    /*
-	    U.sop("CLIENT: " + rmiiIPOA.m(rmiiIPOAArg));
-	    */
+            U.sop("CLIENT: " + idlIConnect.o(idlIConnectArg));
+            U.sop("CLIENT: " + idlIPOA.o(idlIPOAArg));
+            U.sop("CLIENT: " + rmiiIConnect.m(rmiiIConnectArg));
+            /*
+            U.sop("CLIENT: " + rmiiIPOA.m(rmiiIPOAArg));
+            */
 
-	    orb.shutdown(true);
+            orb.shutdown(true);
 
-	    if (errors != 0) {
-		U.sop("!!! Errors found !!!");
-		System.exit(1);
-	    }
+            if (errors != 0) {
+                U.sop("!!! Errors found !!!");
+                System.exit(1);
+            }
 
         } catch (Exception e) {
             U.sopUnexpectedException(main + " : ", e);
-	    System.exit(1);
+            System.exit(1);
         }
-	U.sop(main + " ending successfully");
-	System.exit(Controller.SUCCESS);
+        U.sop(main + " ending successfully");
+        System.exit(Controller.SUCCESS);
     }
 }
 

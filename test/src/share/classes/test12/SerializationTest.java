@@ -58,16 +58,16 @@ public class SerializationTest extends test.Test {
 
         try {        
             helper.start( "test1" ) ;
-	    Properties props = new Properties() ;
-	    props.put( "org.omg.CORBA.ORBClass", "com.sun.corba.se.impl.orb.ORBImpl" ) ;
+            Properties props = new Properties() ;
+            props.put( "org.omg.CORBA.ORBClass", "com.sun.corba.ee.impl.orb.ORBImpl" ) ;
             org.omg.CORBA.ORB orb = 
-		org.omg.CORBA.ORB.init(getArgsAsArgs(),props);
+                org.omg.CORBA.ORB.init(getArgsAsArgs(),props);
             org.omg.CORBA_2_3.portable.OutputStream sos =
                 (org.omg.CORBA_2_3.portable.OutputStream)orb.create_output_stream();
 
 
-	    ARectangle rect = new ARectangle(1,3,5,7);
-	    sos.write_value(rect);
+            ARectangle rect = new ARectangle(1,3,5,7);
+            sos.write_value(rect);
 
             /***************************************************************/
             /*********************** READ DATA BACK IN *********************/
@@ -76,9 +76,9 @@ public class SerializationTest extends test.Test {
             org.omg.CORBA_2_3.portable.InputStream sis = 
                 (org.omg.CORBA_2_3.portable.InputStream)sos.create_input_stream();
 
-	    ARectangle _rect = (ARectangle)sis.read_value();
-	    if (!rect.equals(_rect))
-		throw new Error("ARectangle test failed!");
+            ARectangle _rect = (ARectangle)sis.read_value();
+            if (!rect.equals(_rect))
+                throw new Error("ARectangle test failed!");
 
             helper.pass() ;
         } catch(Throwable e) {

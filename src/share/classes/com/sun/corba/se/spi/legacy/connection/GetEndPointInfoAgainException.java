@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.legacy.connection;
+package com.sun.corba.ee.spi.legacy.connection;
 
-import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.transport.SocketInfo;
 
 /**
  * This exception is raised by <code>ORBSocketFactory.createSocket</code>.

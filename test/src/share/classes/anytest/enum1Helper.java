@@ -45,34 +45,34 @@ public class enum1Helper {
     private enum1Helper() { }
 
     public static void write(org.omg.CORBA.portable.OutputStream out, enum1 that)  {
-	out.write_long(that.value());
+        out.write_long(that.value());
     }
     public static enum1 read(org.omg.CORBA.portable.InputStream in)  {
-	return enum1.from_int(in.read_long());
+        return enum1.from_int(in.read_long());
     }
     public static enum1 extract(org.omg.CORBA.Any a) {
-	org.omg.CORBA.portable.InputStream in = a.create_input_stream();
-	return read(in);
+        org.omg.CORBA.portable.InputStream in = a.create_input_stream();
+        return read(in);
     }
     public static void insert(org.omg.CORBA.Any a, enum1 that) {
-	org.omg.CORBA.portable.OutputStream out = a.create_output_stream();
-	write(out, that);
-	a.read_value(out.create_input_stream(), type());
+        org.omg.CORBA.portable.OutputStream out = a.create_output_stream();
+        write(out, that);
+        a.read_value(out.create_input_stream(), type());
     }
     private static org.omg.CORBA.TypeCode _tc;
     private static final int _memberCount = 4;
     private static String[] _members = {
-	"zeroth",
-	"first",
-	"second",
-	"third"
+        "zeroth",
+        "first",
+        "second",
+        "third"
     };
     synchronized public static org.omg.CORBA.TypeCode type() {
-	if (_tc == null)
-	    _tc = org.omg.CORBA.ORB.init().create_enum_tc(id(), "enum1", _members);
-	return _tc;
+        if (_tc == null)
+            _tc = org.omg.CORBA.ORB.init().create_enum_tc(id(), "enum1", _members);
+        return _tc;
     }
     public static String id() {
-	return "IDL:anytest/enum1:1.0";
+        return "IDL:anytest/enum1:1.0";
     }
 }

@@ -53,8 +53,8 @@ module serviceexample
 
         oneway void         arbitraryOperation2 ( in long a1 );
 
-	       void         arbitraryOperation3 ( in string a1 )
-	                        raises (ArbitraryObjectException);
+               void         arbitraryOperation3 ( in string a1 )
+                                raises (ArbitraryObjectException);
     };
 
 
@@ -63,7 +63,7 @@ module serviceexample
 
     interface LoggingService
     {
-	void log ( in string a1 );
+        void log ( in string a1 );
     };
 
     // This would also typically be in a file of its own.
@@ -73,9 +73,9 @@ module serviceexample
     // REVISIT: local
     /*local*/ interface AService
     {
-	void begin();
-	void end();
-	void verify();
+        void begin();
+        void end();
+        void verify();
     };
 
     // Tagged component for adding to an IOR to indicate that

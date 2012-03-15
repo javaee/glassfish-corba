@@ -40,7 +40,7 @@
 
 package corba.requestpartitioning;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
 public class TesterImpl extends TesterPOA
 {
@@ -52,25 +52,25 @@ public class TesterImpl extends TesterPOA
 
     // return the thread pool where request was executed
     public int getThreadPoolIdForThisRequest(String theString) {
-	int result;
+        int result;
 
-	// Get the current thread's name, parse the thread id.
-	// Thread's name looks like  "p: xx; w: yy"
+        // Get the current thread's name, parse the thread id.
+        // Thread's name looks like  "p: xx; w: yy"
         //        parsing indexes --- 0123456789
 
-	String threadName = Thread.currentThread().getName();
-	String tmpStr = null;
-	if (threadName.charAt(5) == ';') {
+        String threadName = Thread.currentThread().getName();
+        String tmpStr = null;
+        if (threadName.charAt(5) == ';') {
             // double digit thread id
-	    tmpStr = threadName.substring(3,5);
+            tmpStr = threadName.substring(3,5);
         }
-	else {
+        else {
             // single digit thread id
-	    tmpStr = threadName.substring(3,4);
+            tmpStr = threadName.substring(3,4);
         }
 
-	result = Integer.valueOf(tmpStr).intValue();
+        result = Integer.valueOf(tmpStr).intValue();
 
-	return result;
+        return result;
     }
 }

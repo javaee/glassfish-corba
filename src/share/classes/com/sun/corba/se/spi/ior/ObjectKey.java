@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior;
+package com.sun.corba.ee.spi.ior;
 
-import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
+import com.sun.corba.ee.spi.protocol.ServerRequestDispatcher ;
 
 /** The full object key, which is contained in an IIOPProfile.
 * The object identifier corresponds to the information passed into

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.protocol;
+package com.sun.corba.ee.spi.protocol;
 
 import java.io.Closeable ;
 
@@ -55,12 +55,12 @@ import org.omg.CORBA.PolicyError ;
 
 import org.omg.CORBA.portable.RemarshalException;
 
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
+import com.sun.corba.ee.spi.oa.ObjectAdapter ;
 
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
+import com.sun.corba.ee.spi.ior.ObjectKeyTemplate ;
 
-import com.sun.corba.se.impl.corba.RequestImpl ;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage ;
+import com.sun.corba.ee.impl.corba.RequestImpl ;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage ;
 
 /** This interface defines the PI interface that is used to interface the rest of the
  * ORB to the PI implementation.
@@ -96,7 +96,7 @@ public interface PIHandler extends Closeable {
      * and by implication of all object adapters managed by this manager.
      */
     void adapterManagerStateChanged( int managerId,
-	short newState ) ;
+        short newState ) ;
 
     /** Called whenever a state change occurs in an object adapter that
     * was not caused by an adapter manager state change.
@@ -106,7 +106,7 @@ public interface PIHandler extends Closeable {
     * templates.
     */
     void adapterStateChanged( ObjectReferenceTemplate[] templates,
-	short newState ) ;
+        short newState ) ;
 
     /*
      *****************
@@ -255,7 +255,7 @@ public interface PIHandler extends Closeable {
      * we need not introduce a dependency on the POA package.
      */
     void initializeServerPIInfo( MessageMediator request,
-	ObjectAdapter oa, byte[] objectId, ObjectKeyTemplate oktemp ) ;
+        ObjectAdapter oa, byte[] objectId, ObjectKeyTemplate oktemp ) ;
 
     /**
      * Notifies PI of additional information reqired for ServerRequestInfo.
@@ -308,7 +308,7 @@ public interface PIHandler extends Closeable {
     Policy create_policy( int type, Any val ) throws PolicyError ;
 
     void register_interceptor( Interceptor interceptor, int type ) 
-	throws DuplicateName ;
+        throws DuplicateName ;
 
     Current getPICurrent() ;
 

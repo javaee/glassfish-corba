@@ -48,8 +48,8 @@ public class ColocatedCSWithSticky
 {
     public static void main(String[] av)
     {
-	Client.withSticky = true;
-	ColocatedCS.main(av);
+        Client.withSticky = true;
+        ColocatedCS.main(av);
     }
 }
 

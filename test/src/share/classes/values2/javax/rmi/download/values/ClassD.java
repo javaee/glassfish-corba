@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ClassD.java	1.4 99/06/07 */
+/* @(#)ClassD.java      1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -53,16 +53,16 @@ public class ClassD extends ClassA{
     private static final long serialVersionUID = 128456789L;
 
     private int a;
-	
+        
     public ClassD(){
-	a = 7;
+        a = 7;
     }
-	
+        
     public long getTotal(){
-	return  super.getTotal() + a;
+        return  super.getTotal() + a;
     }
 
     public long getOriginalTotal(){
-	return super.getOriginalTotal() + 7;
+        return super.getOriginalTotal() + 7;
     }
 }

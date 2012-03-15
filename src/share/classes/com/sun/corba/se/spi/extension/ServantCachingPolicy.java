@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.extension ;
+package com.sun.corba.ee.spi.extension ;
 
 import org.omg.CORBA.Policy ;
 import org.omg.CORBA.LocalObject ;
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
 /** Policy used to implement servant caching optimization in the POA.
 * Creating a POA with an instance pol of this policy where 
@@ -101,76 +101,76 @@ public class ServantCachingPolicy extends LocalObject implements Policy
     
     public String typeToName()
     {
-	switch (type) {
-	    case FULL_SEMANTICS: 
-		return "FULL" ;
-	    case INFO_ONLY_SEMANTICS: 
-		return "INFO_ONLY" ;
-	    case MINIMAL_SEMANTICS: 
-		return "MINIMAL" ;
-	    default: 
-		return "UNKNOWN(" + type + ")" ;
-	}
+        switch (type) {
+            case FULL_SEMANTICS: 
+                return "FULL" ;
+            case INFO_ONLY_SEMANTICS: 
+                return "INFO_ONLY" ;
+            case MINIMAL_SEMANTICS: 
+                return "MINIMAL" ;
+            default: 
+                return "UNKNOWN(" + type + ")" ;
+        }
     }
 
     public String toString() 
     {
-	return "ServantCachingPolicy[" + typeToName() + "]" ;
+        return "ServantCachingPolicy[" + typeToName() + "]" ;
     }
 
     private ServantCachingPolicy( int type ) 
     {
-	this.type = type ;
+        this.type = type ;
     }
 
     public int getType()
     {
-	return type ;
+        return type ;
     }
 
     /** Return the default servant caching policy.
     */
     public synchronized static ServantCachingPolicy getPolicy()
     {
-	return getFullPolicy() ;
+        return getFullPolicy() ;
     }
 
     public synchronized static ServantCachingPolicy getFullPolicy()
     {
-	if (policy == null)
-	    policy = new ServantCachingPolicy( FULL_SEMANTICS ) ;
+        if (policy == null)
+            policy = new ServantCachingPolicy( FULL_SEMANTICS ) ;
 
-	return policy ;
+        return policy ;
     }
 
     public synchronized static ServantCachingPolicy getInfoOnlyPolicy()
     {
-	if (infoOnlyPolicy == null)
-	    infoOnlyPolicy = new ServantCachingPolicy( INFO_ONLY_SEMANTICS ) ;
+        if (infoOnlyPolicy == null)
+            infoOnlyPolicy = new ServantCachingPolicy( INFO_ONLY_SEMANTICS ) ;
 
-	return infoOnlyPolicy ;
+        return infoOnlyPolicy ;
     }
 
     public synchronized static ServantCachingPolicy getMinimalPolicy()
     {
-	if (minimalPolicy == null)
-	    minimalPolicy = new ServantCachingPolicy( MINIMAL_SEMANTICS ) ;
+        if (minimalPolicy == null)
+            minimalPolicy = new ServantCachingPolicy( MINIMAL_SEMANTICS ) ;
 
-	return minimalPolicy ;
+        return minimalPolicy ;
     }
 
     public int policy_type ()
     {
-	return ORBConstants.SERVANT_CACHING_POLICY ;
+        return ORBConstants.SERVANT_CACHING_POLICY ;
     }
 
     public org.omg.CORBA.Policy copy ()
     {
-	return this ;
+        return this ;
     }
 
     public void destroy ()
     {
-	// NO-OP
+        // NO-OP
     }
 }

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)IsSerializable.java	1.4 99/06/07 */
+/* @(#)IsSerializable.java      1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -51,18 +51,18 @@ package javax.rmi.CORBA.serialization;
 
 public class IsSerializable
     extends NotSerializable implements java.io.Serializable {
-	
+        
     String helloString;
 
     public IsSerializable(){}
 
     public IsSerializable(String mssg){
-	helloString = mssg;
+        helloString = mssg;
     }
 
     public boolean equals(Object o){
-	if (!(o instanceof IsSerializable))
-	    return false;
-	return helloString.equals(((IsSerializable)o).helloString);
+        if (!(o instanceof IsSerializable))
+            return false;
+        return helloString.equals(((IsSerializable)o).helloString);
     }
 }

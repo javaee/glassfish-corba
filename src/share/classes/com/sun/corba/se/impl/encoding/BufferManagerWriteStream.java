@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
 import java.util.EmptyStackException;
@@ -47,21 +47,21 @@ import sun.corba.Bridge;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.portable.RemarshalException;
 
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.spi.transport.Connection;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.ContactInfoListIterator;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.ContactInfoListIterator;
 
-import com.sun.corba.se.impl.encoding.BufferManagerWrite;
-import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.protocol.InvocationInfo;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
+import com.sun.corba.ee.impl.encoding.BufferManagerWrite;
+import com.sun.corba.ee.impl.encoding.ByteBufferWithInfo;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.protocol.InvocationInfo;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage;
 
 /**
  * Streaming buffer manager.
@@ -72,7 +72,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
 
     BufferManagerWriteStream( ORB orb )
     {
-	super(orb) ;
+        super(orb) ;
     }
 
     public boolean sentFragment() {
@@ -92,32 +92,32 @@ public class BufferManagerWriteStream extends BufferManagerWrite
         // Set the fragment's moreFragments field to true
         MessageBase.setFlag(bbwi.getByteBuffer(), Message.MORE_FRAGMENTS_BIT);
 
-	try {
+        try {
             sendFragment(false);
-	} catch (SystemException se) {
-	    // REVISIT: this part similar to 
-	    // CorbaClientRequestDispatchImpl.beginRequest() 
-	    // and CorbaClientRequestDelegate.request()
-	    ContactInfoListIterator itr;
-	    try {
-		itr = getContactInfoListIterator();
-	    } catch (EmptyStackException ese) {
-		// server side, don't reportException
-		throw se;
-	    }
-	    
-	    // bug 6382377: must not lose exception in PI
-	    orb.getPIHandler().invokeClientPIEndingPoint( ReplyMessage.SYSTEM_EXCEPTION, se ) ;
+        } catch (SystemException se) {
+            // REVISIT: this part similar to 
+            // CorbaClientRequestDispatchImpl.beginRequest() 
+            // and CorbaClientRequestDelegate.request()
+            ContactInfoListIterator itr;
+            try {
+                itr = getContactInfoListIterator();
+            } catch (EmptyStackException ese) {
+                // server side, don't reportException
+                throw se;
+            }
+            
+            // bug 6382377: must not lose exception in PI
+            orb.getPIHandler().invokeClientPIEndingPoint( ReplyMessage.SYSTEM_EXCEPTION, se ) ;
 
-	    boolean retry = itr.reportException(null, se);
-	    if (retry) {
-	        Bridge bridge = Bridge.get();
-	        bridge.throwException(new RemarshalException());
-	    } else { 
+            boolean retry = itr.reportException(null, se);
+            if (retry) {
+                Bridge bridge = Bridge.get();
+                bridge.throwException(new RemarshalException());
+            } else { 
                 // re-throw the SystemException
-	        throw se;
-	    }
-	}
+                throw se;
+            }
+        }
 
         // Reuse the old buffer
 
@@ -142,8 +142,8 @@ public class BufferManagerWriteStream extends BufferManagerWrite
     {
         Connection conn = ((CDROutputObject)outputObject).getMessageMediator().getConnection();
 
-	// REVISIT: need an ORB
-	//System.out.println("sendFragment: last?: " + isLastFragment);
+        // REVISIT: need an ORB
+        //System.out.println("sendFragment: last?: " + isLastFragment);
         conn.writeLock();
 
         try {
@@ -181,8 +181,8 @@ public class BufferManagerWriteStream extends BufferManagerWrite
      */
     protected ContactInfoListIterator getContactInfoListIterator()
     {
-	return (ContactInfoListIterator)
-	    ((InvocationInfo)this.orb.getInvocationInfo())
-	        .getContactInfoListIterator();
+        return (ContactInfoListIterator)
+            ((InvocationInfo)this.orb.getInvocationInfo())
+                .getContactInfoListIterator();
     }
 }

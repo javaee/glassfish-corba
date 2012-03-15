@@ -38,13 +38,13 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
 import java.nio.ByteBuffer;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 /*
  * This implements the GIOP 1.1 & 1.2 Message header.
@@ -54,7 +54,7 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
  */
 
 public class Message_1_1
-        extends com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase {
+        extends com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase {
 
     // Constants
     final static int UPPER_THREE_BYTES_OF_INT_MASK = 0xFF;
@@ -90,15 +90,15 @@ public class Message_1_1
     }
 
     public int getType() {
-    	return this.message_type;
+        return this.message_type;
     }
 
     public int getSize() {
-	    return this.message_size;
+            return this.message_size;
     }
 
     public boolean isLittleEndian() {
-    	return ((this.flags & LITTLE_ENDIAN_BIT) == LITTLE_ENDIAN_BIT);
+        return ((this.flags & LITTLE_ENDIAN_BIT) == LITTLE_ENDIAN_BIT);
     }
 
     public boolean moreFragmentsToFollow() {
@@ -111,25 +111,25 @@ public class Message_1_1
     // Add the poolToUse to the upper 6 bits of byte 6 of the GIOP header.
     // this.flags represents byte 6 here.
     public void setThreadPoolToUse(int poolToUse) {
-	// IMPORTANT: Bitwise operations will promote
-	//            byte types to int before performing
-	//            bitwise operations. And, Java
-	//            types are signed.
-	int tmpFlags = poolToUse << 2;
-	tmpFlags &= UPPER_THREE_BYTES_OF_INT_MASK;
-	tmpFlags |= flags;
-	flags = (byte)tmpFlags;
+        // IMPORTANT: Bitwise operations will promote
+        //            byte types to int before performing
+        //            bitwise operations. And, Java
+        //            types are signed.
+        int tmpFlags = poolToUse << 2;
+        tmpFlags &= UPPER_THREE_BYTES_OF_INT_MASK;
+        tmpFlags |= flags;
+        flags = (byte)tmpFlags;
     }
 
-    public void	setSize(ByteBuffer byteBuffer, int size) {
+    public void setSize(ByteBuffer byteBuffer, int size) {
 
-	this.message_size = size;
+        this.message_size = size;
 
         //
-    	// Patch the size field in the header.
-	//
+        // Patch the size field in the header.
+        //
 
-	int patch = size - GIOPMessageHeaderLength;
+        int patch = size - GIOPMessageHeaderLength;
         if (!isLittleEndian()) {
             byteBuffer.put(8,  (byte)((patch >>> 24) & 0xFF));
             byteBuffer.put(9,  (byte)((patch >>> 16) & 0xFF));
@@ -154,11 +154,11 @@ public class Message_1_1
         case GIOPCancelRequest :
         case GIOPCloseConnection :
         case GIOPMessageError :
-	    throw wrapper.fragmentationDisallowed() ;
+            throw wrapper.fragmentationDisallowed() ;
         case GIOPLocateRequest :
         case GIOPLocateReply :
             if (this.GIOP_version.equals(GIOPVersion.V1_1)) {
-		throw wrapper.fragmentationDisallowed() ;
+                throw wrapper.fragmentationDisallowed() ;
             }
             break;
         }
@@ -168,7 +168,7 @@ public class Message_1_1
         // bit is set. Otherwise, raise error
         // too stringent check
         if ( (this.flags & MORE_FRAGMENTS_BIT) != MORE_FRAGMENTS_BIT ) {
-		throw wrapper.fragmentationDisallowed( CompletionStatus.COMPLETED_MAYBE);
+                throw wrapper.fragmentationDisallowed( CompletionStatus.COMPLETED_MAYBE);
         }
         */
         if (this.GIOP_version.equals(GIOPVersion.V1_1)) {
@@ -177,7 +177,7 @@ public class Message_1_1
             return new FragmentMessage_1_2(this);
         }
 
-	throw wrapper.giopVersionError() ;
+        throw wrapper.giopVersionError() ;
     }
 
     // IO methods

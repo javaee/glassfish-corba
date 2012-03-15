@@ -58,42 +58,42 @@ public class Common
     private static final String NameService = "NameService";
 
     public static org.omg.CORBA.Object resolve(String name, ORB orb)
-	throws 
-	    Exception
+        throws 
+            Exception
     {
-	return getNameService(orb).resolve(makeNameComponent(name));
+        return getNameService(orb).resolve(makeNameComponent(name));
     }
 
     public static org.omg.CORBA.Object rebind(String name,
-					      org.omg.CORBA.Object ref,
-					      ORB orb)
-	throws 
-	    Exception
+                                              org.omg.CORBA.Object ref,
+                                              ORB orb)
+        throws 
+            Exception
     {
-	NamingContext nc = getNameService(orb);
-	nc.rebind(makeNameComponent(name), ref);
-	return ref;
+        NamingContext nc = getNameService(orb);
+        nc.rebind(makeNameComponent(name), ref);
+        return ref;
     }
   
     public static NameComponent[] makeNameComponent(String name)
     {
-	Vector result = new Vector();
-	StringTokenizer tokens = new StringTokenizer(name, "/");
-	while (tokens.hasMoreTokens()) {
-	    result.addElement(tokens.nextToken());
-	}
-	NameComponent path[] = new NameComponent[result.size()];
-	for (int i = 0; i < result.size(); ++i) {
-	    path[i] = new NameComponent((String)result.elementAt(i), "");
-	}
-	return path;
+        Vector result = new Vector();
+        StringTokenizer tokens = new StringTokenizer(name, "/");
+        while (tokens.hasMoreTokens()) {
+            result.addElement(tokens.nextToken());
+        }
+        NameComponent path[] = new NameComponent[result.size()];
+        for (int i = 0; i < result.size(); ++i) {
+            path[i] = new NameComponent((String)result.elementAt(i), "");
+        }
+        return path;
     }
 
     public static NamingContext getNameService(ORB orb)
-	throws
-	    Exception
+        throws
+            Exception
     {
-	return NamingContextHelper.narrow(
+        return NamingContextHelper.narrow(
             orb.resolve_initial_references(NameService));
     }
 }

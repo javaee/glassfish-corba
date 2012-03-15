@@ -142,8 +142,8 @@ module CSI {
     // Each element of an authorization token is logically a PAC.
 
     struct AuthorizationElement {
-	AuthorizationElementType   the_type;
-	AuthorizationElementContents   the_element;
+        AuthorizationElementType   the_type;
+        AuthorizationElementContents   the_element;
     };
 
     // The AuthorizationToken is made up of a sequence of 
@@ -165,32 +165,32 @@ module CSI {
     typedef sequence <octet> IdentityExtension;
       
     union IdentityToken switch ( IdentityTokenType ) {
-	case ITTAbsent: boolean absent;
-	case ITTAnonymous: boolean anonymous;
+        case ITTAbsent: boolean absent;
+        case ITTAnonymous: boolean anonymous;
         case ITTPrincipalName: GSS_NT_ExportedName principal_name;
-	case ITTX509CertChain: X509CertificateChain certificate_chain;
-	case ITTDistinguishedName: X501DistinguishedName dn;
-	default: IdentityExtension id;
+        case ITTX509CertChain: X509CertificateChain certificate_chain;
+        case ITTDistinguishedName: X501DistinguishedName dn;
+        default: IdentityExtension id;
     };
 
     struct EstablishContext {
-	ContextId client_context_id;
-	AuthorizationToken authorization_token;
-	IdentityToken identity_token;
-	GSSToken client_authentication_token;
+        ContextId client_context_id;
+        AuthorizationToken authorization_token;
+        IdentityToken identity_token;
+        GSSToken client_authentication_token;
     };
       
     struct CompleteEstablishContext {
-	ContextId client_context_id;
-	boolean context_stateful;
-	GSSToken final_context_token;
+        ContextId client_context_id;
+        boolean context_stateful;
+        GSSToken final_context_token;
     };
 
     struct ContextError {
-	ContextId client_context_id;
-	long major_status;
-	long minor_status;
-	GSSToken error_token;
+        ContextId client_context_id;
+        long major_status;
+        long minor_status;
+        GSSToken error_token;
     };
 
     // Not sent by stateless clients. If received by a stateless server, a
@@ -198,15 +198,15 @@ module CSI {
     // not exist.
       
     struct MessageInContext {
-	ContextId client_context_id;
-	boolean discard_context;
+        ContextId client_context_id;
+        boolean discard_context;
     };
       
     union SASContextBody switch ( MsgType ) {
-	case MTEstablishContext: EstablishContext establish_msg;
-	case MTCompleteEstablishContext: CompleteEstablishContext complete_msg;
-	case MTContextError: ContextError error_msg;
-	case MTMessageInContext: MessageInContext in_context_msg;
+        case MTEstablishContext: EstablishContext establish_msg;
+        case MTCompleteEstablishContext: CompleteEstablishContext complete_msg;
+        case MTContextError: ContextError error_msg;
+        case MTMessageInContext: MessageInContext in_context_msg;
     };
 
     // The following type represents the string representation of an ASN.1

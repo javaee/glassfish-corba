@@ -46,7 +46,7 @@ package corba.hcks;
 
 public class idlValueTypeCImpl
     extends
-	idlValueTypeC
+        idlValueTypeC
 {
     public static final String baseMsg = idlValueTypeCImpl.class.getName();
 
@@ -54,14 +54,14 @@ public class idlValueTypeCImpl
 
     public idlValueTypeCImpl (short a, short b, short c)
     { 
-	this.a = a;
-	this.b = b;
-	this.c = c;
+        this.a = a;
+        this.b = b;
+        this.c = c;
     }
 
     public String toString ()
     {
-	return baseMsg + " " + a + " " + b + " " + c;
+        return baseMsg + " " + a + " " + b + " " + c;
     }
 
     public void marshal(org.omg.CORBA.DataOutputStream out)

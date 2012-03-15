@@ -43,22 +43,22 @@ public class MyApplicationExceptionBase extends Exception
 {
     public MyApplicationExceptionBase( String msg )
     {
-	super( msg ) ;
+        super( msg ) ;
     }
 
     public boolean equals( Object obj )
     {
-	if (this == obj)
-	    return true ;
+        if (this == obj)
+            return true ;
 
-	if (!obj.getClass().equals(getClass()))
-	    return false ;
+        if (!obj.getClass().equals(getClass()))
+            return false ;
 
-	MyApplicationExceptionBase other = (MyApplicationExceptionBase)obj ;
+        MyApplicationExceptionBase other = (MyApplicationExceptionBase)obj ;
 
-	if (getMessage() == null)
-	    return other.getMessage() == null ;
+        if (getMessage() == null)
+            return other.getMessage() == null ;
 
-	return getMessage().equals( other.getMessage() ) ;
+        return getMessage().equals( other.getMessage() ) ;
     }
 }

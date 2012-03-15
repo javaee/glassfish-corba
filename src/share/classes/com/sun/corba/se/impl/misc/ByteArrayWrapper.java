@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.misc;
+package com.sun.corba.ee.impl.misc;
 
 import java.util.Arrays;
 
@@ -55,14 +55,14 @@ public class ByteArrayWrapper {
     }
 
     public boolean equals( Object obj ) {  
-	if (obj == null)
-	    return false ;
+        if (obj == null)
+            return false ;
 
-	if (obj instanceof ByteArrayWrapper) {	 
-	    return Arrays.equals(objKey, ((ByteArrayWrapper)obj).getObjKey());
-	} else {
-	    return false;
-	}
+        if (obj instanceof ByteArrayWrapper) {   
+            return Arrays.equals(objKey, ((ByteArrayWrapper)obj).getObjKey());
+        } else {
+            return false;
+        }
     }
 
     public int hashCode() {

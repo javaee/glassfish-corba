@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)OBVTestObjectCustomImpl.java	1.1 99/06/07 */
+/* @(#)OBVTestObjectCustomImpl.java     1.1 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -89,16 +89,16 @@ public class OBVTestObjectCustomImpl extends OBVTestObjectCustom {
     public boolean equals(Object o)
     {
         try
-	    {
-		OBVTestObjectCustomImpl ctbo = (OBVTestObjectCustomImpl)o;
-		return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) &&
-			(ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && (ctbo.fDouble == fDouble)
-			);
-	    }
+            {
+                OBVTestObjectCustomImpl ctbo = (OBVTestObjectCustomImpl)o;
+                return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) &&
+                        (ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && (ctbo.fDouble == fDouble)
+                        );
+            }
         catch(Exception e)
-	    {
-		return false;
-	    }
+            {
+                return false;
+            }
     }
 
     public String toString()

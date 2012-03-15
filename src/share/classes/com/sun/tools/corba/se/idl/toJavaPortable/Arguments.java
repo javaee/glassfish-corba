@@ -150,21 +150,21 @@ public class Arguments extends com.sun.tools.corba.se.idl.Arguments
           else
             i = collectUnknownArg (args, i, unknownArgs);
         }
-	else if (lcArg.equals ("pkgtranslate"))
-	{
-	  if (i + 2 >= args.length)
-	    throw new InvalidArgument( args[i] ) ;
+        else if (lcArg.equals ("pkgtranslate"))
+        {
+          if (i + 2 >= args.length)
+            throw new InvalidArgument( args[i] ) ;
 
-	  String orig = args[++i] ;
-	  String trans = args[++i] ;
-	  checkPackageNameValid( orig ) ;
-	  checkPackageNameValid( trans ) ;
-	  if (orig.equals( "org" ) || orig.startsWith( "org.omg" ))
-	      throw new InvalidArgument( args[i] ) ;
-	  orig = orig.replace( '.', '/' ) ;
-	  trans = trans.replace( '.', '/' ) ;
-	  packageTranslation.put( orig, trans ) ;
-	}
+          String orig = args[++i] ;
+          String trans = args[++i] ;
+          checkPackageNameValid( orig ) ;
+          checkPackageNameValid( trans ) ;
+          if (orig.equals( "org" ) || orig.startsWith( "org.omg" ))
+              throw new InvalidArgument( args[i] ) ;
+          orig = orig.replace( '.', '/' ) ;
+          trans = trans.replace( '.', '/' ) ;
+          packageTranslation.put( orig, trans ) ;
+        }
         // Package prefix
         else if (lcArg.equals ("pkgprefix"))
         {
@@ -173,8 +173,8 @@ public class Arguments extends com.sun.tools.corba.se.idl.Arguments
 
           String type = args[++i];
           String pkg = args[++i];
-	  checkPackageNameValid( type ) ;
-	  checkPackageNameValid( pkg ) ;
+          checkPackageNameValid( type ) ;
+          checkPackageNameValid( pkg ) ;
           packages.put (type, pkg);
         }
         // Target directory
@@ -203,16 +203,16 @@ public class Arguments extends com.sun.tools.corba.se.idl.Arguments
         else if (lcArg.equals ("oldimplbase")){
             POAServer = false;
         }
-	else if (lcArg.equals("skeletonname")){
+        else if (lcArg.equals("skeletonname")){
           if (i + 1 >= args.length)
             throw new InvalidArgument (args[i]);
           skeletonPattern = args[++i];
-	}
-	else if (lcArg.equals("tiename")){
+        }
+        else if (lcArg.equals("tiename")){
           if (i + 1 >= args.length)
             throw new InvalidArgument (args[i]);
           tiePattern = args[++i];
-	}
+        }
         else if (lcArg.equals("localoptimization")) {
             LocalOptimization = true;
         }
@@ -265,8 +265,8 @@ public class Arguments extends com.sun.tools.corba.se.idl.Arguments
       {
         String type = prop.substring (10);
         String pkg = props.getProperty (prop);
-	checkPackageNameValid( pkg ) ;
-	checkPackageNameValid( type ) ;
+        checkPackageNameValid( pkg ) ;
+        checkPackageNameValid( type ) ;
         packages.put (type, pkg);
       }
     }
@@ -283,25 +283,25 @@ public class Arguments extends com.sun.tools.corba.se.idl.Arguments
   protected void setNameModifiers( String skeletonPattern, 
     String tiePattern ) {
     if (emit>Client) {
-	String tp ;
-	String sp ;
+        String tp ;
+        String sp ;
 
-	if (skeletonPattern != null)
-	    sp = skeletonPattern ;
-	else if (POAServer)
-	    sp = "%POA" ;
-	else 
-	    sp = "_%ImplBase" ;
+        if (skeletonPattern != null)
+            sp = skeletonPattern ;
+        else if (POAServer)
+            sp = "%POA" ;
+        else 
+            sp = "_%ImplBase" ;
 
-	if (tiePattern != null)
-	    tp = tiePattern ;
-	else if (POAServer)
-	    tp = "%POATie" ;
-	else
-	    tp = "%_Tie" ;
+        if (tiePattern != null)
+            tp = tiePattern ;
+        else if (POAServer)
+            tp = "%POATie" ;
+        else
+            tp = "%_Tie" ;
 
-	skeletonNameModifier = new NameModifierImpl( sp ) ;
-	tieNameModifier = new NameModifierImpl( tp ) ;
+        skeletonNameModifier = new NameModifierImpl( sp ) ;
+        tieNameModifier = new NameModifierImpl( tp ) ;
     }
   }
 

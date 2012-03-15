@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.threadpool;
+package com.sun.corba.ee.spi.threadpool;
 
-import com.sun.corba.se.impl.threadpool.ThreadPoolImpl ;
+import com.sun.corba.ee.impl.threadpool.ThreadPoolImpl ;
 
 public class ThreadPoolFactory {
     /** Create an unbounded thread pool in the current thread group
@@ -64,7 +64,7 @@ public class ThreadPoolFactory {
      * ClassLoader.
      */
     public ThreadPool create(ThreadGroup tg, String threadpoolName, 
-	ClassLoader defaultClassLoader) {
+        ClassLoader defaultClassLoader) {
         return new ThreadPoolImpl( tg, threadpoolName, defaultClassLoader ) ;
     }
  
@@ -73,9 +73,9 @@ public class ThreadPoolFactory {
      * ClassLoader.
      */
     public ThreadPool create( int minSize, int maxSize, long timeout, 
-	String threadpoolName) {
+        String threadpoolName) {
 
-	return new ThreadPoolImpl( minSize, maxSize, timeout, threadpoolName ) ;
+        return new ThreadPoolImpl( minSize, maxSize, timeout, threadpoolName ) ;
     }
 
     /** Create a bounded thread pool in the current thread group
@@ -83,7 +83,7 @@ public class ThreadPoolFactory {
      * ClassLoader.
      */
     public ThreadPool create( int minSize, int maxSize, long timeout, 
-	String threadpoolName, ClassLoader defaultClassLoader ) 
+        String threadpoolName, ClassLoader defaultClassLoader ) 
     {
         return new ThreadPoolImpl( minSize, maxSize, timeout,
             threadpoolName, defaultClassLoader ) ;

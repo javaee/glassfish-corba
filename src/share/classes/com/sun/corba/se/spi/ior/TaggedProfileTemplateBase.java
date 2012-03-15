@@ -38,15 +38,15 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior;
+package com.sun.corba.ee.spi.ior;
 
 import java.util.Iterator ;
 
 import org.omg.CORBA_2_3.portable.OutputStream ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.ior.EncapsulationUtility ;
+import com.sun.corba.ee.impl.ior.EncapsulationUtility ;
 
 public abstract class TaggedProfileTemplateBase 
     extends IdentifiableContainerBase<TaggedComponent> 
@@ -54,29 +54,29 @@ public abstract class TaggedProfileTemplateBase
 {   
     public void write( OutputStream os )
     {
-	EncapsulationUtility.writeEncapsulation( this, os ) ;
+        EncapsulationUtility.writeEncapsulation( this, os ) ;
     }
 
     public org.omg.IOP.TaggedComponent[] getIOPComponents( ORB orb, int id )
     {
-	int count = 0 ;
-	Iterator<TaggedComponent> iter = iteratorById( id ) ;
-	while (iter.hasNext()) {
-	    iter.next() ;
-	    count++ ;
-	}
+        int count = 0 ;
+        Iterator<TaggedComponent> iter = iteratorById( id ) ;
+        while (iter.hasNext()) {
+            iter.next() ;
+            count++ ;
+        }
 
-	org.omg.IOP.TaggedComponent[] result = new
-	    org.omg.IOP.TaggedComponent[count] ;
+        org.omg.IOP.TaggedComponent[] result = new
+            org.omg.IOP.TaggedComponent[count] ;
 
-	int index = 0 ;
-	iter = iteratorById( id ) ;
-	while (iter.hasNext()) {
-	    TaggedComponent comp = iter.next() ;
-	    result[index++] = comp.getIOPComponent( orb ) ;
-	}
+        int index = 0 ;
+        iter = iteratorById( id ) ;
+        while (iter.hasNext()) {
+            TaggedComponent comp = iter.next() ;
+            result[index++] = comp.getIOPComponent( orb ) ;
+        }
 
-	return result ;
+        return result ;
     }
 
     public <T extends TaggedComponent> Iterator<T> iteratorById( int id,

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.presentation.rmi ;
+package com.sun.corba.ee.spi.presentation.rmi ;
 
 import java.io.PrintStream ;
 
@@ -55,7 +55,7 @@ import org.glassfish.pfl.basic.proxy.InvocationHandlerFactory;
  * as well as compiled and reflective ties.  There is normally
  * only one instance of this interface per VM.  The instance
  * is obtained from the static method
- * com.sun.corba.se.spi.orb.ORB.getPresentationManager.
+ * com.sun.corba.ee.spi.orb.ORB.getPresentationManager.
  * <p>
  * Note that
  * the getClassData and getDynamicMethodMarshaller methods
@@ -67,45 +67,45 @@ public interface PresentationManager
      */
     public interface StubFactoryFactory
     {
-	/** Return the standard name of a stub (according to the RMI-IIOP specification
-	 * and rmic).  This is needed so that the name of a stub is known for
-	 * standalone clients of the app server.
+        /** Return the standard name of a stub (according to the RMI-IIOP specification
+         * and rmic).  This is needed so that the name of a stub is known for
+         * standalone clients of the app server.
          *
          * @param className name of the class
          * @return the stub name
          */
-	String getStubName( String className ) ;
+        String getStubName( String className ) ;
 
-	/** Create a stub factory for stubs for the interface whose type is given by
-	 * className.  className may identify either an IDL interface or an RMI-IIOP
-	 * interface.  
-	 * @param className The name of the remote interface as a Java class name.
-	 * @param isIDLStub True if className identifies an IDL stub, else false.
-	 * @param remoteCodeBase The CodeBase to use for loading Stub classes, if
-	 * necessary (may be null or unused).
-	 * @param expectedClass The expected stub type (may be null or unused).
+        /** Create a stub factory for stubs for the interface whose type is given by
+         * className.  className may identify either an IDL interface or an RMI-IIOP
+         * interface.  
+         * @param className The name of the remote interface as a Java class name.
+         * @param isIDLStub True if className identifies an IDL stub, else false.
+         * @param remoteCodeBase The CodeBase to use for loading Stub classes, if
+         * necessary (may be null or unused).
+         * @param expectedClass The expected stub type (may be null or unused).
          * @param classLoader The classLoader to use (may be null).
          * @return The stub factory
-	 */
-	PresentationManager.StubFactory createStubFactory( String className, 
-	    boolean isIDLStub, String remoteCodeBase, Class<?> expectedClass,
-	    ClassLoader classLoader);
+         */
+        PresentationManager.StubFactory createStubFactory( String className, 
+            boolean isIDLStub, String remoteCodeBase, Class<?> expectedClass,
+            ClassLoader classLoader);
 
-	/** Return a Tie for the given class.
+        /** Return a Tie for the given class.
          *
          * @param cls class
          * @return The tie corresponding to cls
          */
-	Tie getTie( Class<?> cls ) ;
+        Tie getTie( Class<?> cls ) ;
 
-	/** Return whether or not this StubFactoryFactory creates StubFactory
-	 * instances that create dynamic stubs and ties.  At the top level, 
-	 * true indicates that rmic -iiop is not needed for generating stubs
-	 * or ties.
+        /** Return whether or not this StubFactoryFactory creates StubFactory
+         * instances that create dynamic stubs and ties.  At the top level, 
+         * true indicates that rmic -iiop is not needed for generating stubs
+         * or ties.
          *
          * @return true iff we are using dynamic stubs
          */
-	boolean createsDynamicStubs() ;
+        boolean createsDynamicStubs() ;
     }
 
     /** Creates the actual stub needed for RMI-IIOP remote
@@ -113,59 +113,59 @@ public interface PresentationManager
      */
     public interface StubFactory
     {
-	/** Create a new dynamic stub.  It has the type that was
-	 * used to create this factory.
+        /** Create a new dynamic stub.  It has the type that was
+         * used to create this factory.
          *
          * @return The dynamic stub
          */
-	org.omg.CORBA.Object makeStub() ;
+        org.omg.CORBA.Object makeStub() ;
 
-	/** Return the repository ID information for all Stubs
-	 * created by this stub factory.
+        /** Return the repository ID information for all Stubs
+         * created by this stub factory.
          *
          * @return Array of type ids, most derived type first.
          */
-	String[] getTypeIds() ;
+        String[] getTypeIds() ;
     }
 
     public interface ClassData 
     {
-	/** Get the class used to create this ClassData instance
+        /** Get the class used to create this ClassData instance
          *
          * @return Class of this ClassData.
          */
-	Class<?> getMyClass() ;
+        Class<?> getMyClass() ;
 
-	/** Get the IDLNameTranslator for the class used to create
-	 * this ClassData instance.
+        /** Get the IDLNameTranslator for the class used to create
+         * this ClassData instance.
          *
          * @return IDLNameTranslator for the class of this ClassData
          */
-	IDLNameTranslator getIDLNameTranslator() ;
+        IDLNameTranslator getIDLNameTranslator() ;
 
-	/** Return the array of repository IDs for all of the remote
-	 * interfaces implemented by this class.
+        /** Return the array of repository IDs for all of the remote
+         * interfaces implemented by this class.
          *
          * @return The typeids, most derived first.
          */
-	String[] getTypeIds() ;
+        String[] getTypeIds() ;
 
-	/** Get the InvocationHandlerFactory that is used to create
-	 * an InvocationHandler for dynamic stubs of the type of the
-	 * ClassData.  
+        /** Get the InvocationHandlerFactory that is used to create
+         * an InvocationHandler for dynamic stubs of the type of the
+         * ClassData.  
          *
          * @return InvocationHandlerFactory.
          */
-	InvocationHandlerFactory getInvocationHandlerFactory() ;
+        InvocationHandlerFactory getInvocationHandlerFactory() ;
 
-	/** Get the dictionary for this ClassData instance.
-	 * This is used to hold class-specific information for a Class
-	 * in the class data.  This avoids the need to create other
-	 * caches for accessing the information.
+        /** Get the dictionary for this ClassData instance.
+         * This is used to hold class-specific information for a Class
+         * in the class data.  This avoids the need to create other
+         * caches for accessing the information.
          *
          * @return the dictionary.
          */
-	Map<String,Object> getDictionary() ;
+        Map<String,Object> getDictionary() ;
     }
 
     /** Get the ClassData for a particular class.
@@ -215,7 +215,7 @@ public interface PresentationManager
      */
     String getRepositoryId( java.rmi.Remote impl ) ;
 
-    /** Returns the value of the com.sun.corba.se.ORBUseDynamicStub
+    /** Returns the value of the com.sun.corba.ee.ORBUseDynamicStub
      * property.
      * @return whether to use dynamic stubs.
      */

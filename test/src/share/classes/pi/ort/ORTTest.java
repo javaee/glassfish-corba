@@ -61,7 +61,7 @@ public class ORTTest extends CORBATest
         // still running even after recievig "Server is Ready" handshake.
         Thread.sleep( 80000 );
       
-	server.stop();
+        server.stop();
 
     }
 }

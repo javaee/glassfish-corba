@@ -65,24 +65,24 @@ public class ID implements Serializable
 
     public ID ()
     {
-	fId = fgNextId++;
+        fId = fgNextId++;
     }
 
     public boolean identifies (Identifiable obj)
     {
-	if ( this.equals (obj.getID()) ) {
-	    return true;
-	} else {
-	    return false;
-	}
+        if ( this.equals (obj.getID()) ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean equals (ID other)
     {
-	if ( fId == other.fId )
-	    return true;
-	else
-	    return false;
+        if ( fId == other.fId )
+            return true;
+        else
+            return false;
     }
 
 }

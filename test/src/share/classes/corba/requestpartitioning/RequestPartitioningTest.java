@@ -49,7 +49,7 @@
 
 package corba.requestpartitioning;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
@@ -57,16 +57,16 @@ import java.util.Properties;
 
 public class RequestPartitioningTest
     extends
-	CORBATest
+        CORBATest
 {
     public static final String thisPackage =
-	RequestPartitioningTest.class.getPackage().getName();
+        RequestPartitioningTest.class.getPackage().getName();
 
     private final static int CLIENT_TIMEOUT = 90000;
 
     protected void doTest()
-	throws
-	    Throwable
+        throws
+            Throwable
     {
         // Run test with DirectByteBuffers
         Controller orbd = createORBD();

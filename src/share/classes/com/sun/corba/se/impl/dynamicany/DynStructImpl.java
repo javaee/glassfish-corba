@@ -38,12 +38,12 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package com.sun.corba.ee.impl.dynamicany;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 import org.omg.DynamicAny.DynStruct;
 
 public class DynStructImpl extends DynAnyComplexImpl implements DynStruct
@@ -74,7 +74,7 @@ public class DynStructImpl extends DynAnyComplexImpl implements DynStruct
     //
     public org.omg.DynamicAny.NameValuePair[] get_members () {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         checkInitComponents();
         return nameValuePairs.clone() ;
@@ -82,7 +82,7 @@ public class DynStructImpl extends DynAnyComplexImpl implements DynStruct
 
     public org.omg.DynamicAny.NameDynAnyPair[] get_members_as_dyn_any () {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         checkInitComponents();
         return nameDynAnyPairs.clone() ;

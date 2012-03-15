@@ -72,41 +72,41 @@ public class ODebugExec extends ExternalExec
 
     protected String[] getDebugVMArgs()
     {
-	String sourcepath = System.getProperty( "com.sun.corba.se.test.sourcepath" ) ;
-	String[] result = { "com.lambda.Debugger.Debugger", "sourcepath", 
-	    sourcepath } ;
+        String sourcepath = System.getProperty( "com.sun.corba.ee.test.sourcepath" ) ;
+        String[] result = { "com.lambda.Debugger.Debugger", "sourcepath", 
+            sourcepath } ;
 
-	return result ;
+        return result ;
     } ;
 
     public int waitFor(long timeout) throws Exception
     {
-	// We don't want to set a timeout while debugging
-	return waitFor() ;
+        // We don't want to set a timeout while debugging
+        return waitFor() ;
     }
 
     public void start() throws Exception
     {
-	System.out.println( "Starting process " + processName + " in remote debug mode" ) ;
-	super.start() ;
-	Object waiter = new Object() ;
-	synchronized (waiter) {
-	    waiter.wait( 5000 ) ;
-	}
+        System.out.println( "Starting process " + processName + " in remote debug mode" ) ;
+        super.start() ;
+        Object waiter = new Object() ;
+        synchronized (waiter) {
+            waiter.wait( 5000 ) ;
+        }
     }
 
     public void stop()
     {
-	// we don't want to stop; just tell the user and let them
-	// tell us when to stop
-	
+        // we don't want to stop; just tell the user and let them
+        // tell us when to stop
+        
         printDebugBreak();
 
         System.out.println("The framework wants to stop the "
                            + processName + " process");
         
-	waitForEnter("Press enter to terminate the process");
+        waitForEnter("Press enter to terminate the process");
 
-	exitValue();
+        exitValue();
     }
 }

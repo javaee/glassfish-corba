@@ -62,35 +62,35 @@ public class StartRMIRegistry {
      * The port number can be specified on the command line.
      */
     public static void main(String args[]) {
-    	// Create and install the security manager
-    	System.setSecurityManager(new RMISecurityManager());
+        // Create and install the security manager
+        System.setSecurityManager(new RMISecurityManager());
 
-    	try {
-    	    int port = Registry.REGISTRY_PORT;
-    	    if (args.length >= 1) {
-		port = Integer.parseInt(args[0]);
-    	    }
-    	    registry = new RegistryImpl(port);
-    	    System.out.println(Util.HANDSHAKE);
+        try {
+            int port = Registry.REGISTRY_PORT;
+            if (args.length >= 1) {
+                port = Integer.parseInt(args[0]);
+            }
+            registry = new RegistryImpl(port);
+            System.out.println(Util.HANDSHAKE);
 
 
-    	    // prevent registry from exiting
-    	    while (true) {
-    		try {
-    		    // The following timeout is used because a bug in the
-    		    // native C code for Thread.sleep() cause it to return
-    		    // immediately for any higher value.
-    		    Thread.sleep(Integer.MAX_VALUE - 1);
-    		} catch (InterruptedException e) {
-    		}
-    	    }
-    	} catch (NumberFormatException e) {
-    	    System.out.println("Port is not a number.");
-    	} catch (Exception e) {
-    	    System.out.println("RegistryImpl.main: an exception occurred: " +
-    			       e.getMessage());
-    	    e.printStackTrace();
-    	}
-    	System.exit(1);
+            // prevent registry from exiting
+            while (true) {
+                try {
+                    // The following timeout is used because a bug in the
+                    // native C code for Thread.sleep() cause it to return
+                    // immediately for any higher value.
+                    Thread.sleep(Integer.MAX_VALUE - 1);
+                } catch (InterruptedException e) {
+                }
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Port is not a number.");
+        } catch (Exception e) {
+            System.out.println("RegistryImpl.main: an exception occurred: " +
+                               e.getMessage());
+            e.printStackTrace();
+        }
+        System.exit(1);
     }
 }

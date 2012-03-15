@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)Kangaroo.java	1.5 99/06/07 */
+/* @(#)Kangaroo.java    1.5 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -54,7 +54,7 @@ package alpha.bravo;
 
 public class Kangaroo extends Wallaby
     implements java.io.Serializable,
-	       java.lang.Cloneable {
+               java.lang.Cloneable {
     private int  length;
     public java.util.Hashtable aHashtable;
     public       Kangaroo( int length ) { }

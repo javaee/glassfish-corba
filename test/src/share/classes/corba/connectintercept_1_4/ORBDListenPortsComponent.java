@@ -46,38 +46,38 @@ package corba.connectintercept_1_4;
 
 import org.omg.CORBA_2_3.portable.OutputStream;
 
-import com.sun.corba.se.spi.ior.TaggedComponentBase;
+import com.sun.corba.ee.spi.ior.TaggedComponentBase;
 
 public class ORBDListenPortsComponent
     extends
-	TaggedComponentBase
+        TaggedComponentBase
 {
     private String listenPorts;
 
     public ORBDListenPortsComponent(String listenPorts)
     {
-	this.listenPorts = listenPorts;
+        this.listenPorts = listenPorts;
     }
 
     public boolean equals(Object o)
     {
-	if (o == null) {
-	    return false;
-	}
-	if (!(o instanceof ORBDListenPortsComponent)) {
-	    return false;
-	}
-	return listenPorts.equals(((ORBDListenPortsComponent)o).listenPorts);
+        if (o == null) {
+            return false;
+        }
+        if (!(o instanceof ORBDListenPortsComponent)) {
+            return false;
+        }
+        return listenPorts.equals(((ORBDListenPortsComponent)o).listenPorts);
     }
 
     public void writeContents(OutputStream os)
     {
-	os.write_string(listenPorts);
+        os.write_string(listenPorts);
     }
 
     public int getId()
     {
-	return Common.ListenPortsComponentID;
+        return Common.ListenPortsComponentID;
     }
 }
 

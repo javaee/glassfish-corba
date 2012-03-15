@@ -159,10 +159,10 @@ abstract public class Servant {
      * on the list returned by <code>_all_interfaces()</code> or is the
      * <code>repository_id</code> for the generic CORBA Object.
      * @param <code>repository_id</code> the <code>repository_id</code>
-     *		to be checked in the repository list or against the id
-     *		of generic CORBA objects.
+     *          to be checked in the repository list or against the id
+     *          of generic CORBA objects.
      * @return <code>is_a</code> boolean indicating whether the specified
-     *		<code>repository_id</code> is
+     *          <code>repository_id</code> is
      *         in the repository list or is same as a generic CORBA
      *         object.
      */
@@ -176,7 +176,7 @@ abstract public class Servant {
      * The <code>Servant</code> provides a default implementation of
      * <code>_non_existent()</code> that can be overridden by derived servants.
      * @return <code>non_existent</code> <code>true</code> if that object does
-     *		 not exist,  <code>false</code> otherwise.
+     *           not exist,  <code>false</code> otherwise.
      */
     public boolean _non_existent() {
         return _get_delegate().non_existent(this);

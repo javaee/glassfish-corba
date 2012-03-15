@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.internal.io;
+package com.sun.corba.ee.internal.io;
 
 public class LibraryManager
 {

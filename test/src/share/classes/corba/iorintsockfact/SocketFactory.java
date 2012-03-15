@@ -48,24 +48,24 @@ import java.util.Iterator;
 
 import org.omg.CORBA.ORB;
 
-import com.sun.corba.se.spi.legacy.connection.ORBSocketFactory;
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent;
-import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.legacy.connection.ORBSocketFactory;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPAddress ;
+import com.sun.corba.ee.spi.ior.iiop.AlternateIIOPAddressComponent;
+import com.sun.corba.ee.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.legacy.connection.DefaultSocketFactory;
-import com.sun.corba.se.impl.legacy.connection.EndPointInfoImpl;
+import com.sun.corba.ee.impl.legacy.connection.DefaultSocketFactory;
+import com.sun.corba.ee.impl.legacy.connection.EndPointInfoImpl;
 
 /**
  * @author Harold Carr
  */
 public class SocketFactory
     extends
-	DefaultSocketFactory
+        DefaultSocketFactory
     implements
-	ORBSocketFactory
+        ORBSocketFactory
 {
     public SocketFactory()
     {
@@ -77,45 +77,45 @@ public class SocketFactory
 
     @Override
     public SocketInfo getEndPointInfo(ORB orb, 
-					IOR ior,
-					SocketInfo socketInfo)
+                                        IOR ior,
+                                        SocketInfo socketInfo)
     {
-	// NOTE: this only uses the first IIOP profile.
-	// If there are multiple profiles a different API would be used
-	// inside a loop.
-	IIOPProfileTemplate iptemp =
-	    (IIOPProfileTemplate)ior.getProfile().getTaggedProfileTemplate() ;
+        // NOTE: this only uses the first IIOP profile.
+        // If there are multiple profiles a different API would be used
+        // inside a loop.
+        IIOPProfileTemplate iptemp =
+            (IIOPProfileTemplate)ior.getProfile().getTaggedProfileTemplate() ;
 
-	Iterator iterator =
-	    iptemp.iteratorById(org.omg.IOP.TAG_ALTERNATE_IIOP_ADDRESS.value);
+        Iterator iterator =
+            iptemp.iteratorById(org.omg.IOP.TAG_ALTERNATE_IIOP_ADDRESS.value);
 
-	// NOTE: this only uses the first address.
-	// If one were to try another address after failure you would
-	// need a loop and a hashtable, hashed by IOR to keep a loop pointer.
-	// Note: IOR hashing is not particularly efficient.  However, the
-	// CorbaContactInfoList version of this solves the problem.
-	while (iterator.hasNext()) {
-	    Client.foundAlternateIIOPAddressComponent = true; // For test.
+        // NOTE: this only uses the first address.
+        // If one were to try another address after failure you would
+        // need a loop and a hashtable, hashed by IOR to keep a loop pointer.
+        // Note: IOR hashing is not particularly efficient.  However, the
+        // CorbaContactInfoList version of this solves the problem.
+        while (iterator.hasNext()) {
+            Client.foundAlternateIIOPAddressComponent = true; // For test.
 
-	    AlternateIIOPAddressComponent iiopAddressComponent =
-		(AlternateIIOPAddressComponent) iterator.next();
-	    return new EndPointInfoImpl(
+            AlternateIIOPAddressComponent iiopAddressComponent =
+                (AlternateIIOPAddressComponent) iterator.next();
+            return new EndPointInfoImpl(
                 ORBSocketFactory.IIOP_CLEAR_TEXT,
-		iiopAddressComponent.getAddress().getPort(),
-		iiopAddressComponent.getAddress().getHost());
-	}
+                iiopAddressComponent.getAddress().getPort(),
+                iiopAddressComponent.getAddress().getHost());
+        }
 
-	// No alternate addresses.  Just use profile address.
-	Client.foundAlternateIIOPAddressComponent = false; // For test.
+        // No alternate addresses.  Just use profile address.
+        Client.foundAlternateIIOPAddressComponent = false; // For test.
 
-	IIOPProfileTemplate temp = 
-	    (IIOPProfileTemplate)ior.getProfile().getTaggedProfileTemplate() ;
-	IIOPAddress primary = temp.getPrimaryAddress() ;
-	String host = primary.getHost().toLowerCase();
-	int    port = primary.getPort();
-	return new EndPointInfoImpl(ORBSocketFactory.IIOP_CLEAR_TEXT,
-				    primary.getPort(),
-				    primary.getHost().toLowerCase());
+        IIOPProfileTemplate temp = 
+            (IIOPProfileTemplate)ior.getProfile().getTaggedProfileTemplate() ;
+        IIOPAddress primary = temp.getPrimaryAddress() ;
+        String host = primary.getHost().toLowerCase();
+        int    port = primary.getPort();
+        return new EndPointInfoImpl(ORBSocketFactory.IIOP_CLEAR_TEXT,
+                                    primary.getPort(),
+                                    primary.getHost().toLowerCase());
     }
 }
 

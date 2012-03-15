@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.org.omg.CORBA ;
+package com.sun.corba.ee.org.omg.CORBA ;
 
 import org.omg.CORBA.ORBPackage.InvalidName ;
 

@@ -131,14 +131,14 @@ public class statusU {
                      "Local Optimization Performance Tests");
             hash.put("performance_interceptors",
                      "ClientInterceptor Performance Tests");
-	    hash.put("scalability_poa", "POA Scalability Tests");
-	    hash.put("scalability_activation",
+            hash.put("scalability_poa", "POA Scalability Tests");
+            hash.put("scalability_activation",
                      "ORB Activation Deactivation Tests");
-	    hash.put("scalability_naming",
+            hash.put("scalability_naming",
                      "NameService Scalability Tests");
-	    hash.put("endToend_pi", "EndToEnd PI Tests");
-	    hash.put("endToend_poa", "EndToEnd POA Tests");
-	    hash.put("Reliability", "Reliability Test");
+            hash.put("endToend_pi", "EndToEnd PI Tests");
+            hash.put("endToend_poa", "EndToEnd POA Tests");
+            hash.put("Reliability", "Reliability Test");
             hash.put("product_rmijrmp", "RMI-JRMP Product Tests");
             hash.put("product_rmiiiop", "RMI-IIOP Product Tests");
             hash.put("product_pcosnaming", "PCosNaming Product Tests");
@@ -147,7 +147,7 @@ public class statusU {
             hash.put("product_ots", "OTS Product Tests");
             hash.put("product_javaidl", "JavaIDL Product Tests");
             hash.put("product_valuetypes", "Valuetypes Product Tests");
-	    hash.put("product_saf", "Server Activation Tests");
+            hash.put("product_saf", "Server Activation Tests");
             hash.put("product_orbspi", "PEORB SPI Tests");
             hash.put("product_ort", "ObjectReferenceTemplate Tests");
         } catch (Exception ex) {
@@ -253,9 +253,9 @@ public class statusU {
             category = "INTEROPERABILITY";
         else if (testName.startsWith("performance"))
             category = "PERFORMANCE";
-	else if (testName.startsWith("scalability"))
+        else if (testName.startsWith("scalability"))
             category = "SCALABILITY";
-	else
+        else
             category = "No Description available";
 
         int index = testName.indexOf("_");

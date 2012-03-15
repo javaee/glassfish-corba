@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.cosnaming;
+package com.sun.corba.ee.impl.naming.cosnaming;
 
 import java.io.StringWriter;
 
@@ -147,7 +147,7 @@ public class InterOperableNamingImpl
        String theStringifiedName )
        throws org.omg.CosNaming.NamingContextPackage.InvalidName
    {
-	String[] components = breakStringToNameComponents( theStringifiedName );
+        String[] components = breakStringToNameComponents( theStringifiedName );
         if (( components == null ) || (components.length == 0)) {
             return null;
         } 
@@ -250,7 +250,7 @@ public class InterOperableNamingImpl
      * by removing the escapes if there are any.
      */ 
    private NameComponent createNameComponentFromString( 
-    	String theStringifiedNameComponent )
+        String theStringifiedNameComponent )
         throws org.omg.CosNaming.NamingContextPackage.InvalidName
 
    {
@@ -292,7 +292,7 @@ public class InterOperableNamingImpl
                     index = theStringifiedNameComponent.indexOf( '.',index + 1);
                     if( index > 0 ) {
                         if( theStringifiedNameComponent.charAt( 
-				index - 1 ) != '\\' )
+                                index - 1 ) != '\\' )
                         {
                             kindfound = true;
                         }
@@ -314,12 +314,12 @@ public class InterOperableNamingImpl
         }
         id = cleanEscapeCharacter( id );
         kind = cleanEscapeCharacter( kind );
-	if( id == null ) {
-		id = "";
-	}
-	if( kind == null ) {
-		kind = "";
-	}
+        if( id == null ) {
+                id = "";
+        }
+        if( kind == null ) {
+                kind = "";
+        }
         return new NameComponent( id, kind );
    }
 
@@ -371,7 +371,7 @@ public class InterOperableNamingImpl
     public String createURLBasedAddress( String address, String name )
         throws InvalidAddress
     {
-	String theurl = null;
+        String theurl = null;
         if( ( address == null )
           ||( address.length() == 0 ) ) {
             throw new InvalidAddress();

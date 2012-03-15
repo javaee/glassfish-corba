@@ -55,14 +55,14 @@ public class TestServant
     public static final String baseMsg = TestServant.class.getName();
 
     public TestServant()
-	throws RemoteException
+        throws RemoteException
     {
     }
 
     public int echo(int x)
-	throws RemoteException
+        throws RemoteException
     {
-	System.out.println(baseMsg + ".echo: " + x);
+        System.out.println(baseMsg + ".echo: " + x);
         return x;
     }
 }

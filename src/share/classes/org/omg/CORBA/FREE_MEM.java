@@ -60,7 +60,7 @@ public final class FREE_MEM extends SystemException {
      * minor code of 0 and a completion state of COMPLETED_NO.
      */
     public FREE_MEM() {
-	this("");
+        this("");
     }
 
     /**

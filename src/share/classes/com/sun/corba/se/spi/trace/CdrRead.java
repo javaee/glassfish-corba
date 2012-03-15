@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.trace ;
+package com.sun.corba.ee.spi.trace ;
 
 import java.lang.annotation.Target ;
 import java.lang.annotation.ElementType ;

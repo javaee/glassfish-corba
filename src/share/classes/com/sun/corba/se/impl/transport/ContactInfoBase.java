@@ -38,29 +38,29 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 import java.nio.ByteBuffer;
 
-import com.sun.corba.se.spi.protocol.ClientRequestDispatcher;
-import com.sun.corba.se.spi.transport.OutboundConnectionCache;
+import com.sun.corba.ee.spi.protocol.ClientRequestDispatcher;
+import com.sun.corba.ee.spi.transport.OutboundConnectionCache;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.MessageMediator;
-import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
-import com.sun.corba.se.spi.transport.Connection;
-import com.sun.corba.se.spi.transport.ContactInfoList;
-import com.sun.corba.se.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfile;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.protocol.RequestDispatcherRegistry;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.ContactInfoList;
+import com.sun.corba.ee.spi.transport.ContactInfo;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.impl.protocol.MessageMediatorImpl;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.impl.protocol.MessageMediatorImpl;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
+import com.sun.corba.ee.spi.trace.Transport;
 
 /**
  * @author Harold Carr
@@ -68,7 +68,7 @@ import com.sun.corba.se.spi.trace.Transport;
 @Transport
 public abstract class ContactInfoBase
     implements
-	ContactInfo
+        ContactInfo
 {
     protected ORB orb;
     protected ContactInfoList contactInfoList;
@@ -79,107 +79,107 @@ public abstract class ContactInfoBase
 
     public ORB getBroker()
     {
-	return orb;
+        return orb;
     }
 
     public ContactInfoList getContactInfoList()
     {
-	return contactInfoList;
+        return contactInfoList;
     }
 
     public ClientRequestDispatcher getClientRequestDispatcher()
     {
-	int scid =
-	    getEffectiveProfile().getObjectKeyTemplate().getSubcontractId() ;
-	RequestDispatcherRegistry scr = orb.getRequestDispatcherRegistry() ;
-	return scr.getClientRequestDispatcher( scid ) ;
+        int scid =
+            getEffectiveProfile().getObjectKeyTemplate().getSubcontractId() ;
+        RequestDispatcherRegistry scr = orb.getRequestDispatcherRegistry() ;
+        return scr.getClientRequestDispatcher( scid ) ;
     }
 
     // Note: not all derived classes will use a connection cache.
     // These are convenience methods that may not be used.
     public void setConnectionCache(OutboundConnectionCache connectionCache)
     {
-	this.connectionCache = connectionCache;
+        this.connectionCache = connectionCache;
     }
 
     public OutboundConnectionCache getConnectionCache()
     {
-	return connectionCache;
+        return connectionCache;
     }
 
     // Called when client making an invocation.    
     @Transport
     public MessageMediator createMessageMediator(ORB broker,
-						 ContactInfo contactInfo,
-						 Connection connection,
-						 String methodName,
-						 boolean isOneWay)
+                                                 ContactInfo contactInfo,
+                                                 Connection connection,
+                                                 String methodName,
+                                                 boolean isOneWay)
     {
-	// REVISIT: Would like version, ior, requestid, etc., decisions
-	// to be in client subcontract.  Cannot pass these to this
-	// factory method because it breaks generic abstraction.
-	// Maybe set methods on mediator called from subcontract
-	// after creation?
-	MessageMediator messageMediator =
- 	    new MessageMediatorImpl(
-	        (ORB) broker,
-		(ContactInfo)contactInfo,
- 		connection,
- 		GIOPVersion.chooseRequestVersion( (ORB)broker,
-		     effectiveTargetIOR),
- 		effectiveTargetIOR,
- 		((Connection)connection).getNextRequestId(),
- 		getAddressingDisposition(),
- 		methodName,
- 		isOneWay);
+        // REVISIT: Would like version, ior, requestid, etc., decisions
+        // to be in client subcontract.  Cannot pass these to this
+        // factory method because it breaks generic abstraction.
+        // Maybe set methods on mediator called from subcontract
+        // after creation?
+        MessageMediator messageMediator =
+            new MessageMediatorImpl(
+                (ORB) broker,
+                (ContactInfo)contactInfo,
+                connection,
+                GIOPVersion.chooseRequestVersion( (ORB)broker,
+                     effectiveTargetIOR),
+                effectiveTargetIOR,
+                ((Connection)connection).getNextRequestId(),
+                getAddressingDisposition(),
+                methodName,
+                isOneWay);
 
-	return messageMediator;
+        return messageMediator;
     }
 
     // Called when not using "useNIOToWait" configuration
     @Transport
     public MessageMediator createMessageMediator(ORB broker,Connection conn)
     {
-	ORB lorb = (ORB) broker;
-	Connection connection = (Connection) conn;
+        ORB lorb = (ORB) broker;
+        Connection connection = (Connection) conn;
 
-	// read giop message
-	Message msg = MessageBase.readGIOPMessage(lorb, connection);
+        // read giop message
+        Message msg = MessageBase.readGIOPMessage(lorb, connection);
 
-	ByteBuffer byteBuffer = msg.getByteBuffer();
-	msg.setByteBuffer(null);
-	MessageMediator messageMediator =
-	    new MessageMediatorImpl(lorb, connection, msg, byteBuffer);
+        ByteBuffer byteBuffer = msg.getByteBuffer();
+        msg.setByteBuffer(null);
+        MessageMediator messageMediator =
+            new MessageMediatorImpl(lorb, connection, msg, byteBuffer);
 
-	return messageMediator;
+        return messageMediator;
     }
 
     @Transport
     public CDROutputObject createOutputObject(MessageMediator messageMediator)
     {
-	MessageMediator corbaMessageMediator = (MessageMediator)
-	    messageMediator;
-	
-	CDROutputObject outputObject =
-	    new CDROutputObject(orb, messageMediator, 
-				corbaMessageMediator.getRequestHeader(),
-				corbaMessageMediator.getStreamFormatVersion());
+        MessageMediator corbaMessageMediator = (MessageMediator)
+            messageMediator;
+        
+        CDROutputObject outputObject =
+            new CDROutputObject(orb, messageMediator, 
+                                corbaMessageMediator.getRequestHeader(),
+                                corbaMessageMediator.getStreamFormatVersion());
 
-	messageMediator.setOutputObject(outputObject);
-	return outputObject;
+        messageMediator.setOutputObject(outputObject);
+        return outputObject;
     }
 
     @Transport
     public CDRInputObject createInputObject(ORB broker, 
         MessageMediator messageMediator) {
 
-	// REVISIT: Duplicate of acceptor code.
-	MessageMediator corbaMessageMediator = (MessageMediator)
-	    messageMediator;
-	return new CDRInputObject((ORB)broker,
-				  (Connection)messageMediator.getConnection(),
-				  corbaMessageMediator.getDispatchBuffer(),
-				  corbaMessageMediator.getDispatchHeader());
+        // REVISIT: Duplicate of acceptor code.
+        MessageMediator corbaMessageMediator = (MessageMediator)
+            messageMediator;
+        return new CDRInputObject((ORB)broker,
+                                  (Connection)messageMediator.getConnection(),
+                                  corbaMessageMediator.getDispatchBuffer(),
+                                  corbaMessageMediator.getDispatchHeader());
     }
 
     ////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ public abstract class ContactInfoBase
     //
 
     public short getAddressingDisposition() {
-	return addressingDisposition;
+        return addressingDisposition;
     }
 
     public void setAddressingDisposition(short addressingDisposition) {
@@ -197,15 +197,15 @@ public abstract class ContactInfoBase
 
     // REVISIT - remove this.
     public IOR getTargetIOR() {
-	return  contactInfoList.getTargetIOR();
+        return  contactInfoList.getTargetIOR();
     }
 
     public IOR getEffectiveTargetIOR() {
-	return effectiveTargetIOR ;
+        return effectiveTargetIOR ;
     }
 
     public IIOPProfile getEffectiveProfile() {
-	return effectiveTargetIOR.getProfile();
+        return effectiveTargetIOR.getProfile();
     }
 
     ////////////////////////////////////////////////////
@@ -214,7 +214,7 @@ public abstract class ContactInfoBase
     //
 
     public String toString() {
-	return "CorbaContactInfoBase[" + "]";
+        return "CorbaContactInfoBase[" + "]";
     }
 }
 

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)SerializationTest.java	1.17 99/06/07 */
+/* @(#)SerializationTest.java   1.17 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -90,123 +90,123 @@ public class SerializationTest extends test.Test
     {
 
         try {
-	    Properties orbProps = new Properties() ;
-	    orbProps.put( "org.omg.CORBA.ORBClass", 
-			  "com.sun.corba.se.impl.orb.ORBImpl" ) ;
-	    orbProps.put( "org.omg.CORBA.ORBSingletonClass", 
-			  "com.sun.corba.se.impl.orb.ORBSingleton" ) ;
+            Properties orbProps = new Properties() ;
+            orbProps.put( "org.omg.CORBA.ORBClass", 
+                          "com.sun.corba.ee.impl.orb.ORBImpl" ) ;
+            orbProps.put( "org.omg.CORBA.ORBSingletonClass", 
+                          "com.sun.corba.ee.impl.orb.ORBSingleton" ) ;
             org.omg.CORBA.ORB orb = 
-		org.omg.CORBA.ORB.init(getArgsAsArgs(),orbProps);
+                org.omg.CORBA.ORB.init(getArgsAsArgs(),orbProps);
 
-	    BitSet _bitset;
+            BitSet _bitset;
 
-	    _bitset = new BitSet(64);
-	    _bitset.set(10);
-	    _bitset.set(20);
-	    _bitset.set(30);
-	    _bitset.set(40);
-	    _bitset.set(50);
-	    _bitset.set(60);
+            _bitset = new BitSet(64);
+            _bitset.set(10);
+            _bitset.set(20);
+            _bitset.set(30);
+            _bitset.set(40);
+            _bitset.set(50);
+            _bitset.set(60);
 
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    ObjectOutputStream oos = new ObjectOutputStream(baos);
-	    oos.writeObject(_bitset);
-	    ObjectInputStream ois = new ObjectInputStream(
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(_bitset);
+            ObjectInputStream ois = new ObjectInputStream(
                 new ByteArrayInputStream(baos.toByteArray()));
-	    BitSet __bitset = (BitSet)ois.readObject();
-														   
+            BitSet __bitset = (BitSet)ois.readObject();
+                                                                                                                   
 
             org.omg.CORBA_2_3.portable.OutputStream sos =
                 (org.omg.CORBA_2_3.portable.OutputStream)orb.create_output_stream();
 
-	    ((org.omg.CORBA_2_3.ORB)orb).register_value_factory(DateHelper.id(),
+            ((org.omg.CORBA_2_3.ORB)orb).register_value_factory(DateHelper.id(),
                 new DateDefaultFactory());
 
 // Start of writing phase:
 
             test( "writeDate" ) ;
-	    javax.rmi.CORBA.serialization.Date date = DateHelper.create__(orb);
-	    DateHelper.write(sos, date);
+            javax.rmi.CORBA.serialization.Date date = DateHelper.create__(orb);
+            DateHelper.write(sos, date);
 
             test( "writeStock" ) ;
-	    Stock stocks[] = new Stock[2];
-	    stocks[0] = new StockImpl("IBM");
-	    stocks[1] = StockHelper.create(orb, "Sun");
-	    seq1_StockHelper.write(sos, stocks);
+            Stock stocks[] = new Stock[2];
+            stocks[0] = new StockImpl("IBM");
+            stocks[1] = StockHelper.create(orb, "Sun");
+            seq1_StockHelper.write(sos, stocks);
 
             test( "writeMARSHAL" ) ;
-	    SystemException sex = new MARSHAL("dummy exception", 37,
+            SystemException sex = new MARSHAL("dummy exception", 37,
                 CompletionStatus.COMPLETED_MAYBE);
-	    sos.write_value(sex);
+            sos.write_value(sex);
 
             test( "writeString" ) ;
-	    String helloString = "Hello world!";
-	    WStringValueHelper.write (sos, helloString);
+            String helloString = "Hello world!";
+            WStringValueHelper.write (sos, helloString);
 
             test( "writeIDLValue" ) ;
-	    IDLValue idlv = new IDLValue();
-	    sos.write_value(idlv);
+            IDLValue idlv = new IDLValue();
+            sos.write_value(idlv);
 
             test( "writeGraph" ) ;
-	    Graph graph = new Graph("This", 
-		new Graph("is", 
-		    new Graph("a", 
-			new Graph("graph",
-			    new Graph("object", 
-				new Graph("test.", null))))));
-	    sos.write_value(graph);
+            Graph graph = new Graph("This", 
+                new Graph("is", 
+                    new Graph("a", 
+                        new Graph("graph",
+                            new Graph("object", 
+                                new Graph("test.", null))))));
+            sos.write_value(graph);
 
             test( "writeDate2" ) ;
-	    java.util.Date aDate = new java.util.Date();
-	    sos.write_value(aDate);
+            java.util.Date aDate = new java.util.Date();
+            sos.write_value(aDate);
 
             test( "writeVector" ) ;
             Vector vector1 = new Vector();
-	    sos.write_value(vector1);
+            sos.write_value(vector1);
 
             test( "writeStringValue" ) ;
-	    sos.write_value("Hey you stream code!");
+            sos.write_value("Hey you stream code!");
 
             test( "writeVector2" ) ;
-	    sos.write_value(vector1);
+            sos.write_value(vector1);
 
             test( "writeVector3" ) ;
-	    Vector vector2 = new Vector();
-	    sos.write_value(vector2);
+            Vector vector2 = new Vector();
+            sos.write_value(vector2);
 
             test( "writeNotSerializableChild" ) ;
-	    NotSerializableChild notser = new NotSerializableChild();
-	    sos.write_value(notser);
+            NotSerializableChild notser = new NotSerializableChild();
+            sos.write_value(notser);
 
             test( "writeIsSerializable" ) ;
-	    IsSerializable isser = new IsSerializable("Hey IBM!");
-	    sos.write_value(isser);
+            IsSerializable isser = new IsSerializable("Hey IBM!");
+            sos.write_value(isser);
 
             test( "writeClass" ) ;
-	    Class clazz = java.util.Hashtable.class;
-	    sos.write_value(clazz);
+            Class clazz = java.util.Hashtable.class;
+            sos.write_value(clazz);
 
             test( "writeString2" ) ;
-	    sos.write_value("I5 X1");
+            sos.write_value("I5 X1");
 
             test( "writeString3" ) ;
-	    sos.write_value("I6 X2");
+            sos.write_value("I6 X2");
 
             test( "writeBoolean" ) ;
-	    sos.write_boolean(true);
+            sos.write_boolean(true);
 
             test( "writeEmptyString" ) ;
-	    sos.write_value("");
+            sos.write_value("");
 
             test( "writeOBJV2" ) ;
-	    TestOBV2 tobv2 = new TestOBV2();
-	    sos.write_value(tobv2);
-			
+            TestOBV2 tobv2 = new TestOBV2();
+            sos.write_value(tobv2);
+                        
             test( "writeArrayString" ) ;
-	    String names[] = {"Alpha","Beta","Charlie"};
-	    double percents[] = {0.5,0.7};
-	    BudgetSummary summary = new BudgetSummary(2, names, percents);
-	    sos.write_value(summary);
+            String names[] = {"Alpha","Beta","Charlie"};
+            double percents[] = {0.5,0.7};
+            BudgetSummary summary = new BudgetSummary(2, names, percents);
+            sos.write_value(summary);
 
             test( "writeOctet" ) ;
             byte b = (byte)0xBA;
@@ -239,18 +239,18 @@ public class SerializationTest extends test.Test
             sos.write_value(str3);
 
             test( "writeCustomObject1" ) ;
-	    OBVTestObjectCustom obvc = new OBVTestObjectCustomImpl();
-	    sos.write_value(obvc);
+            OBVTestObjectCustom obvc = new OBVTestObjectCustomImpl();
+            sos.write_value(obvc);
 
             test( "writeCustomObject2" ) ;
-	    OBVTestObjectCustomHelper.write(sos, obvc);
+            OBVTestObjectCustomHelper.write(sos, obvc);
 
             test( "writeCustomObject3" ) ;
-	    sos.write_value(obvc);
+            sos.write_value(obvc);
 
             test( "writeCustomObject4" ) ;
-	    OBVTestObjectCustom obvc2 = new OBVTestObjectCustomImpl();
-	    OBVTestObjectCustomHelper.write(sos, obvc2);
+            OBVTestObjectCustom obvc2 = new OBVTestObjectCustomImpl();
+            OBVTestObjectCustomHelper.write(sos, obvc2);
 
             test( "writeObjectOne" ) ;
             OBVTestObjectOne obv1 = new OBVTestObjectOneImpl();
@@ -270,7 +270,7 @@ public class SerializationTest extends test.Test
                 (org.omg.CORBA_2_3.portable.OutputStream)orb.create_output_stream();
             sos2.write_value(str1);
             sos2.write_value(obv1);
-			
+                        
             test( "writeFloat" ) ;
             Float f = new Float(1.23);
             sos.write_value(f);
@@ -296,8 +296,8 @@ public class SerializationTest extends test.Test
             sos.write_value(test2subclassDefaults);
 
             test( "writeComplexTestObjectTwoSubclassDelta" ) ;
-	    ComplexTestObjectTwoDelta delta2 = new ComplexTestObjectTwoDelta();
-	    sos.write_value(delta2);
+            ComplexTestObjectTwoDelta delta2 = new ComplexTestObjectTwoDelta();
+            sos.write_value(delta2);
 
             test( "writeEmptyTestObject" ) ;
             javax.rmi.CORBA.serialization.EmptyTestObject testEmptyA=
@@ -329,12 +329,12 @@ public class SerializationTest extends test.Test
             sos.write_value(test4);
 
             test( "writeProperties" ) ;
-	    java.util.Properties props = new java.util.Properties();
+            java.util.Properties props = new java.util.Properties();
             props.put("Key1","Value1");
             sos.write_value(props);
 
             test( "writeIntArray" ) ;
-	    // Test arrays
+            // Test arrays
             int anIntArray[] = {9,8,7};
             sos.write_value(anIntArray);
 
@@ -353,69 +353,69 @@ public class SerializationTest extends test.Test
 
             test( "writeLongArrayArray" ) ;
             long[][] array2 =   {
-		{9,8,7,6,1},
-		{18,4,6},
-		{0,5,7,9,11,13}
-	    };
+                {9,8,7,6,1},
+                {18,4,6},
+                {0,5,7,9,11,13}
+            };
             sos.write_value(array2);
 
             test( "writeObjectArray" ) ;
-	    // Recursive array references
-	    Object recursiveArray[] = {null, "Hello", null, null};
-	    recursiveArray[0] = recursiveArray;
-	    recursiveArray[2] = recursiveArray;
-	    recursiveArray[3] = recursiveArray;
-	    sos.write_value(recursiveArray);
+            // Recursive array references
+            Object recursiveArray[] = {null, "Hello", null, null};
+            recursiveArray[0] = recursiveArray;
+            recursiveArray[2] = recursiveArray;
+            recursiveArray[3] = recursiveArray;
+            sos.write_value(recursiveArray);
 
             test( "writeShortArrayArrayArray" ) ;
             // Check 3 dimensional primitive array...
             short[][][] dim3 = {
-		{
-		    {0,8,7,6,1},
-		    {1,5,7,13},
-		    {2,4,6},
-		},
-		{
-		    {3,4,10},
-		    {4,5,7,9,13}
-		},
-		{
-		    {5,4,6},
-		    {6,5,8,9,11,13},
-		    {7,8,7,6,1},
-		    {8,8,7,6,9},
-		},
-	    };
+                {
+                    {0,8,7,6,1},
+                    {1,5,7,13},
+                    {2,4,6},
+                },
+                {
+                    {3,4,10},
+                    {4,5,7,9,13}
+                },
+                {
+                    {5,4,6},
+                    {6,5,8,9,11,13},
+                    {7,8,7,6,1},
+                    {8,8,7,6,9},
+                },
+            };
             sos.write_value(dim3);
 
             test( "writeObjectArray" ) ;
             // Check single dimensional object array...
-    	    
+            
             ObjectByValue[] array3 =    {
-		new ObjectByValue(5,10,"a","f"),
-		new ObjectByValue(6,11,"b","g"),
-		new ObjectByValue(7,12,"c","h"),
-		new ObjectByValue(8,13,"d","i"),
-		new ObjectByValue(9,14,"e","j"),
-	    };
+                new ObjectByValue(5,10,"a","f"),
+                new ObjectByValue(6,11,"b","g"),
+                new ObjectByValue(7,12,"c","h"),
+                new ObjectByValue(8,13,"d","i"),
+                new ObjectByValue(9,14,"e","j"),
+            };
             sos.write_value(array3);      
             
             // Check multi dimensional object array...
 
             test( "writeObjectArrayArray" ) ;
             ObjectByValue[][] array4 =   {   {
-		new ObjectByValue(0,10,"a","g"),
-		new ObjectByValue(0,11,"b","h"),
-		new ObjectByValue(0,12,"c","i"),
-	    },
-					     {
-						 new ObjectByValue(1,13,"d","j"),
-						 new ObjectByValue(1,14,"e","k"),
-					     },
-					     {
-						 new ObjectByValue(2,15,"f","l"),
-					     }
-	    };
+                new ObjectByValue(0,10,"a","g"),
+                new ObjectByValue(0,11,"b","h"),
+                new ObjectByValue(0,12,"c","i"),
+            },
+                                             {
+                                                 new ObjectByValue(1,13,"d","j"),
+                                                 new ObjectByValue(1,14,"e","k"),
+                                             },
+                                             {
+                                                 new ObjectByValue(2,15,"f","l"),
+                                             }
+            };
                                 
             sos.write_value(array4);
             
@@ -424,8 +424,8 @@ public class SerializationTest extends test.Test
             ComplexTestObjectXXX xxx = new ComplexTestObjectXXX();
             sos.write_value(xxx);
 
-	    //System.out.println("offset = " + ((com.sun.corba.se.impl.encoding.CDROutputStream)sos).get_offset());
-	    //System.out.println("countit = " + ((com.sun.corba.se.impl.encoding.CDROutputStream)sos).countit);
+            //System.out.println("offset = " + ((com.sun.corba.ee.impl.encoding.CDROutputStream)sos).get_offset());
+            //System.out.println("countit = " + ((com.sun.corba.ee.impl.encoding.CDROutputStream)sos).countit);
 
             /***************************************************************/
             /*********************** READ DATA BACK IN *********************/
@@ -436,90 +436,90 @@ public class SerializationTest extends test.Test
                 (org.omg.CORBA_2_3.portable.InputStream)sos.create_input_stream();
 
             test( "readDate" ) ;
-	    javax.rmi.CORBA.serialization.Date _date = (javax.rmi.CORBA.serialization.Date)
-		DateHelper.read(sis);
-			
+            javax.rmi.CORBA.serialization.Date _date = (javax.rmi.CORBA.serialization.Date)
+                DateHelper.read(sis);
+                        
             test( "readStocks" ) ;
-	    Stock _stocks[] = (Stock[])seq1_StockHelper.read(sis);
+            Stock _stocks[] = (Stock[])seq1_StockHelper.read(sis);
 
             test( "readSystemException" ) ;
-	    SystemException _sex = (SystemException)sis.read_value();
-	    if (!(_sex.getMessage().equals(sex.getMessage())) ||
-	        _sex.minor != sex.minor ||
-		_sex.completed != sex.completed)
-		throw new Error("Hello String failed!");
+            SystemException _sex = (SystemException)sis.read_value();
+            if (!(_sex.getMessage().equals(sex.getMessage())) ||
+                _sex.minor != sex.minor ||
+                _sex.completed != sex.completed)
+                throw new Error("Hello String failed!");
 
             test( "readHelloString" ) ;
-	    String _helloString = (String)WStringValueHelper.read(sis);
-	    if (!helloString.equals(_helloString))
-		throw new Error("Hello String failed!");
+            String _helloString = (String)WStringValueHelper.read(sis);
+            if (!helloString.equals(_helloString))
+                throw new Error("Hello String failed!");
 
             test( "readIdlValue" ) ;
-	    IDLValue _idlv = (IDLValue)sis.read_value();
-	    if (!idlv.equals(_idlv))
-		throw new Error("IDLValue test failed!");
+            IDLValue _idlv = (IDLValue)sis.read_value();
+            if (!idlv.equals(_idlv))
+                throw new Error("IDLValue test failed!");
 
             test( "readGraph" ) ;
-	    Graph _graph = (Graph)sis.read_value();
-	    if (!graph.toString().equals(_graph.toString())) {
-		System.out.println("graph = " + graph);
-		System.out.println("_graph = " + _graph);
-		throw new Error("Graph test failed!");
-	    }
+            Graph _graph = (Graph)sis.read_value();
+            if (!graph.toString().equals(_graph.toString())) {
+                System.out.println("graph = " + graph);
+                System.out.println("_graph = " + _graph);
+                throw new Error("Graph test failed!");
+            }
 
             test( "readData2" ) ;
-	    java.util.Date _aDate = 
-		(java.util.Date)sis.read_value();
+            java.util.Date _aDate = 
+                (java.util.Date)sis.read_value();
 
             test( "readVector" ) ;
-	    Vector _vector1 = (Vector)sis.read_value();
+            Vector _vector1 = (Vector)sis.read_value();
 
-	    sis.read_value();
+            sis.read_value();
 
             test( "readSharedVector" ) ;
-	    Vector _sharedVector1 = (Vector)sis.read_value();
-	    if (_vector1 != _sharedVector1)
-		throw new Error("Shared vectors failed! (vectors not shared!)");
+            Vector _sharedVector1 = (Vector)sis.read_value();
+            if (_vector1 != _sharedVector1)
+                throw new Error("Shared vectors failed! (vectors not shared!)");
 
             test( "readUnsharedVector" ) ;
-	    Vector _vector2 = (Vector)sis.read_value();
-	    if (_vector1 == _vector2)
-		throw new Error("Unshared vectors failed! (vectors are shared!)");
+            Vector _vector2 = (Vector)sis.read_value();
+            if (_vector1 == _vector2)
+                throw new Error("Unshared vectors failed! (vectors are shared!)");
 
             test( "readNotSerializableChild" ) ;
-	    NotSerializableChild _notser = (NotSerializableChild)sis.read_value();
-	    if (!notser.equals(_notser))
-		throw new Error("NotSerializableChild test failed!");
+            NotSerializableChild _notser = (NotSerializableChild)sis.read_value();
+            if (!notser.equals(_notser))
+                throw new Error("NotSerializableChild test failed!");
 
             test( "readIsSerializable" ) ;
-	    IsSerializable _isser = (IsSerializable)sis.read_value();
-	    if (!isser.equals(_isser))
-		throw new Error("IsSerializable test failed!");
-			
+            IsSerializable _isser = (IsSerializable)sis.read_value();
+            if (!isser.equals(_isser))
+                throw new Error("IsSerializable test failed!");
+                        
             test( "readClass" ) ;
-	    Class _clazz = (Class)sis.read_value();
-	    if (!clazz.equals(_clazz))
-		throw new Error("Test Clazz failed!");
+            Class _clazz = (Class)sis.read_value();
+            if (!clazz.equals(_clazz))
+                throw new Error("Test Clazz failed!");
 
             test( "readValue1" ) ;
-	    sis.read_value();
+            sis.read_value();
 
             test( "readValue2" ) ;
-	    sis.read_value();
+            sis.read_value();
 
             test( "readBoolean" ) ;
-	    sis.read_boolean();
+            sis.read_boolean();
 
             test( "readValue3" ) ;
-	    sis.read_value();
+            sis.read_value();
 
             test( "readValue4" ) ;
-	    TestOBV2 _tobv2 = (TestOBV2)sis.read_value();
-	    if (!tobv2.equals(_tobv2))
-		throw new Error("TestOBV2 failed!");
+            TestOBV2 _tobv2 = (TestOBV2)sis.read_value();
+            if (!tobv2.equals(_tobv2))
+                throw new Error("TestOBV2 failed!");
 
             test( "readBudgetSummary" ) ;
-	    BudgetSummary _summary = (BudgetSummary)sis.read_value();
+            BudgetSummary _summary = (BudgetSummary)sis.read_value();
 
             test( "readOctet" ) ;
             byte _b = sis.read_octet();
@@ -597,7 +597,7 @@ public class SerializationTest extends test.Test
             OBVTestObjectOne _obv1_sis2 = (OBVTestObjectOne)sis2.read_value(OBVTestObjectOne.class);
             if (!obv1.equals(_obv1_sis2))
                 throw new Error("Test sis2 OBV1 failed!");
-			
+                        
             test( "readObjectOne3" ) ;
             OBVTestObjectOne _obv1Shared = OBVTestObjectOneHelper.read(sis);
             if (_obv1 != _obv1Shared)
@@ -638,12 +638,12 @@ public class SerializationTest extends test.Test
                 throw new Error("FAILURE!  Test2subclassDefaults Failed");
 
             test( "readComplexObjectTwoDelta" ) ;
-	    ComplexTestObjectTwoDelta _delta2 = (ComplexTestObjectTwoDelta)sis.read_value();
+            ComplexTestObjectTwoDelta _delta2 = (ComplexTestObjectTwoDelta)sis.read_value();
             if (!delta2.equals(_delta2)) {
-		System.out.println("delta2 = " + delta2);
-		System.out.println("_delta2 = " + _delta2);
-		throw new Error("FAILURE!  Delta2 Failed");
-	    }
+                System.out.println("delta2 = " + delta2);
+                System.out.println("_delta2 = " + _delta2);
+                throw new Error("FAILURE!  Delta2 Failed");
+            }
 
             test( "readEmptyObject" ) ;
             javax.rmi.CORBA.serialization.EmptyTestObject _testEmptyA =
@@ -681,30 +681,30 @@ public class SerializationTest extends test.Test
                 throw new Error("FAILURE!  Test4 Failed");
 
             test( "readProperties" ) ;
-	    java.util.Properties _props = (java.util.Properties)sis.read_value();
+            java.util.Properties _props = (java.util.Properties)sis.read_value();
             if (!_props.toString().equals(props.toString()))
-            	throw new Error("FAILURE!  props Failed");
+                throw new Error("FAILURE!  props Failed");
 
 
             test( "readIntArray" ) ;
             int _anIntArray[] = (int[])sis.read_value();
             if ((_anIntArray[0] != anIntArray[0]) ||
-            	(_anIntArray[1] != anIntArray[1]) ||
+                (_anIntArray[1] != anIntArray[1]) ||
                 (_anIntArray[2] != anIntArray[2]))
-            	throw new Error("FAILURE!  anIntArray Failed");
+                throw new Error("FAILURE!  anIntArray Failed");
 
             test( "readObjectArray" ) ;
             Object _aSharedRefsArray[] = (Object[])sis.read_value();
             if ((_aSharedRefsArray[0] != _testEmptyA) ||
-            	(_aSharedRefsArray[1] != _test1b) ||
+                (_aSharedRefsArray[1] != _test1b) ||
                 (_aSharedRefsArray[2] != _anIntArray))
-            	throw new Error("FAILURE!  aSharedRefsArray[] == Failed");
+                throw new Error("FAILURE!  aSharedRefsArray[] == Failed");
 
             test( "readIntArray2" ) ;
             int[] array1Echo = (int[])sis.read_value();
             for (int i = 0; i < array1.length; i++) {
                 if (array1[i] != array1Echo[i]) {
-    	            throw new Exception("HelloTest: echoArray (int[]) failed");
+                    throw new Exception("HelloTest: echoArray (int[]) failed");
                 }
             }
 
@@ -713,19 +713,19 @@ public class SerializationTest extends test.Test
             for (int i = 0; i < array2.length; i++) {
                 for (int j = 0; j < array2[i].length; j++) {
                     if (array2[i][j] != array2Echo[i][j]) {
-			throw new Exception("HelloTest: echoArray (int[][]) failed");
+                        throw new Exception("HelloTest: echoArray (int[][]) failed");
                     }
                 }
             }
 
             test( "readRecursizeObjectArray" ) ;
-	    // Recursive array references
-	    Object recursiveArrayEcho[] = (Object[])sis.read_value();
-	    if ((recursiveArrayEcho[0] != recursiveArrayEcho) || 
-		(recursiveArrayEcho[2] != recursiveArrayEcho) || 
-		(recursiveArrayEcho[3] != recursiveArrayEcho) || 
-		(!((String)recursiveArrayEcho[1]).equals("Hello")))
-		throw new Exception("RecursiveArray test failed!");
+            // Recursive array references
+            Object recursiveArrayEcho[] = (Object[])sis.read_value();
+            if ((recursiveArrayEcho[0] != recursiveArrayEcho) || 
+                (recursiveArrayEcho[2] != recursiveArrayEcho) || 
+                (recursiveArrayEcho[3] != recursiveArrayEcho) || 
+                (!((String)recursiveArrayEcho[1]).equals("Hello")))
+                throw new Exception("RecursiveArray test failed!");
 
             test( "readShortArrayArrayArray" ) ;
             short[][][] dim3Echo = (short[][][])sis.read_value();
@@ -733,7 +733,7 @@ public class SerializationTest extends test.Test
                 for (int j = 0; j < dim3[i].length; j++) {
                     for (int k = 0; k < dim3[i][j].length; k++) {
                         if (dim3[i][j][k] != dim3[i][j][k]) {
-            	            throw new Exception("HelloTest: echoArray (short[][][]) failed");
+                            throw new Exception("HelloTest: echoArray (short[][][]) failed");
                         }
                     }
                 }
@@ -743,7 +743,7 @@ public class SerializationTest extends test.Test
             ObjectByValue[] array3Echo = (ObjectByValue[])sis.read_value();
             for (int i = 0; i < array3.length; i++) {
                 if (!array3[i].equals(array3Echo[i])) {
-    	            throw new Exception("HelloTest: echoArray (ObjectByValue[]) failed");
+                    throw new Exception("HelloTest: echoArray (ObjectByValue[]) failed");
                 }
             }
 
@@ -752,7 +752,7 @@ public class SerializationTest extends test.Test
             for (int i = 0; i < array4.length; i++) {
                 for (int j = 0; j < array4[i].length; j++) {
                     if (!array4[i][j].equals(array4Echo[i][j])) {
-			throw new Exception("HelloTest: echoArray (ObjectByValue[][]) failed");
+                        throw new Exception("HelloTest: echoArray (ObjectByValue[][]) failed");
                     }
                 }
             }

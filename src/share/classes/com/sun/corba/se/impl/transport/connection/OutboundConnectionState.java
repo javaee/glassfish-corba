@@ -38,15 +38,15 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport.connection;
+package com.sun.corba.ee.impl.transport.connection;
 
 import java.io.IOException ;
 
-import com.sun.corba.se.spi.transport.connection.Connection ;
-import com.sun.corba.se.spi.transport.connection.ContactInfo ;
+import com.sun.corba.ee.spi.transport.connection.Connection ;
+import com.sun.corba.ee.spi.transport.connection.ContactInfo ;
 
-import com.sun.corba.se.spi.transport.concurrent.ConcurrentQueue ;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.spi.transport.concurrent.ConcurrentQueue ;
+import com.sun.corba.ee.spi.trace.Transport;
 import org.glassfish.gmbal.Description;
 
 import org.glassfish.gmbal.ManagedData ;
@@ -59,17 +59,17 @@ public class OutboundConnectionState<C extends Connection> {
 // The real state of the connection
     private enum ConnectionStateValue { NEW, BUSY, IDLE }
 
-    private ConnectionStateValue csv ;	// Indicates state of connection
+    private ConnectionStateValue csv ;  // Indicates state of connection
 
-    final ContactInfo<C> cinfo ;	// ContactInfo used to create this 
+    final ContactInfo<C> cinfo ;        // ContactInfo used to create this 
                                         // Connection
-    final C connection ;		// Connection of the ConnectionState
+    final C connection ;                // Connection of the ConnectionState
                                         //
-    final OutboundCacheEntry<C> entry ;	// This Connection's OutboundCacheEntry
+    final OutboundCacheEntry<C> entry ; // This Connection's OutboundCacheEntry
 
-    private int busyCount ;	        // Number of calls to get without release
+    private int busyCount ;             // Number of calls to get without release
               
-    int expectedResponseCount ;	        // Number of expected responses not yet 
+    int expectedResponseCount ;         // Number of expected responses not yet 
                                         // received
 
     // At all times, a connection is either on the busy or idle queue in 

@@ -355,7 +355,7 @@ It can be further divided into:
 <DT CLASS="dt-description"><B>sun/rmi</B><DD CLASS="dd-description">rmic compiler
 <DT CLASS="dt-description"><B>sun/corba</B><DD CLASS="dd-description">CORBA Bridge class, which isolates ORB dependencies on
 non-public JDK APIs
-<DT CLASS="dt-description"><B>com/sun/corba/se</B><DD CLASS="dd-description">Main body of ORB source code (automatically renamed
+<DT CLASS="dt-description"><B>com/sun/corba/ee</B><DD CLASS="dd-description">Main body of ORB source code (automatically renamed
 to ee package for app server build) 
 <DL CLASS="description" COMPACT=compact><DT CLASS="dt-description">
 <B>GiopIDL</B><DD CLASS="dd-description">IDL files for GIOP protocol definitions
@@ -432,7 +432,7 @@ the source directories
 <DT CLASS="dt-description"><B>timer</B><DD CLASS="dd-description">XML data for generating timing points 
 </DL>
 </DL>
-<DT CLASS="dt-description"><B>orblib/src/share/classes/com/sun/corba/se</B><DD CLASS="dd-description">Classes in the ORB library.
+<DT CLASS="dt-description"><B>orblib/src/share/classes/com/sun/corba/ee</B><DD CLASS="dd-description">Classes in the ORB library.
 There are no dependencies from any of this code to classes in the
 src hierarchy.
 <DL CLASS="description" COMPACT=compact><DT CLASS="dt-description">
@@ -476,14 +476,14 @@ the app server (should revisit this in light of JDK 5 executors).
 
 <H3 CLASS="subsection"><A NAME="htoc7">1.3.3</A>&nbsp;&nbsp;ORB Renaming</H3><!--SEC END -->
 
-Most of the ORB is packaged under the com.sun.corba.se package. A
+Most of the ORB is packaged under the com.sun.corba.ee package. A
 version of the ORB code exists in this package (or in a slightly different
 version) in every JDK since 1.2. We also deliver the ORB code to the
 Sun application server (now project GlassFish). To avoid possibly
 collisions between the classes in the JDK and the classes in GlassFish,
 we rename all the files in the ORB to the com.sun.corba.ee package.<BR>
 <BR>
-This rename is done automatically using a Java program (com.sun.corba.se.spi.orbutil.file.WorkspaceRename)
+This rename is done automatically using a Java program (com.sun.corba.ee.spi.orbutil.file.WorkspaceRename)
 that is part of the ORB library. There is an ant target (rename) for
 this as well. All that is needed for the rename is:
 <OL CLASS="enumerate" type=1><LI CLASS="li-enumerate">
@@ -831,7 +831,7 @@ document: ignore this section.
 (and also ODebugExec, but the omniscient debugger has not been tested
 or updated in years. See http://www.lambdacs.com/debugger/debugger.html
 for more information).
-<LI CLASS="li-itemize">Default ORB class has changed. We now use com.sun.corba.se.impl.orb.ORBImpl.
+<LI CLASS="li-itemize">Default ORB class has changed. We now use com.sun.corba.ee.impl.orb.ORBImpl.
 <LI CLASS="li-itemize">There are two security policy files available for running the tests.
 The default test.policy file simply sets up the needed permissions
 for all of the tests and the ORB. The more fine grained test.policy.secure
@@ -890,7 +890,7 @@ argument
 </TT></DL></DIV>
 where the argument is a semi-colon separated. Each element of this
 list starts with a controller name, followed by a comma separated
-list of ORB debug flag names (see com.sun.corba.se.spi.orb.ORB for
+list of ORB debug flag names (see com.sun.corba.ee.spi.orb.ORB for
 the current list).<BR>
 <BR>
 It is also possible to change the log levels so that ORB log information
@@ -1115,10 +1115,10 @@ spi class, but should avoid using implementation classes outside of
 its own package.
 <LI CLASS="li-itemize">The ORB object instance is central. It is the repository for all runtime
 ORB data. It drives the configuration of the runtime ORB. Everything
-that the ORB provides is accessible from the com.sun.corba.se.spi.orb.ORB
+that the ORB provides is accessible from the com.sun.corba.ee.spi.orb.ORB
 class.
 <UL CLASS="itemize"><LI CLASS="li-itemize">
-Access the ORB either as org.omg.CORBA.ORB or as com.sun.corba.se.spi.ORB.
+Access the ORB either as org.omg.CORBA.ORB or as com.sun.corba.ee.spi.ORB.
 There are other ORB classes, but never program to them.
 <LI CLASS="li-itemize">Use the CORBA ORB for code that may be shared with other ORB implementations.
 This is mainly an issue in the RMI-IIOP code and the value handler,
@@ -1166,7 +1166,7 @@ aid to figuring out how classes are coupled together. The ORB rules
 that should be followed for import lists are:
 <OL CLASS="enumerate" type=1><LI CLASS="li-enumerate">
 Arrange packages from the general to the specific. For example, put
-java.* first, then org.omg.* first, finally internal com.sun.corba.se.spi.*
+java.* first, then org.omg.* first, finally internal com.sun.corba.ee.spi.*
 classes.
 <LI CLASS="li-enumerate">Within a package, arrange classes in alphabetical order.
 <LI CLASS="li-enumerate">Separate different package imports with a blank line.
@@ -1278,7 +1278,7 @@ inheritance or composition.
 <LI CLASS="li-enumerate">Remember that the io, util, and javax code is shared between our ORB
 and other (non-Sun) ORBs. This means in particular that other ORBs
 may be built using our ValueHandler and RMI-IIOP classes. The main
-issue here is that we cannot assume that the ORB class is always com.sun.corba.se.spi.orb.ORB.
+issue here is that we cannot assume that the ORB class is always com.sun.corba.ee.spi.orb.ORB.
 It is OK to create a specialized path for our ORB, but this must always
 be done with an <B>instanceof</B> check, and handle the non-Sun
 ORB case correctly.
@@ -1310,17 +1310,17 @@ just list the classes and their main function:
 <B>org.omg.CORBA.ORB:</B><DD CLASS="dd-description">This is the main ORB API defined by the OMG.
 <DT CLASS="dt-description"><B>org.omg.CORBA_2_3.ORB:</B><DD CLASS="dd-description">This adds some methods related to value
 types.
-<DT CLASS="dt-description"><B>com.sun.corba.se.org.omg.CORBA.ORB:</B><DD CLASS="dd-description">This adds register_initial_reference.
+<DT CLASS="dt-description"><B>com.sun.corba.ee.org.omg.CORBA.ORB:</B><DD CLASS="dd-description">This adds register_initial_reference.
 While the method is an OMG standard, the Java mapping that we used
 for the ORB API did not include this method, so we put it here.
-<DT CLASS="dt-description"><B>com.sun.corba.se.spi.orb.ORB:</B><DD CLASS="dd-description">This adds all of the internal SPI
+<DT CLASS="dt-description"><B>com.sun.corba.ee.spi.orb.ORB:</B><DD CLASS="dd-description">This adds all of the internal SPI
 methods to the ORB.
-<DT CLASS="dt-description"><B>com.sun.corba.se.impl.orb.ORBImpl:</B><DD CLASS="dd-description">This is the ORB implementation.
-<DT CLASS="dt-description"><B>com.sun.corba.se.internal.iiop.ORB:</B><DD CLASS="dd-description">For backwards compatibility
+<DT CLASS="dt-description"><B>com.sun.corba.ee.impl.orb.ORBImpl:</B><DD CLASS="dd-description">This is the ORB implementation.
+<DT CLASS="dt-description"><B>com.sun.corba.ee.internal.iiop.ORB:</B><DD CLASS="dd-description">For backwards compatibility
 with JDK 1.4.
-<DT CLASS="dt-description"><B>com.sun.corba.se.internal.POAORB:</B><DD CLASS="dd-description">For backwards compatibility with
+<DT CLASS="dt-description"><B>com.sun.corba.ee.internal.POAORB:</B><DD CLASS="dd-description">For backwards compatibility with
 JDK 1.4.
-<DT CLASS="dt-description"><B>com.sun.corba.se.internal.PIORB:</B><DD CLASS="dd-description">For backwards compatibility with
+<DT CLASS="dt-description"><B>com.sun.corba.ee.internal.PIORB:</B><DD CLASS="dd-description">For backwards compatibility with
 JDK 1.4.
 </DL>
 The first 3 classes together define the standard OMG ORB API. It is
@@ -1335,7 +1335,7 @@ set to the class name will continue to work.<BR>
 
 <H2 CLASS="section"><A NAME="htoc23">2.2</A>&nbsp;&nbsp;ORB SPI structure<A NAME="sec:ORB-SPI-structure"></A> </H2><!--SEC END -->
 
-The key part of the ORB SPI is in the com.sun.corba.se.spi.orb.ORB
+The key part of the ORB SPI is in the com.sun.corba.ee.spi.orb.ORB
 abstract class. This is an abstract class because it must extend the
 other ORB abstract API classes defined by the OMG. The ORB class provides
 the following operations:

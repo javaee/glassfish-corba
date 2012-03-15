@@ -50,23 +50,23 @@ import corba.hcks.U;
 
 public class rmiiIServantPOA
     extends 
-	PortableRemoteObject
+        PortableRemoteObject
     implements
-	rmiiI
+        rmiiI
 {
     public static final String baseMsg = rmiiIServantPOA.class.getName();
 
     public rmiiIServantPOA ()
-	throws
-	    RemoteException
+        throws
+            RemoteException
     { 
-	// DO NOT CALL SUPER - that would connect the object.
+        // DO NOT CALL SUPER - that would connect the object.
     }
 
     public String m(String x)
     {
-	String result = x + " (echo from " + baseMsg + ")";
-	U.sop(result);
+        String result = x + " (echo from " + baseMsg + ")";
+        U.sop(result);
         return result;
     }
 }

@@ -46,24 +46,24 @@ Remaining work
 Testing:
 Tagged Components: (DONE)
     General:
-	- Constructed data can be retrieved
-	- read and written correctly as part of IOR
-	  (test this first in IdEncapsulationContainerBase test)
+        - Constructed data can be retrieved
+        - read and written correctly as part of IOR
+          (test this first in IdEncapsulationContainerBase test)
     AlternateIIOPAddressComponent:
-	- can correctly write out TCP port >32K
+        - can correctly write out TCP port >32K
     CodeSetsComponent
-	- none additional
+        - none additional
     JavaCodebaseComponent
-	- none additional
+        - none additional
     ORBTypeComponent
-	- none additional
+        - none additional
     PoliciesComponent
-	- none additional
+        - none additional
 
 IdentifiableContainerBase (DONE)
     - Test iteratorById on Identifiables (DONE)
-	- Iterator on id not present is empty (hasNext() == false)
-	- Iterator on id present returns all ids in sequence
+        - Iterator on id not present is empty (hasNext() == false)
+        - Iterator on id present returns all ids in sequence
 IdEncapsulationContainerBase  (DONE)
     - Test read sequence of TaggedComponents
     - Test writing sequence of TaggedComponents
@@ -73,13 +73,13 @@ GenericIdEncapsulation (DONE)
 IIOPAddress (DONE)
     - Constructed object returns correct values
     - equals:
-	- false for non-IIOPAddress value
-	- true iff ports and hosts match
+        - false for non-IIOPAddress value
+        - true iff ports and hosts match
 IIOPProfile (DONE)
     - construct from id, template; check that correct values are returned
     - write out and read back
-	- no components for 1.0
-	- components for >1.0
+        - no components for 1.0
+        - components for >1.0
     - getObjectKey returns value constructed correctly
     - isEquivalent iff ids equal and templates equivalent
 IIOPProfileTemplate (DONE)
@@ -88,19 +88,19 @@ IIOPProfileTemplate (DONE)
     - cannot have new components added after makeImmutable call
 IOR (DONE)
     - Constructed object contains correct values
-	- IOR() has null typeid and no profiles (DONE)
-	- IOR( String ) has given typeid and no profiles (DONE)
-	- IOR( String, IIOPProfileTemplate, ObjectId ) has given typeid and
+        - IOR() has null typeid and no profiles (DONE)
+        - IOR( String ) has given typeid and no profiles (DONE)
+        - IOR( String, IIOPProfileTemplate, ObjectId ) has given typeid and
           one IIOPProfile corresponding to template and objectid
-	- IOR( String, IORTemplate, ObjectId ) has profiles corresponding to
-	  IORTemplate and ObjectIds. (DONE)
-	- IORTemplate( String, IORTemplate, ObjectIds ) has profiles
-	  corresponding to IORTemplate and ObjectIds (DONE)
-	- IOR( IORTemplate, ObjectIds ) usual test (DONE)
+        - IOR( String, IORTemplate, ObjectId ) has profiles corresponding to
+          IORTemplate and ObjectIds. (DONE)
+        - IORTemplate( String, IORTemplate, ObjectIds ) has profiles
+          corresponding to IORTemplate and ObjectIds (DONE)
+        - IOR( IORTemplate, ObjectIds ) usual test (DONE)
     - write out/read back test (DONE)
-	- Construct IOR with 2 IIOPProfiles, each with several components,
-	  and 2 GenericIdEncapsulation profiles, write out, read back,
-	  check for equals directly and by calling equals
+        - Construct IOR with 2 IIOPProfiles, each with several components,
+          and 2 GenericIdEncapsulation profiles, write out, read back,
+          check for equals directly and by calling equals
     - cannot have new profiles added after makeImmutable call (DONE)
     - contained IIOPProfiles cannot have added components after
       makeImmutable call. (DONE)
@@ -128,13 +128,13 @@ ObjectKey (DONE)
       comparing)
 ObjectKeyFactory (DONE)
     - test create with hand created keys
-	- key length < 4
-	- key length >= 4
-	    - magic is JAVAMAGIC
-		- scid is POA scid
-		- scid is JIDL scid
-		- other scid
-	    - magic is not JAVAMAGIC
+        - key length < 4
+        - key length >= 4
+            - magic is JAVAMAGIC
+                - scid is POA scid
+                - scid is JIDL scid
+                - other scid
+            - magic is not JAVAMAGIC
     - test with error cases on length
 POAObjectKeyTemplate (DONE)
     - test that IDs match expected values when created from

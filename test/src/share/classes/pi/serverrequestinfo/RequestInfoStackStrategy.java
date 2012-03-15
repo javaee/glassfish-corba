@@ -41,7 +41,7 @@
 package pi.serverrequestinfo;
 
 import org.omg.CORBA.*;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.Messaging.*;
 
@@ -70,104 +70,104 @@ public class RequestInfoStackStrategy
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
         throws ForwardRequest
     {
-	try {
-	    super.receive_request_service_contexts( interceptor, ri );
-	    log( "rrsc(): count = " + count );
-	    log( "rrsc(): count = " + count + " to " + (count+1) );
-	    count++;
-	    if( count == 1 ) testNum++;
-	    checkOperationName( "rrsc", ri.operation() );
-	}
-	catch( Exception ex ) {
-	    failException( "rrsc", ex );
-	}
+        try {
+            super.receive_request_service_contexts( interceptor, ri );
+            log( "rrsc(): count = " + count );
+            log( "rrsc(): count = " + count + " to " + (count+1) );
+            count++;
+            if( count == 1 ) testNum++;
+            checkOperationName( "rrsc", ri.operation() );
+        }
+        catch( Exception ex ) {
+            failException( "rrsc", ex );
+        }
     }
 
     public void receive_request (
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
     {
-	try {
-	    super.receive_request( interceptor, ri );
-	    log( "rr(): count = " + count );
-	    checkOperationName( "rr", ri.operation() );
-	}
-	catch( Exception ex ) {
-	    failException( "receive_request", ex );
-	}
+        try {
+            super.receive_request( interceptor, ri );
+            log( "rr(): count = " + count );
+            checkOperationName( "rr", ri.operation() );
+        }
+        catch( Exception ex ) {
+            failException( "receive_request", ex );
+        }
     }
 
     public void send_reply (
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
     {
-	try {
-	    super.send_reply( interceptor, ri );
-	    log( "sr(): count = " + count );
-	    checkOperationName( "sr", ri.operation() );
-	    log( "sr(): count = " + count + " to " + (count-1) );
-	    count--;
-	}
-	catch( Exception ex ) {
-	    failException( "send_reply", ex );
-	}
+        try {
+            super.send_reply( interceptor, ri );
+            log( "sr(): count = " + count );
+            checkOperationName( "sr", ri.operation() );
+            log( "sr(): count = " + count + " to " + (count-1) );
+            count--;
+        }
+        catch( Exception ex ) {
+            failException( "send_reply", ex );
+        }
     }
 
     public void send_exception (
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
         throws ForwardRequest
     {
-	try {
-	    super.send_exception( interceptor, ri );
-	    log( "se(): count = " + count );
-	    checkOperationName( "se", ri.operation() );
-	    log( "se(): count = " + count + " to " + (count-1) );
-	    count--;
-	}
-	catch( Exception ex ) {
-	    failException( "send_exception", ex );
-	}
+        try {
+            super.send_exception( interceptor, ri );
+            log( "se(): count = " + count );
+            checkOperationName( "se", ri.operation() );
+            log( "se(): count = " + count + " to " + (count-1) );
+            count--;
+        }
+        catch( Exception ex ) {
+            failException( "send_exception", ex );
+        }
     }
 
     public void send_other (
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
         throws ForwardRequest
     {
-	try {
-	    super.send_other( interceptor, ri );
-	    log( "so(): count = " + count );
-	    checkOperationName( "so", ri.operation() );
-	    log( "so(): count = " + count + " to " + (count-1) );
-	    count--;
-	}
-	catch( Exception ex ) {
-	    failException( "send_other", ex );
-	}
+        try {
+            super.send_other( interceptor, ri );
+            log( "so(): count = " + count );
+            checkOperationName( "so", ri.operation() );
+            log( "so(): count = " + count + " to " + (count-1) );
+            count--;
+        }
+        catch( Exception ex ) {
+            failException( "send_other", ex );
+        }
     }
 
     private void checkOperationName( String method, String operationName )
-	throws Exception
+        throws Exception
     {
-	switch( count ) {
-	case 1:
-	    if( !operationName.equals( "sayInvokeAgain" ) ) {
-		fail( method + "(): Incorrect operation name: " + 
-		    operationName + " Count = 1" );
-	    }
-	    log( method + "(): sayInvokeAgain() invoked" );
-	    break;
-	case 2:
-	    String expected = (testNum == 1) ? 
-		"sayHello" : "saySystemException";
-	    if( !operationName.equals( expected ) ) {
-		fail( method + "(): Incorrect operation name: " + 
-		    operationName + " Count = 2" );
-	    }
-	    log( method + "(): " + expected + "() invoked" );
-	    break;
-	default:
-	    // This will happen if our recursive depth is too high
-	    // from PI's standpoint.
-	    log( method + "(): count too high! count = " + count );
-	    break;
-	}
+        switch( count ) {
+        case 1:
+            if( !operationName.equals( "sayInvokeAgain" ) ) {
+                fail( method + "(): Incorrect operation name: " + 
+                    operationName + " Count = 1" );
+            }
+            log( method + "(): sayInvokeAgain() invoked" );
+            break;
+        case 2:
+            String expected = (testNum == 1) ? 
+                "sayHello" : "saySystemException";
+            if( !operationName.equals( expected ) ) {
+                fail( method + "(): Incorrect operation name: " + 
+                    operationName + " Count = 2" );
+            }
+            log( method + "(): " + expected + "() invoked" );
+            break;
+        default:
+            // This will happen if our recursive depth is too high
+            // from PI's standpoint.
+            log( method + "(): count too high! count = " + count );
+            break;
+        }
     }
 }

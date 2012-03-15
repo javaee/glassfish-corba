@@ -54,23 +54,23 @@ public class WombatClient extends ThreadProcess
 
     public org.omg.CORBA.Object readObjref(String file) throws IOException {
 
-	String fil = environment.getProperty("output.dir")
+        String fil = environment.getProperty("output.dir")
             + File.separator
             + file;
 
         String ior = null;
 
-	try {
-	    java.io.DataInputStream in = 
-		new java.io.DataInputStream(new FileInputStream(fil));
-	    ior = in.readLine();
-	    out.println("IOR: "+ ior);
+        try {
+            java.io.DataInputStream in = 
+                new java.io.DataInputStream(new FileInputStream(fil));
+            ior = in.readLine();
+            out.println("IOR: "+ ior);
             in.close();
 
-	} catch (java.io.IOException e) {
-	    err.println("Unable to open file "+ fil);
+        } catch (java.io.IOException e) {
+            err.println("Unable to open file "+ fil);
             throw e;
-	}
+        }
 
         return orb.string_to_object(ior);
     }

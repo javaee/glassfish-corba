@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.ior.iiop;
+package com.sun.corba.ee.impl.ior.iiop;
 
 import java.util.Iterator ;
 
@@ -50,40 +50,40 @@ import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.IOP.TAG_INTERNET_IOP;
 import org.omg.IOP.TAG_JAVA_CODEBASE;
 
-import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
+import com.sun.corba.ee.spi.protocol.RequestDispatcherRegistry ;
 
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
-import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
+import com.sun.corba.ee.spi.oa.ObjectAdapter ;
+import com.sun.corba.ee.spi.oa.ObjectAdapterFactory ;
 
-import com.sun.corba.se.spi.ior.ObjectId ;
-import com.sun.corba.se.spi.ior.ObjectAdapterId ;
-import com.sun.corba.se.spi.ior.TaggedProfile ;
-import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
-import com.sun.corba.se.spi.ior.ObjectKey ;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
-import com.sun.corba.se.spi.ior.TaggedComponent ;
-import com.sun.corba.se.spi.ior.IdentifiableBase ;
-import com.sun.corba.se.spi.ior.IORFactories ;
+import com.sun.corba.ee.spi.ior.ObjectId ;
+import com.sun.corba.ee.spi.ior.ObjectAdapterId ;
+import com.sun.corba.ee.spi.ior.TaggedProfile ;
+import com.sun.corba.ee.spi.ior.TaggedProfileTemplate ;
+import com.sun.corba.ee.spi.ior.ObjectKey ;
+import com.sun.corba.ee.spi.ior.ObjectKeyTemplate ;
+import com.sun.corba.ee.spi.ior.TaggedComponent ;
+import com.sun.corba.ee.spi.ior.IdentifiableBase ;
+import com.sun.corba.ee.spi.ior.IORFactories ;
 
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
-import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
-import com.sun.corba.se.spi.ior.iiop.JavaCodebaseComponent ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPAddress ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfile ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPFactories ;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion ;
+import com.sun.corba.ee.spi.ior.iiop.JavaCodebaseComponent ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orb.ORBVersion ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORBVersion ;
 
-import com.sun.corba.se.impl.ior.EncapsulationUtility ;
+import com.sun.corba.ee.impl.ior.EncapsulationUtility ;
 
-import com.sun.corba.se.impl.encoding.EncapsInputStream ;
-import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
+import com.sun.corba.ee.impl.encoding.EncapsInputStream ;
+import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
 
-import com.sun.corba.se.impl.util.JDKBridge;
+import com.sun.corba.ee.impl.util.JDKBridge;
 
-import com.sun.corba.se.spi.logging.IORSystemException;
-import com.sun.corba.se.spi.trace.IsLocal;
+import com.sun.corba.ee.spi.logging.IORSystemException;
+import com.sun.corba.ee.spi.trace.IsLocal;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
@@ -110,16 +110,16 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 
     // initialize-on-demand holder
     private static class LocalCodeBaseSingletonHolder {
-	public static JavaCodebaseComponent comp ;
+        public static JavaCodebaseComponent comp ;
 
-	static {
-	    String localCodebase = JDKBridge.getLocalCodebase() ;
-	    if (localCodebase == null) {
+        static {
+            String localCodebase = JDKBridge.getLocalCodebase() ;
+            if (localCodebase == null) {
                 comp = null;
             } else {
                 comp = IIOPFactories.makeJavaCodebaseComponent(localCodebase);
             }
-	}
+        }
     }
 
     private GIOPVersion giopVersion = null;
@@ -138,175 +138,175 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
     @Override
     public boolean equals( Object obj )
     {
-	if (!(obj instanceof IIOPProfileImpl)) {
+        if (!(obj instanceof IIOPProfileImpl)) {
             return false;
         }
 
-	IIOPProfileImpl other = (IIOPProfileImpl)obj ;
+        IIOPProfileImpl other = (IIOPProfileImpl)obj ;
 
-	return oid.equals( other.oid ) && proftemp.equals( other.proftemp ) &&
-	    oktemp.equals( other.oktemp ) ;
+        return oid.equals( other.oid ) && proftemp.equals( other.proftemp ) &&
+            oktemp.equals( other.oktemp ) ;
     }
 
     @Override
     public int hashCode()
     {
-	return oid.hashCode() ^ proftemp.hashCode() ^ oktemp.hashCode() ;
+        return oid.hashCode() ^ proftemp.hashCode() ^ oktemp.hashCode() ;
     }
 
     public ObjectId getObjectId()
     {
-	return oid ;
+        return oid ;
     }
 
     public TaggedProfileTemplate getTaggedProfileTemplate()
     {
-	return proftemp ;
+        return proftemp ;
     }
 
     public ObjectKeyTemplate getObjectKeyTemplate() 
     {
-	return oktemp ;
+        return oktemp ;
     }
 
     private IIOPProfileImpl( ORB orb ) 
     {
-	this.orb = orb ;
+        this.orb = orb ;
     }
 
     public IIOPProfileImpl( ORB orb, ObjectKeyTemplate oktemp, ObjectId oid, 
-	IIOPProfileTemplate proftemp )
+        IIOPProfileTemplate proftemp )
     {
-	this( orb ) ;
-	this.oktemp = oktemp ;
-	this.oid = oid ;
-	this.proftemp = proftemp ;
+        this( orb ) ;
+        this.oktemp = oktemp ;
+        this.oid = oid ;
+        this.proftemp = proftemp ;
     }
 
     public IIOPProfileImpl( InputStream is )
     {
-	this( (ORB)(is.orb()) ) ;
-	init( is ) ;
+        this( (ORB)(is.orb()) ) ;
+        init( is ) ;
     }
 
     public IIOPProfileImpl( ORB orb, org.omg.IOP.TaggedProfile profile) 
     {
-	this( orb ) ;
+        this( orb ) ;
 
         if (profile == null || profile.tag != TAG_INTERNET_IOP.value ||
-	    profile.profile_data == null) {
-	    throw wrapper.invalidTaggedProfile() ;
+            profile.profile_data == null) {
+            throw wrapper.invalidTaggedProfile() ;
         }
 
         EncapsInputStream istr = new EncapsInputStream(orb, profile.profile_data, 
-	    profile.profile_data.length);
-	istr.consumeEndian();
-	init( istr ) ;
+            profile.profile_data.length);
+        istr.consumeEndian();
+        init( istr ) ;
     }
 
     private void init( InputStream istr )
     {
-	// First, read all of the IIOP IOR data
-	GIOPVersion version = new GIOPVersion() ;
-	version.read( istr ) ;
-	IIOPAddress primary = new IIOPAddressImpl( istr ) ;
-	byte[] key = EncapsulationUtility.readOctets( istr ) ;
+        // First, read all of the IIOP IOR data
+        GIOPVersion version = new GIOPVersion() ;
+        version.read( istr ) ;
+        IIOPAddress primary = new IIOPAddressImpl( istr ) ;
+        byte[] key = EncapsulationUtility.readOctets( istr ) ;
 
-	ObjectKey okey = orb.getObjectKeyFactory().create( key ) ;
-	oktemp = okey.getTemplate() ;
-	oid = okey.getId() ;
+        ObjectKey okey = orb.getObjectKeyFactory().create( key ) ;
+        oktemp = okey.getTemplate() ;
+        oid = okey.getId() ;
 
-	proftemp = IIOPFactories.makeIIOPProfileTemplate( orb, 
-	    version, primary ) ;
+        proftemp = IIOPFactories.makeIIOPProfileTemplate( orb, 
+            version, primary ) ;
 
-	// Handle any tagged components (if applicable)
-	if (version.getMinor() > 0) {
+        // Handle any tagged components (if applicable)
+        if (version.getMinor() > 0) {
             EncapsulationUtility.readIdentifiableSequence(proftemp,
                 orb.getTaggedComponentFactoryFinder(), istr);
         }
 
-	// If there is no codebase in this IOR and there IS a
-	// java.rmi.server.codebase property set, we need to
-	// update the IOR with the local codebase.  Note that
-	// there is only one instance of the local codebase, but it
-	// can be safely shared in multiple IORs since it is immutable.
-	if (uncachedGetCodeBase() == null) {
-	    JavaCodebaseComponent jcc = LocalCodeBaseSingletonHolder.comp ;
+        // If there is no codebase in this IOR and there IS a
+        // java.rmi.server.codebase property set, we need to
+        // update the IOR with the local codebase.  Note that
+        // there is only one instance of the local codebase, but it
+        // can be safely shared in multiple IORs since it is immutable.
+        if (uncachedGetCodeBase() == null) {
+            JavaCodebaseComponent jcc = LocalCodeBaseSingletonHolder.comp ;
 
-	    if (jcc != null) {
-		if (version.getMinor() > 0) {
+            if (jcc != null) {
+                if (version.getMinor() > 0) {
                     proftemp.add(jcc);
                 }
 
-		codebase = jcc.getURLs() ;
-	    }
+                codebase = jcc.getURLs() ;
+            }
 
-	    // Whether codebase is null or not, we have it,
-	    // and so getCodebase ned never call uncachedGetCodebase.
-	    cachedCodebase = true;
-	}
-    }	
+            // Whether codebase is null or not, we have it,
+            // and so getCodebase ned never call uncachedGetCodebase.
+            cachedCodebase = true;
+        }
+    }   
 
     public void writeContents(OutputStream os)
     {
-	proftemp.write( oktemp, oid, os ) ;
+        proftemp.write( oktemp, oid, os ) ;
     }
 
     public int getId()
     {
-	return proftemp.getId() ;
+        return proftemp.getId() ;
     }
 
     public boolean isEquivalent( TaggedProfile prof )
     {
-	if (!(prof instanceof IIOPProfile)) {
+        if (!(prof instanceof IIOPProfile)) {
             return false;
         }
 
-	IIOPProfile other = (IIOPProfile)prof ;
+        IIOPProfile other = (IIOPProfile)prof ;
 
-	return oid.equals( other.getObjectId() ) && 
-	       proftemp.isEquivalent( other.getTaggedProfileTemplate() ) &&
-	       oktemp.equals( other.getObjectKeyTemplate() ) ;
+        return oid.equals( other.getObjectId() ) && 
+               proftemp.isEquivalent( other.getTaggedProfileTemplate() ) &&
+               oktemp.equals( other.getObjectKeyTemplate() ) ;
     }
 
     public synchronized ObjectKey getObjectKey()
     {
         if (objectKey == null) {
-	    objectKey = IORFactories.makeObjectKey( oktemp, oid ) ;
-	}
-	return objectKey ;
+            objectKey = IORFactories.makeObjectKey( oktemp, oid ) ;
+        }
+        return objectKey ;
     }
 
     public org.omg.IOP.TaggedProfile getIOPProfile()
     {
-	EncapsOutputStream os = new EncapsOutputStream( orb ) ;
-	os.write_long( getId() ) ;
-	write( os ) ;
-	InputStream is = (InputStream)(os.create_input_stream()) ;
-	return org.omg.IOP.TaggedProfileHelper.read( is ) ;
+        EncapsOutputStream os = new EncapsOutputStream( orb ) ;
+        os.write_long( getId() ) ;
+        write( os ) ;
+        InputStream is = (InputStream)(os.create_input_stream()) ;
+        return org.omg.IOP.TaggedProfileHelper.read( is ) ;
     }
 
     private String uncachedGetCodeBase() {
-	Iterator<TaggedComponent> iter = 
-	    proftemp.iteratorById( TAG_JAVA_CODEBASE.value ) ;
+        Iterator<TaggedComponent> iter = 
+            proftemp.iteratorById( TAG_JAVA_CODEBASE.value ) ;
 
-	if (iter.hasNext()) {
-	    JavaCodebaseComponent jcbc = 
-		JavaCodebaseComponent.class.cast( iter.next() ) ;
-	    return jcbc.getURLs() ;
-	}
+        if (iter.hasNext()) {
+            JavaCodebaseComponent jcbc = 
+                JavaCodebaseComponent.class.cast( iter.next() ) ;
+            return jcbc.getURLs() ;
+        }
 
-	return null ;
+        return null ;
     }
 
     public synchronized String getCodebase() {
-	if (!cachedCodebase) {
-	    cachedCodebase = true ;
-	    codebase = uncachedGetCodeBase() ;
-	}
+        if (!cachedCodebase) {
+            cachedCodebase = true ;
+            codebase = uncachedGetCodeBase() ;
+        }
 
-	return codebase ;
+        return codebase ;
     }
 
     /**
@@ -326,10 +326,10 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
     @IsLocal
     public synchronized boolean isLocal()
     {
-	if (!checkedIsLocal) {
-	    checkedIsLocal = true ;
+        if (!checkedIsLocal) {
+            checkedIsLocal = true ;
 
-	    final String host = proftemp.getPrimaryAddress().getHost() ;
+            final String host = proftemp.getPrimaryAddress().getHost() ;
             final int scid = oktemp.getSubcontractId() ;
             final int sid = oktemp.getServerId() ;
             final int port = proftemp.getPrimaryAddress().getPort() ;
@@ -342,11 +342,11 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
                 orb.getLegacyServerSocketManager().legacyIsLocalServerPort( port ) ;
             isLocalResults( isLocalHost, isLocalServerId, isLocalServerPort ) ;
 
-	    cachedIsLocal = isLocalHost && isLocalServerId 
+            cachedIsLocal = isLocalHost && isLocalServerId 
                 && isLocalServerPort ;
         }
 
-	return cachedIsLocal ;
+        return cachedIsLocal ;
     }
 
     /** Return the servant for this IOR, if it is local AND if the OA that
@@ -356,30 +356,30 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
     @IsLocal
     public java.lang.Object getServant()
     {
-	if (!isLocal()) {
+        if (!isLocal()) {
             return null;
         }
 
-	RequestDispatcherRegistry scr = orb.getRequestDispatcherRegistry() ;
-	ObjectAdapterFactory oaf = scr.getObjectAdapterFactory( 
-	    oktemp.getSubcontractId() ) ;
+        RequestDispatcherRegistry scr = orb.getRequestDispatcherRegistry() ;
+        ObjectAdapterFactory oaf = scr.getObjectAdapterFactory( 
+            oktemp.getSubcontractId() ) ;
 
-	ObjectAdapterId oaid = oktemp.getObjectAdapterId() ;
-	ObjectAdapter oa = null ;
+        ObjectAdapterId oaid = oktemp.getObjectAdapterId() ;
+        ObjectAdapter oa = null ;
 
-	try {
-	    oa = oaf.find( oaid ) ;
-	} catch (SystemException exc) {
-	    // Could not find the OA, so just return null.
-	    // This usually happens when POAs are being deleted,
-	    // and the POA always return null for getLocalServant anyway.
-	    wrapper.getLocalServantFailure( exc, oaid ) ;
-	    return null ;
-	}
+        try {
+            oa = oaf.find( oaid ) ;
+        } catch (SystemException exc) {
+            // Could not find the OA, so just return null.
+            // This usually happens when POAs are being deleted,
+            // and the POA always return null for getLocalServant anyway.
+            wrapper.getLocalServantFailure( exc, oaid ) ;
+            return null ;
+        }
 
-	byte[] boid = oid.getId() ;
-	java.lang.Object servant = oa.getLocalServant( boid ) ;
-	return servant ;
+        byte[] boid = oid.getId() ;
+        java.lang.Object servant = oa.getLocalServant( boid ) ;
+        return servant ;
     }
 
     /**
@@ -389,11 +389,11 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
      */
     public synchronized GIOPVersion getGIOPVersion()
     {
-	return proftemp.getGIOPVersion() ;
+        return proftemp.getGIOPVersion() ;
     }
 
     public void makeImmutable()
     {
-	proftemp.makeImmutable() ;
+        proftemp.makeImmutable() ;
     }
 }

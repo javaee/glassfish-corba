@@ -38,23 +38,23 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.ior;
+package com.sun.corba.ee.impl.ior;
 
 
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
 
-import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
+import com.sun.corba.ee.spi.protocol.ServerRequestDispatcher ;
 
-import com.sun.corba.se.spi.ior.ObjectId ;
-import com.sun.corba.se.spi.ior.ObjectAdapterId ;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
+import com.sun.corba.ee.spi.ior.ObjectId ;
+import com.sun.corba.ee.spi.ior.ObjectAdapterId ;
+import com.sun.corba.ee.spi.ior.ObjectKeyTemplate ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orb.ORBVersion ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORBVersion ;
 
 
-import com.sun.corba.se.spi.logging.IORSystemException ;
+import com.sun.corba.ee.spi.logging.IORSystemException ;
 
 /**
  * @author Ken Cavanaugh
@@ -121,14 +121,14 @@ public abstract class ObjectKeyTemplateBase implements ObjectKeyTemplate
     }
 
     public ObjectKeyTemplateBase( ORB orb, int magic, int scid, int serverid, 
-	String orbid, ObjectAdapterId oaid ) 
+        String orbid, ObjectAdapterId oaid ) 
     {
-	this.orb = orb ;
-	this.magic = magic ;
-	this.scid = scid ;
-	this.serverid = serverid ;
-	this.orbid = orbid ;
-	this.oaid = oaid ;
+        this.orb = orb ;
+        this.magic = magic ;
+        this.scid = scid ;
+        this.serverid = serverid ;
+        this.orbid = orbid ;
+        this.oaid = oaid ;
 
         adapterId = null;
     }

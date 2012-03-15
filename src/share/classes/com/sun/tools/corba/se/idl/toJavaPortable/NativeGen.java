@@ -74,7 +74,7 @@ public class NativeGen implements com.sun.tools.corba.se.idl.NativeGen
    **/
   public void generate (Hashtable symbolTable, NativeEntry c, PrintWriter s)
   {
-	// noop, do not generate anything
+        // noop, do not generate anything
   } // generate
 
 } // class NativeGen

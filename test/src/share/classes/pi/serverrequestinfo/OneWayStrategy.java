@@ -40,7 +40,7 @@
 
 package pi.serverrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 
 /**
@@ -57,7 +57,7 @@ public class OneWayStrategy
         super.receive_request_service_contexts( interceptor, ri );
 
         try {
-	    checkResponseExpected( "rrsc", ri );
+            checkResponseExpected( "rrsc", ri );
         }
         catch( Exception e ) {
             failException( "rrsc", e );
@@ -70,7 +70,7 @@ public class OneWayStrategy
         super.receive_request( interceptor, ri );
         
         try {
-	    checkResponseExpected( "receive_request", ri );
+            checkResponseExpected( "receive_request", ri );
         }
         catch( Exception e ) {
             failException( "receive_request", e );
@@ -83,7 +83,7 @@ public class OneWayStrategy
         super.send_reply( interceptor, ri );
         
         try {
-	    checkResponseExpected( "send_reply", ri );
+            checkResponseExpected( "send_reply", ri );
         }
         catch( Exception e ) {
             failException( "send_reply", e );
@@ -92,16 +92,16 @@ public class OneWayStrategy
 
 
     private void checkResponseExpected( String method, ServerRequestInfo ri ) {
-	String operationName = ri.operation();
-	boolean responseExpected = ri.response_expected();
-	boolean validExpected = !operationName.equals( "sayOneway" );
+        String operationName = ri.operation();
+        boolean responseExpected = ri.response_expected();
+        boolean validExpected = !operationName.equals( "sayOneway" );
 
-	log( method + "(): Operation " + operationName + 
-	     ", response expected = " + responseExpected );
+        log( method + "(): Operation " + operationName + 
+             ", response expected = " + responseExpected );
 
-	if( responseExpected != validExpected ) {
-	    fail( "response_expected() invalid for this operation." );
-	}
+        if( responseExpected != validExpected ) {
+            fail( "response_expected() invalid for this operation." );
+        }
     }
 
 }

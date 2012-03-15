@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior.iiop;
+package com.sun.corba.ee.spi.ior.iiop;
 
-import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
+import com.sun.corba.ee.spi.ior.TaggedProfileTemplate ;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion ;
 
 import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.ManagedAttribute ;

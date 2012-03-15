@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package com.sun.corba.ee.impl.dynamicany;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
@@ -48,7 +48,7 @@ import org.omg.CORBA.portable.OutputStream;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 import org.omg.DynamicAny.DynAny;
 import org.omg.DynamicAny.DynSequence;
 
@@ -135,7 +135,7 @@ public class DynSequenceImpl extends DynAnyCollectionImpl implements DynSequence
     // Returns the current length of the sequence
     public int get_length() {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         return (checkInitComponents() ? components.length : 0);
     }
@@ -166,7 +166,7 @@ public class DynSequenceImpl extends DynAnyCollectionImpl implements DynSequence
         throws org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         int bound = getBound();
         if (bound > 0 && len > bound) {

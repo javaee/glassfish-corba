@@ -45,16 +45,16 @@
 package corba.orbconfigappserv;
 
 import org.omg.CORBA.INITIALIZE;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orb.ORBConfigurator;
-import com.sun.corba.se.spi.orb.ParserImplBase;
-import com.sun.corba.se.spi.orb.PropertyParser;
-import com.sun.corba.se.spi.orb.DataCollector;
-import com.sun.corba.se.spi.orb.OperationFactory;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORBConfigurator;
+import com.sun.corba.ee.spi.orb.ParserImplBase;
+import com.sun.corba.ee.spi.orb.PropertyParser;
+import com.sun.corba.ee.spi.orb.DataCollector;
+import com.sun.corba.ee.spi.orb.OperationFactory;
 
 public class UserORBConfiguratorImpl 
     implements 
-	ORBConfigurator 
+        ORBConfigurator 
 {
     public static String propertyName = "userConfigProperty";
 
@@ -65,31 +65,31 @@ public class UserORBConfiguratorImpl
             this.orb = orb ;
         }
 
-	public Class testclass = 
-	    corba.orbconfigappserv.UserORBConfiguratorImpl.class;
+        public Class testclass = 
+            corba.orbconfigappserv.UserORBConfiguratorImpl.class;
 
-	public PropertyParser makeParser()
-	{
-	    PropertyParser parser = new PropertyParser() ;
-	    parser.add( propertyName,
-			OperationFactory.classAction(orb.classNameResolver()), 
-			"testclass" ) ;
-	    return parser ;
-	}
+        public PropertyParser makeParser()
+        {
+            PropertyParser parser = new PropertyParser() ;
+            parser.add( propertyName,
+                        OperationFactory.classAction(orb.classNameResolver()), 
+                        "testclass" ) ;
+            return parser ;
+        }
     }
 
     public void configure( DataCollector dc, ORB orb ) {
-	ConfigParser parser = new ConfigParser( orb );
-	parser.init( dc );
-	Class theTestclass = parser.testclass;
+        ConfigParser parser = new ConfigParser( orb );
+        parser.init( dc );
+        Class theTestclass = parser.testclass;
 
         if (theTestclass != null) {
             try {
                 Object o = theTestclass.newInstance();
-		System.out.println("UserORBConfiguratorImpl.configure: " + o);
+                System.out.println("UserORBConfiguratorImpl.configure: " + o);
             } catch (Exception ex) {
                 throw new org.omg.CORBA.INITIALIZE(ex.toString());
             }
         }
-    }	
+    }   
 }

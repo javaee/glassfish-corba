@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.naming.pcosnaming;
+package com.sun.corba.ee.impl.naming.pcosnaming;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,7 +53,7 @@ import org.omg.PortableServer.ForwardRequest;
 import org.omg.PortableServer.ServantLocator;
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
 /**
  * @version     1.6, 99/10/07
@@ -81,105 +81,105 @@ public class ServantManagerImpl extends org.omg.CORBA.LocalObject implements Ser
 
     ServantManagerImpl(ORB orb, File logDir, NameService aNameService)
     {
-	this.logDir = logDir;
-	this.orb    = orb;
-	// initialize the counter database
-	counterDb   = new CounterDB(logDir);
-	contexts    = new HashMap<String,NamingContextImpl>();
-	theNameService = aNameService;
+        this.logDir = logDir;
+        this.orb    = orb;
+        // initialize the counter database
+        counterDb   = new CounterDB(logDir);
+        contexts    = new HashMap<String,NamingContextImpl>();
+        theNameService = aNameService;
     }
 
 
     public Servant preinvoke(byte[] oid, POA adapter, String operation, 
-			     CookieHolder cookie) throws ForwardRequest
+                             CookieHolder cookie) throws ForwardRequest
     {
 
-	String objKey = new String(oid);
+        String objKey = new String(oid);
 
-	Servant servant = contexts.get(objKey);
+        Servant servant = contexts.get(objKey);
 
-	if (servant == null) {
+        if (servant == null) {
             servant =  readInContext(objKey);
-	}
+        }
 
-	return servant;
+        return servant;
     }
 
     public void postinvoke(byte[] oid, POA adapter, String operation,
-			   java.lang.Object cookie, Servant servant)
+                           java.lang.Object cookie, Servant servant)
     {
-	// nada
+        // nada
     }
 
     public NamingContextImpl readInContext(String objKey)
     {
-	NamingContextImpl context = contexts.get(objKey);
-	if( context != null ) {
+        NamingContextImpl context = contexts.get(objKey);
+        if( context != null ) {
             // Returning Context from Cache
             return context;
-	}	
+        }       
 
-	File contextFile = new File(logDir, objKey);
-	if (contextFile.exists()) {
-	    try {
-		FileInputStream fis = new FileInputStream(contextFile);
-		ObjectInputStream ois = new ObjectInputStream(fis);
-		context = (NamingContextImpl) ois.readObject();
-		context.setORB( orb );
-		context.setServantManagerImpl( this );
-		context.setRootNameService( theNameService );
-		ois.close();
-	    } catch (Exception ex) {
+        File contextFile = new File(logDir, objKey);
+        if (contextFile.exists()) {
+            try {
+                FileInputStream fis = new FileInputStream(contextFile);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                context = (NamingContextImpl) ois.readObject();
+                context.setORB( orb );
+                context.setServantManagerImpl( this );
+                context.setRootNameService( theNameService );
+                ois.close();
+            } catch (Exception ex) {
                 throw new RuntimeException( "No file for context " + objKey ) ;
-	    }
-	}
+            }
+        }
 
-	if (context != null) {
+        if (context != null) {
             contexts.put(objKey, context);
-	}
-	return context;
+        }
+        return context;
     }
 
     public NamingContextImpl addContext(String objKey, 
-					NamingContextImpl context)
+                                        NamingContextImpl context)
     {
-	File contextFile =  new File(logDir, objKey);
+        File contextFile =  new File(logDir, objKey);
 
-	if (contextFile.exists()) {
-	    context = readInContext(objKey);
-	} else {
-	    try {
-		FileOutputStream fos = new FileOutputStream(contextFile);
-		ObjectOutputStream oos = new ObjectOutputStream(fos);
-		oos.writeObject(context);
-		oos.close();
-	    } catch (Exception ex) {
+        if (contextFile.exists()) {
+            context = readInContext(objKey);
+        } else {
+            try {
+                FileOutputStream fos = new FileOutputStream(contextFile);
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                oos.writeObject(context);
+                oos.close();
+            } catch (Exception ex) {
                 throw new RuntimeException( "Error in adding new context " 
                     + objKey, ex) ;
-	    }
-	}
+            }
+        }
 
-	try {
+        try {
             contexts.remove( objKey );
-	} catch( Exception e) {
+        } catch( Exception e) {
             throw new RuntimeException( "Error in removing old context "
                 + objKey, e) ;
-	}
+        }
 
-	contexts.put(objKey, context);
+        contexts.put(objKey, context);
 
-	return context;
-    }	
+        return context;
+    }   
 
     public void updateContext( String objKey,
-				   NamingContextImpl context )
+                                   NamingContextImpl context )
     {
-	File contextFile =  new File(logDir, objKey);
-	if (contextFile.exists()) {
-		contextFile.delete( );
-		contextFile =  new File(logDir, objKey);
-	}
-		
+        File contextFile =  new File(logDir, objKey);
+        if (contextFile.exists()) {
+                contextFile.delete( );
+                contextFile =  new File(logDir, objKey);
+        }
+                
         try {
             FileOutputStream fos = new FileOutputStream(contextFile);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -193,12 +193,12 @@ public class ServantManagerImpl extends org.omg.CORBA.LocalObject implements Ser
 
     public static String getRootObjectKey()
     {
-	return objKeyPrefix + CounterDB.rootCounter;
+        return objKeyPrefix + CounterDB.rootCounter;
     }
 
     public String getNewObjectKey()
     {
-	return objKeyPrefix + counterDb.getNextCounter();
+        return objKeyPrefix + counterDb.getNextCounter();
     }
 }
 
@@ -212,23 +212,23 @@ class CounterDB {
 
     CounterDB (File logDir)
     {
-	counterFile = new File(logDir, counterFileName);
-	if (!counterFile.exists()) {
-	    counter = Integer.valueOf(rootCounter);
-    	    writeCounter();
-	} else {
-	    readCounter();
-	}
+        counterFile = new File(logDir, counterFileName);
+        if (!counterFile.exists()) {
+            counter = Integer.valueOf(rootCounter);
+            writeCounter();
+        } else {
+            readCounter();
+        }
     }
 
     private void readCounter()
     {
-	try {
-	    FileInputStream fis = new FileInputStream(counterFile);
-	    ObjectInputStream ois = new ObjectInputStream(fis);
-	    counter = (Integer) ois.readObject();
-	    ois.close();
-	} catch (Exception ex) {
+        try {
+            FileInputStream fis = new FileInputStream(counterFile);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            counter = (Integer) ois.readObject();
+            ois.close();
+        } catch (Exception ex) {
             throw new RuntimeException( "Could not read counter",
                 ex ) ;
         }
@@ -236,26 +236,26 @@ class CounterDB {
 
     private void writeCounter()
     {
-	try {
-	    counterFile.delete();
-	    FileOutputStream fos = new FileOutputStream(counterFile);
-	    ObjectOutputStream oos = new ObjectOutputStream(fos);
-	    oos.writeObject(counter);
-	    oos.flush();
-	    oos.close();
+        try {
+            counterFile.delete();
+            FileOutputStream fos = new FileOutputStream(counterFile);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(counter);
+            oos.flush();
+            oos.close();
 
-	} catch (Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException( "Could not write counter",
                 ex ) ;
-	}
+        }
     }
 
     public synchronized int getNextCounter()
     {
-	int counterVal = counter.intValue();
-	counter = Integer.valueOf(++counterVal); 
-	writeCounter();
+        int counterVal = counter.intValue();
+        counter = Integer.valueOf(++counterVal); 
+        writeCounter();
 
-	return counterVal;
+        return counterVal;
     }
 }

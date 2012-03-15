@@ -80,66 +80,66 @@ import corba.framework.MethodEventListener ;
  * seq is the expected sequence of entry/exit events.
  */
 public class ProxyInterceptor {
-    private final String id ;	    // The id for this interceptor
-    private final Set methods ;	    // Set<Method>
+    private final String id ;       // The id for this interceptor
+    private final Set methods ;     // Set<Method>
     private final Set listeners ;   // Set<Listener>
     private final Object target ;   // The actual target
     private final Object actual ;   // The proxy that forwards requests
-				    // to target
+                                    // to target
 
     private class MyHandler implements InvocationHandler
     {
-	private void broadcastEnter( MethodEvent mev ) 
-	{
-	    Iterator iter = listeners.iterator() ;
-	    while (iter.hasNext()) {
-		MethodEventListener listener = 
-		    (MethodEventListener)(iter.next()) ;
-		listener.methodEntered( mev ) ;
-	    }
-	}
+        private void broadcastEnter( MethodEvent mev ) 
+        {
+            Iterator iter = listeners.iterator() ;
+            while (iter.hasNext()) {
+                MethodEventListener listener = 
+                    (MethodEventListener)(iter.next()) ;
+                listener.methodEntered( mev ) ;
+            }
+        }
 
-	private void broadcastExit( MethodEvent mev ) 
-	{
-	    Iterator iter = listeners.iterator() ;
-	    while (iter.hasNext()) {
-		MethodEventListener listener = 
-		    (MethodEventListener)(iter.next()) ;
-		listener.methodExited( mev ) ;
-	    }
-	}
+        private void broadcastExit( MethodEvent mev ) 
+        {
+            Iterator iter = listeners.iterator() ;
+            while (iter.hasNext()) {
+                MethodEventListener listener = 
+                    (MethodEventListener)(iter.next()) ;
+                listener.methodExited( mev ) ;
+            }
+        }
 
-	private Object invokeMethod( Method method, Object target, 
-	    Object[] args )
-	{
-	    try {
-		return method.invoke( target, args )  ;
-	    } catch (IllegalAccessException exc) {
-		throw new RuntimeException( 
-		    "Illegal access exception on method " + method, exc ) ;
-	    } catch (IllegalArgumentException exc) {
-		throw new RuntimeException( 
-		    "Illegal argument exception on method " + method, exc ) ;
-	    } catch (InvocationTargetException exc) {
-		throw new RuntimeException( 
-		    "Invocation target exception on method " + method, exc ) ;
-	    }
-	}
+        private Object invokeMethod( Method method, Object target, 
+            Object[] args )
+        {
+            try {
+                return method.invoke( target, args )  ;
+            } catch (IllegalAccessException exc) {
+                throw new RuntimeException( 
+                    "Illegal access exception on method " + method, exc ) ;
+            } catch (IllegalArgumentException exc) {
+                throw new RuntimeException( 
+                    "Illegal argument exception on method " + method, exc ) ;
+            } catch (InvocationTargetException exc) {
+                throw new RuntimeException( 
+                    "Invocation target exception on method " + method, exc ) ;
+            }
+        }
 
-	public synchronized Object invoke( Object proxy, Method method,
-	    Object[] args )
-	{
-	    if (methods.contains( method )) {
-		MethodEvent mev = MethodEvent.make( id, method ) ;
-		try {
-		    broadcastEnter( mev ) ;
-		    return invokeMethod( method, target, args ) ;
-		} finally {
-		    broadcastExit( mev ) ;
-		}
-	    } else
-		return invokeMethod( method, target, args ) ;
-	}
+        public synchronized Object invoke( Object proxy, Method method,
+            Object[] args )
+        {
+            if (methods.contains( method )) {
+                MethodEvent mev = MethodEvent.make( id, method ) ;
+                try {
+                    broadcastEnter( mev ) ;
+                    return invokeMethod( method, target, args ) ;
+                } finally {
+                    broadcastExit( mev ) ;
+                }
+            } else
+                return invokeMethod( method, target, args ) ;
+        }
     }
 
     /** Create a ProxyInterceptor for the given classes.
@@ -148,20 +148,20 @@ public class ProxyInterceptor {
      * is.
      */
     public static ProxyInterceptor make( String id, Class[] intf,
-	Object target ) 
+        Object target ) 
     {
-	return new ProxyInterceptor( id, intf, target ) ;
+        return new ProxyInterceptor( id, intf, target ) ;
     }
 
     private ProxyInterceptor( String id, Class[] intf, Object target ) 
     {
-	this.id = id ;
-	methods = new HashSet() ;
-	listeners = new HashSet() ;
-	this.target = target ;
-	InvocationHandler ih = new MyHandler() ;
-	actual = Proxy.newProxyInstance( intf[0].getClassLoader(),
-	    intf, ih ) ;
+        this.id = id ;
+        methods = new HashSet() ;
+        listeners = new HashSet() ;
+        this.target = target ;
+        InvocationHandler ih = new MyHandler() ;
+        actual = Proxy.newProxyInstance( intf[0].getClassLoader(),
+            intf, ih ) ;
     }
 
     /** Add method to the list of methods that are reported to the
@@ -169,7 +169,7 @@ public class ProxyInterceptor {
      */
     public synchronized void addMethod( Method method ) 
     {
-	methods.add( method ) ;
+        methods.add( method ) ;
     }
 
     /** Remote method from the list of methods that are reported to the
@@ -177,14 +177,14 @@ public class ProxyInterceptor {
      */
     public synchronized void removeMethod( Method method ) 
     {
-	methods.remove( method ) ;
+        methods.remove( method ) ;
     }
 
     /** Return the list of methods are reported to the listeners.
      */
     public synchronized Method[] getMethods()
     {
-	return (Method[])methods.toArray( new Method[0] ) ;
+        return (Method[])methods.toArray( new Method[0] ) ;
     }
 
     /** Add listener to the list of listeners for 
@@ -192,7 +192,7 @@ public class ProxyInterceptor {
      */
     public synchronized void addListener( MethodEventListener listener )
     {
-	listeners.add( listener ) ;
+        listeners.add( listener ) ;
     }
 
     /** Remove listener from the list of listeners for 
@@ -200,7 +200,7 @@ public class ProxyInterceptor {
      */
     public synchronized void removeListener( MethodEventListener listener ) 
     {
-	listeners.remove( listener ) ;
+        listeners.remove( listener ) ;
     }
 
     /** Return the list of listeners for 
@@ -208,8 +208,8 @@ public class ProxyInterceptor {
      */
     public synchronized MethodEventListener[] getListeners()
     {
-	return (MethodEventListener[])listeners.toArray( 
-	    new MethodEventListener[0] ) ;
+        return (MethodEventListener[])listeners.toArray( 
+            new MethodEventListener[0] ) ;
     }
 
     /** Return the actual object to use.  This object simply
@@ -219,6 +219,6 @@ public class ProxyInterceptor {
      */
     public synchronized Object getActual() 
     {
-	return actual ;
+        return actual ;
     }
 }

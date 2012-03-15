@@ -49,7 +49,7 @@ import org.omg.CORBA.NO_MEMORY;
 
 class idlSLIServant
     extends 
-	idlSLIPOA
+        idlSLIPOA
 {
     public static String baseMsg = idlSLIServant.class.getName();
 
@@ -63,71 +63,71 @@ class idlSLIServant
 
     public String raiseSystemInServantThenPOThenSE ( )
     {
-	throw new NO_MEMORY();
+        throw new NO_MEMORY();
     }
 
     public String raiseUserInServantThenSystemInPOThenSE ( )
-	throws 
-	    idlExampleException
+        throws 
+            idlExampleException
     {
-	C.throwUserException(baseMsg +
-			     C.raiseUserInServantThenSystemInPOThenSE);
-	// return for compiler
-	return U.SHOULD_NOT_SEE_THIS;
+        C.throwUserException(baseMsg +
+                             C.raiseUserInServantThenSystemInPOThenSE);
+        // return for compiler
+        return U.SHOULD_NOT_SEE_THIS;
     }
 
     public String makeColocatedCallFromServant ( )
     {
-	return C.makeColocatedCallFromServant(C.idlSLI1, orb, baseMsg);
+        return C.makeColocatedCallFromServant(C.idlSLI1, orb, baseMsg);
     }
     public String colocatedCallFromServant ( String a )
     {
-	return C.colocatedCallFromServant(a, orb, baseMsg);
+        return C.colocatedCallFromServant(a, orb, baseMsg);
     }
 
     public String throwThreadDeathInReceiveRequestServiceContexts( String a )
     {
-	U.sop(U.servant(a));
-	return a; 
+        U.sop(U.servant(a));
+        return a; 
     }
     public String throwThreadDeathInPreinvoke ( String a )
     {
-	U.sop(U.servant(a));
-	return a; 
+        U.sop(U.servant(a));
+        return a; 
     }
     public String throwThreadDeathInReceiveRequest ( String a )
     {
-	U.sop(U.servant(a));
-	return a;
+        U.sop(U.servant(a));
+        return a;
     }
 
     public String throwThreadDeathInServant ( String a )
     {
-	U.sop(U.servant(a));
-	throw new ThreadDeath();
+        U.sop(U.servant(a));
+        throw new ThreadDeath();
     }
     public String throwThreadDeathInPostinvoke ( String a ) 
     {
-	U.sop(U.servant(a));
-	return a; 
+        U.sop(U.servant(a));
+        return a; 
     }
     public String throwThreadDeathInSendReply ( String a ) 
     { 
-	U.sop(U.servant(a));
-	return a; 
+        U.sop(U.servant(a));
+        return a; 
     }
     public String throwThreadDeathInServantThenSysInPostThenSysInSendException ( String a )
     {
-	U.sop(U.servant(a));
-	throw new ThreadDeath();
+        U.sop(U.servant(a));
+        throw new ThreadDeath();
     }
 
     public void sPic1()
     {
-	C.testAndIncrementPICSlot(true, C.sPic1,
-				  SsPicInterceptor.sPic1ASlotId, 3, orb);
-	C.testAndIncrementPICSlot(true, C.sPic1,
-				  SsPicInterceptor.sPic1BSlotId, 3, orb);
+        C.testAndIncrementPICSlot(true, C.sPic1,
+                                  SsPicInterceptor.sPic1ASlotId, 3, orb);
+        C.testAndIncrementPICSlot(true, C.sPic1,
+                                  SsPicInterceptor.sPic1BSlotId, 3, orb);
     }
     public void sPic2()
     {

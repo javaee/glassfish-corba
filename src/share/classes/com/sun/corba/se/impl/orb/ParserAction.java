@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.orb ;
+package com.sun.corba.ee.impl.orb ;
 
 import java.util.Properties ;
 

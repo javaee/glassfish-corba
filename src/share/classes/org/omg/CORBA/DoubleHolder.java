@@ -62,7 +62,7 @@ import org.omg.CORBA.portable.OutputStream;
  * the value stored in its <code>value</code> field can be accessed with
  * <code>myDoubleHolder.value</code>.
  *
- * @version	1.14, 09/09/97
+ * @version     1.14, 09/09/97
  * @since       JDK1.2
  */
 public final class DoubleHolder implements Streamable {
@@ -89,7 +89,7 @@ public final class DoubleHolder implements Streamable {
      *                <code>DoubleHolder</code> object
      */
     public DoubleHolder(double initial) {
-	value = initial;
+        value = initial;
     }
 
     /**
@@ -99,7 +99,7 @@ public final class DoubleHolder implements Streamable {
      * @param input the <code>InputStream</code> to read from.
      */
     public void _read(InputStream input) {
-	value = input.read_double();
+        value = input.read_double();
     }
 
     /**
@@ -109,7 +109,7 @@ public final class DoubleHolder implements Streamable {
      * @param output the <code>OutputStream</code> to write into.
      */
     public void _write(OutputStream output) {
-	output.write_double(value);
+        output.write_double(value);
     }
 
     /**
@@ -118,7 +118,7 @@ public final class DoubleHolder implements Streamable {
      * @return the <code>TypeCode</code> object. 
      */
     public org.omg.CORBA.TypeCode _type() {
-	return ORB.init().get_primitive_tc(TCKind.tk_double);
+        return ORB.init().get_primitive_tc(TCKind.tk_double);
     }
 
 

@@ -53,44 +53,44 @@ import corba.framework.*;
 
 public class SystemExceptionsTest extends CORBATest {
     public static final String thisPackage =
-	SystemExceptionsTest.class.getPackage().getName();
+        SystemExceptionsTest.class.getPackage().getName();
     
     protected void doTest() throws Throwable {
-	Controller orbd = createORBD();
-	orbd.start();
+        Controller orbd = createORBD();
+        orbd.start();
 
         Properties clientProps = Options.getClientProperties();
         clientProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
-			"corba.systemexceptions.Client", "true");
+                        "corba.systemexceptions.Client", "true");
 
-	doTestType("Server", "Server",
-		   "Client", "Client");
+        doTestType("Server", "Server",
+                   "Client", "Client");
 
-	Controller colocatedClientServer = 
-	    createClient(thisPackage + ".ColocatedClientServer",
-			 "colocatedClientServer");
-	colocatedClientServer.start();
-	colocatedClientServer.waitFor();
-	colocatedClientServer.stop();
+        Controller colocatedClientServer = 
+            createClient(thisPackage + ".ColocatedClientServer",
+                         "colocatedClientServer");
+        colocatedClientServer.start();
+        colocatedClientServer.waitFor();
+        colocatedClientServer.stop();
 
-	orbd.stop();
+        orbd.stop();
     }
 
     protected void doTestType(String serverMainClass, String serverTestName,
-			      String clientMainClass, String clientTestName)
-	throws Throwable {
+                              String clientMainClass, String clientTestName)
+        throws Throwable {
 
-	Controller server = createServer(thisPackage + "." + serverMainClass,
-					 serverTestName);
-	server.start();
+        Controller server = createServer(thisPackage + "." + serverMainClass,
+                                         serverTestName);
+        server.start();
 
-	Controller client = createClient(thisPackage + "." + clientMainClass,
-					 clientTestName);
-	client.start();
-	client.waitFor();
-	client.stop();
+        Controller client = createClient(thisPackage + "." + clientMainClass,
+                                         clientTestName);
+        client.start();
+        client.waitFor();
+        client.stop();
 
-	server.stop();
+        server.stop();
     }
 }
 

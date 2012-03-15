@@ -41,7 +41,7 @@
 
 <!DOCTYPE timing SYSTEM "./timing.dtd">
 
-<timing name="TimingPoints" package="com.sun.corba.se.impl.orbutil.newtimer.generated">
+<timing name="TimingPoints" package="com.sun.corba.ee.impl.orbutil.newtimer.generated">
     <timer name="totalInvocation" description="Total time for a single invocation"/>
     <timer name="totalRequest" description="Total time for a single request in an invocation"/>
     <timer name="requestAddServiceContexts" description="Adding service contexts to a request"/>
@@ -54,17 +54,17 @@
     <timer name="clientDecoding" description="Client side response unmarshalling in CorbaClientRequestDispatcherImpl"/>
 
     <timerGroup name="transportClient" description="Major events in client side request cycle">
-	<contains name="hasNextNext"/>
-	<contains name="connectionSetup"/>
-	<contains name="clientEncoding"/>
-	<contains name="clientTransportAndWait"/>
-	<contains name="clientDecoding"/>
+        <contains name="hasNextNext"/>
+        <contains name="connectionSetup"/>
+        <contains name="clientEncoding"/>
+        <contains name="clientTransportAndWait"/>
+        <contains name="clientDecoding"/>
     </timerGroup>
 
     <timerGroup name="invocation" description="All activity for an invocation">
-	<contains name="totalInvocation"/>
-	<contains name="totalRequest"/>
-	<contains name="requestAddServiceContexts"/>
-	<contains name="processResponse"/>
+        <contains name="totalInvocation"/>
+        <contains name="totalRequest"/>
+        <contains name="requestAddServiceContexts"/>
+        <contains name="processResponse"/>
     </timerGroup>
 </timing>

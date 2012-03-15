@@ -51,27 +51,27 @@ import corba.hcks.U;
 
 public class rmiiIServantConnect
     extends 
-	PortableRemoteObject
+        PortableRemoteObject
     implements 
-	rmiiI
+        rmiiI
 {
     public static final String baseMsg = rmiiIServantConnect.class.getName();
 
     public rmiiIServantConnect ()
-	throws
-	    RemoteException 
+        throws
+            RemoteException 
     {
         super();
     }
 
     public String m(String x)
-	throws
-	    RemoteException
+        throws
+            RemoteException
     {
-	Server.checkThread(baseMsg);
-	String result = Server.filter(x, baseMsg);
-	U.sop(result);
-	return result;
+        Server.checkThread(baseMsg);
+        String result = Server.filter(x, baseMsg);
+        U.sop(result);
+        return result;
     }
 }
 

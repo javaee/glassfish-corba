@@ -41,8 +41,8 @@
 package pi.orbinit;
 
 import org.omg.CORBA.*;
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.corba.AnyImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import org.omg.PortableInterceptor.*;
 import org.omg.IOP.*;
 import org.omg.IOP.CodecPackage.*;
@@ -59,42 +59,42 @@ public class SystemClient
     extends ClientCommon
 {
     public static void main(String args[]) {
-	try {
-	    (new SystemClient()).run( System.getProperties(),
-		                      args, System.out, System.err, null );
-	}
-	catch( Exception e ) {
-	    e.printStackTrace( System.err );
-	    System.exit( 1 );
-	}
+        try {
+            (new SystemClient()).run( System.getProperties(),
+                                      args, System.out, System.err, null );
+        }
+        catch( Exception e ) {
+            e.printStackTrace( System.err );
+            System.exit( 1 );
+        }
     }
 
     protected ORB createORB( String[] args ) {
-	// Initializer classes
-	String invalidInitializer = "com.sun.nonexistent.intializer.Foo";
-	String testInitializer = "pi.orbinit.ClientTestInitializer";
+        // Initializer classes
+        String invalidInitializer = "com.sun.nonexistent.intializer.Foo";
+        String testInitializer = "pi.orbinit.ClientTestInitializer";
 
-	// add an additional argument to args[].
-	String[] newArgs = new String[ args.length + 2 ];
-	int i = 0;
-	for( i = 0; i < args.length; i++ ) {
-	    newArgs[i] = args[i];
-	}
+        // add an additional argument to args[].
+        String[] newArgs = new String[ args.length + 2 ];
+        int i = 0;
+        for( i = 0; i < args.length; i++ ) {
+            newArgs[i] = args[i];
+        }
 
-	// We will check for the presence of these arguments later:
-	newArgs[i++] = "abcd";
-	newArgs[i++] = "efgh";
+        // We will check for the presence of these arguments later:
+        newArgs[i++] = "abcd";
+        newArgs[i++] = "efgh";
 
-	// create and initialize the ORB
-	Properties props = new Properties() ;
-	props.put( "org.omg.CORBA.ORBClass", 
-		   System.getProperty("org.omg.CORBA.ORBClass"));
-	System.setProperty( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX + 
-	    invalidInitializer, "" );
-	System.setProperty( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX + 
-	    testInitializer, "" );
+        // create and initialize the ORB
+        Properties props = new Properties() ;
+        props.put( "org.omg.CORBA.ORBClass", 
+                   System.getProperty("org.omg.CORBA.ORBClass"));
+        System.setProperty( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX + 
+            invalidInitializer, "" );
+        System.setProperty( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX + 
+            testInitializer, "" );
 
-	return ORB.init(newArgs, props);
+        return ORB.init(newArgs, props);
     }
 
 }

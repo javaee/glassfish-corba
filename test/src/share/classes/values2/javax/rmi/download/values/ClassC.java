@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ClassC.java	1.4 99/06/07 */
+/* @(#)ClassC.java      1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -52,17 +52,17 @@ package javax.rmi.download.values;
 public class ClassC extends ClassA {
     private static final long serialVersionUID = 123156789L;
     private int e, f;
-	
+        
     public ClassC(){
-	e = 56;
-	f = 1;
+        e = 56;
+        f = 1;
     }
-	
+        
     public long getTotal(){
-	return  super.getTotal() + e + f;
+        return  super.getTotal() + e + f;
     }
 
     public long getOriginalTotal(){
-	return super.getOriginalTotal() + 56 + 1;
+        return super.getOriginalTotal() + 56 + 1;
     }
 }

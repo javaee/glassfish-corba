@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi.codegen;
+package com.sun.corba.ee.impl.presentation.rmi.codegen;
 
 import org.glassfish.pfl.dynamic.codegen.spi.Primitives;
 import org.glassfish.pfl.dynamic.codegen.spi.Variable;
@@ -73,26 +73,26 @@ public class CodegenProxyCreator {
     private static final Properties emptyProps = new Properties() ;
 
     static {
-	debugProps.setProperty( DUMP_AFTER_SETUP_VISITOR, "true" ) ;
-	debugProps.setProperty( TRACE_BYTE_CODE_GENERATION, "true" ) ;
-	debugProps.setProperty( USE_ASM_VERIFIER, "true" ) ;
+        debugProps.setProperty( DUMP_AFTER_SETUP_VISITOR, "true" ) ;
+        debugProps.setProperty( TRACE_BYTE_CODE_GENERATION, "true" ) ;
+        debugProps.setProperty( USE_ASM_VERIFIER, "true" ) ;
     }
 
     public CodegenProxyCreator( String className, Class sc,
-	Class[] interfaces, Method[] methods ) {
+        Class[] interfaces, Method[] methods ) {
 
-	this.className = className ;
-	this.superClass = Type.type( sc ) ;
+        this.className = className ;
+        this.superClass = Type.type( sc ) ;
 
-	this.interfaces = new ArrayList<Type>() ;
-	for (Class cls : interfaces) {
-	    this.interfaces.add( Type.type( cls ) ) ;
-	}
+        this.interfaces = new ArrayList<Type>() ;
+        for (Class cls : interfaces) {
+            this.interfaces.add( Type.type( cls ) ) ;
+        }
 
-	this.methods = new ArrayList<MethodInfo>() ;
-	for (Method method : methods) {
-	    this.methods.add( Utility.getMethodInfo( method ) ) ;
-	}
+        this.methods = new ArrayList<MethodInfo>() ;
+        for (Method method : methods) {
+            this.methods.add( Utility.getMethodInfo( method ) ) ;
+        }
     }
 
     /** Construct a generator for a proxy class 
@@ -131,77 +131,77 @@ public class CodegenProxyCreator {
      * @param methods the methods that the generated class implements
      */
     public Class<?> create( ProtectionDomain pd, ClassLoader cl,
-	boolean debug, PrintStream ps ) {
+        boolean debug, PrintStream ps ) {
 
-	Pair<String,String> nm = splitClassName( className ) ;
+        Pair<String,String> nm = splitClassName( className ) ;
 
-	_clear() ;
-	_setClassLoader( cl ) ;
-	_package( nm.first() ) ;
-	_class( PUBLIC, nm.second(), superClass, interfaces ) ;
+        _clear() ;
+        _setClassLoader( cl ) ;
+        _package( nm.first() ) ;
+        _class( PUBLIC, nm.second(), superClass, interfaces ) ;
 
-	_constructor( PUBLIC ) ;
-	_body() ;
-	    _expr(_super());
-	_end() ;
+        _constructor( PUBLIC ) ;
+        _body() ;
+            _expr(_super());
+        _end() ;
 
-	_method( PRIVATE, _Object(), "writeReplace" ) ;
-	_body() ;
-	    _return(_call(_this(), "selfAsBaseClass" )) ;
-	_end() ;
+        _method( PRIVATE, _Object(), "writeReplace" ) ;
+        _body() ;
+            _return(_call(_this(), "selfAsBaseClass" )) ;
+        _end() ;
 
-	int ctr=0 ;
-	for (MethodInfo method : methods) 
-	    createMethod( ctr++, method ) ;
+        int ctr=0 ;
+        for (MethodInfo method : methods) 
+            createMethod( ctr++, method ) ;
     
-	_end() ; // of _class
+        _end() ; // of _class
 
-	return _generate( cl, pd, debug ? debugProps : emptyProps, ps ) ;
+        return _generate( cl, pd, debug ? debugProps : emptyProps, ps ) ;
     }
 
     private static final Type objectArrayType = Type._array(_Object()) ;
 
     private static void createMethod( int mnum, MethodInfo method ) {
-	Type rtype = method.returnType() ;
-	_method( method.modifiers() & ~ABSTRACT, rtype, method.name()) ;
-	
-	List<Expression> args = new ArrayList<Expression>() ;
-	for (Variable var : method.arguments() ) 
-	    args.add( _arg( var.type(), var.ident() ) ) ;
+        Type rtype = method.returnType() ;
+        _method( method.modifiers() & ~ABSTRACT, rtype, method.name()) ;
+        
+        List<Expression> args = new ArrayList<Expression>() ;
+        for (Variable var : method.arguments() ) 
+            args.add( _arg( var.type(), var.ident() ) ) ;
 
-	_body() ;
-	    List<Expression> wrappedArgs = new ArrayList<Expression>() ;
-	    for (Expression arg : args) {
-		wrappedArgs.add( Primitives.wrap( arg ) ) ;
-	    }
-	    
-	    Expression invokeArgs = _define( objectArrayType, "args",
-		_new_array_init( _Object(), wrappedArgs ) ) ;
+        _body() ;
+            List<Expression> wrappedArgs = new ArrayList<Expression>() ;
+            for (Expression arg : args) {
+                wrappedArgs.add( Primitives.wrap( arg ) ) ;
+            }
+            
+            Expression invokeArgs = _define( objectArrayType, "args",
+                _new_array_init( _Object(), wrappedArgs ) ) ;
 
-	    // create expression to call the invoke method
-	    Expression invokeExpression = _call(
-		_this(), "invoke", _const(mnum), invokeArgs ) ;
+            // create expression to call the invoke method
+            Expression invokeExpression = _call(
+                _this(), "invoke", _const(mnum), invokeArgs ) ;
 
-	    // return result if non-void
-	    if (rtype == _void()) {
-		_expr( invokeExpression ) ;
-		_return() ;
-	    } else {
-		Expression resultExpr = _define( _Object(), "result", invokeExpression ) ;
+            // return result if non-void
+            if (rtype == _void()) {
+                _expr( invokeExpression ) ;
+                _return() ;
+            } else {
+                Expression resultExpr = _define( _Object(), "result", invokeExpression ) ;
 
-		if (rtype != _Object()) {
-		    if (rtype.isPrimitive()) {
-			// Must cast resultExpr to expected type, or unwrap won't work!
-			Type ctype = Primitives.getWrapperTypeForPrimitive( rtype ) ;
-			Expression cexpr = _cast( ctype, resultExpr ) ;
-			_return( Primitives.unwrap( cexpr ) ) ;
-		    } else {
-			_return(_cast(rtype, resultExpr )) ;
-		    }
-		} else {
-		    _return( resultExpr ) ;
-		}
-	    }
-	_end() ; // of method
+                if (rtype != _Object()) {
+                    if (rtype.isPrimitive()) {
+                        // Must cast resultExpr to expected type, or unwrap won't work!
+                        Type ctype = Primitives.getWrapperTypeForPrimitive( rtype ) ;
+                        Expression cexpr = _cast( ctype, resultExpr ) ;
+                        _return( Primitives.unwrap( cexpr ) ) ;
+                    } else {
+                        _return(_cast(rtype, resultExpr )) ;
+                    }
+                } else {
+                    _return( resultExpr ) ;
+                }
+            }
+        _end() ; // of method
     }
 }

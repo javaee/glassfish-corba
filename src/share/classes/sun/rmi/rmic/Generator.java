@@ -64,8 +64,8 @@ import sun.tools.java.ClassDefinition;
  * point, Main will invoke the generate(...) method once for _each_ class passed
  * on the command line.
  *
- * @version	1.0, 2/23/98
- * @author	Bryan Atsatt
+ * @version     1.0, 2/23/98
+ * @author      Bryan Atsatt
  */
 public interface Generator {
 
@@ -83,11 +83,11 @@ public interface Generator {
      * be added to the compiler environment using the addGeneratedFile(File)
      * method.
      *
-     * @param env	The compiler environment
-     * @param cdef	The definition for the implementation class or interface from
+     * @param env       The compiler environment
+     * @param cdef      The definition for the implementation class or interface from
      *              which to generate output
-     * @param destDir	The directory for the root of the package hierarchy
-     *			        for generated files. May be null.
+     * @param destDir   The directory for the root of the package hierarchy
+     *                          for generated files. May be null.
      */
     public void generate(BatchEnvironment env, ClassDefinition cdef, File destDir);
 }

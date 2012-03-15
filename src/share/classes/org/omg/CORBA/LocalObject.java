@@ -96,7 +96,7 @@ public class LocalObject implements org.omg.CORBA.Object
      *         they reference distinct objects.
      */
     public boolean _is_equivalent(org.omg.CORBA.Object that) {
-	return equals(that) ;
+        return equals(that) ;
     }
 
     /**
@@ -107,7 +107,7 @@ public class LocalObject implements org.omg.CORBA.Object
      * @return <code>false</code>
      */
     public boolean _non_existent() {
-	return false;
+        return false;
     }
 
     /**
@@ -120,7 +120,7 @@ public class LocalObject implements org.omg.CORBA.Object
      * @return this instance's hashcode
      */
     public int _hash(int maximum) {
-	return hashCode() ;
+        return hashCode() ;
     }
 
     /**
@@ -207,9 +207,9 @@ public class LocalObject implements org.omg.CORBA.Object
      *      comments for unimplemented features</a>
      */
     public Request _create_request(Context ctx,
-				   String operation,
-				   NVList arg_list,
-				   NamedValue result) {
+                                   String operation,
+                                   NVList arg_list,
+                                   NamedValue result) {
         throw new org.omg.CORBA.NO_IMPLEMENT(reason);
     }
 
@@ -239,11 +239,11 @@ public class LocalObject implements org.omg.CORBA.Object
      *      comments for unimplemented features</a>
      */
     public Request _create_request(Context ctx,
-				   String operation,
-				   NVList arg_list,
-				   NamedValue result,
-				   ExceptionList exceptions,
-				   ContextList contexts) {
+                                   String operation,
+                                   NVList arg_list,
+                                   NamedValue result,
+                                   ExceptionList exceptions,
+                                   ContextList contexts) {
         throw new org.omg.CORBA.NO_IMPLEMENT(reason);
     }
 
@@ -276,12 +276,12 @@ public class LocalObject implements org.omg.CORBA.Object
      */
     public org.omg.CORBA.Object _get_interface_def() 
     {
-	// First try to call the delegate implementation class's
-	// "Object get_interface_def(..)" method (will work for JDK1.2 
-	// ORBs).
-	// Else call the delegate implementation class's
-	// "InterfaceDef get_interface(..)" method using reflection
-	// (will work for pre-JDK1.2 ORBs).
+        // First try to call the delegate implementation class's
+        // "Object get_interface_def(..)" method (will work for JDK1.2 
+        // ORBs).
+        // Else call the delegate implementation class's
+        // "InterfaceDef get_interface(..)" method using reflection
+        // (will work for pre-JDK1.2 ORBs).
 
         throw new org.omg.CORBA.NO_IMPLEMENT(reason);
     }
@@ -351,8 +351,8 @@ public class LocalObject implements org.omg.CORBA.Object
      *      comments for unimplemented features</a>
      */
     public org.omg.CORBA.Object
-	_set_policy_override(org.omg.CORBA.Policy[] policies,
-			     org.omg.CORBA.SetOverrideType set_add) {
+        _set_policy_override(org.omg.CORBA.Policy[] policies,
+                             org.omg.CORBA.SetOverrideType set_add) {
         throw new org.omg.CORBA.NO_IMPLEMENT(reason);
     }
 
@@ -369,7 +369,7 @@ public class LocalObject implements org.omg.CORBA.Object
      *      comments for unimplemented features</a>
      */
     public boolean _is_local() {
-	throw new org.omg.CORBA.NO_IMPLEMENT(reason);
+        throw new org.omg.CORBA.NO_IMPLEMENT(reason);
     }
 
     /**
@@ -431,7 +431,7 @@ public class LocalObject implements org.omg.CORBA.Object
      *      comments for unimplemented features</a>
      */
     public OutputStream _request(String operation,
-				 boolean responseExpected) {
+                                 boolean responseExpected) {
         throw new org.omg.CORBA.NO_IMPLEMENT(reason);
     }
 
@@ -468,9 +468,9 @@ public class LocalObject implements org.omg.CORBA.Object
      *      comments for unimplemented features</a>
      */
     public InputStream _invoke(OutputStream output)
-	throws ApplicationException, RemarshalException 
+        throws ApplicationException, RemarshalException 
     {
-	throw new org.omg.CORBA.NO_IMPLEMENT(reason);
+        throw new org.omg.CORBA.NO_IMPLEMENT(reason);
     }
 
     /**

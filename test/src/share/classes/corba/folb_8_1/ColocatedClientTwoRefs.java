@@ -48,9 +48,9 @@ public class ColocatedClientTwoRefs
 {
     public static void main(String[] av)
     {
-	Client.withSticky = true;
-	ColocatedCS.clientTwoRefs = true;
-	ColocatedCS.main(av);
+        Client.withSticky = true;
+        ColocatedCS.clientTwoRefs = true;
+        ColocatedCS.main(av);
     }
 }
 

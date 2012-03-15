@@ -53,8 +53,8 @@ public class Server {
             obj = new FrobnicatorProviderBean();
             Context initialNamingContext = new InitialContext();
             initialNamingContext.rebind("DynamicProxyBug1368", obj);
-	    // below print line is important, else the testframe does not work
-	    System.out.println("Server is ready.");
+            // below print line is important, else the testframe does not work
+            System.out.println("Server is ready.");
             System.out.flush();
             java.lang.Object sync = new java.lang.Object();
             synchronized (sync) { sync.wait(); }

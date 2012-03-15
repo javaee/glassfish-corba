@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.util;
+package com.sun.corba.ee.impl.util;
 import java.util.Date;
 
 public class Version {
@@ -56,7 +56,7 @@ public class Version {
     public static final String  BUILD = "0.0";
     public static final String  BUILD_TIME = "unknown";
     public static final String  FULL = PROJECT_NAME + " " + VERSION + " (" 
-	+ BUILD_TIME + ")";
+        + BUILD_TIME + ")";
     
     public static String asString () {
         return FULL;

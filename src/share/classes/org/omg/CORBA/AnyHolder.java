@@ -62,7 +62,7 @@ import org.omg.CORBA.portable.OutputStream;
  * the value stored in its <code>value</code> field can be accessed with
  * <code>myAnyHolder.value</code>.
  *
- * @version	1.14, 09/09/97
+ * @version     1.14, 09/09/97
  * @since       JDK1.2
  */
 public final class AnyHolder implements  Streamable {
@@ -87,7 +87,7 @@ public final class AnyHolder implements  Streamable {
      *                <code>AnyHolder</code> object
      */
     public AnyHolder(Any initial) {
-	value = initial;
+        value = initial;
     }
 
     /**
@@ -97,7 +97,7 @@ public final class AnyHolder implements  Streamable {
      * @param input the InputStream containing CDR formatted data from the wire.
      */
     public void _read(InputStream input) {
-	value = input.read_any();
+        value = input.read_any();
     }
 
     /**
@@ -107,7 +107,7 @@ public final class AnyHolder implements  Streamable {
      * @param output the OutputStream which will contain the CDR formatted data.
      */
     public void _write(OutputStream output) {
-	output.write_any(value);
+        output.write_any(value);
     }
 
     /**
@@ -118,6 +118,6 @@ public final class AnyHolder implements  Streamable {
      *              this <code>AnyHolder</code> object
      */
     public TypeCode _type() {
-	return ORB.init().get_primitive_tc(TCKind.tk_any);
+        return ORB.init().get_primitive_tc(TCKind.tk_any);
     }
 }

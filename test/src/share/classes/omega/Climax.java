@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)Climax.java	1.3 99/06/07 */
+/* @(#)Climax.java      1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -67,7 +67,7 @@ public final class Climax extends org.omg.CORBA.UserException implements org.omg
 
     public Climax (int _quickstep)
     {
-	quickstep = _quickstep;
+        quickstep = _quickstep;
     } // ctor
 
 } // class Climax

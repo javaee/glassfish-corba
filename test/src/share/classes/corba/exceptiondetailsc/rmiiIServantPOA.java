@@ -51,39 +51,39 @@ import corba.hcks.U;
 
 public class rmiiIServantPOA
     extends 
-	PortableRemoteObject
+        PortableRemoteObject
     implements
-	rmiiI
+        rmiiI
 {
     public static final String baseMsg = rmiiIServantPOA.class.getName();
 
     public rmiiIServantPOA ()
-	throws
-	    RemoteException
+        throws
+            RemoteException
     { 
-	// DO NOT CALL SUPER - that would connect the object.
+        // DO NOT CALL SUPER - that would connect the object.
     }
 
     public void raiseSystemException(String x)
-	throws
-	    RemoteException
+        throws
+            RemoteException
     {
-	throw new FREE_MEM(x);
+        throw new FREE_MEM(x);
     }
 
     public void raiseUserException(String x)
-	throws
-	    RemoteException,
-	    rmiiException
+        throws
+            RemoteException,
+            rmiiException
     {
-	throw new rmiiException(x);
+        throw new rmiiException(x);
     }
 
     public void raiseRuntimeException(String x)
-	throws
-	    RemoteException
+        throws
+            RemoteException
     {
-	throw new RuntimeException(x);
+        throw new RuntimeException(x);
     }
 }
 

@@ -137,15 +137,15 @@ class ARectangle implements java.io.Serializable {
     private void writeObject(ObjectOutputStream s)
         throws IOException {
 
-	// set the values of the Serializable fields
-	ObjectOutputStream.PutField fields = s.putFields();
-	fields.put("x1", point1.x);
-	fields.put("y1", point1.y);
-	fields.put("x2", point2.x);
-	fields.put("y2", point2.y);
-		
-	// save them
-	s.writeFields();        
+        // set the values of the Serializable fields
+        ObjectOutputStream.PutField fields = s.putFields();
+        fields.put("x1", point1.x);
+        fields.put("y1", point1.y);
+        fields.put("x2", point2.x);
+        fields.put("y2", point2.y);
+                
+        // save them
+        s.writeFields();        
     }
 
     /**
@@ -159,37 +159,37 @@ class ARectangle implements java.io.Serializable {
      */
     private void readObject(ObjectInputStream s)
         throws IOException {
-		
-	// prepare to read the alternate persistent fields
-	ObjectInputStream.GetField fields = null;
-	try { 
-	    fields = s.readFields();
+                
+        // prepare to read the alternate persistent fields
+        ObjectInputStream.GetField fields = null;
+        try { 
+            fields = s.readFields();
 
-	} catch (Exception ClassNotFoundException) {
-	    throw new IOException();
-	}
-		
-	// read the alternate persistent fields
-	int x1 = (int)fields.get("x1", 0);
-	int y1 = (int)fields.get("y1", 0);
-	int x2 = (int)fields.get("x2", 0);
-	int y2 = (int)fields.get("y2", 0);
-		
-	// save them back as Points.
-	point1 = new Point(x1, y1);
-	point2 = new Point(x2, y2);
+        } catch (Exception ClassNotFoundException) {
+            throw new IOException();
+        }
+                
+        // read the alternate persistent fields
+        int x1 = (int)fields.get("x1", 0);
+        int y1 = (int)fields.get("y1", 0);
+        int x2 = (int)fields.get("x2", 0);
+        int y2 = (int)fields.get("y2", 0);
+                
+        // save them back as Points.
+        point1 = new Point(x1, y1);
+        point2 = new Point(x2, y2);
     }
 
     public boolean equals(Object o){
-	if (!(o instanceof ARectangle))
-	    return false;
+        if (!(o instanceof ARectangle))
+            return false;
 
-	ARectangle other = (ARectangle)o;
+        ARectangle other = (ARectangle)o;
 
-	return ((point1.x == other.point1.x) &&
-		(point1.y == other.point1.y) &&
-		(point2.x == other.point2.x) &&
-		(point2.y == other.point2.y));
+        return ((point1.x == other.point1.x) &&
+                (point1.y == other.point1.y) &&
+                (point2.x == other.point2.x) &&
+                (point2.y == other.point2.y));
     }
 
     public String toString() {

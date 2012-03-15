@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)MissingClass.java	1.3 99/06/07 */
+/* @(#)MissingClass.java        1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -52,9 +52,9 @@ package javax.rmi.download.values;
 public class MissingClass implements java.io.Serializable {
 
     private int a;
-	
+        
     public MissingClass(){
-	a = 3;
+        a = 3;
     }
 
 }

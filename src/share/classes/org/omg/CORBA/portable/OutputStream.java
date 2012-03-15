@@ -139,7 +139,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_boolean_array(boolean[] value, int offset,
-					     int length);
+                                             int length);
     /**
      * Writes an array of chars on this output stream.
      * @param value the array to be written.
@@ -147,7 +147,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_char_array(char[] value, int offset,
-					  int length);
+                                          int length);
     /**
      * Writes an array of wide chars on this output stream.
      * @param value the array to be written.
@@ -155,7 +155,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_wchar_array(char[] value, int offset,
-					   int length);
+                                           int length);
     /**
      * Writes an array of CORBA octets (bytes) on this output stream.
      * @param value the array to be written.
@@ -163,7 +163,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_octet_array(byte[] value, int offset,
-					   int length);
+                                           int length);
     /**
      * Writes an array of shorts on this output stream.
      * @param value the array to be written.
@@ -171,7 +171,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_short_array(short[] value, int offset,
-					   int length);
+                                           int length);
     /**
      * Writes an array of unsigned shorts on this output stream.
      * @param value the array to be written.
@@ -179,7 +179,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_ushort_array(short[] value, int offset,
-					    int length);
+                                            int length);
     /**
      * Writes an array of CORBA longs (i.e. Java ints) on this output stream.
      * @param value the array to be written.
@@ -187,7 +187,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_long_array(int[] value, int offset,
-					  int length);
+                                          int length);
     /**
      * Writes an array of unsigned CORBA longs (i.e. Java ints) on this output stream.
      * @param value the array to be written.
@@ -195,7 +195,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_ulong_array(int[] value, int offset,
-					   int length);
+                                           int length);
     /**
      * Writes an array of CORBA longlongs (i.e. Java longs) on this output stream.
      * @param value the array to be written.
@@ -203,7 +203,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_longlong_array(long[] value, int offset,
-					      int length);
+                                              int length);
     /**
      * Writes an array of unsigned CORBA longlongs (i.e. Java ints) on this output stream.
      * @param value the array to be written.
@@ -211,7 +211,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_ulonglong_array(long[] value, int offset,
-					       int length);
+                                               int length);
     /**
      * Writes an array of floats on this output stream.
      * @param value the array to be written.
@@ -219,7 +219,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_float_array(float[] value, int offset,
-					   int length);
+                                           int length);
     /**
      * Writes an array of doubles on this output stream.
      * @param value the array to be written.
@@ -227,7 +227,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * @param length length of buffer to write.
      */
     public abstract void write_double_array(double[] value, int offset,
-					    int length);
+                                            int length);
     /**
      * Writes a CORBA Object on this output stream.
      * @param value the value to be written.
@@ -285,7 +285,7 @@ public abstract class OutputStream extends java.io.OutputStream
      * package comments for unimplemented features</a>
      */
     public void write_Context(org.omg.CORBA.Context ctx,
-			      org.omg.CORBA.ContextList contexts) {
+                              org.omg.CORBA.ContextList contexts) {
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }
 
@@ -296,6 +296,6 @@ public abstract class OutputStream extends java.io.OutputStream
      * package comments for unimplemented features</a>
      */
     public org.omg.CORBA.ORB orb() {
-	throw new org.omg.CORBA.NO_IMPLEMENT();
+        throw new org.omg.CORBA.NO_IMPLEMENT();
     }
 }

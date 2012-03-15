@@ -50,7 +50,7 @@ import javax.naming.InitialContext;
 
 import org.omg.CORBA.ORB;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 import corba.framework.Controller;
 import corba.hcks.U;
@@ -110,23 +110,23 @@ class CallThread extends Thread
     CallThread(int iterations, EchoTest ref)
     { 
         this.failures = 0 ;
-	this.iterations = iterations;
-	this.ref = ref;
-	done = false;
+        this.iterations = iterations;
+        this.ref = ref;
+        done = false;
     }
 
     public void run()
     {
-	for (int i = 0; i < iterations; ++i) {
-	    try {
-		ref.echo("FOO");
-	    } catch (java.rmi.RemoteException e) {
+        for (int i = 0; i < iterations; ++i) {
+            try {
+                ref.echo("FOO");
+            } catch (java.rmi.RemoteException e) {
                 failures++ ;
-		System.out.println("CallThread.run FAILURE !!!!!");
-		e.printStackTrace(System.out);
-	    }
-	}
-	done = true;
+                System.out.println("CallThread.run FAILURE !!!!!");
+                e.printStackTrace(System.out);
+            }
+        }
+        done = true;
     }
 }
 

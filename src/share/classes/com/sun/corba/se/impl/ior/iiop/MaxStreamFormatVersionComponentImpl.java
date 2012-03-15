@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.ior.iiop;
+package com.sun.corba.ee.impl.ior.iiop;
 
 import org.omg.IOP.TAG_RMI_CUSTOM_MAX_STREAM_FORMAT;
 
@@ -46,11 +46,11 @@ import org.omg.CORBA_2_3.portable.OutputStream;
 import javax.rmi.CORBA.ValueHandler;
 import javax.rmi.CORBA.ValueHandlerMultiFormat;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
-import com.sun.corba.se.spi.ior.TaggedComponentBase;
+import com.sun.corba.ee.spi.ior.TaggedComponentBase;
 
-import com.sun.corba.se.spi.ior.iiop.MaxStreamFormatVersionComponent;
+import com.sun.corba.ee.spi.ior.iiop.MaxStreamFormatVersionComponent;
 
 // Java to IDL ptc 02-01-12 1.4.11
 // TAG_RMI_CUSTOM_MAX_STREAM_FORMAT
@@ -64,23 +64,23 @@ public class MaxStreamFormatVersionComponentImpl extends TaggedComponentBase
 
     public boolean equals(Object obj)
     {
-	if (!(obj instanceof MaxStreamFormatVersionComponentImpl))
-	    return false ;
+        if (!(obj instanceof MaxStreamFormatVersionComponentImpl))
+            return false ;
 
-	MaxStreamFormatVersionComponentImpl other = 
-	    (MaxStreamFormatVersionComponentImpl)obj ;
+        MaxStreamFormatVersionComponentImpl other = 
+            (MaxStreamFormatVersionComponentImpl)obj ;
 
-	return version == other.version ;
+        return version == other.version ;
     }
 
     public int hashCode()
     {
-	return version ;
+        return version ;
     }
 
     public String toString()
     {
-	return "MaxStreamFormatVersionComponentImpl[version=" + version + "]" ;
+        return "MaxStreamFormatVersionComponentImpl[version=" + version + "]" ;
     }
 
     public MaxStreamFormatVersionComponentImpl()
@@ -94,7 +94,7 @@ public class MaxStreamFormatVersionComponentImpl extends TaggedComponentBase
 
     public byte getMaxStreamFormatVersion()
     {
-	return version;
+        return version;
     }
 
     public void writeContents(OutputStream os) 
@@ -104,6 +104,6 @@ public class MaxStreamFormatVersionComponentImpl extends TaggedComponentBase
     
     public int getId() 
     {
-	return TAG_RMI_CUSTOM_MAX_STREAM_FORMAT.value;
+        return TAG_RMI_CUSTOM_MAX_STREAM_FORMAT.value;
     }
 }

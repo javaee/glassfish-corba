@@ -50,7 +50,7 @@ public interface TieTest extends Remote
     int throwsException( int arg ) throws Exception, RemoteException ;
 
     int throwsDeclaredException( int arg ) throws MyApplicationExceptionBase,
-	RemoteException ;
+        RemoteException ;
 
     int throwsSystemException( int arg ) throws RemoteException ;
 

@@ -187,7 +187,7 @@ public final class MathContext implements Serializable {
      * @throws NullPointerException if the rounding mode argument is {@code null}
      */
     public MathContext(int setPrecision, 
-		       RoundingMode setRoundingMode) {
+                       RoundingMode setRoundingMode) {
         if (setPrecision < MIN_DIGITS)
             throw new IllegalArgumentException("Digits < 0");
         if (setRoundingMode == null)
@@ -230,7 +230,7 @@ public final class MathContext implements Serializable {
             setPrecision = Integer.parseInt(val.substring(10, fence));
 
             if (!val.startsWith("roundingMode=", fence+1)) 
-		throw new RuntimeException();
+                throw new RuntimeException();
             off = fence + 1 + 13;
             String str = val.substring(off, val.length());
             roundingMode = RoundingMode.valueOf(str);
@@ -340,8 +340,8 @@ public final class MathContext implements Serializable {
      * @return a {@code String} representing the context settings
      */
     public java.lang.String toString() {
-        return "precision=" +		precision + " " +
-	       "roundingMode=" +	roundingMode.toString();
+        return "precision=" +           precision + " " +
+               "roundingMode=" +        roundingMode.toString();
     }
 
     // Private methods

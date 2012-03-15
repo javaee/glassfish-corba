@@ -57,7 +57,7 @@ public final class CODESET_INCOMPATIBLE extends SystemException {
      * minor code set to 0 and CompletionStatus set to COMPLETED_NO.
      */
     public CODESET_INCOMPATIBLE() {
-	this("");
+        this("");
     }
 
     /**

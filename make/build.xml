@@ -41,13 +41,13 @@
 -->
 <project name="corba-main" default="all" basedir="..">
     <description>
-	This is the Ant file that builds the GlassFish ORB.
+        This is the Ant file that builds the GlassFish ORB.
     </description>
 
     <import file="src-build.xml"/>
 
     <target name="init" depends="corba-src.init">
-        <property name="test.src.dir"	    	        value="test/src/share/classes"/>
+        <property name="test.src.dir"                   value="test/src/share/classes"/>
 
         <!-- cobertura related -->
         <property name="cobertura.dir"                  value="build/cobertura"/>
@@ -57,72 +57,72 @@
         <property name="cobertura.merge.datafile"       value="${cobertura.dir}/cobertura.merge.ser"/>
 
         <!-- Emma related -->
-	<property name="emma.dir"                       value="build/coverage"/>
-	<property name="emma.classes.dir"               location="${emma.dir}/classes"/>
-	<property name="emma.metadata.file"             location="${emma.dir}/coverage.em"/>
+        <property name="emma.dir"                       value="build/coverage"/>
+        <property name="emma.classes.dir"               location="${emma.dir}/classes"/>
+        <property name="emma.metadata.file"             location="${emma.dir}/coverage.em"/>
 
         <!-- ORB Test directories -->
 
         <property name="test.run.base"                  value="${root.dir}/test/run"/>
-        <property name="test.output"		        value="${test.run.base}/gen"/>
-        <property name="junit.reports"		        value="${test.run.base}/junitreports"/>
-	<property name="test-build.dir"                 location="${root.dir}/test/build"/>
-	<property name="test-classes.dir"               location="${test-build.dir}/classes"/>
-	<property name="test-values1.dir"               location="${test-build.dir}/values1/classes"/>
-	<property name="test-values2.dir"               location="${test-build.dir}/values2/classes"/>
-	<property name="test-gensrc.dir"                location="${test-build.dir}/gensrc"/>
+        <property name="test.output"                    value="${test.run.base}/gen"/>
+        <property name="junit.reports"                  value="${test.run.base}/junitreports"/>
+        <property name="test-build.dir"                 location="${root.dir}/test/build"/>
+        <property name="test-classes.dir"               location="${test-build.dir}/classes"/>
+        <property name="test-values1.dir"               location="${test-build.dir}/values1/classes"/>
+        <property name="test-values2.dir"               location="${test-build.dir}/values2/classes"/>
+        <property name="test-gensrc.dir"                location="${test-build.dir}/gensrc"/>
 
-	<mkdir dir="${test-classes.dir}"/>
-	<mkdir dir="${test-values1.dir}"/>
-	<mkdir dir="${test-values2.dir}"/>
-	<mkdir dir="${test-gensrc.dir}"/>
+        <mkdir dir="${test-classes.dir}"/>
+        <mkdir dir="${test-values1.dir}"/>
+        <mkdir dir="${test-values2.dir}"/>
+        <mkdir dir="${test-gensrc.dir}"/>
 
         <!-- Findbugs related -->
         <property name="findbugs.dir"                   location="build/findbugs"/>
-        <property name="findbugs.home"		        value="${root.dir}/lib/findbugs-1.3.9"/>
-	<property name="findbugs.exclude.file"          value="${root.dir}/make/findbugs-filter.xml"/>
+        <property name="findbugs.home"                  value="${root.dir}/lib/findbugs-1.3.9"/>
+        <property name="findbugs.exclude.file"          value="${root.dir}/make/findbugs-filter.xml"/>
         
-        <property name="jdo-jar"			value="${root.dir}/lib/jdo2-api-2.3-SNAPSHOT.jar"/>
-        <property name="jscheme-jar"		        value="${root.dir}/jscheme/lib/jscheme.jar"/>
-        <property name="ejb-jar"			value="${root.dir}/lib/ejb-2_1-api.jar"/>
-        <property name="ejb3-jar"			value="${root.dir}/lib/javax.ejb.jar"/>
-        <property name="ejbcontainer-jar"		value="${root.dir}/lib/ejb-container.jar"/>
-        <property name="junit-jar"			value="${root.dir}/lib/ant-junit.jar"/>
-        <property name="ant-junit-jar"		        value="${root.dir}/lib/junit.jar"/>
-        <property name="testng-jar"			value="${root.dir}/lib/testng.jar"/>
-        <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
+        <property name="jdo-jar"                        value="${root.dir}/lib/jdo2-api-2.3-SNAPSHOT.jar"/>
+        <property name="jscheme-jar"                    value="${root.dir}/jscheme/lib/jscheme.jar"/>
+        <property name="ejb-jar"                        value="${root.dir}/lib/ejb-2_1-api.jar"/>
+        <property name="ejb3-jar"                       value="${root.dir}/lib/javax.ejb.jar"/>
+        <property name="ejbcontainer-jar"               value="${root.dir}/lib/ejb-container.jar"/>
+        <property name="junit-jar"                      value="${root.dir}/lib/ant-junit.jar"/>
+        <property name="ant-junit-jar"                  value="${root.dir}/lib/junit.jar"/>
+        <property name="testng-jar"                     value="${root.dir}/lib/testng.jar"/>
+        <property name="japex-jar"                      value="${root.dir}/lib/japex.jar"/>
 
-	<path id="test-classpath.master">
-	    <pathelement location="${emma.classes.dir}"/>
-	    <pathelement location="${cobertura.classes.dir}"/>
+        <path id="test-classpath.master">
+            <pathelement location="${emma.classes.dir}"/>
+            <pathelement location="${cobertura.classes.dir}"/>
 
             <path refid="classpath.master"/>
 
-	    <pathelement location="${emma-jar}"/>
-	    <pathelement location="${jdo-jar}"/>
-	    <pathelement location="${ant-junit-jar}"/>
-	    <pathelement location="${junit-jar}"/>
-	    <pathelement location="${ejb3-jar}"/>
-	    <pathelement location="${ejb-jar}"/>
-	    <pathelement location="${ejbcontainer-jar}"/>
-	    <pathelement location="${testng-jar}"/>
-	    <pathelement location="${japex-jar}"/>
-	    <pathelement location="${test-classes.dir}"/>
-	    <pathelement location="${test-gensrc.dir}"/>
-	    <pathelement location="${test.output}"/>
-	    <pathelement location="${test-values1.dir}"/>
-	    <pathelement location="${test.src.dir}"/>
+            <pathelement location="${emma-jar}"/>
+            <pathelement location="${jdo-jar}"/>
+            <pathelement location="${ant-junit-jar}"/>
+            <pathelement location="${junit-jar}"/>
+            <pathelement location="${ejb3-jar}"/>
+            <pathelement location="${ejb-jar}"/>
+            <pathelement location="${ejbcontainer-jar}"/>
+            <pathelement location="${testng-jar}"/>
+            <pathelement location="${japex-jar}"/>
+            <pathelement location="${test-classes.dir}"/>
+            <pathelement location="${test-gensrc.dir}"/>
+            <pathelement location="${test.output}"/>
+            <pathelement location="${test-values1.dir}"/>
+            <pathelement location="${test.src.dir}"/>
 
             <path refid="cobertura.classpath"/>
-	</path>
+        </path>
 
-	<pathconvert property="test.source.path">
-	    <path>
-		<pathelement location="${src.dir}"/>
-		<pathelement location="${test.src.dir}"/>
-		<pathelement location="${test.output}"/>
-	    </path>
-	</pathconvert>
+        <pathconvert property="test.source.path">
+            <path>
+                <pathelement location="${src.dir}"/>
+                <pathelement location="${test.src.dir}"/>
+                <pathelement location="${test.output}"/>
+            </path>
+        </pathconvert>
     </target>
 
     <!-- ========================= COMPILE-TESTS ========================= -->
@@ -134,144 +134,144 @@
     <target name="compile-tests-main" depends="init, compile-tests-main-gen, compile-tests-main-nongen"/>
 
     <target name="compile-tests-main-gen" depends="init">
-	<echo message="Compiling all tests"/>
-	<javac destdir="${test-classes.dir}" 
-		classpathref="test-classpath.master"
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-		fork="true"
-		memoryMaximumSize="512m"> 
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
-	    <src path="${test-gensrc.dir}"/>
-	    <include name="**"/>
+        <echo message="Compiling all tests"/>
+        <javac destdir="${test-classes.dir}" 
+                classpathref="test-classpath.master"
+                deprecation="${deprecation}"
+                debug="${javac.debug}" 
+                optimize="${javac.optimize}"
+                fork="true"
+                memoryMaximumSize="512m"> 
+            <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
+            <src path="${test-gensrc.dir}"/>
+            <include name="**"/>
 
-	    <!-- Exclude these files because they are compiled to a different
-	         destdir in the compile-values target -->
-	    <exclude name="values1/**"/>
-	    <exclude name="values2/**"/>
+            <!-- Exclude these files because they are compiled to a different
+                 destdir in the compile-values target -->
+            <exclude name="values1/**"/>
+            <exclude name="values2/**"/>
 
-	    <!-- Following files are excluded from compilation
-		because they are either compiled during running of the tests
-		or not compiled at all.  -->
-	    <exclude name="corba/strm2/class*/**"/>
-	    <exclude name="corba/evolve/original/**"/>
-	    <exclude name="corba/evolve/evolved/UserName.java"/>
-	    <exclude name="corba/example/Client.java"/>
-	    <exclude name="corba/example/Server.java"/>
-	    <exclude name="corba/driinvocation/**"/>
-	    <exclude name="corba/tcpreadtimeout/**"/>
+            <!-- Following files are excluded from compilation
+                because they are either compiled during running of the tests
+                or not compiled at all.  -->
+            <exclude name="corba/strm2/class*/**"/>
+            <exclude name="corba/evolve/original/**"/>
+            <exclude name="corba/evolve/evolved/UserName.java"/>
+            <exclude name="corba/example/Client.java"/>
+            <exclude name="corba/example/Server.java"/>
+            <exclude name="corba/driinvocation/**"/>
+            <exclude name="corba/tcpreadtimeout/**"/>
 
             <!-- Exclude test where the generated IDL REQUIRES a value impl (ugh! what a bad idea!) -->
             <exclude name="corba/hcks/**"/>
             <exclude name="CodeSetTester/**"/>
 
-	    <!-- Excluded until we get the test moved to the JDK XML classes -->
-	    <exclude name="corba/genericRPCMSGFramework/**"/>
+            <!-- Excluded until we get the test moved to the JDK XML classes -->
+            <exclude name="corba/genericRPCMSGFramework/**"/>
 
-	    <exclude name="hopper/h4549085/Server.java"/>
-	    <exclude name="hopper/h4549085/Client.java"/>
-	    <exclude name="hopper/h4620926/Server.java"/>
-	    <exclude name="hopper/h4620926/Client.java"/>
-	    <exclude name="hopper/h4670827/HelloImpl.java"/>
-	    <exclude name="hopper/h4670827/Client.java"/>
-	    <exclude name="hopper/h4670827/INSServer.java"/>
-	    <exclude name="hopper/h4670827/TestConstants.java"/>
+            <exclude name="hopper/h4549085/Server.java"/>
+            <exclude name="hopper/h4549085/Client.java"/>
+            <exclude name="hopper/h4620926/Server.java"/>
+            <exclude name="hopper/h4620926/Client.java"/>
+            <exclude name="hopper/h4670827/HelloImpl.java"/>
+            <exclude name="hopper/h4670827/Client.java"/>
+            <exclude name="hopper/h4670827/INSServer.java"/>
+            <exclude name="hopper/h4670827/TestConstants.java"/>
 
-	    <exclude name="naming/pcosnaming/hello*"/>
-	    <exclude name="naming/instest/Client.java*"/>
-	    <exclude name="naming/instest/INSServer.java"/>
-	    <exclude name="naming/instest/HelloImpl.java"/>
+            <exclude name="naming/pcosnaming/hello*"/>
+            <exclude name="naming/instest/Client.java*"/>
+            <exclude name="naming/instest/INSServer.java"/>
+            <exclude name="naming/instest/HelloImpl.java"/>
 
-	    <exclude name="javax/rmi/CORBA/io/**"/>
-	    <exclude name="java/**"/>
+            <exclude name="javax/rmi/CORBA/io/**"/>
+            <exclude name="java/**"/>
 
             <!--exclude name="corba/dynamicrmiiiop/testclasses/**"/-->
-	</javac>
+        </javac>
     </target>
 
     <target name="compile-tests-main-nongen" depends="init">
-	<echo message="Compiling all tests"/>
-	<javac destdir="${test-classes.dir}" 
-		classpathref="test-classpath.master"
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-		fork="true"
-		memoryMaximumSize="512m"> 
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
-	    <src path="${test-gensrc.dir}"/>
-	    <src path="${test.src.dir}"/>
-	    <include name="**"/>
-	    <!-- Exclude these files because they are compiled to a different
-	         destdir in the compile-values target -->
-	    <exclude name="values1/**"/>
-	    <exclude name="values2/**"/>
-	    <!-- Following files are excluded from compilation
-		because they are either compiled during running of the tests
-		or not compiled at all.  -->
-	    <exclude name="corba/strm2/class*/**"/>
-	    <exclude name="corba/evolve/original/**"/>
-	    <exclude name="corba/evolve/evolved/UserName.java"/>
-	    <exclude name="corba/example/Client.java"/>
-	    <exclude name="corba/example/Server.java"/>
-	    <exclude name="corba/driinvocation/**"/>
-	    <exclude name="corba/tcpreadtimeout/**"/>
+        <echo message="Compiling all tests"/>
+        <javac destdir="${test-classes.dir}" 
+                classpathref="test-classpath.master"
+                deprecation="${deprecation}"
+                debug="${javac.debug}" 
+                optimize="${javac.optimize}"
+                fork="true"
+                memoryMaximumSize="512m"> 
+            <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
+            <src path="${test-gensrc.dir}"/>
+            <src path="${test.src.dir}"/>
+            <include name="**"/>
+            <!-- Exclude these files because they are compiled to a different
+                 destdir in the compile-values target -->
+            <exclude name="values1/**"/>
+            <exclude name="values2/**"/>
+            <!-- Following files are excluded from compilation
+                because they are either compiled during running of the tests
+                or not compiled at all.  -->
+            <exclude name="corba/strm2/class*/**"/>
+            <exclude name="corba/evolve/original/**"/>
+            <exclude name="corba/evolve/evolved/UserName.java"/>
+            <exclude name="corba/example/Client.java"/>
+            <exclude name="corba/example/Server.java"/>
+            <exclude name="corba/driinvocation/**"/>
+            <exclude name="corba/tcpreadtimeout/**"/>
 
-	    <exclude name="hopper/h4549085/Server.java"/>
-	    <exclude name="hopper/h4549085/Client.java"/>
-	    <exclude name="hopper/h4620926/Server.java"/>
-	    <exclude name="hopper/h4620926/Client.java"/>
-	    <exclude name="hopper/h4670827/HelloImpl.java"/>
-	    <exclude name="hopper/h4670827/Client.java"/>
-	    <exclude name="hopper/h4670827/INSServer.java"/>
-	    <exclude name="hopper/h4670827/TestConstants.java"/>
+            <exclude name="hopper/h4549085/Server.java"/>
+            <exclude name="hopper/h4549085/Client.java"/>
+            <exclude name="hopper/h4620926/Server.java"/>
+            <exclude name="hopper/h4620926/Client.java"/>
+            <exclude name="hopper/h4670827/HelloImpl.java"/>
+            <exclude name="hopper/h4670827/Client.java"/>
+            <exclude name="hopper/h4670827/INSServer.java"/>
+            <exclude name="hopper/h4670827/TestConstants.java"/>
 
-	    <exclude name="naming/pcosnaming/hello*"/>
-	    <exclude name="naming/instest/Client.java*"/>
-	    <exclude name="naming/instest/INSServer.java"/>
-	    <exclude name="naming/instest/HelloImpl.java"/>
+            <exclude name="naming/pcosnaming/hello*"/>
+            <exclude name="naming/instest/Client.java*"/>
+            <exclude name="naming/instest/INSServer.java"/>
+            <exclude name="naming/instest/HelloImpl.java"/>
 
-	    <exclude name="javax/rmi/CORBA/io/**"/>
-	    <exclude name="java/**"/>
+            <exclude name="javax/rmi/CORBA/io/**"/>
+            <exclude name="java/**"/>
 
             <!--exclude name="corba/dynamicrmiiiop/testclasses/**"/-->
-	</javac>
+        </javac>
     </target>
 
     <target name="compile-tests-values" depends="init">
-	<!-- Compile the values classes separately so that we can
-	     control how and if they are in the classpath.
-	     values1 and values2 contain different versions of the
-	     same classes for testing class evolution.
-	-->
-	<javac destdir="${test-values1.dir}" 
-		classpathref="test-classpath.master"
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-		failonerror="true">
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
-	    <src path="${test.src.dir}/values1"/>
-	    <include name="**"/>
-	</javac>
-	<javac destdir="${test-values2.dir}" 
-		classpathref="test-classpath.master"
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-		failonerror="true">
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
-	    <src path="${test.src.dir}/values2"/>
-	    <include name="**"/>
-	</javac>
+        <!-- Compile the values classes separately so that we can
+             control how and if they are in the classpath.
+             values1 and values2 contain different versions of the
+             same classes for testing class evolution.
+        -->
+        <javac destdir="${test-values1.dir}" 
+                classpathref="test-classpath.master"
+                deprecation="${deprecation}"
+                debug="${javac.debug}" 
+                optimize="${javac.optimize}"
+                failonerror="true">
+            <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
+            <src path="${test.src.dir}/values1"/>
+            <include name="**"/>
+        </javac>
+        <javac destdir="${test-values2.dir}" 
+                classpathref="test-classpath.master"
+                deprecation="${deprecation}"
+                debug="${javac.debug}" 
+                optimize="${javac.optimize}"
+                failonerror="true">
+            <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
+            <src path="${test.src.dir}/values2"/>
+            <include name="**"/>
+        </javac>
     </target>
 
     <!-- ======================== findbugs integration ========= 
 
-	 This uses the findbugs command instead of the findbugs ant task because it
-	 is easier to use the command than to arrange that findbugs-ant.jar is properly
-	 installed where it is needed.
+         This uses the findbugs command instead of the findbugs ant task because it
+         is easier to use the command than to arrange that findbugs-ant.jar is properly
+         installed where it is needed.
 
       -->
 
@@ -286,55 +286,55 @@
     </target>
 
     <target name="findbugs" depends="init, prepare-findbugs"> 
-	<mkdir dir="${findbugs.dir}"/>
-	<exec executable="${findbugs.home}/bin/findbugs">
-	    <arg value="-textui"/>
-	    <arg value="-html"/>
-	    <arg value="-outputFile"/>
-	    <arg file="${findbugs.dir}/orb-fb.html"/>
-	    <arg value="-exclude"/>
-	    <arg file="${findbugs.exclude.file}"/>
-	    <arg value="-sourcepath"/>
-	    <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
+        <mkdir dir="${findbugs.dir}"/>
+        <exec executable="${findbugs.home}/bin/findbugs">
+            <arg value="-textui"/>
+            <arg value="-html"/>
+            <arg value="-outputFile"/>
+            <arg file="${findbugs.dir}/orb-fb.html"/>
+            <arg value="-exclude"/>
+            <arg file="${findbugs.exclude.file}"/>
+            <arg value="-sourcepath"/>
+            <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
             <arg file="${gmbal-jar}"/>
             <arg file="${management-api-jar}"/>
             <arg file="${gmbal-jar}"/>
             <arg file="${libcache.dir}/org.osgi.core.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-asm.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-internal-api.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>
-	    <!-- <arg file="${test-classes.dir}"/> -->
-	</exec>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-asm.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-internal-api.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>
+            <!-- <arg file="${test-classes.dir}"/> -->
+        </exec>
     </target>
 
     <target name="findbugs-xml" depends="init, prepare-findbugs"> 
-	<mkdir dir="${findbugs.dir}"/>
-	<exec executable="${findbugs.home}/bin/findbugs">
-	    <arg value="-textui"/>
-	    <arg value="-xml"/>
-	    <arg value="-outputFile"/>
-	    <arg file="${findbugs.dir}/orb-fb.xml"/>
-	    <arg value="-exclude"/>
-	    <arg file="${findbugs.exclude.file}"/>
-	    <arg value="-sourcepath"/>
-	    <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
+        <mkdir dir="${findbugs.dir}"/>
+        <exec executable="${findbugs.home}/bin/findbugs">
+            <arg value="-textui"/>
+            <arg value="-xml"/>
+            <arg value="-outputFile"/>
+            <arg file="${findbugs.dir}/orb-fb.xml"/>
+            <arg value="-exclude"/>
+            <arg file="${findbugs.exclude.file}"/>
+            <arg value="-sourcepath"/>
+            <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
             <arg file="${gmbal-jar}"/>
             <arg file="${management-api-jar}"/>
             <arg file="${gmbal-jar}"/>
             <arg file="${libcache.dir}/org.osgi.core.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-asm.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-internal-api.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>
-	    <!-- <arg file="${test-classes.dir}"/> -->
-	</exec>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-asm.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-internal-api.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
+            <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>
+            <!-- <arg file="${test-classes.dir}"/> -->
+        </exec>
     </target>
 
     <target name="increment-build-version" depends="init">
@@ -1500,9 +1500,9 @@
         <sequential>
             <echo message="Called run-test with args=@{args}"/>
             <java classname="test.Test" classpathref="test-classpath.master" fork="true" dir="${test.run.base}">
-                <jvmarg value="-Djavax.rmi.CORBA.UtilClass=com.sun.corba.se.impl.javax.rmi.CORBA.Util"/>
-                <jvmarg value="-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
-                <jvmarg value="-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
+                <jvmarg value="-Djavax.rmi.CORBA.UtilClass=com.sun.corba.ee.impl.javax.rmi.CORBA.Util"/>
+                <jvmarg value="-Djavax.rmi.CORBA.StubClass=com.sun.corba.ee.impl.javax.rmi.CORBA.StubDelegateImpl"/>
+                <jvmarg value="-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.ee.impl.javax.rmi.PortableRemoteObject"/>
 
                 <!--
                 <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}:${orblib.classes.dir}:${gmbal-jar}:${management-api-jar}"/>
@@ -1517,16 +1517,16 @@
                 <jvmarg value="-Dhttp.server.root.directory=../build/values2/classes"/>
                 <jvmarg value="-Djava.security.policy=../src/share/classes/test.policy"/>
                 <jvmarg value="-Djava.security.debug=debug"/>
-                <jvmarg value="-Dorg.omg.CORBA.ORBClass=com.sun.corba.se.impl.orb.ORBImpl"/>
-                <jvmarg value="-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.se.impl.orb.ORBSingleton"/>
-                <jvmarg value="-Dcom.sun.corba.se.POA.ORBServerId=1"/>
-                <jvmarg value="-Dcom.sun.corba.se.ORBBase=${basedir}"/>
-                <jvmarg value="-Dcom.sun.corba.se.test.sourcepath=${test.source.path}"/>
-                <jvmarg value="-Dcom.sun.corba.se.ORBUseDynamicStub=${use.dynamic.stub}"/>
-                <jvmarg value="-Dcom.sun.corba.se.ORBUseCodegenReflectiveCopyobject=${use.codegen.copyobject}"/>
-                <jvmarg value="-Dcom.sun.corba.se.encoding.ORBEnableJavaSerialization=${use.java.serialization}"/>
-                <jvmarg value="-Dcom.sun.corba.se.ORBDebugForkedProcess=${debug.forked.process}"/>
-                <jvmarg value="-Dcom.sun.corba.se.ORBDebugStubGeneration=false"/>
+                <jvmarg value="-Dorg.omg.CORBA.ORBClass=com.sun.corba.ee.impl.orb.ORBImpl"/>
+                <jvmarg value="-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.ee.impl.orb.ORBSingleton"/>
+                <jvmarg value="-Dcom.sun.corba.ee.POA.ORBServerId=1"/>
+                <jvmarg value="-Dcom.sun.corba.ee.ORBBase=${basedir}"/>
+                <jvmarg value="-Dcom.sun.corba.ee.test.sourcepath=${test.source.path}"/>
+                <jvmarg value="-Dcom.sun.corba.ee.ORBUseDynamicStub=${use.dynamic.stub}"/>
+                <jvmarg value="-Dcom.sun.corba.ee.ORBUseCodegenReflectiveCopyobject=${use.codegen.copyobject}"/>
+                <jvmarg value="-Dcom.sun.corba.ee.encoding.ORBEnableJavaSerialization=${use.java.serialization}"/>
+                <jvmarg value="-Dcom.sun.corba.ee.ORBDebugForkedProcess=${debug.forked.process}"/>
+                <jvmarg value="-Dcom.sun.corba.ee.ORBDebugStubGeneration=false"/>
                 <jvmarg value="-Djunit.report.dir=junitreports"/>
                 <jvmarg value="-Demma.coverage.out.file=../../${emma.dir}/orb_coverage.ec"/>
                 <jvmarg value="-Demma.coverage.out.merge=true"/>
@@ -1563,9 +1563,9 @@
             <!-- <run-test args="-file ../src/share/classes/corba/CopyObjectTests.tdesc -verbose"/> 
             <run-test args="-test corba.copyobjectpolicy.CopyObjectPolicyTest -verbose"/> -->
             <junit printsummary="on" fork="on" forkmode="perTest" newenvironment="true" maxmemory="200M" showoutput="true" dir="${test.run.base}">
-                <sysproperty key="javax.rmi.CORBA.UtilClass" value="com.sun.corba.se.impl.javax.rmi.CORBA.Util"/>
-                <sysproperty key="javax.rmi.CORBA.StubClass" value="com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
-                <sysproperty key="javax.rmi.CORBA.PortableRemoteObjectClass" value="com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
+                <sysproperty key="javax.rmi.CORBA.UtilClass" value="com.sun.corba.ee.impl.javax.rmi.CORBA.Util"/>
+                <sysproperty key="javax.rmi.CORBA.StubClass" value="com.sun.corba.ee.impl.javax.rmi.CORBA.StubDelegateImpl"/>
+                <sysproperty key="javax.rmi.CORBA.PortableRemoteObjectClass" value="com.sun.corba.ee.impl.javax.rmi.PortableRemoteObject"/>
                 <!--
                 <sysproperty key="corba.test.orb.classpath" value="${classes.dir}:${orblib.classes.dir}"/>
                 -->
@@ -1575,16 +1575,16 @@
                 <sysproperty key="http.server.root.directory" value="../build/values2/classes"/>
                 <sysproperty key="java.security.policy" value="../src/share/classes/test.policy"/>
                 <sysproperty key="java.security.debug" value="debug"/>
-                <sysproperty key="org.omg.CORBA.ORBClass" value="com.sun.corba.se.impl.orb.ORBImpl"/>
-                <sysproperty key="org.omg.CORBA.ORBSingletonClass" value="com.sun.corba.se.impl.orb.ORBSingleton"/>
-                <sysproperty key="com.sun.corba.se.POA.ORBServerId" value="1"/>
-                <sysproperty key="com.sun.corba.se.ORBBase" value="${basedir}"/>
-                <sysproperty key="com.sun.corba.se.test.sourcepath" value="${test.source.path}"/>
-                <sysproperty key="com.sun.corba.se.ORBUseDynamicStub" value="${use.dynamic.stub}"/>
-                <sysproperty key="com.sun.corba.se.ORBUseCodegenReflectiveCopyobject" value="${use.codegen.copyobject}"/>
-                <sysproperty key="com.sun.corba.se.encoding.ORBEnableJavaSerialization" value="${use.java.serialization}"/>
-                <sysproperty key="com.sun.corba.se.ORBDebugForkedProcess" value="${debug.forked.process}"/>
-                <sysproperty key="com.sun.corba.se.ORBDebugStubGeneration" value="false"/>
+                <sysproperty key="org.omg.CORBA.ORBClass" value="com.sun.corba.ee.impl.orb.ORBImpl"/>
+                <sysproperty key="org.omg.CORBA.ORBSingletonClass" value="com.sun.corba.ee.impl.orb.ORBSingleton"/>
+                <sysproperty key="com.sun.corba.ee.POA.ORBServerId" value="1"/>
+                <sysproperty key="com.sun.corba.ee.ORBBase" value="${basedir}"/>
+                <sysproperty key="com.sun.corba.ee.test.sourcepath" value="${test.source.path}"/>
+                <sysproperty key="com.sun.corba.ee.ORBUseDynamicStub" value="${use.dynamic.stub}"/>
+                <sysproperty key="com.sun.corba.ee.ORBUseCodegenReflectiveCopyobject" value="${use.codegen.copyobject}"/>
+                <sysproperty key="com.sun.corba.ee.encoding.ORBEnableJavaSerialization" value="${use.java.serialization}"/>
+                <sysproperty key="com.sun.corba.ee.ORBDebugForkedProcess" value="${debug.forked.process}"/>
+                <sysproperty key="com.sun.corba.ee.ORBDebugStubGeneration" value="false"/>
                 <sysproperty key="junit.report.dir" value="junitreports"/>
                 <sysproperty key="emma.coverage.out.file" value="../../${emma.dir}/orb_coverage.ec"/>
                 <sysproperty key="emma.coverage.out.merge" value="true"/>
@@ -1675,7 +1675,7 @@
     </target>
 
     <target name="test-rmi-iiop" depends="test-init">
-        <java classname="com.sun.corba.se.impl.util.ORBProperties" classpathref="test-classpath.master"/>
+        <java classname="com.sun.corba.ee.impl.util.ORBProperties" classpathref="test-classpath.master"/>
         <run-test args="-file ../src/share/classes/test/AllTests.tdesc -verbose"/>
     </target>
 
@@ -1732,57 +1732,57 @@
     -->
 
     <patternset id="gf.orb.classes">
-        <include name="com/sun/corba/se/spi/**/*.class"/>
-        <include name="com/sun/corba/se/impl/**/*.class"/>
-        <exclude name="com/sun/corba/se/spi/activation/**/*.class"/>
-        <exclude name="com/sun/corba/se/impl/activation/**/*.class"/>
-        <exclude name="com/sun/corba/se/impl/dynamicany/*.class"/>
-        <exclude name="com/sun/corba/se/impl/encoding/fast/**/*.class"/>
-        <exclude name="com/sun/corba/se/impl/naming/pcosnaming/*.class"/>
-        <exclude name="com/sun/corba/se/impl/orbutil/newtimer/generated/*.class"/>
-        <exclude name="com/sun/corba/se/internal/**/*.class"/>
-        <exclude name="com/sun/corba/se/org/omg/**/*.class"/>
+        <include name="com/sun/corba/ee/spi/**/*.class"/>
+        <include name="com/sun/corba/ee/impl/**/*.class"/>
+        <exclude name="com/sun/corba/ee/spi/activation/**/*.class"/>
+        <exclude name="com/sun/corba/ee/impl/activation/**/*.class"/>
+        <exclude name="com/sun/corba/ee/impl/dynamicany/*.class"/>
+        <exclude name="com/sun/corba/ee/impl/encoding/fast/**/*.class"/>
+        <exclude name="com/sun/corba/ee/impl/naming/pcosnaming/*.class"/>
+        <exclude name="com/sun/corba/ee/impl/orbutil/newtimer/generated/*.class"/>
+        <exclude name="com/sun/corba/ee/internal/**/*.class"/>
+        <exclude name="com/sun/corba/ee/org/omg/**/*.class"/>
         <exclude name="com/sun/org/omg/**/*.class"/>
-        <exclude name="com/sun/corba/se/impl/txpoa/*.class"/>
-        <exclude name="com/sun/corba/se/impl/osgi/main/*.class"/>
-        <exclude name="com/sun/corba/se/impl/presentation/rmi/proxy/*.class"/>
+        <exclude name="com/sun/corba/ee/impl/txpoa/*.class"/>
+        <exclude name="com/sun/corba/ee/impl/osgi/main/*.class"/>
+        <exclude name="com/sun/corba/ee/impl/presentation/rmi/proxy/*.class"/>
     </patternset>
 
     <patternset id="gf.orblib.classes">
-        <include name="com/sun/corba/se/spi/orbutil/**/*.class"/>
-        <include name="com/sun/corba/se/impl/orbutil/**/*.class"/>
-        <exclude name="com/sun/corba/se/impl/orbutil/copyobject/CodegenCopier*"/>
-        <exclude name="com/sun/corba/se/impl/orbutil/copyobject/FastCache*"/>
-        <exclude name="com/sun/corba/se/org/objectweb/*.class"/>
-        <exclude name="com/sun/corba/se/spi/orbutil/file/*.class"/>
-        <exclude name="com/sun/corba/se/spi/orbutil/argparser/*.class"/>
+        <include name="com/sun/corba/ee/spi/orbutil/**/*.class"/>
+        <include name="com/sun/corba/ee/impl/orbutil/**/*.class"/>
+        <exclude name="com/sun/corba/ee/impl/orbutil/copyobject/CodegenCopier*"/>
+        <exclude name="com/sun/corba/ee/impl/orbutil/copyobject/FastCache*"/>
+        <exclude name="com/sun/corba/ee/org/objectweb/*.class"/>
+        <exclude name="com/sun/corba/ee/spi/orbutil/file/*.class"/>
+        <exclude name="com/sun/corba/ee/spi/orbutil/argparser/*.class"/>
     </patternset>
 
     <patternset id="gf.orb.sources">
-        <include name="com/sun/corba/se/spi/**/*.java"/>
-        <include name="com/sun/corba/se/impl/**/*.java"/>
-        <exclude name="com/sun/corba/se/spi/activation/**/*.java"/>
-        <exclude name="com/sun/corba/se/impl/activation/**/*.java"/>
-        <exclude name="com/sun/corba/se/impl/dynamicany/*.java"/>
-        <exclude name="com/sun/corba/se/impl/encoding/fast/**/*.java"/>
-        <exclude name="com/sun/corba/se/impl/naming/pcosnaming/*.java"/>
-        <exclude name="com/sun/corba/se/impl/orbutil/newtimer/generated/*.java"/>
-        <exclude name="com/sun/corba/se/internal/**/*.java"/>
-        <exclude name="com/sun/corba/se/org/omg/**/*.java"/>
+        <include name="com/sun/corba/ee/spi/**/*.java"/>
+        <include name="com/sun/corba/ee/impl/**/*.java"/>
+        <exclude name="com/sun/corba/ee/spi/activation/**/*.java"/>
+        <exclude name="com/sun/corba/ee/impl/activation/**/*.java"/>
+        <exclude name="com/sun/corba/ee/impl/dynamicany/*.java"/>
+        <exclude name="com/sun/corba/ee/impl/encoding/fast/**/*.java"/>
+        <exclude name="com/sun/corba/ee/impl/naming/pcosnaming/*.java"/>
+        <exclude name="com/sun/corba/ee/impl/orbutil/newtimer/generated/*.java"/>
+        <exclude name="com/sun/corba/ee/internal/**/*.java"/>
+        <exclude name="com/sun/corba/ee/org/omg/**/*.java"/>
         <exclude name="com/sun/org/omg/**/*.java"/>
-        <exclude name="com/sun/corba/se/impl/txpoa/*.java"/>
-        <exclude name="com/sun/corba/se/impl/osgi/main/*.java"/>
-        <exclude name="com/sun/corba/se/impl/presentation/rmi/proxy/*.java"/>
+        <exclude name="com/sun/corba/ee/impl/txpoa/*.java"/>
+        <exclude name="com/sun/corba/ee/impl/osgi/main/*.java"/>
+        <exclude name="com/sun/corba/ee/impl/presentation/rmi/proxy/*.java"/>
     </patternset>
 
     <patternset id="gf.orblib.sources">
-        <include name="com/sun/corba/se/spi/orbutil/**/*.java"/>
-        <include name="com/sun/corba/se/impl/orbutil/**/*.java"/>
-        <exclude name="com/sun/corba/se/impl/orbutil/copyobject/CodegenCopier*"/>
-        <exclude name="com/sun/corba/se/impl/orbutil/copyobject/FastCache*"/>
-        <exclude name="com/sun/corba/se/org/objectweb/*.java"/>
-        <exclude name="com/sun/corba/se/spi/orbutil/file/*.java"/>
-        <exclude name="com/sun/corba/se/spi/orbutil/argparser/*.java"/>
+        <include name="com/sun/corba/ee/spi/orbutil/**/*.java"/>
+        <include name="com/sun/corba/ee/impl/orbutil/**/*.java"/>
+        <exclude name="com/sun/corba/ee/impl/orbutil/copyobject/CodegenCopier*"/>
+        <exclude name="com/sun/corba/ee/impl/orbutil/copyobject/FastCache*"/>
+        <exclude name="com/sun/corba/ee/org/objectweb/*.java"/>
+        <exclude name="com/sun/corba/ee/spi/orbutil/file/*.java"/>
+        <exclude name="com/sun/corba/ee/spi/orbutil/argparser/*.java"/>
     </patternset>
 
     <target name="instrument-cobertura" depends="init">
@@ -1833,9 +1833,9 @@
     <!-- 
     Running emma on the ORB
     All emma files will end up in <ws>/build/coverage as follows:
-    build/coverage/classes		contains the instrumented ORB classes
-    build/coverage/report			contains the generated reports
-    build/coverage/orb_coverage.ec	contains the collected coverage data from running the tests
+    build/coverage/classes              contains the instrumented ORB classes
+    build/coverage/report                       contains the generated reports
+    build/coverage/orb_coverage.ec      contains the collected coverage data from running the tests
 
     The emma target must be run after the build target.  The emma target will:
     - call init, to set up the properties
@@ -1867,43 +1867,43 @@
                 <pathelement location="${classes.dir}"/>
                 <pathelement location="${orblib.classes.dir}"/>
             </instrpath>
-            <filter includes="com.sun.corba.se.spi.*"/>
-            <filter includes="com.sun.corba.se.spi.*.*"/>
-            <filter includes="com.sun.corba.se.spi.*.*.*"/>
-            <filter includes="com.sun.corba.se.impl.*"/>
-            <filter includes="com.sun.corba.se.impl.*.*"/>
-            <filter includes="com.sun.corba.se.impl.*.*.*"/>
+            <filter includes="com.sun.corba.ee.spi.*"/>
+            <filter includes="com.sun.corba.ee.spi.*.*"/>
+            <filter includes="com.sun.corba.ee.spi.*.*.*"/>
+            <filter includes="com.sun.corba.ee.impl.*"/>
+            <filter includes="com.sun.corba.ee.impl.*.*"/>
+            <filter includes="com.sun.corba.ee.impl.*.*.*"/>
             <filter includes="javax.rmi.PortableRemoteObject"/>
             <filter includes="javax.rmi.CORBA.*"/>
-            <filter includes="com.sun.corba.se.spi.folb.GroupInfoServiceBase"/>
+            <filter includes="com.sun.corba.ee.spi.folb.GroupInfoServiceBase"/>
 
             <!-- exclude IDL and scheme generated classes -->
-            <filter excludes="com.sun.corba.se.spi.folb.*"/>
-            <filter excludes="com.sun.corba.se.impl.logging.*"/>
+            <filter excludes="com.sun.corba.ee.spi.folb.*"/>
+            <filter excludes="com.sun.corba.ee.impl.logging.*"/>
 
             <!-- exclude ORB classes not used in the app server -->
-            <filter excludes="com.sun.corba.se.spi.activation.*"/>
-            <filter excludes="com.sun.corba.se.spi.activation.InitialNameServicePackage.*"/>
-            <filter excludes="com.sun.corba.se.spi.activation.LocatorPackage.*"/>
-            <filter excludes="com.sun.corba.se.spi.activation.RepositoryPackage.*"/>
-            <filter excludes="com.sun.corba.se.impl.activation.*"/>
-            <filter excludes="com.sun.corba.se.impl.orbutil.copyobject.CodegenCopier*"/>
-            <filter excludes="com.sun.corba.se.impl.orbutil.copyobject.FastCache*"/>
-            <filter excludes="com.sun.corba.se.spi.orbutil.proxy.*"/>
-            <filter excludes="com.sun.corba.se.impl.dynamicany.*"/>
-            <filter excludes="com.sun.corba.se.impl.encoding.fast.*"/>
-            <filter excludes="com.sun.corba.se.impl.naming.pcosnaming.*"/>
-            <filter excludes="com.sun.corba.se.impl.orbutil.newtimer.generated.*"/>
-            <filter excludes="com.sun.corba.se.internal.*.*"/>
-            <filter excludes="com.sun.corba.se.org.omg"/>
+            <filter excludes="com.sun.corba.ee.spi.activation.*"/>
+            <filter excludes="com.sun.corba.ee.spi.activation.InitialNameServicePackage.*"/>
+            <filter excludes="com.sun.corba.ee.spi.activation.LocatorPackage.*"/>
+            <filter excludes="com.sun.corba.ee.spi.activation.RepositoryPackage.*"/>
+            <filter excludes="com.sun.corba.ee.impl.activation.*"/>
+            <filter excludes="com.sun.corba.ee.impl.orbutil.copyobject.CodegenCopier*"/>
+            <filter excludes="com.sun.corba.ee.impl.orbutil.copyobject.FastCache*"/>
+            <filter excludes="com.sun.corba.ee.spi.orbutil.proxy.*"/>
+            <filter excludes="com.sun.corba.ee.impl.dynamicany.*"/>
+            <filter excludes="com.sun.corba.ee.impl.encoding.fast.*"/>
+            <filter excludes="com.sun.corba.ee.impl.naming.pcosnaming.*"/>
+            <filter excludes="com.sun.corba.ee.impl.orbutil.newtimer.generated.*"/>
+            <filter excludes="com.sun.corba.ee.internal.*.*"/>
+            <filter excludes="com.sun.corba.ee.org.omg"/>
             <filter excludes="com.sun.org.omg"/>
-            <filter excludes="com.sun.corba.se.org.objectweb"/>
-            <filter excludes="com.sun.corba.se.impl.txpoa.*"/>
-            <filter excludes="com.sun.corba.se.impl.osgi.main.*"/>
-            <filter excludes="com.sun.corba.se.spi.osgi.*"/>
-            <filter excludes="com.sun.corba.se.impl.presentation.rmi.proxy.*"/>
-            <filter excludes="com.sun.corba.se.spi.orbutil.file.*"/>
-            <filter excludes="com.sun.corba.se.spi.orbutil.argparser.*"/>
+            <filter excludes="com.sun.corba.ee.org.objectweb"/>
+            <filter excludes="com.sun.corba.ee.impl.txpoa.*"/>
+            <filter excludes="com.sun.corba.ee.impl.osgi.main.*"/>
+            <filter excludes="com.sun.corba.ee.spi.osgi.*"/>
+            <filter excludes="com.sun.corba.ee.impl.presentation.rmi.proxy.*"/>
+            <filter excludes="com.sun.corba.ee.spi.orbutil.file.*"/>
+            <filter excludes="com.sun.corba.ee.spi.orbutil.argparser.*"/>
             <filter excludes="javax.rmi.*"/>
         </instr>
     </emma>

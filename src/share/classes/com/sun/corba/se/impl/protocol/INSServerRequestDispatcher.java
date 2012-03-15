@@ -46,15 +46,15 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.ObjectKey;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.ServerRequestDispatcher;
-import com.sun.corba.se.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.ObjectKey;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.protocol.ServerRequestDispatcher;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 /**
  * INSServerRequestDispatcher handles all INS related discovery request. The INS Service
@@ -89,9 +89,9 @@ public class INSServerRequestDispatcher
         // send a locate forward with the right IOR. If the insKey is not 
         // registered then it will throw OBJECT_NOT_EXIST Exception
         String insKey = new String( 
-	    request.getObjectKeyCacheEntry().getObjectKey().getBytes(orb) );
-	request.getProtocolHandler()
-	    .createLocationForward(request, getINSReference( insKey ), null);
+            request.getObjectKeyCacheEntry().getObjectKey().getBytes(orb) );
+        request.getProtocolHandler()
+            .createLocationForward(request, getINSReference( insKey ), null);
         return;
     }
 
@@ -106,6 +106,6 @@ public class INSServerRequestDispatcher
             return entry;
         }
 
-	throw wrapper.servantNotFound() ;
+        throw wrapper.servantNotFound() ;
     }
 }

@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.oa ;
+package com.sun.corba.ee.spi.oa ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.ior.ObjectAdapterId ;
+import com.sun.corba.ee.spi.ior.ObjectAdapterId ;
 
 public interface ObjectAdapterFactory {
     /** Initialize this object adapter factory instance.

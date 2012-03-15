@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.legacy.interceptor;
+package com.sun.corba.ee.spi.legacy.interceptor;
 
-import com.sun.corba.se.spi.legacy.connection.Connection;
+import com.sun.corba.ee.spi.legacy.connection.Connection;
 
 /**
  * This interface is implemented by our implementation of 

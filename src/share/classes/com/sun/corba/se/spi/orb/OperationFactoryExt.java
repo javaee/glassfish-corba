@@ -37,11 +37,11 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.orb ;
+package com.sun.corba.ee.spi.orb ;
 
 import java.lang.reflect.Constructor ;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 /** Provides an extension to the OperationFactory for convertAction( Class ),
  * which takes a Class with a constructor that takes a String as an argument.
@@ -57,57 +57,57 @@ public class OperationFactoryExt {
     private OperationFactoryExt() {} 
 
     private static class ConvertAction implements Operation {
-	private Class<?> cls ;
-	private Constructor<?> cons ;
+        private Class<?> cls ;
+        private Constructor<?> cons ;
 
-	public ConvertAction( Class<?> cls ) {
-	    this.cls = cls ;
-	    try {
-		cons = cls.getConstructor( String.class ) ;
-	    } catch (Exception exc) {
-		throw wrapper.exceptionInConvertActionConstructor( exc,
+        public ConvertAction( Class<?> cls ) {
+            this.cls = cls ;
+            try {
+                cons = cls.getConstructor( String.class ) ;
+            } catch (Exception exc) {
+                throw wrapper.exceptionInConvertActionConstructor( exc,
                     cls.getName() ) ;
-	    }
-	}
+            }
+        }
 
-	public Object operate( Object value )
-	{
-	    try {
-		return cons.newInstance( value ) ;
-	    } catch (Exception exc) {
-		throw wrapper.exceptionInConvertAction( exc ) ;
-	    }
-	}
-
-        @Override
-	public String toString() {
-	    return "ConvertAction[" + cls.getName() + "]" ;
-	}
+        public Object operate( Object value )
+        {
+            try {
+                return cons.newInstance( value ) ;
+            } catch (Exception exc) {
+                throw wrapper.exceptionInConvertAction( exc ) ;
+            }
+        }
 
         @Override
-	public boolean equals( Object obj ) 
-	{
-	    if (this==obj) {
+        public String toString() {
+            return "ConvertAction[" + cls.getName() + "]" ;
+        }
+
+        @Override
+        public boolean equals( Object obj ) 
+        {
+            if (this==obj) {
                 return true;
             }
 
-	    if (!(obj instanceof ConvertAction)) {
+            if (!(obj instanceof ConvertAction)) {
                 return false;
             }
 
-	    ConvertAction other = (ConvertAction)obj ;
+            ConvertAction other = (ConvertAction)obj ;
 
-	    return toString().equals( other.toString() ) ;
-	}
+            return toString().equals( other.toString() ) ;
+        }
 
         @Override
-	public int hashCode()
-	{
-	    return toString().hashCode() ;
-	}
+        public int hashCode()
+        {
+            return toString().hashCode() ;
+        }
     }
 
     public static Operation convertAction( Class<?> cls ) {
-	return new ConvertAction( cls ) ;
+        return new ConvertAction( cls ) ;
     }
 }

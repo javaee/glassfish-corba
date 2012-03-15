@@ -38,16 +38,16 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
 import com.sun.org.omg.SendingContext.CodeBase;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 /**
  * Encapsulations are supposed to explicitly define their
@@ -71,15 +71,15 @@ public class EncapsInputStream extends CDRInputObject
     // corba/ORBSingleton
     // iiop/ORB
     public EncapsInputStream(org.omg.CORBA.ORB orb, byte[] buf, 
-			     int size, boolean littleEndian,
-			     GIOPVersion version) {
+                             int size, boolean littleEndian,
+                             GIOPVersion version) {
         super(orb, ByteBuffer.wrap(buf), size, littleEndian,
-	      version, ORBUtility.getEncodingVersion(),
-	      BufferManagerFactory.newBufferManagerRead(
-				      BufferManagerFactory.GROW,
-				      ORBUtility.getEncodingVersion(),
-				      (ORB)orb),
-	      false); 
+              version, ORBUtility.getEncodingVersion(),
+              BufferManagerFactory.newBufferManagerRead(
+                                      BufferManagerFactory.GROW,
+                                      ORBUtility.getEncodingVersion(),
+                                      (ORB)orb),
+              false); 
 
         performORBVersionSpecificInit();
     }
@@ -90,10 +90,10 @@ public class EncapsInputStream extends CDRInputObject
         super(orb, byteBuffer, size, littleEndian, 
               version, ORBUtility.getEncodingVersion(),
               BufferManagerFactory.newBufferManagerRead(
-				      BufferManagerFactory.GROW,
-				      ORBUtility.getEncodingVersion(),
-				      (com.sun.corba.se.spi.orb.ORB)orb),
-	      false); 
+                                      BufferManagerFactory.GROW,
+                                      ORBUtility.getEncodingVersion(),
+                                      (com.sun.corba.ee.spi.orb.ORB)orb),
+              false); 
 
         performORBVersionSpecificInit();
     }
@@ -143,10 +143,10 @@ public class EncapsInputStream extends CDRInputObject
               false, 
               version, ORBUtility.getEncodingVersion(),
               BufferManagerFactory.newBufferManagerRead(
-				      BufferManagerFactory.GROW,
-				      ORBUtility.getEncodingVersion(),
-				      (ORB)orb),
-	      false); // IDLJavaSerializationInputStream::directRead == false
+                                      BufferManagerFactory.GROW,
+                                      ORBUtility.getEncodingVersion(),
+                                      (ORB)orb),
+              false); // IDLJavaSerializationInputStream::directRead == false
 
         this.codeBase = codeBase;
 
@@ -168,7 +168,7 @@ public class EncapsInputStream extends CDRInputObject
     protected CodeSetConversion.BTCConverter createWCharBTCConverter() {
         // Wide characters don't exist in GIOP 1.0
         if (getGIOPVersion().equals(GIOPVersion.V1_0))
-	    throw wrapper.wcharDataInGiop10();
+            throw wrapper.wcharDataInGiop10();
 
         // In GIOP 1.1, we shouldn't have byte order markers.  Take the order
         // of the stream if we don't see them.

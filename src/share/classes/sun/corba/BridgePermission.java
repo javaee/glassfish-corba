@@ -58,7 +58,7 @@ public final class BridgePermission extends BasicPermission
      */
     public BridgePermission(String name)
     {
-	super(name);
+        super(name);
     }
 
     /**
@@ -73,6 +73,6 @@ public final class BridgePermission extends BasicPermission
 
     public BridgePermission(String name, String actions)
     {
-	super(name, actions);
+        super(name, actions);
     }
 }

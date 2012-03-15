@@ -39,7 +39,7 @@
  */
 package pi.policyfactory;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.BAD_POLICY;
 import org.omg.CORBA.Any;
@@ -78,7 +78,7 @@ public class Client implements Runnable
             // create and initialize the ORB
             Properties props = new Properties() ;
             props.put( "org.omg.CORBA.ORBClass",
-                       "com.sun.corba.se.impl.orb.ORBImpl" );
+                       "com.sun.corba.ee.impl.orb.ORBImpl" );
             props.put( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
                        "pi.policyfactory.TestORBInitializer", "" );
             orb = ORB.init( (String[]) null, props );

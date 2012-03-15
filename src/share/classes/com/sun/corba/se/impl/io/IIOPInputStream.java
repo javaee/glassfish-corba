@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.io;
+package com.sun.corba.ee.impl.io;
 
 import java.io.IOException;
 import java.io.StreamCorruptedException;
@@ -80,14 +80,14 @@ import com.sun.org.omg.SendingContext.CodeBase;
 
 import javax.rmi.CORBA.ValueHandler;
 
-import com.sun.corba.se.spi.logging.OMGSystemException ;
+import com.sun.corba.ee.spi.logging.OMGSystemException ;
 
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
+import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.impl.misc.ClassInfoCache ;
+import com.sun.corba.ee.impl.misc.ClassInfoCache ;
 
-import com.sun.corba.se.impl.util.Utility ;
-import com.sun.corba.se.spi.trace.ValueHandlerRead;
+import com.sun.corba.ee.impl.util.Utility ;
+import com.sun.corba.ee.spi.trace.ValueHandlerRead;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -113,14 +113,14 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @ValueHandlerRead
 public class IIOPInputStream
-    extends com.sun.corba.se.impl.io.InputStreamHook
+    extends com.sun.corba.ee.impl.io.InputStreamHook
 {
     private static Bridge bridge = AccessController.doPrivileged( 
-	new PrivilegedAction<Bridge>() {
-	    public Bridge run() {
-		return Bridge.get() ;
-	    }
-	} 
+        new PrivilegedAction<Bridge>() {
+            public Bridge run() {
+                return Bridge.get() ;
+            }
+        } 
     ) ;
 
     // Necessary to pass the appropriate fields into the
@@ -210,7 +210,7 @@ public class IIOPInputStream
     private static Constructor getOptDataExceptionCtor() {
         try {
             Constructor result = AccessController.doPrivileged(
-		new PrivilegedExceptionAction<Constructor>() {
+                new PrivilegedExceptionAction<Constructor>() {
                     public Constructor run() 
                         throws NoSuchMethodException, SecurityException {
                         
@@ -222,8 +222,8 @@ public class IIOPInputStream
                         
                         return boolCtor;
                     }
-		}
-	    );
+                }
+            );
             
             if (result == null) {
                 throw new Error("Unable to find OptionalDataException constructor");
@@ -290,24 +290,24 @@ public class IIOPInputStream
     }
 
     public static void setTestFVDFlag(boolean val){
-	//  useFVDOnly = val;
+        //  useFVDOnly = val;
     }
 
     /**
      * Dummy constructor; passes upper stream a dummy stream;
      **/
     public IIOPInputStream()
-    	throws java.io.IOException {
-    	super();
-	resetStream();
+        throws java.io.IOException {
+        super();
+        resetStream();
     }
-	
+        
     public final void setOrbStream(org.omg.CORBA_2_3.portable.InputStream os) {
-    	orbStream = os;
+        orbStream = os;
     }
 
     public final org.omg.CORBA_2_3.portable.InputStream getOrbStream() {
-    	return orbStream;
+        return orbStream;
     }
 
     //added setSender and getSender
@@ -322,25 +322,25 @@ public class IIOPInputStream
     // 4365188 this is added to enable backward compatability w/ wrong
     // rep-ids
     public final void setValueHandler(ValueHandler vh) {
-        vhandler = (com.sun.corba.se.impl.io.ValueHandlerImpl) vh;
+        vhandler = (com.sun.corba.ee.impl.io.ValueHandlerImpl) vh;
     }
 
     public final ValueHandler getValueHandler() {
-	return (javax.rmi.CORBA.ValueHandler) vhandler;
+        return (javax.rmi.CORBA.ValueHandler) vhandler;
     }
-	
+        
     @InfoMethod
     private void recursionDepthInfo( int rd ) {}
 
     @ValueHandlerRead
     public final void increaseRecursionDepth(){
-	recursionDepth++;
+        recursionDepth++;
         recursionDepthInfo(recursionDepth);
     }
 
     @ValueHandlerRead
     public final int decreaseRecursionDepth(){
-	--recursionDepth;
+        --recursionDepth;
         recursionDepthInfo(recursionDepth);
         return recursionDepth ;
     }
@@ -383,14 +383,14 @@ public class IIOPInputStream
     @ValueHandlerRead
     public final Object readObjectDelegate() throws IOException
     {
-	try {
+        try {
             readObjectState.readData(this);
 
             return orbStream.read_abstract_interface();
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, true);
             throw marshalException;
-	} catch(IndirectionException cdrie) {
+        } catch(IndirectionException cdrie) {
             // The CDR stream had never seen the given offset before,
             // so check the recursion manager (it will throw an
             // IOException if it doesn't have a reference, either).
@@ -408,7 +408,7 @@ public class IIOPInputStream
         Class<?> prevClass = currentClass;
         byte oldStreamFormatVersion = streamFormatVersion;
 
-        simpleReadDepth++;	// Entering
+        simpleReadDepth++;      // Entering
         Object obj = null;
 
         OperationTracer.startReadValue( clz.getName() ) ;
@@ -475,7 +475,7 @@ public class IIOPInputStream
         Class<?> prevClass = currentClass;
         byte oldStreamFormatVersion = streamFormatVersion;
 
-        simpleReadDepth++;	// Entering
+        simpleReadDepth++;      // Entering
         Object obj = null;
 
         /*
@@ -537,7 +537,7 @@ public class IIOPInputStream
      */
     @Override
     protected final Object readObjectOverride()
- 	throws OptionalDataException, ClassNotFoundException, IOException
+        throws OptionalDataException, ClassNotFoundException, IOException
     {
         return readObjectDelegate();
     }
@@ -565,7 +565,7 @@ public class IIOPInputStream
     @ValueHandlerRead
     public final void defaultReadObjectDelegate() {
         try {
-	    if (currentObject == null || currentClassDesc == null) {
+            if (currentObject == null || currentClassDesc == null) {
                 throw new NotActiveException("defaultReadObjectDelegate");
             }
 
@@ -595,11 +595,11 @@ public class IIOPInputStream
                 }
             }
         } catch(NotActiveException nae) {
-	    bridge.throwException( nae ) ;
-	} catch(IOException ioe) {
-	    bridge.throwException( ioe ) ;
-	} catch(ClassNotFoundException cnfe) {
-	    bridge.throwException( cnfe ) ;
+            bridge.throwException( nae ) ;
+        } catch(IOException ioe) {
+            bridge.throwException( ioe ) ;
+        } catch(ClassNotFoundException cnfe) {
+            bridge.throwException( cnfe ) ;
         }
     }
 
@@ -621,7 +621,7 @@ public class IIOPInputStream
     public final boolean enableResolveObjectDelegate(boolean enable)
     /* throws SecurityException */
     {
-	return false;
+        return false;
     }
 
     // The following three methods allow the implementing orbStream
@@ -642,7 +642,7 @@ public class IIOPInputStream
         try {
             orbStream.reset();
         } catch (Error e) {
-	    throw new IOException(e) ;
+            throw new IOException(e) ;
         }
     }
 
@@ -672,8 +672,8 @@ public class IIOPInputStream
 
             throw marshalException;
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerRead
@@ -693,8 +693,8 @@ public class IIOPInputStream
 
             throw marshalException;
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
 
     }
 
@@ -710,8 +710,8 @@ public class IIOPInputStream
             throw marshalException;
 
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerRead
@@ -726,8 +726,8 @@ public class IIOPInputStream
             throw marshalException;
 
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerRead
@@ -742,8 +742,8 @@ public class IIOPInputStream
             throw marshalException;
 
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerRead
@@ -757,8 +757,8 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerRead
@@ -772,8 +772,8 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerRead
@@ -797,8 +797,8 @@ public class IIOPInputStream
             
             throw marshalException;
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerRead
@@ -812,8 +812,8 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @Override
@@ -833,8 +833,8 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerRead
@@ -848,8 +848,8 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @Override
@@ -863,13 +863,13 @@ public class IIOPInputStream
         try{
             readObjectState.readData(this);
 
-    	    return (orbStream.read_octet()) & 0x000000FF;
+            return (orbStream.read_octet()) & 0x000000FF;
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
-	} catch(Error e) {
-	    throw new IOException(e) ;
-	}
+        } catch(Error e) {
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerRead
@@ -878,13 +878,13 @@ public class IIOPInputStream
         try{
             readObjectState.readData(this);
 
-    	    return (orbStream.read_ushort()) & 0x0000FFFF;
+            return (orbStream.read_ushort()) & 0x0000FFFF;
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     /**
@@ -910,8 +910,8 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     // If the ORB stream detects an incompatibility between what's
@@ -952,14 +952,14 @@ public class IIOPInputStream
 
     @Override
     public final synchronized void registerValidation(ObjectInputValidation obj,
-						      int prio)
-	throws NotActiveException, InvalidObjectException{
+                                                      int prio)
+        throws NotActiveException, InvalidObjectException{
         throw Exceptions.self.registerValidationNotSupport() ;
     }
 
     @Override
     protected final Class<?> resolveClass(java.io.ObjectStreamClass v)
-	throws IOException, ClassNotFoundException{
+        throws IOException, ClassNotFoundException{
         throw Exceptions.self.resolveClassNotSupported() ;
     }
 
@@ -982,7 +982,7 @@ public class IIOPInputStream
             
             throw marshalException;
         } catch(Error e) {
-	    throw new IOException(e) ;
+            throw new IOException(e) ;
         }
     }
 
@@ -1044,7 +1044,7 @@ public class IIOPInputStream
     @ValueHandlerRead
     private Object inputObject(Class clz, ClassInfoCache.ClassInfo cinfo,
         String repositoryID, com.sun.org.omg.SendingContext.CodeBase sender, 
-	int offset) throws IOException, ClassNotFoundException {
+        int offset) throws IOException, ClassNotFoundException {
 
         int spBase = spClass ;
         try {
@@ -1100,7 +1100,7 @@ public class IIOPInputStream
                 Class<?> currclass = currentClass;
 
                 // MS: cstack.mark() ;
-                spBase = spClass;	// current top of stack
+                spBase = spClass;       // current top of stack
 
                 for (currdesc = currentClassDesc, currclass = currentClass;
                      currdesc != null && currdesc.isSerializable();   
@@ -1267,7 +1267,7 @@ public class IIOPInputStream
     // will not provide base_value id's for non-serializable classes!
     @ValueHandlerRead
     private List<FullValueDescription> getOrderedDescriptions(
-	String repositoryID, com.sun.org.omg.SendingContext.CodeBase sender) {
+        String repositoryID, com.sun.org.omg.SendingContext.CodeBase sender) {
 
         List<FullValueDescription> descs =
             new ArrayList<FullValueDescription>();
@@ -1462,9 +1462,9 @@ public class IIOPInputStream
         final int offset) throws IOException, ClassNotFoundException {
 
         int spBase  = spClass ; 
-	try {
-	    currentClassDesc = ObjectStreamClass.lookup(clz);
-	    currentClass = currentClassDesc.forClass();
+        try {
+            currentClassDesc = ObjectStreamClass.lookup(clz);
+            currentClass = currentClassDesc.forClass();
 
             // KMC start of enum receiver-makes-right changes
             if (cinfo.isEnum()) {
@@ -1472,156 +1472,156 @@ public class IIOPInputStream
             } else if (currentClassDesc.isExternalizable()) {
                 readingExternalizable();
 
-		try {
+                try {
                     newInstanceInfo( currentClass ) ;
 
-		    currentObject = (currentClass == null) ?
-			null : currentClassDesc.newInstance();
+                    currentObject = (currentClass == null) ?
+                        null : currentClassDesc.newInstance();
 
-		    if (currentObject != null) {
+                    if (currentObject != null) {
                         // Store this object and its beginning position
                         // since there might be indirections to it while
                         // it's been unmarshalled.
                         activeRecursionMgr.addObject(offset, currentObject);
 
-			// Read format version
-			readFormatVersion();
-						
+                        // Read format version
+                        readFormatVersion();
+                                                
                         callReadExternal( (Externalizable)currentObject ) ;
-		    }
-		} catch (InvocationTargetException e) {
-		    InvalidClassException exc = new InvalidClassException(
-			currentClass.getName(), 
-			"InvocationTargetException accessing no-arg constructor");
-		    exc.initCause( e ) ;
-		    throw exc ;
-		} catch (UnsupportedOperationException e) {
-		    InvalidClassException exc = new InvalidClassException(
-			currentClass.getName(), 
-			"UnsupportedOperationException accessing no-arg constructor");
-		    exc.initCause( e ) ;
-		    throw exc ;
-		} catch (InstantiationException e) {
-		    InvalidClassException exc = new InvalidClassException(
-			currentClass.getName(), 
-			"InstantiationException accessing no-arg constructor");
-		    exc.initCause( e ) ;
-		    throw exc ;
-		}
-	    } else {
+                    }
+                } catch (InvocationTargetException e) {
+                    InvalidClassException exc = new InvalidClassException(
+                        currentClass.getName(), 
+                        "InvocationTargetException accessing no-arg constructor");
+                    exc.initCause( e ) ;
+                    throw exc ;
+                } catch (UnsupportedOperationException e) {
+                    InvalidClassException exc = new InvalidClassException(
+                        currentClass.getName(), 
+                        "UnsupportedOperationException accessing no-arg constructor");
+                    exc.initCause( e ) ;
+                    throw exc ;
+                } catch (InstantiationException e) {
+                    InvalidClassException exc = new InvalidClassException(
+                        currentClass.getName(), 
+                        "InstantiationException accessing no-arg constructor");
+                    exc.initCause( e ) ;
+                    throw exc ;
+                }
+            } else {
                 readingSerializable() ;
 
                 ObjectStreamClass currdesc = currentClassDesc ;
                 Class<?> currclass = currentClass = clz;
                 
                 // MS: cstack.mark() ;
-                spBase = spClass;	// current top of stack
+                spBase = spClass;       // current top of stack
 
-		for (currdesc = currentClassDesc, currclass = currentClass;
-		     currdesc != null && currdesc.isSerializable();   
-		     currdesc = currdesc.getSuperclass()) {
+                for (currdesc = currentClassDesc, currclass = currentClass;
+                     currdesc != null && currdesc.isSerializable();   
+                     currdesc = currdesc.getSuperclass()) {
 
-		    Class<?> cc = currdesc.forClass();
+                    Class<?> cc = currdesc.forClass();
 
                     currentClassInfo(currdesc, cc) ;
-					
-		    Class<?> cl;
-		    for (cl = currclass; cl != null; cl = cl.getSuperclass()) {
-			if (cc == cl) {
+                                        
+                    Class<?> cl;
+                    for (cl = currclass; cl != null; cl = cl.getSuperclass()) {
+                        if (cc == cl) {
                             matchingClassInfo(cl);
-			    break;
+                            break;
                         }
-		    } 
+                    } 
 
                     // MS: cstack.push( new Pair<Class,ObjectStreamClass>( cl, currdesc ) ) ;
                     // if (cl != null)
                     //      currclass = cl.getSuperclass() ;
-		    spClass++;
-		    if (spClass >= classes.length) {
-			int newlen = classes.length * 2;
-			Class<?>[] newclasses = new Class<?>[newlen];
-			ObjectStreamClass[] newclassdesc =
+                    spClass++;
+                    if (spClass >= classes.length) {
+                        int newlen = classes.length * 2;
+                        Class<?>[] newclasses = new Class<?>[newlen];
+                        ObjectStreamClass[] newclassdesc =
                             new ObjectStreamClass[newlen];
-				
-			System.arraycopy(classes, 0, newclasses,
+                                
+                        System.arraycopy(classes, 0, newclasses,
                             0, classes.length);
-			System.arraycopy(classdesc, 0, newclassdesc,
+                        System.arraycopy(classdesc, 0, newclassdesc,
                             0, classes.length);
-						
-			classes = newclasses;
-			classdesc = newclassdesc;
-    		    }
+                                                
+                        classes = newclasses;
+                        classdesc = newclassdesc;
+                    }
 
-		    if (cl == null) {
-			classdesc[spClass] = currdesc;
-			classes[spClass] = null;
-		    } else {
-			classdesc[spClass] = currdesc;
-			classes[spClass] = cl;
-			currclass = cl.getSuperclass();
-		    }
-		} // end : for (currdesc = currentClassDesc, currclass = currentClass;
-				
-		try {
+                    if (cl == null) {
+                        classdesc[spClass] = currdesc;
+                        classes[spClass] = null;
+                    } else {
+                        classdesc[spClass] = currdesc;
+                        classes[spClass] = cl;
+                        currclass = cl.getSuperclass();
+                    }
+                } // end : for (currdesc = currentClassDesc, currclass = currentClass;
+                                
+                try {
                     newInstanceInfo( currentClass ) ;
-		    currentObject = (currentClass == null) ?
-			null : currentClassDesc.newInstance();
+                    currentObject = (currentClass == null) ?
+                        null : currentClassDesc.newInstance();
 
                     // Store this object and its beginning position
                     // since there might be indirections to it while
                     // it's been unmarshalled.
                     activeRecursionMgr.addObject(offset, currentObject);
-		} catch (InvocationTargetException e) {
-		    InvalidClassException exc = new InvalidClassException(
-			currentClass.getName(), 
-			"InvocationTargetException accessing no-arg constructor");
-		    exc.initCause( e ) ;
-		    throw exc ;
-		} catch (UnsupportedOperationException e) {
-		    InvalidClassException exc = new InvalidClassException(
-			currentClass.getName(), 
-			"UnsupportedOperationException accessing no-arg constructor");
-		    exc.initCause( e ) ;
-		    throw exc ;
-		} catch (InstantiationException e) {
-		    InvalidClassException exc = new InvalidClassException(
-			currentClass.getName(), 
-			"InstantiationException accessing no-arg constructor");
-		    exc.initCause( e ) ;
-		    throw exc ;
-		}
-				
-		Iterator<FullValueDescription> fvdsList = 
-		    getOrderedDescriptions(repositoryID, sender).iterator();
-				
+                } catch (InvocationTargetException e) {
+                    InvalidClassException exc = new InvalidClassException(
+                        currentClass.getName(), 
+                        "InvocationTargetException accessing no-arg constructor");
+                    exc.initCause( e ) ;
+                    throw exc ;
+                } catch (UnsupportedOperationException e) {
+                    InvalidClassException exc = new InvalidClassException(
+                        currentClass.getName(), 
+                        "UnsupportedOperationException accessing no-arg constructor");
+                    exc.initCause( e ) ;
+                    throw exc ;
+                } catch (InstantiationException e) {
+                    InvalidClassException exc = new InvalidClassException(
+                        currentClass.getName(), 
+                        "InstantiationException accessing no-arg constructor");
+                    exc.initCause( e ) ;
+                    throw exc ;
+                }
+                                
+                Iterator<FullValueDescription> fvdsList = 
+                    getOrderedDescriptions(repositoryID, sender).iterator();
+                                
                 // MS: while (fvdsList.hasNext() && !cstack.isEmpty())
-		while((fvdsList.hasNext()) && (spClass > spBase)) {
-		    FullValueDescription fvd = fvdsList.next();
+                while((fvdsList.hasNext()) && (spClass > spBase)) {
+                    FullValueDescription fvd = fvdsList.next();
                     readingDataUsingFVD(fvd);
 
-		    String repIDForFVD = vhandler.getClassName( fvd.id);
-		    String repIDForClass = vhandler.getClassName(
-			vhandler.getRMIRepositoryID(currentClass));
-					
+                    String repIDForFVD = vhandler.getClassName( fvd.id);
+                    String repIDForClass = vhandler.getClassName(
+                        vhandler.getRMIRepositoryID(currentClass));
+                                        
                     // MS: while (!cstack.isEmpty() &&
-		    while ((spClass > spBase) &&
-			   (!repIDForFVD.equals(repIDForClass))) {
+                    while ((spClass > spBase) &&
+                           (!repIDForFVD.equals(repIDForClass))) {
                         // MS: while (!cstack.isEmpty() && !cstack.peek().first().getName.equals( repIDForFVD ))
                         //      cstack.pop() ;
-			int pos = findNextClass(repIDForFVD, classes, spClass, spBase);
+                        int pos = findNextClass(repIDForFVD, classes, spClass, spBase);
                         // if (!cstack.isEmpty()) 
                         //     currClass = currentClass = cstack.peek.first() ;
-			if (pos != -1) {
-			    spClass = pos;
-			    currclass = currentClass = classes[spClass];
-			    repIDForClass = vhandler.getClassName(
-				vhandler.getRMIRepositoryID(currentClass));
-			} else { 
+                        if (pos != -1) {
+                            spClass = pos;
+                            currclass = currentClass = classes[spClass];
+                            repIDForClass = vhandler.getClassName(
+                                vhandler.getRMIRepositoryID(currentClass));
+                        } else { 
                             // Read and throw away one level of the fvdslist
                             // This seems to mean that the sender had a superclass that
                             // we don't have
 
-			    if (fvd.is_custom) {
+                            if (fvd.is_custom) {
                                 readFormatVersion();
                                 boolean calledDefaultWriteObject = readBoolean();
 
@@ -1640,23 +1640,23 @@ public class IIOPInputStream
                                 // WARNING: If stream format version is 1 and there's
                                 // optional data, we'll get some form of exception down
                                 // the line or data corruption.
-			    } else {
-				inputClassFields(null, currentClass, null, fvd.members, sender);
-			    }
+                            } else {
+                                inputClassFields(null, currentClass, null, fvd.members, sender);
+                            }
 
-			    if (fvdsList.hasNext()){
-				fvd = fvdsList.next();
-				repIDForFVD = vhandler.getClassName(fvd.id);
-			    } else {
+                            if (fvdsList.hasNext()){
+                                fvd = fvdsList.next();
+                                repIDForFVD = vhandler.getClassName(fvd.id);
+                            } else {
                                 return currentObject;
                             }
-			}
-		    }
+                        }
+                    }
 
-		    currdesc = currentClassDesc
+                    currdesc = currentClassDesc
                         = ObjectStreamClass.lookup(currentClass);
 
-		    if (!repIDForClass.equals("java.lang.Object")) {
+                    if (!repIDForClass.equals("java.lang.Object")) {
 
                         // If the sender used custom marshaling, then it should have put
                         // the two bytes on the wire indicating stream format version
@@ -1671,8 +1671,8 @@ public class IIOPInputStream
                                 readFormatVersion();
                                 boolean calledDefaultWriteObject = readBoolean();
                                 readObjectState.beginUnmarshalCustomValue( this, 
-				    calledDefaultWriteObject, 
-				    (currentClassDesc.readObjectMethod != null));
+                                    calledDefaultWriteObject, 
+                                    (currentClassDesc.readObjectMethod != null));
                             }
 
                             boolean usedReadObject = false;
@@ -1702,14 +1702,14 @@ public class IIOPInputStream
                         }
                            
                         currclass = currentClass = classes[--spClass];
-		    } else { 
-			// The remaining hierarchy of the local class does not match the sender's FVD.
-			// So, use remaining FVDs to read data off wire.  If any remaining FVDs indicate
-			// custom marshaling, throw MARSHAL error.
-			inputClassFields(null, currentClass, null, fvd.members, sender);
-						
-			while (fvdsList.hasNext()){
-			    fvd = fvdsList.next();
+                    } else { 
+                        // The remaining hierarchy of the local class does not match the sender's FVD.
+                        // So, use remaining FVDs to read data off wire.  If any remaining FVDs indicate
+                        // custom marshaling, throw MARSHAL error.
+                        inputClassFields(null, currentClass, null, fvd.members, sender);
+                                                
+                        while (fvdsList.hasNext()){
+                            fvd = fvdsList.next();
 
                             if (fvd.is_custom) {
                                 skipCustomUsingFVD(fvd.members, sender);
@@ -1717,20 +1717,20 @@ public class IIOPInputStream
                                 inputClassFields(null, currentClass, null,
                                     fvd.members, sender);
                             }
-			}
-		    }
-		} // end : while(fvdsList.hasNext()) 
+                        }
+                    }
+                } // end : while(fvdsList.hasNext()) 
 
-		while (fvdsList.hasNext()){
-		    FullValueDescription fvd = fvdsList.next();
-		    if (fvd.is_custom) {
+                while (fvdsList.hasNext()){
+                    FullValueDescription fvd = fvdsList.next();
+                    if (fvd.is_custom) {
                         skipCustomUsingFVD(fvd.members, sender);
                     } else {
                         throwAwayData(fvd.members, sender);
                     }
-		}
-	    }
-	} finally {
+                }
+            }
+        } finally {
             // Make sure we exit at the same stack level as when we started.
             // MS: cstack.popMark() ;
             spClass = spBase;
@@ -1757,16 +1757,16 @@ public class IIOPInputStream
      */
     @ValueHandlerRead
     private Object skipObjectUsingFVD(String repositoryID,
-	com.sun.org.omg.SendingContext.CodeBase sender)
-	throws IOException, ClassNotFoundException {
+        com.sun.org.omg.SendingContext.CodeBase sender)
+        throws IOException, ClassNotFoundException {
 
-	for (FullValueDescription fvd : 
-	    getOrderedDescriptions( repositoryID, sender )) {
+        for (FullValueDescription fvd : 
+            getOrderedDescriptions( repositoryID, sender )) {
 
-	    String repIDForFVD = vhandler.getClassName(fvd.id);
-			
-	    if (!repIDForFVD.equals("java.lang.Object")) {
-		if (fvd.is_custom) {
+            String repIDForFVD = vhandler.getClassName(fvd.id);
+                        
+            if (!repIDForFVD.equals("java.lang.Object")) {
+                if (fvd.is_custom) {
                     readFormatVersion();
                         
                     boolean calledDefaultWriteObject = readBoolean();
@@ -1783,15 +1783,15 @@ public class IIOPInputStream
                     // WARNING: If stream format version is 1 and there's
                     // optional data, we'll get some form of exception down
                     // the line.
-		} else { 
-		    // Use default marshaling
-		    inputClassFields(null, null, null, fvd.members, sender);
-		}
-	    }
+                } else { 
+                    // Use default marshaling
+                    inputClassFields(null, null, null, fvd.members, sender);
+                }
+            }
 
-	} 
+        } 
 
-	return null;
+        return null;
     }
 
     ///////////////////
@@ -1800,13 +1800,13 @@ public class IIOPInputStream
     private int findNextClass(String classname, Class classes[],
         int _spClass, int _spBase){
 
-	for (int i = _spClass; i > _spBase; i--){
-	    if (classname.equals(classes[i].getName())) {
-		return i ;
-	    }
-	}
+        for (int i = _spClass; i > _spBase; i--){
+            if (classname.equals(classes[i].getName())) {
+                return i ;
+            }
+        }
 
-	return -1 ;
+        return -1 ;
     }
 
     /*
@@ -1817,8 +1817,8 @@ public class IIOPInputStream
     @ValueHandlerRead
     private boolean invokeObjectReader(ObjectStreamClass osc, Object obj, 
         Class aclass, ValueMember[] valueMembers )
-	throws InvalidClassException, StreamCorruptedException,
-	       ClassNotFoundException, IOException
+        throws InvalidClassException, StreamCorruptedException,
+               ClassNotFoundException, IOException
     {
         OperationTracer.readingField( "<<readObject>>" ) ;
 
@@ -1864,24 +1864,24 @@ public class IIOPInputStream
     @ValueHandlerRead
     private void resetStream() throws IOException {
 
-	if (classes == null) {
+        if (classes == null) {
             classes = new Class<?>[20];
         } else {
-	    for (int i = 0; i < classes.length; i++) {
+            for (int i = 0; i < classes.length; i++) {
                 classes[i] = null;
             }
-	}
+        }
 
-	if (classdesc == null) {
+        if (classdesc == null) {
             classdesc = new ObjectStreamClass[20];
         } else {
-	    for (int i = 0; i < classdesc.length; i++) {
+            for (int i = 0; i < classdesc.length; i++) {
                 classdesc[i] = null;
             }
-	}
-	spClass = 0;
+        }
+        spClass = 0;
 
-	if (callbacks != null) {
+        if (callbacks != null) {
             callbacks.clear();
         } // discard any pending callbacks
     }
@@ -1901,45 +1901,45 @@ public class IIOPInputStream
             switch (field.getTypeCode()) {
                 case 'B':
                     byte byteValue = orbStream.read_octet();
-		    bridge.putByte( o, field.getFieldID(), byteValue ) ;
-		    //reflective code: field.getField().setByte( o, byteValue ) ;
+                    bridge.putByte( o, field.getFieldID(), byteValue ) ;
+                    //reflective code: field.getField().setByte( o, byteValue ) ;
                     break;
                 case 'Z':
                     boolean booleanValue = orbStream.read_boolean();
-		    bridge.putBoolean( o, field.getFieldID(), booleanValue ) ;
-		    //reflective code: field.getField().setBoolean( o, booleanValue ) ;
+                    bridge.putBoolean( o, field.getFieldID(), booleanValue ) ;
+                    //reflective code: field.getField().setBoolean( o, booleanValue ) ;
                     break;
-		case 'C':
+                case 'C':
                     char charValue = orbStream.read_wchar();
-		    bridge.putChar( o, field.getFieldID(), charValue ) ;
-		    //reflective code: field.getField().setChar( o, charValue ) ;
+                    bridge.putChar( o, field.getFieldID(), charValue ) ;
+                    //reflective code: field.getField().setChar( o, charValue ) ;
                     break;
-		case 'S':
+                case 'S':
                     short shortValue = orbStream.read_short();
-		    bridge.putShort( o, field.getFieldID(), shortValue ) ;
-		    //reflective code: field.getField().setShort( o, shortValue ) ;
+                    bridge.putShort( o, field.getFieldID(), shortValue ) ;
+                    //reflective code: field.getField().setShort( o, shortValue ) ;
                     break;
-		case 'I':
+                case 'I':
                     int intValue = orbStream.read_long();
-		    bridge.putInt( o, field.getFieldID(), intValue ) ;
-		    //reflective code: field.getField().setInt( o, intValue ) ;
+                    bridge.putInt( o, field.getFieldID(), intValue ) ;
+                    //reflective code: field.getField().setInt( o, intValue ) ;
                     break;
-		case 'J':
+                case 'J':
                     long longValue = orbStream.read_longlong();
-		    bridge.putLong( o, field.getFieldID(), longValue ) ;
-		    //reflective code: field.getField().setLong( o, longValue ) ;
+                    bridge.putLong( o, field.getFieldID(), longValue ) ;
+                    //reflective code: field.getField().setLong( o, longValue ) ;
                     break;
-		case 'F' :
+                case 'F' :
                     float floatValue = orbStream.read_float();
-		    bridge.putFloat( o, field.getFieldID(), floatValue ) ;
-		    //reflective code: field.getField().setFloat( o, floatValue ) ;
+                    bridge.putFloat( o, field.getFieldID(), floatValue ) ;
+                    //reflective code: field.getField().setFloat( o, floatValue ) ;
                     break;
-		case 'D' :
+                case 'D' :
                     double doubleValue = orbStream.read_double();
-		    bridge.putDouble( o, field.getFieldID(), doubleValue ) ;
-		    //reflective code: field.getField().setDouble( o, doubleValue ) ;
+                    bridge.putDouble( o, field.getFieldID(), doubleValue ) ;
+                    //reflective code: field.getField().setDouble( o, doubleValue ) ;
                     break;
-		default:
+                default:
                     throw Exceptions.self.invalidClassForPrimitive(
                         cl.getName() ) ;
             }
@@ -1948,13 +1948,13 @@ public class IIOPInputStream
                are not the same, InvalidClassException is raised when
                matching the local class to the serialized ObjectStreamClass. */
             ClassCastException cce = new ClassCastException(
-		"Assigning instance of class " 
-		+ field.getType().getName() + " to field " 
-		+ currentClassDesc.getName() + '#' 
-		+ field.getField().getName());
-	    cce.initCause( e ) ;
-	    throw cce ;
-	}
+                "Assigning instance of class " 
+                + field.getType().getName() + " to field " 
+                + currentClassDesc.getName() + '#' 
+                + field.getField().getName());
+            cce.initCause( e ) ;
+            throw cce ;
+        }
     }
 
     @InfoMethod
@@ -1965,7 +1965,7 @@ public class IIOPInputStream
 
     @ValueHandlerRead
     private Object inputObjectField(org.omg.CORBA.ValueMember field,
-	com.sun.org.omg.SendingContext.CodeBase sender)
+        com.sun.org.omg.SendingContext.CodeBase sender)
         throws IndirectionException, ClassNotFoundException, IOException,
                StreamCorruptedException {
 
@@ -2094,8 +2094,8 @@ public class IIOPInputStream
         // corresponding to the data type
         // Class type = osc.forClass();
         Class<?> fieldType = field.getType();
-	Class<?> actualType = fieldType; // This may change if stub loaded.
-				
+        Class<?> actualType = fieldType; // This may change if stub loaded.
+                                
         // Decide what method call to make based on the fieldType. If
         // it is a type for which we need to load a stub, convert
         // the type to the correct stub type.
@@ -2103,14 +2103,14 @@ public class IIOPInputStream
         int callType = ValueHandlerImpl.kValueType;
         boolean narrow = false;
         
-	ClassInfoCache.ClassInfo cinfo = field.getClassInfo() ;
+        ClassInfoCache.ClassInfo cinfo = field.getClassInfo() ;
         if (cinfo.isInterface()) { 
             boolean loadStubClass = false;
             
-	    if (cinfo.isARemote(fieldType)) {
+            if (cinfo.isARemote(fieldType)) {
                 // RMI Object reference...
                 callType = ValueHandlerImpl.kRemoteType;
-	    } else if (cinfo.isACORBAObject(fieldType)) {
+            } else if (cinfo.isACORBAObject(fieldType)) {
                 // IDL Object reference...
                 callType = ValueHandlerImpl.kRemoteType;
                 loadStubClass = true;
@@ -2119,7 +2119,7 @@ public class IIOPInputStream
                 callType = ValueHandlerImpl.kAbstractType;
                 loadStubClass = true;
             } else if (ObjectStreamClassCorbaExt.isAbstractInterface(
-		fieldType)) {
+                fieldType)) {
                 // RMI Abstract Object reference...
                 callType = ValueHandlerImpl.kAbstractType;
             }
@@ -2129,15 +2129,15 @@ public class IIOPInputStream
                     String codebase = Util.getInstance().getCodebase(fieldType);
                     String repID = vhandler.createForAnyType(fieldType);
                     Class<?> stubType =
-			Utility.loadStubClass(repID, codebase, fieldType); 
-		    actualType = stubType;
+                        Utility.loadStubClass(repID, codebase, fieldType); 
+                    actualType = stubType;
                 } catch (ClassNotFoundException e) {
                     narrow = true;
                 }
             } else {
                 narrow = true;
             }
-        }			
+        }                       
 
         switch (callType) {
             case ValueHandlerImpl.kRemoteType: 
@@ -2180,7 +2180,7 @@ public class IIOPInputStream
 
     @ValueHandlerRead
     private void inputRemoteMembersForReadFields(
-	Map<String,Object> fieldToValueMap)
+        Map<String,Object> fieldToValueMap)
         throws InvalidClassException, StreamCorruptedException,
                ClassNotFoundException, IOException {
 
@@ -2189,8 +2189,8 @@ public class IIOPInputStream
         ValueMember fields[] = defaultReadObjectFVDMembers;
         defaultReadObjectFVDMembers = null ;
 
-	try {
-	    for (int i = 0; i < fields.length; i++) {
+        try {
+            for (int i = 0; i < fields.length; i++) {
                 OperationTracer.readingField( fields[i].name ) ;
                 displayValueMember( fields[i] );
 
@@ -2265,7 +2265,7 @@ public class IIOPInputStream
             StreamCorruptedException result = new StreamCorruptedException(t.getMessage());
             result.initCause(t);
             throw result;
-	}
+        }
     }
 
     /**
@@ -2278,12 +2278,12 @@ public class IIOPInputStream
      */
     @ValueHandlerRead
     private void inputCurrentClassFieldsForReadFields(
-	Map<String,Object> fieldToValueMap) throws InvalidClassException, 
-	    StreamCorruptedException, ClassNotFoundException, IOException {
+        Map<String,Object> fieldToValueMap) throws InvalidClassException, 
+            StreamCorruptedException, ClassNotFoundException, IOException {
 
         ObjectStreamField[] fields = currentClassDesc.getFieldsNoCopy();
 
-	int primFields = fields.length - currentClassDesc.objFields;
+        int primFields = fields.length - currentClassDesc.objFields;
 
         // Handle the primitives first
         for (int i = 0; i < primFields; ++i) {
@@ -2298,45 +2298,45 @@ public class IIOPInputStream
                    fieldToValueMap.put(fields[i].getName(),
                                        Boolean.valueOf(booleanValue));
                    break;
-		case 'C':
+                case 'C':
                     char charValue = orbStream.read_wchar();
                     fieldToValueMap.put(fields[i].getName(),
                                         Character.valueOf(charValue));
                     break;
-		case 'S':
+                case 'S':
                     short shortValue = orbStream.read_short();
                     fieldToValueMap.put(fields[i].getName(),
                                         Short.valueOf(shortValue));
                     break;
-		case 'I':
+                case 'I':
                     int intValue = orbStream.read_long();
                     fieldToValueMap.put(fields[i].getName(),
                                         Integer.valueOf(intValue));
                     break;
-		case 'J':
+                case 'J':
                     long longValue = orbStream.read_longlong();
                     fieldToValueMap.put(fields[i].getName(),
                                         Long.valueOf(longValue));
                     break;
-		case 'F' :
+                case 'F' :
                     float floatValue = orbStream.read_float();
                     fieldToValueMap.put(fields[i].getName(),
                                         Float.valueOf(floatValue));
                     break;
-		case 'D' :
+                case 'D' :
                     double doubleValue = orbStream.read_double();
                     fieldToValueMap.put(fields[i].getName(),
                                         Double.valueOf(doubleValue));
                     break;
-		default:
+                default:
                     throw Exceptions.self.invalidClassForPrimitive(
                         currentClassDesc.getName() );
-	    }
-	}
+            }
+        }
 
-	/* Read and set object fields from the input stream. */
-	if (currentClassDesc.objFields > 0) {
-	    for (int i = primFields; i < fields.length; i++) {
+        /* Read and set object fields from the input stream. */
+        if (currentClassDesc.objFields > 0) {
+            for (int i = primFields; i < fields.length; i++) {
                 OperationTracer.readingField( fields[i].getName() ) ;
 
                 Object objectValue = null;
@@ -2372,10 +2372,10 @@ public class IIOPInputStream
      */
     @ValueHandlerRead
     private void inputClassFields(Object o, Class<?> cl,
-				  ObjectStreamField[] fields, 
-				  com.sun.org.omg.SendingContext.CodeBase sender)
-	throws InvalidClassException, StreamCorruptedException,
-	       ClassNotFoundException, IOException
+                                  ObjectStreamField[] fields, 
+                                  com.sun.org.omg.SendingContext.CodeBase sender)
+        throws InvalidClassException, StreamCorruptedException,
+               ClassNotFoundException, IOException
     {
         int primFields = fields.length - currentClassDesc.objFields;
         readingPrimitiveFields(primFields);
@@ -2453,79 +2453,79 @@ public class IIOPInputStream
      */
     @ValueHandlerRead
     private void inputClassFields(Object o, Class<?> cl,
-				  ObjectStreamClass osc,
-				  ValueMember[] fields,
-				  com.sun.org.omg.SendingContext.CodeBase sender)
-	throws InvalidClassException, StreamCorruptedException,
-	       ClassNotFoundException, IOException
+                                  ObjectStreamClass osc,
+                                  ValueMember[] fields,
+                                  com.sun.org.omg.SendingContext.CodeBase sender)
+        throws InvalidClassException, StreamCorruptedException,
+               ClassNotFoundException, IOException
     {
         displayValueMembers( fields ) ;
 
-	try {
-	    for (int i = 0; i < fields.length; ++i) {
+        try {
+            for (int i = 0; i < fields.length; ++i) {
                 OperationTracer.readingField( fields[i].name ) ;
 
                 displayValueMember( fields[i] ) ;
 
-		try {
-		    switch (fields[i].type.kind().value()) {
-		    case TCKind._tk_octet:
-			byte byteValue = orbStream.read_octet();
-			if ((o != null) && osc.hasField(fields[i])) {
+                try {
+                    switch (fields[i].type.kind().value()) {
+                    case TCKind._tk_octet:
+                        byte byteValue = orbStream.read_octet();
+                        if ((o != null) && osc.hasField(fields[i])) {
                             setByteField(o, cl, fields[i].name, byteValue);
                         }
-			break;
-		    case TCKind._tk_boolean:
-			boolean booleanValue = orbStream.read_boolean();
-			if ((o != null) && osc.hasField(fields[i])) {
+                        break;
+                    case TCKind._tk_boolean:
+                        boolean booleanValue = orbStream.read_boolean();
+                        if ((o != null) && osc.hasField(fields[i])) {
                             setBooleanField(o, cl, fields[i].name, booleanValue);
                         }
-			break;
-		    case TCKind._tk_char:
+                        break;
+                    case TCKind._tk_char:
                         // Backwards compatibility.  Older Sun ORBs sent
                         // _tk_char even though they read and wrote wchars
                         // correctly.
                         //
                         // Fall through to the _tk_wchar case.
                     case TCKind._tk_wchar:
-			char charValue = orbStream.read_wchar();
-			if ((o != null) && osc.hasField(fields[i])) {
+                        char charValue = orbStream.read_wchar();
+                        if ((o != null) && osc.hasField(fields[i])) {
                             setCharField(o, cl, fields[i].name, charValue);
                         }
-			break;
-		    case TCKind._tk_short:
-			short shortValue = orbStream.read_short();
-			if ((o != null) && osc.hasField(fields[i])) {
+                        break;
+                    case TCKind._tk_short:
+                        short shortValue = orbStream.read_short();
+                        if ((o != null) && osc.hasField(fields[i])) {
                             setShortField(o, cl, fields[i].name, shortValue);
                         }
-			break;
-		    case TCKind._tk_long:
-			int intValue = orbStream.read_long();
-			if ((o != null) && osc.hasField(fields[i])) {
+                        break;
+                    case TCKind._tk_long:
+                        int intValue = orbStream.read_long();
+                        if ((o != null) && osc.hasField(fields[i])) {
                             setIntField(o, cl, fields[i].name, intValue);
                         }
-			break;
-		    case TCKind._tk_longlong:
-			long longValue = orbStream.read_longlong();
-			if ((o != null) && osc.hasField(fields[i])) {
+                        break;
+                    case TCKind._tk_longlong:
+                        long longValue = orbStream.read_longlong();
+                        if ((o != null) && osc.hasField(fields[i])) {
                             setLongField(o, cl, fields[i].name, longValue);
                         }
-			break;
-		    case TCKind._tk_float:
-			float floatValue = orbStream.read_float();
-			if ((o != null) && osc.hasField(fields[i])) {
+                        break;
+                    case TCKind._tk_float:
+                        float floatValue = orbStream.read_float();
+                        if ((o != null) && osc.hasField(fields[i])) {
                             setFloatField(o, cl, fields[i].name, floatValue);
                         }
-			break;
-		    case TCKind._tk_double:
-			double doubleValue = orbStream.read_double();
-			if ((o != null) && osc.hasField(fields[i])) {
+                        break;
+                    case TCKind._tk_double:
+                        double doubleValue = orbStream.read_double();
+                        if ((o != null) && osc.hasField(fields[i])) {
                             setDoubleField(o, cl, fields[i].name, doubleValue);
                         }
-			break;
+                        break;
                     case TCKind._tk_value:
-		    case TCKind._tk_objref:
-		    case TCKind._tk_value_box:
+                    case TCKind._tk_objref:
+                    case TCKind._tk_value_box:
                         Object objectValue = null;
                         try {
                             objectValue = inputObjectField(fields[i], sender);
@@ -2535,44 +2535,44 @@ public class IIOPInputStream
                             // IOException if it doesn't have a reference, either).
                             objectValue = activeRecursionMgr.getObject(cdrie.offset);
                         }
-								
-			if (o == null) {
+                                                                
+                        if (o == null) {
                             continue;
                         }
 
-			try {
-			    if (osc.hasField(fields[i])){
+                        try {
+                            if (osc.hasField(fields[i])){
                                 setObjectField(o, cl, fields[i].name,
                                     objectValue);
-			    } else {
+                            } else {
                                 Exceptions.self.notSettingField( fields[i].name,
                                     osc.getName() ) ;
                             }
-			} catch (IllegalArgumentException e) {
+                        } catch (IllegalArgumentException e) {
                             throw Exceptions.self.couldNotAssignObjectToField(
                                 e, objectValue.getClass().getName(),
                                 fields[i].name ) ;
-			}		
-			break;
+                        }               
+                        break;
                     default:
                         throw Exceptions.self.unknownTypecodeKind( 
                             fields[i].type.kind().value());
-		    }
-		} catch (IllegalArgumentException e) {
+                    }
+                } catch (IllegalArgumentException e) {
                     throw Exceptions.self.couldNotAssignObjectToField( e,
                         fields[i].id, fields[i].name ) ;
-		}
-	    }
-	} catch(Throwable t){
+                }
+            }
+        } catch(Throwable t){
             throw Exceptions.self.streamCorrupted( t ) ;
         }
     }
 
     @ValueHandlerRead
     private void skipCustomUsingFVD(ValueMember[] fields,
-	com.sun.org.omg.SendingContext.CodeBase sender
+        com.sun.org.omg.SendingContext.CodeBase sender
     ) throws InvalidClassException, StreamCorruptedException, 
-	ClassNotFoundException, IOException {
+        ClassNotFoundException, IOException {
 
         readFormatVersion();
         boolean calledDefaultWriteObject = readBoolean();
@@ -2587,259 +2587,259 @@ public class IIOPInputStream
             ((ValueInputStream)getOrbStream()).end_value();
         }
     }
-	
+        
     /*
      * Read the fields of the specified class from the input stream throw data 
      * away.  This must handle same switch logic as above.
      */
     @ValueHandlerRead
     private void throwAwayData(ValueMember[] fields, 
-	com.sun.org.omg.SendingContext.CodeBase sender
+        com.sun.org.omg.SendingContext.CodeBase sender
     ) throws InvalidClassException, StreamCorruptedException, 
-	ClassNotFoundException, IOException {
+        ClassNotFoundException, IOException {
 
-	for (int i = 0; i < fields.length; ++i) {
-            OperationTracer.readingField( fields[i].name ) ;	
-	    try {
-		switch (fields[i].type.kind().value()) {
-		case TCKind._tk_octet:
-		    orbStream.read_octet();
-		    break;
-		case TCKind._tk_boolean:
-		    orbStream.read_boolean();
-		    break;
-		case TCKind._tk_char:
+        for (int i = 0; i < fields.length; ++i) {
+            OperationTracer.readingField( fields[i].name ) ;    
+            try {
+                switch (fields[i].type.kind().value()) {
+                case TCKind._tk_octet:
+                    orbStream.read_octet();
+                    break;
+                case TCKind._tk_boolean:
+                    orbStream.read_boolean();
+                    break;
+                case TCKind._tk_char:
                     // Backwards compatibility.  Older Sun ORBs sent
                     // _tk_char even though they read and wrote wchars
                     // correctly.
                     //
                     // Fall through to the _tk_wchar case.
                 case TCKind._tk_wchar:
-		    orbStream.read_wchar();
-		    break;
-		case TCKind._tk_short:
-		    orbStream.read_short();
-		    break;
-		case TCKind._tk_long:
-		    orbStream.read_long();
-		    break;
-		case TCKind._tk_longlong:
-		    orbStream.read_longlong();
-		    break;
-		case TCKind._tk_float:
-		    orbStream.read_float();
-		    break;
-		case TCKind._tk_double:
-		    orbStream.read_double();
-		    break;
+                    orbStream.read_wchar();
+                    break;
+                case TCKind._tk_short:
+                    orbStream.read_short();
+                    break;
+                case TCKind._tk_long:
+                    orbStream.read_long();
+                    break;
+                case TCKind._tk_longlong:
+                    orbStream.read_longlong();
+                    break;
+                case TCKind._tk_float:
+                    orbStream.read_float();
+                    break;
+                case TCKind._tk_double:
+                    orbStream.read_double();
+                    break;
                 case TCKind._tk_value:
-		case TCKind._tk_objref:
-		case TCKind._tk_value_box:
-		    Class<?> type = null;
-	            String id = fields[i].id;
+                case TCKind._tk_objref:
+                case TCKind._tk_value_box:
+                    Class<?> type = null;
+                    String id = fields[i].id;
 
-		    try {
-			type = vhandler.getClassFromType(id);
-		    }
-		    catch(ClassNotFoundException cnfe){
-			// Make sure type = null
-			type = null;
-		    }
-		    String signature = null;
-		    if (type != null) {
+                    try {
+                        type = vhandler.getClassFromType(id);
+                    }
+                    catch(ClassNotFoundException cnfe){
+                        // Make sure type = null
+                        type = null;
+                    }
+                    String signature = null;
+                    if (type != null) {
                         signature = ValueUtility.getSignature(fields[i]);
                     }
-								
-		    // Read value
-		    try {
-			if ((signature != null) && ( 
-			    signature.equals("Ljava/lang/Object;") 
-			    || signature.equals("Ljava/io/Serializable;") 
-			    || signature.equals("Ljava/io/Externalizable;")) ) {
-			    Util.getInstance().readAny(orbStream);
-			} else {
-			    // Decide what method call to make based on the type.
-			    //
-			    // NOTE : Since FullValueDescription does not allow 
-			    // us to ask whether something is an interface we 
-			    // do not have the ability to optimize this check.
-			    int callType = ValueHandlerImpl.kValueType;
+                                                                
+                    // Read value
+                    try {
+                        if ((signature != null) && ( 
+                            signature.equals("Ljava/lang/Object;") 
+                            || signature.equals("Ljava/io/Serializable;") 
+                            || signature.equals("Ljava/io/Externalizable;")) ) {
+                            Util.getInstance().readAny(orbStream);
+                        } else {
+                            // Decide what method call to make based on the type.
+                            //
+                            // NOTE : Since FullValueDescription does not allow 
+                            // us to ask whether something is an interface we 
+                            // do not have the ability to optimize this check.
+                            int callType = ValueHandlerImpl.kValueType;
 
-			    if (!vhandler.isSequence(id)) {
-				FullValueDescription fieldFVD = 
-				    sender.meta(fields[i].id);
-				if (kRemoteTypeCode == fields[i].type) {
+                            if (!vhandler.isSequence(id)) {
+                                FullValueDescription fieldFVD = 
+                                    sender.meta(fields[i].id);
+                                if (kRemoteTypeCode == fields[i].type) {
 
-				    // RMI Object reference...
-				    callType = ValueHandlerImpl.kRemoteType;
-				} else if (fieldFVD.is_abstract) {
-				    // RMI Abstract Object reference...
+                                    // RMI Object reference...
+                                    callType = ValueHandlerImpl.kRemoteType;
+                                } else if (fieldFVD.is_abstract) {
+                                    // RMI Abstract Object reference...
 
-				    callType = ValueHandlerImpl.kAbstractType;
-				}
-			    }
-										
-			    // Now that we have used the FVD of the field to 
-			    // determine the proper course
-			    // of action, it is ok to use the type (Class) 
-			    // from this point forward since 
-			    // the rep. id for this read will also follow on 
-			    // the wire.
-			    switch (callType) {
-			    case ValueHandlerImpl.kRemoteType: 
-				orbStream.read_Object();
-				break;
-			    case ValueHandlerImpl.kAbstractType: 
-				orbStream.read_abstract_interface(); 
-				break;
-			    case ValueHandlerImpl.kValueType:
-				if (type != null) {
-				    orbStream.read_value(type);
-				} else {
-				    orbStream.read_value();
-				}
-				break;
+                                    callType = ValueHandlerImpl.kAbstractType;
+                                }
+                            }
+                                                                                
+                            // Now that we have used the FVD of the field to 
+                            // determine the proper course
+                            // of action, it is ok to use the type (Class) 
+                            // from this point forward since 
+                            // the rep. id for this read will also follow on 
+                            // the wire.
+                            switch (callType) {
+                            case ValueHandlerImpl.kRemoteType: 
+                                orbStream.read_Object();
+                                break;
+                            case ValueHandlerImpl.kAbstractType: 
+                                orbStream.read_abstract_interface(); 
+                                break;
+                            case ValueHandlerImpl.kValueType:
+                                if (type != null) {
+                                    orbStream.read_value(type);
+                                } else {
+                                    orbStream.read_value();
+                                }
+                                break;
                             default:
                                 throw Exceptions.self.unknownCallType(callType) ;
-			    }
-			}
-		    } catch(IndirectionException cdrie) {
-			// Since we are throwing this away, don't bother 
-			// handling recursion.
-			continue;
-		    }
-									
-		    break;
+                            }
+                        }
+                    } catch(IndirectionException cdrie) {
+                        // Since we are throwing this away, don't bother 
+                        // handling recursion.
+                        continue;
+                    }
+                                                                        
+                    break;
                 default:
                     throw Exceptions.self.unknownTypecodeKind(
-			fields[i].type.kind().value());
-		}
-	    } catch (IllegalArgumentException e) {
+                        fields[i].type.kind().value());
+                }
+            } catch (IllegalArgumentException e) {
                 throw Exceptions.self.couldNotAssignObjectToField( e,
-		    fields[i].id, currentClassDesc.getName() ) ;
-	    }
-	}
-		
+                    fields[i].id, currentClassDesc.getName() ) ;
+            }
+        }
+                
     }
 
     @ValueHandlerRead
     private static void setObjectField(Object o, Class<?> c, String fieldName,
-	Object v) {
+        Object v) {
 
-	try {
-	    Field fld = c.getDeclaredField( fieldName ) ;
-	    long key = bridge.objectFieldOffset( fld ) ;
-	    bridge.putObject( o, key, v ) ;
-	} catch (Exception e) {
-	    throw utilWrapper.errorSetObjectField( e, fieldName, o, v ) ;
-	}
+        try {
+            Field fld = c.getDeclaredField( fieldName ) ;
+            long key = bridge.objectFieldOffset( fld ) ;
+            bridge.putObject( o, key, v ) ;
+        } catch (Exception e) {
+            throw utilWrapper.errorSetObjectField( e, fieldName, o, v ) ;
+        }
     }
 
     @ValueHandlerRead
     private static void setBooleanField(Object o, Class<?> c, String fieldName,
         boolean v)
     {
-	try {
-	    Field fld = c.getDeclaredField( fieldName ) ;
-	    long key = bridge.objectFieldOffset( fld ) ;
-	    bridge.putBoolean( o, key, v ) ;
-	} catch (Exception e) {
-	    throw utilWrapper.errorSetBooleanField( e, fieldName, o, v ) ;
-	}
+        try {
+            Field fld = c.getDeclaredField( fieldName ) ;
+            long key = bridge.objectFieldOffset( fld ) ;
+            bridge.putBoolean( o, key, v ) ;
+        } catch (Exception e) {
+            throw utilWrapper.errorSetBooleanField( e, fieldName, o, v ) ;
+        }
     }
 
     @ValueHandlerRead
     private static void setByteField(Object o, Class<?> c, String fieldName,
         byte v)
     {
-	try {
-	    Field fld = c.getDeclaredField( fieldName ) ;
-	    long key = bridge.objectFieldOffset( fld ) ;
-	    bridge.putByte( o, key, v ) ;
-	} catch (Exception e) {
-	    throw utilWrapper.errorSetByteField( e, fieldName, o, v ) ;
-	}
+        try {
+            Field fld = c.getDeclaredField( fieldName ) ;
+            long key = bridge.objectFieldOffset( fld ) ;
+            bridge.putByte( o, key, v ) ;
+        } catch (Exception e) {
+            throw utilWrapper.errorSetByteField( e, fieldName, o, v ) ;
+        }
     }
 
     @ValueHandlerRead
     private static void setCharField(Object o, Class<?> c, String fieldName,
         char v)
     {
-	try {
-	    Field fld = c.getDeclaredField( fieldName ) ;
-	    long key = bridge.objectFieldOffset( fld ) ;
-	    bridge.putChar( o, key, v ) ;
-	} catch (Exception e) {
-	    throw utilWrapper.errorSetCharField( e, fieldName, 
-		o, v ) ;
-	}
+        try {
+            Field fld = c.getDeclaredField( fieldName ) ;
+            long key = bridge.objectFieldOffset( fld ) ;
+            bridge.putChar( o, key, v ) ;
+        } catch (Exception e) {
+            throw utilWrapper.errorSetCharField( e, fieldName, 
+                o, v ) ;
+        }
     }
 
     @ValueHandlerRead
     private static void setShortField(Object o, Class<?> c, String fieldName,
         short v)
     {
-	try {
-	    Field fld = c.getDeclaredField( fieldName ) ;
-	    long key = bridge.objectFieldOffset( fld ) ;
-	    bridge.putShort( o, key, v ) ;
-	} catch (Exception e) {
-	    throw utilWrapper.errorSetShortField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ), v ) ;
-	}
+        try {
+            Field fld = c.getDeclaredField( fieldName ) ;
+            long key = bridge.objectFieldOffset( fld ) ;
+            bridge.putShort( o, key, v ) ;
+        } catch (Exception e) {
+            throw utilWrapper.errorSetShortField( e, fieldName, 
+                ObjectUtility.compactObjectToString( o ), v ) ;
+        }
     }
 
     @ValueHandlerRead
     private static void setIntField(Object o, Class<?> c, String fieldName,
         int v)
     {
-	try {
-	    Field fld = c.getDeclaredField( fieldName ) ;
-	    long key = bridge.objectFieldOffset( fld ) ;
-	    bridge.putInt( o, key, v ) ;
-	} catch (Exception e) {
-	    throw utilWrapper.errorSetIntField( e, fieldName, o, v ) ;
-	}
+        try {
+            Field fld = c.getDeclaredField( fieldName ) ;
+            long key = bridge.objectFieldOffset( fld ) ;
+            bridge.putInt( o, key, v ) ;
+        } catch (Exception e) {
+            throw utilWrapper.errorSetIntField( e, fieldName, o, v ) ;
+        }
     }
 
     @ValueHandlerRead
     private static void setLongField(Object o, Class<?> c, String fieldName,
         long v)
     {
-	try {
-	    Field fld = c.getDeclaredField( fieldName ) ;
-	    long key = bridge.objectFieldOffset( fld ) ;
-	    bridge.putLong( o, key, v ) ;
-	} catch (Exception e) {
-	    throw utilWrapper.errorSetLongField( e, fieldName, o, v ) ;
-	}
+        try {
+            Field fld = c.getDeclaredField( fieldName ) ;
+            long key = bridge.objectFieldOffset( fld ) ;
+            bridge.putLong( o, key, v ) ;
+        } catch (Exception e) {
+            throw utilWrapper.errorSetLongField( e, fieldName, o, v ) ;
+        }
     }
 
     @ValueHandlerRead
     private static void setFloatField(Object o, Class<?> c, String fieldName,
         float v)
     {
-	try {
-	    Field fld = c.getDeclaredField( fieldName ) ;
-	    long key = bridge.objectFieldOffset( fld ) ;
-	    bridge.putFloat( o, key, v ) ;
-	} catch (Exception e) {
-	    throw utilWrapper.errorSetFloatField( e, fieldName, 
-		o, v ) ;
-	}
+        try {
+            Field fld = c.getDeclaredField( fieldName ) ;
+            long key = bridge.objectFieldOffset( fld ) ;
+            bridge.putFloat( o, key, v ) ;
+        } catch (Exception e) {
+            throw utilWrapper.errorSetFloatField( e, fieldName, 
+                o, v ) ;
+        }
     }
 
     @ValueHandlerRead
     private static void setDoubleField(Object o, Class<?> c, String fieldName,
         double v)
     {
-	try {
-	    Field fld = c.getDeclaredField( fieldName ) ;
-	    long key = bridge.objectFieldOffset( fld ) ;
-	    bridge.putDouble( o, key, v ) ;
-	} catch (Exception e) {
-	    throw utilWrapper.errorSetDoubleField( e, fieldName, o, v ) ;
-	}
+        try {
+            Field fld = c.getDeclaredField( fieldName ) ;
+            long key = bridge.objectFieldOffset( fld ) ;
+            bridge.putDouble( o, key, v ) ;
+        } catch (Exception e) {
+            throw utilWrapper.errorSetDoubleField( e, fieldName, o, v ) ;
+        }
     }
 
     /**

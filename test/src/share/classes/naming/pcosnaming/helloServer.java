@@ -38,7 +38,7 @@
  * holder.
  */
 /*
- * @(#)helloServer.java	1.2 99/10/29
+ * @(#)helloServer.java 1.2 99/10/29
  *
  * Copyright 1999 Sun Microsystems, Inc. All Rights Reserved.
  * 

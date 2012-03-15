@@ -44,50 +44,50 @@
 
 package corba.hcks;
 
-import com.sun.corba.se.impl.orb.ORBImpl;
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.impl.orb.ORBImpl;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
 
 public class MyPOAORB 
     extends 
-	ORBImpl 
+        ORBImpl 
 {
     public static final String baseMsg = MyPOAORB.class.getName();
 
     public static boolean showProprietaryHooks = false;
 
     public static boolean throwRuntimeExceptionInSendingRequestServiceContexts
-	= false;
+        = false;
 
     protected void sendingRequestServiceContexts( ServiceContexts scs ) 
     {
         if (showProprietaryHooks) {
-	    U.sop(baseMsg + ".sendingRequestServiceContexts - " + scs);
-	}
-	if (throwRuntimeExceptionInSendingRequestServiceContexts) {
-	    throw new RuntimeException(baseMsg +
-				       ".sendingRequestServiceContexts");
-	}
+            U.sop(baseMsg + ".sendingRequestServiceContexts - " + scs);
+        }
+        if (throwRuntimeExceptionInSendingRequestServiceContexts) {
+            throw new RuntimeException(baseMsg +
+                                       ".sendingRequestServiceContexts");
+        }
     }
 
     protected void receivedReplyServiceContexts(ServiceContexts scs)
     {
         if (showProprietaryHooks) {
-	    U.sop(baseMsg + ".receivedReplyServiceContexts - " + scs);
-	}
+            U.sop(baseMsg + ".receivedReplyServiceContexts - " + scs);
+        }
     }
 
     protected void receivedRequestServiceContexts(ServiceContexts scs) 
     {
         if (showProprietaryHooks) {
-	    U.sop(baseMsg + ".receivedRequestServiceContexts - " + scs);
-	}
+            U.sop(baseMsg + ".receivedRequestServiceContexts - " + scs);
+        }
     }
 
     protected void sendingReplyServiceContexts(ServiceContexts scs)
     {
         if (showProprietaryHooks) {
-	    U.sop(baseMsg + ".sendingReplyServiceContexts - " + scs);
-	}
+            U.sop(baseMsg + ".sendingReplyServiceContexts - " + scs);
+        }
     }
 }
  

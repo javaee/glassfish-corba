@@ -40,8 +40,8 @@
 module ORBInitTest
 {
     interface SampleObject {
-	attribute short x;
-	attribute short y;
+        attribute short x;
+        attribute short y;
     };
 
 };

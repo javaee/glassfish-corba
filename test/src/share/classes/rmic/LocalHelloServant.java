@@ -48,7 +48,7 @@
  */
 
 package rmic;
-import com.sun.corba.se.impl.util.JDKBridge;
+import com.sun.corba.ee.impl.util.JDKBridge;
 import javax.rmi.CORBA.Stub;
 import org.omg.CORBA.BAD_OPERATION;
 import java.rmi.RemoteException;
@@ -59,9 +59,9 @@ public class LocalHelloServant extends javax.rmi.PortableRemoteObject implements
     public LocalHelloServant() throws java.rmi.RemoteException {
         JDKBridge.setLocalCodebase(null);
     }
-	
+        
     public String sayHello (String to) throws java.rmi.RemoteException {
-	return "Hello " + to;
+        return "Hello " + to;
     }
     
     public String echoString(String it) throws java.rmi.RemoteException {

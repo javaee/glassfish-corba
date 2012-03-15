@@ -50,18 +50,18 @@ public class TesterImpl extends PortableRemoteObject implements Tester
     }
 
     public String getDescription() throws RemoteException {
-	return "Tester supports a remote method, String passString(String)";
+        return "Tester supports a remote method, String passString(String)";
     }
 
     public String passString(String theString) throws RemoteException {
-	// reverse the string and send it back
+        // reverse the string and send it back
         StringBuffer sb = new StringBuffer(theString.length());
-	for (int i = (theString.length() - 1); i >= 0; i--) {
-	    sb.append(theString.charAt(i));
-	}
+        for (int i = (theString.length() - 1); i >= 0; i--) {
+            sb.append(theString.charAt(i));
+        }
 
-	String result = sb.toString();
-	return result;
+        String result = sb.toString();
+        return result;
     }
 }
 

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport.connection;
+package com.sun.corba.ee.spi.transport.connection;
 
 /** A concurrent connection cache for passively created connections (e.g.
  * from an acceptor).  Here a Connection is an 

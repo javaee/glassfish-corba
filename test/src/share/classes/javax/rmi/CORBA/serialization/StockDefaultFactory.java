@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)StockDefaultFactory.java	1.1 99/06/07 */
+/* @(#)StockDefaultFactory.java 1.1 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -57,7 +57,7 @@ public class StockDefaultFactory implements StockValueFactory {
   }
 
   public java.io.Serializable read_value (org.omg.CORBA_2_3.portable.InputStream is)
-  {		    
+  {                 
     return is.read_value(new StockImpl ());
   }
 }

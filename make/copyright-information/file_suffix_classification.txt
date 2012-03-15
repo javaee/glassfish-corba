@@ -2,64 +2,64 @@ Changes in /volumes/ws/headers:
 
 Block comments:
     Java comment conventions (Use /* ... */ block comments):
-	C source:
-	    *.c *.h
+        C source:
+            *.c *.h
 
-	Java source:
-	    *.java *.javaref *.sjava
-	    (also policy files: *.policy *.secure)
+        Java source:
+            *.java *.javaref *.sjava
+            (also policy files: *.policy *.secure)
 
-	IDL
-	    *.idl *.idlref
+        IDL
+            *.idl *.idlref
 
     XML/HTML related:
-	(All use <!-- ... --> for block comments)
-	HTML
-	    *.htm *.html:
+        (All use <!-- ... --> for block comments)
+        HTML
+            *.htm *.html:
 
-	XML
-	    *.xml *.pom 
+        XML
+            *.xml *.pom 
 
-	XML DTD
-	    *.dtd 
+        XML DTD
+            *.dtd 
 
 Line comments:
     Scheme comment conventions: (comment lines start with ;)
-	Scheme source:
-	    *.mc *.mcd *.scm *.vthought
+        Scheme source:
+            *.mc *.mcd *.scm *.vthought
 
     Unix shell comment: (Comment lines start with #):
-	*.classlist *.config *.jmk *.ksh *.properties *.prp *.xjmk *.set *.sh *.data
+        *.classlist *.config *.jmk *.ksh *.properties *.prp *.xjmk *.set *.sh *.data
 
-	Makefiles:
-	    Makefile.corba *.gmk Makefile.example ExampleMakefile Makefile
+        Makefiles:
+            Makefile.corba *.gmk Makefile.example ExampleMakefile Makefile
 
-	Text files:
-	    *.text *.txt
+        Text files:
+            *.text *.txt
 
-	Also, anything with contents that starts with #! is a shell script
+        Also, anything with contents that starts with #! is a shell script
 
 Things that do NOT get comments:
     Binary files:
-	StarOffice files:
-	    *.sxc *.sxi *.sxw *.odp
+        StarOffice files:
+            *.sxc *.sxi *.sxw *.odp
 
-	Binary files:
-	    *.gif *.png *.jar *.zip *.jpg *.pdf
+        Binary files:
+            *.gif *.png *.jar *.zip *.jpg *.pdf
 
-	Framemaker
-	    *.doc *.mif *.fm *.book
+        Framemaker
+            *.doc *.mif *.fm *.book
 
-	UML tools:
-	    *.zargo *.zuml
+        UML tools:
+            *.zargo *.zuml
 
     text files, no comments allowed:
-	.cvsignore .hgignore *.list
+        .cvsignore .hgignore *.list
 
     ASM java file:
-	*.old
+        *.old
 
     BCEL java file:
-	*.orig *.rej
+        *.orig *.rej
 
 ignore *.swp (from vim)

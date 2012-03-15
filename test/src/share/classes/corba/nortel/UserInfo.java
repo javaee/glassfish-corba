@@ -46,28 +46,28 @@ public class UserInfo implements Serializable {
     private String lastName ;
 
     public UserInfo( String fname, String lname ) {
-	firstName = fname ;
-	lastName = lname ;
+        firstName = fname ;
+        lastName = lname ;
     }
 
     public String toString() {
-	return firstName + " " + lastName ;
+        return firstName + " " + lastName ;
     }
 
     public int hashCode() {
-	return toString().hashCode() ;
+        return toString().hashCode() ;
     }
 
     public boolean equals( Object obj ) {
-	return toString().equals( obj.toString() ) ;
+        return toString().equals( obj.toString() ) ;
     }
 
     public String getFirstName() {
-	return firstName ;
+        return firstName ;
     }
 
     public String getLastName() {
-	return lastName ;
+        return lastName ;
     }
 }
 

@@ -64,7 +64,7 @@ import org.omg.CORBA.portable.OutputStream;
  * the value stored in its <code>value</code> field can be accessed with
  * <code>myObjectHolder.value</code>.
  *
- * @version	1.14, 09/09/97
+ * @version     1.14, 09/09/97
  * @since       JDK1.2
  */
 public final class ObjectHolder implements Streamable {
@@ -90,7 +90,7 @@ public final class ObjectHolder implements Streamable {
      *                <code>ObjectHolder</code> object
      */
     public ObjectHolder(Object initial) {
-	value = initial;
+        value = initial;
     }
 
     /**
@@ -101,7 +101,7 @@ public final class ObjectHolder implements Streamable {
      * @param input the InputStream containing CDR formatted data from the wire.
      */
     public void _read(InputStream input) {
-	value = input.read_Object();
+        value = input.read_Object();
     }
 
     /**
@@ -111,7 +111,7 @@ public final class ObjectHolder implements Streamable {
      * @param output the OutputStream which will contain the CDR formatted data.
      */
     public void _write(OutputStream output) {
-	output.write_Object(value);
+        output.write_Object(value);
     }
 
     /**
@@ -122,6 +122,6 @@ public final class ObjectHolder implements Streamable {
      *            this <code>ObjectHolder</code> object
      */
     public org.omg.CORBA.TypeCode _type() {
-	return org.omg.CORBA.ORB.init().get_primitive_tc(TCKind.tk_objref);
+        return org.omg.CORBA.ORB.init().get_primitive_tc(TCKind.tk_objref);
     }
 }

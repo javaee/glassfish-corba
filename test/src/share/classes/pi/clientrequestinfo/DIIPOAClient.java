@@ -42,9 +42,9 @@ package pi.clientrequestinfo;
 
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.corba.AnyImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import corba.framework.*;
 
@@ -67,30 +67,30 @@ public class DIIPOAClient
     private helloDIIClientStub helloRefForward;
 
     public static void main(String args[]) {
-	try {
-	    (new DIIPOAClient()).run( System.getProperties(),
-		                      args, System.out, System.err, null );
-	}
-	catch( Exception e ) {
-	    e.printStackTrace( System.err );
-	    System.exit( 1 );
-	}
+        try {
+            (new DIIPOAClient()).run( System.getProperties(),
+                                      args, System.out, System.err, null );
+        }
+        catch( Exception e ) {
+            e.printStackTrace( System.err );
+            System.exit( 1 );
+        }
     }
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
-	TestInitializer.out = out;
-	this.out = out;
-	this.err = err;
+        TestInitializer.out = out;
+        this.out = out;
+        this.err = err;
 
-	out.println( "====================================" );
-	out.println( "Creating ORB for DII POA Remote test" );
-	out.println( "====================================" );
+        out.println( "====================================" );
+        out.println( "Creating ORB for DII POA Remote test" );
+        out.println( "====================================" );
 
         out.println( "+ Creating ORB..." );
-	createORB( args );
+        createORB( args );
 
         try {
             // Test ClientInterceptor
@@ -104,50 +104,50 @@ public class DIIPOAClient
      * Clear invocation flags of helloRef and helloRefForward
      */
     protected void clearInvoked() 
-	throws Exception
+        throws Exception
     {
-	helloRef.clearInvoked();
-	helloRefForward.clearInvoked();
+        helloRef.clearInvoked();
+        helloRefForward.clearInvoked();
     }
 
     /**
      * Invoke the method with the given name on the object
      */
     protected void invokeMethod( String methodName ) 
-	throws Exception
+        throws Exception
     {
-	// Make an invocation:
-	if( methodName.equals( "sayHello" ) ) {
-	    helloRef.sayHello();
-	}
-	else if( methodName.equals( "saySystemException" ) ) {
-	    helloRef.saySystemException();
-	}
-	else if( methodName.equals( "sayUserException" ) ) {
-	    helloRef.sayUserException();
-	}
-	else if( methodName.equals( "sayOneway" ) ) {
-	    helloRef.sayOneway();
-	}
-	else if( methodName.equals( "sayArguments" ) ) {
-	    helloRef.sayArguments( "one", 2, true );
-	}
+        // Make an invocation:
+        if( methodName.equals( "sayHello" ) ) {
+            helloRef.sayHello();
+        }
+        else if( methodName.equals( "saySystemException" ) ) {
+            helloRef.saySystemException();
+        }
+        else if( methodName.equals( "sayUserException" ) ) {
+            helloRef.sayUserException();
+        }
+        else if( methodName.equals( "sayOneway" ) ) {
+            helloRef.sayOneway();
+        }
+        else if( methodName.equals( "sayArguments" ) ) {
+            helloRef.sayArguments( "one", 2, true );
+        }
     }
 
     /**
      * Return true if the method was invoked
      */
     protected boolean wasInvoked() 
-	throws Exception 
+        throws Exception 
     {
-	return helloRef.wasInvoked();
+        return helloRef.wasInvoked();
     }
 
     /**
      * Return true if the method was forwarded
      */
     protected boolean didForward() 
-	throws Exception 
+        throws Exception 
     {
         return helloRefForward.wasInvoked();
     }
@@ -156,12 +156,12 @@ public class DIIPOAClient
      * Perform ClientRequestRequestInfo tests
      */
     protected void testClientRequestInfo() 
-	throws Exception 
+        throws Exception 
     {
-	super.testClientRequestInfo();
+        super.testClientRequestInfo();
 
-	// Perform DII-specific tests:
-	testDynamic();
+        // Perform DII-specific tests:
+        testDynamic();
     }
 
     /**
@@ -169,18 +169,18 @@ public class DIIPOAClient
      * from the last invocation
      */
     protected void resolveReferences() 
-	throws Exception 
+        throws Exception 
     {
         out.println( "    + resolving references..." );
         out.println( "      - disabling interceptors..." );
         SampleClientRequestInterceptor.enabled = false;
         // Resolve the hello object.
-	out.println( "      - Hello1" );
+        out.println( "      - Hello1" );
         helloRef = resolve( orb, "Hello1" );
         // The initializer will store the location the interceptors should
         // use during a normal request:
-	TestInitializer.helloRef = helloRef.getObject();
-	out.println( "      - Hello1Forward" );
+        TestInitializer.helloRef = helloRef.getObject();
+        out.println( "      - Hello1Forward" );
         helloRefForward = resolve( orb, "Hello1Forward" );
         // The initializer will store the location the interceptors should
         // use during a forward request:
@@ -193,7 +193,7 @@ public class DIIPOAClient
      * Implementation borrwed from corba.socket.HelloClient.java test
      */
     private helloDIIClientStub resolve(ORB orb, String name)
-	throws Exception
+        throws Exception
     {
         // Get the root naming context
         org.omg.CORBA.Object objRef = 
@@ -203,7 +203,7 @@ public class DIIPOAClient
         // resolve the Object Reference in Naming
         NameComponent nc = new NameComponent(name, "");
         NameComponent path[] = {nc};
-	org.omg.CORBA.Object helloRef = ncRef.resolve( path );
+        org.omg.CORBA.Object helloRef = ncRef.resolve( path );
         
         return new helloDIIClientStub( orb, helloRef );
     }
@@ -212,15 +212,15 @@ public class DIIPOAClient
      * Test DII-specific features
      */
     protected void testDynamic() 
-	throws Exception
+        throws Exception
     {
-	out.println( "+ Testing DII ClientRequestInfo methods..." );
+        out.println( "+ Testing DII ClientRequestInfo methods..." );
 
-	InterceptorStrategy interceptorStrategy =
-	    new DynamicStrategy();
+        InterceptorStrategy interceptorStrategy =
+            new DynamicStrategy();
         InvokeStrategy invokeStrategy = new InvokeDynamic();
-	setParameters( interceptorStrategy, invokeStrategy );
-	runTestCase( "dii_dynamic" );
+        setParameters( interceptorStrategy, invokeStrategy );
+        runTestCase( "dii_dynamic" );
     }
 
     /**
@@ -228,9 +228,9 @@ public class DIIPOAClient
      * This will skip any UserException-related tests.
      */
     protected void testException() 
-	throws Exception
+        throws Exception
     {
-	out.println( "+ Testing received_exception[_id]() in DII mode..." );
+        out.println( "+ Testing received_exception[_id]() in DII mode..." );
 
         InterceptorStrategy interceptorStrategy =
             new ExceptionStrategy( true );

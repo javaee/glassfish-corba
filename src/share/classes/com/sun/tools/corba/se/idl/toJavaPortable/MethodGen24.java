@@ -102,7 +102,7 @@ public class MethodGen24 extends MethodGen
         stream.print (", ");
       ParameterEntry parm = (ParameterEntry)e.nextElement ();
       if (listTypes) {
-	writeParmType (parm.type (), parm.passType ());
+        writeParmType (parm.type (), parm.passType ());
         stream.print (' ');
       }
       // Print parm name
@@ -113,8 +113,8 @@ public class MethodGen24 extends MethodGen
 
   /**
    * <d62023> Write the methodEntry for a valuetype factory method into
-   * 	      the Value Helper class. Contents from email from Simon,
-   *	      4/25/99.
+   *          the Value Helper class. Contents from email from Simon,
+   *          4/25/99.
    **/
   protected void helperFactoryMethod (Hashtable symbolTable, MethodEntry m, SymtabEntry t, PrintWriter stream)
   {
@@ -127,7 +127,7 @@ public class MethodGen24 extends MethodGen
 
     // Step 1. Print factory method decl up to parms.
     stream.print  ("  public static " + typeName + " " + initializerName +
-	    " (org.omg.CORBA.ORB $orb");
+            " (org.omg.CORBA.ORB $orb");
     if (!m.parameters ().isEmpty ())
       stream.print (", "); // <d62794>
 
@@ -169,8 +169,8 @@ public class MethodGen24 extends MethodGen
 
   /**
    * <d62023> - write a default factory method implementation for the
-   *		<value>DefaultFactory. m is a methodEntry for a factory
-   *		method contained in a non-abstract ValueEntry.
+   *            <value>DefaultFactory. m is a methodEntry for a factory
+   *            method contained in a non-abstract ValueEntry.
    **/
   protected void defaultFactoryMethod (Hashtable symbolTable, MethodEntry m, PrintWriter stream)
   {
@@ -202,10 +202,10 @@ public class MethodGen24 extends MethodGen
     if (m.type () == null)
     {
         // if factory method, result type is container 
-	if (isValueInitializer ())
-	    stream.print (m.container ().name ());
+        if (isValueInitializer ())
+            stream.print (m.container ().name ());
         else
-	    stream.print ("void");
+            stream.print ("void");
     }
     else
     {

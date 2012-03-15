@@ -55,75 +55,75 @@ public class Client
     public static void main(String av[])
     {
         try {
-	    Properties props = new Properties();
-	    props.put("org.omg.PortableInterceptor.ORBInitializerClass."
-		      + "pi.serviceexample.AServiceORBInitializer",
-		      "");
-	    props.put("org.omg.PortableInterceptor.ORBInitializerClass."
-		      + "pi.serviceexample.LoggingServiceClientORBInitializer",
-		      "");
-	    ORB orb = ORB.init(av, props);
+            Properties props = new Properties();
+            props.put("org.omg.PortableInterceptor.ORBInitializerClass."
+                      + "pi.serviceexample.AServiceORBInitializer",
+                      "");
+            props.put("org.omg.PortableInterceptor.ORBInitializerClass."
+                      + "pi.serviceexample.LoggingServiceClientORBInitializer",
+                      "");
+            ORB orb = ORB.init(av, props);
 
-	    //
-	    // The client obtains a reference to a service.
-	    // The client does not know the service is implemented
-	    // using interceptors.
-	    //
+            //
+            // The client obtains a reference to a service.
+            // The client does not know the service is implemented
+            // using interceptors.
+            //
 
-	    AService aService =	
-		AServiceHelper.narrow(
-	            orb.resolve_initial_references("AService"));
+            AService aService = 
+                AServiceHelper.narrow(
+                    orb.resolve_initial_references("AService"));
 
-	    //
-	    // The client obtains a reference to some object that
-	    // it will invoke.
-	    //
+            //
+            // The client obtains a reference to some object that
+            // it will invoke.
+            //
 
-	    NamingContext nameService = 
-		NamingContextHelper.narrow(
+            NamingContext nameService = 
+                NamingContextHelper.narrow(
                     orb.resolve_initial_references("NameService"));
-	    NameComponent arbitraryObjectPath[] =
-	        { new NameComponent("ArbitraryObject", "") };
-	    ArbitraryObject arbitraryObject =
-		ArbitraryObjectHelper.narrow(nameService.resolve(arbitraryObjectPath));
+            NameComponent arbitraryObjectPath[] =
+                { new NameComponent("ArbitraryObject", "") };
+            ArbitraryObject arbitraryObject =
+                ArbitraryObjectHelper.narrow(nameService.resolve(arbitraryObjectPath));
 
-	    //
-	    // The client begins the service so that invocations of
-	    // any object will be done with that service in effect.
-	    //
+            //
+            // The client begins the service so that invocations of
+            // any object will be done with that service in effect.
+            //
 
-	    aService.begin();
-	    
-	    arbitraryObject.arbitraryOperation1("one");
-	    arbitraryObject.arbitraryOperation2(2);
+            aService.begin();
+            
+            arbitraryObject.arbitraryOperation1("one");
+            arbitraryObject.arbitraryOperation2(2);
 
-	    //
-	    // The client ends the service so that further invocations
-	    // of any object will not be done with that service in effect.
-	    //
+            //
+            // The client ends the service so that further invocations
+            // of any object will not be done with that service in effect.
+            //
 
-	    aService.end();
+            aService.end();
 
-	    // This invocation is not serviced by aService since
-	    // it is outside the begin/end.
-	    arbitraryObject.arbitraryOperation3("just return");
+            // This invocation is not serviced by aService since
+            // it is outside the begin/end.
+            arbitraryObject.arbitraryOperation3("just return");
 
 
-	    aService.begin();
-	    try {
-		arbitraryObject.arbitraryOperation3("throw exception");
-		throw new RuntimeException("should not see this");
-	    } catch (ArbitraryObjectException e) {
-		// Expected in this example, so do nothing.
-	    }
-	    aService.end();
+            aService.begin();
+            try {
+                arbitraryObject.arbitraryOperation3("throw exception");
+                throw new RuntimeException("should not see this");
+            } catch (ArbitraryObjectException e) {
+                // Expected in this example, so do nothing.
+            }
+            aService.end();
 
         } catch (Exception e) {
             e.printStackTrace();
-	    System.exit(-1);
+            System.exit(-1);
         }
-	System.out.println("Client done.");
-	System.exit(0);
+        System.out.println("Client done.");
+        System.exit(0);
     }
 }
 

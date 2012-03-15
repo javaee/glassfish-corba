@@ -50,7 +50,7 @@
  * FINEST = logs everything, including exception stack traces
  */
 
-package com.sun.corba.se.impl.copyobject ;
+package com.sun.corba.ee.impl.copyobject ;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -77,9 +77,9 @@ import java.security.PrivilegedExceptionAction;
 
 import sun.corba.Bridge; 
 
-import com.sun.corba.se.impl.util.Utility;
+import com.sun.corba.ee.impl.util.Utility;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
 import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
@@ -99,7 +99,7 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
     public OldReflectObjectCopierImpl( org.omg.CORBA.ORB orb ) 
     {
         objRefs = new IdentityHashMap();
-	this.orb = (ORB)orb ;
+        this.orb = (ORB)orb ;
     }
 
     /**
@@ -116,7 +116,7 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
     class ReflectAttrs {
         public Field[] fields;
         public Constructor constr;
-	public Class thisClass ;
+        public Class thisClass ;
         public Class arrayClass;
         public Class superClass;
         public boolean isImmutable;
@@ -124,34 +124,34 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
         public boolean isSQLDate;
 
         public ReflectAttrs(Class cls) {
-	    thisClass = cls ;
-	    String name = cls.getName();
-	    char ch = name.charAt(0);
+            thisClass = cls ;
+            String name = cls.getName();
+            char ch = name.charAt(0);
 
-	    isImmutable = false;
-	    isDate = false;
-	    isSQLDate = false; 
-	    fields = null;
-	    constr = null;
-	    superClass = null;
-	    if (ch == '[') {
-		arrayClass = cls.getComponentType();
-	    } else if (isImmutable(name)) {
-		isImmutable = true;
-	    } else if (name.equals("java.util.Date")) {
-		isDate = true;
-	    } else if (name.equals("java.sql.Date")) {
-		isSQLDate = true;
-	    } else {
-		if (Externalizable.class.isAssignableFrom( cls ))
-		    constr = getExternalizableConstructor(cls) ;
-		else if (Serializable.class.isAssignableFrom( cls ))
+            isImmutable = false;
+            isDate = false;
+            isSQLDate = false; 
+            fields = null;
+            constr = null;
+            superClass = null;
+            if (ch == '[') {
+                arrayClass = cls.getComponentType();
+            } else if (isImmutable(name)) {
+                isImmutable = true;
+            } else if (name.equals("java.util.Date")) {
+                isDate = true;
+            } else if (name.equals("java.sql.Date")) {
+                isSQLDate = true;
+            } else {
+                if (Externalizable.class.isAssignableFrom( cls ))
+                    constr = getExternalizableConstructor(cls) ;
+                else if (Serializable.class.isAssignableFrom( cls ))
                     constr = getSerializableConstructor(cls) ;
-		if (constr != null) { constr.setAccessible(true); }    
-		fields = cls.getDeclaredFields();
-		AccessibleObject.setAccessible(fields, true);
-		superClass = cls.getSuperclass();
-	    }
+                if (constr != null) { constr.setAccessible(true); }    
+                fields = cls.getDeclaredFields();
+                AccessibleObject.setAccessible(fields, true);
+                superClass = cls.getSuperclass();
+            }
         }
     };
 
@@ -160,13 +160,13 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
      * This must be carefully protected!
      */
     private static final Bridge bridge = 
-	(Bridge)AccessController.doPrivileged(
-	    new PrivilegedAction() {
-		public Object run() {
-		    return Bridge.get() ;
-		}
-	    } 
-	) ;
+        (Bridge)AccessController.doPrivileged(
+            new PrivilegedAction() {
+                public Object run() {
+                    return Bridge.get() ;
+                }
+            } 
+        ) ;
 
     /**
      * Returns public no-arg constructor of given class, or null if none found.
@@ -282,47 +282,47 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
      */
     private final Object arrayCopy(Object obj, Class aClass) 
         throws RemoteException, InstantiationException, 
-	IllegalAccessException, InvocationTargetException
+        IllegalAccessException, InvocationTargetException
     {
         Object acopy = null;
 
-	if (aClass.isPrimitive()) {
-	    if (aClass == byte.class) {
-		acopy = ((byte[])obj).clone();
-	    } else if (aClass == char.class) {
-		acopy = ((char[])obj).clone();
-	    } else if (aClass == short.class) {
-		acopy = ((short[])obj).clone();
-	    } else if (aClass == int.class) {
-		acopy = ((int[])obj).clone();
-	    } else if (aClass == long.class) {
-		acopy = ((long[])obj).clone();
-	    } else if (aClass == double.class) {
-		acopy = ((double[])obj).clone();
-	    } else if (aClass == float.class) {
-		acopy = ((float[])obj).clone();
-	    } else if (aClass == boolean.class) {
-		acopy = ((boolean[])obj).clone();
-	    }
-	    objRefs.put(obj, acopy);
-	} else if (aClass == String.class) {
-	    acopy = ((String [])obj).clone();
-	    objRefs.put(obj, acopy);
-	} else {
-	    int alen = Array.getLength(obj);
+        if (aClass.isPrimitive()) {
+            if (aClass == byte.class) {
+                acopy = ((byte[])obj).clone();
+            } else if (aClass == char.class) {
+                acopy = ((char[])obj).clone();
+            } else if (aClass == short.class) {
+                acopy = ((short[])obj).clone();
+            } else if (aClass == int.class) {
+                acopy = ((int[])obj).clone();
+            } else if (aClass == long.class) {
+                acopy = ((long[])obj).clone();
+            } else if (aClass == double.class) {
+                acopy = ((double[])obj).clone();
+            } else if (aClass == float.class) {
+                acopy = ((float[])obj).clone();
+            } else if (aClass == boolean.class) {
+                acopy = ((boolean[])obj).clone();
+            }
+            objRefs.put(obj, acopy);
+        } else if (aClass == String.class) {
+            acopy = ((String [])obj).clone();
+            objRefs.put(obj, acopy);
+        } else {
+            int alen = Array.getLength(obj);
 
             aClass = obj.getClass().getComponentType();
 
             acopy = Array.newInstance(aClass, alen);
 
 
-		objRefs.put(obj, acopy);
-		for (int idx=0; idx<alen; idx++) {
-		    Object aobj = Array.get(obj, idx);
-		    aobj = reflectCopy(aobj);
-		    Array.set(acopy, idx, aobj);
-		}
-	}
+                objRefs.put(obj, acopy);
+                for (int idx=0; idx<alen; idx++) {
+                    Object aobj = Array.get(obj, idx);
+                    aobj = reflectCopy(aobj);
+                    Array.set(acopy, idx, aobj);
+                }
+        }
 
         return acopy;
     }
@@ -334,44 +334,44 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
      * @exception RemoteException if any object could not be copied.
      */
     private final void copyFields(Class cls, Field[] fields, Object obj, 
-	Object copy) throws RemoteException, IllegalAccessException,
-	InstantiationException, InvocationTargetException
+        Object copy) throws RemoteException, IllegalAccessException,
+        InstantiationException, InvocationTargetException
     {
         if (fields == null || fields.length == 0) {
             return;
         }
 
-	// regular object, so copy the fields over
-	for (int idx=0; idx<fields.length; idx++) {
-	    Field fld = fields[idx];
-	    int modifiers = fld.getModifiers() ;
-	    Object fobj = null;
-	    Class fieldClass = fld.getType();
+        // regular object, so copy the fields over
+        for (int idx=0; idx<fields.length; idx++) {
+            Field fld = fields[idx];
+            int modifiers = fld.getModifiers() ;
+            Object fobj = null;
+            Class fieldClass = fld.getType();
 
-	    if (!Modifier.isStatic(modifiers)) {
-		if (fieldClass == int.class) {
-		    fld.setInt(copy, fld.getInt(obj));
-		} else if (fieldClass == long.class) {
-		    fld.setLong(copy, fld.getLong(obj));
-		} else if (fieldClass == double.class) {
-		    fld.setDouble(copy, fld.getDouble(obj));
-		} else if (fieldClass == byte.class) {
-		    fld.setByte(copy, fld.getByte(obj));
-		} else if (fieldClass == char.class) {
-		    fld.setChar(copy, fld.getChar(obj));
-		} else if (fieldClass == short.class) {
-		    fld.setShort(copy, fld.getShort(obj));
-		} else if (fieldClass == float.class) {
-		    fld.setFloat(copy, fld.getFloat(obj));
-		} else if (fieldClass == boolean.class) {
-		    fld.setBoolean(copy, fld.getBoolean(obj));
-		} else {
-		    fobj = fld.get(obj);
-		    Object newfobj = reflectCopy(fobj);
-		    fld.set(copy, newfobj);
-		}
-	    }
-	}
+            if (!Modifier.isStatic(modifiers)) {
+                if (fieldClass == int.class) {
+                    fld.setInt(copy, fld.getInt(obj));
+                } else if (fieldClass == long.class) {
+                    fld.setLong(copy, fld.getLong(obj));
+                } else if (fieldClass == double.class) {
+                    fld.setDouble(copy, fld.getDouble(obj));
+                } else if (fieldClass == byte.class) {
+                    fld.setByte(copy, fld.getByte(obj));
+                } else if (fieldClass == char.class) {
+                    fld.setChar(copy, fld.getChar(obj));
+                } else if (fieldClass == short.class) {
+                    fld.setShort(copy, fld.getShort(obj));
+                } else if (fieldClass == float.class) {
+                    fld.setFloat(copy, fld.getFloat(obj));
+                } else if (fieldClass == boolean.class) {
+                    fld.setBoolean(copy, fld.getBoolean(obj));
+                } else {
+                    fobj = fld.get(obj);
+                    Object newfobj = reflectCopy(fobj);
+                    fld.set(copy, newfobj);
+                }
+            }
+        }
     }
 
 
@@ -379,58 +379,58 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
     // cloning collection types.  Requires a no args constructor,
     // public for now (but could use non-public)
     private Object makeInstanceOfClass (Class cls) 
-	throws IllegalAccessException, InstantiationException
+        throws IllegalAccessException, InstantiationException
     {
-	return cls.newInstance() ;
+        return cls.newInstance() ;
     }
 
     // Copy any object that is an instanceof Map.
     private Object copyMap( Object obj ) 
-	throws RemoteException, InstantiationException, IllegalAccessException,
-	InvocationTargetException
+        throws RemoteException, InstantiationException, IllegalAccessException,
+        InvocationTargetException
     {
-	Map src = (Map)obj ;
-	Map result = (Map)makeInstanceOfClass( src.getClass() ) ;
-	// Do this early, or self-references cause stack overflow!
-	objRefs.put( src, result ) ;  
-	Iterator iter = src.entrySet().iterator() ;
-	while (iter.hasNext()) {
-	    Map.Entry entry = (Map.Entry)(iter.next());
-	    Object key = entry.getKey();
-	    Object value = entry.getValue() ;
-	    // Checks for null are handled in reflectCopy.
-	    Object newKey = reflectCopy( key) ;
-	    Object newValue = reflectCopy( value) ;
-	    result.put( newKey, newValue ) ;
-	}
+        Map src = (Map)obj ;
+        Map result = (Map)makeInstanceOfClass( src.getClass() ) ;
+        // Do this early, or self-references cause stack overflow!
+        objRefs.put( src, result ) ;  
+        Iterator iter = src.entrySet().iterator() ;
+        while (iter.hasNext()) {
+            Map.Entry entry = (Map.Entry)(iter.next());
+            Object key = entry.getKey();
+            Object value = entry.getValue() ;
+            // Checks for null are handled in reflectCopy.
+            Object newKey = reflectCopy( key) ;
+            Object newValue = reflectCopy( value) ;
+            result.put( newKey, newValue ) ;
+        }
 
-	return result ;
+        return result ;
     }
 
     // Pass in attrs just to avoid looking them up again.
     private Object copyAnyClass( ReflectAttrs attrs, Object obj ) 
-	throws RemoteException, InstantiationException, 
-	IllegalAccessException, InvocationTargetException
+        throws RemoteException, InstantiationException, 
+        IllegalAccessException, InvocationTargetException
     {
-	// regular object, so copy the fields over
-	Constructor cons = attrs.constr;
-	if (cons == null)
-	    throw new IllegalArgumentException( "Class " + attrs.thisClass +
-		 " is not Serializable" ) ;
+        // regular object, so copy the fields over
+        Constructor cons = attrs.constr;
+        if (cons == null)
+            throw new IllegalArgumentException( "Class " + attrs.thisClass +
+                 " is not Serializable" ) ;
 
-	Object copy = cons.newInstance();
+        Object copy = cons.newInstance();
 
-	// Do this before copyFields, or self-references cause stack overflow!
-	objRefs.put(obj, copy);
-	copyFields(attrs.thisClass, attrs.fields, obj, copy);
-	Class cls = attrs.superClass;
-	while (cls != null && cls != Object.class) {
-	    attrs = getClassAttrs(cls);
-	    copyFields(cls, attrs.fields, obj, copy);
-	    cls = attrs.superClass;
-	} 
+        // Do this before copyFields, or self-references cause stack overflow!
+        objRefs.put(obj, copy);
+        copyFields(attrs.thisClass, attrs.fields, obj, copy);
+        Class cls = attrs.superClass;
+        while (cls != null && cls != Object.class) {
+            attrs = getClassAttrs(cls);
+            copyFields(cls, attrs.fields, obj, copy);
+            cls = attrs.superClass;
+        } 
 
-	return copy ;
+        return copy ;
     }
 
     /**
@@ -440,15 +440,15 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
      * @return the copied object.
      */
     private final Object reflectCopy(Object obj) 
-	throws RemoteException, InstantiationException, 
-	IllegalAccessException, InvocationTargetException
+        throws RemoteException, InstantiationException, 
+        IllegalAccessException, InvocationTargetException
     {
-	// Always check for nulls here, so we don't need to check in other places.
-	if (obj == null)
-	    return null ;
+        // Always check for nulls here, so we don't need to check in other places.
+        if (obj == null)
+            return null ;
 
-	Class cls = obj.getClass() ;
-	ReflectAttrs attrs = getClassAttrs( cls ) ;
+        Class cls = obj.getClass() ;
+        ReflectAttrs attrs = getClassAttrs( cls ) ;
 
         Object copy = null;
 
@@ -462,29 +462,29 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
 
         copy = objRefs.get(obj);
         if (copy == null) {
-	    // Handle instance of HashMap specially because Map.Entry contains 
-	    // non-static finals.  HashTable is likewise handled here.
+            // Handle instance of HashMap specially because Map.Entry contains 
+            // non-static finals.  HashTable is likewise handled here.
             if ( ( cls.getName().equals("java.util.HashMap") ) ||
                  ( cls.getName().equals("java.util.HashTable") ) ) {
-		copy = copyMap( obj ) ;
-	    } else {
-		Class aClass = attrs.arrayClass;
+                copy = copyMap( obj ) ;
+            } else {
+                Class aClass = attrs.arrayClass;
 
-		if (aClass != null) {
-		    // object is an array, so do the array copy
-		    copy = arrayCopy(obj, aClass);
-		} else {
-		    if (attrs.isDate) {
-			copy = new java.util.Date(((java.util.Date)obj).getTime());
-			objRefs.put(obj, copy);
-		    } else if (attrs.isSQLDate) {
-			copy = new java.sql.Date(((java.sql.Date)obj).getTime());
-			objRefs.put(obj, copy);
-		    } else {
-			copy = copyAnyClass( attrs, obj ) ;
-		    }
-		}
-	    }
+                if (aClass != null) {
+                    // object is an array, so do the array copy
+                    copy = arrayCopy(obj, aClass);
+                } else {
+                    if (attrs.isDate) {
+                        copy = new java.util.Date(((java.util.Date)obj).getTime());
+                        objRefs.put(obj, copy);
+                    } else if (attrs.isSQLDate) {
+                        copy = new java.sql.Date(((java.sql.Date)obj).getTime());
+                        objRefs.put(obj, copy);
+                    } else {
+                        copy = copyAnyClass( attrs, obj ) ;
+                    }
+                }
+            }
         }
 
         return copy;
@@ -496,7 +496,7 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
     // This can trigger fallback behavior in IasUtilDelegate.
     public Object copy(final Object obj, boolean debug ) throws ReflectiveCopyException
     {
-	return copy( obj ) ;
+        return copy( obj ) ;
     }
 
     public Object copy(final Object obj) throws ReflectiveCopyException

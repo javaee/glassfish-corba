@@ -37,15 +37,15 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.ior.iiop;
+package com.sun.corba.ee.impl.ior.iiop;
 
 import org.omg.CORBA_2_3.portable.OutputStream;
 
-import com.sun.corba.se.spi.ior.TaggedComponentBase;
-import com.sun.corba.se.spi.ior.iiop.LoadBalancingComponent;
+import com.sun.corba.ee.spi.ior.TaggedComponentBase;
+import com.sun.corba.ee.spi.ior.iiop.LoadBalancingComponent;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class LoadBalancingComponentImpl extends TaggedComponentBase 
     implements LoadBalancingComponent
@@ -59,26 +59,26 @@ public class LoadBalancingComponentImpl extends TaggedComponentBase
     @Override
     public boolean equals(Object obj)
     {
-	if (!(obj instanceof LoadBalancingComponentImpl)) {
+        if (!(obj instanceof LoadBalancingComponentImpl)) {
             return false;
         }
 
-	LoadBalancingComponentImpl other = 
-	    (LoadBalancingComponentImpl)obj ;
+        LoadBalancingComponentImpl other = 
+            (LoadBalancingComponentImpl)obj ;
 
-	return loadBalancingValue == other.loadBalancingValue ;
+        return loadBalancingValue == other.loadBalancingValue ;
     }
 
     @Override
     public int hashCode()
     {
-	return loadBalancingValue;
+        return loadBalancingValue;
     }
 
     @Override
     public String toString()
     {
-	return "LoadBalancingComponentImpl[loadBalancingValue=" + loadBalancingValue + "]" ;
+        return "LoadBalancingComponentImpl[loadBalancingValue=" + loadBalancingValue + "]" ;
     }
 
     public LoadBalancingComponentImpl()
@@ -87,19 +87,19 @@ public class LoadBalancingComponentImpl extends TaggedComponentBase
     }
 
     public LoadBalancingComponentImpl(int theLoadBalancingValue) {
-	if (theLoadBalancingValue < ORBConstants.FIRST_LOAD_BALANCING_VALUE ||
-	    theLoadBalancingValue > ORBConstants.LAST_LOAD_BALANCING_VALUE) {
-	    throw wrapper.invalidLoadBalancingComponentValue(
-		  theLoadBalancingValue,
-		  ORBConstants.FIRST_LOAD_BALANCING_VALUE,
-		  ORBConstants.LAST_LOAD_BALANCING_VALUE );
-	}
+        if (theLoadBalancingValue < ORBConstants.FIRST_LOAD_BALANCING_VALUE ||
+            theLoadBalancingValue > ORBConstants.LAST_LOAD_BALANCING_VALUE) {
+            throw wrapper.invalidLoadBalancingComponentValue(
+                  theLoadBalancingValue,
+                  ORBConstants.FIRST_LOAD_BALANCING_VALUE,
+                  ORBConstants.LAST_LOAD_BALANCING_VALUE );
+        }
         loadBalancingValue = theLoadBalancingValue;
     }
 
     public int getLoadBalancingValue()
     {
-	return loadBalancingValue;
+        return loadBalancingValue;
     }
 
     public void writeContents(OutputStream os) 
@@ -109,7 +109,7 @@ public class LoadBalancingComponentImpl extends TaggedComponentBase
     
     public int getId() 
     {
-	return ORBConstants.TAG_LOAD_BALANCING_ID;
+        return ORBConstants.TAG_LOAD_BALANCING_ID;
     }
 }
 

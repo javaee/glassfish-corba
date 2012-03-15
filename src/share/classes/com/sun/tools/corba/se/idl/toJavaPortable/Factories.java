@@ -108,9 +108,9 @@ public class Factories extends com.sun.tools.corba.se.idl.Factories
   {
     if (_helper == null)
       if (Util.corbaLevel (2.4f, 99.0f)) // <d60023>
-	 _helper = new Helper24 ();     // <d60023>
+         _helper = new Helper24 ();     // <d60023>
       else
-	 _helper = new Helper ();
+         _helper = new Helper ();
     return _helper;
   } // helper
 
@@ -119,7 +119,7 @@ public class Factories extends com.sun.tools.corba.se.idl.Factories
   {
     if (_valueFactory == null)
       if (Util.corbaLevel (2.4f, 99.0f)) // <d60023>
-	 _valueFactory = new ValueFactory ();     // <d60023>
+         _valueFactory = new ValueFactory ();     // <d60023>
       // else return null since shouldn't be used
     return _valueFactory;
   } // valueFactory
@@ -129,7 +129,7 @@ public class Factories extends com.sun.tools.corba.se.idl.Factories
   {
     if (_defaultFactory == null)
       if (Util.corbaLevel (2.4f, 99.0f)) // <d60023>
-	 _defaultFactory = new DefaultFactory ();     // <d60023>
+         _defaultFactory = new DefaultFactory ();     // <d60023>
       // else return null since shouldn't be used
     return _defaultFactory;
   } // defaultFactory

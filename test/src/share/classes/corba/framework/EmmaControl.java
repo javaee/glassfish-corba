@@ -72,22 +72,22 @@ public class EmmaControl {
      * method.
      */
     private synchronized static int allocatePort() {
-	return nextPort++ ;
+        return nextPort++ ;
     }
 
     public synchronized static void resetPortAllocator() {
-	nextPort = FIRST_PORT ;
+        nextPort = FIRST_PORT ;
     }
 
     public static int setCoverageProperties( Properties props ) {
-	// Allow for both automatic and controlled output of coverage data.
-	props.setProperty( "emma.coverage.out.file", Options.getEmmaFile() ) ;
-	props.setProperty( "emma.coverage.out.merge", "true" ) ;
-	props.setProperty( "emma.rt.control", "true" ) ;
-	props.setProperty( "emma.rt.control.host", "localhost" ) ;
-	int result = allocatePort() ;
-	props.setProperty( "emma.rt.control.port", "" + result ) ;
-	return result ;
+        // Allow for both automatic and controlled output of coverage data.
+        props.setProperty( "emma.coverage.out.file", Options.getEmmaFile() ) ;
+        props.setProperty( "emma.coverage.out.merge", "true" ) ;
+        props.setProperty( "emma.rt.control", "true" ) ;
+        props.setProperty( "emma.rt.control.host", "localhost" ) ;
+        int result = allocatePort() ;
+        props.setProperty( "emma.rt.control.port", "" + result ) ;
+        return result ;
     }
 
     /** Tell emma to dump the coverage data for the process listening
@@ -97,33 +97,33 @@ public class EmmaControl {
      * exit after this method is used.
      */
     public static void writeCoverageData( int port, String fileName ) {
-	String[] args = new String[] {
-		"-connect",
-		"localhost:" + port,
-		"-command", 
-		"coverage.dump," + fileName + ",true,true"
-	    } ;
+        String[] args = new String[] {
+                "-connect",
+                "localhost:" + port,
+                "-command", 
+                "coverage.dump," + fileName + ",true,true"
+            } ;
 
-	/*
-	if (DEBUG) {
-	    System.out.print( "Executing emma ctl command with args:" ) ;
-	    for (String arg : args) 
-		System.out.print( " " + arg ) ;
-	    System.out.println() ;
-	}
+        /*
+        if (DEBUG) {
+            System.out.print( "Executing emma ctl command with args:" ) ;
+            for (String arg : args) 
+                System.out.print( " " + arg ) ;
+            System.out.println() ;
+        }
 
-	ctlCommand cmd = new ctlCommand( "ctl", args ) ;
-	cmd.run() ;
-	*/
+        ctlCommand cmd = new ctlCommand( "ctl", args ) ;
+        cmd.run() ;
+        */
 
-	String command = "java emma ctl" ;
-	for (String arg : args)
-	    command += " " + arg ;
-	try {
-	    Runtime.getRuntime().exec( command ) ;
-	} catch (Exception exc) {
-	    System.out.println( "Error in executing emma ctl command" + exc ) ;
-	    exc.printStackTrace() ;
-	}
+        String command = "java emma ctl" ;
+        for (String arg : args)
+            command += " " + arg ;
+        try {
+            Runtime.getRuntime().exec( command ) ;
+        } catch (Exception exc) {
+            System.out.println( "Error in executing emma ctl command" + exc ) ;
+            exc.printStackTrace() ;
+        }
     }
 }

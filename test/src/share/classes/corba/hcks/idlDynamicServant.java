@@ -50,7 +50,7 @@ import java.util.Properties;
 
 class idlDynamicServant
     extends
-	org.omg.PortableServer.DynamicImplementation
+        org.omg.PortableServer.DynamicImplementation
 {
     //private static String[] __ids = { "IDL:hcks/idlI:1.0" };
     private static String[] __ids = new _idlIStub()._ids();
@@ -65,7 +65,7 @@ class idlDynamicServant
 
     public void invoke(ServerRequest r) 
     {
-	idlDynInvokeHelper.invoke(orb, r);
+        idlDynInvokeHelper.invoke(orb, r);
     }    
 }
 

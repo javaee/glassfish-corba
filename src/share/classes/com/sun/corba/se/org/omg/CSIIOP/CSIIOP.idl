@@ -90,7 +90,7 @@ module CSIIOP {
     // Object Format," p. 84.
 
     struct ServiceConfiguration {
-	ServiceConfigurationSyntax syntax;
+        ServiceConfigurationSyntax syntax;
         ServiceSpecificName name;
     };
 
@@ -106,28 +106,28 @@ module CSIIOP {
         AssociationOptions target_supports;
         AssociationOptions target_requires;
         CSI::OID client_authentication_mech;
-	CSI::GSS_NT_ExportedName target_name;
+        CSI::GSS_NT_ExportedName target_name;
     };
 
     // type used to define SAS layer functionality within a compound mechanism
     // definition
  
     struct SAS_ContextSec {
-	AssociationOptions target_supports;
-	AssociationOptions target_requires;
-	ServiceConfigurationList  privilege_authorities;
-	CSI::OIDList supported_naming_mechanisms;
-	CSI::IdentityTokenType supported_identity_types;
+        AssociationOptions target_supports;
+        AssociationOptions target_requires;
+        ServiceConfigurationList  privilege_authorities;
+        CSI::OIDList supported_naming_mechanisms;
+        CSI::IdentityTokenType supported_identity_types;
     };
 
     // type used in the body of a TAG_CSI_SEC_MECH_LIST component to
     // describe a compound mechanism
       
     struct CompoundSecMech {
-	AssociationOptions target_requires;
-	IOP::TaggedComponent transport_mech;
-	AS_ContextSec as_context_mech;
-	SAS_ContextSec sas_context_mech;
+        AssociationOptions target_requires;
+        IOP::TaggedComponent transport_mech;
+        AS_ContextSec as_context_mech;
+        SAS_ContextSec sas_context_mech;
     };
 
     typedef sequence <CompoundSecMech> CompoundSecMechanisms;
@@ -136,13 +136,13 @@ module CSIIOP {
     // component
       
     struct CompoundSecMechList {
-	boolean stateful;
-	CompoundSecMechanisms  mechanism_list;
+        boolean stateful;
+        CompoundSecMechanisms  mechanism_list;
     };
 
     struct TransportAddress {
-	string host_name;
-	unsigned short port;
+        string host_name;
+        unsigned short port;
     };
 
     typedef sequence <TransportAddress> TransportAddressList;
@@ -152,11 +152,11 @@ module CSIIOP {
     const IOP::ComponentId TAG_SECIOP_SEC_TRANS = 35;
 
     struct SECIOP_SEC_TRANS {
-	AssociationOptions target_supports;
-	AssociationOptions target_requires;
-	CSI::OID mech_oid;
-	CSI::GSS_NT_ExportedName target_name;
-	TransportAddressList addresses;
+        AssociationOptions target_supports;
+        AssociationOptions target_requires;
+        CSI::OID mech_oid;
+        CSI::GSS_NT_ExportedName target_name;
+        TransportAddressList addresses;
     };
 
     // tagged component for configuring TLS/SSL as a CSIv2 transport mechanism
@@ -164,9 +164,9 @@ module CSIIOP {
     const IOP::ComponentId TAG_TLS_SEC_TRANS = 36;
 
     struct TLS_SEC_TRANS {
-	AssociationOptions target_supports;
-	AssociationOptions target_requires;
-	TransportAddressList addresses;
+        AssociationOptions target_supports;
+        AssociationOptions target_requires;
+        TransportAddressList addresses;
     };
 
 }; //CSIIOP

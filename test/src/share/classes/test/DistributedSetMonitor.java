@@ -71,8 +71,8 @@ import javax.rmi.PortableRemoteObject;
  * supports the addition of notifiers which enable monitoring events
  * in the set.
  *
- * @version	1.0, 5/13/98
- * @author	Bryan Atsatt
+ * @version     1.0, 5/13/98
+ * @author      Bryan Atsatt
  */
 public class DistributedSetMonitor  extends PortableRemoteObject
     implements DistributedSet, AlarmHandler {
@@ -96,7 +96,7 @@ public class DistributedSetMonitor  extends PortableRemoteObject
         int count = notifiers.size();
         for (int i = 0; i < count; i++) {
             DistributedSetNotifier notifier = 
-		(DistributedSetNotifier) notifiers.elementAt(i); 
+                (DistributedSetNotifier) notifiers.elementAt(i); 
             notifier.pinged(fromSetName);
         }
         return PING_RESPONSE; 
@@ -167,7 +167,7 @@ public class DistributedSetMonitor  extends PortableRemoteObject
      * this instance.
      */
     public synchronized int countSets () throws RemoteException {
-	return sets.size();
+        return sets.size();
     }
     
     /*
@@ -206,7 +206,7 @@ public class DistributedSetMonitor  extends PortableRemoteObject
             Alarm.scheduleWakeupFromNow(theAlarm,autoRefreshDelay);
         }
     }
-	
+        
     //_____________________________________________________________________
     // Local Methods
     //_____________________________________________________________________
@@ -227,7 +227,7 @@ public class DistributedSetMonitor  extends PortableRemoteObject
                                     String name,
                                     String type,
                                     int autoRefreshDelay)
-	throws RemoteException, NamingException {
+        throws RemoteException, NamingException {
         this.context = context;
         this.name = name;
         this.type = type;
@@ -249,63 +249,63 @@ public class DistributedSetMonitor  extends PortableRemoteObject
         // Connect to the ORB...
         
         Tie tie = javax.rmi.CORBA.Util.getTie(this);
-	tie.orb(orb);
+        tie.orb(orb);
 
         // Publish self...
 
-	try {
-	    context.bind(publishName, tie);
-	} catch (Exception e) {
+        try {
+            context.bind(publishName, tie);
+        } catch (Exception e) {
 
-	    // There is already such a name registered.
-	    // Can we reuse it?
-	        
-	    boolean okToReuse = false;
-	        
-	    try {
-		DistributedSet other = lookup(publishName);  
-		if (other != null) {
+            // There is already such a name registered.
+            // Can we reuse it?
+                
+            boolean okToReuse = false;
+                
+            try {
+                DistributedSet other = lookup(publishName);  
+                if (other != null) {
                     try {
                         other.ping(this.name);
                     } catch (RemoteException ex) {
-    	                
-    	                // Nope, so we can reuse the name...
-    	                
-    	                okToReuse = true;
-    	            }
-    	        } else {
-    	            okToReuse = true;
-    	        }
-	    } catch (Exception ne) {
-		okToReuse = true;
-	    }
-	        
-	    if (okToReuse) {
-	            
-		// We can reuse the name...
-	            
-		context.rebind(publishName, tie);
-	    } else {
-	            
-		// We cannot reuse the name...
-	            
-		PortableRemoteObject.unexportObject(this);
+                        
+                        // Nope, so we can reuse the name...
+                        
+                        okToReuse = true;
+                    }
+                } else {
+                    okToReuse = true;
+                }
+            } catch (Exception ne) {
+                okToReuse = true;
+            }
+                
+            if (okToReuse) {
+                    
+                // We can reuse the name...
+                    
+                context.rebind(publishName, tie);
+            } else {
+                    
+                // We cannot reuse the name...
+                    
+                PortableRemoteObject.unexportObject(this);
                 throw new NamingException("Name is already in use: " + name);
             }
-	}
+        }
         
         // Initialize our list...
         
         checkNameServer();
-	    
-	// Are we supposed to auto-refresh?
-	    
-	if (autoRefreshDelay > 0) {
-	        
-	    // Yep, so set an alarm...
-	        
-	    Alarm.scheduleWakeupFromNow(this,autoRefreshDelay);
-	}
+            
+        // Are we supposed to auto-refresh?
+            
+        if (autoRefreshDelay > 0) {
+                
+            // Yep, so set an alarm...
+                
+            Alarm.scheduleWakeupFromNow(this,autoRefreshDelay);
+        }
     }
     
     /*
@@ -501,114 +501,114 @@ public class DistributedSetMonitor  extends PortableRemoteObject
         boolean iiop = true;
         
         try {
-    	    
-    	    // Get the args...
+            
+            // Get the args...
 
             String name = null;
             String host = null;
             int port = 0;
       
             if (args.length == 3) {
-		name = args[0];
-		port = Integer.parseInt(args[1]);
-		host = args[2];
-		if (host.equals("null")) {
-		    host = null;
-		}
+                name = args[0];
+                port = Integer.parseInt(args[1]);
+                host = args[2];
+                if (host.equals("null")) {
+                    host = null;
+                }
             } else if (args.length == 2) {
-		name = args[0];
-		port = Integer.parseInt(args[1]);
+                name = args[0];
+                port = Integer.parseInt(args[1]);
             } else {
                 System.out.println("Usage: DistributedSetMonitor <name> <nameServerPort> [<nameServerHost>]");
                 System.exit(1);
-    	    }
-    	    
-    	    // Create the orb and initial context...
-    	    
-    	    ORB orb = Util.createORB(host,port,null);
-    	    Context context = null;
-    	    
-    	    try {
-    	        context = Util.getInitialContext(iiop,host,port,orb);
-    	    } catch (Exception e) {
-    	        
-    	        if (host == null) {
-		    System.out.println("Starting name server. Don't forget to kill it later!");
-        	        
-		    try {
-			Util.startNameServer(port,iiop);
-		    } catch (Exception e1) {
-			System.out.println("Failed. Caught " + e1.toString());
-			System.exit(1);
-		    }
-        	        
-		    // REMIND: We have to recreate the orb at this point! Why?
-        	        
+            }
+            
+            // Create the orb and initial context...
+            
+            ORB orb = Util.createORB(host,port,null);
+            Context context = null;
+            
+            try {
+                context = Util.getInitialContext(iiop,host,port,orb);
+            } catch (Exception e) {
+                
+                if (host == null) {
+                    System.out.println("Starting name server. Don't forget to kill it later!");
+                        
+                    try {
+                        Util.startNameServer(port,iiop);
+                    } catch (Exception e1) {
+                        System.out.println("Failed. Caught " + e1.toString());
+                        System.exit(1);
+                    }
+                        
+                    // REMIND: We have to recreate the orb at this point! Why?
+                        
                     orb = Util.createORB(host,port,null);
-		    context = Util.getInitialContext(iiop,host,port,orb);
-        	        
-    	        } else {
-    	        
-		    System.out.println("Could not connect to the name server. Did you forget to start it?");
-		    System.exit(1);
-		}
-    	    }
-    	    
-    	    // Create a monitor...
-    	    
-    	    DistributedSetMonitor monitor = new DistributedSetMonitor(orb,context,name,"main",5);
-    	    
-    	    // Add our notifier...
-    	    
-    	    Notifier notifier = new Notifier(monitor);
-    	    monitor.addNotifier(notifier);
-    	    
-    	    // Print out the 'commands'...
-    	    
-    	    System.out.println("\n" + name + " Ready"); 
-    	    System.out.println("Type 'quit<rtn>' to exit or 'message<rtn>' to broadcast a message.\n"); 
+                    context = Util.getInitialContext(iiop,host,port,orb);
+                        
+                } else {
+                
+                    System.out.println("Could not connect to the name server. Did you forget to start it?");
+                    System.exit(1);
+                }
+            }
+            
+            // Create a monitor...
+            
+            DistributedSetMonitor monitor = new DistributedSetMonitor(orb,context,name,"main",5);
+            
+            // Add our notifier...
+            
+            Notifier notifier = new Notifier(monitor);
+            monitor.addNotifier(notifier);
+            
+            // Print out the 'commands'...
+            
+            System.out.println("\n" + name + " Ready"); 
+            System.out.println("Type 'quit<rtn>' to exit or 'message<rtn>' to broadcast a message.\n"); 
 
             // Dump the current sets...
             
             notifier.dumpCurrent(null);
             
-    	    // Now loop till we're done...
-    	   
-    	    boolean run = true;
-    	    DataInputStream inStream = new DataInputStream(System.in);
-    	    
-    	    while (run) {
-    	        
-    	        String input = inStream.readLine();
-    	       
-    	        if (input.indexOf("quit") >= 0) {
-    	            run = false;
-    	            monitor.destroy();
-    	        } else {
-    	            if (input.length() > 0) {
-    	                monitor.broadcastMessage(input);
-    	            }
-    	        }
-    	    }
-    	    
+            // Now loop till we're done...
+           
+            boolean run = true;
+            DataInputStream inStream = new DataInputStream(System.in);
+            
+            while (run) {
+                
+                String input = inStream.readLine();
+               
+                if (input.indexOf("quit") >= 0) {
+                    run = false;
+                    monitor.destroy();
+                } else {
+                    if (input.length() > 0) {
+                        monitor.broadcastMessage(input);
+                    }
+                }
+            }
+            
         } catch (ThreadDeath death) {
             throw death;
         } catch (Throwable e) {
-    	    if (e instanceof NamingException) {
-    	        String message = e.getMessage();
-    	        if (message.indexOf("already in use") >= 0) {
-            	    System.out.println(message);
+            if (e instanceof NamingException) {
+                String message = e.getMessage();
+                if (message.indexOf("already in use") >= 0) {
+                    System.out.println(message);
                 }
-    	    } else {
-       	        e.printStackTrace(System.out);
-    	        System.out.println();
-    	    }
-    	    System.out.flush();
+            } else {
+                e.printStackTrace(System.out);
+                System.out.println();
+            }
+            System.out.flush();
         }
         
         System.exit(0);
     }
-	
+        
     //_____________________________________________________________________
     // Internal Methods
     //_____________________________________________________________________
@@ -705,7 +705,7 @@ public class DistributedSetMonitor  extends PortableRemoteObject
         int count = notifiers.size();
         for (int i = 0; i < count; i++) {
             DistributedSetNotifier notifier = 
-		(DistributedSetNotifier) notifiers.elementAt(i); 
+                (DistributedSetNotifier) notifiers.elementAt(i); 
             notifier.messageReceived(message,fromSetName);
         }
     }
@@ -714,7 +714,7 @@ public class DistributedSetMonitor  extends PortableRemoteObject
         int count = notifiers.size();
         for (int i = 0; i < count; i++) {
             DistributedSetNotifier notifier = 
-		(DistributedSetNotifier) notifiers.elementAt(i); 
+                (DistributedSetNotifier) notifiers.elementAt(i); 
             
             if (added) {
                 notifier.setAdded(setName);

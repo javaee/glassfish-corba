@@ -47,9 +47,9 @@ import org.omg.PortableServer.*;
 import org.omg.PortableServer.POAPackage.*;
 import org.omg.PortableServer.ServantLocatorPackage.*;
 import org.omg.PortableInterceptor.*;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import corba.framework.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import java.util.*;
 import java.io.*;
@@ -66,7 +66,7 @@ public abstract class DSIRMIServer
     InitialContext initialNamingContext;
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
         try {
@@ -109,17 +109,17 @@ public abstract class DSIRMIServer
      */
     public org.omg.CORBA.Object createAndBind ( String name, 
                                                 String symbol )
-	throws Exception
+        throws Exception
     {
-	// create and register it with RMI
-	helloDSIDeprecatedServant obj = new helloDSIDeprecatedServant( 
-	    orb, out, symbol, this );
-	orb.connect( obj );
-	initialNamingContext.rebind( name, obj );
+        // create and register it with RMI
+        helloDSIDeprecatedServant obj = new helloDSIDeprecatedServant( 
+            orb, out, symbol, this );
+        orb.connect( obj );
+        initialNamingContext.rebind( name, obj );
 
-	java.lang.Object o = initialNamingContext.lookup( name );
-	return (org.omg.CORBA.Object)PortableRemoteObject.narrow( o,
-	    org.omg.CORBA.Object.class );
+        java.lang.Object o = initialNamingContext.lookup( name );
+        return (org.omg.CORBA.Object)PortableRemoteObject.narrow( o,
+            org.omg.CORBA.Object.class );
     }
 
     /**
@@ -133,49 +133,49 @@ public abstract class DSIRMIServer
      * Passes in the appropriate valid and invalid repository ids for RMI
      */
     protected void testAttributesValid() 
-	throws Exception
+        throws Exception
     {
-	testAttributesValid( 
-	    "IDL:ServerRequestInfo/hello:1.0",
-	    "IDL:ServerRequestInfo/goodbye:1.0" );
+        testAttributesValid( 
+            "IDL:ServerRequestInfo/hello:1.0",
+            "IDL:ServerRequestInfo/goodbye:1.0" );
     }
 
 
     // ClientCallback interface
 
     public String sayHello() {
-	String result = "";
+        String result = "";
 
-	out.println( 
-	    "    + ClientCallback: resolving and invoking sayHello()..." );
-	try {
-	    hello helloRef = resolve( "Hello1" );
-	    result = helloRef.sayHello();
-	}
-	catch( Exception e ) {
-	    e.printStackTrace();
-	    throw new RuntimeException( "ClientCallback: Exception thrown." );
-	}
+        out.println( 
+            "    + ClientCallback: resolving and invoking sayHello()..." );
+        try {
+            hello helloRef = resolve( "Hello1" );
+            result = helloRef.sayHello();
+        }
+        catch( Exception e ) {
+            e.printStackTrace();
+            throw new RuntimeException( "ClientCallback: Exception thrown." );
+        }
 
-	return result;
+        return result;
     }
 
     public void saySystemException() {
-	out.println( 
-	    "    + ClientCallback: resolving and invoking " + 
-	    "saySystemException()..." );
-	try {
-	    hello helloRef = resolve( "Hello1" );
-	    helloRef.saySystemException();
-	}
-	catch( SystemException e ) {
-	    // expected.
-	    throw e;
-	}
-	catch( Exception e ) {
-	    e.printStackTrace();
-	    throw new RuntimeException( "ClientCallback: Exception thrown." );
-	}
+        out.println( 
+            "    + ClientCallback: resolving and invoking " + 
+            "saySystemException()..." );
+        try {
+            hello helloRef = resolve( "Hello1" );
+            helloRef.saySystemException();
+        }
+        catch( SystemException e ) {
+            // expected.
+            throw e;
+        }
+        catch( Exception e ) {
+            e.printStackTrace();
+            throw new RuntimeException( "ClientCallback: Exception thrown." );
+        }
     }
 
     /**

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.cosnaming;
+package com.sun.corba.ee.impl.naming.cosnaming;
 
 import org.omg.CORBA.Object;
 import org.omg.CosNaming.Binding;
@@ -60,7 +60,7 @@ public class InternalBindingValue
 
     // Normal constructor
     public InternalBindingValue(Binding b, String o) {
-	theBinding = b;
-	strObjectRef = o;
+        theBinding = b;
+        strObjectRef = o;
     }
 }

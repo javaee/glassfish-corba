@@ -170,7 +170,7 @@ public class Compile extends com.sun.tools.corba.se.idl.Compile
     try
     {
       // <f46082.51> Use generator-specific messages file.
-      //Util.registerMessageFile ("com/sun/corba/se/idl/toJavaPortable/toJava.prp");
+      //Util.registerMessageFile ("com/sun/corba/ee/idl/toJavaPortable/toJava.prp");
       Util.registerMessageFile ("com/sun/tools/corba/se/idl/toJavaPortable/toJavaPortable.prp");
       init (args);
       if (arguments.versionRequest)

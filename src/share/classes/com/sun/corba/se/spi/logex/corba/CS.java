@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.logex.corba ;
+package com.sun.corba.ee.spi.logex.corba ;
 
 /**
  *

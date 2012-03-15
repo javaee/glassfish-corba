@@ -60,7 +60,7 @@ public class SerialPersistent implements java.io.Serializable {
         new ObjectStreamField("member5",short.class),
         new ObjectStreamField("member6",int.class),
         new ObjectStreamField("member7",long[][][].class),
-	//        new ObjectStreamField("member8",float.class),
+        //        new ObjectStreamField("member8",float.class),
         new ObjectStreamField("member9",double.class),
         new ObjectStreamField("member10",boolean[].class),
     };

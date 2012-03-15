@@ -48,17 +48,17 @@ import java.util.Hashtable;
 import java.util.Properties;
 import javax.naming.InitialContext;
 
-import com.sun.corba.se.spi.folb.GroupInfoService;
-import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
+import com.sun.corba.ee.spi.folb.GroupInfoService;
+import com.sun.corba.ee.spi.folb.GroupInfoServiceObserver;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
-import com.sun.corba.se.impl.folb.ClientGroupManager;
+import com.sun.corba.ee.impl.folb.ClientGroupManager;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 import corba.folb_8_1.SocketFactoryImpl;
 import corba.framework.TestngRunner;
@@ -90,28 +90,28 @@ public abstract class ClientBase {
 
     protected Properties getDefaultProperties() {
         Properties props = new Properties();
-	props.setProperty(ORBConstants.DEBUG_PROPERTY,
+        props.setProperty(ORBConstants.DEBUG_PROPERTY,
             //"giop,transport,subcontract,poa"
             "transport,folb,protocol" );
 
-	props.setProperty(ORBConstants.SOCKET_FACTORY_CLASS_PROPERTY,
+        props.setProperty(ORBConstants.SOCKET_FACTORY_CLASS_PROPERTY,
             SocketFactoryImpl.class.getName());
 
-	// Register a client interceptor to see what connection
-	// is being used for test (using a proprietary extension).
-	props.setProperty(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX
-			  + corba.folb_8_1.Client.class.getName(),
-			  "dummy");
+        // Register a client interceptor to see what connection
+        // is being used for test (using a proprietary extension).
+        props.setProperty(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX
+                          + corba.folb_8_1.Client.class.getName(),
+                          "dummy");
 
-	props.setProperty(ORBConstants.USER_CONFIGURATOR_PREFIX
-			  + ClientGroupManager.class.getName(),
-			  "dummy");
+        props.setProperty(ORBConstants.USER_CONFIGURATOR_PREFIX
+                          + ClientGroupManager.class.getName(),
+                          "dummy");
 
-	props.setProperty(ORBConstants.USER_CONFIGURATOR_PREFIX
-			  + CSIv2SSLTaggedComponentHandlerImpl.class.getName(),
-			  "dummy");
+        props.setProperty(ORBConstants.USER_CONFIGURATOR_PREFIX
+                          + CSIv2SSLTaggedComponentHandlerImpl.class.getName(),
+                          "dummy");
 
-	props.setProperty( ORBConstants.USE_DYNAMIC_STUB_PROPERTY, "true" ) ;
+        props.setProperty( ORBConstants.USE_DYNAMIC_STUB_PROPERTY, "true" ) ;
 
         return props ;
     }
@@ -190,7 +190,7 @@ public abstract class ClientBase {
             dprint("remove IIOP_CLEAR_TEXT listener");
             dprint("--------------------------------------------------");
             gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
-                com.sun.corba.se.spi.transport.SocketInfo.IIOP_CLEAR_TEXT);
+                com.sun.corba.ee.spi.transport.SocketInfo.IIOP_CLEAR_TEXT);
             Thread.sleep(2000);
 
             dprint("--------------------------------------------------");
@@ -202,56 +202,56 @@ public abstract class ClientBase {
     }
 
     protected void circularSetup() throws Exception {
-	dprint("--------------------------------------------------");
-	dprint("BEGIN CIRCULAR SETUP");
-	dprint("--------------------------------------------------");
+        dprint("--------------------------------------------------");
+        dprint("BEGIN CIRCULAR SETUP");
+        dprint("--------------------------------------------------");
 
-	dprint("--------------------------------------------------");
-	dprint("Remove W acceptor/connections");
-	dprint("--------------------------------------------------");
-	gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
+        dprint("--------------------------------------------------");
+        dprint("Remove W acceptor/connections");
+        dprint("--------------------------------------------------");
+        gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
             corba.folb_8_1.Common.W);
 
-	dprint("--------------------------------------------------");
-	dprint("Remove X acceptor/connections");
-	dprint("--------------------------------------------------");
-	gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
+        dprint("--------------------------------------------------");
+        dprint("Remove X acceptor/connections");
+        dprint("--------------------------------------------------");
+        gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
             corba.folb_8_1.Common.X);
 
-	dprint("--------------------------------------------------");
-	dprint("Remove Y acceptor/connections");
-	dprint("--------------------------------------------------");
-	gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
+        dprint("--------------------------------------------------");
+        dprint("Remove Y acceptor/connections");
+        dprint("--------------------------------------------------");
+        gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
             corba.folb_8_1.Common.Y);
-	Thread.sleep(2000);
+        Thread.sleep(2000);
 
-	dprint("--------------------------------------------------");
-	dprint("Failover without update (send label, no IORUpdate)");
-	dprint("--------------------------------------------------");
+        dprint("--------------------------------------------------");
+        dprint("Failover without update (send label, no IORUpdate)");
+        dprint("--------------------------------------------------");
 
-	makeCall(testRfmWithAddressesWithLabel,
-			Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-			"Failover without update (send label, no IORUpdate)",
-			corba.folb_8_1.Common.Z,
-			SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);	    
+        makeCall(testRfmWithAddressesWithLabel,
+                        Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
+                        "Failover without update (send label, no IORUpdate)",
+                        corba.folb_8_1.Common.Z,
+                        SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);      
 
-	dprint("--------------------------------------------------");
-	dprint("Restart X Acceptor");
-	dprint("--------------------------------------------------");
-	gisPoaWithAddressesWithLabels.addAcceptor(
+        dprint("--------------------------------------------------");
+        dprint("Restart X Acceptor");
+        dprint("--------------------------------------------------");
+        gisPoaWithAddressesWithLabels.addAcceptor(
             corba.folb_8_1.Common.X);
-	Thread.sleep(2000);
+        Thread.sleep(2000);
 
-	dprint("--------------------------------------------------");
-	dprint("Remove Z Acceptor");
-	dprint("--------------------------------------------------");
-	gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
+        dprint("--------------------------------------------------");
+        dprint("Remove Z Acceptor");
+        dprint("--------------------------------------------------");
+        gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
             corba.folb_8_1.Common.Z);
-	Thread.sleep(2000);
+        Thread.sleep(2000);
 
-	dprint("--------------------------------------------------");
-	dprint("END CIRCULAR SETUP");
-	dprint("--------------------------------------------------");
+        dprint("--------------------------------------------------");
+        dprint("END CIRCULAR SETUP");
+        dprint("--------------------------------------------------");
     }
 
     protected void makeCall(EchoTest ref, String refName, String arg, 
@@ -307,11 +307,11 @@ public abstract class ClientBase {
     }
 
     private String sentOrNotSent(boolean x) {
-	return x ? "sent" : "not sent";
+        return x ? "sent" : "not sent";
     }
 
     private String receivedOrNotReceived(boolean x) {
-	return x ? "received" : "not received";
+        return x ? "received" : "not received";
     }
 
     protected void checkMarshalException(String msg, Exception got, 
@@ -331,24 +331,24 @@ public abstract class ClientBase {
             sysex = (SystemException)thr ;
         }
 
-	if ((sysex != null) && (sysex.minor == expected.minor) 
+        if ((sysex != null) && (sysex.minor == expected.minor) 
             && (sysex.completed == expected.completed)) {
-	    dprint("--------------------------------------------------");
-	    dprint(msg + ": SUCCEEDED");
-	    dprint("--------------------------------------------------");
-	} else {
-	    got.printStackTrace(System.out);
-	    dprint( msg + "ERROR: Expected MarshalException " + expected
-	        + " Got   : " + got
-	        + " detail: " + got.getCause() ) ;
-	    Assert.fail( msg + " FAILED: Expected MarshalException " + expected
-	        + " Got   : " + got
-	        + " detail: " + got.getCause() ) ;
-	}
+            dprint("--------------------------------------------------");
+            dprint(msg + ": SUCCEEDED");
+            dprint("--------------------------------------------------");
+        } else {
+            got.printStackTrace(System.out);
+            dprint( msg + "ERROR: Expected MarshalException " + expected
+                + " Got   : " + got
+                + " detail: " + got.getCause() ) ;
+            Assert.fail( msg + " FAILED: Expected MarshalException " + expected
+                + " Got   : " + got
+                + " detail: " + got.getCause() ) ;
+        }
     }
 
     protected void dprint(String msg) {
-	ORBUtility.dprint(this, msg);
+        ORBUtility.dprint(this, msg);
     }
 
     protected static void doMain( Class<?> cls ) {

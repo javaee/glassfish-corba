@@ -265,7 +265,7 @@ public class ValueBoxGen implements com.sun.tools.corba.se.idl.ValueBoxGen, Java
   public void helperRead (String entryName, SymtabEntry entry, PrintWriter stream)
   {
   // <d59418 - KLR> per Simon, make "static" read call istream.read_value.
-  //		    put real marshalling code in read_value.
+  //                put real marshalling code in read_value.
     stream.println ("    return (" + entryName +") ((org.omg.CORBA_2_3.portable.InputStream) istream).read_value (get_instance());"); // <d60929>
     stream.println ("  }");
     stream.println ();
@@ -303,7 +303,7 @@ public class ValueBoxGen implements com.sun.tools.corba.se.idl.ValueBoxGen, Java
   public void helperWrite (SymtabEntry entry, PrintWriter stream)
   {
     // <d59418 - KLR> per Simon, make "static" write call istream.write_value.
-    //		    put real marshalling code in write_value.
+    //              put real marshalling code in write_value.
     stream.println ("    ((org.omg.CORBA_2_3.portable.OutputStream) ostream).write_value (value, get_instance());"); // <d60929>
     stream.println ("  }");
     stream.println ();
@@ -332,7 +332,7 @@ public class ValueBoxGen implements com.sun.tools.corba.se.idl.ValueBoxGen, Java
       stream.println (indent
                       + "((org.omg.CORBA_2_3.portable.OutputStream)ostream).write_value ((java.io.Serializable) value, " // <d60929>
                       +  Util.helperName (mType, true)  // <d61056>
-		      + ".get_instance ());"); // <d61056>
+                      + ".get_instance ());"); // <d61056>
     else
       stream.println (indent + Util.helperName (mType, true) + ".write (ostream, " + name + ");"); // <d61056>
     return index;

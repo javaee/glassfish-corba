@@ -38,10 +38,10 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
-import com.sun.corba.se.spi.protocol.RequestId;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.protocol.RequestId;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 /**
  * Represents a protocol request id.  Currently used to ensure proper

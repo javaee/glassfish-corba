@@ -37,17 +37,17 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.Reader ; 
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.Reader ; 
 
 public class EmergeStreamParser {
     private EmergeLLP fsm ;
     private Reader reader ;
 
     public EmergeStreamParser( Reader reader ) {
-	this.reader = reader ;
-	fsm = new EmergeLLP() ;
+        this.reader = reader ;
+        fsm = new EmergeLLP() ;
     }
 
     public void parse( EmergeStreamEventHandler handler ) {
@@ -56,295 +56,295 @@ public class EmergeStreamParser {
         long sessionId ;
         long offset = 0 ;
         long length = 0 ;
-	byte bytecode = reader.getByte() ;
-	EmergeCode ec = EmergeCodeFactory.getByteCode( bytecode ) ;
+        byte bytecode = reader.getByte() ;
+        EmergeCode ec = EmergeCodeFactory.getByteCode( bytecode ) ;
 
-	// XXX Is the fsm a performance issue?  Speeding it up is tricky,
-	// because there is no way to optimize Guard evaluation.  Best bet
-	// may be to allow for custom-coded transition functions on States.
-	// This could be a custom-coded Transition class that combines evaluation
-	// of Guards with selection of nextState.
-	// May also need to support better maps than a simple HashMap for
-	// states and inputs: assigning indices may be needed (which may require
-	// further assignment of state engine IDs to prevent stupid errors).
-	fsm.checkState( ec ) ;
+        // XXX Is the fsm a performance issue?  Speeding it up is tricky,
+        // because there is no way to optimize Guard evaluation.  Best bet
+        // may be to allow for custom-coded transition functions on States.
+        // This could be a custom-coded Transition class that combines evaluation
+        // of Guards with selection of nextState.
+        // May also need to support better maps than a simple HashMap for
+        // states and inputs: assigning indices may be needed (which may require
+        // further assignment of state engine IDs to prevent stupid errors).
+        fsm.checkState( ec ) ;
 
-	// Have a valid bytecode, so now let's see what it is
-	// Unused codes should have been rejected by fsm
-	switch (ec.getKind()) {
-	    case BYTE :		    
-		byte byteResult = 0 ;
-		if (ec.hasEncodedValue()) {
-		    byteResult = ec.getValue( Byte.class ) ;
-		} else {
-		    byteResult = reader.getByte() ;
-		}
-		handler.byteEvent( byteResult ) ;
-		break ;
+        // Have a valid bytecode, so now let's see what it is
+        // Unused codes should have been rejected by fsm
+        switch (ec.getKind()) {
+            case BYTE :             
+                byte byteResult = 0 ;
+                if (ec.hasEncodedValue()) {
+                    byteResult = ec.getValue( Byte.class ) ;
+                } else {
+                    byteResult = reader.getByte() ;
+                }
+                handler.byteEvent( byteResult ) ;
+                break ;
 
-	    case CHAR :		    
-		char charResult = 0 ;
-		if (ec.hasEncodedValue()) {
-		    charResult = ec.getValue( Character.class ) ;
-		} else {
-		    charResult = reader.getChar() ;
-		}
-		handler.charEvent( charResult ) ;
-		break ;
+            case CHAR :             
+                char charResult = 0 ;
+                if (ec.hasEncodedValue()) {
+                    charResult = ec.getValue( Character.class ) ;
+                } else {
+                    charResult = reader.getChar() ;
+                }
+                handler.charEvent( charResult ) ;
+                break ;
 
-	    case SHORT :		    
-		short shortResult = 0 ;
-		if (ec.hasEncodedValue()) {
-		    shortResult = ec.getValue( Short.class ) ;
-		} else {
-		    shortResult = reader.getShort() ;
-		}
-		handler.shortEvent( shortResult ) ;
-		break ;
+            case SHORT :                    
+                short shortResult = 0 ;
+                if (ec.hasEncodedValue()) {
+                    shortResult = ec.getValue( Short.class ) ;
+                } else {
+                    shortResult = reader.getShort() ;
+                }
+                handler.shortEvent( shortResult ) ;
+                break ;
 
-	    case INT :		    
-		int intResult = 0 ;
-		if (ec.hasEncodedValue()) {
-		    intResult = ec.getValue( Integer.class ) ;
-		} else {
-		    intResult = reader.getInt() ;
-		}
-		handler.intEvent( intResult ) ;
-		break ;
+            case INT :              
+                int intResult = 0 ;
+                if (ec.hasEncodedValue()) {
+                    intResult = ec.getValue( Integer.class ) ;
+                } else {
+                    intResult = reader.getInt() ;
+                }
+                handler.intEvent( intResult ) ;
+                break ;
 
-	    case LONG :		    
-		long longResult = 0 ;
-		if (ec.hasEncodedValue()) {
-		    longResult = ec.getValue( Long.class ) ;
-		} else {
-		    longResult = reader.getLong() ;
-		}
-		handler.longEvent( longResult ) ;
-		break ;
+            case LONG :             
+                long longResult = 0 ;
+                if (ec.hasEncodedValue()) {
+                    longResult = ec.getValue( Long.class ) ;
+                } else {
+                    longResult = reader.getLong() ;
+                }
+                handler.longEvent( longResult ) ;
+                break ;
 
-	    case FLOAT :		    
-		float floatResult = 0 ;
-		if (ec.hasEncodedValue()) {
-		    floatResult = ec.getValue( Float.class ) ;
-		} else {
-		    floatResult = reader.getFloat() ;
-		}
-		handler.floatEvent( floatResult ) ;
-		break ;
+            case FLOAT :                    
+                float floatResult = 0 ;
+                if (ec.hasEncodedValue()) {
+                    floatResult = ec.getValue( Float.class ) ;
+                } else {
+                    floatResult = reader.getFloat() ;
+                }
+                handler.floatEvent( floatResult ) ;
+                break ;
 
-	    case DOUBLE :		    
-		double doubleResult = 0 ;
-		if (ec.hasEncodedValue()) {
-		    doubleResult = ec.getValue( Double.class ) ;
-		} else {
-		    doubleResult = reader.getDouble() ;
-		}
-		handler.doubleEvent( doubleResult ) ;
-		break ;
+            case DOUBLE :                   
+                double doubleResult = 0 ;
+                if (ec.hasEncodedValue()) {
+                    doubleResult = ec.getValue( Double.class ) ;
+                } else {
+                    doubleResult = reader.getDouble() ;
+                }
+                handler.doubleEvent( doubleResult ) ;
+                break ;
 
-	    case BOOL :		    
-		boolean boolResult = false ;
-		if (ec.hasEncodedValue()) {
-		    boolResult = ec.getValue( Boolean.class ) ;
-		} else {
-		    boolResult = reader.getBoolean() ;
-		}
-		handler.boolEvent( boolResult ) ;
-		break ;
+            case BOOL :             
+                boolean boolResult = false ;
+                if (ec.hasEncodedValue()) {
+                    boolResult = ec.getValue( Boolean.class ) ;
+                } else {
+                    boolResult = reader.getBoolean() ;
+                }
+                handler.boolEvent( boolResult ) ;
+                break ;
 
-	    case TUPLE :		    
-		EmergeCode.TupleCode tc = ec.getValue( EmergeCode.TupleCode.class ) ;
-		if (tc == EmergeCode.TupleCode.TUPLE_START) {
-		    handler.tupleStartEvent() ;
-		} else if (tc == EmergeCode.TupleCode.TUPLE_START) {
-		    handler.tupleEndEvent() ;
-		} else {
-		    // ERROR
-		}
-		break ;
+            case TUPLE :                    
+                EmergeCode.TupleCode tc = ec.getValue( EmergeCode.TupleCode.class ) ;
+                if (tc == EmergeCode.TupleCode.TUPLE_START) {
+                    handler.tupleStartEvent() ;
+                } else if (tc == EmergeCode.TupleCode.TUPLE_START) {
+                    handler.tupleEndEvent() ;
+                } else {
+                    // ERROR
+                }
+                break ;
 
-	    case PART :		    
-		typeLabel = new LabelManager.Label( reader ) ;
-		// offset length, length needs to set EmergeLLP dataCtr
-		offset = VarOctetUtility.get( reader ) ;
-		length = VarOctetUtility.get( reader ) ;
-		fsm.setDataCtr( length ) ;
+            case PART :             
+                typeLabel = new LabelManager.Label( reader ) ;
+                // offset length, length needs to set EmergeLLP dataCtr
+                offset = VarOctetUtility.get( reader ) ;
+                length = VarOctetUtility.get( reader ) ;
+                fsm.setDataCtr( length ) ;
 
-		EmergeCode.PartCode pc = ec.getValue( EmergeCode.PartCode.class ) ;
-		if (pc == EmergeCode.PartCode.NO_CUSTOM) {
-		    handler.simplePartEvent( typeLabel, offset, length ) ;
-		} else if (pc == EmergeCode.PartCode.HAS_CUSTOM) {
-		    handler.customPartEvent( typeLabel, offset, length ) ;
-		} else {
-		    // ERROR
-		}
-		break ;
+                EmergeCode.PartCode pc = ec.getValue( EmergeCode.PartCode.class ) ;
+                if (pc == EmergeCode.PartCode.NO_CUSTOM) {
+                    handler.simplePartEvent( typeLabel, offset, length ) ;
+                } else if (pc == EmergeCode.PartCode.HAS_CUSTOM) {
+                    handler.customPartEvent( typeLabel, offset, length ) ;
+                } else {
+                    // ERROR
+                }
+                break ;
 
-	    case MSG :		    
-		// header body trailer
-		// header : MSG-start request-id session-id fiber-id num-args
-		// body : tuple-seq ref-seq
-		// trailer : MSG-end request-id session-id fiber-id num-args
-		long requestId = VarOctetUtility.get( reader ) ;
-		sessionId = VarOctetUtility.get( reader ) ;
-		long fiberId = VarOctetUtility.get( reader ) ;
-		long numArgs = VarOctetUtility.get( reader ) ;
+            case MSG :              
+                // header body trailer
+                // header : MSG-start request-id session-id fiber-id num-args
+                // body : tuple-seq ref-seq
+                // trailer : MSG-end request-id session-id fiber-id num-args
+                long requestId = VarOctetUtility.get( reader ) ;
+                sessionId = VarOctetUtility.get( reader ) ;
+                long fiberId = VarOctetUtility.get( reader ) ;
+                long numArgs = VarOctetUtility.get( reader ) ;
 
-		EmergeCode.MsgCode mc = ec.getValue( EmergeCode.MsgCode.class ) ;
-		if (mc == EmergeCode.MsgCode.MSG_START) {
-		    handler.messageStartEvent( requestId, sessionId, fiberId, numArgs ) ;
-		} else if (mc == EmergeCode.MsgCode.MSG_END) {
-		    handler.messageEndEvent( requestId, sessionId, fiberId, numArgs ) ;
-		} else {
-		    // ERROR
-		}
-		break ;
+                EmergeCode.MsgCode mc = ec.getValue( EmergeCode.MsgCode.class ) ;
+                if (mc == EmergeCode.MsgCode.MSG_START) {
+                    handler.messageStartEvent( requestId, sessionId, fiberId, numArgs ) ;
+                } else if (mc == EmergeCode.MsgCode.MSG_END) {
+                    handler.messageEndEvent( requestId, sessionId, fiberId, numArgs ) ;
+                } else {
+                    // ERROR
+                }
+                break ;
 
-	    case LABEL_MSG :	    
-		LabelManager.Label label = new LabelManager.Label( reader ) ;
-		switch (ec.getValue( EmergeCode.LabelMsg.class )) {
-		    case REQUEST :
-			handler.labelMessageRequestEvent( label ) ;
-			break ;
+            case LABEL_MSG :        
+                LabelManager.Label label = new LabelManager.Label( reader ) ;
+                switch (ec.getValue( EmergeCode.LabelMsg.class )) {
+                    case REQUEST :
+                        handler.labelMessageRequestEvent( label ) ;
+                        break ;
 
-		    case REPLY_GOOD :
-			handler.labelMessageReplyGoodEvent( label ) ;
-			break ;
-			
-		    case REPLY_ERROR :
-			long category = VarOctetUtility.get( reader ) ;
-			long minorCode = VarOctetUtility.get( reader ) ;
-			handler.labelMessageReplyBadEvent( label, category, minorCode ) ;
-			break ;
-			
-		    default:
-			// ERROR
-		}
-		break ;
+                    case REPLY_GOOD :
+                        handler.labelMessageReplyGoodEvent( label ) ;
+                        break ;
+                        
+                    case REPLY_ERROR :
+                        long category = VarOctetUtility.get( reader ) ;
+                        long minorCode = VarOctetUtility.get( reader ) ;
+                        handler.labelMessageReplyBadEvent( label, category, minorCode ) ;
+                        break ;
+                        
+                    default:
+                        // ERROR
+                }
+                break ;
 
-	    case NULL :		    
-		handler.nullEvent() ;
-		break ;
+            case NULL :             
+                handler.nullEvent() ;
+                break ;
 
-	    case INDIR :		    
-		LabelManager.Label label2 = new LabelManager.Label( reader ) ;
-		handler.indirEvent( label2 ) ;
-		break ;
+            case INDIR :                    
+                LabelManager.Label label2 = new LabelManager.Label( reader ) ;
+                handler.indirEvent( label2 ) ;
+                break ;
 
-	    case BOOL_ARR :	    
-		selfLabel = new LabelManager.Label( reader ) ;
-		offset = VarOctetUtility.get( reader ) ;
-		length = VarOctetUtility.get( reader ) ;
+            case BOOL_ARR :         
+                selfLabel = new LabelManager.Label( reader ) ;
+                offset = VarOctetUtility.get( reader ) ;
+                length = VarOctetUtility.get( reader ) ;
                 boolean[] booleanValue = new boolean[ (int)length ] ;
-		reader.getBooleanArray( booleanValue ) ;
-		handler.boolArrEvent( selfLabel, offset, length, booleanValue ) ;
-		break ;
+                reader.getBooleanArray( booleanValue ) ;
+                handler.boolArrEvent( selfLabel, offset, length, booleanValue ) ;
+                break ;
 
-	    case BYTE_ARR :	    
-		selfLabel = new LabelManager.Label( reader ) ;
-		offset = VarOctetUtility.get( reader ) ;
-		length = VarOctetUtility.get( reader ) ;
-		byte[] byteVale = new byte[(int)length] ;
+            case BYTE_ARR :         
+                selfLabel = new LabelManager.Label( reader ) ;
+                offset = VarOctetUtility.get( reader ) ;
+                length = VarOctetUtility.get( reader ) ;
+                byte[] byteVale = new byte[(int)length] ;
                 reader.getByteArray( byteVale ) ;
-		handler.byteArrEvent( selfLabel, offset, length, byteVale ) ;
-		break ;
+                handler.byteArrEvent( selfLabel, offset, length, byteVale ) ;
+                break ;
 
-	    case CHAR_ARR :	    
-		selfLabel = new LabelManager.Label( reader ) ;
-		offset = VarOctetUtility.get( reader ) ;
-		length = VarOctetUtility.get( reader ) ;
-		char[] charValue = new char[(int)length] ;
+            case CHAR_ARR :         
+                selfLabel = new LabelManager.Label( reader ) ;
+                offset = VarOctetUtility.get( reader ) ;
+                length = VarOctetUtility.get( reader ) ;
+                char[] charValue = new char[(int)length] ;
                 reader.getCharArray( charValue ) ;
-		handler.charArrEvent( selfLabel, offset, length, charValue ) ;
-		break ;
+                handler.charArrEvent( selfLabel, offset, length, charValue ) ;
+                break ;
 
-	    case SHORT_ARR :	    
-		selfLabel = new LabelManager.Label( reader ) ;
-		offset = VarOctetUtility.get( reader ) ;
-		length = VarOctetUtility.get( reader ) ;
-		short[] shortValue = new short[(int)length] ;
+            case SHORT_ARR :        
+                selfLabel = new LabelManager.Label( reader ) ;
+                offset = VarOctetUtility.get( reader ) ;
+                length = VarOctetUtility.get( reader ) ;
+                short[] shortValue = new short[(int)length] ;
                 reader.getShortArray( shortValue ) ;
-		handler.shortArrEvent( selfLabel, offset, length, shortValue ) ;
-		break ;
+                handler.shortArrEvent( selfLabel, offset, length, shortValue ) ;
+                break ;
 
-	    case INT_ARR :	    
-		selfLabel = new LabelManager.Label( reader ) ;
-		offset = VarOctetUtility.get( reader ) ;
-		length = VarOctetUtility.get( reader ) ;
-		int[] intValue = new int[(int)length] ;
+            case INT_ARR :          
+                selfLabel = new LabelManager.Label( reader ) ;
+                offset = VarOctetUtility.get( reader ) ;
+                length = VarOctetUtility.get( reader ) ;
+                int[] intValue = new int[(int)length] ;
                 reader.getIntArray( intValue ) ;
-		handler.intArrEvent( selfLabel, offset, length, intValue ) ;
-		break ;
+                handler.intArrEvent( selfLabel, offset, length, intValue ) ;
+                break ;
 
-	    case LONG_ARR :	    
-		selfLabel = new LabelManager.Label( reader ) ;
-		offset = VarOctetUtility.get( reader ) ;
-		length = VarOctetUtility.get( reader ) ;
-		long[] longValue = new long[(int)length] ;
+            case LONG_ARR :         
+                selfLabel = new LabelManager.Label( reader ) ;
+                offset = VarOctetUtility.get( reader ) ;
+                length = VarOctetUtility.get( reader ) ;
+                long[] longValue = new long[(int)length] ;
                 reader.getLongArray( longValue ) ;
-		handler.longArrEvent( selfLabel, offset, length, longValue ) ;
-		break ;
+                handler.longArrEvent( selfLabel, offset, length, longValue ) ;
+                break ;
 
-	    case FLOAT_ARR :	    
-		selfLabel = new LabelManager.Label( reader ) ;
-		offset = VarOctetUtility.get( reader ) ;
-		length = VarOctetUtility.get( reader ) ;
-		float[] floatValue = new float[(int)length] ;
+            case FLOAT_ARR :        
+                selfLabel = new LabelManager.Label( reader ) ;
+                offset = VarOctetUtility.get( reader ) ;
+                length = VarOctetUtility.get( reader ) ;
+                float[] floatValue = new float[(int)length] ;
                 reader.getFloatArray( floatValue ) ;
-		handler.floatArrEvent( selfLabel, offset, length, floatValue ) ;
-		break ;
+                handler.floatArrEvent( selfLabel, offset, length, floatValue ) ;
+                break ;
 
-	    case DOUBLE_ARR :	    
-		selfLabel = new LabelManager.Label( reader ) ;
-		offset = VarOctetUtility.get( reader ) ;
-		length = VarOctetUtility.get( reader ) ;
-		double[] doubleValue = new double[(int)length] ;
+            case DOUBLE_ARR :       
+                selfLabel = new LabelManager.Label( reader ) ;
+                offset = VarOctetUtility.get( reader ) ;
+                length = VarOctetUtility.get( reader ) ;
+                double[] doubleValue = new double[(int)length] ;
                 reader.getDoubleArray( doubleValue ) ;
-		handler.doubleArrEvent( selfLabel, offset, length, doubleValue ) ;
-		break ;
+                handler.doubleArrEvent( selfLabel, offset, length, doubleValue ) ;
+                break ;
 
-	    case REF_ARR :	    
-		selfLabel = new LabelManager.Label( reader ) ;
-		typeLabel = new LabelManager.Label( reader ) ;
-		offset = VarOctetUtility.get( reader ) ;
-		length = VarOctetUtility.get( reader ) ;
-		LabelManager.Label[] refValue = new LabelManager.Label[ (int)length ] ;
-		for (int ctr=0; ctr<length; ctr++) {
-		    refValue[ctr] = new LabelManager.Label( reader ) ;
-		}
-		handler.refArrEvent( selfLabel, typeLabel, offset, length, refValue ) ;
-		break ;
+            case REF_ARR :          
+                selfLabel = new LabelManager.Label( reader ) ;
+                typeLabel = new LabelManager.Label( reader ) ;
+                offset = VarOctetUtility.get( reader ) ;
+                length = VarOctetUtility.get( reader ) ;
+                LabelManager.Label[] refValue = new LabelManager.Label[ (int)length ] ;
+                for (int ctr=0; ctr<length; ctr++) {
+                    refValue[ctr] = new LabelManager.Label( reader ) ;
+                }
+                handler.refArrEvent( selfLabel, typeLabel, offset, length, refValue ) ;
+                break ;
 
-	    case FLIST :		    
-		length = VarOctetUtility.get( reader ) ;
-		long[] flistValue = new long[(int)length] ;
-		for (int ctr=0; ctr<length; ctr++) {
-		    flistValue[ctr] = VarOctetUtility.get( reader ) ;
-		}
-		handler.fiberListMessageEvent( flistValue ) ;
-		break ;
+            case FLIST :                    
+                length = VarOctetUtility.get( reader ) ;
+                long[] flistValue = new long[(int)length] ;
+                for (int ctr=0; ctr<length; ctr++) {
+                    flistValue[ctr] = VarOctetUtility.get( reader ) ;
+                }
+                handler.fiberListMessageEvent( flistValue ) ;
+                break ;
 
-	    case CLOSE_SESSION :	    
-		sessionId = VarOctetUtility.get( reader ) ;
-		handler.closeSessionMessageEvent( sessionId ) ;
-		break ;
+            case CLOSE_SESSION :            
+                sessionId = VarOctetUtility.get( reader ) ;
+                handler.closeSessionMessageEvent( sessionId ) ;
+                break ;
 
-	    case REJECT_REQUEST :	    
-		long category = VarOctetUtility.get( reader ) ;
-		long minorCode = VarOctetUtility.get( reader ) ;
-		handler.rejectRequestMessageEvent( category, minorCode ) ;
-		break ;
+            case REJECT_REQUEST :           
+                long category = VarOctetUtility.get( reader ) ;
+                long minorCode = VarOctetUtility.get( reader ) ;
+                handler.rejectRequestMessageEvent( category, minorCode ) ;
+                break ;
 
-	    case REF :		    
-		selfLabel = new LabelManager.Label( reader ) ;
-		length = VarOctetUtility.get( reader ) ;
-		fsm.setPartCtr( length ) ;
-		handler.refEvent( selfLabel, length ) ;
-		break ; 
+            case REF :              
+                selfLabel = new LabelManager.Label( reader ) ;
+                length = VarOctetUtility.get( reader ) ;
+                fsm.setPartCtr( length ) ;
+                handler.refEvent( selfLabel, length ) ;
+                break ; 
 
-	    default :
-		// ERROR
-		break ;
-	}
+            default :
+                // ERROR
+                break ;
+        }
     }
 }

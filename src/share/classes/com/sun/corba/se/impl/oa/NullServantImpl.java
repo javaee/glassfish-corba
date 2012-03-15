@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.oa ;
+package com.sun.corba.ee.impl.oa ;
 
 import org.omg.CORBA.SystemException ;
 
-import com.sun.corba.se.spi.oa.NullServant ;
+import com.sun.corba.ee.spi.oa.NullServant ;
 
 public class NullServantImpl implements NullServant 
 {
@@ -50,11 +50,11 @@ public class NullServantImpl implements NullServant
 
     public NullServantImpl( SystemException ex ) 
     {
-	this.sysex = ex ;
+        this.sysex = ex ;
     }
 
     public SystemException getException()
     {
-	return sysex ;
+        return sysex ;
     }
 }

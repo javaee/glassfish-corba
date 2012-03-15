@@ -81,24 +81,24 @@ public class GalaxyProfile implements java.io.Serializable
 
     public GalaxyProfile (int type, int size, int density)
     {
-	fType = type;
-	fSize = size;
-	fDensity = density;
+        fType = type;
+        fSize = size;
+        fDensity = density;
     }
 
     public int getType ()
     {
-	return fType;
+        return fType;
     }
 
     public int getSize ()
     {
-	return fSize;
+        return fSize;
     }
 
     public int getDensity ()
     {
-	return fDensity;
+        return fDensity;
     }
   
 }

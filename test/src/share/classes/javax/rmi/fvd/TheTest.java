@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)TheTest.java	1.4 99/06/07 */
+/* @(#)TheTest.java     1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -68,16 +68,16 @@ public class TheTest extends test.Test {
     static Process client      = null;
 
     public void setup() {
-	try {
-    	    // Now we need to start the NameServer and
-    	    // our test server. The test server will register
-    	    // with the NameServer.
-    	    
+        try {
+            // Now we need to start the NameServer and
+            // our test server. The test server will register
+            // with the NameServer.
+            
             nameServer  = Util.startNameServer("1050",true);
-	    compileClasses();
-	} catch(Throwable t) { 
+            compileClasses();
+        } catch(Throwable t) { 
             System.out.println("Compiling classes failed : "+t.toString());
-	}
+        }
     }
 
     public  void run() {
@@ -86,83 +86,83 @@ public class TheTest extends test.Test {
         helper.start( "test1" ) ;
         boolean testPassed  = true;
 
-    	try {
-	    // The RMIClassLoader requires a security manager to be set
-	    //System.setSecurityManager(new javax.rmi.download.SecurityManager());
-	    //System.setSecurityManager(new java.rmi.RMISecurityManager());
+        try {
+            // The RMIClassLoader requires a security manager to be set
+            //System.setSecurityManager(new javax.rmi.download.SecurityManager());
+            //System.setSecurityManager(new java.rmi.RMISecurityManager());
 
-    	    // First Compile the classes to generate the Stub and Tie 
-    	    // files that are needed.  NOTE: This requires the latest
-    	    // RMIC compiler that supports IIOP.
+            // First Compile the classes to generate the Stub and Tie 
+            // files that are needed.  NOTE: This requires the latest
+            // RMIC compiler that supports IIOP.
 
-	    // Create user.dir property (this is how the server knows
-	    // where the test value is but we (this client) does not).
-	    Vector properties = new Vector();
+            // Create user.dir property (this is how the server knows
+            // where the test value is but we (this client) does not).
+            Vector properties = new Vector();
             String testPolicy = System.getProperty("java.security.policy");
-	    if (testPolicy!=null)
-		properties.addElement("-Djava.security.policy="+testPolicy);
-			
-			
-	    // Start it
-    	    server = Util.startServer("javax.rmi.fvd.TheServer", 
-				      properties, getClassesDirectory("values"));
+            if (testPolicy!=null)
+                properties.addElement("-Djava.security.policy="+testPolicy);
+                        
+                        
+            // Start it
+            server = Util.startServer("javax.rmi.fvd.TheServer", 
+                                      properties, getClassesDirectory("values"));
             
-    	    // Lets setup some properties that we are using
-    	    // for this test and then create the ORB Object...
-    	    Properties props = System.getProperties();
+            // Lets setup some properties that we are using
+            // for this test and then create the ORB Object...
+            Properties props = System.getProperties();
             
             props.put(  "java.naming.factory.initial",
                         "com.sun.jndi.cosnaming.CNCtxFactory");
-    	    
-    	    props.put(  "org.omg.CORBA.ORBClass", 
-    	                "com.sun.corba.se.impl.orb.ORBImpl");
-    	    
-    	    props.put(  "org.omg.CORBA.ORBSingletonClass", 
-    	                "com.sun.corba.se.impl.orb.ORBSingleton");
-    	    
-    	    ORB orb = ORB.init(myArgs, props);
-	        
+            
+            props.put(  "org.omg.CORBA.ORBClass", 
+                        "com.sun.corba.ee.impl.orb.ORBImpl");
+            
+            props.put(  "org.omg.CORBA.ORBSingletonClass", 
+                        "com.sun.corba.ee.impl.orb.ORBSingleton");
+            
+            ORB orb = ORB.init(myArgs, props);
+                
             // We are going to use JNDI/CosNaming so lets go ahead and
-    	    // create our root naming context.  NOTE:  We setup CosNaming
-    	    // as our naming plug-in for JNDI by setting properties above.
+            // create our root naming context.  NOTE:  We setup CosNaming
+            // as our naming plug-in for JNDI by setting properties above.
             Hashtable env = new Hashtable();
-	    env.put(  "java.naming.corba.orb", orb);
-    	    Context ic = new InitialContext(env);
-    	    
-    	    // Let the test begin...
+            env.put(  "java.naming.corba.orb", orb);
+            Context ic = new InitialContext(env);
+            
+            // Let the test begin...
             // Resolve the Object Reference using JNDI/CosNaming
             java.lang.Object objref  = ic.lookup("TheFVDTestServer");
 
             // This test is designed to verify PortableRemoteObject.narrow
 
-	    try{
+            try{
                 // Now try from separate client that has no codebase of its own
 
-		Vector properties2 = new Vector();
-		properties.addElement("-Djava.security.policy="+testPolicy);
+                Vector properties2 = new Vector();
+                properties.addElement("-Djava.security.policy="+testPolicy);
 
                 // Start it
-		client = Util.startServer("javax.rmi.fvd.TheClient", 
+                client = Util.startServer("javax.rmi.fvd.TheClient", 
                     properties, getClassesDirectory("values2"));
 
                 helper.pass() ;
-    	    } catch (Throwable ex) {
+            } catch (Throwable ex) {
                 System.out.println(testName + " FAILED.");
-		ex.printStackTrace();
-		testPassed = false;
+                ex.printStackTrace();
+                testPassed = false;
                 helper.fail( ex ) ;
             }
-    	} catch (Exception ex) {
+        } catch (Exception ex) {
             System.out.println(testName + " FAILED.");
-    	    ex.printStackTrace();
-    	    testPassed = false;
+            ex.printStackTrace();
+            testPassed = false;
             helper.fail( ex ) ;
-    	} finally {
+        } finally {
             helper.done() ;
-	    // Kill the client
-	    if (client != null) {
-		client.destroy();
-	    }
+            // Kill the client
+            if (client != null) {
+                client.destroy();
+            }
 
             // Make sure we kill the test server...
 
@@ -186,20 +186,20 @@ public class TheTest extends test.Test {
     }
 
     public static void shutdown(){
-	if (client != null) {
-	    client.destroy();
-	    client = null;
-	}
+        if (client != null) {
+            client.destroy();
+            client = null;
+        }
 
-	if (server != null) {
-	    server.destroy();
-	    server = null;
-	}
+        if (server != null) {
+            server.destroy();
+            server = null;
+        }
   
-	if (nameServer != null) {
-	    nameServer.destroy();
-	    nameServer = null;
-	}
+        if (nameServer != null) {
+            nameServer.destroy();
+            nameServer = null;
+        }
     }
 
     // Compiling ComboInterface causes the compiler to compile

@@ -47,9 +47,9 @@ package corba.connections;
 import java.util.Properties;
 import javax.naming.InitialContext;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import corba.framework.Options;
 import corba.hcks.C;
@@ -75,50 +75,50 @@ public class Server
 
     public static void main(String[] av)
     {
-	serverName = av[0];
-	name1 = av[1];
-	name2 = av[2];
+        serverName = av[0];
+        name1 = av[1];
+        name2 = av[2];
 
         try {
-	    Properties props = new Properties();
+            Properties props = new Properties();
 
-	    if (setWaterMarks) {
-		props.put(ORBConstants.HIGH_WATER_MARK_PROPERTY, "25");
-		props.put(ORBConstants.LOW_WATER_MARK_PROPERTY, "5");
-		props.put(ORBConstants.NUMBER_TO_RECLAIM_PROPERTY, "10");
-	    }
-	    if (dprint) {
-		props.put(ORBConstants.DEBUG_PROPERTY, "transport");
-	    }
-	    orb = (ORB) org.omg.CORBA.ORB.init((String[])null, props);
+            if (setWaterMarks) {
+                props.put(ORBConstants.HIGH_WATER_MARK_PROPERTY, "25");
+                props.put(ORBConstants.LOW_WATER_MARK_PROPERTY, "5");
+                props.put(ORBConstants.NUMBER_TO_RECLAIM_PROPERTY, "10");
+            }
+            if (dprint) {
+                props.put(ORBConstants.DEBUG_PROPERTY, "transport");
+            }
+            orb = (ORB) org.omg.CORBA.ORB.init((String[])null, props);
             ConnectionStatistics stats = new ConnectionStatistics(orb);
 
-	    /* Cannot do these here because there is no "Connections" root
-	    stats.inbound(serverName + ": after ORB.init", orb);
-	    stats.outbound(serverName + ": after ORB.init", orb);
-	    */
+            /* Cannot do these here because there is no "Connections" root
+            stats.inbound(serverName + ": after ORB.init", orb);
+            stats.outbound(serverName + ": after ORB.init", orb);
+            */
 
-	    initialContext = C.createInitialContext(orb);
-	    stats.outbound(serverName + ": after InitialContext", orb);
-	    stats.inbound(serverName + ": after InitialContext", orb);
+            initialContext = C.createInitialContext(orb);
+            stats.outbound(serverName + ": after InitialContext", orb);
+            stats.inbound(serverName + ": after InitialContext", orb);
 
-	    U.sop(serverName + " binding: " + name1 + " " + name2);
+            U.sop(serverName + " binding: " + name1 + " " + name2);
 
-	    initialContext.rebind(name1, new RemoteService(orb, serverName));
-	    initialContext.rebind(name2, new RemoteService(orb, serverName));
+            initialContext.rebind(name1, new RemoteService(orb, serverName));
+            initialContext.rebind(name2, new RemoteService(orb, serverName));
 
-	    stats.outbound(serverName + ": after binding", orb);
-	    stats.inbound(serverName + ": after binding", orb);
+            stats.outbound(serverName + ": after binding", orb);
+            stats.inbound(serverName + ": after binding", orb);
 
-	    U.sop(Options.defServerHandshake);
-	    orb.run();
+            U.sop(Options.defServerHandshake);
+            orb.run();
 
         } catch (Exception e) {
-	    U.sop(serverName + " exception");
-	    e.printStackTrace(System.out);
-	    System.exit(1);
+            U.sop(serverName + " exception");
+            e.printStackTrace(System.out);
+            System.exit(1);
         }
-	U.sop(serverName + " ending successfully");
+        U.sop(serverName + " ending successfully");
     }
 }
 

@@ -58,7 +58,7 @@ package org.omg.CORBA;
 // @SuppressWarnings({"serial"})
 public final class StructMember implements org.omg.CORBA.portable.IDLEntity {
 
-    //	instance variables
+    //  instance variables
 
     /**
      * The name of the struct member described by
@@ -80,7 +80,7 @@ public final class StructMember implements org.omg.CORBA.portable.IDLEntity {
      * @serial
      */
     public org.omg.CORBA.IDLType type_def;
-    //	constructors
+    //  constructors
 
     /**
      * Constructs a default <code>StructMember</code> object.
@@ -98,8 +98,8 @@ public final class StructMember implements org.omg.CORBA.portable.IDLEntity {
      *        of the struct member
      */
     public StructMember(String __name, org.omg.CORBA.TypeCode __type, org.omg.CORBA.IDLType __type_def) {
-	name = __name;
-	type = __type;
-	type_def = __type_def;
+        name = __name;
+        type = __type;
+        type_def = __type_def;
     }
 }

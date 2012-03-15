@@ -39,7 +39,7 @@
  */
 package corba.example;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import java.util.Properties ;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NameComponent;
@@ -68,7 +68,7 @@ public class Client implements Runnable
         try{
             Properties props = new Properties(System.getProperties());
 // Examples of how to set ORB debug properties and default fragment size
-//	    props.put(ORBConstants.DEBUG_PROPERTY, "transport,giop");
+//          props.put(ORBConstants.DEBUG_PROPERTY, "transport,giop");
 //            props.put(ORBConstants.GIOP_FRAGMENT_SIZE, "32");
             // create and initialize the ORB
             ORB orb = ORB.init(args, props);
@@ -106,7 +106,7 @@ public class Client implements Runnable
             hello helloRef2 = helloHelper.narrow(ncRef.resolve(path));
             
             boolean result = helloRef.equals(helloRef2);
-	    System.out.println("equals: " + result);
+            System.out.println("equals: " + result);
             if (result == false) {                
                 errorOccured = true;
             }

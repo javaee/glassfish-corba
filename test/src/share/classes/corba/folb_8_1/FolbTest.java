@@ -52,14 +52,14 @@ import corba.framework.CORBATest;
  */
 public class FolbTest
     extends
-	CORBATest
+        CORBATest
 {
     public static final String thisPackage =
-	FolbTest.class.getPackage().getName();
+        FolbTest.class.getPackage().getName();
 
     protected void doTest()
-	throws
-	    Throwable
+        throws
+            Throwable
     {
         Controller orbd;
         Controller server;

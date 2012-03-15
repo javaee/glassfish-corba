@@ -40,7 +40,7 @@
 
 package pi.serverrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.CORBA.*;
 
@@ -52,12 +52,12 @@ public class InvokeOneWay
     extends InvokeStrategy
 {
     public void invoke() throws Exception {
-	super.invoke();
+        super.invoke();
 
-	// Invoke normal call
-	invokeMethod( "sayHello" );
+        // Invoke normal call
+        invokeMethod( "sayHello" );
 
-	// Invoke oneway call
-	invokeMethod( "sayOneway" );
+        // Invoke oneway call
+        invokeMethod( "sayOneway" );
     }
 }

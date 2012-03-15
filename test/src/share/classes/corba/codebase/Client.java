@@ -121,7 +121,7 @@ public class Client
 
     public static void main(String args[])
     {
-	try {
+        try {
             System.setSecurityManager(new NoSecurityManager());
 
             Client.tryLoadingClasses();
@@ -145,9 +145,9 @@ public class Client
                 Client.testClientValueDownloading(tester);
             }
 
-	} catch (Throwable t) {
-	    t.printStackTrace();
+        } catch (Throwable t) {
+            t.printStackTrace();
             System.exit(1);
-	}
+        }
     }
 }

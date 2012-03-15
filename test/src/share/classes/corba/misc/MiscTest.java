@@ -48,13 +48,13 @@ public class MiscTest extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-	Controller client = createClient( "corba.misc.Client" ) ;
+        Controller client = createClient( "corba.misc.Client" ) ;
 
-	client.start();
+        client.start();
 
-	client.waitFor(120000);
+        client.waitFor(120000);
 
-	client.stop();
+        client.stop();
     }
 }
 

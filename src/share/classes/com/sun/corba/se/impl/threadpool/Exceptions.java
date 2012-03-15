@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.threadpool;
+package com.sun.corba.ee.impl.threadpool;
 
-import com.sun.corba.se.spi.logex.stdcorba.StandardLogger;
+import com.sun.corba.ee.spi.logex.stdcorba.StandardLogger;
 import org.glassfish.pfl.basic.logex.Chain;
 import org.glassfish.pfl.basic.logex.ExceptionWrapper;
 import org.glassfish.pfl.basic.logex.Log;

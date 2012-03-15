@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.corba;
+package com.sun.corba.ee.impl.corba;
 
 
 import org.omg.CORBA.Any;
@@ -69,9 +69,9 @@ import org.omg.CORBA.portable.RemarshalException ;
 import org.omg.CORBA.portable.InputStream ;
 import org.omg.CORBA.portable.OutputStream ;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 public class RequestImpl 
     extends Request
@@ -80,27 +80,27 @@ public class RequestImpl
     // data members
 
     protected org.omg.CORBA.Object _target;
-    protected String    	 _opName;
-    protected NVList 		 _arguments;
-    protected ExceptionList	 _exceptions;
-    private NamedValue		 _result;
-    protected Environment	 _env;
-    private Context		 _ctx;
-    private ContextList		 _ctxList;
-    protected ORB		 _orb;
+    protected String             _opName;
+    protected NVList             _arguments;
+    protected ExceptionList      _exceptions;
+    private NamedValue           _result;
+    protected Environment        _env;
+    private Context              _ctx;
+    private ContextList          _ctxList;
+    protected ORB                _orb;
     private static final ORBUtilSystemException _wrapper =
         ORBUtilSystemException.self ;
 
     // invocation-specific stuff
-    protected boolean 		 _isOneWay	= false;
-    private int[]		 _paramCodes;
-    private long[]		 _paramLongs;
-    private java.lang.Object[] 	 _paramObjects;
+    protected boolean            _isOneWay      = false;
+    private int[]                _paramCodes;
+    private long[]               _paramLongs;
+    private java.lang.Object[]   _paramObjects;
 
     // support for deferred invocations. 
     // protected instead of private since it needs to be set by the
     // thread object doing the asynchronous invocation.
-    protected boolean 		 gotResponse 	= false;
+    protected boolean            gotResponse    = false;
 
     ///////////////////////////////////////////////////////////////////////////
     // constructor
@@ -108,22 +108,22 @@ public class RequestImpl
     // REVISIT - used to be protected.  Now public so it can be
     // accessed from xgiop.
     public RequestImpl (ORB orb,
-			org.omg.CORBA.Object targetObject,
-			Context ctx,
-			String operationName,
-			NVList argumentList,
-			NamedValue resultContainer,
-			ExceptionList exceptionList,
-			ContextList ctxList)
+                        org.omg.CORBA.Object targetObject,
+                        Context ctx,
+                        String operationName,
+                        NVList argumentList,
+                        NamedValue resultContainer,
+                        ExceptionList exceptionList,
+                        ContextList ctxList)
     {
 
         // initialize the orb
-        _orb 	= orb;
+        _orb    = orb;
 
         // initialize target, context and operation name
         _target     = targetObject;
-        _ctx	= ctx;
-        _opName	= operationName;
+        _ctx    = ctx;
+        _opName = operationName;
 
         // initialize argument list if not passed in
         if (argumentList == null) {
@@ -150,7 +150,7 @@ public class RequestImpl
         }
 
         // initialize environment 
-        _env	= new EnvironmentImpl();
+        _env    = new EnvironmentImpl();
 
     }
 
@@ -287,9 +287,9 @@ public class RequestImpl
             // release the lock. wait to be notified by the thread that is
             // doing the asynchronous invocation.
             try {
-	        wait();
+                wait();
             } 
-	    catch (InterruptedException e) {}
+            catch (InterruptedException e) {}
         }
     }
     
@@ -303,53 +303,53 @@ public class RequestImpl
     protected void doInvocation()
     {
         org.omg.CORBA.portable.Delegate delegate = StubAdapter.getDelegate( 
-	    _target ) ;
+            _target ) ;
 
-	// Initiate Client Portable Interceptors.  Inform the PIHandler that 
+        // Initiate Client Portable Interceptors.  Inform the PIHandler that 
         // this is a DII request so that it knows to ignore the second 
         // inevitable call to initiateClientPIRequest in createRequest. 
         // Also, save the RequestImpl object for later use. 
-	_orb.getPIHandler().initiateClientPIRequest( true );
-	_orb.getPIHandler().setClientPIInfo( this );
+        _orb.getPIHandler().initiateClientPIRequest( true );
+        _orb.getPIHandler().setClientPIInfo( this );
 
-	InputStream $in = null;
-	try {
-	    OutputStream $out = delegate.request(null, _opName, !_isOneWay);
-	    // Marshal args
-	    try {
-		for (int i=0; i<_arguments.count() ; i++) {
-		    NamedValue nv = _arguments.item(i);
-		    switch (nv.flags()) {
-		    case ARG_IN.value:
-			nv.value().write_value($out);
-			break;
-		    case ARG_OUT.value:
-			break;
-		    case ARG_INOUT.value:
-			nv.value().write_value($out);
-			break;
-	            }
-		}
-	    } catch ( org.omg.CORBA.Bounds ex ) {
-		throw _wrapper.boundsErrorInDiiRequest( ex ) ;
-	    }
+        InputStream $in = null;
+        try {
+            OutputStream $out = delegate.request(null, _opName, !_isOneWay);
+            // Marshal args
+            try {
+                for (int i=0; i<_arguments.count() ; i++) {
+                    NamedValue nv = _arguments.item(i);
+                    switch (nv.flags()) {
+                    case ARG_IN.value:
+                        nv.value().write_value($out);
+                        break;
+                    case ARG_OUT.value:
+                        break;
+                    case ARG_INOUT.value:
+                        nv.value().write_value($out);
+                        break;
+                    }
+                }
+            } catch ( org.omg.CORBA.Bounds ex ) {
+                throw _wrapper.boundsErrorInDiiRequest( ex ) ;
+            }
 
-	    $in = delegate.invoke(null, $out);
-	} catch (ApplicationException e) {
-	    // REVISIT - minor code.
-	    // This is already handled in subcontract.
-	    // REVISIT - uncomment.
-	    //throw new INTERNAL();
-	} catch (RemarshalException e) {
-	    doInvocation();
-	} catch( SystemException ex ) {
-	    _env.exception(ex);
-	    // NOTE: The exception should not be thrown.
-	    // However, JDK 1.4 and earlier threw the exception,
-	    // so we keep the behavior to be compatible.
-	    throw ex;
-	} finally {
-	    delegate.releaseReply(null, $in);
+            $in = delegate.invoke(null, $out);
+        } catch (ApplicationException e) {
+            // REVISIT - minor code.
+            // This is already handled in subcontract.
+            // REVISIT - uncomment.
+            //throw new INTERNAL();
+        } catch (RemarshalException e) {
+            doInvocation();
+        } catch( SystemException ex ) {
+            _env.exception(ex);
+            // NOTE: The exception should not be thrown.
+            // However, JDK 1.4 and earlier threw the exception,
+            // so we keep the behavior to be compatible.
+            throw ex;
+        } finally {
+            delegate.releaseReply(null, $in);
         }
     }
 
@@ -369,17 +369,17 @@ public class RequestImpl
             for ( int i=0; i<_arguments.count() ; i++) {
                 NamedValue nv = _arguments.item(i);
                 switch( nv.flags() ) {
-		case ARG_IN.value:
-		    break;
-		case ARG_OUT.value:
-		case ARG_INOUT.value:
-		    Any any = nv.value();	
-		    any.read_value(is, any.type());
-		    break;
+                case ARG_IN.value:
+                    break;
+                case ARG_OUT.value:
+                case ARG_INOUT.value:
+                    Any any = nv.value();       
+                    any.read_value(is, any.type());
+                    break;
                 }
             }
         } catch ( org.omg.CORBA.Bounds ex ) {
-	    // Cannot happen since we only iterate till _arguments.count()
+            // Cannot happen since we only iterate till _arguments.count()
         }
     }
 }

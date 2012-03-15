@@ -48,13 +48,13 @@ import java.net.ServerSocket;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.ServerSocketChannel;
 
-import com.sun.corba.se.spi.transport.Acceptor;
+import com.sun.corba.ee.spi.transport.Acceptor;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.ORBSocketFactory;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.ORBSocketFactory;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 public class SocketFactoryImpl
     implements ORBSocketFactory
@@ -63,80 +63,80 @@ public class SocketFactoryImpl
 
     public void setORB(ORB orb)
     {
-	this.orb = orb;
+        this.orb = orb;
     }
 
     public ServerSocket createServerSocket(String type, 
-					   InetSocketAddress inetSocketAddress)
+                                           InetSocketAddress inetSocketAddress)
         throws IOException
     {
-	ServerSocket serverSocket = null;
-	try {
-	    if (! Common.timing) {
-		System.out.println(".createServerSocket->: " + type + " " 
-				   + inetSocketAddress);
-	    }
+        ServerSocket serverSocket = null;
+        try {
+            if (! Common.timing) {
+                System.out.println(".createServerSocket->: " + type + " " 
+                                   + inetSocketAddress);
+            }
 
-	    ServerSocketChannel serverSocketChannel = null;
+            ServerSocketChannel serverSocketChannel = null;
 
-	    if (orb.getORBData().acceptorSocketType().equals(ORBConstants.SOCKETCHANNEL)) {
-		serverSocketChannel = ServerSocketChannel.open();
-		serverSocket = serverSocketChannel.socket();
-	    } else {
-		serverSocket = new ServerSocket();
-	    }
-	    serverSocket.bind(inetSocketAddress);
-	    return serverSocket;
-	} finally {
-	    if (! Common.timing) {
-		System.out.println(".createServerSocket<-: " + type + " " 
-				   + inetSocketAddress + " " + serverSocket);
-	    }
-	}
+            if (orb.getORBData().acceptorSocketType().equals(ORBConstants.SOCKETCHANNEL)) {
+                serverSocketChannel = ServerSocketChannel.open();
+                serverSocket = serverSocketChannel.socket();
+            } else {
+                serverSocket = new ServerSocket();
+            }
+            serverSocket.bind(inetSocketAddress);
+            return serverSocket;
+        } finally {
+            if (! Common.timing) {
+                System.out.println(".createServerSocket<-: " + type + " " 
+                                   + inetSocketAddress + " " + serverSocket);
+            }
+        }
     }
 
     public Socket createSocket(String type, 
-			       InetSocketAddress inetSocketAddress)
+                               InetSocketAddress inetSocketAddress)
         throws IOException
     {
-	Socket socket = null;
+        Socket socket = null;
 
-	try {
-	    if (! Common.timing) {
-		System.out.println(".createSocket->: " + type + " " 
-				   + inetSocketAddress);
-	    }
+        try {
+            if (! Common.timing) {
+                System.out.println(".createSocket->: " + type + " " 
+                                   + inetSocketAddress);
+            }
 
-	    SocketChannel socketChannel = null;
+            SocketChannel socketChannel = null;
 
-	    if (orb.getORBData().connectionSocketType().equals(ORBConstants.SOCKETCHANNEL)) {
-		socketChannel = ORBUtility.openSocketChannel(inetSocketAddress);
-		socket = socketChannel.socket();
-	    } else {
-		socket = new Socket(inetSocketAddress.getHostName(),
-				    inetSocketAddress.getPort());
-	    }
+            if (orb.getORBData().connectionSocketType().equals(ORBConstants.SOCKETCHANNEL)) {
+                socketChannel = ORBUtility.openSocketChannel(inetSocketAddress);
+                socket = socketChannel.socket();
+            } else {
+                socket = new Socket(inetSocketAddress.getHostName(),
+                                    inetSocketAddress.getPort());
+            }
 
-	    // Disable Nagle's algorithm (i.e., always send immediately).
-	    socket.setTcpNoDelay(true);
+            // Disable Nagle's algorithm (i.e., always send immediately).
+            socket.setTcpNoDelay(true);
 
-	    return socket;
+            return socket;
 
-	} finally {
-	    if (! Common.timing) {
-		System.out.println(".createSocket<-: " + type + " " 
-				   + inetSocketAddress + " " + socket);
-	    }
-	}
+        } finally {
+            if (! Common.timing) {
+                System.out.println(".createSocket<-: " + type + " " 
+                                   + inetSocketAddress + " " + socket);
+            }
+        }
     }
 
     public void setAcceptedSocketOptions(Acceptor acceptor,
-					 ServerSocket serverSocket,
-					 Socket socket)
-	throws SocketException
+                                         ServerSocket serverSocket,
+                                         Socket socket)
+        throws SocketException
     {
-	// Disable Nagle's algorithm (i.e., always send immediately).
-	socket.setTcpNoDelay(true);
+        // Disable Nagle's algorithm (i.e., always send immediately).
+        socket.setTcpNoDelay(true);
     }
 }
 

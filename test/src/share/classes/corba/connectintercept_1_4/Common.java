@@ -49,8 +49,8 @@ import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.*;
 
-import com.sun.corba.se.spi.legacy.interceptor.IORInfoExt;
-import com.sun.corba.se.spi.legacy.interceptor.UnknownType;
+import com.sun.corba.ee.spi.legacy.interceptor.IORInfoExt;
+import com.sun.corba.ee.spi.legacy.interceptor.UnknownType;
 
 public abstract class Common
 {
@@ -59,10 +59,10 @@ public abstract class Common
     public static final String ORBClassKey = "org.omg.CORBA.ORBClass";
 
     public static final String DEFAULT_FACTORY_CLASS =
-	"com.sun.corba.se.impl.legacy.connection.DefaultSocketFactory";
+        "com.sun.corba.ee.impl.legacy.connection.DefaultSocketFactory";
 
     public static final String CUSTOM_FACTORY_CLASS =
-	MySocketFactory.class.getName();
+        MySocketFactory.class.getName();
 
     public static final String serverName1 = "ExI1";
     public static final String serverName2 = "ExI2";
@@ -98,75 +98,75 @@ public abstract class Common
 
     public static void up(int x)
     {
-	if (x >= currentOrder) {
-	    currentOrder = x;
-	} else {
-	    throw new INTERNAL("Interceptor ordering (up): " 
-			       + x + " " + currentOrder,
-			       -45,
-			       CompletionStatus.COMPLETED_MAYBE);
-	}
+        if (x >= currentOrder) {
+            currentOrder = x;
+        } else {
+            throw new INTERNAL("Interceptor ordering (up): " 
+                               + x + " " + currentOrder,
+                               -45,
+                               CompletionStatus.COMPLETED_MAYBE);
+        }
     }
 
     public static void down(int x)
     {
-	if (x <= currentOrder) {
-	    currentOrder = x;
-	} else {
-	    throw new INTERNAL("Interceptor ordering (down): "
-			       + x + " " + currentOrder,
-			       -45,
-			       CompletionStatus.COMPLETED_MAYBE);
-	}
+        if (x <= currentOrder) {
+            currentOrder = x;
+        } else {
+            throw new INTERNAL("Interceptor ordering (down): "
+                               + x + " " + currentOrder,
+                               -45,
+                               CompletionStatus.COMPLETED_MAYBE);
+        }
     }
 
     public static String createComponentData(String msg, Object o)
     {
-	String ccd = baseMsg + ".createComponentData";
-	int MyType1Port = -1;
-	int MyType2Port = -1;
-	int MyType3Port = -1;
-	if (o instanceof IORInfoExt) {
-	    try {
-		MyType1Port = ((IORInfoExt)o).getServerPort(Common.MyType1);
-		MyType2Port = ((IORInfoExt)o).getServerPort(Common.MyType2);
-		MyType3Port = ((IORInfoExt)o).getServerPort(Common.MyType3);
-	    } catch (UnknownType ex) {
-		System.out.println(ccd + ": " + ex);
-		System.exit(-1);
-	    }
-	} else {
-	    throw new RuntimeException(ccd + 
-				       ": unexpected type of object: " + o);
-	}
+        String ccd = baseMsg + ".createComponentData";
+        int MyType1Port = -1;
+        int MyType2Port = -1;
+        int MyType3Port = -1;
+        if (o instanceof IORInfoExt) {
+            try {
+                MyType1Port = ((IORInfoExt)o).getServerPort(Common.MyType1);
+                MyType2Port = ((IORInfoExt)o).getServerPort(Common.MyType2);
+                MyType3Port = ((IORInfoExt)o).getServerPort(Common.MyType3);
+            } catch (UnknownType ex) {
+                System.out.println(ccd + ": " + ex);
+                System.exit(-1);
+            }
+        } else {
+            throw new RuntimeException(ccd + 
+                                       ": unexpected type of object: " + o);
+        }
 
-	return createComponentData(msg, MyType1Port, MyType2Port, MyType3Port);
+        return createComponentData(msg, MyType1Port, MyType2Port, MyType3Port);
     }
 
     public static String createComponentData(String msg,
-					     int MyType1Port,
-					     int MyType2Port,
-					     int MyType3Port)
+                                             int MyType1Port,
+                                             int MyType2Port,
+                                             int MyType3Port)
     {
-	String componentData =
-	    Common.MyType1 + ":" + MyType1Port + "," +
-	    Common.MyType2 + ":" + MyType2Port + "," +
-	    Common.MyType3 + ":" + MyType3Port;
-	System.out.println(msg + " componentData: " + componentData);
+        String componentData =
+            Common.MyType1 + ":" + MyType1Port + "," +
+            Common.MyType2 + ":" + MyType2Port + "," +
+            Common.MyType3 + ":" + MyType3Port;
+        System.out.println(msg + " componentData: " + componentData);
 
-	return componentData;
+        return componentData;
     }
 
     public static NamingContext getNameService(ORB orb)
     {
         org.omg.CORBA.Object objRef = null;
-	try {
-	    objRef = orb.resolve_initial_references("NameService");
-	} catch (Exception ex) {
-	    System.out.println("Common.getNameService: " + ex);
-	    ex.printStackTrace(System.out);
-	    System.exit(-1);
-	}
+        try {
+            objRef = orb.resolve_initial_references("NameService");
+        } catch (Exception ex) {
+            System.out.println("Common.getNameService: " + ex);
+            ex.printStackTrace(System.out);
+            System.exit(-1);
+        }
         return NamingContextHelper.narrow(objRef);
     }
 
@@ -174,7 +174,7 @@ public abstract class Common
     {
         NameComponent nc = new NameComponent(name, "");
         NameComponent path[] = {nc};
-	return path;
+        return path;
     }
 }
 

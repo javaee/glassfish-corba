@@ -385,9 +385,9 @@ class ParseException extends Exception
   {
     scannerInfo( scanner ) ;
     String[] parameters = { filename, Integer.toString(lineNumber), 
-	declName, baseName, line, pointer } ;
+        declName, baseName, line, pointer } ;
     return new ParseException (Util.getMessage( 
-	"ParseException.forwardInheritance", parameters ) ) ;
+        "ParseException.forwardInheritance", parameters ) ) ;
   }
 
   static ParseException illegalIncompleteTypeReference( Scanner scanner, 
@@ -395,9 +395,9 @@ class ParseException extends Exception
   {
     scannerInfo( scanner ) ;
     String[] parameters = { filename, Integer.toString(lineNumber), 
-	declName, line, pointer } ;
+        declName, line, pointer } ;
     return new ParseException (Util.getMessage( 
-	"ParseException.illegalIncompleteTypeReference", parameters ) ) ;
+        "ParseException.illegalIncompleteTypeReference", parameters ) ) ;
   }
 
   private static void scannerInfo (Scanner scanner)

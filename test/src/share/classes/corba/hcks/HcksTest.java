@@ -49,50 +49,50 @@ import corba.framework.CORBATest;
 
 public class HcksTest
     extends
-	CORBATest
+        CORBATest
 {
     public static final String thisPackage =
-	HcksTest.class.getPackage().getName();
+        HcksTest.class.getPackage().getName();
 
     protected void doTest()
-	throws
-	    Throwable
+        throws
+            Throwable
     {
-	Controller orbd   = createORBD();
-	orbd.start();
+        Controller orbd   = createORBD();
+        orbd.start();
 
-	doTestType("Server", "remoteServerStream",
-		   "Client", "remoteClientStream");
-	doTestType("ServerGrow", "remoteServerGrow",
-		   "ClientGrow", "remoteClientGrow");
-	doTestType("Server_1_1", "remoteServer_1_1",
-		   "Client_1_1", "remoteClient_1_1");
+        doTestType("Server", "remoteServerStream",
+                   "Client", "remoteClientStream");
+        doTestType("ServerGrow", "remoteServerGrow",
+                   "ClientGrow", "remoteClientGrow");
+        doTestType("Server_1_1", "remoteServer_1_1",
+                   "Client_1_1", "remoteClient_1_1");
 
-	Controller colocatedClientServer = 
-	    createClient(thisPackage + ".ColocatedClientServer",
-			 "colocatedClientServer");
-	colocatedClientServer.start();
-	colocatedClientServer.waitFor();
-	colocatedClientServer.stop();
+        Controller colocatedClientServer = 
+            createClient(thisPackage + ".ColocatedClientServer",
+                         "colocatedClientServer");
+        colocatedClientServer.start();
+        colocatedClientServer.waitFor();
+        colocatedClientServer.stop();
 
-	orbd.stop();
+        orbd.stop();
     }
 
     protected void doTestType(String serverMainClass, String serverTestName,
-			      String clientMainClass, String clientTestName)
-	throws
-	    Throwable
+                              String clientMainClass, String clientTestName)
+        throws
+            Throwable
     {
-	Controller server = createServer(thisPackage + "." + serverMainClass,
-					 serverTestName);
-	server.start();
+        Controller server = createServer(thisPackage + "." + serverMainClass,
+                                         serverTestName);
+        server.start();
 
-	Controller client = createClient(thisPackage + "." + clientMainClass,
-					 clientTestName);
-	client.start();
-	client.waitFor();
-	client.stop();
-	server.stop();
+        Controller client = createClient(thisPackage + "." + clientMainClass,
+                                         clientTestName);
+        client.start();
+        client.waitFor();
+        client.stop();
+        server.stop();
     }
 }
 

@@ -109,6 +109,6 @@ public class Client {
         runner.registerClass( Client.class ) ;
         runner.registerClass( Second.class ) ;
         runner.run() ;
-	System.exit( runner.hasFailure() ? 1 : 0 ) ;
+        System.exit( runner.hasFailure() ? 1 : 0 ) ;
     }
 }

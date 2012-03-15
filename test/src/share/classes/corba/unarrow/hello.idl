@@ -41,22 +41,22 @@ module corba
 {
     module unarrow
     {
-	interface Hello
-	{
-	    string sayHello();
-	};
-	interface Bye
-	{
-	    string sayBye();
-	};
-	abstract interface Foo
-	{
-	    string doFoo();
-	};
-	interface Bar:Foo
-	{
-	    string doBar();
-	};
+        interface Hello
+        {
+            string sayHello();
+        };
+        interface Bye
+        {
+            string sayBye();
+        };
+        abstract interface Foo
+        {
+            string doFoo();
+        };
+        interface Bar:Foo
+        {
+            string doBar();
+        };
     };
 };
 

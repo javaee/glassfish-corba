@@ -37,11 +37,11 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.trace.CdrRead;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.trace.CdrRead;
 
 @CdrRead
 public class CDRInputStream_1_2 extends CDRInputStream_1_1
@@ -145,7 +145,7 @@ public class CDRInputStream_1_2 extends CDRInputStream_1_1
         // assigned, and a single 16 bit Java char isn't enough.
         // Better to use strings for i18n purposes.
         if (getWCharConverter().getNumChars() > 1)
-	    throw wrapper.btcResultMoreThanOneChar() ;
+            throw wrapper.btcResultMoreThanOneChar() ;
 
         return result[0];
     }

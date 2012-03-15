@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior ;
+package com.sun.corba.ee.spi.ior ;
 
 import java.io.Serializable ;
 
@@ -50,19 +50,19 @@ import org.omg.CORBA.portable.ValueFactory ;
 import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 
-import com.sun.corba.se.impl.ior.ObjectIdImpl ;
-import com.sun.corba.se.impl.ior.ObjectKeyImpl ;
-import com.sun.corba.se.impl.ior.IORImpl ;
-import com.sun.corba.se.impl.ior.IORTemplateImpl ;
-import com.sun.corba.se.impl.ior.IORTemplateListImpl ;
-import com.sun.corba.se.impl.ior.ObjectReferenceProducerBase ;
-import com.sun.corba.se.impl.ior.ObjectReferenceFactoryImpl ;
-import com.sun.corba.se.impl.ior.ObjectReferenceTemplateImpl ;
-import com.sun.corba.se.impl.ior.ObjectKeyFactoryImpl ;
+import com.sun.corba.ee.impl.ior.ObjectIdImpl ;
+import com.sun.corba.ee.impl.ior.ObjectKeyImpl ;
+import com.sun.corba.ee.impl.ior.IORImpl ;
+import com.sun.corba.ee.impl.ior.IORTemplateImpl ;
+import com.sun.corba.ee.impl.ior.IORTemplateListImpl ;
+import com.sun.corba.ee.impl.ior.ObjectReferenceProducerBase ;
+import com.sun.corba.ee.impl.ior.ObjectReferenceFactoryImpl ;
+import com.sun.corba.ee.impl.ior.ObjectReferenceTemplateImpl ;
+import com.sun.corba.ee.impl.ior.ObjectKeyFactoryImpl ;
 
-import com.sun.corba.se.impl.misc.ORBUtility ;
+import com.sun.corba.ee.impl.misc.ORBUtility ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 /** This class provides a number of factory methods for creating
  * various IOR SPI classes which are not subclassed for specific protocols.
@@ -81,7 +81,7 @@ public class IORFactories {
      */
     public static ObjectId makeObjectId( byte[] id )
     {
-	return new ObjectIdImpl( id ) ;
+        return new ObjectIdImpl( id ) ;
     }
 
     /** Create an ObjectKey for the given ObjectKeyTemplate and
@@ -89,28 +89,28 @@ public class IORFactories {
      */
     public static ObjectKey makeObjectKey( ObjectKeyTemplate oktemp, ObjectId oid )
     {
-	return new ObjectKeyImpl( oktemp, oid ) ;
+        return new ObjectKeyImpl( oktemp, oid ) ;
     }
 
     /** Create an empty IOR for the given orb and typeid.  The result is mutable.
      */
     public static IOR makeIOR( ORB orb, String typeid ) 
     {
-	return new IORImpl( orb, typeid ) ;
+        return new IORImpl( orb, typeid ) ;
     }
 
     /** Create an empty IOR for the given orb with a null typeid.  The result is mutable.
      */
     public static IOR makeIOR( ORB orb ) 
     {
-	return new IORImpl( orb ) ;
+        return new IORImpl( orb ) ;
     }
 
     /** Read an IOR from an InputStream.  ObjectKeys are not shared.
      */
     public static IOR makeIOR( ORB orb, InputStream is )
     {
-	return new IORImpl( orb, is ) ;
+        return new IORImpl( orb, is ) ;
     }
 
     /** Create an IORTemplate with the given ObjectKeyTemplate.  The result
@@ -118,68 +118,68 @@ public class IORFactories {
      */
     public static IORTemplate makeIORTemplate( ObjectKeyTemplate oktemp )
     {
-	return new IORTemplateImpl( oktemp ) ;
+        return new IORTemplateImpl( oktemp ) ;
     }
 
     /** Read an IORTemplate from an InputStream.
      */
     public static IORTemplate makeIORTemplate( InputStream is )
     {
-	return new IORTemplateImpl( is ) ;
+        return new IORTemplateImpl( is ) ;
     }
 
     public static IORTemplateList makeIORTemplateList() 
     {
-	return new IORTemplateListImpl() ;
+        return new IORTemplateListImpl() ;
     }
 
     public static IORTemplateList makeIORTemplateList( InputStream is ) 
     {
-	return new IORTemplateListImpl( is ) ;
+        return new IORTemplateListImpl( is ) ;
     }
 
     public static IORFactory getIORFactory( ObjectReferenceTemplate ort ) 
     {
-	if (ort instanceof ObjectReferenceTemplateImpl) {
-	    ObjectReferenceTemplateImpl orti = 
-		(ObjectReferenceTemplateImpl)ort ;
-	    return orti.getIORFactory() ;
-	}
+        if (ort instanceof ObjectReferenceTemplateImpl) {
+            ObjectReferenceTemplateImpl orti = 
+                (ObjectReferenceTemplateImpl)ort ;
+            return orti.getIORFactory() ;
+        }
 
-	throw new BAD_PARAM() ;
+        throw new BAD_PARAM() ;
     }
 
     public static IORTemplateList getIORTemplateList( ObjectReferenceFactory orf ) 
     {
-	if (orf instanceof ObjectReferenceProducerBase) {
-	    ObjectReferenceProducerBase base =
-		(ObjectReferenceProducerBase)orf ;
-	    return base.getIORTemplateList() ;
-	}
+        if (orf instanceof ObjectReferenceProducerBase) {
+            ObjectReferenceProducerBase base =
+                (ObjectReferenceProducerBase)orf ;
+            return base.getIORTemplateList() ;
+        }
 
-	throw new BAD_PARAM() ;
+        throw new BAD_PARAM() ;
     }
 
     public static ObjectReferenceTemplate makeObjectReferenceTemplate( ORB orb, 
-	IORTemplate iortemp ) 
+        IORTemplate iortemp ) 
     {
-	return new ObjectReferenceTemplateImpl( orb, iortemp ) ;
+        return new ObjectReferenceTemplateImpl( orb, iortemp ) ;
     }
 
     public static ObjectReferenceFactory makeObjectReferenceFactory( ORB orb, 
-	IORTemplateList iortemps )
+        IORTemplateList iortemps )
     {
-	return new ObjectReferenceFactoryImpl( orb, iortemps ) ;
+        return new ObjectReferenceFactoryImpl( orb, iortemps ) ;
     }
 
     public static ObjectKeyFactory makeObjectKeyFactory( ORB orb ) 
     {
-	return new ObjectKeyFactoryImpl( orb ) ;
+        return new ObjectKeyFactoryImpl( orb ) ;
     }
 
     public static org.omg.CORBA.Object makeObjectReference( IOR ior ) 
     {
-	return ORBUtility.makeObjectReference( ior ) ;
+        return ORBUtility.makeObjectReference( ior ) ;
     }
 
     /** This method must be called in order to register the value
@@ -188,26 +188,26 @@ public class IORFactories {
      */
     public static void registerValueFactories( ORB orb ) 
     {
-	// Create and register the factory for the Object Reference Template
-	// implementation.
-	ValueFactory vf = new ValueFactory() {
-	    public Serializable read_value( InputStream is ) 
-	    {
-		return new ObjectReferenceTemplateImpl( is ) ;
-	    }
-	} ;
+        // Create and register the factory for the Object Reference Template
+        // implementation.
+        ValueFactory vf = new ValueFactory() {
+            public Serializable read_value( InputStream is ) 
+            {
+                return new ObjectReferenceTemplateImpl( is ) ;
+            }
+        } ;
 
-	orb.register_value_factory( ObjectReferenceTemplateImpl.repositoryId, vf ) ;
+        orb.register_value_factory( ObjectReferenceTemplateImpl.repositoryId, vf ) ;
 
-	// Create and register the factory for the Object Reference Factory
-	// implementation.
-	vf = new ValueFactory() {
-	    public Serializable read_value( InputStream is ) 
-	    {
-		return new ObjectReferenceFactoryImpl( is ) ;
-	    }
-	} ;
+        // Create and register the factory for the Object Reference Factory
+        // implementation.
+        vf = new ValueFactory() {
+            public Serializable read_value( InputStream is ) 
+            {
+                return new ObjectReferenceFactoryImpl( is ) ;
+            }
+        } ;
 
-	orb.register_value_factory( ObjectReferenceFactoryImpl.repositoryId, vf ) ;
+        orb.register_value_factory( ObjectReferenceFactoryImpl.repositoryId, vf ) ;
     }
 }

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,34 +49,34 @@ import java.util.Map;
 import java.nio.ByteBuffer ;
 import java.io.IOException ;
 
-import com.sun.corba.se.spi.transport.Selector;
+import com.sun.corba.ee.spi.transport.Selector;
 
-import com.sun.corba.se.spi.ior.IORTemplate;
-import com.sun.corba.se.spi.ior.ObjectAdapterId;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.ByteBufferPool;
-import com.sun.corba.se.spi.transport.Acceptor;
-import com.sun.corba.se.spi.transport.Connection;
-import com.sun.corba.se.spi.transport.TransportManager;
-import com.sun.corba.se.spi.transport.MessageData;
-import com.sun.corba.se.spi.transport.MessageTraceManager;
+import com.sun.corba.ee.spi.ior.IORTemplate;
+import com.sun.corba.ee.spi.ior.ObjectAdapterId;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.ByteBufferPool;
+import com.sun.corba.ee.spi.transport.Acceptor;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.TransportManager;
+import com.sun.corba.ee.spi.transport.MessageData;
+import com.sun.corba.ee.spi.transport.MessageTraceManager;
 
 // REVISIT - impl/poa specific:
-import com.sun.corba.se.impl.oa.poa.Policies;
+import com.sun.corba.ee.impl.oa.poa.Policies;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.BufferManagerRead;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.BufferManagerRead;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message_1_2;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message_1_2;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
+import com.sun.corba.ee.spi.trace.Transport;
 
-import com.sun.corba.se.spi.transport.ContactInfo;
-import com.sun.corba.se.spi.transport.InboundConnectionCache;
-import com.sun.corba.se.spi.transport.OutboundConnectionCache;
+import com.sun.corba.ee.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.transport.InboundConnectionCache;
+import com.sun.corba.ee.spi.transport.OutboundConnectionCache;
 
 import org.glassfish.external.probe.provider.StatsProviderManager ;
 import org.glassfish.external.probe.provider.PluginPoint ;
@@ -90,7 +90,7 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 @Transport
 public class TransportManagerImpl
     implements
-	TransportManager
+        TransportManager
 {
     protected ORB orb;
     protected List<Acceptor> acceptors;
@@ -100,34 +100,34 @@ public class TransportManagerImpl
     
     public TransportManagerImpl(ORB orb)
     {
-	this.orb = orb;
-	acceptors = new ArrayList<Acceptor>();
-	outboundConnectionCaches = new HashMap<String,OutboundConnectionCache>();
-	inboundConnectionCaches = new HashMap<String,InboundConnectionCache>();
-	selector = new SelectorImpl(orb);
+        this.orb = orb;
+        acceptors = new ArrayList<Acceptor>();
+        outboundConnectionCaches = new HashMap<String,OutboundConnectionCache>();
+        inboundConnectionCaches = new HashMap<String,InboundConnectionCache>();
+        selector = new SelectorImpl(orb);
         orb.mom().register( orb, this ) ;
     }
 
     public ByteBufferPool getByteBufferPool(int id)
     {
-	throw new RuntimeException(); 
+        throw new RuntimeException(); 
     }
 
     public OutboundConnectionCache getOutboundConnectionCache(
         ContactInfo contactInfo)
     {
-	synchronized (contactInfo) {
-	    if (contactInfo.getConnectionCache() == null) {
-		OutboundConnectionCache connectionCache = null;
-		synchronized (outboundConnectionCaches) {
-		    connectionCache = outboundConnectionCaches.get(
+        synchronized (contactInfo) {
+            if (contactInfo.getConnectionCache() == null) {
+                OutboundConnectionCache connectionCache = null;
+                synchronized (outboundConnectionCaches) {
+                    connectionCache = outboundConnectionCaches.get(
                         contactInfo.getConnectionCacheType());
-		    if (connectionCache == null) {
-			// REVISIT: Would like to be able to configure
-			// the connection cache type used.
-			connectionCache = 
-			    new OutboundConnectionCacheImpl(orb,
-								 contactInfo);
+                    if (connectionCache == null) {
+                        // REVISIT: Would like to be able to configure
+                        // the connection cache type used.
+                        connectionCache = 
+                            new OutboundConnectionCacheImpl(orb,
+                                                                 contactInfo);
 
                         // We need to clean up the multi-cache support:
                         // this really only works with a single cache.
@@ -135,55 +135,55 @@ public class TransportManagerImpl
                         StatsProviderManager.register( "orb", PluginPoint.SERVER,
                             "orb/transport/connectioncache/outbound", connectionCache ) ;
 
-			outboundConnectionCaches.put(
+                        outboundConnectionCaches.put(
                             contactInfo.getConnectionCacheType(),
-			    connectionCache);
-		    }
-		}
-		contactInfo.setConnectionCache(connectionCache);
-	    }
-	    return contactInfo.getConnectionCache();
-	}
+                            connectionCache);
+                    }
+                }
+                contactInfo.setConnectionCache(connectionCache);
+            }
+            return contactInfo.getConnectionCache();
+        }
     }
 
     public Collection<OutboundConnectionCache> getOutboundConnectionCaches()
     {
-	return outboundConnectionCaches.values();
+        return outboundConnectionCaches.values();
     }
 
     public Collection<InboundConnectionCache> getInboundConnectionCaches()
     {
-	return inboundConnectionCaches.values();
+        return inboundConnectionCaches.values();
     }
 
     public InboundConnectionCache getInboundConnectionCache(
         Acceptor acceptor)
     {
-	synchronized (acceptor) {
-	    if (acceptor.getConnectionCache() == null) {
-		InboundConnectionCache connectionCache = null;
-		synchronized (inboundConnectionCaches) {
-		    connectionCache = inboundConnectionCaches.get(
+        synchronized (acceptor) {
+            if (acceptor.getConnectionCache() == null) {
+                InboundConnectionCache connectionCache = null;
+                synchronized (inboundConnectionCaches) {
+                    connectionCache = inboundConnectionCaches.get(
                             acceptor.getConnectionCacheType());
-		    if (connectionCache == null) {
-			// REVISIT: Would like to be able to configure
-			// the connection cache type used.
-			connectionCache = 
-			    new InboundConnectionCacheImpl(orb,
-								acceptor);
+                    if (connectionCache == null) {
+                        // REVISIT: Would like to be able to configure
+                        // the connection cache type used.
+                        connectionCache = 
+                            new InboundConnectionCacheImpl(orb,
+                                                                acceptor);
                         orb.mom().register( this, connectionCache ) ;
                         StatsProviderManager.register( "orb", PluginPoint.SERVER,
                             "orb/transport/connectioncache/inbound", connectionCache ) ;
 
-			inboundConnectionCaches.put(
+                        inboundConnectionCaches.put(
                             acceptor.getConnectionCacheType(),
-			    connectionCache);
-		    }
-		}
-		acceptor.setConnectionCache(connectionCache);
-	    }
-	    return acceptor.getConnectionCache();
-	}
+                            connectionCache);
+                    }
+                }
+                acceptor.setConnectionCache(connectionCache);
+            }
+            return acceptor.getConnectionCache();
+        }
     }
 
     public Selector getSelector() {
@@ -192,17 +192,17 @@ public class TransportManagerImpl
 
     public Selector getSelector(int id) 
     {
-	return selector;
+        return selector;
     }
 
     @Transport
     public synchronized void registerAcceptor(Acceptor acceptor) {
-	acceptors.add(acceptor);
+        acceptors.add(acceptor);
     }
 
     @Transport
     public synchronized void unregisterAcceptor(Acceptor acceptor) {
-	acceptors.remove(acceptor);
+        acceptors.remove(acceptor);
     }
 
     @Transport
@@ -233,123 +233,123 @@ public class TransportManagerImpl
 
     @Transport
     public Collection<Acceptor> getAcceptors(String objectAdapterManagerId,
-				   ObjectAdapterId objectAdapterId)
+                                   ObjectAdapterId objectAdapterId)
     {
-	// REVISIT - need to filter based on arguments.
+        // REVISIT - need to filter based on arguments.
 
-	// REVISIT - initialization will be moved to OA.
-	// Lazy initialization of acceptors.
+        // REVISIT - initialization will be moved to OA.
+        // Lazy initialization of acceptors.
         for (Acceptor acc : acceptors) {
-	    if (acc.initialize()) {
+            if (acc.initialize()) {
                 display( "initializing acceptors" ) ;
-		if (acc.shouldRegisterAcceptEvent()) {
-		    orb.getTransportManager().getSelector(0)
-			.registerForEvent(acc.getEventHandler());
-		}
-	    }
-	}
-	return acceptors;
+                if (acc.shouldRegisterAcceptEvent()) {
+                    orb.getTransportManager().getSelector(0)
+                        .registerForEvent(acc.getEventHandler());
+                }
+            }
+        }
+        return acceptors;
     }
 
     // REVISIT - POA specific policies
     @Transport
     public void addToIORTemplate(IORTemplate iorTemplate, 
-				 Policies policies,
-				 String codebase,
-				 String objectAdapterManagerId,
-				 ObjectAdapterId objectAdapterId)
+                                 Policies policies,
+                                 String codebase,
+                                 String objectAdapterManagerId,
+                                 ObjectAdapterId objectAdapterId)
     {
-	Iterator iterator = 
-	    getAcceptors(objectAdapterManagerId, objectAdapterId).iterator();
-	while (iterator.hasNext()) {
-	    Acceptor acceptor = (Acceptor) iterator.next();
-	    acceptor.addToIORTemplate(iorTemplate, policies, codebase);
-	}
+        Iterator iterator = 
+            getAcceptors(objectAdapterManagerId, objectAdapterId).iterator();
+        while (iterator.hasNext()) {
+            Acceptor acceptor = (Acceptor) iterator.next();
+            acceptor.addToIORTemplate(iorTemplate, policies, codebase);
+        }
     }
 
     public Message getMessage( byte[] data )
     {
         Connection connection = new BufferConnectionImpl(orb) ;
-	ByteBuffer bb = ByteBuffer.allocate( data.length ) ;
-	bb.put( data ) ;
-	bb.position( 0 ) ;
-	try {
-	    connection.write( bb ) ;
-	} catch (IOException exc) {
-	    // should never happen in this case
-	}
+        ByteBuffer bb = ByteBuffer.allocate( data.length ) ;
+        bb.put( data ) ;
+        bb.position( 0 ) ;
+        try {
+            connection.write( bb ) ;
+        } catch (IOException exc) {
+            // should never happen in this case
+        }
 
-	Message msg = MessageBase.readGIOPMessage( orb, connection ) ;
-	if (msg.getGIOPVersion().equals( GIOPVersion.V1_2 ))
-	    ((Message_1_2)msg).unmarshalRequestID( msg.getByteBuffer() ) ; 
+        Message msg = MessageBase.readGIOPMessage( orb, connection ) ;
+        if (msg.getGIOPVersion().equals( GIOPVersion.V1_2 ))
+            ((Message_1_2)msg).unmarshalRequestID( msg.getByteBuffer() ) ; 
 
-	return msg ;
+        return msg ;
     }
 
     public MessageData getMessageData( byte[][] data ) 
     {
         Connection connection = new BufferConnectionImpl(orb) ;
-	for (int ctr=0; ctr<data.length; ctr++) {
-	    byte[] message = data[ctr] ;
-	    ByteBuffer bb = ByteBuffer.allocate( message.length ) ;
-	    bb.put( message ) ;
-	    bb.position( 0 ) ;
-	    try {
-		connection.write( bb ) ;
-	    } catch (IOException exc) {
-		// should never happen in this case
-	    }
-	}
+        for (int ctr=0; ctr<data.length; ctr++) {
+            byte[] message = data[ctr] ;
+            ByteBuffer bb = ByteBuffer.allocate( message.length ) ;
+            bb.put( message ) ;
+            bb.position( 0 ) ;
+            try {
+                connection.write( bb ) ;
+            } catch (IOException exc) {
+                // should never happen in this case
+            }
+        }
 
-	final Message[] messages = new Message[data.length] ;
-	int requestID = 0 ;
-	Message firstMessage = null ;
-	Message msg = null ;
-	CDRInputObject inobj = null ;
-	BufferManagerRead buffman = null ;
+        final Message[] messages = new Message[data.length] ;
+        int requestID = 0 ;
+        Message firstMessage = null ;
+        Message msg = null ;
+        CDRInputObject inobj = null ;
+        BufferManagerRead buffman = null ;
 
-	for (int ctr=0; ctr<data.length; ctr++) {
-	    msg = MessageBase.readGIOPMessage( orb, connection ) ;
-	    messages[ctr] = msg ;
-	    if (msg.getGIOPVersion().equals( GIOPVersion.V1_2 ))
-		((Message_1_2)msg).unmarshalRequestID( msg.getByteBuffer() ) ; 
-	    
-	    // Check that moreFragments == (ctr < messages.length)?
+        for (int ctr=0; ctr<data.length; ctr++) {
+            msg = MessageBase.readGIOPMessage( orb, connection ) ;
+            messages[ctr] = msg ;
+            if (msg.getGIOPVersion().equals( GIOPVersion.V1_2 ))
+                ((Message_1_2)msg).unmarshalRequestID( msg.getByteBuffer() ) ; 
+            
+            // Check that moreFragments == (ctr < messages.length)?
 
-	    if (ctr==0) {
-		firstMessage = msg ;
-		inobj = new CDRInputObject( orb, connection,
-		    msg.getByteBuffer(), msg ) ;
-		buffman = inobj.getBufferManager() ;
-		inobj.performORBVersionSpecificInit() ;
-	    } else {
-		buffman.processFragment( msg.getByteBuffer(), (FragmentMessage)msg ) ;
-	    }
-	}
+            if (ctr==0) {
+                firstMessage = msg ;
+                inobj = new CDRInputObject( orb, connection,
+                    msg.getByteBuffer(), msg ) ;
+                buffman = inobj.getBufferManager() ;
+                inobj.performORBVersionSpecificInit() ;
+            } else {
+                buffman.processFragment( msg.getByteBuffer(), (FragmentMessage)msg ) ;
+            }
+        }
 
-	// Unmarshal all the data in the first message.  This may 
-	// cause other fragments to be read.
-	firstMessage.read( inobj ) ;
+        // Unmarshal all the data in the first message.  This may 
+        // cause other fragments to be read.
+        firstMessage.read( inobj ) ;
 
-	final CDRInputObject resultObj = inobj ;
+        final CDRInputObject resultObj = inobj ;
 
-	return new MessageData() {
-	   public Message[] getMessages() { return messages ; }
-	   public CDRInputObject getStream() { return resultObj ; }
-	} ;
+        return new MessageData() {
+           public Message[] getMessages() { return messages ; }
+           public CDRInputObject getStream() { return resultObj ; }
+        } ;
     }
 
     private ThreadLocal currentMessageTraceManager =
-	new ThreadLocal() {
-	    public Object initialValue() 
-	    {
-		return new MessageTraceManagerImpl( ) ;
-	    }
-	} ;
+        new ThreadLocal() {
+            public Object initialValue() 
+            {
+                return new MessageTraceManagerImpl( ) ;
+            }
+        } ;
 
     public MessageTraceManager getMessageTraceManager() 
     {
-	return (MessageTraceManager)(currentMessageTraceManager.get()) ;
+        return (MessageTraceManager)(currentMessageTraceManager.get()) ;
     }
 }
 

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ClientA.java	1.4 99/06/07 */
+/* @(#)ClientA.java     1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -53,17 +53,17 @@ public class ClientA extends javax.rmi.fvd.ParentClass{
     private static final long serialVersionUID = 113456789L;
 
     private int c, d;
-	
+        
     public ClientA(){
-	c = 456;
-	d = 31;
+        c = 456;
+        d = 31;
     }
-	
+        
     public long getTotal(){
-	return  super.getTotal() + c + d;
+        return  super.getTotal() + c + d;
     }
 
     public long getOriginalTotal(){
-	return 456 + 31;
+        return 456 + 31;
     }
 }

@@ -83,13 +83,13 @@ public class JourneyImpl implements Journey, java.io.Serializable
 
     public JourneyImpl (FleetImpl fleet, PlanetImpl origin, PlanetImpl destination)
     {
-	fID = new ID ();
-	fFleet = fleet;
-	fOrigin = origin;
-	fDestination = destination;
-	fTotalDistance = fOrigin.distanceTo (fDestination);
-	fDistanceTraveled = 0;
-	fIsComplete = false;
+        fID = new ID ();
+        fFleet = fleet;
+        fOrigin = origin;
+        fDestination = destination;
+        fTotalDistance = fOrigin.distanceTo (fDestination);
+        fDistanceTraveled = 0;
+        fIsComplete = false;
     }
 
     //
@@ -98,22 +98,22 @@ public class JourneyImpl implements Journey, java.io.Serializable
 
     public ID getID ()
     {
-	return fID;
+        return fID;
     }
 
     public Planet getOrigin ()
     {
-	return fOrigin;
+        return fOrigin;
     }
 
     public Planet getDestination ()
     {
-	return fDestination;
+        return fDestination;
     }
 
     public double getPercentComplete ()
     {
-	return (double)fDistanceTraveled/(double)fTotalDistance;
+        return (double)fDistanceTraveled/(double)fTotalDistance;
     }
 
     //
@@ -122,27 +122,27 @@ public class JourneyImpl implements Journey, java.io.Serializable
 
     public FleetImpl getFleet ()
     {
-	return fFleet;
+        return fFleet;
     }
 
     public int getTotalDistance ()
     {
-	return fTotalDistance;
+        return fTotalDistance;
     }
 
     public int getDistanceTraveled ()
     {
-	return fDistanceTraveled;
+        return fDistanceTraveled;
     }
 
     public int getRemainingDistance ()
     {
-	return fTotalDistance = fDistanceTraveled;
+        return fTotalDistance = fDistanceTraveled;
     }
 
     public boolean isComplete ()
     {
-	return fIsComplete;
+        return fIsComplete;
     }
 
     //
@@ -151,20 +151,20 @@ public class JourneyImpl implements Journey, java.io.Serializable
 
     public void moveFleet ()
     {
-	if ( fDistanceTraveled == 0 ) {
-	    fOrigin.removeFleet (fFleet);
-	    fFleet.setStation (null);
-	    fFleet.setJourney (this);
-	}
+        if ( fDistanceTraveled == 0 ) {
+            fOrigin.removeFleet (fFleet);
+            fFleet.setStation (null);
+            fFleet.setJourney (this);
+        }
 
-	fDistanceTraveled += fFleet.getSpeed ();
-	fFleet.move (fDistanceTraveled);
+        fDistanceTraveled += fFleet.getSpeed ();
+        fFleet.move (fDistanceTraveled);
     
-	if ( fDistanceTraveled >= fTotalDistance ) {
-	    fIsComplete = true;
-	    fDestination.acceptOrbit (fFleet);
-	    fFleet.setJourney (null);
-	}
+        if ( fDistanceTraveled >= fTotalDistance ) {
+            fIsComplete = true;
+            fDestination.acceptOrbit (fFleet);
+            fFleet.setJourney (null);
+        }
     }
 
 }

@@ -62,7 +62,7 @@ import org.omg.CORBA.portable.OutputStream;
  * the value stored in its <code>value</code> field can be accessed with
  * <code>myBooleanHolder.value</code>.
  *
- * @version	1.14, 09/09/97
+ * @version     1.14, 09/09/97
  * @since       JDK1.2
  */
 public final class BooleanHolder implements Streamable {
@@ -88,7 +88,7 @@ public final class BooleanHolder implements Streamable {
      *                <code>BooleanHolder</code> object
      */
     public BooleanHolder(boolean initial) {
-	value = initial;
+        value = initial;
     }
 
     /**
@@ -99,7 +99,7 @@ public final class BooleanHolder implements Streamable {
      *              CDR formatted data from the wire
      */
     public void _read(InputStream input) {
-	value = input.read_boolean();
+        value = input.read_boolean();
     }
 
     /**
@@ -109,7 +109,7 @@ public final class BooleanHolder implements Streamable {
      * @param output the OutputStream which will contain the CDR formatted data
      */
     public void _write(OutputStream output) {
-	output.write_boolean(value);
+        output.write_boolean(value);
     }
 
     /**
@@ -120,6 +120,6 @@ public final class BooleanHolder implements Streamable {
      *            in this <code>BooleanHolder</code> object
      */
     public TypeCode _type() {
-	return ORB.init().get_primitive_tc(TCKind.tk_boolean);
+        return ORB.init().get_primitive_tc(TCKind.tk_boolean);
     }
 }

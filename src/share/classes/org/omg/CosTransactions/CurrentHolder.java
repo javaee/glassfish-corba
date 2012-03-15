@@ -46,14 +46,14 @@ package org.omg.CosTransactions;
  */
 public final class CurrentHolder implements org.omg.CORBA.portable.Streamable
 {
-    //	instance variable 
+    //  instance variable 
     public org.omg.CosTransactions.Current value;
-    //	constructors 
+    //  constructors 
     public CurrentHolder() {
-	this(null);
+        this(null);
     }
     public CurrentHolder(org.omg.CosTransactions.Current __arg) {
-	value = __arg;
+        value = __arg;
     }
 
     public void _write(org.omg.CORBA.portable.OutputStream out) {

@@ -38,16 +38,16 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.servicecontext;
+package com.sun.corba.ee.spi.servicecontext;
 
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 /** Base class for all ServiceContext classes.
 * There is a derived ServiceContext class for each service context that
@@ -106,19 +106,19 @@ public abstract class ServiceContextBase {
      */
     public synchronized void write(OutputStream s, GIOPVersion gv) throws SystemException {
         if (data == null) {
-	    EncapsOutputStream os = new EncapsOutputStream((ORB)(s.orb()), gv);	  
-	    try {
-	        os.putEndian();
-		writeData(os);
-		data = os.toByteArray();
-	    } finally {
-	        try {
-		    os.close();
-		} catch (java.io.IOException e) {
-		    wrapper.ioexceptionDuringStreamClose(e);
-		}
-	    }
-	}
+            EncapsOutputStream os = new EncapsOutputStream((ORB)(s.orb()), gv);   
+            try {
+                os.putEndian();
+                writeData(os);
+                data = os.toByteArray();
+            } finally {
+                try {
+                    os.close();
+                } catch (java.io.IOException e) {
+                    wrapper.ioexceptionDuringStreamClose(e);
+                }
+            }
+        }
         s.write_long(getId());
         s.write_long(data.length);
         s.write_octet_array(data, 0, data.length);
@@ -138,6 +138,6 @@ public abstract class ServiceContextBase {
     @Override
     public String toString() 
     {
-	return "ServiceContext[ id=" + getId() + " ]" ;
+        return "ServiceContext[ id=" + getId() + " ]" ;
     } 
 }

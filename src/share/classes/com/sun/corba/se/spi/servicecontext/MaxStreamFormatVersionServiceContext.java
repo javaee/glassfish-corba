@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.servicecontext;
+package com.sun.corba.ee.spi.servicecontext;
 
 import org.omg.IOP.RMICustomMaxStreamFormat;
 

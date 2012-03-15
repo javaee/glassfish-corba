@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.naming.namingutil;
+package com.sun.corba.ee.impl.naming.namingutil;
 
 import org.omg.CORBA.CompletionStatus;
 import java.util.StringTokenizer;

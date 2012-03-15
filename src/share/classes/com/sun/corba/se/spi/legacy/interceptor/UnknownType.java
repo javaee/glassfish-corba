@@ -38,19 +38,19 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.legacy.interceptor;
+package com.sun.corba.ee.spi.legacy.interceptor;
 
 public class UnknownType
     extends
-	Exception
+        Exception
 {
     public UnknownType()
     {
-	super();
+        super();
     }
 
     public UnknownType(String msg)
     {
-	super(msg);
+        super(msg);
     }
 }

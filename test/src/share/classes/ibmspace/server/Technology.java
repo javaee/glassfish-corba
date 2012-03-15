@@ -68,34 +68,34 @@ public class Technology implements Investment, java.io.Serializable
 
     public Technology (String name, int initialLevel)
     {
-	fName = name;
-	fLevel = initialLevel;
-	fInvestment = 0;
-	fRequiredInvestment = (fLevel+1) * UNIT_INVESTMENT;
+        fName = name;
+        fLevel = initialLevel;
+        fInvestment = 0;
+        fRequiredInvestment = (fLevel+1) * UNIT_INVESTMENT;
     }
 
     public String getName ()
     {
-	return fName;
+        return fName;
     }
 
     public void invest (long investment)
     {
-	// formula:  1. each level requires level* UNIT_INVESTMENT to reach
-	//           2. investments are dampened by a random percentage
+        // formula:  1. each level requires level* UNIT_INVESTMENT to reach
+        //           2. investments are dampened by a random percentage
 
-	fInvestment += investment * Math.random () * 1.25;
-	if ( fInvestment >= fRequiredInvestment ) {
-	    fLevel ++;
-	    fInvestment -= fRequiredInvestment;
-	    fRequiredInvestment = (fLevel+1) * UNIT_INVESTMENT;
-	}
+        fInvestment += investment * Math.random () * 1.25;
+        if ( fInvestment >= fRequiredInvestment ) {
+            fLevel ++;
+            fInvestment -= fRequiredInvestment;
+            fRequiredInvestment = (fLevel+1) * UNIT_INVESTMENT;
+        }
 
     }
 
     public int getLevel ()
     {
-	return fLevel;
+        return fLevel;
     }
 
 }

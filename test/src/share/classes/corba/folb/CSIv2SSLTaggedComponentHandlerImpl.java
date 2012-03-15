@@ -50,16 +50,16 @@ import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.IOP.TaggedComponent;
 import org.omg.PortableInterceptor.IORInfo;
 
-import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
-import com.sun.corba.se.impl.folb.CSIv2SSLTaggedComponentHandler;
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.orb.DataCollector;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orb.ORBConfigurator;
-import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.folb.ClusterInstanceInfo;
+import com.sun.corba.ee.impl.folb.CSIv2SSLTaggedComponentHandler;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.orb.DataCollector;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORBConfigurator;
+import com.sun.corba.ee.spi.transport.SocketInfo;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 /**
  * @author Harold Carr
@@ -67,7 +67,7 @@ import com.sun.corba.se.impl.misc.ORBUtility;
 public class CSIv2SSLTaggedComponentHandlerImpl
     extends org.omg.CORBA.LocalObject
     implements CSIv2SSLTaggedComponentHandler,
-	       ORBConfigurator
+               ORBConfigurator
 {
     private boolean debug = true;
     private ORB orb;
@@ -78,16 +78,16 @@ public class CSIv2SSLTaggedComponentHandlerImpl
     //
 
     public TaggedComponent insert(IORInfo iorInfo, 
-				  List<ClusterInstanceInfo> clusterInstanceInfo)
+                                  List<ClusterInstanceInfo> clusterInstanceInfo)
     {
-	if (debug) { dprint(".insert: " + iorInfo); }
-	return null;
+        if (debug) { dprint(".insert: " + iorInfo); }
+        return null;
     }
 
     public List<SocketInfo> extract(IOR ior)
     {
-	if (debug) { dprint(".extract"); }
-	return null;
+        if (debug) { dprint(".extract"); }
+        return null;
     }
 
     ////////////////////////////////////////////////////
@@ -97,20 +97,20 @@ public class CSIv2SSLTaggedComponentHandlerImpl
 
     public void configure(DataCollector collector, ORB orb) 
     {
-	if (debug) { dprint(".configure->:"); }
+        if (debug) { dprint(".configure->:"); }
 
-	this.orb = orb;
-	try {
-	    orb.register_initial_reference(
-	        ORBConstants.CSI_V2_SSL_TAGGED_COMPONENT_HANDLER,
-	        this);
-	} catch (InvalidName e) {
-	    dprint(".configure: !!!!! FAILURE");
-	    e.printStackTrace(System.out);
-	    System.exit(1);
-	}
+        this.orb = orb;
+        try {
+            orb.register_initial_reference(
+                ORBConstants.CSI_V2_SSL_TAGGED_COMPONENT_HANDLER,
+                this);
+        } catch (InvalidName e) {
+            dprint(".configure: !!!!! FAILURE");
+            e.printStackTrace(System.out);
+            System.exit(1);
+        }
 
-	if (debug) { dprint(".configure<-:"); }
+        if (debug) { dprint(".configure<-:"); }
     }
 
     ////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ public class CSIv2SSLTaggedComponentHandlerImpl
 
     private static void dprint(String msg)
     {
-	ORBUtility.dprint("CSIv2SSLTaggedComponentHandlerImpl", msg);
+        ORBUtility.dprint("CSIv2SSLTaggedComponentHandlerImpl", msg);
     }
 
 }

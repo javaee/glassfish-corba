@@ -38,16 +38,16 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
 import java.util.List;
 
-import com.sun.corba.se.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.transport.ContactInfo;
 
 /**
  * This interface is the "sticky manager" for IIOP failover.  The default
  * ORB does NOT contain a sticky manager.  One is registered by supplying
- * a class via the com.sun.corba.se.transport.ORBIIOPPrimaryToContactInfoClass.
+ * a class via the com.sun.corba.ee.transport.ORBIIOPPrimaryToContactInfoClass.
  *
  * It uses the IIOP primary host/port (with a SocketInfo.IIOP_CLEAR_TEXT type)
  * as a key to map to the last ContactInfo that resulted in successful'
@@ -78,8 +78,8 @@ public interface IIOPPrimaryToContactInfo
      * primary.
      */
     public boolean hasNext(ContactInfo primary,
-			   ContactInfo previous,
-			   List contactInfos);
+                           ContactInfo previous,
+                           List contactInfos);
 
     /**
      * @param primary - the key.
@@ -92,8 +92,8 @@ public interface IIOPPrimaryToContactInfo
      * previous to primary and return that <code>ContactInfo</code>.
      */
     public ContactInfo next(ContactInfo primary,
-			    ContactInfo previous,
-			    List contactInfos);
+                            ContactInfo previous,
+                            List contactInfos);
 
 }
 

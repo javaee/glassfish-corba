@@ -46,12 +46,12 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.corba;
+package com.sun.corba.ee.impl.corba;
 
 import org.omg.CORBA.NamedValue;
 import org.omg.CORBA.Any;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 public class NamedValueImpl extends NamedValue 
 {
@@ -68,14 +68,14 @@ public class NamedValueImpl extends NamedValue
     }
 
     public NamedValueImpl(ORB orb,
-			  String name, 
-			  Any value, 
-			  int flags) 
+                          String name, 
+                          Any value, 
+                          int flags) 
     {
         // Note: This orb could be an instanceof ORBSingleton or ORB
-        _orb	= orb;
-        _name 	= name;
-        _value	= value;
+        _orb    = orb;
+        _name   = name;
+        _value  = value;
         _flags      = flags;
     }
     

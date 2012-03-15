@@ -47,7 +47,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.util;
+package com.sun.corba.ee.impl.util;
 
 import java.util.List ;
 import java.util.ArrayList ;
@@ -68,14 +68,14 @@ import java.rmi.RemoteException;
 import javax.rmi.PortableRemoteObject;
 import javax.rmi.CORBA.Tie;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter ;
 
-import com.sun.corba.se.spi.logging.UtilSystemException ;
-import com.sun.corba.se.spi.logging.OMGSystemException ;
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
+import com.sun.corba.ee.spi.logging.UtilSystemException ;
+import com.sun.corba.ee.spi.logging.OMGSystemException ;
+import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.spi.misc.ORBClassLoader ;
+import com.sun.corba.ee.spi.misc.ORBClassLoader ;
 import java.util.IdentityHashMap;
 
 
@@ -118,15 +118,15 @@ public final class Utility {
         
         if (StubAdapter.isStub(obj)) {
             try {
-		StubAdapter.getDelegate(obj) ;
+                StubAdapter.getDelegate(obj) ;
             } catch (BAD_OPERATION okay) {
                 try {
-		    StubAdapter.connect( obj, orb ) ;
+                    StubAdapter.connect( obj, orb ) ;
                 } catch (RemoteException e) {
                     // The stub could not be connected because it
                     // has an invalid IOR...
-		    throw wrapper.objectNotConnected( e, 
-			obj.getClass().getName() ) ; 
+                    throw wrapper.objectNotConnected( e, 
+                        obj.getClass().getName() ) ; 
                 }
             }                
             
@@ -134,7 +134,7 @@ public final class Utility {
         }
         
         if (obj instanceof Remote) {
-	    Remote remoteObj = (Remote)obj;
+            Remote remoteObj = (Remote)obj;
             Tie theTie = Util.getInstance().getTie(remoteObj);
             if (theTie != null) {
                 try {
@@ -148,16 +148,16 @@ public final class Utility {
                     if (result != null) {
                         return result;
                     } else {
-			throw wrapper.couldNotLoadStub(obj.getClass().getName());
+                        throw wrapper.couldNotLoadStub(obj.getClass().getName());
                     }
                 } else {
-		    return StubAdapter.activateTie( theTie );
+                    return StubAdapter.activateTie( theTie );
                 }
             } else {
                 // This is an implementation object which has not been
                 // exported to IIOP OR is a JRMP stub or implementation
                 // object which cannot be marshalled into an ORB stream...
-		throw wrapper.objectNotExported( obj.getClass().getName() ) ;
+                throw wrapper.objectNotExported( obj.getClass().getName() ) ;
             }
         }
         
@@ -182,29 +182,29 @@ public final class Utility {
      * the StubFactoryFactory, and this method should be eliminated.
      */
     public static Tie loadTie(Remote obj) {
-    	Tie result = null;
-    	Class<?> objClass = obj.getClass();
-    	
-    	// Have we tried to find this guy before?
-    	
+        Tie result = null;
+        Class<?> objClass = obj.getClass();
+        
+        // Have we tried to find this guy before?
+        
         synchronized (tieCache) {
             
-    	    Object it = tieCache.get(obj);
-        	
-    	    if (it == null) {
-        	    
-    	        // No, so try it...
-        	    
-    	        try {
+            Object it = tieCache.get(obj);
+                
+            if (it == null) {
+                    
+                // No, so try it...
+                    
+                try {
 
-    	            // First try the classname...
-            	    
-    	            result = loadTie(objClass);
-            	        
-    	            // If we don't have a valid tie at this point,
-    	            // walk up the parent chain until we either
-    	            // load a tie or encounter PortableRemoteObject
-    	            // or java.lang.Object...
+                    // First try the classname...
+                    
+                    result = loadTie(objClass);
+                        
+                    // If we don't have a valid tie at this point,
+                    // walk up the parent chain until we either
+                    // load a tie or encounter PortableRemoteObject
+                    // or java.lang.Object...
 
                     while (result == null &&
                            (objClass = objClass.getSuperclass()) != null &&
@@ -213,9 +213,9 @@ public final class Utility {
                                 
                         result = loadTie(objClass);   
                     }
-    	        } catch (Exception ex) {
-		    wrapper.loadTieFailed( ex, objClass.getName() ) ;
-		}
+                } catch (Exception ex) {
+                    wrapper.loadTieFailed( ex, objClass.getName() ) ;
+                }
             
                 // Did we get it?
                 
@@ -253,8 +253,8 @@ public final class Utility {
      */
     private static Tie loadTie(Class theClass) 
     {
-	return com.sun.corba.se.spi.orb.ORB.getStubFactoryFactory().
-	    getTie( theClass ) ;
+        return com.sun.corba.ee.spi.orb.ORB.getStubFactoryFactory().
+            getTie( theClass ) ;
     }
  
     /*
@@ -282,12 +282,12 @@ public final class Utility {
      * @return the loaded class.
      */
     static Class loadClassOfType(String className, String remoteCodebase, 
-	ClassLoader loader, Class expectedType, 
-	ClassLoader expectedTypeClassLoader) throws ClassNotFoundException 
+        ClassLoader loader, Class expectedType, 
+        ClassLoader expectedTypeClassLoader) throws ClassNotFoundException 
     {
-	Class<?> loadedClass = null;
+        Class<?> loadedClass = null;
 
-	try {
+        try {
             //Sequence finding of the stubs according to spec
             try{
                 //If-else is put here for speed up of J2EE.
@@ -296,10 +296,10 @@ public final class Utility {
                 //into org.omg.stub hierarchy for non-offending
                 //classes. This will encourage people to
                 //produce non-offending class stubs in their own hierarchy.
-		final String wpp = PackagePrefixChecker.withoutPackagePrefix(className) ;
+                final String wpp = PackagePrefixChecker.withoutPackagePrefix(className) ;
                 if (!PackagePrefixChecker.hasOffendingPrefix( wpp )) {
                     loadedClass = Util.getInstance().loadClass(
-			wpp, remoteCodebase, loader);
+                        wpp, remoteCodebase, loader);
                 } else {
                     loadedClass = Util.getInstance().loadClass(className, remoteCodebase, 
                         loader);
@@ -311,19 +311,19 @@ public final class Utility {
             if (expectedType == null) {
                 return loadedClass;
             }
-	} catch (ClassNotFoundException cnfe) {
-	    if (expectedType == null) {
+        } catch (ClassNotFoundException cnfe) {
+            if (expectedType == null) {
                 throw cnfe;
             }
-	}
-	
+        }
+        
         // If no class was loaded, or if the loaded class is not of the 
-	// correct type, make a further attempt to load the correct class
-	// using the classloader of the expected type.
-	// _REVISIT_ Is this step necessary, or should the Util,loadClass
-	// algorithm always produce a valid class if the setup is correct?
-	// Does the OMG standard algorithm need to be changed to include
-	// this step?
+        // correct type, make a further attempt to load the correct class
+        // using the classloader of the expected type.
+        // _REVISIT_ Is this step necessary, or should the Util,loadClass
+        // algorithm always produce a valid class if the setup is correct?
+        // Does the OMG standard algorithm need to be changed to include
+        // this step?
         if (loadedClass == null || !expectedType.isAssignableFrom(loadedClass)){
             if (expectedType.getClassLoader() != expectedTypeClassLoader) {
                 throw new IllegalArgumentException("expectedTypeClassLoader not class loader of " +
@@ -337,7 +337,7 @@ public final class Utility {
             }
         }
 
-	return loadedClass;
+        return loadedClass;
     }
 
     /*
@@ -351,7 +351,7 @@ public final class Utility {
     public static Class loadClassForClass (String className,
                                            String remoteCodebase,
                                            ClassLoader loader,
-					   Class relatedType,
+                                           Class relatedType,
                                            ClassLoader relatedTypeClassLoader)
         throws ClassNotFoundException 
     {
@@ -360,25 +360,25 @@ public final class Utility {
                 loader);
         }
 
-	Class<?> loadedClass = null;
-	try {
-	    loadedClass = Util.getInstance().loadClass(className, remoteCodebase, loader);
-	} catch (ClassNotFoundException cnfe) {
-	    if (relatedType.getClassLoader() == null) {
+        Class<?> loadedClass = null;
+        try {
+            loadedClass = Util.getInstance().loadClass(className, remoteCodebase, loader);
+        } catch (ClassNotFoundException cnfe) {
+            if (relatedType.getClassLoader() == null) {
                 throw cnfe;
             }
-	}
-	
+        }
+        
         // If no class was not loaded, or if the loaded class is not of the 
-	// correct type, make a further attempt to load the correct class
-	// using the classloader of the related type.
-	// _REVISIT_ Is this step necessary, or should the Util,loadClass
-	// algorithm always produce a valid class if the setup is correct?
-	// Does the OMG standard algorithm need to be changed to include
-	// this step?
+        // correct type, make a further attempt to load the correct class
+        // using the classloader of the related type.
+        // _REVISIT_ Is this step necessary, or should the Util,loadClass
+        // algorithm always produce a valid class if the setup is correct?
+        // Does the OMG standard algorithm need to be changed to include
+        // this step?
         if (loadedClass == null || 
-	    (loadedClass.getClassLoader() != null &&
-	     loadedClass.getClassLoader().loadClass(relatedType.getName()) != 
+            (loadedClass.getClassLoader() != null &&
+             loadedClass.getClassLoader().loadClass(relatedType.getName()) != 
                  relatedType))
         {
             if (relatedType.getClassLoader() != relatedTypeClassLoader) {
@@ -389,8 +389,8 @@ public final class Utility {
                 loadedClass = relatedTypeClassLoader.loadClass(className);
             }
         }
-	
-	return loadedClass;
+        
+        return loadedClass;
     }
 
     /**
@@ -401,39 +401,39 @@ public final class Utility {
     public static BoxedValueHelper getHelper(Class clazz, String codebase, 
         String repId)
     {
-	String className = null;
+        String className = null;
         if (clazz != null) {
-	    className = clazz.getName();
-	    if (codebase == null) {
+            className = clazz.getName();
+            if (codebase == null) {
                 codebase =
                     Util.getInstance().getCodebase(clazz);
             }
-	} else {
-	    if (repId != null) {
+        } else {
+            if (repId != null) {
                 className =
                     RepositoryId.cache.getId(repId).getClassName();
             }
-	    if (className == null) {
+            if (className == null) {
                 throw wrapper.unableLocateValueHelper();
             }
-	}
+        }
 
-    	try {
+        try {
             ClassLoader clazzLoader = 
                 (clazz == null ? null : clazz.getClassLoader());
             Class helperClass = 
                 loadClassForClass(className+"Helper", codebase, clazzLoader, 
                 clazz, clazzLoader);
-	    return (BoxedValueHelper)helperClass.newInstance();
+            return (BoxedValueHelper)helperClass.newInstance();
 
-    	} catch (ClassNotFoundException cnfe) {
-	    throw wrapper.unableLocateValueHelper( cnfe );
+        } catch (ClassNotFoundException cnfe) {
+            throw wrapper.unableLocateValueHelper( cnfe );
         } catch (IllegalAccessException iae) {
-	    throw wrapper.unableLocateValueHelper( iae );
+            throw wrapper.unableLocateValueHelper( iae );
         } catch (InstantiationException ie) {
-	    throw wrapper.unableLocateValueHelper( ie );
+            throw wrapper.unableLocateValueHelper( ie );
         } catch (ClassCastException cce) {
-	    throw wrapper.unableLocateValueHelper( cce );
+            throw wrapper.unableLocateValueHelper( cce );
         }    
     }
 
@@ -445,56 +445,56 @@ public final class Utility {
     public static ValueFactory getFactory(Class clazz, String codebase, 
                                ORB orb, String repId)
     {
-	ValueFactory factory = null;
-	if ((orb != null) && (repId != null)) {
-	    try {
+        ValueFactory factory = null;
+        if ((orb != null) && (repId != null)) {
+            try {
                 factory = ((org.omg.CORBA_2_3.ORB)orb).lookup_value_factory(
                     repId);
-	    } catch (org.omg.CORBA.BAD_PARAM ex) {
-	        // Try other way
-	    }
-	}
+            } catch (org.omg.CORBA.BAD_PARAM ex) {
+                // Try other way
+            }
+        }
 
-	String className = null;
+        String className = null;
         if (clazz != null) {
-	    className = clazz.getName();
-	    if (codebase == null) {
+            className = clazz.getName();
+            if (codebase == null) {
                 codebase =
                     Util.getInstance().getCodebase(clazz);
             }
-	} else {
-	    if (repId != null) {
+        } else {
+            if (repId != null) {
                 className =
                     RepositoryId.cache.getId(repId).getClassName();
             }
-	    if (className == null) {
+            if (className == null) {
                 throw omgWrapper.unableLocateValueFactory();
             }
-	}
+        }
 
-	// if earlier search found a non-default factory, or the same default
-	// factory that loadClassForClass would return, bale out now... 
-	if (factory != null && 
-	    (!factory.getClass().getName().equals(className+"DefaultFactory") ||
-	     (clazz == null && codebase == null)))
-	    return factory;
+        // if earlier search found a non-default factory, or the same default
+        // factory that loadClassForClass would return, bale out now... 
+        if (factory != null && 
+            (!factory.getClass().getName().equals(className+"DefaultFactory") ||
+             (clazz == null && codebase == null)))
+            return factory;
 
-    	try {
+        try {
             ClassLoader clazzLoader = 
                 (clazz == null ? null : clazz.getClassLoader());
-	    Class factoryClass = 
+            Class factoryClass = 
                 loadClassForClass(className+"DefaultFactory", codebase,
                 clazzLoader, clazz, clazzLoader);
-	    return (ValueFactory)factoryClass.newInstance();
+            return (ValueFactory)factoryClass.newInstance();
 
-    	} catch (ClassNotFoundException cnfe) {
-	    throw omgWrapper.unableLocateValueFactory( cnfe);
+        } catch (ClassNotFoundException cnfe) {
+            throw omgWrapper.unableLocateValueFactory( cnfe);
         } catch (IllegalAccessException iae) {
-	    throw omgWrapper.unableLocateValueFactory( iae);
+            throw omgWrapper.unableLocateValueFactory( iae);
         } catch (InstantiationException ie) {
-	    throw omgWrapper.unableLocateValueFactory( ie);
+            throw omgWrapper.unableLocateValueFactory( ie);
         } catch (ClassCastException cce) {
-	    throw omgWrapper.unableLocateValueFactory( cce);
+            throw omgWrapper.unableLocateValueFactory( cce);
         }    
     }
 
@@ -509,9 +509,9 @@ public final class Utility {
      */
 
     public static Remote loadStub(Tie tie,
-				  PresentationManager.StubFactory stubFactory,
-				  String remoteCodebase,
-				  boolean onlyMostDerived) 
+                                  PresentationManager.StubFactory stubFactory,
+                                  String remoteCodebase,
+                                  boolean onlyMostDerived) 
     {
         StubEntry entry = null;
 
@@ -538,20 +538,20 @@ public final class Utility {
                     if (!entry.mostDerived && onlyMostDerived) {
                         // We must reload because we do not have
                         // the most derived cached already...
-			// The stubFactory arg must be null here
-			// to force onlyMostDerived=true to work
-			// correctly.
+                        // The stubFactory arg must be null here
+                        // to force onlyMostDerived=true to work
+                        // correctly.
                         entry = loadStubAndUpdateCache(tie,null,
-			    remoteCodebase,true);
+                            remoteCodebase,true);
                     } else if (stubFactory != null && 
-			!StubAdapter.getTypeIds(entry.stub)[0].equals( 
-			    stubFactory.getTypeIds()[0]) )
+                        !StubAdapter.getTypeIds(entry.stub)[0].equals( 
+                            stubFactory.getTypeIds()[0]) )
                     {
                         // We do not have exactly the right stub. First, try to
                         // upgrade the cached stub by forcing it to the most
                         // derived stub...
                         entry = loadStubAndUpdateCache(tie,null,
-			    remoteCodebase,true);
+                            remoteCodebase,true);
 
                         // If that failed, try again with the exact type
                         // we need...
@@ -563,14 +563,14 @@ public final class Utility {
                         // Use the cached stub. Is the delegate set?
                         try {
                             Delegate stubDel = StubAdapter.getDelegate(
-				entry.stub ) ;
+                                entry.stub ) ;
                         } catch (Exception e2) {
                             // No, so set it if we can...
                             try {            
                                 Delegate del = StubAdapter.getDelegate(
-				    tie ) ;
-				StubAdapter.setDelegate( entry.stub,
-				    del ) ;
+                                    tie ) ;
+                                StubAdapter.setDelegate( entry.stub,
+                                    del ) ;
                             } catch (Exception e) {}
                         }
                     }
@@ -597,7 +597,7 @@ public final class Utility {
      */
     private static StubEntry loadStubAndUpdateCache (
         Tie tie, PresentationManager.StubFactory  stubFactory,
-	String remoteCodebase, boolean onlyMostDerived) 
+        String remoteCodebase, boolean onlyMostDerived) 
     {
         org.omg.CORBA.Object stub = null;
         StubEntry entry = null;
@@ -607,7 +607,7 @@ public final class Utility {
             try {
                 stub = stubFactory.makeStub();
             } catch (Throwable e) {
-		wrapper.stubFactoryCouldNotMakeStub( e ) ;
+                wrapper.stubFactoryCouldNotMakeStub( e ) ;
                 if (e instanceof ThreadDeath) {
                     throw (ThreadDeath) e;
                 }
@@ -615,10 +615,10 @@ public final class Utility {
         } else {
             String[] ids = null;
             if (tieIsStub) {
-		ids = StubAdapter.getTypeIds( tie ) ;
+                ids = StubAdapter.getTypeIds( tie ) ;
             } else {
-		// This will throw an exception if the tie
-		// is not a Servant.  
+                // This will throw an exception if the tie
+                // is not a Servant.  
                 ids = ((org.omg.PortableServer.Servant)tie).
                       _all_interfaces( null, null );
             }
@@ -627,74 +627,74 @@ public final class Utility {
                 remoteCodebase = Util.getInstance().getCodebase(tie.getClass());
             }
                     
-	    if (ids.length == 0) {
-		stub = new org.omg.stub.java.rmi._Remote_Stub();
-	    } else {
-		// Keep track of the errors for reporting after all attempts
-		List errors = new ArrayList() ;
+            if (ids.length == 0) {
+                stub = new org.omg.stub.java.rmi._Remote_Stub();
+            } else {
+                // Keep track of the errors for reporting after all attempts
+                List errors = new ArrayList() ;
 
-		// Now walk all the RepIDs till we find a stub or fail...
-		for (int i = 0; i < ids.length; i++) {
-		    if (ids[i].length() == 0) {
-			stub = new org.omg.stub.java.rmi._Remote_Stub();
-			break;
-		    }
-			    
-		    try {
-			PresentationManager.StubFactoryFactory stubFactoryFactory =
-			    com.sun.corba.se.spi.orb.ORB.getStubFactoryFactory();
-			RepositoryId rid = RepositoryId.cache.getId( ids[i] ) ;
-			String className = rid.getClassName() ;
-			boolean isIDLInterface = rid.isIDLType() ;
-			stubFactory = stubFactoryFactory.createStubFactory( 
-			    className, isIDLInterface, remoteCodebase, null, 
-			    // This used to use the Tie's ClassLoader, but
-			    // that is probably wrong for dynamic RMI-IIOP,
-			    // since the Tie is always ReflectiveTie, which
-			    // would always be loaded by the ORB ClassLoader,
-			    // which may not be the application ClassLoader
-			    // in some cases.
-			    ORBClassLoader.getClassLoader() ) ;
-			stub = stubFactory.makeStub();
-			break;
-		    } catch (Exception e) {
-			// save exception for reporting after all attempts are completed.
-			errors.add( e ) ;
-		    }
-			    
-		    if (onlyMostDerived) {
+                // Now walk all the RepIDs till we find a stub or fail...
+                for (int i = 0; i < ids.length; i++) {
+                    if (ids[i].length() == 0) {
+                        stub = new org.omg.stub.java.rmi._Remote_Stub();
                         break;
                     }
-		}
+                            
+                    try {
+                        PresentationManager.StubFactoryFactory stubFactoryFactory =
+                            com.sun.corba.ee.spi.orb.ORB.getStubFactoryFactory();
+                        RepositoryId rid = RepositoryId.cache.getId( ids[i] ) ;
+                        String className = rid.getClassName() ;
+                        boolean isIDLInterface = rid.isIDLType() ;
+                        stubFactory = stubFactoryFactory.createStubFactory( 
+                            className, isIDLInterface, remoteCodebase, null, 
+                            // This used to use the Tie's ClassLoader, but
+                            // that is probably wrong for dynamic RMI-IIOP,
+                            // since the Tie is always ReflectiveTie, which
+                            // would always be loaded by the ORB ClassLoader,
+                            // which may not be the application ClassLoader
+                            // in some cases.
+                            ORBClassLoader.getClassLoader() ) ;
+                        stub = stubFactory.makeStub();
+                        break;
+                    } catch (Exception e) {
+                        // save exception for reporting after all attempts are completed.
+                        errors.add( e ) ;
+                    }
+                            
+                    if (onlyMostDerived) {
+                        break;
+                    }
+                }
 
-		// Report errors.  Errors are logged at FINE level if
-		// we got a stub (stub != null).  Errors are logged
-		// as WARNINGs if we did not get a stub.
-		Iterator iter = errors.iterator() ;
-		if (stub == null ) {
-		    while (iter.hasNext()) {
-			Exception exc = (Exception)iter.next() ;
-			wrapper.failureInMakeStubFromRepositoryId( exc ) ;
-		    }
+                // Report errors.  Errors are logged at FINE level if
+                // we got a stub (stub != null).  Errors are logged
+                // as WARNINGs if we did not get a stub.
+                Iterator iter = errors.iterator() ;
+                if (stub == null ) {
+                    while (iter.hasNext()) {
+                        Exception exc = (Exception)iter.next() ;
+                        wrapper.failureInMakeStubFromRepositoryId( exc ) ;
+                    }
 
-		    wrapper.couldNotMakeStubFromRepositoryId() ;
-		} else {
-		    while (iter.hasNext()) {
-			Exception exc = (Exception)iter.next() ;
-			wrapper.errorInMakeStubFromRepositoryId( exc ) ;
-		    }
-		}
-	    }
-	}
+                    wrapper.couldNotMakeStubFromRepositoryId() ;
+                } else {
+                    while (iter.hasNext()) {
+                        Exception exc = (Exception)iter.next() ;
+                        wrapper.errorInMakeStubFromRepositoryId( exc ) ;
+                    }
+                }
+            }
+        }
                 
         if (stub == null) {
             // Stub == null, so cache the miss...
             tieToStubCache.put(tie,CACHE_MISS);
-	} else {
+        } else {
             if (tieIsStub) {
                 try {
-		    Delegate del = StubAdapter.getDelegate( tie ) ;
-		    StubAdapter.setDelegate( stub, del ) ;
+                    Delegate del = StubAdapter.getDelegate( tie ) ;
+                    StubAdapter.setDelegate( stub, del ) ;
                 } catch( Exception e1 ) {
                     // The tie does not have a delegate set, so stash
                     // this tie away using the stub as a key so that
@@ -708,8 +708,8 @@ public final class Utility {
             } else {
                 // Tie extends Servant
                 try {
-		    Delegate delegate = StubAdapter.getDelegate( tie ) ;
-		    StubAdapter.setDelegate( stub, delegate ) ;
+                    Delegate delegate = StubAdapter.getDelegate( tie ) ;
+                    StubAdapter.setDelegate( stub, delegate ) ;
                 } catch( org.omg.CORBA.BAD_INV_ORDER bad) {
                     synchronized (stubToTieCache) {
                         stubToTieCache.put(stub,tie);
@@ -720,7 +720,7 @@ public final class Utility {
                     // 1) POA is not associated with the TIE 
                     // 2) POA Policies for the tie-associated POA
                     //    does not support _this_object() call. 
-		    throw wrapper.noPoa( e ) ;
+                    throw wrapper.noPoa( e ) ;
                 }
             }
             // Update the cache...
@@ -750,23 +750,23 @@ public final class Utility {
         synchronized (tieToStubCache) {
             entry = (StubEntry)tieToStubCache.remove(tie);
         }
-	if (entry != null) {
+        if (entry != null) {
             synchronized (stubToTieCache) {
                 stubToTieCache.remove(entry.stub);
             }
-	}
+        }
     }
     
     /*
      * Remove cached tie/servant pair.
      */
     public static void purgeTieAndServant (Tie tie) {
-	synchronized (tieCache) {
-	    Object target = tie.getTarget();
-	    if (target != null) {
+        synchronized (tieCache) {
+            Object target = tie.getTarget();
+            if (target != null) {
                 tieCache.remove(target);
             }
-	}
+        }
     }
 
     /*
@@ -797,49 +797,49 @@ public final class Utility {
     {
         Remote result = null;
             
-	try {
+        try {
             // Get the codebase from the delegate to use when loading
             // the new stub, if possible...
             String codebase = null;
-	    Delegate delegate = null ;
+            Delegate delegate = null ;
             try {
                 // We can't assume that narrowFrom is a CORBA_2_3 stub, yet
                 // it may have a 2_3 Delegate that provides a codebase.  Swallow
                 // the ClassCastException otherwise.
-		delegate = StubAdapter.getDelegate( narrowFrom ) ;
+                delegate = StubAdapter.getDelegate( narrowFrom ) ;
                 codebase = ((org.omg.CORBA_2_3.portable.Delegate)delegate).
-		    get_codebase(narrowFrom);
+                    get_codebase(narrowFrom);
 
             } catch (ClassCastException e) {
-		wrapper.classCastExceptionInLoadStub( e ) ;
+                wrapper.classCastExceptionInLoadStub( e ) ;
             }
 
-	    // Fix for bug 6344962
-	    //
-	    // Note that we (currently) only support Dynamic RMI-IIOP
-	    // for our own ORB.  Consequently, we need to check here
-	    // whether our own ORB is in use or not.  If not,
-	    // we must use the static StubFactoryFactory ONLY.
-	    ORB orb = delegate.orb(narrowFrom) ;
-	    PresentationManager.StubFactoryFactory sff = null ;
-	    if (orb instanceof com.sun.corba.se.spi.orb.ORB) {
-		// This can be either static or dynamic
-		sff = com.sun.corba.se.spi.orb.ORB.getStubFactoryFactory() ;
-	    } else {
-		PresentationManager pm = 
-		    com.sun.corba.se.spi.orb.ORB.getPresentationManager() ;
-		// This is the static version
-		sff = pm.getStubFactoryFactory(false) ; 
-	    }
+            // Fix for bug 6344962
+            //
+            // Note that we (currently) only support Dynamic RMI-IIOP
+            // for our own ORB.  Consequently, we need to check here
+            // whether our own ORB is in use or not.  If not,
+            // we must use the static StubFactoryFactory ONLY.
+            ORB orb = delegate.orb(narrowFrom) ;
+            PresentationManager.StubFactoryFactory sff = null ;
+            if (orb instanceof com.sun.corba.ee.spi.orb.ORB) {
+                // This can be either static or dynamic
+                sff = com.sun.corba.ee.spi.orb.ORB.getStubFactoryFactory() ;
+            } else {
+                PresentationManager pm = 
+                    com.sun.corba.ee.spi.orb.ORB.getPresentationManager() ;
+                // This is the static version
+                sff = pm.getStubFactoryFactory(false) ; 
+            }
 
-	    PresentationManager.StubFactory sf = sff.createStubFactory( 
-		narrowTo.getName(), false, codebase, narrowTo, 
-		narrowTo.getClassLoader() ) ;
-	    result = (Remote)sf.makeStub() ;
-	    StubAdapter.setDelegate( result, 
-		StubAdapter.getDelegate( narrowFrom ) ) ;
+            PresentationManager.StubFactory sf = sff.createStubFactory( 
+                narrowTo.getName(), false, codebase, narrowTo, 
+                narrowTo.getClassLoader() ) ;
+            result = (Remote)sf.makeStub() ;
+            StubAdapter.setDelegate( result, 
+                StubAdapter.getDelegate( narrowFrom ) ) ;
         } catch (Exception err) {
-	    wrapper.exceptionInLoadStub( err ) ;
+            wrapper.exceptionInLoadStub( err ) ;
         }
         
         return result;
@@ -851,9 +851,9 @@ public final class Utility {
      */
     public static Class loadStubClass(String repID,
                                       String remoteCodebase,
-				      Class expectedType) 
-	throws ClassNotFoundException 
-    {	                                    
+                                      Class expectedType) 
+        throws ClassNotFoundException 
+    {                                       
         // Get the repID and check for "" special case.
         // We should never be called with it (See CDRInputStream
         // and the loadStub() method)...
@@ -867,7 +867,7 @@ public final class Utility {
         // back to using its codebase if we need to...
         String className = Utility.stubNameFromRepID(repID);
         ClassLoader expectedTypeClassLoader = (expectedType == null ? null : 
-	    expectedType.getClassLoader());
+            expectedType.getClassLoader());
 
         try {
               return loadClassOfType(className,
@@ -876,7 +876,7 @@ public final class Utility {
                                        expectedType,
                                        expectedTypeClassLoader);
         } catch (ClassNotFoundException e) {
-	    return loadClassOfType(PackagePrefixChecker.packagePrefix() + className,
+            return loadClassOfType(PackagePrefixChecker.packagePrefix() + className,
                                    remoteCodebase,
                                    expectedTypeClassLoader,
                                    expectedType,
@@ -889,44 +889,44 @@ public final class Utility {
      */
     public static String stubName (String className) 
     {
-	return stubName( className, false ) ;
+        return stubName( className, false ) ;
     }
 
     public static String dynamicStubName( String className )
     {
-	return stubName( className, true ) ;
+        return stubName( className, true ) ;
     }
 
     private static String stubName( String className,
-	boolean isDynamic ) 
+        boolean isDynamic ) 
     {
-	String name = stubNameForCompiler( className, isDynamic ) ;
-	if (PackagePrefixChecker.hasOffendingPrefix( name )) {
+        String name = stubNameForCompiler( className, isDynamic ) ;
+        if (PackagePrefixChecker.hasOffendingPrefix( name )) {
             name =
                 PackagePrefixChecker.packagePrefix() + name;
         }
-	return name ;
+        return name ;
     }
 
     public static String stubNameForCompiler (String className) 
     {
-	return stubNameForCompiler( className, false ) ;
+        return stubNameForCompiler( className, false ) ;
     }
 
     private static String stubNameForCompiler( String className, 
-	boolean isDynamic )
+        boolean isDynamic )
     {
         int index = className.indexOf('$');
         if (index < 0) {
             index = className.lastIndexOf('.');
         }
 
-	String suffix = isDynamic ? DYNAMIC_STUB_SUFFIX : 
-	    RMI_STUB_SUFFIX ;
+        String suffix = isDynamic ? DYNAMIC_STUB_SUFFIX : 
+            RMI_STUB_SUFFIX ;
     
         if (index > 0) {
             return className.substring(0,index+1) + STUB_PREFIX + 
-		className.substring(index+1) + suffix;
+                className.substring(index+1) + suffix;
         } else {
             return STUB_PREFIX + className + suffix;
         }
@@ -951,13 +951,13 @@ public final class Utility {
         }
         if (index > 0) {
             return className.substring(0,index+1) +
-		STUB_PREFIX +
-		className.substring(index+1) +
-		TIE_SUFIX;
+                STUB_PREFIX +
+                className.substring(index+1) +
+                TIE_SUFIX;
         } else {
             return STUB_PREFIX +
-		className +
-		TIE_SUFIX;
+                className +
+                TIE_SUFIX;
         }
     }
 
@@ -965,7 +965,7 @@ public final class Utility {
      * Throws the CORBA equivalent of a java.io.NotSerializableException
      */
     public static void throwNotSerializableForCorba(String className) {
-	throw omgWrapper.notSerializable( className ) ;
+        throw omgWrapper.notSerializable( className ) ;
     }
 
     /**
@@ -977,22 +977,22 @@ public final class Utility {
         int index = className.lastIndexOf('.');
         if (index > 0) {
             result = className.substring(0,index+1) + 
-		STUB_PREFIX +
-		className.substring(index+1) + 
-		IDL_STUB_SUFFIX;
+                STUB_PREFIX +
+                className.substring(index+1) + 
+                IDL_STUB_SUFFIX;
         } else {
             result = STUB_PREFIX +
-		className +
-		IDL_STUB_SUFFIX;
+                className +
+                IDL_STUB_SUFFIX;
         }
         return result;
     }
     
     public static void printStackTrace() 
     {
-	Throwable thr = new Throwable( "Printing stack trace:" ) ;
-	thr.fillInStackTrace() ;
-	thr.printStackTrace() ;
+        Throwable thr = new Throwable( "Printing stack trace:" ) ;
+        thr.fillInStackTrace() ;
+        thr.printStackTrace() ;
     }
 
     /**
@@ -1003,10 +1003,10 @@ public final class Utility {
      */
     public static Object readObjectAndNarrow(InputStream in,
                                              Class narrowTo)
-	throws ClassCastException 
+        throws ClassCastException 
     {
         Object result = in.read_Object();
-	if (result != null) {
+        if (result != null) {
             return PortableRemoteObject.narrow(result, narrowTo);
         } else {
             return null;
@@ -1020,11 +1020,11 @@ public final class Utility {
      * @throws ClassCastException if narrowFrom cannot be cast to narrowTo.
      */
     public static Object readAbstractAndNarrow(
-	org.omg.CORBA_2_3.portable.InputStream in, Class narrowTo)
-	throws ClassCastException 
+        org.omg.CORBA_2_3.portable.InputStream in, Class narrowTo)
+        throws ClassCastException 
     {
         Object result = in.read_abstract_interface();
-	if (result != null) {
+        if (result != null) {
             return PortableRemoteObject.narrow(result, narrowTo);
         } else {
             return null;
@@ -1036,7 +1036,7 @@ public final class Utility {
      */
     static int hexOf( char x )
     {
-	int val;
+        int val;
 
         val = x - '0';
         if (val >=0 && val <= 9) {
@@ -1053,7 +1053,7 @@ public final class Utility {
             return val;
         }
 
-	throw wrapper.badHexDigit() ;
+        throw wrapper.badHexDigit() ;
     }
 }
 

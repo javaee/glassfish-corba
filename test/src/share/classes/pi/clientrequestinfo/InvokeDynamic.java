@@ -40,7 +40,7 @@
 
 package pi.clientrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.CORBA.*;
 
@@ -59,29 +59,29 @@ public class InvokeDynamic
     extends InvokeStrategy
 {
     public void invoke() throws Exception {
-	super.invoke();
+        super.invoke();
 
-	// Invoke send_request then receive_reply
-	invokeMethod( "sayArguments" );
+        // Invoke send_request then receive_reply
+        invokeMethod( "sayArguments" );
 
-	// Invoke send_request then receive_exception:
-	try {
-	    invokeMethod( "sayUserException" );
-	}
-	catch( ExampleException e ) {
-	    // We expect this, but no other exception.
-	}
-	catch( UnknownUserException e ) {
-	    // We expect this, but no other exception.
-	}
-
-	// Invoke send_request then receive_other:
-	SampleClientRequestInterceptor.exceptionRedirectToOther = true;
-	try {
-	    invokeMethod( "saySystemException" );
+        // Invoke send_request then receive_exception:
+        try {
+            invokeMethod( "sayUserException" );
         }
-	catch( UNKNOWN e ) {
-	    // We expect this, but no other exception.
-	}
+        catch( ExampleException e ) {
+            // We expect this, but no other exception.
+        }
+        catch( UnknownUserException e ) {
+            // We expect this, but no other exception.
+        }
+
+        // Invoke send_request then receive_other:
+        SampleClientRequestInterceptor.exceptionRedirectToOther = true;
+        try {
+            invokeMethod( "saySystemException" );
+        }
+        catch( UNKNOWN e ) {
+            // We expect this, but no other exception.
+        }
     }
 }

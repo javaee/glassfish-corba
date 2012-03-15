@@ -49,7 +49,7 @@ module GSSUP {
     // username/password mechanism is defined below.
     //
     // { iso-itu-t (2) international-organization (23) omg (130)
-    //	security (1) authentication (1) gssup-mechanism (1) }
+    //  security (1) authentication (1) gssup-mechanism (1) }
 
     const CSI::StringOID GSSUPMechOID = "oid:2.23.130.1.1.1";
 
@@ -59,16 +59,16 @@ module GSSUP {
     // username/password GSS (initial context) Token.
 
     struct InitialContextToken {
-	CSI::UTF8String username;
-	CSI::UTF8String password;
-	CSI::GSS_NT_ExportedName target_name;
+        CSI::UTF8String username;
+        CSI::UTF8String password;
+        CSI::GSS_NT_ExportedName target_name;
     };
 
     typedef unsigned long ErrorCode;
 
     // GSSUP Mechanism-Specific Error Token
     struct ErrorToken {
-	ErrorCode error_code;
+        ErrorCode error_code;
     };
 
     // The context validator has chosen not to reveal the GSSUP

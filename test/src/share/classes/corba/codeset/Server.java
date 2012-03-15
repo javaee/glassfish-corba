@@ -85,7 +85,7 @@ public class Server extends VerifierPOA
         try {
       
             ORB orb = ORB.init(args, System.getProperties());
-	    System.out.println(orb);
+            System.out.println(orb);
       
             // Get rootPOA
             POA rootPOA = (POA)orb.resolve_initial_references("RootPOA");

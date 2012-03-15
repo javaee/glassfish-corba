@@ -48,11 +48,11 @@ public class EchoServant extends PortableRemoteObject implements Echo
 {
     public EchoServant() throws RemoteException
     {
-	super() ;
+        super() ;
     }
 
     public String echo( String arg ) 
     {
-	return arg ;
+        return arg ;
     }
 }

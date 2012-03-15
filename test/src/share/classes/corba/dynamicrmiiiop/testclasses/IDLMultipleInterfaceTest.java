@@ -48,10 +48,10 @@ public class IDLMultipleInterfaceTest {
     // interface methods.  See TestIDLNameTranslator for sorting details.    
     //
     public static final String[] IDL_NAMES = {   
-	"A1",
-	"CB",
-	"CC",
-	"CD" 
+        "A1",
+        "CB",
+        "CC",
+        "CD" 
     } ;
 
     public static String[] getIDLNames() {
@@ -59,12 +59,12 @@ public class IDLMultipleInterfaceTest {
     }
     
     public interface first extends java.rmi.Remote {
-	void A1() throws RemoteException ;
-	void CC( int a ) throws RemoteException ;
+        void A1() throws RemoteException ;
+        void CC( int a ) throws RemoteException ;
     }
 
     public interface second extends java.rmi.Remote {
-	void CB( int a ) throws RemoteException ;
-	void CD( int a ) throws RemoteException ;
+        void CB( int a ) throws RemoteException ;
+        void CD( int a ) throws RemoteException ;
     }
 }

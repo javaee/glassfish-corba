@@ -92,7 +92,7 @@ public class IDLOverloadedTest {
         "A__wchar",
         "A__corba_dynamicrmiiiop_testclasses_IDLOverloadedTest__InnerU0300",
         "A__corba_dynamicrmiiiop_testclasses_IDLOverloadedTest__InnerU0300__ExtraU0301Inner",
-	"A__org_omg_boxedIDL_corba_dynamicrmiiiop_testclasses_TestStruct",
+        "A__org_omg_boxedIDL_corba_dynamicrmiiiop_testclasses_TestStruct",
         "A__double",
         "A__float",
         "A__long",
@@ -196,7 +196,7 @@ public class IDLOverloadedTest {
         void A(org.omg.CORBA.Object o) throws java.rmi.RemoteException;
         void A(short s) throws java.rmi.RemoteException;
         
-	void A(TestStruct t) throws java.rmi.RemoteException; 
+        void A(TestStruct t) throws java.rmi.RemoteException; 
     }
 
 }

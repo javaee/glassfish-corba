@@ -72,72 +72,72 @@ public class Galaxy implements Serializable
 
     public Galaxy (int rows, int columns)
     {
-	PlanetNames names = new PlanetNames ();
-	fPlanets = new Vector ();
-	int i = 0;
+        PlanetNames names = new PlanetNames ();
+        fPlanets = new Vector ();
+        int i = 0;
 
-	for (int r=0; r<rows; r++) {
-	    for (int c=0; c<columns; c++) {
-		double temp = PlanetImpl.RandomTemp ();
-		double gravity = PlanetImpl.RandomGravity ();
-		long metal = PlanetImpl.RandomMetal ();
-		PlanetImpl p = new PlanetImpl (names.getName(), temp, gravity, metal);
-		p.setCoordinates (new Point((r+1)*150-50,(c+1)*150-50));
-		fPlanets.addElement (p);
-	    }
-	}
+        for (int r=0; r<rows; r++) {
+            for (int c=0; c<columns; c++) {
+                double temp = PlanetImpl.RandomTemp ();
+                double gravity = PlanetImpl.RandomGravity ();
+                long metal = PlanetImpl.RandomMetal ();
+                PlanetImpl p = new PlanetImpl (names.getName(), temp, gravity, metal);
+                p.setCoordinates (new Point((r+1)*150-50,(c+1)*150-50));
+                fPlanets.addElement (p);
+            }
+        }
 
-	fNumberOfPlanets = rows * columns;
-	fSize = new Dimension (rows*100, columns*100);
+        fNumberOfPlanets = rows * columns;
+        fSize = new Dimension (rows*100, columns*100);
 
-	fHomes = new PlanetImpl [fNumberOfPlanets];
-	for (i=0; i<fNumberOfPlanets; i++) {
-	    fHomes[i] = null;
-	}
+        fHomes = new PlanetImpl [fNumberOfPlanets];
+        for (i=0; i<fNumberOfPlanets; i++) {
+            fHomes[i] = null;
+        }
     
     }
 
     public PlanetImpl createHomeWorldFor (Player player)
     {
-	int homeIndex = 0;
-	do {
-	    homeIndex = (int)(Math.random() * (fNumberOfPlanets-1));
-	} while ( fHomes[homeIndex] != null );
+        int homeIndex = 0;
+        do {
+            homeIndex = (int)(Math.random() * (fNumberOfPlanets-1));
+        } while ( fHomes[homeIndex] != null );
 
-	PlanetImpl home = (PlanetImpl)fPlanets.elementAt (homeIndex);
-	home.setTemp (player.getIdealTemp());
-	home.setGravity (player.getIdealGravity());
-	home.setMetal (20000);
-	fHomes[homeIndex] = home;
-	return home;
+        PlanetImpl home = (PlanetImpl)fPlanets.elementAt (homeIndex);
+        home.setTemp (player.getIdealTemp());
+        home.setGravity (player.getIdealGravity());
+        home.setMetal (20000);
+        fHomes[homeIndex] = home;
+        return home;
     }
 
     public int getNumberOfPlanets ()
     {
-	return fNumberOfPlanets;
+        return fNumberOfPlanets;
     }
 
     public Dimension getSize ()
     {
-	return fSize;
+        return fSize;
     }
 
     public PlanetImpl getPlanet (ID planetID)
     {
-	if ( planetID != null ) {
-	    for (int i=0; i<fNumberOfPlanets; i++) {
-		PlanetImpl p = (PlanetImpl)fPlanets.elementAt (i);
-		if ( planetID.identifies (p) ) {
-		    return p;
-		}
-	    }
-	}
-	return null;
+        if ( planetID != null ) {
+            for (int i=0; i<fNumberOfPlanets; i++) {
+                PlanetImpl p = (PlanetImpl)fPlanets.elementAt (i);
+                if ( planetID.identifies (p) ) {
+                    return p;
+                }
+            }
+        }
+        return null;
     }
 
     public Vector getPlanets ()
     {
-	return fPlanets;
+        return fPlanets;
     }
 
 

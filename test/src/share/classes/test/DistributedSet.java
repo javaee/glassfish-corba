@@ -57,8 +57,8 @@ import java.rmi.RemoteException;
  * collection of sets, all of which coordinate with each other to maintain,
  * in each instance, a list of all the currently active sets.
  *
- * @version	1.0, 5/13/98
- * @author	Bryan Atsatt
+ * @version     1.0, 5/13/98
+ * @author      Bryan Atsatt
  */
 public interface DistributedSet extends Remote {
 

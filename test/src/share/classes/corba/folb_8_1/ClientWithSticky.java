@@ -48,8 +48,8 @@ public class ClientWithSticky
 {
     public static void main(String[] av)
     {
-	Client.withSticky = true;
-	Client.main(av);
+        Client.withSticky = true;
+        Client.main(av);
     }
 }
 

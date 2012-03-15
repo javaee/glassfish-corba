@@ -390,7 +390,7 @@ public class StructGen implements com.sun.tools.corba.se.idl.StructGen, JavaGene
           // these two cases may be obsolete.  See UnionGen.read().
           //jHelper = Util.helperName (vbType, false);  // <d61056>
           jHelper = Util.helperName (mType, true);
-	      }
+              }
         else
         {
           jName = Util.javaName (mType);       // name of mapped Java class
@@ -443,13 +443,13 @@ public class StructGen implements com.sun.tools.corba.se.idl.StructGen, JavaGene
         index = ((JavaGenerator)member.generator ()).write (index, "    ", name + '.' + member.name (), member, stream);
 
       // <d62023-klr> for corbaLevel 2.4 and up, use Helper.write like
-      //		everything else
+      //                everything else
       else if ((mType instanceof ValueEntry || mType instanceof ValueBoxEntry)
-      		&& !Util.corbaLevel (2.4f, 99.0f)) { // <d62023>
+                && !Util.corbaLevel (2.4f, 99.0f)) { // <d62023>
         stream.println (indent + "((org.omg.CORBA_2_3.portable.OutputStream)ostream).write_value ((java.io.Serializable) " // <d60929>
-			+ name + '.' + member.name () + ", "
-			+ Util.helperName (member.type (), true) // <d61056>
-			+ ".get_instance ());"); // <d61056>
+                        + name + '.' + member.name () + ", "
+                        + Util.helperName (member.type (), true) // <d61056>
+                        + ".get_instance ());"); // <d61056>
       }
       else
         stream.println (indent + Util.helperName (member.type (), true) + ".write (ostream, " + name + '.' + member.name () + ");"); // <d61056>

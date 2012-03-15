@@ -38,7 +38,7 @@
  * holder.
  */
 /*
- * @(#)counterImpl.java	1.6 99/10/29
+ * @(#)counterImpl.java 1.6 99/10/29
  *
  * Copyright 1998, 1999 Sun Microsystems, Inc. All Rights Reserved.
  * 
@@ -61,12 +61,12 @@ public class counterImpl extends PortableRemoteObject implements counterIF
 
     public counterImpl() throws RemoteException
     {
-	value = 0 ;
+        value = 0 ;
     }
 
     public synchronized long increment(long invalue) throws RemoteException
     {
-	value += invalue;
+        value += invalue;
      
         return value;
     }

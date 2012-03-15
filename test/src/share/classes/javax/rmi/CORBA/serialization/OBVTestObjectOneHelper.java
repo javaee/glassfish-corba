@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)OBVTestObjectOneHelper.java	1.10 99/06/07 */
+/* @(#)OBVTestObjectOneHelper.java      1.10 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0

@@ -55,7 +55,7 @@ import corba.framework.Controller;
 import corba.hcks.C;
 import corba.hcks.U;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 import org.omg.CORBA.*;
 import org.omg.PortableInterceptor.*;
@@ -70,93 +70,93 @@ public class Client extends org.omg.CORBA.LocalObject
     public static InitialContext initialContext;
     
     private static String excs[] = { 
-	"org.omg.CORBA.ACTIVITY_COMPLETED", "org.omg.CORBA.ACTIVITY_REQUIRED",
-	"org.omg.CORBA.BAD_QOS", "org.omg.CORBA.CODESET_INCOMPATIBLE",
-	"org.omg.CORBA.INVALID_ACTIVITY", "org.omg.CORBA.REBIND",
-	"org.omg.CORBA.TIMEOUT", "org.omg.CORBA.TRANSACTION_MODE",
-	"org.omg.CORBA.TRANSACTION_UNAVAILABLE", "org.omg.CORBA.UNKNOWN" };
-	
+        "org.omg.CORBA.ACTIVITY_COMPLETED", "org.omg.CORBA.ACTIVITY_REQUIRED",
+        "org.omg.CORBA.BAD_QOS", "org.omg.CORBA.CODESET_INCOMPATIBLE",
+        "org.omg.CORBA.INVALID_ACTIVITY", "org.omg.CORBA.REBIND",
+        "org.omg.CORBA.TIMEOUT", "org.omg.CORBA.TRANSACTION_MODE",
+        "org.omg.CORBA.TRANSACTION_UNAVAILABLE", "org.omg.CORBA.UNKNOWN" };
+        
     static int counter; // counter
 
     public static void main(String[] av) {
 
         try {
-	    U.sop(main + " starting");
+            U.sop(main + " starting");
 
-	    if (! ColocatedClientServer.isColocated) {
-		U.sop(main + " : creating ORB.");
-		orb = ORB.init(av, null);
-		U.sop(main + " : creating InitialContext.");
-		initialContext = C.createInitialContext(orb);
-	    }
+            if (! ColocatedClientServer.isColocated) {
+                U.sop(main + " : creating ORB.");
+                orb = ORB.init(av, null);
+                U.sop(main + " : creating InitialContext.");
+                initialContext = C.createInitialContext(orb);
+            }
 
-	    // RMI invocations
+            // RMI invocations
 
-	    rmiiI rmiiIPOA = (rmiiI) U.lookupAndNarrow(Server.rmiiIPOA,
-						 rmiiI.class, initialContext);
-	    U.sop("\nRMI invocations:\n");
-	    int i = 0;
-	    for (counter = 0, i = 0; i < 10; i++, counter++) {
-		try {
-		    rmiiIPOA.invoke(i);
-		} catch (java.rmi.RemoteException re) {
-		    SystemException se = (SystemException) re.getCause();
-		    if (se instanceof ACTIVITY_REQUIRED) {
-			if (!(re instanceof ActivityRequiredException)) {
-			    throw new RuntimeException("Test Failed");
-			}
-			U.sop("javax.activity.ActivityRequiredException");
-		    } else if (se instanceof ACTIVITY_COMPLETED) {
-			if (!(re instanceof ActivityCompletedException)) {
-			    throw new RuntimeException("Test Failed");
-			}
-			U.sop("javax.activity.ActivityCompletedException");
-		    } else if (se instanceof INVALID_ACTIVITY) {
-			if (!(re instanceof InvalidActivityException)) {
-			    throw new RuntimeException("Test Failed");
-			}
-			U.sop("javax.activity.InvalidActivityException");
-		    }
-		    String name = se.getClass().getName();
-		    U.sop("name: " + name + ", minorCode: " + se.minor +
-			  ", completed: " + 
-			  ((se.completed.value() == 
-			   CompletionStatus._COMPLETED_YES) ?
-			   "true" : "false") + "\n");
-		    if (!(name.equals(excs[i]))) {
-			throw new RuntimeException("Test Failed");
-		    }
-		}
-	    }
+            rmiiI rmiiIPOA = (rmiiI) U.lookupAndNarrow(Server.rmiiIPOA,
+                                                 rmiiI.class, initialContext);
+            U.sop("\nRMI invocations:\n");
+            int i = 0;
+            for (counter = 0, i = 0; i < 10; i++, counter++) {
+                try {
+                    rmiiIPOA.invoke(i);
+                } catch (java.rmi.RemoteException re) {
+                    SystemException se = (SystemException) re.getCause();
+                    if (se instanceof ACTIVITY_REQUIRED) {
+                        if (!(re instanceof ActivityRequiredException)) {
+                            throw new RuntimeException("Test Failed");
+                        }
+                        U.sop("javax.activity.ActivityRequiredException");
+                    } else if (se instanceof ACTIVITY_COMPLETED) {
+                        if (!(re instanceof ActivityCompletedException)) {
+                            throw new RuntimeException("Test Failed");
+                        }
+                        U.sop("javax.activity.ActivityCompletedException");
+                    } else if (se instanceof INVALID_ACTIVITY) {
+                        if (!(re instanceof InvalidActivityException)) {
+                            throw new RuntimeException("Test Failed");
+                        }
+                        U.sop("javax.activity.InvalidActivityException");
+                    }
+                    String name = se.getClass().getName();
+                    U.sop("name: " + name + ", minorCode: " + se.minor +
+                          ", completed: " + 
+                          ((se.completed.value() == 
+                           CompletionStatus._COMPLETED_YES) ?
+                           "true" : "false") + "\n");
+                    if (!(name.equals(excs[i]))) {
+                        throw new RuntimeException("Test Failed");
+                    }
+                }
+            }
 
-	    // IDL invocations
+            // IDL invocations
 
-	    idlI idlIPOA = idlIHelper.narrow(U.resolve(Server.idlIPOA, orb));
-	    U.sop("IDL invocations:\n");
-	    for (counter = 0, i = 0; i < 10; i++, counter++) {
-		try {
-		    idlIPOA.invoke(i);
-		} catch (org.omg.CORBA.SystemException se) {
-		    String name = se.getClass().getName();
-		    U.sop("name: " + name + ", minorCode: " + se.minor +
-			  ", completed: " + 
-			  ((se.completed.value() == 
-			   CompletionStatus._COMPLETED_YES) ?
-			   "true" : "false") + "\n");
-		    if (!(name.equals(excs[i]))) {
-			throw new RuntimeException("Test Failed");
-		    }
-		}
-	    }
+            idlI idlIPOA = idlIHelper.narrow(U.resolve(Server.idlIPOA, orb));
+            U.sop("IDL invocations:\n");
+            for (counter = 0, i = 0; i < 10; i++, counter++) {
+                try {
+                    idlIPOA.invoke(i);
+                } catch (org.omg.CORBA.SystemException se) {
+                    String name = se.getClass().getName();
+                    U.sop("name: " + name + ", minorCode: " + se.minor +
+                          ", completed: " + 
+                          ((se.completed.value() == 
+                           CompletionStatus._COMPLETED_YES) ?
+                           "true" : "false") + "\n");
+                    if (!(name.equals(excs[i]))) {
+                        throw new RuntimeException("Test Failed");
+                    }
+                }
+            }
 
-	    orb.shutdown(true);
+            orb.shutdown(true);
 
         } catch (Exception e) {
             U.sopUnexpectedException(main + " : ", e);
-	    System.exit(1);
+            System.exit(1);
         }
-	U.sop(main + " ending successfully");
-	System.exit(Controller.SUCCESS);
+        U.sop(main + " ending successfully");
+        System.exit(Controller.SUCCESS);
     }
 
     ////////////////////////////////////////////////////
@@ -212,13 +212,13 @@ public class Client extends org.omg.CORBA.LocalObject
 
     public void receive_exception(ClientRequestInfo ri) throws ForwardRequest 
     {
-	String repID = ri.received_exception_id();
-	String className = ORBUtility.classNameOf(repID);
-	U.sop("receive_exception.repID: " + repID);
-	U.sop("receive_exception.className: " + className);
-	if ( !(className.equals(excs[counter])) ) {
-	    throw new RuntimeException("Test Failed");
-	}
+        String repID = ri.received_exception_id();
+        String className = ORBUtility.classNameOf(repID);
+        U.sop("receive_exception.repID: " + repID);
+        U.sop("receive_exception.className: " + className);
+        if ( !(className.equals(excs[counter])) ) {
+            throw new RuntimeException("Test Failed");
+        }
     }
 
     public void receive_other(ClientRequestInfo ri) throws ForwardRequest 

@@ -100,30 +100,30 @@ import junit.framework.TestResult ;
 import junit.framework.TestSuite ;
 import junit.extensions.TestSetup ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
-import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPAddress ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPFactories ;
+import com.sun.corba.ee.spi.ior.iiop.AlternateIIOPAddressComponent ;
 
-import com.sun.corba.se.spi.transport.TcpTimeouts ;
+import com.sun.corba.ee.spi.transport.TcpTimeouts ;
 
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.impl.orbutil.newtimer.generated.TimingPoints ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
-import com.sun.corba.se.impl.misc.ORBUtility ;
+import com.sun.corba.ee.impl.misc.ORBUtility ;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
 
-import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
-import com.sun.corba.se.spi.oa.rfm.ReferenceFactory ;
+import com.sun.corba.ee.spi.oa.rfm.ReferenceFactoryManager ;
+import com.sun.corba.ee.spi.oa.rfm.ReferenceFactory ;
 
-import com.sun.corba.se.spi.trace.CdrRead ;
-import com.sun.corba.se.spi.trace.CdrWrite ;
-import com.sun.corba.se.spi.trace.PrimitiveRead ;
-import com.sun.corba.se.spi.trace.PrimitiveWrite ;
-import com.sun.corba.se.spi.trace.ValueHandlerRead ;
-import com.sun.corba.se.spi.trace.ValueHandlerWrite ;
+import com.sun.corba.ee.spi.trace.CdrRead ;
+import com.sun.corba.ee.spi.trace.CdrWrite ;
+import com.sun.corba.ee.spi.trace.PrimitiveRead ;
+import com.sun.corba.ee.spi.trace.PrimitiveWrite ;
+import com.sun.corba.ee.spi.trace.ValueHandlerRead ;
+import com.sun.corba.ee.spi.trace.ValueHandlerWrite ;
 
 import corba.folb_8_1.IIOPPrimaryToContactInfoImpl ;
 import org.glassfish.pfl.basic.contain.SPair;
@@ -143,11 +143,11 @@ import org.glassfish.pfl.tf.timer.spi.TimerManager;
 public class Client extends TestCase
 {
     static final String[][] idInfo = {
-	{ "", "orb" },
-	{ "A", "orb_A_1" },
-	{ "", "orb__2" },
-	{ "A", "orb_A_2" },
-	{ "B", "orb_B_1" } } ;
+        { "", "orb" },
+        { "A", "orb_A_1" },
+        { "", "orb__2" },
+        { "A", "orb_A_2" },
+        { "B", "orb_B_1" } } ;
 
     static ORB orb ;
     static ORB[] orbs ;
@@ -158,97 +158,97 @@ public class Client extends TestCase
     // Also sets up the tester remote object.
     private static class ORBManager extends TestSetup
     {
-	public ORBManager( Test test ) 
-	{
-	    super( test ) ;
-	}
+        public ORBManager( Test test ) 
+        {
+            super( test ) ;
+        }
 
         @Override
-	public void setUp()
-	{
-	    orbs = new ORB[idInfo.length] ;
-	    for (int ctr=0; ctr<idInfo.length; ctr++) {
-		orbs[ctr] = makeORB( idInfo[ctr][0] ) ;
-		if (ctr==0) {
+        public void setUp()
+        {
+            orbs = new ORB[idInfo.length] ;
+            for (int ctr=0; ctr<idInfo.length; ctr++) {
+                orbs[ctr] = makeORB( idInfo[ctr][0] ) ;
+                if (ctr==0) {
                     orb = orbs[ctr];
                 }
-	    }
-	}
+            }
+        }
 
-	private ORB makeORB( String id ) 
-	{
-	    Properties props = new Properties() ;
-	    props.setProperty( "org.omg.CORBA.ORBClass",
-		"com.sun.corba.se.impl.orb.ORBImpl" ) ;
-	    props.setProperty( "org.omg.CORBA.ORBId", id ) ;
-	    return (ORB)ORB.init( new String[0], props ) ;
-	}
+        private ORB makeORB( String id ) 
+        {
+            Properties props = new Properties() ;
+            props.setProperty( "org.omg.CORBA.ORBClass",
+                "com.sun.corba.ee.impl.orb.ORBImpl" ) ;
+            props.setProperty( "org.omg.CORBA.ORBId", id ) ;
+            return (ORB)ORB.init( new String[0], props ) ;
+        }
 
         @Override
-	public void tearDown()
-	{
-	    for (int ctr=0; ctr<orbs.length; ctr++) {
+        public void tearDown()
+        {
+            for (int ctr=0; ctr<orbs.length; ctr++) {
                 orbs[ctr].destroy();
             }
-	    // System.out.println( "TimerFactories after ORB destruction:" ) ;
-	    // displayTimerFactories() ;
-	}
+            // System.out.println( "TimerFactories after ORB destruction:" ) ;
+            // displayTimerFactories() ;
+        }
     }
 
     static boolean debug = false ;
 
     public static void main( String[] args ) 
     {
-	debug = (args.length>0) && args[0].equals( "-debug" ) ;
+        debug = (args.length>0) && args[0].equals( "-debug" ) ;
 
-	Client root = new Client() ;
-	TestResult result = junit.textui.TestRunner.run(Client.suite()) ;
+        Client root = new Client() ;
+        TestResult result = junit.textui.TestRunner.run(Client.suite()) ;
 
-	if (result.errorCount() + result.failureCount() > 0) {
-	    System.out.println( "Error: failures or errrors in JUnit test" ) ;
-	    System.exit( 1 ) ;
-	} else {
+        if (result.errorCount() + result.failureCount() > 0) {
+            System.out.println( "Error: failures or errrors in JUnit test" ) ;
+            System.exit( 1 ) ;
+        } else {
             System.exit(0);
         }
     }
 
     public Client()
     {
-	super() ;
+        super() ;
     }
 
     public Client( String name )
     {
-	super( name ) ;
+        super( name ) ;
     }
 
     public static Test suite()
     {
-	System.out.println( 
-	    "==============================================================\n" +
-	    "Miscellaneous CORBA Tests\n" +
-	    "==============================================================\n" 
-	) ;
+        System.out.println( 
+            "==============================================================\n" +
+            "Miscellaneous CORBA Tests\n" +
+            "==============================================================\n" 
+        ) ;
 
-	// TestSuite created only to include the ORBManager setup wrapper,
-	// which wraps the real TestSuite made from this class.
-	// This causes the ORBs for this test to be created before all
-	// tests run, and destroyed after all tests are completed.  
-	TestSuite main = new TestSuite( "main" ) ;
-	TestSuite ts = TestCaseTools.makeTestSuite( Client.class ) ;
-	main.addTest( new ORBManager( ts ) ) ;
-	return main ;
+        // TestSuite created only to include the ORBManager setup wrapper,
+        // which wraps the real TestSuite made from this class.
+        // This causes the ORBs for this test to be created before all
+        // tests run, and destroyed after all tests are completed.  
+        TestSuite main = new TestSuite( "main" ) ;
+        TestSuite ts = TestCaseTools.makeTestSuite( Client.class ) ;
+        main.addTest( new ORBManager( ts ) ) ;
+        return main ;
     }
 
     /** Test for bug 4919770: multiple ORBs share the same root MonitoredObject.
       *
     public void testMonitoringRootName()
     {
-	for (int ctr=0; ctr<idInfo.length; ctr++) {
-	    String rootName = 
-		orbs[ctr].getMonitoringManager().getRootMonitoredObject().getName() ;
-	    assertEquals( rootName, idInfo[ctr][1] ) ;
-	}
+        for (int ctr=0; ctr<idInfo.length; ctr++) {
+            String rootName = 
+                orbs[ctr].getMonitoringManager().getRootMonitoredObject().getName() ;
+            assertEquals( rootName, idInfo[ctr][1] ) ;
+        }
     }
     */
 
@@ -256,46 +256,46 @@ public class Client extends TestCase
     // Test for bug 6177606: incorrect error handling for string_to_object.
     public static class NamingTestSuite extends TestCase
     {
-	public NamingTestSuite()
-	{
-	    super() ;
-	}
+        public NamingTestSuite()
+        {
+            super() ;
+        }
 
-	public NamingTestSuite( String name ) 
-	{
-	    super( name ) ;
-	}
+        public NamingTestSuite( String name ) 
+        {
+            super( name ) ;
+        }
 
-	// Check that expected BAD_PARAM exception is thrown.
-	private void expectException( String url, int mc )
-	{
-	    try {
-		orb.string_to_object( url ) ;
-		fail( "Expected BAD_PARAM exception but instead did not throw exception" ) ;
-	    } catch (BAD_PARAM bp) {
-		assertEquals( bp.minor, mc ) ;
-	    } catch (Exception exc) {
-		fail( "Expected BAD_PARAM exception but got " + exc ) ;
-	    }
-	}
+        // Check that expected BAD_PARAM exception is thrown.
+        private void expectException( String url, int mc )
+        {
+            try {
+                orb.string_to_object( url ) ;
+                fail( "Expected BAD_PARAM exception but instead did not throw exception" ) ;
+            } catch (BAD_PARAM bp) {
+                assertEquals( bp.minor, mc ) ;
+            } catch (Exception exc) {
+                fail( "Expected BAD_PARAM exception but got " + exc ) ;
+            }
+        }
 
-	public void testSoBadSchemeName()
-	{
-	    expectException( "foo:a_very_bad_url", 
-		OMGSystemException.SO_BAD_SCHEME_NAME ) ;
-	}
+        public void testSoBadSchemeName()
+        {
+            expectException( "foo:a_very_bad_url", 
+                OMGSystemException.SO_BAD_SCHEME_NAME ) ;
+        }
 
-	public void testSoBadAddress()
-	{
-	    expectException( "corbaloc:/another_bad_url", 
-		OMGSystemException.SO_BAD_ADDRESS ) ;
-	}
+        public void testSoBadAddress()
+        {
+            expectException( "corbaloc:/another_bad_url", 
+                OMGSystemException.SO_BAD_ADDRESS ) ;
+        }
 
-	public void testSoBadSchemaSpecific() 
-	{
-	    expectException( "corbaname:iiop:1.2@localhost:49832#ABadCosName", 
-		OMGSystemException.SO_BAD_SCHEMA_SPECIFIC ) ;
-	}
+        public void testSoBadSchemaSpecific() 
+        {
+            expectException( "corbaname:iiop:1.2@localhost:49832#ABadCosName", 
+                OMGSystemException.SO_BAD_SCHEMA_SPECIFIC ) ;
+        }
     }
     */
 
@@ -303,23 +303,23 @@ public class Client extends TestCase
      */
     public void testAlternateIIOPAddress()
     {
-	IIOPAddress addr = IIOPFactories.makeIIOPAddress( "localhost",
-	    2345 ) ;
-	AlternateIIOPAddressComponent comp = 
-	    IIOPFactories.makeAlternateIIOPAddressComponent( addr ) ;
-	org.omg.IOP.TaggedComponent tcomp = comp.getIOPComponent( orb ) ;
-	assertEquals( tcomp.tag, TAG_ALTERNATE_IIOP_ADDRESS.value ) ;
+        IIOPAddress addr = IIOPFactories.makeIIOPAddress( "localhost",
+            2345 ) ;
+        AlternateIIOPAddressComponent comp = 
+            IIOPFactories.makeAlternateIIOPAddressComponent( addr ) ;
+        org.omg.IOP.TaggedComponent tcomp = comp.getIOPComponent( orb ) ;
+        assertEquals( tcomp.tag, TAG_ALTERNATE_IIOP_ADDRESS.value ) ;
     }
 
     private static int counter = 1 ;
 
     private static synchronized int getCounter()
     {
-	int result = counter++ ;
-	if (counter > Byte.MAX_VALUE) {
+        int result = counter++ ;
+        if (counter > Byte.MAX_VALUE) {
             counter = 1;
         }
-	return result ;
+        return result ;
     }
 
     private static final Random gen = new Random() ;
@@ -330,133 +330,133 @@ public class Client extends TestCase
 
     private ByteBuffer getBuffer( int val, int len ) 
     {
-	byte[] buff = new byte[len] ;
-	for (int ctr=0; ctr<len; ctr++) {
+        byte[] buff = new byte[len] ;
+        for (int ctr=0; ctr<len; ctr++) {
             buff[ctr] = (byte) val;
         }
-	ByteBuffer result = ByteBuffer.wrap( buff ) ;
-	result.position( len ) ;
-	return result ;
+        ByteBuffer result = ByteBuffer.wrap( buff ) ;
+        result.position( len ) ;
+        return result ;
     }
 
     private class Printer extends Thread 
     {
-	private int threadId ;
-	private PrintStream ps ;
+        private int threadId ;
+        private PrintStream ps ;
 
-	public Printer( int threadId, PrintStream ps )
-	{
-	    this.threadId = threadId ;
-	    this.ps = ps ;
-	}
+        public Printer( int threadId, PrintStream ps )
+        {
+            this.threadId = threadId ;
+            this.ps = ps ;
+        }
 
-	private int getSleepTime() 
-	{
-	    return 10 + gen.nextInt( 100 ) ;
-	}
+        private int getSleepTime() 
+        {
+            return 10 + gen.nextInt( 100 ) ;
+        }
 
         @Override
-	public void run() 
-	{
-	    for (int ctr=0; ctr<REP_COUNT; ctr++) {
-		ByteBuffer bb = getBuffer( getCounter(), BUF_SIZE ) ;
+        public void run() 
+        {
+            for (int ctr=0; ctr<REP_COUNT; ctr++) {
+                ByteBuffer bb = getBuffer( getCounter(), BUF_SIZE ) ;
 
-		try {
-		    sleep( getSleepTime() ) ;
-		} catch (InterruptedException ie) {
-		    // ignore this; just trying to catch a little sleep here
-		}
+                try {
+                    sleep( getSleepTime() ) ;
+                } catch (InterruptedException ie) {
+                    // ignore this; just trying to catch a little sleep here
+                }
 
-		ORBUtility.printBuffer( "Printer Thread " + threadId, bb, ps ) ;
-	    }
-	}
+                ORBUtility.printBuffer( "Printer Thread " + threadId, bb, ps ) ;
+            }
+        }
     }
 
     /** Have 5 threads print 10 different buffers each with random delays.
      */
     public void testPrintBuffer()
     {
-	ByteArrayOutputStream os = new ByteArrayOutputStream() ;
-	PrintStream ps = new PrintStream( os ) ;
+        ByteArrayOutputStream os = new ByteArrayOutputStream() ;
+        PrintStream ps = new PrintStream( os ) ;
 
-	counter = 1 ;
-	Printer[] printers = new Printer[NUM_THREADS] ;
-	for (int ctr = 0; ctr<NUM_THREADS; ctr++) {
-	    printers[ctr] = new Printer( ctr, ps ) ;
-	    printers[ctr].start() ;
-	}
+        counter = 1 ;
+        Printer[] printers = new Printer[NUM_THREADS] ;
+        for (int ctr = 0; ctr<NUM_THREADS; ctr++) {
+            printers[ctr] = new Printer( ctr, ps ) ;
+            printers[ctr].start() ;
+        }
 
-	for (int ctr=0; ctr<NUM_THREADS; ctr++) {
-	    try {
-		printers[ctr].join() ;
-	    } catch (InterruptedException ie) {
-		// ignore this
-	    }
-	}
+        for (int ctr=0; ctr<NUM_THREADS; ctr++) {
+            try {
+                printers[ctr].join() ;
+            } catch (InterruptedException ie) {
+                // ignore this
+            }
+        }
 
-	ps.close() ;
-	byte[] data = os.toByteArray() ; 
+        ps.close() ;
+        byte[] data = os.toByteArray() ; 
     }
 
     public void testBrooksPOAActivationProblem() {
-	try {
-	    POA rootPOA = (POA)orb.resolve_initial_references( "RootPOA" ) ;
+        try {
+            POA rootPOA = (POA)orb.resolve_initial_references( "RootPOA" ) ;
 
-	    // Create POA in RETAIN USE_AOM USER_ID mode
-	    Policy[] policies = new Policy[] {
-		rootPOA.create_servant_retention_policy( 
-		    ServantRetentionPolicyValue.RETAIN ),
-		rootPOA.create_request_processing_policy( 
-		    RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY ),
-		rootPOA.create_id_assignment_policy( 
-		    IdAssignmentPolicyValue.USER_ID ),
-		rootPOA.create_implicit_activation_policy( 
-		    ImplicitActivationPolicyValue.NO_IMPLICIT_ACTIVATION ),
-		rootPOA.create_lifespan_policy( 
-		    LifespanPolicyValue.TRANSIENT ), 
-		rootPOA.create_id_uniqueness_policy( 
-		    IdUniquenessPolicyValue.UNIQUE_ID ) 
-	    } ;
+            // Create POA in RETAIN USE_AOM USER_ID mode
+            Policy[] policies = new Policy[] {
+                rootPOA.create_servant_retention_policy( 
+                    ServantRetentionPolicyValue.RETAIN ),
+                rootPOA.create_request_processing_policy( 
+                    RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY ),
+                rootPOA.create_id_assignment_policy( 
+                    IdAssignmentPolicyValue.USER_ID ),
+                rootPOA.create_implicit_activation_policy( 
+                    ImplicitActivationPolicyValue.NO_IMPLICIT_ACTIVATION ),
+                rootPOA.create_lifespan_policy( 
+                    LifespanPolicyValue.TRANSIENT ), 
+                rootPOA.create_id_uniqueness_policy( 
+                    IdUniquenessPolicyValue.UNIQUE_ID ) 
+            } ;
 
-	    POA myPOA = rootPOA.create_POA( "TestPOA", null, policies ) ;
-	    myPOA.the_POAManager().activate() ;
+            POA myPOA = rootPOA.create_POA( "TestPOA", null, policies ) ;
+            myPOA.the_POAManager().activate() ;
 
-	    // Activate an object with id1 (don't need a real servant for this)
-	    Servant servant = new Servant() {
-		public String[] _all_interfaces( POA poa, byte[] objectId ) {
-		    return new String[0] ;
-		}
-	    } ;
-	    byte[] oid = new byte[] { 1, 2, 3, 4 } ;
-	    myPOA.activate_object_with_id( oid, servant ) ;
+            // Activate an object with id1 (don't need a real servant for this)
+            Servant servant = new Servant() {
+                public String[] _all_interfaces( POA poa, byte[] objectId ) {
+                    return new String[0] ;
+                }
+            } ;
+            byte[] oid = new byte[] { 1, 2, 3, 4 } ;
+            myPOA.activate_object_with_id( oid, servant ) ;
 
-	    // Deactivate the object
-	    myPOA.deactivate_object( oid ) ;
+            // Deactivate the object
+            myPOA.deactivate_object( oid ) ;
 
-	    // Call idToServant on id1
-	    boolean expectedException = true ;
-	    try {
-		// This should fail with an ObjectNotActive exception 
-		Servant servant2 = myPOA.id_to_servant( oid ) ;
-	    } catch (ObjectNotActive exc) {
-		// this is expected
-		expectedException = true ;
-	    } catch (Exception exc) {
-		fail( "Unexpected exception on id_to_servant: " + exc ) ;
-	    }
-	    if (!expectedException) {
+            // Call idToServant on id1
+            boolean expectedException = true ;
+            try {
+                // This should fail with an ObjectNotActive exception 
+                Servant servant2 = myPOA.id_to_servant( oid ) ;
+            } catch (ObjectNotActive exc) {
+                // this is expected
+                expectedException = true ;
+            } catch (Exception exc) {
+                fail( "Unexpected exception on id_to_servant: " + exc ) ;
+            }
+            if (!expectedException) {
                 fail("id_to_servant did not throw excepted exception");
             }
 
-	    // Try to Activate again: Failure?
-	    myPOA.activate_object_with_id( oid, servant ) ;
+            // Try to Activate again: Failure?
+            myPOA.activate_object_with_id( oid, servant ) ;
 
-	    // Destroy POA
-	    myPOA.destroy( false, true ) ;
-	} catch (Exception exc) {
-	    exc.printStackTrace() ;
-	    fail( "Failed with exception: " + exc ) ;
-	}
+            // Destroy POA
+            myPOA.destroy( false, true ) ;
+        } catch (Exception exc) {
+            exc.printStackTrace() ;
+            fail( "Failed with exception: " + exc ) ;
+        }
     }
 
 /*
@@ -472,60 +472,60 @@ public class Client extends TestCase
     // Start a thread that blocks on POAManager.enter
     // Call orb.shutdown.  Does it hang?
     public void testPOAManagerAndORBShutdown() {
-	try {
-	    Properties props = new Properties() ;
-	    props.setProperty( "org.omg.CORBA.ORBClass",
-		"com.sun.corba.se.impl.orb.ORBImpl" ) ;
-	    props.setProperty( "org.omg.CORBA.ORBId", "25678891" ) ;
-	    ORB lorb = (ORB)ORB.init( new String[0], props ) ;
+        try {
+            Properties props = new Properties() ;
+            props.setProperty( "org.omg.CORBA.ORBClass",
+                "com.sun.corba.ee.impl.orb.ORBImpl" ) ;
+            props.setProperty( "org.omg.CORBA.ORBId", "25678891" ) ;
+            ORB lorb = (ORB)ORB.init( new String[0], props ) ;
 
-	    Properties props = new Properties() ;
-	    props.setProperty( "org.omg.CORBA.ORBClass",
-		"com.sun.corba.se.impl.orb.ORBImpl" ) ;
-	    props.setProperty( "org.omg.CORBA.ORBId", "25678891" ) ;
-	    ORB lorb = (ORB)ORB.init( new String[0], props ) ;
+            Properties props = new Properties() ;
+            props.setProperty( "org.omg.CORBA.ORBClass",
+                "com.sun.corba.ee.impl.orb.ORBImpl" ) ;
+            props.setProperty( "org.omg.CORBA.ORBId", "25678891" ) ;
+            ORB lorb = (ORB)ORB.init( new String[0], props ) ;
 
-	    POA rootPOA = (POA)lorb.resolve_initial_references( "RootPOA" ) ;
+            POA rootPOA = (POA)lorb.resolve_initial_references( "RootPOA" ) ;
 
-	    // Create POA in RETAIN USE_AOM USER_ID mode
-	    Policy[] policies = new Policy[] {
-		rootPOA.create_servant_retention_policy( 
-		    ServantRetentionPolicyValue.RETAIN ),
-		rootPOA.create_request_processing_policy( 
-		    RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY ),
-		rootPOA.create_id_assignment_policy( 
-		    IdAssignmentPolicyValue.USER_ID ),
-		rootPOA.create_implicit_activation_policy( 
-		    ImplicitActivationPolicyValue.NO_IMPLICIT_ACTIVATION ),
-		rootPOA.create_lifespan_policy( 
-		    LifespanPolicyValue.TRANSIENT ), 
-		rootPOA.create_id_uniqueness_policy( 
-		    IdUniquenessPolicyValue.UNIQUE_ID ) 
-	    } ;
+            // Create POA in RETAIN USE_AOM USER_ID mode
+            Policy[] policies = new Policy[] {
+                rootPOA.create_servant_retention_policy( 
+                    ServantRetentionPolicyValue.RETAIN ),
+                rootPOA.create_request_processing_policy( 
+                    RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY ),
+                rootPOA.create_id_assignment_policy( 
+                    IdAssignmentPolicyValue.USER_ID ),
+                rootPOA.create_implicit_activation_policy( 
+                    ImplicitActivationPolicyValue.NO_IMPLICIT_ACTIVATION ),
+                rootPOA.create_lifespan_policy( 
+                    LifespanPolicyValue.TRANSIENT ), 
+                rootPOA.create_id_uniqueness_policy( 
+                    IdUniquenessPolicyValue.UNIQUE_ID ) 
+            } ;
 
-	    final POAImpl myPOA = (POAImpl)(rootPOA.create_POA( "ShutdownTestPOA", null, 
-		policies )) ;
-	    new Thread( new Runnable() {
-		public void run() {
-		    try {
-			myPOA.enter() ;
-		    } catch (OADestroyed oad) {
-			System.out.println( "Caught OADestroyed!" ) ;
-			return ;
-		    }
-		    System.out.println( "Did not catch OADestroyed!" ) ;
-		}
-	    } ).start() ;
+            final POAImpl myPOA = (POAImpl)(rootPOA.create_POA( "ShutdownTestPOA", null, 
+                policies )) ;
+            new Thread( new Runnable() {
+                public void run() {
+                    try {
+                        myPOA.enter() ;
+                    } catch (OADestroyed oad) {
+                        System.out.println( "Caught OADestroyed!" ) ;
+                        return ;
+                    }
+                    System.out.println( "Did not catch OADestroyed!" ) ;
+                }
+            } ).start() ;
 
-	    System.out.println( "ORB shutdown starts..." ) ;
+            System.out.println( "ORB shutdown starts..." ) ;
 
-	    lorb.shutdown( true ) ;
+            lorb.shutdown( true ) ;
 
-	    System.out.println( "ORB shutdown completed" ) ;
-	} catch (Exception exc) {
-	    exc.printStackTrace() ;
-	    fail( "Failed with exception: " + exc ) ;
-	}
+            System.out.println( "ORB shutdown completed" ) ;
+        } catch (Exception exc) {
+            exc.printStackTrace() ;
+            fail( "Failed with exception: " + exc ) ;
+        }
     }
 */
     // Various tests for enum marshaling
@@ -551,31 +551,31 @@ public class Client extends TestCase
     public enum Color { RED, BLUE, GREEN } ;
 
     public enum Coin {
-	QUARTER( 25 ), 
-	DIME( 10 ), 
-	NICKEL( 5 ), 
-	PENNY( 1 ) ;
+        QUARTER( 25 ), 
+        DIME( 10 ), 
+        NICKEL( 5 ), 
+        PENNY( 1 ) ;
 
-	int value() {
-	    return value ;
-	}
+        int value() {
+            return value ;
+        }
 
-	private int value ;
+        private int value ;
 
-	Coin( int value ) {
-	    this.value = value ;
-	}
+        Coin( int value ) {
+            this.value = value ;
+        }
     }
 
     private Color[] colors = { Color.RED, Color.RED, Color.BLUE,
-	Color.RED, Color.GREEN, Color.GREEN, Color.GREEN, Color.GREEN,
-	Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, 
-	Color.BLUE, Color.BLUE,	Color.BLUE, Color.BLUE,     
-	Color.RED, Color.RED, Color.RED } ;
+        Color.RED, Color.GREEN, Color.GREEN, Color.GREEN, Color.GREEN,
+        Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, 
+        Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE,     
+        Color.RED, Color.RED, Color.RED } ;
 
     private SPair<SPair<Color,Color>,Color> pair = 
-	new SPair<SPair<Color,Color>,Color>(
-	    new SPair<Color,Color>( Color.RED, Color.BLUE ), Color.RED ) ;
+        new SPair<SPair<Color,Color>,Color>(
+            new SPair<Color,Color>( Color.RED, Color.BLUE ), Color.RED ) ;
     
     private ORB makeORBForEnumTest( boolean useEnumDesc ) {
         String[] args = new String[0] ;
@@ -629,8 +629,8 @@ public class Client extends TestCase
     private static final boolean SIMPLE = false ;
 
     public void enumMarshalingTest( ORB orb ) {
-	try {
-	    OutputStream os = OutputStream.class.cast( orb.create_output_stream() ) ;
+        try {
+            OutputStream os = OutputStream.class.cast( orb.create_output_stream() ) ;
 
 
             if (SIMPLE) {
@@ -644,7 +644,7 @@ public class Client extends TestCase
                 os.write_value( TestEnum.HELLO ) ;
             }
 
-	    InputStream is = InputStream.class.cast( os.create_input_stream() ) ;
+            InputStream is = InputStream.class.cast( os.create_input_stream() ) ;
 
             if (SIMPLE) {
                 System.out.println( "Testing BLUE" ) ;
@@ -694,97 +694,97 @@ public class Client extends TestCase
                 assertSame( "Result of read_value is not the expected value",
                     shouldBeTestEnum, TestEnum.HELLO ) ;
             }
-	} finally {
+        } finally {
             orb.destroy();
-	}
+        }
     }
 
     private static class RRTest implements Serializable {
-	private int value ;
+        private int value ;
 
-	public static RRTest rr1 = new RRTest( 1 ) ;
-	public static RRTest rr2 = new RRTest( 2 ) ;
+        public static RRTest rr1 = new RRTest( 1 ) ;
+        public static RRTest rr2 = new RRTest( 2 ) ;
 
-	public RRTest( int val ) {
-	    value = val ;
-	}
+        public RRTest( int val ) {
+            value = val ;
+        }
 
-	public int getValue() {
-	    return value ;
-	}
+        public int getValue() {
+            return value ;
+        }
 
         @Override
-	public boolean equals( Object obj ) {
-	    if (obj == this) {
+        public boolean equals( Object obj ) {
+            if (obj == this) {
                 return true;
             }
 
-	    if (obj instanceof RRTest) {
-		RRTest other = (RRTest)obj ;
-		return value == other.getValue() ;
-	    } else {
-		return false ;
-	    }
-	}
+            if (obj instanceof RRTest) {
+                RRTest other = (RRTest)obj ;
+                return value == other.getValue() ;
+            } else {
+                return false ;
+            }
+        }
 
-	public int hashCode() {
-	    return value ;
-	}
+        public int hashCode() {
+            return value ;
+        }
 
-	private Object readResolve() {
-	    if (value == 1) {
+        private Object readResolve() {
+            if (value == 1) {
                 return rr1;
             } else if (value == 2) {
                 return rr2;
             } else {
                 return this;
             }
-	}
+        }
     }
 
     public void testReadResolve() {
-	RRTest rr1_1 = new RRTest( 1 ) ;
-	RRTest rr1_2 = new RRTest( 1 ) ;
-	RRTest rr2_1 = new RRTest( 2 ) ;
-	RRTest rr2_2 = new RRTest( 2 ) ;
-	RRTest rr3_1 = new RRTest( 3 ) ;
-	RRTest rr3_2 = new RRTest( 3 ) ;
+        RRTest rr1_1 = new RRTest( 1 ) ;
+        RRTest rr1_2 = new RRTest( 1 ) ;
+        RRTest rr2_1 = new RRTest( 2 ) ;
+        RRTest rr2_2 = new RRTest( 2 ) ;
+        RRTest rr3_1 = new RRTest( 3 ) ;
+        RRTest rr3_2 = new RRTest( 3 ) ;
 
-	RRTest[] data = new RRTest[] {
-	    rr1_1, rr2_1, rr1_1, rr1_2, rr2_2, rr2_2, 
-	    rr3_1, rr3_2 } ;
+        RRTest[] data = new RRTest[] {
+            rr1_1, rr2_1, rr1_1, rr1_2, rr2_2, rr2_2, 
+            rr3_1, rr3_2 } ;
 
-	// Each element of result is either == the corresponding element of
-	// expected, unless expected is null, then the result must have value 3.
-	RRTest[] expected = new RRTest[] {
-	    RRTest.rr1, RRTest.rr2, RRTest.rr1, RRTest.rr1, RRTest.rr2, RRTest.rr2,
-	    null, null } ;
+        // Each element of result is either == the corresponding element of
+        // expected, unless expected is null, then the result must have value 3.
+        RRTest[] expected = new RRTest[] {
+            RRTest.rr1, RRTest.rr2, RRTest.rr1, RRTest.rr1, RRTest.rr2, RRTest.rr2,
+            null, null } ;
 
-	ORB orb = null ;
+        ORB orb = null ;
 
-	try {
-	    String[] args = new String[0] ;
-	    Properties props = new Properties() ;
-	    orb = ORB.class.cast( ORB.init( args, props ) ) ;
+        try {
+            String[] args = new String[0] ;
+            Properties props = new Properties() ;
+            orb = ORB.class.cast( ORB.init( args, props ) ) ;
 
-	    OutputStream os = OutputStream.class.cast( orb.create_output_stream() ) ;
-	    os.write_value( data ) ;
+            OutputStream os = OutputStream.class.cast( orb.create_output_stream() ) ;
+            os.write_value( data ) ;
 
-	    InputStream is = InputStream.class.cast( os.create_input_stream() ) ;
-	    RRTest[] result = (RRTest[])is.read_value() ;
+            InputStream is = InputStream.class.cast( os.create_input_stream() ) ;
+            RRTest[] result = (RRTest[])is.read_value() ;
 
-	    for (int ctr=0; ctr<result.length; ctr++) {
-		RRTest exp = expected[ctr] ;
-		RRTest res = result[ctr] ;
-		if (exp == null) {
-		    assertEquals( res.getValue(), 3 ) ;
-		} else {
-		    assertSame( exp, res ) ;
-		}
-	    }
-	} finally {
-	    orb.destroy() ;
-	}
+            for (int ctr=0; ctr<result.length; ctr++) {
+                RRTest exp = expected[ctr] ;
+                RRTest res = result[ctr] ;
+                if (exp == null) {
+                    assertEquals( res.getValue(), 3 ) ;
+                } else {
+                    assertSame( exp, res ) ;
+                }
+            }
+        } finally {
+            orb.destroy() ;
+        }
     }
 
     // We expected that the contactInfoListIteratorNext durations will start at near 0,
@@ -805,99 +805,99 @@ public class Client extends TestCase
     // will take some non-zero time less than the initialTimeout.
     // All time arguments are in milliseconds; the time in the timer is in nanoseconds.
     void validateLogEvents( final ORB orb, final LogEventHandler leh, 
-	final int initialTimeout, final int maxWait, final int backoff ) {
+        final int initialTimeout, final int maxWait, final int backoff ) {
 
-	final TimerManager<TimingPoints> tm = orb.makeTimerManager(
+        final TimerManager<TimingPoints> tm = orb.makeTimerManager(
             TimingPoints.class ) ;
-	final TimingPoints tp = tm.points() ;
-	final Timer nextTime = tp.ContactInfoListIteratorImpl__next() ;
+        final TimingPoints tp = tm.points() ;
+        final Timer nextTime = tp.ContactInfoListIteratorImpl__next() ;
 
-	// per-event data (all events)
-	boolean firstEvent = true ;
-	long startTime = 0 ;
+        // per-event data (all events)
+        boolean firstEvent = true ;
+        long startTime = 0 ;
 
-	// per-next event data (only nextTime events)
-	boolean firstNextEvent = true ;
-	long currentWait = initialTimeout ; // each wait after first must be in [c,1.1*c]
-	long currentTime = 0 ; // duration of current nextTime event in milliseconds
+        // per-next event data (only nextTime events)
+        boolean firstNextEvent = true ;
+        long currentWait = initialTimeout ; // each wait after first must be in [c,1.1*c]
+        long currentTime = 0 ; // duration of current nextTime event in milliseconds
 
-	for (TimerEvent te : leh) {
-	    if (firstEvent) {
-		startTime = te.time() ;
-		firstEvent = false ;
-	    }
+        for (TimerEvent te : leh) {
+            if (firstEvent) {
+                startTime = te.time() ;
+                firstEvent = false ;
+            }
 
-	    if (te.timer() == nextTime) {
-		if (te.type() == TimerEvent.TimerEventType.ENTER) {
-		    currentTime = te.time() ;
-		} else { // EXIT
-		    final long duration = (te.time()-currentTime)/1000000 ;
+            if (te.timer() == nextTime) {
+                if (te.type() == TimerEvent.TimerEventType.ENTER) {
+                    currentTime = te.time() ;
+                } else { // EXIT
+                    final long duration = (te.time()-currentTime)/1000000 ;
 
-		    if (firstNextEvent) {
-			assertTrue( duration <= 1 ) ; // assume first wait is <= 1 msec.
+                    if (firstNextEvent) {
+                        assertTrue( duration <= 1 ) ; // assume first wait is <= 1 msec.
 
-			firstNextEvent = false ;
-		    } else {
-			assertTrue( "Expected duration " + duration 
-			    + " to be at least " + currentWait, duration >= currentWait ) ;
+                        firstNextEvent = false ;
+                    } else {
+                        assertTrue( "Expected duration " + duration 
+                            + " to be at least " + currentWait, duration >= currentWait ) ;
 
-			final long upperBound = (currentWait * 150)/100 ;
-			assertTrue( "Expected duration " + duration 
-			    + " to be less than " + upperBound, duration < upperBound ) ;
+                        final long upperBound = (currentWait * 150)/100 ;
+                        assertTrue( "Expected duration " + duration 
+                            + " to be less than " + upperBound, duration < upperBound ) ;
 
-			currentWait = (backoff * currentWait)/100 ;
-		    }
-		}
-	    }
+                        currentWait = (backoff * currentWait)/100 ;
+                    }
+                }
+            }
 
-	    currentTime = te.time() ; // keep track of last time for overall duration
-	}
+            currentTime = te.time() ; // keep track of last time for overall duration
+        }
 
-	// Check that overall duration is within range.
-	final long totalTime = (currentTime - startTime)/1000000 ;
+        // Check that overall duration is within range.
+        final long totalTime = (currentTime - startTime)/1000000 ;
 
-	assertTrue( totalTime > maxWait ) ;
-	assertTrue( totalTime < ((backoff*maxWait)/100 + initialTimeout) ) ;
+        assertTrue( totalTime > maxWait ) ;
+        assertTrue( totalTime < ((backoff*maxWait)/100 + initialTimeout) ) ;
     }
 
     // Create a corbaloc URL that points to nowhere, then attempt to 
     // narrow and invoke on it.  This will fail, but we are interested
     // in studying the ORB retry behavior.
     public void testConnectionFailure( boolean useSticky ) {
-	final String url = "corbaloc:iiop:1.2@ThisHostDoesNotExist:5555/NameService" ;
+        final String url = "corbaloc:iiop:1.2@ThisHostDoesNotExist:5555/NameService" ;
 
-	final Properties props = new Properties() ;
-	props.setProperty( "org.omg.CORBA.ORBClass",
-	    "com.sun.corba.se.impl.orb.ORBImpl" ) ;
+        final Properties props = new Properties() ;
+        props.setProperty( "org.omg.CORBA.ORBClass",
+            "com.sun.corba.ee.impl.orb.ORBImpl" ) ;
 
-	if (useSticky) {
-	    props.setProperty( 
-		ORBConstants.IIOP_PRIMARY_TO_CONTACT_INFO_CLASS_PROPERTY,
-		IIOPPrimaryToContactInfoImpl.class.getName() ) ;
-	}
+        if (useSticky) {
+            props.setProperty( 
+                ORBConstants.IIOP_PRIMARY_TO_CONTACT_INFO_CLASS_PROPERTY,
+                IIOPPrimaryToContactInfoImpl.class.getName() ) ;
+        }
 
-	final int expectedInitialTimeout = 50 ;
-	final int expectedMaxWait = 2000 ;
-	final int expectedBackoff = 100 ;
-	final String timeoutString = expectedInitialTimeout + ":" 
-	    + expectedMaxWait + ":" + expectedBackoff ;
+        final int expectedInitialTimeout = 50 ;
+        final int expectedMaxWait = 2000 ;
+        final int expectedBackoff = 100 ;
+        final String timeoutString = expectedInitialTimeout + ":" 
+            + expectedMaxWait + ":" + expectedBackoff ;
 
-	props.setProperty( ORBConstants.TRANSPORT_TCP_CONNECT_TIMEOUTS_PROPERTY, 
-	    timeoutString ) ;
-	props.setProperty( ORBConstants.TIMING_POINTS_ENABLED, "true" ) ;
-	final ORB orb = (ORB)ORB.init( new String[0], props ) ;
+        props.setProperty( ORBConstants.TRANSPORT_TCP_CONNECT_TIMEOUTS_PROPERTY, 
+            timeoutString ) ;
+        props.setProperty( ORBConstants.TIMING_POINTS_ENABLED, "true" ) ;
+        final ORB orb = (ORB)ORB.init( new String[0], props ) ;
 
-	final TcpTimeouts timeouts = orb.getORBData().getTransportTcpConnectTimeouts() ;
-	assertEquals( timeouts.get_initial_time_to_wait(), expectedInitialTimeout ) ;
-	assertEquals( timeouts.get_max_time_to_wait(),     expectedMaxWait ) ;
-	assertEquals( timeouts.get_backoff_factor(),       expectedBackoff + 100 ) ;
-	
-	TimerManager<TimingPoints> tm = orb.makeTimerManager(
+        final TcpTimeouts timeouts = orb.getORBData().getTransportTcpConnectTimeouts() ;
+        assertEquals( timeouts.get_initial_time_to_wait(), expectedInitialTimeout ) ;
+        assertEquals( timeouts.get_max_time_to_wait(),     expectedMaxWait ) ;
+        assertEquals( timeouts.get_backoff_factor(),       expectedBackoff + 100 ) ;
+        
+        TimerManager<TimingPoints> tm = orb.makeTimerManager(
             TimingPoints.class ) ;
-	LogEventHandler leh = tm.factory().makeLogEventHandler( "ContactInfoListIterator" ) ;
-	tm.controller().register( leh ) ;
+        LogEventHandler leh = tm.factory().makeLogEventHandler( "ContactInfoListIterator" ) ;
+        tm.controller().register( leh ) ;
         TimingPoints tp = tm.points() ;
-	TimerGroup cili = tm.factory().makeTimerGroup( "cili", 
+        TimerGroup cili = tm.factory().makeTimerGroup( "cili", 
             "TimerGroup for ContactInfoListIteratorImpl" ) ;
         cili.add( tp.ContactInfoListIteratorImpl__hasNext() ) ;
         cili.add( tp.ContactInfoListIteratorImpl__next() ) ;
@@ -906,76 +906,76 @@ public class Client extends TestCase
         cili.add( tp.ContactInfoListIteratorImpl__reportRedirect() ) ;
         cili.add( tp.ContactInfoListIteratorImpl__reportSuccess() ) ;
 
-	try {
-	    cili.enable() ;
-	    org.omg.CORBA.Object obj = orb.string_to_object( url ) ;
-	    NamingContextExt nc = NamingContextExtHelper.narrow( obj ) ;
-	    nc.resolve_str( "this/does/not/exist" ) ;
-	    cili.disable() ;
+        try {
+            cili.enable() ;
+            org.omg.CORBA.Object obj = orb.string_to_object( url ) ;
+            NamingContextExt nc = NamingContextExtHelper.narrow( obj ) ;
+            nc.resolve_str( "this/does/not/exist" ) ;
+            cili.disable() ;
 
-	} catch (Exception exc) {
+        } catch (Exception exc) {
             if (debug) {
                 System.out.println( "Received exception: " ) ;
                 exc.printStackTrace() ;
             }
-	} finally {
+        } finally {
             if (debug) {
                 leh.display( System.out, "Connection timer log contents" ) ;
                 validateLogEvents( orb, leh, expectedInitialTimeout, expectedMaxWait,
                     expectedBackoff+100 ) ;
                 orb.destroy() ;
             }
-	}
+        }
     }
 
     public void DONTRUNtestConnectionFailureWithStickyManager() {
-	testConnectionFailure( true ) ;
+        testConnectionFailure( true ) ;
     }
 
     public void DONTRUNtestConnectionFailureWithoutStickyManager() {
-	testConnectionFailure( false ) ;
+        testConnectionFailure( false ) ;
     }
 
     private static void displayTimerFactories() {
-	System.out.println( "Current TimerFactory instances:" ) ;
-	for (TimerFactory tf : TimerFactoryBuilder.contents()) {
-	    System.out.println( "\t" + tf ) ;
-	}
+        System.out.println( "Current TimerFactory instances:" ) ;
+        for (TimerFactory tf : TimerFactoryBuilder.contents()) {
+            System.out.println( "\t" + tf ) ;
+        }
     }
 
     private static TimerFactory findTimerFactoryForORB( String orbId ) {
-	for (TimerFactory tf : TimerFactoryBuilder.contents()) {
-	    if (tf.name().contains( orbId )) {
+        for (TimerFactory tf : TimerFactoryBuilder.contents()) {
+            if (tf.name().contains( orbId )) {
                 return tf;
             }
-	}
+        }
 
-	return null ;
+        return null ;
     }
 
     public void testORBInit() {
-	final String orbId = "OrbOne" ;
-	Properties props = new Properties() ;
-	props.setProperty( "org.omg.CORBA.ORBClass",
-	    "com.sun.corba.se.impl.orb.ORBImpl" ) ;
-	props.setProperty( "org.omg.CORBA.ORBId", orbId ) ;
-	ORB lorb = null ;
-	
-	for (int ctr=0; ctr<2; ctr++) {
-	    lorb = (ORB)ORB.init( new String[0], props ) ;
+        final String orbId = "OrbOne" ;
+        Properties props = new Properties() ;
+        props.setProperty( "org.omg.CORBA.ORBClass",
+            "com.sun.corba.ee.impl.orb.ORBImpl" ) ;
+        props.setProperty( "org.omg.CORBA.ORBId", orbId ) ;
+        ORB lorb = null ;
+        
+        for (int ctr=0; ctr<2; ctr++) {
+            lorb = (ORB)ORB.init( new String[0], props ) ;
             // If we don't create a TimerManager, there won't be a 
             // TimerFactory.
             TimerManager<TimingPoints> tm =
                 lorb.makeTimerManager( TimingPoints.class ) ;
 
-	    // displayTimerFactories() ;
-	    assertTrue( findTimerFactoryForORB(orbId) != null ) ;
+            // displayTimerFactories() ;
+            assertTrue( findTimerFactoryForORB(orbId) != null ) ;
 
-	    lorb.destroy() ;
-	    // displayTimerFactories() ;
+            lorb.destroy() ;
+            // displayTimerFactories() ;
             tm.destroy() ; // ORB.destroy won't clean this up!
-	    assertTrue( findTimerFactoryForORB(orbId) == null ) ;
-	}
+            assertTrue( findTimerFactoryForORB(orbId) == null ) ;
+        }
     }
 
     private void print2( String actual, String expected ) {
@@ -1029,10 +1029,10 @@ public class Client extends TestCase
 
         OutputStream out = (OutputStream)orb.create_output_stream();
 
-	out.write_value(bpal) ;
-	out.write_value(bpv) ;
+        out.write_value(bpal) ;
+        out.write_value(bpv) ;
 
-	InputStream in = (InputStream)out.create_input_stream();
+        InputStream in = (InputStream)out.create_input_stream();
 
         BuckPasserAL bpal2 = (BuckPasserAL)in.read_value() ;
         BuckPasserV bpv2 = (BuckPasserV)in.read_value() ;
@@ -1202,24 +1202,24 @@ public class Client extends TestCase
         public TestServantLocator( ORB orb ) {
             this.orb = orb ;
             ETestImpl impl = null ;
-	    try {
-	        impl = new ETestImpl() ;
-	    } catch (Exception exc) {
-		// do nothing
-	    }
+            try {
+                impl = new ETestImpl() ;
+            } catch (Exception exc) {
+                // do nothing
+            }
             Tie tie = orb.getPresentationManager().getTie() ;
             tie.setTarget( impl ) ;
             servant = Servant.class.cast( tie ) ;
         }
 
-	public synchronized Servant preinvoke( byte[] oid, POA adapter,
-	    String operation, CookieHolder the_cookie ) throws ForwardRequest {
-	    return servant ;
-	}
+        public synchronized Servant preinvoke( byte[] oid, POA adapter,
+            String operation, CookieHolder the_cookie ) throws ForwardRequest {
+            return servant ;
+        }
 
-	public void postinvoke( byte[] oid, POA adapter,
-	    String operation, Object the_cookie, Servant the_servant ) {
-	}
+        public void postinvoke( byte[] oid, POA adapter,
+            String operation, Object the_cookie, Servant the_servant ) {
+        }
     }
 
     public void testTypeCode() {
@@ -1238,18 +1238,18 @@ public class Client extends TestCase
             // Just get some object referece for testing
             final ServantLocator locator = new TestServantLocator( orb ) ;
 
-	    ReferenceFactoryManager rfm = null ;
+            ReferenceFactoryManager rfm = null ;
 
-	    try {
+            try {
                 rfm = ReferenceFactoryManager.class.cast(
                     orb.resolve_initial_references( "ReferenceFactoryManager" )) ;
-		} catch (Exception exc) {
-		    // do nthing
-		}
+                } catch (Exception exc) {
+                    // do nthing
+                }
             rfm.activate() ;
 
             final PresentationManager pm = 
-                com.sun.corba.se.spi.orb.ORB.getPresentationManager() ;
+                com.sun.corba.ee.spi.orb.ORB.getPresentationManager() ;
             String repositoryId ;
 
             try {
@@ -1257,7 +1257,7 @@ public class Client extends TestCase
             } catch (Exception exc) {
                 throw new RuntimeException( exc ) ;
             }
-	
+        
             final List<Policy> policies = new ArrayList<Policy>() ;
             final ReferenceFactory rf = rfm.create( "factory", repositoryId, 
                 policies, locator ) ;

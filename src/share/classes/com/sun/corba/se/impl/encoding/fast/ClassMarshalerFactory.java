@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 import org.glassfish.pfl.basic.func.UnaryFunction;
 
@@ -78,25 +78,25 @@ public final class ClassMarshalerFactory {
     }
 
     public static ClassMarshaler<?> getClassMarshaler( Class<?> cls ) {
-	return cmTable.lookup( null, cls ) ;
+        return cmTable.lookup( null, cls ) ;
     }
 
     public static ClassAnalyzer<?> getClassAnalyzer( Class<?> cls ) {
-	return caTable.lookup( null, cls ) ;
+        return caTable.lookup( null, cls ) ;
     }
 
     public static ClassMarshaler<?> getClassMarshaler( char[] typeLabel ) {
-	// XXX for now, we will just treat typeLabel as the name
-	// of the class and load it.  A full implementation should
-	// use a repository ID, which contains the serialization and
-	// RMI-IIOP hashcodes.  We'll use the existing FVD mechanism
-	// to fetch info about the class from the sender, and do
-	// some variant of the IIOPInputStream diff code or the equivalent
-	// in the java.io classes to handle the class evolution.
-	
-	// convert typeLabel to string
-	// load the class
-	// use getMarshaler( cls ) to get the result.
-	return null ;
+        // XXX for now, we will just treat typeLabel as the name
+        // of the class and load it.  A full implementation should
+        // use a repository ID, which contains the serialization and
+        // RMI-IIOP hashcodes.  We'll use the existing FVD mechanism
+        // to fetch info about the class from the sender, and do
+        // some variant of the IIOPInputStream diff code or the equivalent
+        // in the java.io classes to handle the class evolution.
+        
+        // convert typeLabel to string
+        // load the class
+        // use getMarshaler( cls ) to get the result.
+        return null ;
     }
 }

@@ -38,17 +38,17 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.Connection;
-import com.sun.corba.se.spi.transport.ConnectionCache;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.ConnectionCache;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.trace.Transport;
 
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;
@@ -69,7 +69,7 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 @Transport
 public abstract class ConnectionCacheBase
     implements
-	ConnectionCache
+        ConnectionCache
 {
     protected static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
@@ -95,23 +95,23 @@ public abstract class ConnectionCacheBase
     protected String monitoringName;
 
     protected ConnectionCacheBase(ORB orb, String cacheType,
-				       String monitoringName)
+                                       String monitoringName)
     {
-	this.orb = orb;
-	this.cacheType = cacheType;
-	this.monitoringName = monitoringName;
-	dprintCreation();
+        this.orb = orb;
+        this.cacheType = cacheType;
+        this.monitoringName = monitoringName;
+        dprintCreation();
     }
     
     @NameValue
     public String getCacheType()
     {
-	return cacheType;
+        return cacheType;
     }
 
     public synchronized void stampTime(Connection c)
     {
-	// _REVISIT_ Need to worry about wrap around some day
+        // _REVISIT_ Need to worry about wrap around some day
         c.setTimeStamp(timestamp++);
     }
 
@@ -143,9 +143,9 @@ public abstract class ConnectionCacheBase
     public long numberOfConnections()
     {
         long count = 0 ;
-	synchronized (backingStore()) {
-	    count = values().size();
-	}
+        synchronized (backingStore()) {
+            count = values().size();
+        }
 
         return count ;
     }
@@ -160,15 +160,15 @@ public abstract class ConnectionCacheBase
 
     public long numberOfIdleConnections()
     {
-	long count = 0;
-	synchronized (backingStore()) {
-	    Iterator connections = values().iterator();
-	    while (connections.hasNext()) {
-		if (! ((Connection)connections.next()).isBusy()) {
-		    count++;
-		}
-	    }
-	}
+        long count = 0;
+        synchronized (backingStore()) {
+            Iterator connections = values().iterator();
+            while (connections.hasNext()) {
+                if (! ((Connection)connections.next()).isBusy()) {
+                    count++;
+                }
+            }
+        }
 
         return count ;
     }
@@ -183,15 +183,15 @@ public abstract class ConnectionCacheBase
 
     public long numberOfBusyConnections()
     {
-	long count = 0;
-	synchronized (backingStore()) {
-	    Iterator connections = values().iterator();
-	    while (connections.hasNext()) {
-		if (((Connection)connections.next()).isBusy()) {
-		    count++;
-		}
-	    }
-	}
+        long count = 0;
+        synchronized (backingStore()) {
+            Iterator connections = values().iterator();
+            while (connections.hasNext()) {
+                if (((Connection)connections.next()).isBusy()) {
+                    count++;
+                }
+            }
+        }
         
         return count ;
     }
@@ -267,7 +267,7 @@ public abstract class ConnectionCacheBase
 
     public String getMonitoringName()
     {
-	return monitoringName;
+        return monitoringName;
     }
 
     ////////////////////////////////////////////////////

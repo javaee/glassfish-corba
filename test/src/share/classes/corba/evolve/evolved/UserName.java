@@ -85,7 +85,7 @@ public class UserName implements corba.evolve.UserNameInt
     private synchronized void readObject(java.io.ObjectInputStream s)
         throws IOException, ClassNotFoundException 
     {
-	s.defaultReadObject();
+        s.defaultReadObject();
 
         if (name == null)
             throw new IOException("name is null in readObject");

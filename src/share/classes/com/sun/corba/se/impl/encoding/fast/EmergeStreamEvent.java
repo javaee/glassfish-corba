@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 // XXX This seems like the wrong approach: do we even need this API?
 
@@ -59,114 +59,114 @@ public interface EmergeStreamEvent {
     /** The primitive representing an indirection.
      */
     public interface IndirEvent extends PrimitiveEvent {
-	LabelManager.Label label() ;
+        LabelManager.Label label() ;
     }
 
     /** The primitive representing a boolean value.
      */
     public interface BoolEvent extends PrimitiveEvent {
-	boolean value() ;
+        boolean value() ;
     }
 
     /** The primitive representing a byte value.
      */
     public interface ByteEvent extends PrimitiveEvent {
-	byte value() ;
+        byte value() ;
     }
 
     /** The primitive representing a char value.
      */
     public interface CharEvent extends PrimitiveEvent {
-	char value() ;
+        char value() ;
     }
 
     /** The primitive representing a short value.
      */
     public interface ShortEvent extends PrimitiveEvent {
-	short value() ;
+        short value() ;
     }
 
     /** The primitive representing a int value.
      */
     public interface IntEvent extends PrimitiveEvent {
-	int value() ;
+        int value() ;
     }
 
     /** The primitive representing a long value.
      */
     public interface LongEvent extends PrimitiveEvent {
-	long value() ;
+        long value() ;
     }
 
     /** The primitive representing a float value.
      */
     public interface FloatEvent extends PrimitiveEvent {
-	float value() ;
+        float value() ;
     }
 
     /** The primitive representing a double value.
      */
     public interface DoubleEvent extends PrimitiveEvent {
-	double value() ;
+        double value() ;
     }
 
     /** Event type common to all arrays.
      */
     public interface ArrayEvent extends EmergeStreamEvent {
-	LabelManager.Label selfLabel() ;
-	long offset() ;
-	long length() ;
+        LabelManager.Label selfLabel() ;
+        long offset() ;
+        long length() ;
     }
 
     public interface BoolArrEvent extends ArrayEvent {
-	boolean[] value() ;
+        boolean[] value() ;
     }
 
     public interface CharArrEvent extends ArrayEvent {
-	char[] value() ;
+        char[] value() ;
     }
 
     public interface ByteArrEvent extends ArrayEvent {
-	byte[] value() ;
+        byte[] value() ;
     }
 
     public interface ShortArrEvent extends ArrayEvent {
-	short[] value() ;
+        short[] value() ;
     }
 
     public interface IntArrEvent extends ArrayEvent {
-	int[] value() ;
+        int[] value() ;
     }
 
     public interface LongArrEvent extends ArrayEvent {
-	long[] value() ;
+        long[] value() ;
     }
 
     public interface FloatArrEvent extends ArrayEvent {
-	float[] value() ;
+        float[] value() ;
     }
 
     public interface DoubleArrEvent extends ArrayEvent {
-	double[] value() ;
+        double[] value() ;
     }
 
     public interface RefArrEvent extends ArrayEvent {
-	LabelManager.Label[] value() ;
+        LabelManager.Label[] value() ;
     }
 
     /** A RefEvent is followed by numParts() SimplePartEvents.
      */
     public interface RefEvent extends EmergeStreamEvent {
-	LabelManager.Label selfLabel() ;
-	long numParts() ;
+        LabelManager.Label selfLabel() ;
+        long numParts() ;
     }
 
     /** A SimplePartEvent is followed by length() PrimitiveEvents.
      */
     public interface SimplePartEvent extends EmergeStreamEvent {
-	LabelManager.Label typeLabel() ;
-	long offset() ;
-	long length() ;
+        LabelManager.Label typeLabel() ;
+        long offset() ;
+        long length() ;
     }
 
     /** A CustomPartEvent is followed by length() PrimitiveEvents (as
@@ -179,7 +179,7 @@ public interface EmergeStreamEvent {
     /** Represents the beginning or end of a tuple sequence.
      */
     public interface TupleEvent extends EmergeStreamEvent {
-	EmergeCode.TupleCode code() ;
+        EmergeCode.TupleCode code() ;
     }
 
     /** Base interface for all Label message requests and replies.
@@ -191,29 +191,29 @@ public interface EmergeStreamEvent {
      * </UL>
      */
     public interface LabelMessageEvent extends EmergeStreamEvent {
-	EmergeCode.LabelMsg labelMsg() ;
-	LabelManager.Label label() ;
+        EmergeCode.LabelMsg labelMsg() ;
+        LabelManager.Label label() ;
     }
 
     public interface LabelMessageReplyGoodEvent extends LabelMessageEvent {
     }
 
     public interface LabelMessageReplyBadEvent extends LabelMessageEvent {
-	long reasonCodeCategory() ;
-	long reasonCodeMinorCode() ;
+        long reasonCodeCategory() ;
+        long reasonCodeMinorCode() ;
     }
 
     public interface CloseSessionMessageEvent extends EmergeStreamEvent {
-	long sessionId() ;
+        long sessionId() ;
     }
 
     public interface RejectRequestMessageEvent extends EmergeStreamEvent {
-	long reasonCodeCategory() ;
-	long reasonCodeMinorCode() ;
+        long reasonCodeCategory() ;
+        long reasonCodeMinorCode() ;
     }
 
     public interface FiberListMessageEvent extends EmergeStreamEvent {
-	long[] fibers() ;
+        long[] fibers() ;
     }
 
     /** Represents a data message transferring some number
@@ -227,11 +227,11 @@ public interface EmergeStreamEvent {
      * <LI>MessageEvent (end)
      */
     public interface MessageEvent extends EmergeStreamEvent {
-	EmergeCode.MsgCode msgCode() ;
-	long requestId() ;
-	long sessionId() ;
-	long fiberId() ;
-	long numArgs() ;
+        EmergeCode.MsgCode msgCode() ;
+        long requestId() ;
+        long sessionId() ;
+        long fiberId() ;
+        long numArgs() ;
     }
 }
 

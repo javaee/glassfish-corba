@@ -38,10 +38,10 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.activation;
+package com.sun.corba.ee.impl.activation;
 
 import java.util.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 /** ProcessMonitorThread is started when ServerManager is instantiated. The 
   * thread wakes up every minute (This can be changed by setting sleepTime) and
@@ -88,24 +88,24 @@ public class ProcessMonitorThread extends java.lang.Thread {
     }
 
     static void start( Map<Integer,ServerTableEntry> serverTable ) { 
-	int sleepTime = ORBConstants.DEFAULT_SERVER_POLLING_TIME;
+        int sleepTime = ORBConstants.DEFAULT_SERVER_POLLING_TIME;
 
-	String pollingTime = System.getProperties().getProperty( 
-	    ORBConstants.SERVER_POLLING_TIME ); 
+        String pollingTime = System.getProperties().getProperty( 
+            ORBConstants.SERVER_POLLING_TIME ); 
 
-	if ( pollingTime != null ) {
-	    try {
-		sleepTime = Integer.parseInt( pollingTime ); 
-	    } catch (Exception e ) {
-		// Too late to complain, Just use the default 
-		// sleepTime
-	    }
-	}
+        if ( pollingTime != null ) {
+            try {
+                sleepTime = Integer.parseInt( pollingTime ); 
+            } catch (Exception e ) {
+                // Too late to complain, Just use the default 
+                // sleepTime
+            }
+        }
 
-	instance = new ProcessMonitorThread( serverTable, 
-	    sleepTime );
-	instance.setDaemon( true );
-	instance.start();
+        instance = new ProcessMonitorThread( serverTable, 
+            sleepTime );
+        instance.setDaemon( true );
+        instance.start();
     }
 
     static void interruptThread( ) {

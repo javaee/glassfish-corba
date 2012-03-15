@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.presentation.rmi ;
+package com.sun.corba.ee.impl.presentation.rmi ;
 
 /**
  * Checked exception containing information about an

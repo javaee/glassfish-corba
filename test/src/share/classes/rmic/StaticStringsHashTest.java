@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)StaticStringsHashTest.java	1.4 99/06/07 */
+/* @(#)StaticStringsHashTest.java       1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -268,7 +268,7 @@ public class StaticStringsHashTest extends Test {
             "* the class's <tt>equals(Object)</tt> method:<pre>",
             "* {(x, y) such that x.equals((Object)y)}.",
             "* </pre>",
-	},
+        },
     };
     
     /**
@@ -293,29 +293,29 @@ public class StaticStringsHashTest extends Test {
         for (int i = 0; i < hash.buckets.length; i++) {
             int currentHash = hash.keys[i];
             for (int j = 0; j < hash.buckets[i].length; j++) {
-		int index = hash.buckets[i][j];
-		        
-		// Make sure it is not already used...
-		        
-		if (found[index] == 1) {
-		    throw new Error("index found more than once");
-		} else {
-		    found[index] = 1;
-		}
-		        
-		int h = hash.getKey(list[index]);
-		if (h != currentHash) {
-		    throw new Error("hash does not match");   
-		}
-	    }
-	}
+                int index = hash.buckets[i][j];
+                        
+                // Make sure it is not already used...
+                        
+                if (found[index] == 1) {
+                    throw new Error("index found more than once");
+                } else {
+                    found[index] = 1;
+                }
+                        
+                int h = hash.getKey(list[index]);
+                if (h != currentHash) {
+                    throw new Error("hash does not match");   
+                }
+            }
+        }
         
         // Make sure all indices are represented...
         
         for (int i = 0; i < length; i++) {
-	    if (found[i] != 1) {
-		throw new Error("index "+i+" not found");
-	    }
+            if (found[i] != 1) {
+                throw new Error("index "+i+" not found");
+            }
         }
     }
 

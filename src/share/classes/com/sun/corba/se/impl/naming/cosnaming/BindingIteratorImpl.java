@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.cosnaming;
+package com.sun.corba.ee.impl.naming.cosnaming;
 
 // Import general CORBA classes
 import org.omg.CORBA.ORB;
@@ -80,8 +80,8 @@ public abstract class BindingIteratorImpl extends BindingIteratorPOA
     public BindingIteratorImpl(ORB orb) 
         throws java.lang.Exception 
     {
-	super();
-	this.orb = orb ;
+        super();
+        this.orb = orb ;
     }
   
     /**
@@ -95,8 +95,8 @@ public abstract class BindingIteratorImpl extends BindingIteratorPOA
      */
     public synchronized boolean next_one(org.omg.CosNaming.BindingHolder b)
     {
-	// NextOne actually returns the next one
-	return nextOneImpl(b);
+        // NextOne actually returns the next one
+        return nextOneImpl(b);
     }
   
     /**
@@ -129,29 +129,29 @@ public abstract class BindingIteratorImpl extends BindingIteratorPOA
      */
     public boolean list( int how_many, org.omg.CosNaming.BindingListHolder blh) 
     {
-	// Take the smallest of what's left and what's being asked for
-	int numberToGet = Math.min(remainingElementsImpl(),how_many);
+        // Take the smallest of what's left and what's being asked for
+        int numberToGet = Math.min(remainingElementsImpl(),how_many);
     
         // Create a resulting BindingList
-	Binding[] bl = new Binding[numberToGet];
-	BindingHolder bh = new BindingHolder();
-	int i = 0;
-	// Keep iterating as long as there are entries
-	while (i < numberToGet && this.nextOneImpl(bh) == true) {
-	    bl[i] = bh.value;
-	    i++;
-	}
-	// Found any at all?
-	if (i == 0) {
-	    // No
-	    blh.value = new Binding[0];
-	    return false;
-	}
+        Binding[] bl = new Binding[numberToGet];
+        BindingHolder bh = new BindingHolder();
+        int i = 0;
+        // Keep iterating as long as there are entries
+        while (i < numberToGet && this.nextOneImpl(bh) == true) {
+            bl[i] = bh.value;
+            i++;
+        }
+        // Found any at all?
+        if (i == 0) {
+            // No
+            blh.value = new Binding[0];
+            return false;
+        }
 
-	// Set into holder
-	blh.value = bl;
+        // Set into holder
+        blh.value = bl;
     
-	return true;
+        return true;
     }
 
 
@@ -166,8 +166,8 @@ public abstract class BindingIteratorImpl extends BindingIteratorPOA
      */ 
     public synchronized void destroy()
     {
-	// Destroy actually destroys
-	this.destroyImpl();
+        // Destroy actually destroys
+        this.destroyImpl();
     }
 
     /**

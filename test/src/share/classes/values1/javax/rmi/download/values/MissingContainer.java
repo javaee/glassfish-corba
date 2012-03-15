@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)MissingContainer.java	1.3 99/06/07 */
+/* @(#)MissingContainer.java    1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -55,14 +55,14 @@ public class MissingContainer extends javax.rmi.fvd.ParentClass {
     private int a;
 
     public MissingContainer(){
-	a = 5;
+        a = 5;
     }
 
     public long getTotal(){
-	return super.getTotal() + a;
+        return super.getTotal() + a;
     }
 
     public long getOriginalTotal(){
-	return super.getOriginalTotal() +  5;
+        return super.getOriginalTotal() +  5;
     }
 }

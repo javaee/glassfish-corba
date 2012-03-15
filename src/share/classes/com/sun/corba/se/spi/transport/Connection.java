@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -50,22 +50,22 @@ import org.omg.CORBA.SystemException;
 import com.sun.org.omg.SendingContext.CodeBase;
 
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.MessageMediator;
-import com.sun.corba.se.spi.protocol.RequestId;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.protocol.RequestId;
 
-import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.impl.encoding.CodeSetComponentInfo;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
 
 /**
  * @author Harold Carr
  */
 public interface Connection
     extends
-	com.sun.corba.se.spi.legacy.connection.Connection
+        com.sun.corba.ee.spi.legacy.connection.Connection
 {
     /**
      * Used to determine if the <code>Connection</code> should register
@@ -176,7 +176,7 @@ public interface Connection
 
     /*
      * Send the data encoded in
-     * {@link com.sun.corba.se.impl.encoding.CDROutputObject CDROutputObject}
+     * {@link com.sun.corba.ee.impl.encoding.CDROutputObject CDROutputObject}
      * on the <code>Connection</code>.
      *
      * @param outputObject
@@ -220,14 +220,14 @@ public interface Connection
 
     // NOTE: This method can throw a connection rebind SystemException.
     public ByteBuffer read(int size, int offset, int length )
-	throws IOException;
+        throws IOException;
 
     // NOTE: This method can throw a connection rebind SystemException.
     public ByteBuffer read(ByteBuffer byteBuffer, int offset,
-	                  int length) throws IOException;
+                          int length) throws IOException;
 
     public void write(ByteBuffer byteBuffer)
-	throws IOException;
+        throws IOException;
 
     public int getNextRequestId();
     public ORB getBroker();
@@ -251,7 +251,7 @@ public interface Connection
     public void setPostInitialContexts();
 
     public void purgeCalls(SystemException systemException,
-			   boolean die, boolean lockHeld);
+                           boolean die, boolean lockHeld);
 
     //
     // Connection status
@@ -287,25 +287,25 @@ public interface Connection
     // End Code Base methods -----------------------------------------
 
     public void sendCloseConnection(GIOPVersion giopVersion)
-	throws IOException;
+        throws IOException;
 
     public void sendMessageError(GIOPVersion giopVersion)
-	throws IOException;
+        throws IOException;
 
     public void sendCancelRequest(GIOPVersion giopVersion, int requestId)
-	throws
-	    IOException;
+        throws
+            IOException;
 
     // NOTE: This method can throw a connection rebind SystemException.
     public void sendCancelRequestWithLock(GIOPVersion giopVersion,
-					  int requestId)
-	throws 
-	    IOException;
+                                          int requestId)
+        throws 
+            IOException;
 
     public ResponseWaitingRoom getResponseWaitingRoom();
 
     public void serverRequestMapPut(int requestId,
-				    MessageMediator messageMediator);
+                                    MessageMediator messageMediator);
     public MessageMediator serverRequestMapGet(int requestId);
     public void serverRequestMapRemove(int requestId);
 

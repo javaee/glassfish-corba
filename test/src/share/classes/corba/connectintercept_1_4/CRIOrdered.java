@@ -51,7 +51,7 @@ public class CRIOrdered
     extends
         org.omg.CORBA.LocalObject
     implements
-	org.omg.PortableInterceptor.ClientRequestInterceptor,
+        org.omg.PortableInterceptor.ClientRequestInterceptor,
         Comparable
 {
     public static final String baseMsg = CRIOrdered.class.getName();
@@ -59,52 +59,52 @@ public class CRIOrdered
     public int order;
     public CRIOrdered(String name, int order)
     {
-	this.name = name;
-	this.order = order;
+        this.name = name;
+        this.order = order;
     }
     public int compareTo(Object o)
     {
-	int otherOrder = ((CRIOrdered)o).order;
-	if (order < otherOrder) {
-	    return -1;
-	} else if (order == otherOrder) {
-	    return 0;
-	}
-	return 1;
+        int otherOrder = ((CRIOrdered)o).order;
+        if (order < otherOrder) {
+            return -1;
+        } else if (order == otherOrder) {
+            return 0;
+        }
+        return 1;
     }
     public String name() { return name; }
 
     public void destroy() 
     {
-	try {
-	    Common.up(order);
-	} catch (INTERNAL e) {
-	    // INTERNAL will get swallowed by ORB.
-	    // Convert it to something else so server will exit incorrectly
-	    // so error can be detected.
-	    throw new RuntimeException(baseMsg + ": Wrong order in destroy.");
-	}
+        try {
+            Common.up(order);
+        } catch (INTERNAL e) {
+            // INTERNAL will get swallowed by ORB.
+            // Convert it to something else so server will exit incorrectly
+            // so error can be detected.
+            throw new RuntimeException(baseMsg + ": Wrong order in destroy.");
+        }
     }
 
     public void send_request(ClientRequestInfo cri)
     {
-	Common.up(order);
+        Common.up(order);
     }
     public void send_poll(ClientRequestInfo cri)
     {
-	Common.up(order);
+        Common.up(order);
     }
     public void receive_reply(ClientRequestInfo cri)
     {
-	Common.down(order);
+        Common.down(order);
     }
     public void receive_exception(ClientRequestInfo cri)
     {
-	Common.down(order);
+        Common.down(order);
     }
     public void receive_other(ClientRequestInfo cri)
     {
-	Common.down(order);
+        Common.down(order);
     }
 }
 

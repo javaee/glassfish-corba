@@ -52,7 +52,7 @@ import corba.framework.CORBATest;
  */
 public class IorIntSockFactTest extends CORBATest {
     public static final String thisPackage =
-	IorIntSockFactTest.class.getPackage().getName();
+        IorIntSockFactTest.class.getPackage().getName();
 
     protected void doTest() throws Throwable {
         Controller orbd   = createORBD();

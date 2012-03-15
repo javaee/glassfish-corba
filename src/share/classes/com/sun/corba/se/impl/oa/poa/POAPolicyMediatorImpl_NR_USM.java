@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.oa.poa ;
+package com.sun.corba.ee.impl.oa.poa ;
 
 
 import org.omg.PortableServer.POA ;
@@ -55,8 +55,8 @@ import org.omg.PortableServer.POAPackage.ServantAlreadyActive ;
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 
 
-import com.sun.corba.se.spi.oa.OAInvocationInfo ;
-import com.sun.corba.se.impl.oa.NullServantImpl ;
+import com.sun.corba.ee.spi.oa.OAInvocationInfo ;
+import com.sun.corba.ee.impl.oa.NullServantImpl ;
 
 /** Implementation of POARequesHandler that provides policy specific
  * operations on the POA.
@@ -67,30 +67,30 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
 
     POAPolicyMediatorImpl_NR_USM( Policies policies, POAImpl poa ) 
     {
-	super( policies, poa ) ;
+        super( policies, poa ) ;
 
-	// assert !policies.retainServants() && policies.useServantManager()
-	if (policies.retainServants()) {
+        // assert !policies.retainServants() && policies.useServantManager()
+        if (policies.retainServants()) {
             throw wrapper.policyMediatorBadPolicyInFactory();
         }
 
-	if (!policies.useServantManager()) {
+        if (!policies.useServantManager()) {
             throw wrapper.policyMediatorBadPolicyInFactory();
         }
 
-	locator = null ;
+        locator = null ;
     }
     
     protected java.lang.Object internalGetServant( byte[] id, 
-	String operation ) throws ForwardRequest
+        String operation ) throws ForwardRequest
     { 
-	if (locator == null) {
+        if (locator == null) {
             throw wrapper.poaNoServantManager();
         }
     
-	CookieHolder cookieHolder = orb.peekInvocationInfo().getCookieHolder() ;
+        CookieHolder cookieHolder = orb.peekInvocationInfo().getCookieHolder() ;
 
-	java.lang.Object servant = locator.preinvoke(id, poa, operation,
+        java.lang.Object servant = locator.preinvoke(id, poa, operation,
             cookieHolder);
 
         if (servant == null) {
@@ -100,15 +100,15 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
         }
 
 
-	return servant;
+        return servant;
     }
 
     public void returnServant() 
     {
-	OAInvocationInfo info = orb.peekInvocationInfo();
+        OAInvocationInfo info = orb.peekInvocationInfo();
 
         // 6878245: added info == null check.
-	if (locator == null || info == null) {
+        if (locator == null || info == null) {
             return;
         }
 
@@ -118,27 +118,27 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
     }
 
     public void etherealizeAll() 
-    {	
-	// NO-OP
+    {   
+        // NO-OP
     }
 
     public void clearAOM() 
     {
-	// NO-OP
+        // NO-OP
     }
 
     public ServantManager getServantManager() throws WrongPolicy
     {
-	return locator ;
+        return locator ;
     }
 
     public void setServantManager( ServantManager servantManager ) throws WrongPolicy
     {
-	if (locator != null) {
+        if (locator != null) {
             throw wrapper.servantManagerAlreadySet();
         }
 
-	if (servantManager instanceof ServantLocator) {
+        if (servantManager instanceof ServantLocator) {
             locator = (ServantLocator) servantManager;
         } else {
             throw wrapper.servantManagerBadType();
@@ -147,33 +147,33 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
 
     public Servant getDefaultServant() throws NoServant, WrongPolicy 
     {
-	throw new WrongPolicy();
+        throw new WrongPolicy();
     }
 
     public void setDefaultServant( Servant servant ) throws WrongPolicy
     {
-	throw new WrongPolicy();
+        throw new WrongPolicy();
     }
 
     public final void activateObject(byte[] id, Servant servant) 
-	throws WrongPolicy, ServantAlreadyActive, ObjectAlreadyActive
+        throws WrongPolicy, ServantAlreadyActive, ObjectAlreadyActive
     {
-	throw new WrongPolicy();
+        throw new WrongPolicy();
     }
 
     public Servant deactivateObject( byte[] id ) throws ObjectNotActive, WrongPolicy 
     {
-	throw new WrongPolicy();
+        throw new WrongPolicy();
     }
 
     public byte[] servantToId( Servant servant ) throws ServantNotActive, WrongPolicy
-    {	
-	throw new WrongPolicy();
+    {   
+        throw new WrongPolicy();
     }
 
     public Servant idToServant( byte[] id ) 
-	throws WrongPolicy, ObjectNotActive
+        throws WrongPolicy, ObjectNotActive
     {
-	throw new WrongPolicy();
+        throw new WrongPolicy();
     }
 }

@@ -39,7 +39,7 @@
  */
 package corba.msgtypes;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import corba.framework.CORBATest;
 import corba.framework.Controller;
 import corba.framework.Options;
@@ -316,7 +316,7 @@ public class MsgTypesTest extends CORBATest {
 
         Properties serverProps = Options.getServerProperties();
         serverProps.put("org.omg.CORBA.ORBClass",
-                        "com.sun.corba.se.impl.orb.ORBImpl");
+                        "com.sun.corba.ee.impl.orb.ORBImpl");
         serverProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
                   "corba.msgtypes.Server", "true");
 
@@ -355,13 +355,13 @@ public class MsgTypesTest extends CORBATest {
         clientProps.put(ORBConstants.GIOP_TARGET_ADDRESSING,
                   "" + ORBConstants.ADDR_DISP_IOR);
         clientProps.put("org.omg.CORBA.ORBClass",
-                        "com.sun.corba.se.impl.orb.ORBImpl");
+                        "com.sun.corba.ee.impl.orb.ORBImpl");
         clientProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
                   "corba.msgtypes.Client", "true");
                   
         Properties serverProps = Options.getServerProperties();
         serverProps.put("org.omg.CORBA.ORBClass",
-                        "com.sun.corba.se.impl.orb.ORBImpl");
+                        "com.sun.corba.ee.impl.orb.ORBImpl");
         serverProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
                   "corba.msgtypes.Server", "true");
         serverProps.put(ORBConstants.GIOP_TARGET_ADDRESSING,

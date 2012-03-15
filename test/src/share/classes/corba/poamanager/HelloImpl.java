@@ -44,11 +44,11 @@ import HelloStuff.HelloPOA;
 public class HelloImpl extends HelloPOA
 {
     public String hi() {
-	try { 
-	    Thread.sleep(10); // to allow interesting threading behavior
-	} catch ( InterruptedException ex ) {}
-	return "Welcome, POA";
+        try { 
+            Thread.sleep(10); // to allow interesting threading behavior
+        } catch ( InterruptedException ex ) {}
+        return "Welcome, POA";
     }
 }
-	
+        
 

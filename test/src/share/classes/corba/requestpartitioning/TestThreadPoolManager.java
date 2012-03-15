@@ -39,13 +39,13 @@
  */
 package corba.requestpartitioning;
 
-import com.sun.corba.se.spi.threadpool.ThreadPoolChooser;
-import com.sun.corba.se.spi.threadpool.ThreadPoolManager;
-import com.sun.corba.se.spi.threadpool.ThreadPool;
-import com.sun.corba.se.spi.threadpool.NoSuchThreadPoolException;
+import com.sun.corba.ee.spi.threadpool.ThreadPoolChooser;
+import com.sun.corba.ee.spi.threadpool.ThreadPoolManager;
+import com.sun.corba.ee.spi.threadpool.ThreadPool;
+import com.sun.corba.ee.spi.threadpool.NoSuchThreadPoolException;
 
-import com.sun.corba.se.impl.threadpool.ThreadPoolImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.threadpool.ThreadPoolImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -66,36 +66,36 @@ public class TestThreadPoolManager implements ThreadPoolManager {
     private static ThreadPoolManager testThreadPoolMgr = new TestThreadPoolManager();
 
     public static ThreadPoolManager getThreadPoolManager() {
-	return testThreadPoolMgr;
+        return testThreadPoolMgr;
     }
 
     TestThreadPoolManager() {
 
         for (int i = 0; i < NUMBER_OF_THREAD_POOLS_TO_CREATE; i++) {
-	    createThreadPools(i);
-	}
-	defaultID = (String)indexToIdTable.get(new Integer(0));
+            createThreadPools(i);
+        }
+        defaultID = (String)indexToIdTable.get(new Integer(0));
     }
 
     private void createThreadPools(int index) {
-	String threadpoolId = Integer.toString(index);
+        String threadpoolId = Integer.toString(index);
 
-	// Mutiply the idleTimeoutInSeconds by 1000 to convert to milliseconds
-	com.sun.corba.se.spi.threadpool.ThreadPool threadpool = 
-	    new ThreadPoolImpl(DEFAULT_MIN_THREAD_COUNT,
-		               DEFAULT_MAX_THREAD_COUNT, 
-		               ThreadPoolImpl.DEFAULT_INACTIVITY_TIMEOUT * 1000,
-		               threadpoolId);
+        // Mutiply the idleTimeoutInSeconds by 1000 to convert to milliseconds
+        com.sun.corba.ee.spi.threadpool.ThreadPool threadpool = 
+            new ThreadPoolImpl(DEFAULT_MIN_THREAD_COUNT,
+                               DEFAULT_MAX_THREAD_COUNT, 
+                               ThreadPoolImpl.DEFAULT_INACTIVITY_TIMEOUT * 1000,
+                               threadpoolId);
 
-	// Add the threadpool instance to the threadpoolList
-	threadpoolList.add(threadpool);
+        // Add the threadpool instance to the threadpoolList
+        threadpoolList.add(threadpool);
 
-	// Associate the threadpoolId to the index passed
-	idToIndexTable.put(threadpoolId, new Integer(index));
+        // Associate the threadpoolId to the index passed
+        idToIndexTable.put(threadpoolId, new Integer(index));
 
-	// Associate the threadpoolId to the index passed
-	indexToIdTable.put(new Integer(index), threadpoolId);
-	
+        // Associate the threadpoolId to the index passed
+        indexToIdTable.put(new Integer(index), threadpoolId);
+        
     }
 
     /** 
@@ -105,22 +105,22 @@ public class TestThreadPoolManager implements ThreadPoolManager {
     * @throws NoSuchThreadPoolException thrown when invalid threadpoolId is passed
     * as a parameter
     */ 
-    public com.sun.corba.se.spi.threadpool.ThreadPool
-				getThreadPool(String id) 
+    public com.sun.corba.ee.spi.threadpool.ThreadPool
+                                getThreadPool(String id) 
         throws NoSuchThreadPoolException {
 
-	Integer i = (Integer)idToIndexTable.get(id);
-	if (i == null) {
-	    throw new NoSuchThreadPoolException();
-	}
-	try {
-	    com.sun.corba.se.spi.threadpool.ThreadPool threadpool =
-		(com.sun.corba.se.spi.threadpool.ThreadPool)
-		threadpoolList.get(i.intValue());
-	    return threadpool;
-	} catch (IndexOutOfBoundsException iobe) {
-	    throw new NoSuchThreadPoolException();
-	}
+        Integer i = (Integer)idToIndexTable.get(id);
+        if (i == null) {
+            throw new NoSuchThreadPoolException();
+        }
+        try {
+            com.sun.corba.ee.spi.threadpool.ThreadPool threadpool =
+                (com.sun.corba.ee.spi.threadpool.ThreadPool)
+                threadpoolList.get(i.intValue());
+            return threadpool;
+        } catch (IndexOutOfBoundsException iobe) {
+            throw new NoSuchThreadPoolException();
+        }
     }
 
     /** 
@@ -131,18 +131,18 @@ public class TestThreadPoolManager implements ThreadPoolManager {
     * @throws NoSuchThreadPoolException thrown when invalidnumericIdForThreadpool is passed
     * as a parameter
     */ 
-    public com.sun.corba.se.spi.threadpool.ThreadPool 
-			getThreadPool(int numericIdForThreadpool) 
+    public com.sun.corba.ee.spi.threadpool.ThreadPool 
+                        getThreadPool(int numericIdForThreadpool) 
         throws NoSuchThreadPoolException { 
 
-	try {
-	    com.sun.corba.se.spi.threadpool.ThreadPool threadpool =
-		(com.sun.corba.se.spi.threadpool.ThreadPool)
-		threadpoolList.get(numericIdForThreadpool);
-	    return threadpool;
-	} catch (IndexOutOfBoundsException iobe) {
-	    throw new NoSuchThreadPoolException();
-	}
+        try {
+            com.sun.corba.ee.spi.threadpool.ThreadPool threadpool =
+                (com.sun.corba.ee.spi.threadpool.ThreadPool)
+                threadpoolList.get(numericIdForThreadpool);
+            return threadpool;
+        } catch (IndexOutOfBoundsException iobe) {
+            throw new NoSuchThreadPoolException();
+        }
     }
 
     /** 
@@ -152,8 +152,8 @@ public class TestThreadPoolManager implements ThreadPoolManager {
     * dedicated threadpool. 
     */ 
     public int  getThreadPoolNumericId(String id) { 
-	Integer i = (Integer)idToIndexTable.get(id);
-	return ((i == null) ? 0 : i.intValue());
+        Integer i = (Integer)idToIndexTable.get(id);
+        return ((i == null) ? 0 : i.intValue());
     }
 
     /** 
@@ -161,41 +161,41 @@ public class TestThreadPoolManager implements ThreadPoolManager {
     * manager 
     */ 
     public String getThreadPoolStringId(int numericIdForThreadpool) {
-	String id = (String)indexToIdTable.get(new Integer(numericIdForThreadpool));
-	return ((id == null) ? defaultID : id);
+        String id = (String)indexToIdTable.get(new Integer(numericIdForThreadpool));
+        return ((id == null) ? defaultID : id);
     } 
 
     /** 
     * Returns the first instance of ThreadPool in the ThreadPoolManager 
     */ 
-    public com.sun.corba.se.spi.threadpool.ThreadPool 
-					getDefaultThreadPool() {
-	try {
-	    return getThreadPool(0);
-	} catch (NoSuchThreadPoolException nstpe) {
-	    System.err.println("No default ThreadPool defined " + nstpe);
-	    System.exit(1);
-	}
-	return null;
+    public com.sun.corba.ee.spi.threadpool.ThreadPool 
+                                        getDefaultThreadPool() {
+        try {
+            return getThreadPool(0);
+        } catch (NoSuchThreadPoolException nstpe) {
+            System.err.println("No default ThreadPool defined " + nstpe);
+            System.exit(1);
+        }
+        return null;
     }
 
     public ThreadPoolChooser getThreadPoolChooser(String componentId) {
-	// not used
-	return null;
+        // not used
+        return null;
     }
 
     public ThreadPoolChooser getThreadPoolChooser(int componentIndex) {
-	// not used
-	return null;
+        // not used
+        return null;
     }
 
     public void setThreadPoolChooser(String componentId, ThreadPoolChooser aThreadPoolChooser) {
-	// not used
+        // not used
     }
 
     public int getThreadPoolChooserNumericId(String componentId) {
-	// not used
-	return 0;
+        // not used
+        return 0;
     }
 
     public void close() throws java.io.IOException {

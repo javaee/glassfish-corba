@@ -51,16 +51,16 @@ public class helloClient
 {
     public static void main(String args[])
     {
-	try{
-	    // create and initialize the ORB
-	    Properties props = new Properties() ;
-	    props.put( "org.omg.CORBA.ORBClass", 
+        try{
+            // create and initialize the ORB
+            Properties props = new Properties() ;
+            props.put( "org.omg.CORBA.ORBClass", 
                        System.getProperty("org.omg.CORBA.ORBClass"));
-	    ORB orb = ORB.init(args, props);
+            ORB orb = ORB.init(args, props);
 
             // get the root naming context
             org.omg.CORBA.Object objRef = 
-		orb.resolve_initial_references("NameService");
+                orb.resolve_initial_references("NameService");
             NamingContext ncRef = NamingContextHelper.narrow(objRef);
  
             // resolve the Object Reference in Naming
@@ -68,20 +68,20 @@ public class helloClient
             NameComponent path[] = {nc};
             hello helloRef = helloHelper.narrow(ncRef.resolve(path));
 
-	    // call the hello server object and print results
-	    System.out.println("Invoking oneway method...");
-	    helloRef.sayHello();
-	    System.out.println("OK! Returned from oneway call !!");
+            // call the hello server object and print results
+            System.out.println("Invoking oneway method...");
+            helloRef.sayHello();
+            System.out.println("OK! Returned from oneway call !!");
 
-	    // call shutdown
-	    System.out.println("Invoking shutdown...");
-	    helloRef.shutdown();
-	    System.out.println("OK! Returned from shutdown!!");
+            // call shutdown
+            System.out.println("Invoking shutdown...");
+            helloRef.shutdown();
+            System.out.println("OK! Returned from shutdown!!");
 
-	} catch (Exception e) {
-	    System.out.println("ERROR : " + e) ;
-	    e.printStackTrace(System.out);
+        } catch (Exception e) {
+            System.out.println("ERROR : " + e) ;
+            e.printStackTrace(System.out);
             System.exit (1);
-	}
+        }
     }
 }

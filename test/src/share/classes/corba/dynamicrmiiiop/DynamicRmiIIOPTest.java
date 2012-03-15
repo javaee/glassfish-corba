@@ -48,16 +48,16 @@ public class DynamicRmiIIOPTest extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-	Controller client = createClient( "corba.dynamicrmiiiop.Client" ) ;
+        Controller client = createClient( "corba.dynamicrmiiiop.Client" ) ;
 
-	client.start();
+        client.start();
 
-	// Wait for the client to finish for up to 1 minute, then
-	// throw an exception.
-	client.waitFor(120000);
+        // Wait for the client to finish for up to 1 minute, then
+        // throw an exception.
+        client.waitFor(120000);
 
-	// Make sure all the processes are shut down.
-	client.stop();
+        // Make sure all the processes are shut down.
+        client.stop();
     }
 }
 

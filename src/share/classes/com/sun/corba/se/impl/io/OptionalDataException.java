@@ -47,7 +47,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.io;
+package com.sun.corba.ee.impl.io;
 
 /**
  * Unexpected data appeared in an ObjectInputStream trying to read
@@ -67,8 +67,8 @@ public class OptionalDataException extends java.io.IOException {
      * Create an <code>OptionalDataException</code> with a length.
      */
     OptionalDataException(int len) {
-	eof = false;
-	length = len;
+        eof = false;
+        length = len;
     }
 
     /*
@@ -76,8 +76,8 @@ public class OptionalDataException extends java.io.IOException {
      * more primitive data is available.
      */
     OptionalDataException(boolean end) {
-	length = 0;
-	eof = end;
+        length = 0;
+        eof = end;
     }
 
     /**

@@ -41,9 +41,9 @@
 <HTML>
 
 <HEAD>
-	<META HTTP-EQUIV="Content-Type" CONTENT="text/html;CHARSET=iso-8859-1">
-	<META NAME="GENERATOR" Content="Visual Page 2.0 for Windows">
-	<TITLE>ORB Versioning</TITLE>
+        <META HTTP-EQUIV="Content-Type" CONTENT="text/html;CHARSET=iso-8859-1">
+        <META NAME="GENERATOR" Content="Visual Page 2.0 for Windows">
+        <TITLE>ORB Versioning</TITLE>
 </HEAD>
 
 <BODY BGCOLOR="#FFFBF0">
@@ -57,24 +57,24 @@ format of the versioning information and how it can be interpreted to achieve in
 <P>I have thought of a number of possibilities for the format of version information:</P>
 
 <OL>
-	<LI>single byte (as Ram suggested): I'm not sure we want to make it that limited.
-	<LI>4 bytes: plenty of range, or can do major+minor in the same space. Larger than 1, plus inflexible.
-	<LI>string: very flexible encoding, but somewhat longer: typically would add at least 8 bytes, even if short.
-	<LI>CDR encapsulation: can put any data type in there, but we would need a version encoding ID, making this too
-	bulky (this is as big as a tagged component).
-	<LI>self-describing sequence of octets. What I mean by this is that bit 7 in each octet is set to 1 if more octets
-	follow, or 0 if it is the last octet.This is usually as small as case 1, while being completely open ended if we
-	need to extend it later. Reading this from a CDR stream is simple enough: just keep calling read_byte until a result
-	&gt;0 is returned. Then the encoding is simply:
-	<UL>
-		<LI>Last octet: encoding = value
-		<LI>Not last octet: encoding = value - 128
-	</UL>
+        <LI>single byte (as Ram suggested): I'm not sure we want to make it that limited.
+        <LI>4 bytes: plenty of range, or can do major+minor in the same space. Larger than 1, plus inflexible.
+        <LI>string: very flexible encoding, but somewhat longer: typically would add at least 8 bytes, even if short.
+        <LI>CDR encapsulation: can put any data type in there, but we would need a version encoding ID, making this too
+        bulky (this is as big as a tagged component).
+        <LI>self-describing sequence of octets. What I mean by this is that bit 7 in each octet is set to 1 if more octets
+        follow, or 0 if it is the last octet.This is usually as small as case 1, while being completely open ended if we
+        need to extend it later. Reading this from a CDR stream is simple enough: just keep calling read_byte until a result
+        &gt;0 is returned. Then the encoding is simply:
+        <UL>
+                <LI>Last octet: encoding = value
+                <LI>Not last octet: encoding = value - 128
+        </UL>
 </OL>
 
 
 <BLOCKQUOTE>
-	<P>Note that for a version in the range 0-127, this is exactly the same as option 1.
+        <P>Note that for a version in the range 0-127, this is exactly the same as option 1.
 </BLOCKQUOTE>
 
 <P>As I stated previously, the reason I am thinking about the format of the version ID is if we need to know something
@@ -93,38 +93,38 @@ context should be present in all GIOP request and reply messages sent by NEW and
 solely of a series of octets (no length is needed) encoded as above.</P>
 <P>A service context is then encoded using a CDR encapsulation as follows: 
 <TABLE BORDER="1" WIDTH="20%" BGCOLOR="#FFFFCC">
-	<TR>
-		<TD WIDTH="100%">ID (4 bytes)</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="100%">Length (4 bytes)</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="100%">endianness (1 byte)</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="100%">1xxx</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="100%">1xxx</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="100%">...</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="100%">0xxx</TD>
-	</TR>
+        <TR>
+                <TD WIDTH="100%">ID (4 bytes)</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="100%">Length (4 bytes)</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="100%">endianness (1 byte)</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="100%">1xxx</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="100%">1xxx</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="100%">...</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="100%">0xxx</TD>
+        </TR>
 </TABLE>
 </P>
 <P>This is easy to read as follows:</P>
 
 <OL>
-	<LI>read the ID
-	<LI>read the length
-	<LI>read the octet array based on the length
-	<LI>create an input stream from the octet array
-	<LI>consume the endianness from the new input stream
-	<LI>read and accumulate the version until we read a byte &gt; 0
+        <LI>read the ID
+        <LI>read the length
+        <LI>read the octet array based on the length
+        <LI>create an input stream from the octet array
+        <LI>consume the endianness from the new input stream
+        <LI>read and accumulate the version until we read a byte &gt; 0
 </OL>
 
 <P>If we attempt to read past the end of the encapsulation, we get a marshaling error.</P>
@@ -133,60 +133,60 @@ solely of a series of octets (no length is needed) encoded as above.</P>
 
 <P>
 <TABLE BORDER="1" WIDTH="64%" BGCOLOR="#CCFFFF">
-	<TR>
-		<TD WIDTH="23%">
-			<P ALIGN="CENTER">ORB Type
-		</TD>
-		<TD WIDTH="50%">
-			<P ALIGN="CENTER">Definition
-		</TD>
-		<TD WIDTH="15%">
-			<P ALIGN="CENTER">Encoding
-		</TD>
-		<TD WIDTH="12%">
-			<P ALIGN="CENTER">Magic
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="23%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="50%" BGCOLOR="#CCFFCC">Foreign ORB</TD>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">none
-		</TD>
-		<TD WIDTH="12%">
-			<P ALIGN="CENTER">N/A
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="23%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="50%" BGCOLOR="#CCFFCC">Old Sun ORB (JDK 1.2, RMI-IIOP Standard Extension, JDK 1.3, J2EE 1.0, 1.1, 1.2)</TD>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">1
-		</TD>
-		<TD WIDTH="12%">
-			<P ALIGN="CENTER">0xAFABCAFE
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="23%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="50%" BGCOLOR="#CCFFCC">JDK 1.3.1 ORB</TD>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">2
-		</TD>
-		<TD WIDTH="12%">
-			<P ALIGN="CENTER">0xAFABCAFF
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="23%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="50%" BGCOLOR="#CCFFCC">JDK 1.4 or later ORB, including J2EE 1.3 or later.</TD>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">3
-		</TD>
-		<TD WIDTH="12%">
-			<P ALIGN="CENTER">0xAFABCB00
-		</TD>
-	</TR>
+        <TR>
+                <TD WIDTH="23%">
+                        <P ALIGN="CENTER">ORB Type
+                </TD>
+                <TD WIDTH="50%">
+                        <P ALIGN="CENTER">Definition
+                </TD>
+                <TD WIDTH="15%">
+                        <P ALIGN="CENTER">Encoding
+                </TD>
+                <TD WIDTH="12%">
+                        <P ALIGN="CENTER">Magic
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="23%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="50%" BGCOLOR="#CCFFCC">Foreign ORB</TD>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">none
+                </TD>
+                <TD WIDTH="12%">
+                        <P ALIGN="CENTER">N/A
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="23%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="50%" BGCOLOR="#CCFFCC">Old Sun ORB (JDK 1.2, RMI-IIOP Standard Extension, JDK 1.3, J2EE 1.0, 1.1, 1.2)</TD>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">1
+                </TD>
+                <TD WIDTH="12%">
+                        <P ALIGN="CENTER">0xAFABCAFE
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="23%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="50%" BGCOLOR="#CCFFCC">JDK 1.3.1 ORB</TD>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">2
+                </TD>
+                <TD WIDTH="12%">
+                        <P ALIGN="CENTER">0xAFABCAFF
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="23%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="50%" BGCOLOR="#CCFFCC">JDK 1.4 or later ORB, including J2EE 1.3 or later.</TD>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">3
+                </TD>
+                <TD WIDTH="12%">
+                        <P ALIGN="CENTER">0xAFABCB00
+                </TD>
+        </TR>
 </TABLE>
 </P>
 
@@ -202,59 +202,59 @@ is implicit in the MAGIC value for OLD and NEW ORBs.</P>
 
 <P>
 <TABLE BORDER="1" WIDTH="60%">
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Object Key Type
-		</TD>
-		<TD WIDTH="33%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Field Name
-		</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Field Type
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" ROWSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">JIDL
-		</TD>
-		<TD WIDTH="33%" BGCOLOR="#CCFFCC">MAGIC</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#CCFFCC">SCID</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#CCFFCC">ID</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFCC">sequence&lt;octet&gt;</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" ROWSPAN="6" BGCOLOR="#FFCCCC">
-			<P ALIGN="CENTER">POA
-		</TD>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">MAGIC</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">SCID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">SERVERID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">ORBID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">POAID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">ID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">sequence&lt;octet&gt;</TD>
-	</TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Object Key Type
+                </TD>
+                <TD WIDTH="33%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Field Name
+                </TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Field Type
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" ROWSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">JIDL
+                </TD>
+                <TD WIDTH="33%" BGCOLOR="#CCFFCC">MAGIC</TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#CCFFCC">SCID</TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#CCFFCC">ID</TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFCC">sequence&lt;octet&gt;</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" ROWSPAN="6" BGCOLOR="#FFCCCC">
+                        <P ALIGN="CENTER">POA
+                </TD>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">MAGIC</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">SCID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">SERVERID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">ORBID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">POAID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">ID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">sequence&lt;octet&gt;</TD>
+        </TR>
 </TABLE>
 </P>
 
@@ -265,59 +265,59 @@ magic number:</P>
 
 <P>
 <TABLE BORDER="1" WIDTH="60%">
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Object Key Type
-		</TD>
-		<TD WIDTH="33%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Field Name
-		</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Field Type
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" ROWSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">JIDL
-		</TD>
-		<TD WIDTH="33%" BGCOLOR="#CCFFCC">MAGIC</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#CCFFCC">SCID</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#CCFFCC">ID</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFCC">sequence&lt;octet&gt;</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" ROWSPAN="6" BGCOLOR="#FFCCCC">
-			<P ALIGN="CENTER">POA
-		</TD>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">MAGIC</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">SCID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">SERVERID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">ORBID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">POAID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">ID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">sequence&lt;octet&gt;</TD>
-	</TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Object Key Type
+                </TD>
+                <TD WIDTH="33%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Field Name
+                </TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Field Type
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" ROWSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">JIDL
+                </TD>
+                <TD WIDTH="33%" BGCOLOR="#CCFFCC">MAGIC</TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#CCFFCC">SCID</TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#CCFFCC">ID</TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFCC">sequence&lt;octet&gt;</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" ROWSPAN="6" BGCOLOR="#FFCCCC">
+                        <P ALIGN="CENTER">POA
+                </TD>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">MAGIC</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">SCID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">SERVERID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">ORBID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">POAID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">ID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">sequence&lt;octet&gt;</TD>
+        </TR>
 </TABLE>
 </P>
 
@@ -327,67 +327,67 @@ magic number:</P>
 
 <P>
 <TABLE BORDER="1" WIDTH="60%">
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Object Key Type
-		</TD>
-		<TD WIDTH="33%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Field Name
-		</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Field Type
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" ROWSPAN="4" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">JIDL
-		</TD>
-		<TD WIDTH="33%" BGCOLOR="#CCFFCC">MAGIC</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#CCFFCC">SCID</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#CCFFCC">ID</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFCC">sequence&lt;octet&gt;</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#CCFFCC">VERSION</TD>
-		<TD WIDTH="34%" BGCOLOR="#CCFFCC">n octets</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" ROWSPAN="7" BGCOLOR="#FFCCCC">
-			<P ALIGN="CENTER">POA
-		</TD>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">MAGIC</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">SCID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">SERVERID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">ORBID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">string</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">POANAME</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">sequence&lt;string&gt;</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">ID</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">sequence&lt;octet&gt;</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="33%" BGCOLOR="#FFCCCC">VERSION</TD>
-		<TD WIDTH="34%" BGCOLOR="#FFCCCC">n octets</TD>
-	</TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Object Key Type
+                </TD>
+                <TD WIDTH="33%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Field Name
+                </TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Field Type
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" ROWSPAN="4" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">JIDL
+                </TD>
+                <TD WIDTH="33%" BGCOLOR="#CCFFCC">MAGIC</TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#CCFFCC">SCID</TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#CCFFCC">ID</TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFCC">sequence&lt;octet&gt;</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#CCFFCC">VERSION</TD>
+                <TD WIDTH="34%" BGCOLOR="#CCFFCC">n octets</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" ROWSPAN="7" BGCOLOR="#FFCCCC">
+                        <P ALIGN="CENTER">POA
+                </TD>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">MAGIC</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">SCID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">SERVERID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">long</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">ORBID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">string</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">POANAME</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">sequence&lt;string&gt;</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">ID</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">sequence&lt;octet&gt;</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="33%" BGCOLOR="#FFCCCC">VERSION</TD>
+                <TD WIDTH="34%" BGCOLOR="#FFCCCC">n octets</TD>
+        </TR>
 </TABLE>
 </P>
 
@@ -399,30 +399,30 @@ versions of the same subcontract that differ only in trivial encoding details.)<
 <P>I don't want to expose the exact encoding of versions to all of the code that needs to check the version. Instead,
 I would like to define an ORBVersion interface as follows:</P>
 <PRE>public interface ORBVersion {</PRE>
-<PRE>	int FOREIGN = 0 ;</PRE>
-<PRE>	int OLD = 1 ;</PRE>
-<PRE>	int NEW = 2 ;</PRE>
-<PRE>	int NEWER = 3 ;</PRE>
-<PRE>	/** Return the ORB version type.</PRE>
-<PRE>	* Always returns one of the constants defined in this interface</PRE>
-<PRE>	*/</PRE>
-<PRE>	int getORBType() ;</PRE>
-<PRE>	/** Write the version to os as a series of properly encoded octets.</PRE>
-<PRE>	void write( OutputStream os ) ;</PRE>
+<PRE>   int FOREIGN = 0 ;</PRE>
+<PRE>   int OLD = 1 ;</PRE>
+<PRE>   int NEW = 2 ;</PRE>
+<PRE>   int NEWER = 3 ;</PRE>
+<PRE>   /** Return the ORB version type.</PRE>
+<PRE>   * Always returns one of the constants defined in this interface</PRE>
+<PRE>   */</PRE>
+<PRE>   int getORBType() ;</PRE>
+<PRE>   /** Write the version to os as a series of properly encoded octets.</PRE>
+<PRE>   void write( OutputStream os ) ;</PRE>
 <PRE>}</PRE>
 <P>This interface provides all of the version information that we currently need. It can be extended as needed
 in the future.</P>
 <P>We also need a factory class:</P>
 <PRE>public class ORBVersionFactory {</PRE>
-<PRE>	private ORBVersionFactory() {} </PRE>
-<PRE>	/** Return the ORB version that this ORB is using.</PRE>
-<PRE>	*/</PRE>
-<PRE>	public static ORBVersion getORBVersion() </PRE>
-<PRE>	{ ... }</PRE>
-<PRE>	/** Get the ORB version encoded in the input stream.</PRE>
-<PRE>	*/</PRE>
-<PRE>	public static ORBVersion create( InputStream is ) </PRE>
-<PRE>	{ ... }</PRE>
+<PRE>   private ORBVersionFactory() {} </PRE>
+<PRE>   /** Return the ORB version that this ORB is using.</PRE>
+<PRE>   */</PRE>
+<PRE>   public static ORBVersion getORBVersion() </PRE>
+<PRE>   { ... }</PRE>
+<PRE>   /** Get the ORB version encoded in the input stream.</PRE>
+<PRE>   */</PRE>
+<PRE>   public static ORBVersion create( InputStream is ) </PRE>
+<PRE>   { ... }</PRE>
 <PRE>}</PRE>
 <P>The factory can be efficiently implemented rather easily by pre-allocating 4 instances of an implementation
 of ORBVersion. Since the ORBVersion does not need to be mutable, we can just share the pre-allocated instances
@@ -432,11 +432,11 @@ to read the data when the service context is constructed. This simply requires a
 class to handle the service context.</P>
 <P>Getting the ORB version from a GIOP request proceeds something like the following:</P>
 <PRE>if (version service context is present)</PRE>
-<PRE>	get version from service context</PRE>
+<PRE>   get version from service context</PRE>
 <PRE>else if (request is SUN-1.0 protocol(see interoperability <A HREF="#interop-protocol">discussion</A>))</PRE>
-<PRE>	version is OLD</PRE>
+<PRE>   version is OLD</PRE>
 <PRE>else</PRE>
-<PRE>	version is FOREIGN</PRE>
+<PRE>   version is FOREIGN</PRE>
 <H2>IOR version implementation</H2>
 <P>For getting the version from the IOR, we want something like:</P>
 <P>ior.getProfile().getVersion()</P>
@@ -447,13 +447,13 @@ The details of how this is implemented are substantially different in the two co
 follows:</P>
 
 <OL>
-	<LI>Get the object key from the IOR profile.
-	<LI>Convert the object key byte array into an InputStream.
-	<LI>Read off the magic and the scid.
-	<LI>Use the scid to determine whether the key is POA or JIDL.
-	<LI>read off the rest of the data including the user ID.
-	<LI>Hand the object key over to the ORBVersionFactory.
-	<LI>return the ORBVersion.
+        <LI>Get the object key from the IOR profile.
+        <LI>Convert the object key byte array into an InputStream.
+        <LI>Read off the magic and the scid.
+        <LI>Use the scid to determine whether the key is POA or JIDL.
+        <LI>read off the rest of the data including the user ID.
+        <LI>Hand the object key over to the ORBVersionFactory.
+        <LI>return the ORBVersion.
 </OL>
 
 <P>I think we will just code this directly in core.Profile in Ladybird and not worry about the fact that too much
@@ -462,15 +462,15 @@ of the code knows all about the object key formats. That problem is fixed in Mer
 <P>Implementing IOR versioning in Merlin is pretty simple:</P>
 
 <DL>
-	<DT>ObjectKeyTemplate</DT>
-	<DD>The basic interface for all object key templates. I will add a ORBVersion getVersion() method on this interface.
-	<DT>ObjectKeyTemplateBase</DT>
-	<DD>This abstract class factors out the common parts of the implementation of all object key templates. This is
-	where getVersion will be implemented.
-	<DT>ObjectKeyFactory</DT>
-	<DD>This singleton factory class contains the code that determines what kind of object key template to create based
-	on the magic and subcontract ids. It needs to be modified to handle two different forms of magic, and also to get
-	the ORB version if it is present.
+        <DT>ObjectKeyTemplate</DT>
+        <DD>The basic interface for all object key templates. I will add a ORBVersion getVersion() method on this interface.
+        <DT>ObjectKeyTemplateBase</DT>
+        <DD>This abstract class factors out the common parts of the implementation of all object key templates. This is
+        where getVersion will be implemented.
+        <DT>ObjectKeyFactory</DT>
+        <DD>This singleton factory class contains the code that determines what kind of object key template to create based
+        on the magic and subcontract ids. It needs to be modified to handle two different forms of magic, and also to get
+        the ORB version if it is present.
 </DL>
 
 <P>POAObjectKeyTemplate, JIDLObjectKeyTemplate, and WireObjectKeyTemplate are the three concrete classes that represent
@@ -485,204 +485,204 @@ and NEW can be distinguished based on the version. I will refer to the OLD and N
 <P>Then we can make everything interoperate across all versions as follows:</P>
 <P>
 <TABLE BORDER="1" WIDTH="100%">
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Invoking ORB
-		</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">ORB of IOR
-		</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFFF">Receiving ORB</TD>
-		<TD WIDTH="40%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Detection Mechanisms
-		</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Protocol
-		</TD>
-		<TD WIDTH="10%" BGCOLOR="#CCFFFF">
-			<P ALIGN="CENTER">Serialization
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD COLSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">DON'T' CARE
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD COLSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">DON'T CARE (probably does not interoperate)
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="40%" ROWSPAN="3" BGCOLOR="#CCFFCC">Server: GIOP request is not SUN-1.0</TD>
-		<TD WIDTH="11%" ROWSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">compliant
-		</TD>
-		<TD WIDTH="10%" ROWSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">compliant
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD COLSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">DON'T CARE (probably does not interoperate)
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD COLSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">currently interoperable
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="40%" ROWSPAN="3" BGCOLOR="#CCFFCC">Server: GIOP request is SUN-1.0</TD>
-		<TD WIDTH="11%" ROWSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">SUN-1.0
-		</TD>
-		<TD WIDTH="10%" ROWSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">old
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR does not contain magic</TD>
-		<TD WIDTH="11%" ROWSPAN="5" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">SUN-1.0
-		</TD>
-		<TD WIDTH="10%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">compliant
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains old magic</TD>
-		<TD WIDTH="10%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">old
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains new magic, NEW version</TD>
-		<TD WIDTH="10%" ROWSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">compliant
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains new magic, NEW version<BR>
-			<BR>
-			Server: receives target with NEW version</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" HEIGHT="52" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="11%" HEIGHT="52" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="13%" HEIGHT="52" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="40%" HEIGHT="52" BGCOLOR="#CCFFCC">Client: IOR contains new magic<BR>
-			<BR>
-			Server: receives target with NEWER version</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">FOREIGN</TD>
-		<TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR does not contain magic</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">compliant
-		</TD>
-		<TD WIDTH="10%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">compliant
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">OLD</TD>
-		<TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains old magic</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">SUN-1.0
-		</TD>
-		<TD WIDTH="10%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">old
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains new magic, NEW version</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">SUN-1.0
-		</TD>
-		<TD WIDTH="10%" ROWSPAN="3" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">compliant
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains new magic, NEW version<BR>
-			<BR>
-			Server: receives target with NEW version</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">SUN-1.0
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH="15%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
-		<TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains new magic, NEWER version<BR>
-			<BR>
-			Server: receives target with NEWER version</TD>
-		<TD WIDTH="11%" BGCOLOR="#CCFFCC">
-			<P ALIGN="CENTER">compliant
-		</TD>
-	</TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Invoking ORB
+                </TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">ORB of IOR
+                </TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFFF">Receiving ORB</TD>
+                <TD WIDTH="40%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Detection Mechanisms
+                </TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Protocol
+                </TD>
+                <TD WIDTH="10%" BGCOLOR="#CCFFFF">
+                        <P ALIGN="CENTER">Serialization
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD COLSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">DON'T' CARE
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD COLSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">DON'T CARE (probably does not interoperate)
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="40%" ROWSPAN="3" BGCOLOR="#CCFFCC">Server: GIOP request is not SUN-1.0</TD>
+                <TD WIDTH="11%" ROWSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">compliant
+                </TD>
+                <TD WIDTH="10%" ROWSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">compliant
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD COLSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">DON'T CARE (probably does not interoperate)
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD COLSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">currently interoperable
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="40%" ROWSPAN="3" BGCOLOR="#CCFFCC">Server: GIOP request is SUN-1.0</TD>
+                <TD WIDTH="11%" ROWSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">SUN-1.0
+                </TD>
+                <TD WIDTH="10%" ROWSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">old
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR does not contain magic</TD>
+                <TD WIDTH="11%" ROWSPAN="5" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">SUN-1.0
+                </TD>
+                <TD WIDTH="10%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">compliant
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains old magic</TD>
+                <TD WIDTH="10%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">old
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains new magic, NEW version</TD>
+                <TD WIDTH="10%" ROWSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">compliant
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains new magic, NEW version<BR>
+                        <BR>
+                        Server: receives target with NEW version</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" HEIGHT="52" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="11%" HEIGHT="52" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="13%" HEIGHT="52" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="40%" HEIGHT="52" BGCOLOR="#CCFFCC">Client: IOR contains new magic<BR>
+                        <BR>
+                        Server: receives target with NEWER version</TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">FOREIGN</TD>
+                <TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR does not contain magic</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">compliant
+                </TD>
+                <TD WIDTH="10%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">compliant
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">OLD</TD>
+                <TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains old magic</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">SUN-1.0
+                </TD>
+                <TD WIDTH="10%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">old
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains new magic, NEW version</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">SUN-1.0
+                </TD>
+                <TD WIDTH="10%" ROWSPAN="3" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">compliant
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">NEW</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains new magic, NEW version<BR>
+                        <BR>
+                        Server: receives target with NEW version</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">SUN-1.0
+                </TD>
+        </TR>
+        <TR>
+                <TD WIDTH="15%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="13%" BGCOLOR="#CCFFCC">NEWER</TD>
+                <TD WIDTH="40%" BGCOLOR="#CCFFCC">Client: IOR contains new magic, NEWER version<BR>
+                        <BR>
+                        Server: receives target with NEWER version</TD>
+                <TD WIDTH="11%" BGCOLOR="#CCFFCC">
+                        <P ALIGN="CENTER">compliant
+                </TD>
+        </TR>
 </TABLE>
 </P>
 

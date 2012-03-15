@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)PROTest.java	1.14 99/06/07 */
+/* @(#)PROTest.java     1.14 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -55,7 +55,7 @@ import java.rmi.NoSuchObjectException;
 import java.rmi.server.ExportException;
 import test.ServantContext;
 import test.RemoteTest;
-import com.sun.corba.se.impl.util.Utility;
+import com.sun.corba.ee.impl.util.Utility;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.SystemException;
 import java.io.ObjectOutputStream;
@@ -68,8 +68,8 @@ import javax.naming.Context;
 import com.sun.org.omg.SendingContext.CodeBase;
 import alpha.bravo.Multi;
 
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
 import org.glassfish.pfl.test.JUnitReportHelper;
 
 /*
@@ -80,15 +80,15 @@ public class PROTest extends RemoteTest {
     private static final String servantName     = "PROServer";
     private static final String servantClass    = "javax.rmi.PROImpl";
     private static final String[] compileEm     =   {
-	"javax.rmi.PROImpl",
-	"javax.rmi.PROImpl2",
-	"javax.rmi.DogServer",
-	"javax.rmi.ServantInner",
-	"javax.rmi.ServantOuter.Inner",
-	"rmic.OnlyRemoteServant",
-	"javax.rmi.HashCodeImpl",
-	"javax.rmi.HashCodeAImpl",
-	"alpha.bravo.Multi",
+        "javax.rmi.PROImpl",
+        "javax.rmi.PROImpl2",
+        "javax.rmi.DogServer",
+        "javax.rmi.ServantInner",
+        "javax.rmi.ServantOuter.Inner",
+        "rmic.OnlyRemoteServant",
+        "javax.rmi.HashCodeImpl",
+        "javax.rmi.HashCodeAImpl",
+        "alpha.bravo.Multi",
     };
 
     private static final int TIMING_ITERATIONS = 100;
@@ -141,7 +141,7 @@ public class PROTest extends RemoteTest {
         try {
             dprint( "test starts" ) ;
             boolean usesDynamicStubs = 
-                com.sun.corba.se.spi.orb.ORB.getPresentationManager().
+                com.sun.corba.ee.spi.orb.ORB.getPresentationManager().
                     useDynamicStubs() ;
             
             // Certain tests that depend on the absence of iiop stubs and ties
@@ -720,20 +720,20 @@ public class PROTest extends RemoteTest {
     }
     
     private void testLoadStub( Multi servant, Tie tie, 
-	String interfaceName, String repoId, boolean flag ) throws Exception
+        String interfaceName, String repoId, boolean flag ) throws Exception
     {
-	PresentationManager.StubFactoryFactory sff = 
-	    com.sun.corba.se.spi.orb.ORB.getStubFactoryFactory() ;
-	PresentationManager.StubFactory stubFactory = 
-	    sff.createStubFactory( interfaceName, false, null, null, null ) ;
-	Remote stub = Utility.loadStub( tie, stubFactory, 
-	    null, flag ) ;
-	String actualRepoId = StubAdapter.getTypeIds( stub )[0] ;
+        PresentationManager.StubFactoryFactory sff = 
+            com.sun.corba.ee.spi.orb.ORB.getStubFactoryFactory() ;
+        PresentationManager.StubFactory stubFactory = 
+            sff.createStubFactory( interfaceName, false, null, null, null ) ;
+        Remote stub = Utility.loadStub( tie, stubFactory, 
+            null, flag ) ;
+        String actualRepoId = StubAdapter.getTypeIds( stub )[0] ;
 
-	if (!actualRepoId.equals( repoId )) {
-	    throw new Exception( "Utility.loadStub: expected " + repoId +
-		" got " + actualRepoId ) ;
-	}
+        if (!actualRepoId.equals( repoId )) {
+            throw new Exception( "Utility.loadStub: expected " + repoId +
+                " got " + actualRepoId ) ;
+        }
     }
 
 }

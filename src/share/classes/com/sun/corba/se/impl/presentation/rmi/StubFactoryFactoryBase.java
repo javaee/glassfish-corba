@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi;
+package com.sun.corba.ee.impl.presentation.rmi;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager;
 
-import com.sun.corba.se.impl.util.Utility ;
+import com.sun.corba.ee.impl.util.Utility ;
 
 public abstract class StubFactoryFactoryBase implements
     PresentationManager.StubFactoryFactory
@@ -54,6 +54,6 @@ public abstract class StubFactoryFactoryBase implements
      */
     public String getStubName(String fullName) 
     {
-	return Utility.stubName( fullName ) ;
+        return Utility.stubName( fullName ) ;
     }
 }

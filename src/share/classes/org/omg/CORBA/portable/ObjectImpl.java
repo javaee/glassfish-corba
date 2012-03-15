@@ -83,7 +83,7 @@ abstract public class ObjectImpl implements org.omg.CORBA.Object
      */
     public Delegate _get_delegate() {
         if (__delegate == null)
-	    throw new BAD_OPERATION("The delegate has not been set!");
+            throw new BAD_OPERATION("The delegate has not been set!");
         return __delegate;
     }
 
@@ -212,14 +212,14 @@ abstract public class ObjectImpl implements org.omg.CORBA.Object
      *         return value
      */
     public Request _create_request(Context ctx,
-				   String operation,
-				   NVList arg_list,
-				   NamedValue result) {
+                                   String operation,
+                                   NVList arg_list,
+                                   NamedValue result) {
         return _get_delegate().create_request(this,
-					      ctx,
-					      operation,
-					      arg_list,
-					      result);
+                                              ctx,
+                                              operation,
+                                              arg_list,
+                                              result);
     }
 
     /**
@@ -251,18 +251,18 @@ abstract public class ObjectImpl implements org.omg.CORBA.Object
      *         names to be used in resolving the context strings
      */
     public Request _create_request(Context ctx,
-				   String operation,
-				   NVList arg_list,
-				   NamedValue result,
-				   ExceptionList exceptions,
-				   ContextList contexts) {
+                                   String operation,
+                                   NVList arg_list,
+                                   NamedValue result,
+                                   ExceptionList exceptions,
+                                   ContextList contexts) {
         return _get_delegate().create_request(this,
-					      ctx,
-					      operation,
-					      arg_list,
-					      result,
-					      exceptions,
-					      contexts);
+                                              ctx,
+                                              operation,
+                                              arg_list,
+                                              result,
+                                              exceptions,
+                                              contexts);
     }
 
     /** 
@@ -274,28 +274,28 @@ abstract public class ObjectImpl implements org.omg.CORBA.Object
      */
     public org.omg.CORBA.Object _get_interface_def() 
     {
-	// First try to call the delegate implementation class's
-	// "Object get_interface_def(..)" method (will work for JDK1.2 ORBs).
-	// Else call the delegate implementation class's
-	// "InterfaceDef get_interface(..)" method using reflection
-	// (will work for pre-JDK1.2 ORBs).
+        // First try to call the delegate implementation class's
+        // "Object get_interface_def(..)" method (will work for JDK1.2 ORBs).
+        // Else call the delegate implementation class's
+        // "InterfaceDef get_interface(..)" method using reflection
+        // (will work for pre-JDK1.2 ORBs).
 
         org.omg.CORBA.portable.Delegate delegate = _get_delegate();         
         try {
-	    // If the ORB's delegate class does not implement 
-	    // "Object get_interface_def(..)", this will call 
-	    // get_interface_def(..) on portable.Delegate. 
+            // If the ORB's delegate class does not implement 
+            // "Object get_interface_def(..)", this will call 
+            // get_interface_def(..) on portable.Delegate. 
             return delegate.get_interface_def(this);
         } 
-	catch( org.omg.CORBA.NO_IMPLEMENT ex ) {
-	    // Call "InterfaceDef get_interface(..)" method using reflection.
+        catch( org.omg.CORBA.NO_IMPLEMENT ex ) {
+            // Call "InterfaceDef get_interface(..)" method using reflection.
             try {
-		Class[] argc = { org.omg.CORBA.Object.class };
-	        java.lang.reflect.Method meth = 
-		    delegate.getClass().getMethod("get_interface", argc);
-		Object[] argx = { this };
+                Class[] argc = { org.omg.CORBA.Object.class };
+                java.lang.reflect.Method meth = 
+                    delegate.getClass().getMethod("get_interface", argc);
+                Object[] argx = { this };
                 return (org.omg.CORBA.Object)meth.invoke(delegate, argx);
-	    }
+            }
             catch( java.lang.reflect.InvocationTargetException exs ) {
                 Throwable t = exs.getTargetException();
                 if (t instanceof Error) {
@@ -308,8 +308,8 @@ abstract public class ObjectImpl implements org.omg.CORBA.Object
                     throw new org.omg.CORBA.NO_IMPLEMENT();
                 }
             } catch( RuntimeException rex ) {
-		throw rex;
-	    } catch( Exception exr ) {
+                throw rex;
+            } catch( Exception exr ) {
                 throw new org.omg.CORBA.NO_IMPLEMENT();
             }
         }
@@ -370,10 +370,10 @@ abstract public class ObjectImpl implements org.omg.CORBA.Object
      *         added to its previous policies
      */
     public org.omg.CORBA.Object
-	_set_policy_override(org.omg.CORBA.Policy[] policies,
-			     org.omg.CORBA.SetOverrideType set_add) {
-	return _get_delegate().set_policy_override(this, policies,
-						   set_add);
+        _set_policy_override(org.omg.CORBA.Policy[] policies,
+                             org.omg.CORBA.SetOverrideType set_add) {
+        return _get_delegate().set_policy_override(this, policies,
+                                                   set_add);
     }
 
     /**
@@ -422,7 +422,7 @@ abstract public class ObjectImpl implements org.omg.CORBA.Object
     public ServantObject _servant_preinvoke(String operation,
                                             Class expectedType) {
         return _get_delegate().servant_preinvoke(this, operation,
-						 expectedType);
+                                                 expectedType);
     }
 
     /**
@@ -460,8 +460,8 @@ abstract public class ObjectImpl implements org.omg.CORBA.Object
      * @return an <code>OutputStream</code> object for dispatching the request
      */
     public OutputStream _request(String operation,
-				 boolean responseExpected) {
-	return _get_delegate().request(this, operation, responseExpected);
+                                 boolean responseExpected) {
+        return _get_delegate().request(this, operation, responseExpected);
     }
 
     /**
@@ -486,8 +486,8 @@ abstract public class ObjectImpl implements org.omg.CORBA.Object
      * @see #_request
      */
     public InputStream _invoke(OutputStream output)
-	throws ApplicationException, RemarshalException {
-	return _get_delegate().invoke(this, output);
+        throws ApplicationException, RemarshalException {
+        return _get_delegate().invoke(this, output);
     }
 
     /**
@@ -504,7 +504,7 @@ abstract public class ObjectImpl implements org.omg.CORBA.Object
      * @see #_invoke
      */
     public void _releaseReply(InputStream input) {
-	_get_delegate().releaseReply(this, input);
+        _get_delegate().releaseReply(this, input);
     }
 
     /**

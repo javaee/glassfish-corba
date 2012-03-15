@@ -38,21 +38,21 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA_2_3.portable.InputStream;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.IORFactories;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.IORFactories;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 /**
  * This implements the GIOP 1.1 LocateReply header.
@@ -124,7 +124,7 @@ public final class LocateReplyMessage_1_1 extends Message_1_1
         // The code below reads the reply body if status is OBJECT_FORWARD
         if (this.reply_status == OBJECT_FORWARD) {
             CDRInputObject cdr = (CDRInputObject) istream;
-	    this.ior = IORFactories.makeIOR( orb, (InputStream)cdr ) ;
+            this.ior = IORFactories.makeIOR( orb, (InputStream)cdr ) ;
         }
     }
 
@@ -146,7 +146,7 @@ public final class LocateReplyMessage_1_1 extends Message_1_1
         case OBJECT_FORWARD :
             break;
         default :
-	    throw wrapper.illegalReplyStatus();
+            throw wrapper.illegalReplyStatus();
         }
     }
 

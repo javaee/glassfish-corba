@@ -61,11 +61,11 @@ public final class ExceptionDescription implements org.omg.CORBA.portable.IDLEnt
 
     public ExceptionDescription (String _name, String _id, String _defined_in, String _version, org.omg.CORBA.TypeCode _type)
     {
-	name = _name;
-	id = _id;
-	defined_in = _defined_in;
-	version = _version;
-	type = _type;
+        name = _name;
+        id = _id;
+        defined_in = _defined_in;
+        version = _version;
+        type = _type;
     } // ctor
 
 } // class ExceptionDescription

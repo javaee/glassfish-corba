@@ -38,13 +38,13 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.protocol;
+package com.sun.corba.ee.spi.protocol;
 
 import java.nio.ByteBuffer;
 
-import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.Connection;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 
 
 /**

@@ -39,7 +39,7 @@
  */
 package corba.nortel ;
 
-import com.sun.corba.se.impl.transport.DefaultSocketFactoryImpl;
+import com.sun.corba.ee.impl.transport.DefaultSocketFactoryImpl;
 
 import java.io.IOException;
 
@@ -56,60 +56,60 @@ public class NortelSocketFactory extends DefaultSocketFactoryImpl {
     public static boolean verbose = false ;
 
     private static void msg( String str ) {
-	if (verbose) {
-	    System.out.println( "+++NortelSocketFactory: " + str ) ;
-	}
+        if (verbose) {
+            System.out.println( "+++NortelSocketFactory: " + str ) ;
+        }
     }
 
     public ServerSocket createServerSocket(String type, InetSocketAddress in) throws IOException {
-	if (transportDown) {
-	    msg( "Simulating transport failure..." ) ;
-	    throw new IOException( "Transport simulated down" ) ;
-	}
+        if (transportDown) {
+            msg( "Simulating transport failure..." ) ;
+            throw new IOException( "Transport simulated down" ) ;
+        }
 
-	msg("In method createServerSocket, type:" + type + ", InetSocketAddress:" + in );
-	ServerSocket serverSocket = new ServerSocket();
-	serverSocket.bind(in);
+        msg("In method createServerSocket, type:" + type + ", InetSocketAddress:" + in );
+        ServerSocket serverSocket = new ServerSocket();
+        serverSocket.bind(in);
 
-	return serverSocket;
+        return serverSocket;
     }
 
     public Socket createSocket(String type, InetSocketAddress in) throws IOException {
-	msg("In method createSocket, type:" + type + ", InetSocketAddress:" + in );
-	if (transportDown) {
-	    msg( "Simulating transport failure..." ) ;
-	    throw new IOException( "Transport simulated down" ) ;
-	}
+        msg("In method createSocket, type:" + type + ", InetSocketAddress:" + in );
+        if (transportDown) {
+            msg( "Simulating transport failure..." ) ;
+            throw new IOException( "Transport simulated down" ) ;
+        }
 
-	Socket socket = null;
-	if (useNio) {
-	    socket = super.createSocket(type, in); 
-	} else {
-	    socket = new Socket(in.getHostName(), in.getPort());
-	    socket.setTcpNoDelay(true);
-	}
-	
-	savedSocket = socket;
-	return socket;
+        Socket socket = null;
+        if (useNio) {
+            socket = super.createSocket(type, in); 
+        } else {
+            socket = new Socket(in.getHostName(), in.getPort());
+            socket.setTcpNoDelay(true);
+        }
+        
+        savedSocket = socket;
+        return socket;
     }
 
     public static void disconnectSocket(){
-	msg( "Disconnecting socket" ) ;
-	try  {
-	    savedSocket.close();
-	} catch (Exception e) {
+        msg( "Disconnecting socket" ) ;
+        try  {
+            savedSocket.close();
+        } catch (Exception e) {
 
-	    msg("Exception " + e);
-	}
+            msg("Exception " + e);
+        }
     }
 
     // Simulate the failure of the destination: ensure that all connection attempts fail
     public static void simulateConnectionDown() {
-	transportDown = true ;
+        transportDown = true ;
     }
 
     public static void simulateConnectionUp() {
-	transportDown = false ;
+        transportDown = false ;
     }
 }
 

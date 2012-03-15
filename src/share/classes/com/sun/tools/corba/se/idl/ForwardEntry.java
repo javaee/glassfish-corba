@@ -116,7 +116,7 @@ public class ForwardEntry extends SymtabEntry implements InterfaceType
       if ( forwardEntry != null )
       {
         result = (interfaceEntry.getInterfaceType () == 
-	    forwardEntry.getInterfaceType ());
+            forwardEntry.getInterfaceType ());
         forwardEntry.type (interfaceEntry);
 
         // If this interface has been forward declared, there are probably

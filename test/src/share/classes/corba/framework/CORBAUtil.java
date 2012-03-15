@@ -236,7 +236,7 @@ public class CORBAUtil
      */
     public static void toAbsolutePaths(String[] files,
                                        String[] dirs) 
-	throws FileNotFoundException
+        throws FileNotFoundException
     {
         // No null check
         for (int i = 0; i < files.length; i++) 

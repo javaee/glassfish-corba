@@ -49,10 +49,10 @@ import java.util.Properties;
 
 import org.omg.PortableServer.POA;
 
-import com.sun.corba.se.spi.transport.Acceptor;
-import com.sun.corba.se.spi.transport.TransportManager;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.transport.AcceptorImpl;
+import com.sun.corba.ee.spi.transport.Acceptor;
+import com.sun.corba.ee.spi.transport.TransportManager;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.impl.transport.AcceptorImpl;
 
 
 import corba.framework.Controller;
@@ -74,37 +74,37 @@ public class Server
     public static void main(String[] av)
     {
         try {
-	    U.sop(main + " starting");
+            U.sop(main + " starting");
 
-	    Properties props = System.getProperties();
+            Properties props = System.getProperties();
 
-	    //props.setProperty();
-	    orb = (ORB) ORB.init(av, props);
+            //props.setProperty();
+            orb = (ORB) ORB.init(av, props);
 
-	    transportManager = orb.getCorbaTransportManager();
-	    acceptor = new AcceptorImpl(orb, 4444);
-	    transportManager.registerAcceptor(acceptor);
-	    acceptor = new AcceptorImpl(orb, 5555);
-	    transportManager.registerAcceptor(acceptor);
+            transportManager = orb.getCorbaTransportManager();
+            acceptor = new AcceptorImpl(orb, 4444);
+            transportManager.registerAcceptor(acceptor);
+            acceptor = new AcceptorImpl(orb, 5555);
+            transportManager.registerAcceptor(acceptor);
 
-	    rootPOA = U.getRootPOA(orb);
+            rootPOA = U.getRootPOA(orb);
             rootPOA.the_POAManager().activate();
 
-	    U.createWithServantAndBind(idlIPOA,
-				       new idlIServantPOA(orb), rootPOA, orb);
+            U.createWithServantAndBind(idlIPOA,
+                                       new idlIServantPOA(orb), rootPOA, orb);
 
-	    U.sop(main + " ready");
-	    U.sop(Options.defServerHandshake);
-	    System.out.flush();
+            U.sop(main + " ready");
+            U.sop(Options.defServerHandshake);
+            System.out.flush();
 
-	    orb.run();
+            orb.run();
 
         } catch (Exception e) {
-	    U.sopUnexpectedException(main, e);
-	    System.exit(1);
+            U.sopUnexpectedException(main, e);
+            System.exit(1);
         }
-	U.sop(main + " ending successfully");
-	System.exit(Controller.SUCCESS);
+        U.sop(main + " ending successfully");
+        System.exit(Controller.SUCCESS);
     }
 }
 

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ShipDesign.java	1.4 99/06/07 */
+/* @(#)ShipDesign.java  1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -72,80 +72,80 @@ public class ShipDesign implements Serializable
 
     public ShipDesign (String name, int type, TechProfile techProfile)
     {
-	fName = name;
-	fType = type;
-	fTechProfile = techProfile;
+        fName = name;
+        fType = type;
+        fTechProfile = techProfile;
     }
 
     public String getName ()
     {
-	return fName;
+        return fName;
     }
 
     public int getType ()
     {
-	return fType;
+        return fType;
     }
 
     public TechProfile getTechProfile ()
     {
-	return fTechProfile;
+        return fTechProfile;
     }
 
     public long getDesignCost ()
     {
-	return 2000;
+        return 2000;
     }
 
     public long getCostPerShip ()
     {
-	long cost = 0;
+        long cost = 0;
 
-	switch ( fType )
-	    {
-	    case COLONY_SHIP:
-		cost = 10000;
-		break;
-	    case SCOUT:
-		cost = 2000;
-		break;
-	    case FIGHTER:
-		cost = 5000;
-		break;
-	    case SATELITE:
-		cost = 1000;
-		break;
-	    }
+        switch ( fType )
+            {
+            case COLONY_SHIP:
+                cost = 10000;
+                break;
+            case SCOUT:
+                cost = 2000;
+                break;
+            case FIGHTER:
+                cost = 5000;
+                break;
+            case SATELITE:
+                cost = 1000;
+                break;
+            }
 
-	return cost;
+        return cost;
     }
 
     public long getMetalPerShip ()
     {
-	long metal = 0;
+        long metal = 0;
 
-	switch ( fType )
-	    {
-	    case COLONY_SHIP:
-		metal = 20000;
-		break;
-	    case SCOUT:
-		metal = 500;
-		break;
-	    case FIGHTER:
-		metal = 1000;
-		break;
-	    case SATELITE:
-		metal = 200;
-		break;
-	    }
+        switch ( fType )
+            {
+            case COLONY_SHIP:
+                metal = 20000;
+                break;
+            case SCOUT:
+                metal = 500;
+                break;
+            case FIGHTER:
+                metal = 1000;
+                break;
+            case SATELITE:
+                metal = 200;
+                break;
+            }
 
-	return metal / getTechProfile().getMini ();
+        return metal / getTechProfile().getMini ();
     }
 
     public long getScrapMetalPerShip ()
     {
-	return (long)(0.7 * (double)getMetalPerShip ());
+        return (long)(0.7 * (double)getMetalPerShip ());
     }
 
 }

@@ -48,13 +48,13 @@ import org.omg.CORBA.ORB;
 
 class idlHEADERIServant
     extends
-	idlHEADERIPOA
+        idlHEADERIPOA
 {
     private ORB orb;
     public idlHEADERIServant ( ORB orb ) { this.orb = orb; }
     public void HEADER ( String message )
     {
-	U.HEADER(message);
+        U.HEADER(message);
     }
 }
 

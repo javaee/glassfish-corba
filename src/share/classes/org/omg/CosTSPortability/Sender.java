@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-//	org/omg/CosTSPortability/Sender.java
+//      org/omg/CosTSPortability/Sender.java
 
 package org.omg.CosTSPortability;
 

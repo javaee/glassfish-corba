@@ -49,12 +49,12 @@ module corba
         exception idlException { string reason; };
 
         interface idlI
-	{
-	    void raise_system_exception(in string x);
-	    void raise_user_exception(in string x)
-	        raises (idlException);
-	    void raise_runtime_exception(in string x);
-	};
+        {
+            void raise_system_exception(in string x);
+            void raise_user_exception(in string x)
+                raises (idlException);
+            void raise_runtime_exception(in string x);
+        };
     };
 };
 

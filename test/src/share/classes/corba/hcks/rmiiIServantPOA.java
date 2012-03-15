@@ -51,9 +51,9 @@ import org.omg.CORBA.ORB;
 
 public class rmiiIServantPOA
     extends 
-	PortableRemoteObject
+        PortableRemoteObject
     implements
-	rmiiI
+        rmiiI
 {
     public static final String baseMsg = rmiiIServantPOA.class.getName();
 
@@ -61,12 +61,12 @@ public class rmiiIServantPOA
     public String name;
 
     public rmiiIServantPOA (ORB orb, String name)
-	throws
-	    RemoteException
+        throws
+            RemoteException
     { 
-	// DO NOT CALL SUPER - that would connect the object.
-	this.orb = orb; 
-	this.name = name;
+        // DO NOT CALL SUPER - that would connect the object.
+        this.orb = orb; 
+        this.name = name;
     }
 
     public String sayHello ()
@@ -76,77 +76,77 @@ public class rmiiIServantPOA
 
     public int sendBytes (byte[] x)
     {
-	if (x == null)
-	    return -1;
-	return x.length;
+        if (x == null)
+            return -1;
+        return x.length;
     }
 
     public Object sendOneObject (Object x)
-	throws
-	    rmiiMyException
+        throws
+            rmiiMyException
     {
-	return x;
+        return x;
     }
 
     public Object sendTwoObjects (Object x, Object y)
     {
-	return x;
+        return x;
     }
 
     public String makeColocatedCallFromServant ()
-	throws
-	    RemoteException
+        throws
+            RemoteException
     {
-	rmiiI rrmiiI = null;
-	String result = "";
-	try {
-	    result = new String(U.getPOACurrentOperation(orb));
+        rmiiI rrmiiI = null;
+        String result = "";
+        try {
+            result = new String(U.getPOACurrentOperation(orb));
 
-	    // Colocated via narrow.
+            // Colocated via narrow.
 
-	    rrmiiI = null;
-	    rrmiiI = (rmiiI) this.narrow(this, rmiiI.class);
-	    result = doCall(rrmiiI, result);
+            rrmiiI = null;
+            rrmiiI = (rmiiI) this.narrow(this, rmiiI.class);
+            result = doCall(rrmiiI, result);
 
-	    // Colocated via PortableRemoteObject.narrow
+            // Colocated via PortableRemoteObject.narrow
 
-	    rrmiiI = null;
-	    rrmiiI = (rmiiI) PortableRemoteObject.narrow(this, rmiiI.class);
-	    result = doCall(rrmiiI, result);
+            rrmiiI = null;
+            rrmiiI = (rmiiI) PortableRemoteObject.narrow(this, rmiiI.class);
+            result = doCall(rrmiiI, result);
 
-	    // Colocated via common context and PRO.narrow
+            // Colocated via common context and PRO.narrow
 
-	    rrmiiI = null;
-	    rrmiiI = (rmiiI)
-		U.lookupAndNarrow(name, rmiiI.class, Server.initialContext);
-	    result = doCall(rrmiiI, result);
+            rrmiiI = null;
+            rrmiiI = (rmiiI)
+                U.lookupAndNarrow(name, rmiiI.class, Server.initialContext);
+            result = doCall(rrmiiI, result);
 
-	} catch (Exception e) {
-	    U.sopUnexpectedException(baseMsg + C.makeColocatedCallFromServant,
-				     e);
-	    INTERNAL exc = new INTERNAL(U.SHOULD_NOT_SEE_THIS);
-	    exc.initCause( e ) ;
-	    throw exc ;
-	}
-	return result;
+        } catch (Exception e) {
+            U.sopUnexpectedException(baseMsg + C.makeColocatedCallFromServant,
+                                     e);
+            INTERNAL exc = new INTERNAL(U.SHOULD_NOT_SEE_THIS);
+            exc.initCause( e ) ;
+            throw exc ;
+        }
+        return result;
     }
 
     private String doCall(rmiiI rrmiiI, String resultSoFar)
-	throws
-	    Exception
+        throws
+            Exception
     {
-	String result = rrmiiI.colocatedCallFromServant(resultSoFar);
-	String op = new String(U.getPOACurrentOperation(orb));
-	return op + " " + result;
+        String result = rrmiiI.colocatedCallFromServant(resultSoFar);
+        String op = new String(U.getPOACurrentOperation(orb));
+        return op + " " + result;
     }
 
     public String colocatedCallFromServant (String a)
-	throws
-	    RemoteException,
-	    Exception
+        throws
+            RemoteException,
+            Exception
     {
-	String op = new String(U.getPOACurrentOperation(orb));
-	return op + " " + a;
+        String op = new String(U.getPOACurrentOperation(orb));
+        return op + " " + a;
     }
 
     public String throwThreadDeathInServant (String a)
@@ -154,19 +154,19 @@ public class rmiiIServantPOA
             RemoteException,
             ThreadDeath
     {
-	U.sop(U.servant(a));
-	throw new ThreadDeath();
+        U.sop(U.servant(a));
+        throw new ThreadDeath();
     }
 
     public Object returnObjectFromServer (boolean isSerializable)
-	throws
-	    RemoteException
+        throws
+            RemoteException
     {
-	if (isSerializable) {
-	    return new SerializableObject();
-	} else {
-	    return new NonSerializableObject();
-	}
+        if (isSerializable) {
+            return new SerializableObject();
+        } else {
+            return new NonSerializableObject();
+        }
     }
 }
 

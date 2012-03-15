@@ -55,11 +55,11 @@ import java.io.IOException ;
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
 
-import com.sun.corba.se.spi.transport.connection.ConnectionCache ;
-import com.sun.corba.se.spi.transport.connection.ContactInfo ;
-import com.sun.corba.se.spi.transport.connection.InboundConnectionCache ;
-import com.sun.corba.se.spi.transport.connection.OutboundConnectionCache ;
-import com.sun.corba.se.spi.transport.connection.ConnectionCacheFactory ;
+import com.sun.corba.ee.spi.transport.connection.ConnectionCache ;
+import com.sun.corba.ee.spi.transport.connection.ContactInfo ;
+import com.sun.corba.ee.spi.transport.connection.InboundConnectionCache ;
+import com.sun.corba.ee.spi.transport.connection.OutboundConnectionCache ;
+import com.sun.corba.ee.spi.transport.connection.ConnectionCacheFactory ;
 
 import corba.framework.TestngRunner ;
 import java.util.Random;
@@ -67,37 +67,37 @@ import java.util.Random;
 public class StressClient {
     // Ignore all of the LogRecord information except the message.
     public static class ReallySimpleFormatter extends Formatter {
-	public synchronized String format( LogRecord record ) {
-	    return record.getMessage() + "\n" ;
-	}
+        public synchronized String format( LogRecord record ) {
+            return record.getMessage() + "\n" ;
+        }
     }
 
     // Similar to ConsoleHandler, but outputs to System.out
     // instead of System.err, which works better with the 
     // CORBA test framework.
     public static class SystemOutputHandler extends StreamHandler {
-	public SystemOutputHandler() {
-	    try {
-		setLevel(Level.FINER);
-		setFilter(null);
-		setFormatter(new ReallySimpleFormatter());
-		setEncoding(null);
-		setOutputStream(System.out);
-	    } catch (Exception exc) {
-		System.out.println( "Caught unexpected exception " + exc ) ;
-	    }
-	}
+        public SystemOutputHandler() {
+            try {
+                setLevel(Level.FINER);
+                setFilter(null);
+                setFormatter(new ReallySimpleFormatter());
+                setEncoding(null);
+                setOutputStream(System.out);
+            } catch (Exception exc) {
+                System.out.println( "Caught unexpected exception " + exc ) ;
+            }
+        }
 
         @Override
-	public void publish(LogRecord record) {
-	    super.publish(record);	
-	    flush();
-	}
+        public void publish(LogRecord record) {
+            super.publish(record);      
+            flush();
+        }
 
         @Override
-	public void close() {
-	    flush();
-	}
+        public void close() {
+            flush();
+        }
     }
 
     private static final boolean DEBUG = false ;
@@ -106,41 +106,41 @@ public class StressClient {
     private static final Handler handler = new SystemOutputHandler() ;
 
     static {
-	if (DEBUG) {
-	    logger.setLevel( Level.FINER ) ;
-	    logger.addHandler( handler ) ;
-	}
+        if (DEBUG) {
+            logger.setLevel( Level.FINER ) ;
+            logger.addHandler( handler ) ;
+        }
     }
 
     private void testBanner( String msg ) {
-	if (DEBUG) {
-	    System.out.println( 
-		"======================================="
-		+ "==============================" ) ;
+        if (DEBUG) {
+            System.out.println( 
+                "======================================="
+                + "==============================" ) ;
 
-	    System.out.println( msg ) ;
+            System.out.println( msg ) ;
 
-	    System.out.println( 
-		"======================================="
-		+ "==============================" ) ;
-	}
+            System.out.println( 
+                "======================================="
+                + "==============================" ) ;
+        }
     }
 
     private void checkStat( long actual, long expected, String type ) {
-	Assert.assertEquals( actual, expected, type ) ;
+        Assert.assertEquals( actual, expected, type ) ;
     }
 
     private void checkStats( ConnectionCache<ConnectionImpl> cc, int idle,
         int reclaimable, int busy, int total ) {
 
-	checkStat( cc.numberOfIdleConnections(), idle, 
-	    "Idle connections" ) ;
-	checkStat( cc.numberOfReclaimableConnections(), reclaimable,
-	    "Reclaimable connections" ) ;
-	checkStat( cc.numberOfBusyConnections(), busy,
-	    "Busy connections" ) ;
-	checkStat( cc.numberOfConnections(), total, 
-	    "Total connections" ) ;
+        checkStat( cc.numberOfIdleConnections(), idle, 
+            "Idle connections" ) ;
+        checkStat( cc.numberOfReclaimableConnections(), reclaimable,
+            "Reclaimable connections" ) ;
+        checkStat( cc.numberOfBusyConnections(), busy,
+            "Busy connections" ) ;
+        checkStat( cc.numberOfConnections(), total, 
+            "Total connections" ) ;
     }
 
     private static final int NUM_ITERATIONS = 2000 ;

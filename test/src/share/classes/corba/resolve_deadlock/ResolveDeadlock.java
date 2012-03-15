@@ -41,9 +41,9 @@ package corba.resolve_deadlock;
 
 import java.util.Properties ;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
-import com.sun.corba.se.impl.naming.cosnaming.TransientNameService;
+import com.sun.corba.ee.impl.naming.cosnaming.TransientNameService;
 
 import org.omg.CORBA.ORB ;
 
@@ -55,61 +55,61 @@ public class ResolveDeadlock {
     private static ORB serverORB ;
 
     private static void initializeORBs( String[] args ) {
-	// The following must be set as system properties 
-	System.setProperty( "javax.rmi.CORBA.PortableRemoteObjectClass",
-	    "com.sun.corba.se.impl.javax.rmi.PortableRemoteObject" ) ;
-	System.setProperty( "javax.rmi.CORBA.StubClass",
-	    "com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl" ) ;
-	System.setProperty( "javax.rmi.CORBA.UtilClass",
-	    "com.sun.corba.se.impl.javax.rmi.CORBA.Util" ) ;
+        // The following must be set as system properties 
+        System.setProperty( "javax.rmi.CORBA.PortableRemoteObjectClass",
+            "com.sun.corba.ee.impl.javax.rmi.PortableRemoteObject" ) ;
+        System.setProperty( "javax.rmi.CORBA.StubClass",
+            "com.sun.corba.ee.impl.javax.rmi.CORBA.StubDelegateImpl" ) ;
+        System.setProperty( "javax.rmi.CORBA.UtilClass",
+            "com.sun.corba.ee.impl.javax.rmi.CORBA.Util" ) ;
 
-	// initializer server ORB.
+        // initializer server ORB.
 
-	Properties serverProps = new Properties() ;
-	serverProps.setProperty( "org.omg.CORBA.ORBSingletonClass",
-	    "com.sun.corba.se.impl.orb.ORBSingleton" ) ;
-	serverProps.setProperty( "org.omg.CORBA.ORBClass",
-	    "com.sun.corba.se.impl.orb.ORBImpl" ) ;
-	serverProps.setProperty( ORBConstants.INITIAL_HOST_PROPERTY,
-	    "localhost" ) ;
-	serverProps.setProperty( ORBConstants.INITIAL_PORT_PROPERTY,
-	    PORT_NUM ) ;
-	serverProps.setProperty( ORBConstants.ALLOW_LOCAL_OPTIMIZATION,
-	    "true" ) ;	
-	serverProps.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
-	    PORT_NUM ) ;
-	serverProps.setProperty( ORBConstants.SERVER_HOST_PROPERTY,
-	    "localhost" ) ;
-	serverProps.setProperty( ORBConstants.ORB_ID_PROPERTY,
-	    "serverORB" ) ;
-	serverProps.setProperty( ORBConstants.ORB_SERVER_ID_PROPERTY,
-	    "300" ) ;
+        Properties serverProps = new Properties() ;
+        serverProps.setProperty( "org.omg.CORBA.ORBSingletonClass",
+            "com.sun.corba.ee.impl.orb.ORBSingleton" ) ;
+        serverProps.setProperty( "org.omg.CORBA.ORBClass",
+            "com.sun.corba.ee.impl.orb.ORBImpl" ) ;
+        serverProps.setProperty( ORBConstants.INITIAL_HOST_PROPERTY,
+            "localhost" ) ;
+        serverProps.setProperty( ORBConstants.INITIAL_PORT_PROPERTY,
+            PORT_NUM ) ;
+        serverProps.setProperty( ORBConstants.ALLOW_LOCAL_OPTIMIZATION,
+            "true" ) ;  
+        serverProps.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
+            PORT_NUM ) ;
+        serverProps.setProperty( ORBConstants.SERVER_HOST_PROPERTY,
+            "localhost" ) ;
+        serverProps.setProperty( ORBConstants.ORB_ID_PROPERTY,
+            "serverORB" ) ;
+        serverProps.setProperty( ORBConstants.ORB_SERVER_ID_PROPERTY,
+            "300" ) ;
 
-	// Ignore the args! Don't want to pick up setting of ORBInitialPort from args!
-	String[] noArgs = null ;
-	serverORB = ORB.init( noArgs, serverProps ) ;
-	new TransientNameService( 
-	    com.sun.corba.se.spi.orb.ORB.class.cast(serverORB) ) ;
+        // Ignore the args! Don't want to pick up setting of ORBInitialPort from args!
+        String[] noArgs = null ;
+        serverORB = ORB.init( noArgs, serverProps ) ;
+        new TransientNameService( 
+            com.sun.corba.ee.spi.orb.ORB.class.cast(serverORB) ) ;
 
-	// Activate the transport
-	try {
-	    serverORB.resolve_initial_references( "RootPOA" ) ;
-	} catch (Exception exc) {
-	    throw new RuntimeException( exc ) ;
-	}
+        // Activate the transport
+        try {
+            serverORB.resolve_initial_references( "RootPOA" ) ;
+        } catch (Exception exc) {
+            throw new RuntimeException( exc ) ;
+        }
     }
 
     public static void main( String[] args ) {
-	initializeORBs( args ) ;
-	try {
-	    //lookup a non-existing name "Foo"
-	    org.omg.CORBA.Object objRef = serverORB.resolve_initial_references( "Foo" );
-	    System.out.println( "Unexpectedly found the name Foo! ");
-	    System.exit(1);	    
-	} catch (Exception exc) {	    
-	    System.out.println( "Expected exception in getting initial references: " + exc);
-	    exc.printStackTrace() ;
-	    System.exit(0) ;
-	}
+        initializeORBs( args ) ;
+        try {
+            //lookup a non-existing name "Foo"
+            org.omg.CORBA.Object objRef = serverORB.resolve_initial_references( "Foo" );
+            System.out.println( "Unexpectedly found the name Foo! ");
+            System.exit(1);         
+        } catch (Exception exc) {           
+            System.out.println( "Expected exception in getting initial references: " + exc);
+            exc.printStackTrace() ;
+            System.exit(0) ;
+        }
     }
 }

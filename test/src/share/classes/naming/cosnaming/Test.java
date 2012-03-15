@@ -45,9 +45,9 @@ public class Test extends CORBATest
 {
     protected void doTest () throws Throwable
     {
-	// Turn on debugging flags
-	// Options.addORBDArgs( "-ORBDebug transport,subcontract,giop,orbd" ) ;
-	// Options.addClientArgs( "-ORBDebug transport,subcontract,giop" ) ;
+        // Turn on debugging flags
+        // Options.addORBDArgs( "-ORBDebug transport,subcontract,giop,orbd" ) ;
+        // Options.addClientArgs( "-ORBDebug transport,subcontract,giop" ) ;
 
         Controller orbd = createORBD();
 

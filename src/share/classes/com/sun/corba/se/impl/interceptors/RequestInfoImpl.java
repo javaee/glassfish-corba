@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.interceptors;
+package com.sun.corba.ee.impl.interceptors;
 
 import java.io.IOException ;
 
@@ -68,30 +68,30 @@ import org.omg.CORBA.portable.InputStream;
              
 import org.omg.Dynamic.Parameter;
 
-import com.sun.corba.se.spi.legacy.connection.Connection;
+import com.sun.corba.ee.spi.legacy.connection.Connection;
 
-import com.sun.corba.se.spi.legacy.interceptor.RequestInfoExt;
+import com.sun.corba.ee.spi.legacy.interceptor.RequestInfoExt;
 
-import com.sun.corba.se.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.IOR;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.spi.servicecontext.UnknownServiceContext;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextDefaults;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.spi.servicecontext.UnknownServiceContext;
 
-import com.sun.corba.se.spi.misc.ORBClassLoader;
+import com.sun.corba.ee.spi.misc.ORBClassLoader;
 
-import com.sun.corba.se.impl.encoding.EncapsOutputStream;
+import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
-import com.sun.corba.se.impl.util.RepositoryId;
+import com.sun.corba.ee.impl.util.RepositoryId;
 
-import com.sun.corba.se.spi.logging.InterceptorsSystemException;
-import com.sun.corba.se.spi.logging.OMGSystemException;
+import com.sun.corba.ee.spi.logging.InterceptorsSystemException;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
 
 /**
  * Implementation of the RequestInfo interface as specified in
@@ -186,7 +186,7 @@ public abstract class RequestInfoImpl
      */
     void reset() {
 
-	// Please keep these in the same order as declared above.
+        // Please keep these in the same order as declared above.
 
         flowStackIndex = 0;
         startingPointCall = 0;
@@ -196,10 +196,10 @@ public abstract class RequestInfoImpl
         setReplyStatus( UNINITIALIZED ) ;
         currentExecutionPoint = EXECUTION_POINT_STARTING;
         alreadyExecuted = false;
-	connection = null;
+        connection = null;
         serviceContexts = null;
         forwardRequest = null;
-	forwardRequestIOR = null;
+        forwardRequestIOR = null;
         exception = null;
 
         // We don't need to reset the Slots because they are
@@ -377,7 +377,7 @@ public abstract class RequestInfoImpl
     public Any get_slot (int id) 
         throws InvalidSlot
     {
-	// access is currently valid for all states:
+        // access is currently valid for all states:
         //checkAccess( MID_GET_SLOT );
         // Delegate the call to the slotTable which was set when RequestInfo was
         // created.
@@ -428,9 +428,9 @@ public abstract class RequestInfoImpl
      * Note: we store the connection as an internal type but
      * expose it here as an external type.
      */
-    public com.sun.corba.se.spi.legacy.connection.Connection connection()
+    public com.sun.corba.ee.spi.legacy.connection.Connection connection()
     {
-	return connection;
+        return connection;
     }
 
     /*
@@ -479,25 +479,25 @@ public abstract class RequestInfoImpl
                     ueInputStream.reset();
                 }
                 catch( IOException e ) {
-		    throw wrapper.markAndResetFailed( e ) ;
+                    throw wrapper.markAndResetFailed( e ) ;
                 }
             }
 
             // Insert this UserException into the provided Any using the
             // helper class.
-	    insertUserException( userException, result );
+            insertUserException( userException, result );
         } catch( ClassNotFoundException e ) {
-	    throw stdWrapper.unknownUserException( e ) ;
+            throw stdWrapper.unknownUserException( e ) ;
         } catch( NoSuchMethodException e ) {
-	    throw stdWrapper.unknownUserException( e ) ;
+            throw stdWrapper.unknownUserException( e ) ;
         } catch( SecurityException e ) {
-	    throw stdWrapper.unknownUserException( e ) ;
+            throw stdWrapper.unknownUserException( e ) ;
         } catch( IllegalAccessException e ) {
-	    throw stdWrapper.unknownUserException( e ) ;
+            throw stdWrapper.unknownUserException( e ) ;
         } catch( IllegalArgumentException e ) {
-	    throw stdWrapper.unknownUserException( e ) ;
+            throw stdWrapper.unknownUserException( e ) ;
         } catch( InvocationTargetException e ) {
-	    throw stdWrapper.unknownUserException( e ) ;
+            throw stdWrapper.unknownUserException( e ) ;
         }
     }
 
@@ -514,10 +514,10 @@ public abstract class RequestInfoImpl
             // Insert this UserException into the provided Any using the
             // helper class.
             if( userException != null ) {
-		Class exceptionClass = userException.getClass();
-		String className = exceptionClass.getName();
-		String helperClassName = className + "Helper";
-		Class helperClass = ORBClassLoader.loadClass( helperClassName );
+                Class exceptionClass = userException.getClass();
+                String className = exceptionClass.getName();
+                String helperClassName = className + "Helper";
+                Class helperClass = ORBClassLoader.loadClass( helperClassName );
            
                 Method insertMethod = helperClass.getMethod(
                     "insert", org.omg.CORBA.Any.class, exceptionClass );
@@ -525,17 +525,17 @@ public abstract class RequestInfoImpl
                 insertMethod.invoke( null, result, userException );
             }
         } catch( ClassNotFoundException e ) {
-	    throw stdWrapper.unknownUserException( e );
+            throw stdWrapper.unknownUserException( e );
         } catch( NoSuchMethodException e ) {
-	    throw stdWrapper.unknownUserException( e );
+            throw stdWrapper.unknownUserException( e );
         } catch( SecurityException e ) {
-	    throw stdWrapper.unknownUserException( e );
+            throw stdWrapper.unknownUserException( e );
         } catch( IllegalAccessException e ) {
-	    throw stdWrapper.unknownUserException( e );
+            throw stdWrapper.unknownUserException( e );
         } catch( IllegalArgumentException e ) {
-	    throw stdWrapper.unknownUserException( e );
+            throw stdWrapper.unknownUserException( e );
         } catch( InvocationTargetException e ) {
-	    throw stdWrapper.unknownUserException( e );
+            throw stdWrapper.unknownUserException( e );
         } 
     }
 
@@ -549,8 +549,8 @@ public abstract class RequestInfoImpl
      */
     protected Parameter[] nvListToParameterArray( NVList parNVList ) {
 
-	// _REVISIT_ This utility method should probably be doing a deep
-	// copy so interceptor can't accidentally change the arguments.
+        // _REVISIT_ This utility method should probably be doing a deep
+        // copy so interceptor can't accidentally change the arguments.
 
         int count = parNVList.count();
         Parameter[] plist = new Parameter[count];
@@ -570,7 +570,7 @@ public abstract class RequestInfoImpl
                 plist[i].mode = ParameterMode.from_int( nv.flags() - 1 );
             }
         } catch ( Exception e ) {
-	    throw wrapper.exceptionInArguments( e ) ;
+            throw wrapper.exceptionInArguments( e ) ;
         }
 
         return plist;
@@ -588,7 +588,7 @@ public abstract class RequestInfoImpl
         if( exception == null ) {
             // Note: exception should never be null here since we will throw
             // a BAD_INV_ORDER if this is not called from receive_exception.
-	    throw wrapper.exceptionWasNull2() ;
+            throw wrapper.exceptionWasNull2() ;
         } else if( exception instanceof SystemException ) {
             ORBUtility.insertSystemException(
                 (SystemException)exception, result );
@@ -606,17 +606,17 @@ public abstract class RequestInfoImpl
                 // appropriate class, then return an any containing UNKNOWN,
                 // with a minor code of 1.  This is conveniently the same
                 // exception that is returned from the 
-		// insertApplicationException utility method.
+                // insertApplicationException utility method.
                 ORBUtility.insertSystemException( e, result );
             }
         } else if( exception instanceof UserException ) {
-	    try {
-		UserException userException = (UserException)exception;
-		insertUserException( userException, result );
-	    } catch( UNKNOWN e ) {
+            try {
+                UserException userException = (UserException)exception;
+                insertUserException( userException, result );
+            } catch( UNKNOWN e ) {
                 ORBUtility.insertSystemException( e, result );
-	    }
-	}
+            }
+        }
 
 
         return result;
@@ -628,48 +628,48 @@ public abstract class RequestInfoImpl
      * a cache.  If not found in cache, the result is inserted in the cache.
      */
     protected org.omg.IOP.ServiceContext getServiceContext( 
-	Map<Integer,org.omg.IOP.ServiceContext> cachedServiceContexts, 
-	ServiceContexts serviceContexts, int id )
+        Map<Integer,org.omg.IOP.ServiceContext> cachedServiceContexts, 
+        ServiceContexts serviceContexts, int id )
     {
         org.omg.IOP.ServiceContext result = null;
 
-	// Search cache first:
+        // Search cache first:
         result = cachedServiceContexts.get( id );
 
-	// null could normally mean that either we cached the value null 
-	// or it's not in the cache.  However, there is no way for us to 
-	// cache the value null in the following code.
+        // null could normally mean that either we cached the value null 
+        // or it's not in the cache.  However, there is no way for us to 
+        // cache the value null in the following code.
         if( result == null ) {
-	    // Not in cache.  Find it and put in cache.
-	    // Get the desired "core" service context.
-	    com.sun.corba.se.spi.servicecontext.ServiceContext context = 
-		serviceContexts.get( id );
+            // Not in cache.  Find it and put in cache.
+            // Get the desired "core" service context.
+            com.sun.corba.ee.spi.servicecontext.ServiceContext context = 
+                serviceContexts.get( id );
 
-	    if (context == null) {
-		// The OMG PI standard requires throwing an exception,
-		// but that is slow, so we allow disabling this behavior.
-		if (myORB.getORBData().getServiceContextReturnsNull()) {
-		    return null ;
-		} else {
-		    throw stdWrapper.invalidServiceContextId() ;
-		}
-	    }
+            if (context == null) {
+                // The OMG PI standard requires throwing an exception,
+                // but that is slow, so we allow disabling this behavior.
+                if (myORB.getORBData().getServiceContextReturnsNull()) {
+                    return null ;
+                } else {
+                    throw stdWrapper.invalidServiceContextId() ;
+                }
+            }
 
-	    // Convert the "core" service context to an 
-	    // "IOP" ServiceContext by writing it to a 
-	    // CDROutputStream and reading it back.
-	    EncapsOutputStream out = new EncapsOutputStream(myORB);
+            // Convert the "core" service context to an 
+            // "IOP" ServiceContext by writing it to a 
+            // CDROutputStream and reading it back.
+            EncapsOutputStream out = new EncapsOutputStream(myORB);
 
-	    context.write( out, GIOPVersion.V1_2 );
-	    InputStream inputStream = out.create_input_stream();
-	    result = ServiceContextHelper.read( inputStream );
+            context.write( out, GIOPVersion.V1_2 );
+            InputStream inputStream = out.create_input_stream();
+            result = ServiceContextHelper.read( inputStream );
 
-	    cachedServiceContexts.put( id, result );
-	}
+            cachedServiceContexts.put( id, result );
+        }
 
-	// Good citizen: For increased efficiency, we assume that interceptors
-	// will not modify the returned ServiceContext.  Otherwise, we would
-	// have to make a deep copy.
+        // Good citizen: For increased efficiency, we assume that interceptors
+        // will not modify the returned ServiceContext.  Otherwise, we would
+        // have to make a deep copy.
 
         return result;
     }
@@ -687,28 +687,28 @@ public abstract class RequestInfoImpl
      * in the container, it goes in the HashMap as well.  
      */
     protected void addServiceContext( 
-	Map<Integer, org.omg.IOP.ServiceContext> cachedServiceContexts, 
-	ServiceContexts serviceContexts, 
-	org.omg.IOP.ServiceContext service_context,
-	boolean replace )
+        Map<Integer, org.omg.IOP.ServiceContext> cachedServiceContexts, 
+        ServiceContexts serviceContexts, 
+        org.omg.IOP.ServiceContext service_context,
+        boolean replace )
     {
-	int id = 0 ;
-	// Convert IOP.service_context to core.ServiceContext:
-	EncapsOutputStream outputStream = new EncapsOutputStream(
-	    myORB );
-	InputStream inputStream = null;
-	UnknownServiceContext coreServiceContext = null;
-	ServiceContextHelper.write( outputStream, service_context );
-	inputStream = outputStream.create_input_stream();
+        int id = 0 ;
+        // Convert IOP.service_context to core.ServiceContext:
+        EncapsOutputStream outputStream = new EncapsOutputStream(
+            myORB );
+        InputStream inputStream = null;
+        UnknownServiceContext coreServiceContext = null;
+        ServiceContextHelper.write( outputStream, service_context );
+        inputStream = outputStream.create_input_stream();
 
-	// Constructor expects id to already have been read from stream.
-	coreServiceContext = ServiceContextDefaults.makeUnknownServiceContext(
-	    inputStream.read_long(),
-	    (org.omg.CORBA_2_3.portable.InputStream)inputStream );
+        // Constructor expects id to already have been read from stream.
+        coreServiceContext = ServiceContextDefaults.makeUnknownServiceContext(
+            inputStream.read_long(),
+            (org.omg.CORBA_2_3.portable.InputStream)inputStream );
 
-	id = coreServiceContext.getId();
+        id = coreServiceContext.getId();
 
-	if (serviceContexts.get(id) != null) {
+        if (serviceContexts.get(id) != null) {
             if (replace) {
                 serviceContexts.delete(id);
             } else {
@@ -716,10 +716,10 @@ public abstract class RequestInfoImpl
             }
         }
 
-	serviceContexts.put( coreServiceContext );
+        serviceContexts.put( coreServiceContext );
 
-	// Place IOP.ServiceContext in cache as well:
-	cachedServiceContexts.put( id, service_context );
+        // Place IOP.ServiceContext in cache as well:
+        cachedServiceContexts.put( id, service_context );
     }
 
     /**
@@ -830,7 +830,7 @@ public abstract class RequestInfoImpl
      */
     protected void setForwardRequest( ForwardRequest forwardRequest ) {
         this.forwardRequest = forwardRequest;
-	this.forwardRequestIOR = null;
+        this.forwardRequestIOR = null;
     }
 
     /** 
@@ -838,22 +838,22 @@ public abstract class RequestInfoImpl
      * This version supplements setForwardRequest( ForwardRequest );
      */
     protected void setForwardRequest( IOR ior ) {
-	this.forwardRequestIOR = ior;
-	this.forwardRequest = null;
+        this.forwardRequestIOR = ior;
+        this.forwardRequest = null;
     }
     
     /**
      * Retrieves the ForwardRequest object as a ForwardRequest exception.
      */
     protected ForwardRequest getForwardRequestException() {
-	if( this.forwardRequest == null ) {
-	    if( this.forwardRequestIOR != null ) {
-		// Convert the internal IOR to a forward request exception
-		// by creating an object reference.
-		org.omg.CORBA.Object obj = iorToObject(this.forwardRequestIOR);
-		this.forwardRequest = new ForwardRequest( obj );
-	    }
-	}
+        if( this.forwardRequest == null ) {
+            if( this.forwardRequestIOR != null ) {
+                // Convert the internal IOR to a forward request exception
+                // by creating an object reference.
+                org.omg.CORBA.Object obj = iorToObject(this.forwardRequestIOR);
+                this.forwardRequest = new ForwardRequest( obj );
+            }
+        }
 
         return this.forwardRequest;
     }
@@ -862,14 +862,14 @@ public abstract class RequestInfoImpl
      * Retrieves the IOR of the ForwardRequest exception.
      */
     protected IOR getForwardRequestIOR() {
-	if( this.forwardRequestIOR == null ) {
-	    if( this.forwardRequest != null ) {
-		this.forwardRequestIOR = myORB.getIOR(
-		    this.forwardRequest.forward, false ) ;
-	    }
-	}
+        if( this.forwardRequestIOR == null ) {
+            if( this.forwardRequest != null ) {
+                this.forwardRequestIOR = myORB.getIOR(
+                    this.forwardRequest.forward, false ) ;
+            }
+        }
 
-	return this.forwardRequestIOR;
+        return this.forwardRequestIOR;
     }
     
     /**
@@ -919,11 +919,11 @@ public abstract class RequestInfoImpl
      */
     void setSlotTable(SlotTable slotTable)
     {
-	this.slotTable = slotTable;
+        this.slotTable = slotTable;
     }
 
     protected org.omg.CORBA.Object iorToObject( IOR ior )
     {
-	return ORBUtility.makeObjectReference( ior ) ;
+        return ORBUtility.makeObjectReference( ior ) ;
     }
 }

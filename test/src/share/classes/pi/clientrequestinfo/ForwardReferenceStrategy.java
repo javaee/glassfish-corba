@@ -40,7 +40,7 @@
 
 package pi.clientrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.CORBA.*;
 
@@ -75,10 +75,10 @@ public class ForwardReferenceStrategy
     }
 
     public void send_request (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
         throws ForwardRequest
     {
-	super.send_request( interceptor, ri );
+        super.send_request( interceptor, ri );
 
         try {
             count++;
@@ -95,17 +95,17 @@ public class ForwardReferenceStrategy
                      "raised BAD_INV_ORDER (ok)" );
             }
 
-	    // Try target()
-	    org.omg.CORBA.Object obj = ri.target();
-	    org.omg.CORBA.Object correctObject;
-	    correctObject = TestInitializer.helloRef;
+            // Try target()
+            org.omg.CORBA.Object obj = ri.target();
+            org.omg.CORBA.Object correctObject;
+            correctObject = TestInitializer.helloRef;
 
-	    if( correctObject._is_equivalent( obj ) ) {
-		log( "send_request(): target() is valid." );
-	    }
-	    else {
-		fail( "send_request(): target() is invalid." );
-	    }
+            if( correctObject._is_equivalent( obj ) ) {
+                log( "send_request(): target() is valid." );
+            }
+            else {
+                fail( "send_request(): target() is invalid." );
+            }
 
             // Try effective_target()
             obj = ri.effective_target();
@@ -130,9 +130,9 @@ public class ForwardReferenceStrategy
     }
 
     public void receive_reply(
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
     {
-	super.receive_reply( interceptor, ri );
+        super.receive_reply( interceptor, ri );
 
         try {
             // Try calling forward_reference().  Should fail.
@@ -170,8 +170,8 @@ public class ForwardReferenceStrategy
     }
 
     public void receive_exception (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
-	throws ForwardRequest
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        throws ForwardRequest
     {
         super.receive_exception( interceptor, ri );
 
@@ -190,7 +190,7 @@ public class ForwardReferenceStrategy
             // Try target()
             org.omg.CORBA.Object obj = ri.target();
             org.omg.CORBA.Object correctObject;
-	    correctObject = TestInitializer.helloRef;
+            correctObject = TestInitializer.helloRef;
 
             if( correctObject._is_equivalent( obj ) ) {
                 log( "receive_exception(): target() is valid." );
@@ -222,10 +222,10 @@ public class ForwardReferenceStrategy
     }
 
     public void receive_other (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
-	throws ForwardRequest
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        throws ForwardRequest
     {
-	super.receive_other( interceptor, ri );
+        super.receive_other( interceptor, ri );
 
         try {
             try {

@@ -39,9 +39,9 @@
  */
 
 
-package com.sun.corba.se.impl.oa.poa;
+package com.sun.corba.ee.impl.oa.poa;
 
-import com.sun.corba.se.spi.ior.ObjectKey;
+import com.sun.corba.ee.spi.ior.ObjectKey;
 
 /**
  * The bad server id handler is used to locate persistent objects.

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.cosnaming;
+package com.sun.corba.ee.impl.naming.cosnaming;
 
 // Get CORBA type
 
@@ -51,12 +51,12 @@ import org.omg.PortableServer.ServantRetentionPolicyValue;
 // Get org.omg.CosNaming types
 
 // Import transient naming context
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 
-import com.sun.corba.se.spi.logging.NamingSystemException;
-import com.sun.corba.se.spi.oa.ObjectAdapter;
-import com.sun.corba.se.spi.trace.Naming;
+import com.sun.corba.ee.spi.logging.NamingSystemException;
+import com.sun.corba.ee.spi.oa.ObjectAdapter;
+import com.sun.corba.ee.spi.trace.Naming;
 
 /**
  * Class TransientNameService implements a transient name service
@@ -84,7 +84,7 @@ public class TransientNameService
      * @exception org.omg.CORBA.INITIALIZE Thrown if
      * the TransientNameService cannot initialize.
      */
-    public TransientNameService(com.sun.corba.se.spi.orb.ORB orb )
+    public TransientNameService(com.sun.corba.ee.spi.orb.ORB orb )
         throws org.omg.CORBA.INITIALIZE
     {
         // Default constructor uses "NameService" as the key for the Root Naming
@@ -102,7 +102,7 @@ public class TransientNameService
      * @exception org.omg.CORBA.INITIALIZE Thrown if
      * the TransientNameService cannot initialize.
      */
-    public TransientNameService(com.sun.corba.se.spi.orb.ORB orb,
+    public TransientNameService(com.sun.corba.ee.spi.orb.ORB orb,
         String serviceName ) throws org.omg.CORBA.INITIALIZE
     {
         // This constructor gives the flexibility of providing the Object Key
@@ -116,13 +116,13 @@ public class TransientNameService
      * context with POA and registering the root context with INS Object Keymap.
      */
     @Naming
-    private void initialize( com.sun.corba.se.spi.orb.ORB orb,
+    private void initialize( com.sun.corba.ee.spi.orb.ORB orb,
         String nameServiceName )
         throws org.omg.CORBA.INITIALIZE
     {
         try {
             POA rootPOA = (POA) orb.resolve_initial_references( 
-		ORBConstants.ROOT_POA_NAME );
+                ORBConstants.ROOT_POA_NAME );
             rootPOA.the_POAManager().activate();
 
             int i = 0;
@@ -148,9 +148,9 @@ public class TransientNameService
             orb.register_initial_reference( nameServiceName, 
                 theInitialNamingContext );
         } catch (org.omg.CORBA.SystemException e) {
-	    throw wrapper.transNsCannotCreateInitialNcSys( e ) ;
+            throw wrapper.transNsCannotCreateInitialNcSys( e ) ;
         } catch (Exception e) {
-	    throw wrapper.transNsCannotCreateInitialNc( e ) ;
+            throw wrapper.transNsCannotCreateInitialNc( e ) ;
         } 
     }
 
@@ -161,7 +161,7 @@ public class TransientNameService
      */
     public org.omg.CORBA.Object initialNamingContext()
     {
-	return theInitialNamingContext;
+        return theInitialNamingContext;
     }
 
 

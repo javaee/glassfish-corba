@@ -47,29 +47,29 @@ import java.util.*;
 public class MixedOrbTest extends CORBATest
 {
     private static final String[] javaFiles = { "Client.java", "Echo.java",
-	"EchoImpl.java" }  ;
+        "EchoImpl.java" }  ;
 
     private static final String[] rmicClasses = { "corba.mixedorb.EchoImpl" } ;
 
     protected void doTest() throws Throwable
     {
-	Options.setRMICClasses(rmicClasses) ;
-	Options.addRMICArgs( "-iiop -keep -g -poa" ) ;
-	Options.setJavaFiles( javaFiles ) ;
+        Options.setRMICClasses(rmicClasses) ;
+        Options.addRMICArgs( "-iiop -keep -g -poa" ) ;
+        Options.setJavaFiles( javaFiles ) ;
 
-	compileRMICFiles();
+        compileRMICFiles();
         compileJavaFiles();
 
-	Controller client = createClient( "corba.mixedorb.Client" ) ;
+        Controller client = createClient( "corba.mixedorb.Client" ) ;
 
-	client.start();
+        client.start();
 
-	// Wait for the client to finish for up to 2 minutes, then
-	// throw an exception.
-	client.waitFor(120000);
+        // Wait for the client to finish for up to 2 minutes, then
+        // throw an exception.
+        client.waitFor(120000);
 
-	// Make sure all the processes are shut down.
-	client.stop();
+        // Make sure all the processes are shut down.
+        client.stop();
     }
 }
 

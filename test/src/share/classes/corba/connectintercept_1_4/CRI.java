@@ -45,7 +45,7 @@
 
 package corba.connectintercept_1_4;
 
-import com.sun.corba.se.spi.legacy.interceptor.RequestInfoExt;
+import com.sun.corba.ee.spi.legacy.interceptor.RequestInfoExt;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.INTERNAL;
 import org.omg.IOP.TaggedComponent;
@@ -56,7 +56,7 @@ public class CRI
     extends
         org.omg.CORBA.LocalObject
     implements
-	ClientRequestInterceptor
+        ClientRequestInterceptor
 {
     public static final String baseMsg = CRI.class.getName();
 
@@ -66,53 +66,53 @@ public class CRI
 
     public void destroy() 
     {
-	if (balance != 0) {
-	    throw new RuntimeException(baseMsg + ": Interceptors not balanced.");
-	}
+        if (balance != 0) {
+            throw new RuntimeException(baseMsg + ": Interceptors not balanced.");
+        }
     }
 
     public void send_request(ClientRequestInfo cri)
     {
-	balance++;
-	System.out.println(baseMsg + ".send_request " + cri.operation());
-	System.out.println("    request on connection: " +
-			   ((RequestInfoExt)cri).connection());
+        balance++;
+        System.out.println(baseMsg + ".send_request " + cri.operation());
+        System.out.println("    request on connection: " +
+                           ((RequestInfoExt)cri).connection());
 
-	try {
-	    TaggedComponent taggedComponent =
-		cri.get_effective_component(Common.ListenPortsComponentID);
-	    String componentData = 
-		new String(taggedComponent.component_data);
-	    System.out.println("    found ListenPortsComponentID: " +
-			       componentData);
-	} catch (BAD_PARAM e) {
-	    // This is ignored because we talk to naming which
-	    // will not contain the listen component.
-	}
+        try {
+            TaggedComponent taggedComponent =
+                cri.get_effective_component(Common.ListenPortsComponentID);
+            String componentData = 
+                new String(taggedComponent.component_data);
+            System.out.println("    found ListenPortsComponentID: " +
+                               componentData);
+        } catch (BAD_PARAM e) {
+            // This is ignored because we talk to naming which
+            // will not contain the listen component.
+        }
     }
 
     public void send_poll(ClientRequestInfo cri)
     {
-	balance++;
-	System.out.println(baseMsg + ".send_poll " + cri.operation());
+        balance++;
+        System.out.println(baseMsg + ".send_poll " + cri.operation());
     }
 
     public void receive_reply(ClientRequestInfo cri)
     {
-	balance--;
-	System.out.println(baseMsg + ".receive_reply " + cri.operation());
+        balance--;
+        System.out.println(baseMsg + ".receive_reply " + cri.operation());
     }
 
     public void receive_exception(ClientRequestInfo cri)
     {
-	balance--;
-	System.out.println(baseMsg + ".receive_exception " + cri.operation());
+        balance--;
+        System.out.println(baseMsg + ".receive_exception " + cri.operation());
     }
 
     public void receive_other(ClientRequestInfo cri)
     {
-	balance--;
-	System.out.println(baseMsg + ".receive_other " + cri.operation());
+        balance--;
+        System.out.println(baseMsg + ".receive_other " + cri.operation());
     }
 }
 

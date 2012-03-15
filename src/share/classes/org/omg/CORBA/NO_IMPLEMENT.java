@@ -65,7 +65,7 @@ public final class NO_IMPLEMENT extends SystemException {
      * and a null description.
      */
     public NO_IMPLEMENT() {
-	this("");
+        this("");
     }
 
     /**

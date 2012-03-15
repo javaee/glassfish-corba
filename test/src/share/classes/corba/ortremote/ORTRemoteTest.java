@@ -42,8 +42,8 @@ package corba.ortremote;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.orb.ORB;
 
 public class ORTRemoteTest extends CORBATest
 {
@@ -60,7 +60,7 @@ public class ORTRemoteTest extends CORBATest
         Controller client = createClient("corba.ortremote.Test");
 
         client.start();
-	client.waitFor(120000) ;
+        client.waitFor(120000) ;
         client.stop();
     }
 }

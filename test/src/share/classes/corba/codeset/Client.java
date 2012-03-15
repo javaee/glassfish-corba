@@ -44,8 +44,8 @@ import CodeSetTester.VerifierHelper ;
 import CodeSetTester.VerifierPackage.TestCharSeqHolder;
 import CodeSetTester.VerifierPackage.TestWCharSeqHolder;
 import java.util.Properties;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.encoding.OSFCodeSetRegistry;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContext;
@@ -87,30 +87,30 @@ public class Client
         if (!sending.equals(resStr)) {
             System.out.println("Got: " + resStr.length());
             System.out.println("Expected: " + sending.length());
-	    if (resStr.length() != sending.length()) {
-		throw new Exception("different lengths");
-	    }
-	    for (int i = 0; i < sending.length(); i++) {
-		if (sending.charAt(i) != resStr.charAt(i)) {
-		    System.out.println("chars not eq:");
-		}
-		if (Character.UnicodeBlock.of(sending.charAt(i)) != 
-		    Character.UnicodeBlock.of(resStr.charAt(i))) {
-		    System.out.println("chars UnicodeBlock not eq:");
-		}
-		System.out.println(
+            if (resStr.length() != sending.length()) {
+                throw new Exception("different lengths");
+            }
+            for (int i = 0; i < sending.length(); i++) {
+                if (sending.charAt(i) != resStr.charAt(i)) {
+                    System.out.println("chars not eq:");
+                }
+                if (Character.UnicodeBlock.of(sending.charAt(i)) != 
+                    Character.UnicodeBlock.of(resStr.charAt(i))) {
+                    System.out.println("chars UnicodeBlock not eq:");
+                }
+                System.out.println(
                     "send: " 
-		    + sending.charAt(i)
-		    + " " + Character.UnicodeBlock.of(sending.charAt(i))
-		    + "/n"
+                    + sending.charAt(i)
+                    + " " + Character.UnicodeBlock.of(sending.charAt(i))
+                    + "/n"
                     + "recv: " 
-		    + resStr.charAt(i)
-		    + " " + Character.UnicodeBlock.of(resStr.charAt(i))
-		    );
-	    }
+                    + resStr.charAt(i)
+                    + " " + Character.UnicodeBlock.of(resStr.charAt(i))
+                    );
+            }
             throw new Exception("Invalid result wstring: \n" + 
-				" Got: " + resStr + "\n" +
-				" Expected: " + sending);
+                                " Got: " + resStr + "\n" +
+                                " Expected: " + sending);
         }
 
         System.out.println("Testing char sequence...");

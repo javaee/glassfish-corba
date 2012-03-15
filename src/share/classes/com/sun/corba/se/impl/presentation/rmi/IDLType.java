@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi ;
+package com.sun.corba.ee.impl.presentation.rmi ;
 
 /**
  * Holds information about the OMG IDL mapping of a Java type.
@@ -61,7 +61,7 @@ public class IDLType {
     }
 
     public IDLType(Class cl, String memberName) {
-	this( cl, new String[0], memberName ) ;
+        this( cl, new String[0], memberName ) ;
     }
 
     public Class getJavaClass() {
@@ -70,58 +70,58 @@ public class IDLType {
 
     public String[] getModules()
     {
-	return modules_ ;
+        return modules_ ;
     }
     
     public String makeConcatenatedName( char separator, boolean fixIDLKeywords ) {
-	StringBuffer sbuff = new StringBuffer() ;
-	for (int ctr=0; ctr<modules_.length; ctr++) {
-	    String mod = modules_[ctr] ;
-	    if (ctr>0)
-		sbuff.append( separator ) ;
-	    
-	    if (fixIDLKeywords && IDLNameTranslatorImpl.isIDLKeyword(mod))
-		mod = IDLNameTranslatorImpl.mangleIDLKeywordClash( mod ) ;
+        StringBuffer sbuff = new StringBuffer() ;
+        for (int ctr=0; ctr<modules_.length; ctr++) {
+            String mod = modules_[ctr] ;
+            if (ctr>0)
+                sbuff.append( separator ) ;
+            
+            if (fixIDLKeywords && IDLNameTranslatorImpl.isIDLKeyword(mod))
+                mod = IDLNameTranslatorImpl.mangleIDLKeywordClash( mod ) ;
 
-	    sbuff.append( mod ) ;
-	}
+            sbuff.append( mod ) ;
+        }
 
         return sbuff.toString() ;
     }
    
     public String getModuleName() {
-	// Note that this should probably be makeConcatenatedName( '/', true )
-	// for spec compliance,
-	// but rmic does it this way, so we'll leave this.
-	// The effect is that an overloaded method like
-	// void foo( bar.typedef.Baz ) 
-	// will get an IDL name of foo__bar_typedef_Baz instead of
-	// foo__bar__typedef_Baz (note the extra _ before typedef).
-	return makeConcatenatedName( '_', false ) ;
+        // Note that this should probably be makeConcatenatedName( '/', true )
+        // for spec compliance,
+        // but rmic does it this way, so we'll leave this.
+        // The effect is that an overloaded method like
+        // void foo( bar.typedef.Baz ) 
+        // will get an IDL name of foo__bar_typedef_Baz instead of
+        // foo__bar__typedef_Baz (note the extra _ before typedef).
+        return makeConcatenatedName( '_', false ) ;
     }
 
     public String getExceptionName() {
-	// Here we will check for IDL keyword collisions (see bug 5010332).
-	// This means that the repository ID for 
-	// foo.exception.SomeException is
-	// "IDL:foo/_exception/SomeEx:1.0" (note the underscore in front
-	// of the exception module name).
-	String modName = makeConcatenatedName( '/', true ) ;
+        // Here we will check for IDL keyword collisions (see bug 5010332).
+        // This means that the repository ID for 
+        // foo.exception.SomeException is
+        // "IDL:foo/_exception/SomeEx:1.0" (note the underscore in front
+        // of the exception module name).
+        String modName = makeConcatenatedName( '/', true ) ;
 
-	String suffix = "Exception" ;
-	String excName = memberName_ ;
-	if (excName.endsWith( suffix )) {
-	    int last = excName.length() - suffix.length() ;
-	    excName = excName.substring( 0, last ) ;
-	}
+        String suffix = "Exception" ;
+        String excName = memberName_ ;
+        if (excName.endsWith( suffix )) {
+            int last = excName.length() - suffix.length() ;
+            excName = excName.substring( 0, last ) ;
+        }
    
-	// See bug 4989312: we must always add the Ex.
-	excName += "Ex" ;
+        // See bug 4989312: we must always add the Ex.
+        excName += "Ex" ;
 
-	if (modName.length() == 0)
-	    return "IDL:" + excName + ":1.0" ; 
-	else
-	    return "IDL:" + modName + '/' + excName + ":1.0" ; 
+        if (modName.length() == 0)
+            return "IDL:" + excName + ":1.0" ; 
+        else
+            return "IDL:" + modName + '/' + excName + ":1.0" ; 
     }
 
     public String getMemberName() {

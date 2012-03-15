@@ -42,9 +42,9 @@ package pi.serverinterceptor;
 
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.corba.AnyImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.IOP.*;
 import org.omg.IOP.CodecPackage.*;
@@ -61,7 +61,7 @@ public abstract class ClientCommon
 {
 
     // Set in run()
-    com.sun.corba.se.spi.orb.ORB orb;
+    com.sun.corba.ee.spi.orb.ORB orb;
     
     // Set in run()
     PrintStream out;
@@ -73,14 +73,14 @@ public abstract class ClientCommon
     boolean exceptionRaised;
     
     /**
-     * Creates a com.sun.corba.se.spi.orb.ORB and notifies the TestInitializer of its presence
+     * Creates a com.sun.corba.ee.spi.orb.ORB and notifies the TestInitializer of its presence
      */
     void createORB( String[] args ) {
         // create the ORB without an initializer
         Properties props = new Properties() ;
         props.put( "org.omg.CORBA.ORBClass",
                    System.getProperty("org.omg.CORBA.ORBClass"));
-        this.orb = (com.sun.corba.se.spi.orb.ORB)ORB.init(args, props);
+        this.orb = (com.sun.corba.ee.spi.orb.ORB)ORB.init(args, props);
     }
 
     /**
@@ -109,9 +109,9 @@ public abstract class ClientCommon
 
         String methodName;
         do {
-	    // Re-resolve all references to eliminate any cached 
-	    // LOCATION_FORWARDs
-	    resolveReferences();
+            // Re-resolve all references to eliminate any cached 
+            // LOCATION_FORWARDs
+            resolveReferences();
 
             // Synchronize with the server and get the name of the 
             // method to invoke.:
@@ -123,14 +123,14 @@ public abstract class ClientCommon
             
             // Execute the appropriate method on the hello object:
             out.println( "    - Executing method " + methodName + "..." );
-	    exceptionRaised = false;
-	    try {
-	        invokeMethod( methodName );
-	    }
-	    catch( IMP_LIMIT e ) {
-		exceptionRaised = true;
-		out.println( "      + Received IMP_LIMIT exception" );
-	    }
+            exceptionRaised = false;
+            try {
+                invokeMethod( methodName );
+            }
+            catch( IMP_LIMIT e ) {
+                exceptionRaised = true;
+                out.println( "      + Received IMP_LIMIT exception" );
+            }
 
         } while( !methodName.equals( ServerCommon.EXIT_METHOD ) );
         

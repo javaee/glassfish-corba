@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.util;
+package com.sun.corba.ee.impl.util;
 
 import sun.corba.Bridge ;
 
@@ -66,16 +66,16 @@ class JDKClassLoader {
         = new JDKClassLoaderCache();
 
     private static final Bridge bridge = 
-	(Bridge)AccessController.doPrivileged(
-	    new PrivilegedAction() {
-		public Object run() {
-		    return Bridge.get() ;
-		}
-	    } 
-	) ;
+        (Bridge)AccessController.doPrivileged(
+            new PrivilegedAction() {
+                public Object run() {
+                    return Bridge.get() ;
+                }
+            } 
+        ) ;
 
     static Class loadClass(Class aClass, String className)
-	throws ClassNotFoundException {
+        throws ClassNotFoundException {
 
         // Maintain the same error semantics as Class.forName()
         if (className == null) {
@@ -121,7 +121,7 @@ class JDKClassLoader {
             }
         }
     }
-	
+        
     /**
      * Private cache implementation specific to JDKClassLoader.
      */

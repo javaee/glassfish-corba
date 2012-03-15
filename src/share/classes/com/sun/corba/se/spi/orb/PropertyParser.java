@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.orb ;
+package com.sun.corba.ee.spi.orb ;
 
 import java.util.List ;
 import java.util.LinkedList ;
@@ -46,55 +46,55 @@ import java.util.HashMap ;
 import java.util.Iterator ;
 import java.util.Properties ;
 
-import com.sun.corba.se.impl.orb.ParserAction ;
-import com.sun.corba.se.impl.orb.ParserActionFactory ;
+import com.sun.corba.ee.impl.orb.ParserAction ;
+import com.sun.corba.ee.impl.orb.ParserActionFactory ;
 
 public class PropertyParser {
     private List<ParserAction> actions ;
 
     public PropertyParser( ) 
     {
-	actions = new LinkedList<ParserAction>() ;
+        actions = new LinkedList<ParserAction>() ;
     }
 
     public PropertyParser add( String propName, 
-	Operation action, String fieldName )
+        Operation action, String fieldName )
     {
-	actions.add( ParserActionFactory.makeNormalAction( propName, 
-	    action, fieldName ) ) ;
-	return this ;
+        actions.add( ParserActionFactory.makeNormalAction( propName, 
+            action, fieldName ) ) ;
+        return this ;
     }
 
     public PropertyParser addPrefix( String propName, 
-	Operation action, String fieldName, Class<?> componentType )
+        Operation action, String fieldName, Class<?> componentType )
     {
-	actions.add( ParserActionFactory.makePrefixAction( propName, 
-	    action, fieldName, componentType ) ) ;
-	return this ;
+        actions.add( ParserActionFactory.makePrefixAction( propName, 
+            action, fieldName, componentType ) ) ;
+        return this ;
     }
 
     /** Return a map from field name to value.
     */
     public Map<String,Object> parse( Properties props )
     {
-	Map<String,Object> map = new HashMap<String,Object>() ;
-	Iterator<ParserAction> iter = actions.iterator() ;
-	while (iter.hasNext()) {
-	    ParserAction act = iter.next() ;
-	    Object result = act.apply( props ) ; 
-		
-	    // A null result means that the property was not set for
-	    // this action, so do not override the default value in this case.
-	    if (result != null) {
+        Map<String,Object> map = new HashMap<String,Object>() ;
+        Iterator<ParserAction> iter = actions.iterator() ;
+        while (iter.hasNext()) {
+            ParserAction act = iter.next() ;
+            Object result = act.apply( props ) ; 
+                
+            // A null result means that the property was not set for
+            // this action, so do not override the default value in this case.
+            if (result != null) {
                 map.put(act.getFieldName(), result);
             }
-	}
+        }
 
-	return map ;
+        return map ;
     }
 
     public Iterator<ParserAction> iterator()
     {
-	return actions.iterator() ;
+        return actions.iterator() ;
     }
 }

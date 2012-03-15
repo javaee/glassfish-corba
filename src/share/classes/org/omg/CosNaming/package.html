@@ -104,7 +104,7 @@
     <code>"c_source"</code>, <code>"object_code"</code>,
     <code>"executable"</code>, 
     <code>"postscript"</code>, and <code>""</code>.  It is not unusual
-	for the <code>kind</code> field to be the empty string.
+        for the <code>kind</code> field to be the empty string.
     </OL>
     <P>
     In a name, each <code>NameComponent</code> object except the last denotes
@@ -127,8 +127,8 @@
     </OL>
     <P>
     The interface <code>NamingContext</code> has methods for
-	binding/unbinding names with object references or naming contexts,
-	for listing bindings,
+        binding/unbinding names with object references or naming contexts,
+        for listing bindings,
     and for resolving bindings (given a name, the method
     <code>resolve</code> returns the object reference bound to it).
    
@@ -139,33 +139,33 @@
     not a naming context) or between a name and a naming context.
     <P>
     The class<code>BindingType</code> consists of two methods and
-	four constants. Two of these constants are
-	<code>BindingType</code> objects, and two are <code>int</code>s.
-	<P>
-	The <code>BindingType</code> objects
+        four constants. Two of these constants are
+        <code>BindingType</code> objects, and two are <code>int</code>s.
+        <P>
+        The <code>BindingType</code> objects
     can be passed to the constructor for the class
     <code>Binding</code> or used as parameters or return values.  These
-	<code>BindingType</code> objects are:
+        <code>BindingType</code> objects are:
     <UL>
     <LI><code>public static final BindingType <B>nobject</B></code> -- 
-	to indicate that the binding is with an object reference
+        to indicate that the binding is with an object reference
     <LI><code>public static final BindingType <B>ncontext</B></code> -- 
-	to indicate that the binding is with a naming context
+        to indicate that the binding is with a naming context
     </UL>
     <P>
-	The <code>int</code> constants can be supplied to the method
-	<code>from_int</code> to create  <code>BindingType</code> objects,
-	or they can be return values for the method <code>value</code>.
-	These constants are:
-	<UL>
+        The <code>int</code> constants can be supplied to the method
+        <code>from_int</code> to create  <code>BindingType</code> objects,
+        or they can be return values for the method <code>value</code>.
+        These constants are:
+        <UL>
     <LI><code>public static final int <B>_nobject</B></code>
     <LI><code>public static final int <B>_ncontext</B></code>
-	</UL>
+        </UL>
     If the method <code>from_int</code> is supplied with anything other
-	than <code>_nobject</code>
+        than <code>_nobject</code>
     or <code>_ncontext</code>, it will throw
-	the exception <code>org.omg.CORBA.BAD_PARAM</code>. 
-	<P>Usage is as follows:
+        the exception <code>org.omg.CORBA.BAD_PARAM</code>. 
+        <P>Usage is as follows:
     <PRE>
        BindingType btObject = from_int(_nobject);
        BindingType btContext = from_int(_ncontext);
@@ -309,7 +309,7 @@ Here are the steps to follow:
       This associates <code>NameService</code> with the Root Naming
       Context of the <code>CosNaming</code> implementation that you 
       want to use.
-	  <P>
+          <P>
   <LI>Start the standalone Bootstrap server using the following command:
   <pre>
       <code>
@@ -343,13 +343,13 @@ For an overview and examples of how to use the
 <code>CosNaming</code> API, please see:
 <ul>
   <li><a href="../../../../guide/idl/jidlNaming.html">
-	Naming Service</a>
+        Naming Service</a>
 </ul>
 <p>
 For an overview of Java&nbsp;IDL, please see:
 <ul>
   <li><a href="../../../../guide/idl/index.html">
-	Java&nbsp;IDL home page</a>
+        Java&nbsp;IDL home page</a>
 </ul>
 
 @since JDK1.3

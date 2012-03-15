@@ -61,7 +61,7 @@ import org.omg.PortableInterceptor.ServerRequestInfo;
 public class LoggingServiceServerInterceptor
     extends org.omg.CORBA.LocalObject
     implements ClientRequestInterceptor,
-	       ServerRequestInterceptor
+               ServerRequestInterceptor
 {
     private NamingContext nameService;
     private LoggingService loggingService;
@@ -74,26 +74,26 @@ public class LoggingServiceServerInterceptor
 
     private LoggingService loggingService()
     {
-	if (loggingService == null) {
-	    NameComponent path[] =
-	        { new NameComponent("LoggingService", "") };
-	    try {
-		loggingService = 
-		    LoggingServiceHelper.narrow(nameService.resolve(path));
-	    } catch (Throwable t) {
-		System.out.println("Exception handling not shown.");
-	    }
-	}
-	return loggingService;
+        if (loggingService == null) {
+            NameComponent path[] =
+                { new NameComponent("LoggingService", "") };
+            try {
+                loggingService = 
+                    LoggingServiceHelper.narrow(nameService.resolve(path));
+            } catch (Throwable t) {
+                System.out.println("Exception handling not shown.");
+            }
+        }
+        return loggingService;
     }
 
     public LoggingServiceServerInterceptor(NamingContext nameService,
-					   Current piCurrent,
-					   int outCallIndicatorSlotId)
+                                           Current piCurrent,
+                                           int outCallIndicatorSlotId)
     {
-	this.nameService = nameService;
-	this.piCurrent = piCurrent;
-	this.outCallIndicatorSlotId = outCallIndicatorSlotId;
+        this.nameService = nameService;
+        this.piCurrent = piCurrent;
+        this.outCallIndicatorSlotId = outCallIndicatorSlotId;
     }
 
     //
@@ -102,7 +102,7 @@ public class LoggingServiceServerInterceptor
 
     public String name() 
     {
-	return "LoggingServiceServerInterceptor";
+        return "LoggingServiceServerInterceptor";
     }
 
     public void destroy() 
@@ -116,21 +116,21 @@ public class LoggingServiceServerInterceptor
     public void send_request(ClientRequestInfo ri)
     {
 
-	// If the server interceptor sets the recursion slot then
-	// put in the service context so the server doesn't make
-	// the call again in the case where the server side interceptor
-	// is colocated in the same ORB as the object being invoked.
+        // If the server interceptor sets the recursion slot then
+        // put in the service context so the server doesn't make
+        // the call again in the case where the server side interceptor
+        // is colocated in the same ORB as the object being invoked.
 
-	try {
-	    Any indicator = ri.get_slot(outCallIndicatorSlotId);
-	    if (indicator.type().kind().equals(TCKind.tk_boolean)) {
-		ServiceContext serviceContext =
-		    new ServiceContext(serviceContextId, serviceContextData);
-		ri.add_request_service_context(serviceContext, false);
-	    }
-	} catch (InvalidSlot e) {
-	    System.out.println("Exception handling not shown.");
-	}
+        try {
+            Any indicator = ri.get_slot(outCallIndicatorSlotId);
+            if (indicator.type().kind().equals(TCKind.tk_boolean)) {
+                ServiceContext serviceContext =
+                    new ServiceContext(serviceContextId, serviceContextData);
+                ri.add_request_service_context(serviceContext, false);
+            }
+        } catch (InvalidSlot e) {
+            System.out.println("Exception handling not shown.");
+        }
     }
 
     public void send_poll(ClientRequestInfo ri)
@@ -155,27 +155,27 @@ public class LoggingServiceServerInterceptor
 
     public void receive_request_service_contexts(ServerRequestInfo ri)
     {
-	log(ri, "receive_request_service_contexts");
+        log(ri, "receive_request_service_contexts");
     }
 
     public void receive_request(ServerRequestInfo ri)
     {
-	log(ri, "receive_request");
+        log(ri, "receive_request");
     }
 
     public void send_reply(ServerRequestInfo ri)
     {
-	log(ri, "send_reply");
+        log(ri, "send_reply");
     }
 
     public void send_exception(ServerRequestInfo ri)
     {
-	log(ri, "send_exception");
+        log(ri, "send_exception");
     }
 
     public void send_other(ServerRequestInfo ri)
     {
-	log(ri, "send_other");
+        log(ri, "send_other");
     }
 
     //
@@ -184,42 +184,42 @@ public class LoggingServiceServerInterceptor
 
     public void log(ServerRequestInfo ri, String point)
     {
-	// This is only relevant for the colocated example.
-	// Do not attempt to log until the logging service object
-	// has been bound in naming.  Otherwise the attempt to call
-	// rebind on naming will call log which will fail.
-	if (! ColocatedServers.colocatedBootstrapDone) {
-	    return;
-	}
+        // This is only relevant for the colocated example.
+        // Do not attempt to log until the logging service object
+        // has been bound in naming.  Otherwise the attempt to call
+        // rebind on naming will call log which will fail.
+        if (! ColocatedServers.colocatedBootstrapDone) {
+            return;
+        }
 
-	// IMPORTANT:
-	// The conditional logging of the invocation is only necessary
-	// if there is a chance that the object being invoked is colocated
-	// in the same ORB as this interceptor.  Otherwise the outcall to 
-	// the logging service can be made unconditionally.
+        // IMPORTANT:
+        // The conditional logging of the invocation is only necessary
+        // if there is a chance that the object being invoked is colocated
+        // in the same ORB as this interceptor.  Otherwise the outcall to 
+        // the logging service can be made unconditionally.
 
-	// Always set the recursion slot.
+        // Always set the recursion slot.
 
-	Any indicator = ORB.init().create_any();
-	indicator.insert_boolean(true);
-	try {
-	    piCurrent.set_slot(outCallIndicatorSlotId, indicator);
-	} catch (InvalidSlot e) {
-	    System.out.println("Exception handling not shown.");
-	}
+        Any indicator = ORB.init().create_any();
+        indicator.insert_boolean(true);
+        try {
+            piCurrent.set_slot(outCallIndicatorSlotId, indicator);
+        } catch (InvalidSlot e) {
+            System.out.println("Exception handling not shown.");
+        }
 
-	// Make the out call if you have not already done so.
+        // Make the out call if you have not already done so.
 
-	try {
+        try {
 
-	    // Only the presence of the service context counts.
-	    // The data is ignored.
+            // Only the presence of the service context counts.
+            // The data is ignored.
 
-	    ri.get_request_service_context(serviceContextId);
-	} catch (BAD_PARAM e) {
-	    // Recursion indicator not set so make the call.
-	    loggingService().log(ri.operation() + " " + point);
-	}
+            ri.get_request_service_context(serviceContextId);
+        } catch (BAD_PARAM e) {
+            // Recursion indicator not set so make the call.
+            loggingService().log(ri.operation() + " " + point);
+        }
     }
 }
 

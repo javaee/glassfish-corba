@@ -39,7 +39,7 @@
  */
 
 /*
- * @(#)MutableBigInteger.java	1.14 05/11/17
+ * @(#)MutableBigInteger.java   1.14 05/11/17
  */
 
 package mymath;
@@ -761,19 +761,19 @@ class MutableBigInteger {
         // Normalize the divisor
         int shift = 32 - BigInteger.bitLen(divisor);
 
-	int rem = value[offset];
+        int rem = value[offset];
         long remLong = rem & LONG_MASK;
-	if (remLong < divLong) {
+        if (remLong < divLong) {
             quotient.value[0] = 0;
-	} else {
+        } else {
             quotient.value[0] = (int)(remLong/divLong);
             rem = (int) (remLong - (quotient.value[0] * divLong));
             remLong = rem & LONG_MASK;
-	}
+        }
 
-	int xlen = intLen; 
+        int xlen = intLen; 
         int[] qWord = new int[2];
-	while (--xlen > 0) {
+        while (--xlen > 0) {
             long dividendEstimate = (remLong<<32) |
                 (value[offset + intLen - xlen] & LONG_MASK);
             if (dividendEstimate >= 0) {

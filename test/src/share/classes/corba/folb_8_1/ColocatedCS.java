@@ -59,50 +59,50 @@ public class ColocatedCS
 
     public static void main (String[] av)
     {
-	isColocated = true; // Used by Client and Server.
+        isColocated = true; // Used by Client and Server.
 
-	try {
-	    // Share an ORB between a client and server.
-	    // So ClientDelegate.isLocal currently succeeds.
+        try {
+            // Share an ORB between a client and server.
+            // So ClientDelegate.isLocal currently succeeds.
 
-	    Properties props = new Properties();
-	    props.setProperty("com.sun.corba.se.ORBAllowLocalOptimization",
-			      "true");
-	    Client.setProperties(props);
-	    Server.setProperties(props, Common.socketPorts);
-	    System.out.println(main + " : creating ORB.");
-	    orb = ORB.init(av, props);
-	    Server.orb = orb;
-	    if (clientTwoRefs) {
-		ClientTwoRefs.orb = orb;
-	    } else {
-		Client.orb = orb;
-	    }
-	    
-	    ServerThread ServerThread = new ServerThread(av);
-	    ServerThread.start();
-	    synchronized (signal) {
-		try {
-		    signal.wait();
-		} catch (InterruptedException e) {
-		    ;
-		}
-	    }
-	    if (clientTwoRefs) {
-		ClientTwoRefs.main(av);
-	    } else {
-		Client.main(av);
-	    }
-	    if (Client.foundErrors) {
-		System.out.println("FAIL");
-		System.exit(1);
-	    }
-	} catch (Throwable t) {
-	    System.out.println(main);
-	    t.printStackTrace(System.out);
-	    System.exit(1);
-	}
-	System.out.println(main + " done");
+            Properties props = new Properties();
+            props.setProperty("com.sun.corba.ee.ORBAllowLocalOptimization",
+                              "true");
+            Client.setProperties(props);
+            Server.setProperties(props, Common.socketPorts);
+            System.out.println(main + " : creating ORB.");
+            orb = ORB.init(av, props);
+            Server.orb = orb;
+            if (clientTwoRefs) {
+                ClientTwoRefs.orb = orb;
+            } else {
+                Client.orb = orb;
+            }
+            
+            ServerThread ServerThread = new ServerThread(av);
+            ServerThread.start();
+            synchronized (signal) {
+                try {
+                    signal.wait();
+                } catch (InterruptedException e) {
+                    ;
+                }
+            }
+            if (clientTwoRefs) {
+                ClientTwoRefs.main(av);
+            } else {
+                Client.main(av);
+            }
+            if (Client.foundErrors) {
+                System.out.println("FAIL");
+                System.exit(1);
+            }
+        } catch (Throwable t) {
+            System.out.println(main);
+            t.printStackTrace(System.out);
+            System.exit(1);
+        }
+        System.out.println(main + " done");
     }
 }
 
@@ -111,11 +111,11 @@ class ServerThread extends Thread
     String[] args;
     ServerThread (String[] args)
     {
-	this.args = args;
+        this.args = args;
     }
     public void run ()
     {
-	Server.main(args);
+        Server.main(args);
     }
 }
 

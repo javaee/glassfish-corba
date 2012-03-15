@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.oa.poa ;
+package com.sun.corba.ee.impl.oa.poa ;
 
 import org.omg.PortableServer.Servant ;
 import org.omg.PortableServer.ServantManager ;
@@ -54,17 +54,17 @@ public class POAPolicyMediatorImpl_R_UDS extends POAPolicyMediatorBase_R {
     private Servant defaultServant ;
 
     POAPolicyMediatorImpl_R_UDS( Policies policies, POAImpl poa ) {
-	// assert policies.retainServants() 
-	super( policies, poa ) ;
-	defaultServant = null ;
+        // assert policies.retainServants() 
+        super( policies, poa ) ;
+        defaultServant = null ;
 
-	// policies.useDefaultServant()
-	if (!policies.useDefaultServant()) {
+        // policies.useDefaultServant()
+        if (!policies.useDefaultServant()) {
             throw wrapper.policyMediatorBadPolicyInFactory();
         } }
     
     protected java.lang.Object internalGetServant( byte[] id, 
-	String operation ) throws ForwardRequest {
+        String operation ) throws ForwardRequest {
 
         poa.readLock() ;
         try {
@@ -83,21 +83,21 @@ public class POAPolicyMediatorImpl_R_UDS extends POAPolicyMediatorBase_R {
         }
     }
 
-    public void etherealizeAll() {	
-	// NO-OP
+    public void etherealizeAll() {      
+        // NO-OP
     }
 
     public ServantManager getServantManager() throws WrongPolicy {
-	throw new WrongPolicy();
+        throw new WrongPolicy();
     }
 
     public void setServantManager( 
         ServantManager servantManager ) throws WrongPolicy {
-	throw new WrongPolicy();
+        throw new WrongPolicy();
     }
 
     public Servant getDefaultServant() throws NoServant, WrongPolicy {
-	if (defaultServant == null) {
+        if (defaultServant == null) {
             throw new NoServant();
         } else {
             return defaultServant;
@@ -105,26 +105,26 @@ public class POAPolicyMediatorImpl_R_UDS extends POAPolicyMediatorBase_R {
     }
 
     public void setDefaultServant( Servant servant ) throws WrongPolicy {
-	defaultServant = servant;
-	setDelegate(defaultServant, "DefaultServant".getBytes());
+        defaultServant = servant;
+        setDelegate(defaultServant, "DefaultServant".getBytes());
     }
 
     public Servant idToServant( byte[] id ) 
-	throws WrongPolicy, ObjectNotActive {
+        throws WrongPolicy, ObjectNotActive {
 
-	ActiveObjectMap.Key key = new ActiveObjectMap.Key( id ) ;
-	Servant s = internalKeyToServant(key);
-	
-	if (s == null) {
+        ActiveObjectMap.Key key = new ActiveObjectMap.Key( id ) ;
+        Servant s = internalKeyToServant(key);
+        
+        if (s == null) {
             if (defaultServant != null) {
                 s = defaultServant;
             }
         }
 
-	if (s == null) {
+        if (s == null) {
             throw new ObjectNotActive();
         }
 
-	return s;
+        return s;
     }
 }

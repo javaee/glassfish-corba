@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.interceptors;
+package com.sun.corba.ee.impl.interceptors;
 
 import java.util.Iterator ;
 
@@ -51,19 +51,19 @@ import org.omg.PortableInterceptor.IORInfo;
 import org.omg.PortableInterceptor.ObjectReferenceTemplate;
 import org.omg.PortableInterceptor.ObjectReferenceFactory;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.oa.ObjectAdapter;
+import com.sun.corba.ee.spi.oa.ObjectAdapter;
 
-import com.sun.corba.se.spi.legacy.interceptor.IORInfoExt;
-import com.sun.corba.se.spi.legacy.interceptor.UnknownType;
+import com.sun.corba.ee.spi.legacy.interceptor.IORInfoExt;
+import com.sun.corba.ee.spi.legacy.interceptor.UnknownType;
 
-import com.sun.corba.se.spi.ior.TaggedProfileTemplate;
-import com.sun.corba.se.spi.ior.TaggedComponentFactoryFinder ;
+import com.sun.corba.ee.spi.ior.TaggedProfileTemplate;
+import com.sun.corba.ee.spi.ior.TaggedComponentFactoryFinder ;
 
-import com.sun.corba.se.spi.logging.InterceptorsSystemException ;
-import com.sun.corba.se.spi.logging.OMGSystemException ;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.InterceptorsSystemException ;
+import com.sun.corba.ee.spi.logging.OMGSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 /**
  * IORInfoImpl is the implementation of the IORInfo class, as described
@@ -106,7 +106,7 @@ public final class IORInfoImpl
      */
     IORInfoImpl( ObjectAdapter adapter ) {
         this.orb = adapter.getORB() ;
-	this.adapter = adapter;
+        this.adapter = adapter;
     }
 
     /**
@@ -127,9 +127,9 @@ public final class IORInfoImpl
      *   in effect, then this operation will return a nil object reference.
      */
     public Policy get_effective_policy (int type) {
-	checkState( STATE_INITIAL, STATE_ESTABLISHED ) ;
+        checkState( STATE_INITIAL, STATE_ESTABLISHED ) ;
 
-	return adapter.getEffectivePolicy( type );
+        return adapter.getEffectivePolicy( type );
     }
 
     /**
@@ -143,11 +143,11 @@ public final class IORInfoImpl
      * @param tagged_component The IOP::TaggedComponent to add
      */
     public void add_ior_component (TaggedComponent tagged_component) {
-	checkState( STATE_INITIAL ) ;
+        checkState( STATE_INITIAL ) ;
 
-	if( tagged_component == null ) nullParam();
+        if( tagged_component == null ) nullParam();
         addIORComponentToProfileInternal( tagged_component, 
-					  adapter.getIORTemplate().iterator());
+                                          adapter.getIORTemplate().iterator());
     }
 
     /**
@@ -169,12 +169,12 @@ public final class IORInfoImpl
     public void add_ior_component_to_profile ( 
         TaggedComponent tagged_component, int profile_id ) 
     {
-	checkState( STATE_INITIAL ) ;
+        checkState( STATE_INITIAL ) ;
 
-	if( tagged_component == null ) nullParam();
+        if( tagged_component == null ) nullParam();
         addIORComponentToProfileInternal( 
-	    tagged_component, adapter.getIORTemplate().iteratorById( 
-	    profile_id ) );
+            tagged_component, adapter.getIORTemplate().iteratorById( 
+            profile_id ) );
     }
 
     /**
@@ -184,69 +184,69 @@ public final class IORInfoImpl
      * @throws UnknownType if no port of the given type is found.
      */
     public int getServerPort(String type)
-	throws UnknownType
+        throws UnknownType
     {
-	checkState( STATE_INITIAL, STATE_ESTABLISHED ) ;
+        checkState( STATE_INITIAL, STATE_ESTABLISHED ) ;
 
-	int port =
-	    orb.getLegacyServerSocketManager()
-	        .legacyGetTransientOrPersistentServerPort(type);
-	if (port == -1) {
-	    throw new UnknownType();
-	}
-	return port;
+        int port =
+            orb.getLegacyServerSocketManager()
+                .legacyGetTransientOrPersistentServerPort(type);
+        if (port == -1) {
+            throw new UnknownType();
+        }
+        return port;
     }
 
     public ObjectAdapter getObjectAdapter()
     {
-	return adapter;
+        return adapter;
     }
     
     public int manager_id()
     {
-	checkState( STATE_INITIAL, STATE_ESTABLISHED) ;
+        checkState( STATE_INITIAL, STATE_ESTABLISHED) ;
 
-	return adapter.getManagerId() ;
+        return adapter.getManagerId() ;
     }
 
     public short state()
     {
-	checkState( STATE_INITIAL, STATE_ESTABLISHED) ;
+        checkState( STATE_INITIAL, STATE_ESTABLISHED) ;
 
-	return adapter.getState() ;
+        return adapter.getState() ;
     }
 
     public ObjectReferenceTemplate adapter_template() 
     {
-	checkState( STATE_ESTABLISHED) ;
+        checkState( STATE_ESTABLISHED) ;
 
-	// At this point, the iortemp must contain only a single
-	// IIOPProfileTemplate.  This is a restriction of our
-	// implementation.  Also, note the the ObjectReferenceTemplate
-	// is called when a certain POA is created in a certain ORB
-	// in a certain server, so the server_id, orb_id, and 
-	// poa_id operations must be well-defined no matter what
-	// kind of implementation is used: e.g., if a POA creates
-	// IORs with multiple profiles, they must still all agree
-	// about this information.  Thus, we are justified in
-	// extracting the single IIOPProfileTemplate to create 
-	// an ObjectReferenceTemplate here.
+        // At this point, the iortemp must contain only a single
+        // IIOPProfileTemplate.  This is a restriction of our
+        // implementation.  Also, note the the ObjectReferenceTemplate
+        // is called when a certain POA is created in a certain ORB
+        // in a certain server, so the server_id, orb_id, and 
+        // poa_id operations must be well-defined no matter what
+        // kind of implementation is used: e.g., if a POA creates
+        // IORs with multiple profiles, they must still all agree
+        // about this information.  Thus, we are justified in
+        // extracting the single IIOPProfileTemplate to create 
+        // an ObjectReferenceTemplate here.
 
-	return adapter.getAdapterTemplate() ;
+        return adapter.getAdapterTemplate() ;
     }
 
     public ObjectReferenceFactory current_factory() 
     {
-	checkState( STATE_ESTABLISHED) ;
+        checkState( STATE_ESTABLISHED) ;
 
-	return adapter.getCurrentFactory() ;
+        return adapter.getCurrentFactory() ;
     }
 
     public void current_factory( ObjectReferenceFactory factory )
     {
-	checkState( STATE_ESTABLISHED) ;
+        checkState( STATE_ESTABLISHED) ;
 
-	adapter.setCurrentFactory( factory ) ;
+        adapter.setCurrentFactory( factory ) ;
     }
 
     /**
@@ -260,24 +260,24 @@ public final class IORInfoImpl
         // type for the TaggedProfileTemplate
         TaggedComponentFactoryFinder finder = 
             orb.getTaggedComponentFactoryFinder();
-        com.sun.corba.se.spi.ior.TaggedComponent newTaggedComponent = 
-	    finder.create( orb, tagged_component );
+        com.sun.corba.ee.spi.ior.TaggedComponent newTaggedComponent = 
+            finder.create( orb, tagged_component );
         
         // Iterate through TaggedProfileTemplates and add the given tagged
         // component to the appropriate one(s).
-	boolean found = false;
+        boolean found = false;
         while( iterator.hasNext() ) {
-	    found = true;
+            found = true;
             TaggedProfileTemplate taggedProfileTemplate = 
                 (TaggedProfileTemplate)iterator.next();
-	    taggedProfileTemplate.add( newTaggedComponent );
+            taggedProfileTemplate.add( newTaggedComponent );
         }
 
-	// If no profile was found with the given id, throw a BAD_PARAM:
-	// (See orbos/00-08-06, section 21.5.3.3.)
-	if( !found ) {
-	    throw omgWrapper.invalidProfileId() ;
-	}
+        // If no profile was found with the given id, throw a BAD_PARAM:
+        // (See orbos/00-08-06, section 21.5.3.3.)
+        if( !found ) {
+            throw omgWrapper.invalidProfileId() ;
+        }
     }
     
     /**
@@ -286,34 +286,34 @@ public final class IORInfoImpl
      */
     private void nullParam() 
     {
-	throw orbutilWrapper.nullParamNoComplete() ;
+        throw orbutilWrapper.nullParamNoComplete() ;
     }
 
     // REVISIT: add minor codes!
 
     private void checkState( int expectedState )
     {
-	if (expectedState != state)
-	    throw wrapper.badState1( expectedState, state ) ;
+        if (expectedState != state)
+            throw wrapper.badState1( expectedState, state ) ;
     }
 
     private void checkState( int expectedState1, int expectedState2 )
     {
-	if ((expectedState1 != state) && (expectedState2 != state))
-	    throw wrapper.badState2( expectedState1, expectedState2, state ) ;
+        if ((expectedState1 != state) && (expectedState2 != state))
+            throw wrapper.badState2( expectedState1, expectedState2, state ) ;
     }
 
     void makeStateEstablished()
     {
-	checkState( STATE_INITIAL ) ;
+        checkState( STATE_INITIAL ) ;
 
-	state = STATE_ESTABLISHED ;
+        state = STATE_ESTABLISHED ;
     }
 
     void makeStateDone()
     {
-	checkState( STATE_ESTABLISHED ) ;
+        checkState( STATE_ESTABLISHED ) ;
 
-	state = STATE_DONE ;
+        state = STATE_DONE ;
     }
 }

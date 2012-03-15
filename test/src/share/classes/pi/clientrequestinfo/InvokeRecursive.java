@@ -40,7 +40,7 @@
 
 package pi.clientrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.CORBA.*;
 
@@ -56,11 +56,11 @@ public class InvokeRecursive
     extends InvokeStrategy
 {
     public void invoke() throws Exception {
-	super.invoke();
+        super.invoke();
 
-	// Invoke send_request, cause send_request to make a request causing
-	// send_request then receive_reply, and then finally receive_reply.
-	SampleClientRequestInterceptor.recursiveInvoke = true;
-	invokeMethod( "sayHello" );
+        // Invoke send_request, cause send_request to make a request causing
+        // send_request then receive_reply, and then finally receive_reply.
+        SampleClientRequestInterceptor.recursiveInvoke = true;
+        invokeMethod( "sayHello" );
     }
 }

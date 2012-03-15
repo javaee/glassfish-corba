@@ -51,7 +51,7 @@ import org.omg.IOP.CodecPackage.*;
 import org.omg.IOP.CodecFactoryPackage.*;
 import org.omg.IOP.TaggedComponent;
 import org.omg.IOP.TAG_INTERNET_IOP;
-import com.sun.corba.se.spi.logging.OMGSystemException;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
 
 /**
  * Thoroughly tests IORInterceptor support.
@@ -94,42 +94,42 @@ public class SampleIORInterceptor
     public static final int INVALID_PROFILE_ID = 1234;
 
     public SampleIORInterceptor( String name, PrintStream out ) {
-	this.name = name;
-	this.out = out;
-	out.println( "    - IORInterceptor " + name + " created." );
-	registered = true;
+        this.name = name;
+        this.out = out;
+        out.println( "    - IORInterceptor " + name + " created." );
+        registered = true;
     }
 
     public String name() {
-	return name;
+        return name;
     }
 
     public void destroy() {
     }
 
     public void establish_components (IORInfo info) {
-	out.println( "    - establish_components called." );
+        out.println( "    - establish_components called." );
         establishComponentsCalled = true;
         establishComponentsPassed = true;
 
-	try {
-	    out.println( "    - generating fake data using CodecFactory..." );
-	    // Get a Singleton ORB and create sample data to insert into
-	    // profiles:
-	    ORB initORB = ServerTestInitializer.orb;
-	    org.omg.CORBA.Object objRef = 
-	        initORB.resolve_initial_references( "CodecFactory" );
+        try {
+            out.println( "    - generating fake data using CodecFactory..." );
+            // Get a Singleton ORB and create sample data to insert into
+            // profiles:
+            ORB initORB = ServerTestInitializer.orb;
+            org.omg.CORBA.Object objRef = 
+                initORB.resolve_initial_references( "CodecFactory" );
             CodecFactory codecFactory = CodecFactoryHelper.narrow( objRef );
-	    Codec codec = codecFactory.create_codec( new Encoding(
-		(short)ENCODING_CDR_ENCAPS.value, (byte)1, (byte)2 ) );
-	    Any any = initORB.create_any();
-	    any.insert_float( (float)3.45 );
+            Codec codec = codecFactory.create_codec( new Encoding(
+                (short)ENCODING_CDR_ENCAPS.value, (byte)1, (byte)2 ) );
+            Any any = initORB.create_any();
+            any.insert_float( (float)3.45 );
 
-	    // Create octet stream of CDR encapsulation of value.
-	    FAKE_DATA_1 = codec.encode_value( any );
+            // Create octet stream of CDR encapsulation of value.
+            FAKE_DATA_1 = codec.encode_value( any );
 
-	    any.insert_string( "Hi there" );
-	    FAKE_DATA_2 = codec.encode_value( any );
+            any.insert_string( "Hi there" );
+            FAKE_DATA_2 = codec.encode_value( any );
 
             // Add a component to all profiles:
             out.println( "    - adding component to all profiles..." );
@@ -174,84 +174,84 @@ public class SampleIORInterceptor
             }
 
             // Test get_effective_policy
-	    out.println( "    - testing get_effective_policy..." );
+            out.println( "    - testing get_effective_policy..." );
             Policy policy;
 
             try {
-		out.print( "      + ID Uniqueness policy: " );
+                out.print( "      + ID Uniqueness policy: " );
                 policy = info.get_effective_policy(
                     ID_UNIQUENESS_POLICY_ID.value );
-		if( policy == null ) {
-		    out.println( "policy was null!" );
+                if( policy == null ) {
+                    out.println( "policy was null!" );
                     establishComponentsPassed = false;
-		}
-		else if( !(policy instanceof IdUniquenessPolicy ) ) {
-		    out.println( "not an id uniqueness policy!" );
+                }
+                else if( !(policy instanceof IdUniquenessPolicy ) ) {
+                    out.println( "not an id uniqueness policy!" );
                     establishComponentsPassed = false;
-		}
-		else {
-		    IdUniquenessPolicy idUniquenessPolicy = 
-			(IdUniquenessPolicy)policy;
-		    if( idUniquenessPolicy.value().value() == 
-			IdUniquenessPolicyValue._MULTIPLE_ID ) 
-		    {
+                }
+                else {
+                    IdUniquenessPolicy idUniquenessPolicy = 
+                        (IdUniquenessPolicy)policy;
+                    if( idUniquenessPolicy.value().value() == 
+                        IdUniquenessPolicyValue._MULTIPLE_ID ) 
+                    {
                         out.println( "ok" ); 
-		    }
-		    else {
-			out.println( "wrong policy value!" );
-			establishComponentsPassed = false;
-		    }
-		}
+                    }
+                    else {
+                        out.println( "wrong policy value!" );
+                        establishComponentsPassed = false;
+                    }
+                }
 
-		out.print( "      + Hundred policy: " );
+                out.print( "      + Hundred policy: " );
                 policy = info.get_effective_policy( 100 );
-		if( policy == null ) {
-		    out.println( "policy is null!" );
+                if( policy == null ) {
+                    out.println( "policy is null!" );
                     establishComponentsPassed = false;
-		}
-		else if( !(policy instanceof PolicyHundred ) ) {
-		    out.println( "not a 'hundred' policy!" );
+                }
+                else if( !(policy instanceof PolicyHundred ) ) {
+                    out.println( "not a 'hundred' policy!" );
                     establishComponentsPassed = false;
-		}
-		else {
-		    PolicyHundred hundredPolicy = (PolicyHundred)policy;
-		    if( hundredPolicy.getValue() == 99 ) {
+                }
+                else {
+                    PolicyHundred hundredPolicy = (PolicyHundred)policy;
+                    if( hundredPolicy.getValue() == 99 ) {
                         out.println( "ok" ); 
-		    }
-		    else {
-			out.println( "wrong policy value!" );
-			establishComponentsPassed = false;
-		    }
-		}
+                    }
+                    else {
+                        out.println( "wrong policy value!" );
+                        establishComponentsPassed = false;
+                    }
+                }
             }
             catch( INV_POLICY e ) {
                 out.println( "      + INV_POLICY thrown." );
                 establishComponentsPassed = false;
             }
 
-	    // Try invalid ID:
-	    try {
-		out.print( "      + Invalid policy: " );
+            // Try invalid ID:
+            try {
+                out.print( "      + Invalid policy: " );
                 policy = info.get_effective_policy( 101 );
-		if( policy == null ) {
-		    out.println( "policy was null (ok)" );
-		    establishComponentsPassed = true;
-		}
-		else {
-		    out.println( "policy was not null!" );
-		    establishComponentsPassed = false;
-		}
-	    }
-	    catch( INV_POLICY e ) {
-		out.println( 
-		    "INV_POLICY thrown. (error - should return null)" );
-		establishComponentsPassed = false;
-	    }
+                if( policy == null ) {
+                    out.println( "policy was null (ok)" );
+                    establishComponentsPassed = true;
+                }
+                else {
+                    out.println( "policy was not null!" );
+                    establishComponentsPassed = false;
+                }
+            }
+            catch( INV_POLICY e ) {
+                out.println( 
+                    "INV_POLICY thrown. (error - should return null)" );
+                establishComponentsPassed = false;
+            }
         }
         catch( Exception f ) {
             // Something unexpected happened - treat it as a test failure.
             out.println( "    - Invalid exception " + f + " detected." );
-	    f.printStackTrace();
+            f.printStackTrace();
             establishComponentsPassed = false;
         }
     }
@@ -261,7 +261,7 @@ public class SampleIORInterceptor
     }
 
     public void adapter_state_changed( ObjectReferenceTemplate[] templates, 
-	short state )
+        short state )
     {
     }
 

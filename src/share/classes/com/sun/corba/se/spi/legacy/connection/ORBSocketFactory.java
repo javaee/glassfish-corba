@@ -38,14 +38,14 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.legacy.connection;
+package com.sun.corba.ee.spi.legacy.connection;
 
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.transport.SocketInfo;
 
 /**
  * 
@@ -66,7 +66,7 @@ import com.sun.corba.se.spi.transport.SocketInfo;
  * Example: <p>
 
  * <pre>
- *   -Dcom.sun.corba.se.connection.ORBSocketFactoryClass=MySocketFactory
+ *   -Dcom.sun.corba.ee.connection.ORBSocketFactoryClass=MySocketFactory
  * </pre> <p>
  *
  * Typically one would use the same socket factory class on both the
@@ -164,8 +164,8 @@ public interface ORBSocketFactory
      *
      * <pre>
      *    ... \ 
-     *    -Dcom.sun.corba.se.connection.ORBSocketFactoryClass=com.my.MySockFact \
-     *    -Dcom.sun.corba.se.connection.ORBListenSocket=SSL:0,foo:1 \
+     *    -Dcom.sun.corba.ee.connection.ORBSocketFactoryClass=com.my.MySockFact \
+     *    -Dcom.sun.corba.ee.connection.ORBListenSocket=SSL:0,foo:1 \
      *    ... 
      * </pre>
      *
@@ -208,8 +208,8 @@ public interface ORBSocketFactory
      *
      * <pre>
      *
-     * com.sun.corba.se.spi.legacy.interceptor.IORInfoExt ext;
-     * ext = (com.sun.corba.se.spi.legacy.interceptor.IORInfoExt)info;
+     * com.sun.corba.ee.spi.legacy.interceptor.IORInfoExt ext;
+     * ext = (com.sun.corba.ee.spi.legacy.interceptor.IORInfoExt)info;
      *
      * int port = ext.getServerPort("myType");
      *
@@ -266,13 +266,13 @@ public interface ORBSocketFactory
      *
      * <pre>
      *
-     * -Dcom.sun.corba.se.POA.ORBBadServerIdHandlerClass=corba.socketPersistent.MyBadServerIdHandler
+     * -Dcom.sun.corba.ee.POA.ORBBadServerIdHandlerClass=corba.socketPersistent.MyBadServerIdHandler
      *
      * </pre>
      * 
      * The <code>BadServerIdHandler</code> ...<p>
      *
-     * See <code>com.sun.corba.se.impl.activation.ServerManagerImpl.handle</code>
+     * See <code>com.sun.corba.ee.impl.activation.ServerManagerImpl.handle</code>
      * for example code on writing a bad server id handler.  NOTE:  This
      * is an unsupported internal API.  It will not exist in future releases. 
      * <p>
@@ -291,7 +291,7 @@ public interface ORBSocketFactory
      */
     public ServerSocket createServerSocket(String type, int port)
         throws 
-	    IOException;
+            IOException;
 
 
 
@@ -343,8 +343,8 @@ public interface ORBSocketFactory
      *
      */
     public SocketInfo getEndPointInfo(org.omg.CORBA.ORB orb,
-					IOR ior,
-					SocketInfo socketInfo);
+                                        IOR ior,
+                                        SocketInfo socketInfo);
 
 
     /**
@@ -366,8 +366,8 @@ public interface ORBSocketFactory
      */
     public Socket createSocket(SocketInfo socketInfo)
         throws
-	    IOException,
-	    GetEndPointInfoAgainException;
+            IOException,
+            GetEndPointInfoAgainException;
 }
 
 // End of file.

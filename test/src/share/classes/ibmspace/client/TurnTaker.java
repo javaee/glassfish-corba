@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)TurnTaker.java	1.3 99/06/07 */
+/* @(#)TurnTaker.java   1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -76,13 +76,13 @@ public class TurnTaker extends Thread
 
     public TurnTaker (GameUI ui)
     {
-	fUI = ui;
+        fUI = ui;
     }
 
     public void run ()
     {
-	fUI.beginTurn ();
-	fUI.endTurn ();
+        fUI.beginTurn ();
+        fUI.endTurn ();
     }
 
 }

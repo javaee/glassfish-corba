@@ -61,8 +61,8 @@ import java.lang.reflect.Array;
  * method can be used to get the array element type.  The getArrayDimension()
  * method can be used to get the array dimension.
  *
- * @version	1.0, 2/27/98
- * @author	Bryan Atsatt
+ * @version     1.0, 2/27/98
+ * @author      Bryan Atsatt
  */
 public class ArrayType extends Type {
 
@@ -70,7 +70,7 @@ public class ArrayType extends Type {
     private int arrayDimension;
     private String brackets;
     private String bracketsSig;
-	
+        
     //_____________________________________________________________________
     // Public Interfaces
     //_____________________________________________________________________
@@ -82,57 +82,57 @@ public class ArrayType extends Type {
      * return value will be null, and errors will have been reported to the
      * supplied BatchEnvironment.
      */
-    public static ArrayType forArray(	sun.tools.java.Type theType,
-					ContextStack stack) {
-		
+    public static ArrayType forArray(   sun.tools.java.Type theType,
+                                        ContextStack stack) {
+                
 
-	ArrayType result = null;
-	sun.tools.java.Type arrayType = theType;		
-	  	
-	if (arrayType.getTypeCode() == TC_ARRAY) {
-	  		
-	    // Find real type...
-			
-	    while (arrayType.getTypeCode() == TC_ARRAY) {
-		arrayType = arrayType.getElementType();
-	    }
-			
-	    // Do we already have it?
-			
-	    Type existing = getType(theType,stack);
-	    if (existing != null) {
-				
-		if (!(existing instanceof ArrayType)) return null; // False hit.
-				
-				// Yep, so return it...
-				
-		return (ArrayType) existing;
-	    }
-				
-	    // Now try to make a Type from it...
-			
-	    Type temp = CompoundType.makeType(arrayType,null,stack);
-		
-	    if (temp != null) {
-				
-				// Got a valid one. Make an array type...
-				
-		result = new ArrayType(stack,temp,theType.getArrayDimension());
-				
-				// Add it...
-				
-		putType(theType,result,stack);
-        	    
-		// Do the stack thing in case tracing on...
-        	    
-		stack.push(result);
-		stack.pop(true);
-	    }
-	}
+        ArrayType result = null;
+        sun.tools.java.Type arrayType = theType;                
+                
+        if (arrayType.getTypeCode() == TC_ARRAY) {
+                        
+            // Find real type...
+                        
+            while (arrayType.getTypeCode() == TC_ARRAY) {
+                arrayType = arrayType.getElementType();
+            }
+                        
+            // Do we already have it?
+                        
+            Type existing = getType(theType,stack);
+            if (existing != null) {
+                                
+                if (!(existing instanceof ArrayType)) return null; // False hit.
+                                
+                                // Yep, so return it...
+                                
+                return (ArrayType) existing;
+            }
+                                
+            // Now try to make a Type from it...
+                        
+            Type temp = CompoundType.makeType(arrayType,null,stack);
+                
+            if (temp != null) {
+                                
+                                // Got a valid one. Make an array type...
+                                
+                result = new ArrayType(stack,temp,theType.getArrayDimension());
+                                
+                                // Add it...
+                                
+                putType(theType,result,stack);
+                    
+                // Do the stack thing in case tracing on...
+                    
+                stack.push(result);
+                stack.pop(true);
+            }
+        }
 
-	return result;
+        return result;
     }
-	
+        
     /**
      * Return signature for this type  (e.g. com.acme.Dynamite
      * would return "com.acme.Dynamite", byte = "B")
@@ -145,35 +145,35 @@ public class ArrayType extends Type {
      * Get element type. Returns null if not an array.
      */
     public Type getElementType () {
-	return type;
+        return type;
     }
 
     /**
      * Get array dimension. Returns zero if not an array.
      */
     public int getArrayDimension () {
-	return arrayDimension;
+        return arrayDimension;
     }
     
     /**
      * Get brackets string. Returns "" if not an array.
      */
     public String getArrayBrackets () {
-	return brackets;
+        return brackets;
     }
 
     /**
      * Return a string representation of this type.
      */
     public String toString () {
-	return getQualifiedName() + brackets;
+        return getQualifiedName() + brackets;
     }
     
     /**
      * Return a string describing this type.
      */
     public String getTypeDescription () {
-	return "Array of " + type.getTypeDescription();
+        return "Array of " + type.getTypeDescription();
     }
 
 
@@ -183,14 +183,14 @@ public class ArrayType extends Type {
      * @param useIDLNames If true, print IDL names; otherwise, print java names.
      * @param globalIDLNames If true and useIDLNames true, prepends "::".
      */
-    public String getTypeName (	boolean useQualifiedNames,
-				boolean useIDLNames,
-				boolean globalIDLNames) {
-	if (useIDLNames) {
-	    return super.getTypeName(useQualifiedNames,useIDLNames,globalIDLNames);
-	} else {
-	    return super.getTypeName(useQualifiedNames,useIDLNames,globalIDLNames) + brackets;
-	}
+    public String getTypeName ( boolean useQualifiedNames,
+                                boolean useIDLNames,
+                                boolean globalIDLNames) {
+        if (useIDLNames) {
+            return super.getTypeName(useQualifiedNames,useIDLNames,globalIDLNames);
+        } else {
+            return super.getTypeName(useQualifiedNames,useIDLNames,globalIDLNames) + brackets;
+        }
     }
 
     //_____________________________________________________________________
@@ -200,13 +200,13 @@ public class ArrayType extends Type {
  
     /**
      * Convert all invalid types to valid ones.
-     */ 	
+     */         
     protected void swapInvalidTypes () {
         if (type.getStatus() != STATUS_VALID) {
             type = getValidType(type); 
         }
     }
-	
+        
     /*
      * Add matching types to list. Return true if this type has not
      * been previously checked, false otherwise.
@@ -214,21 +214,21 @@ public class ArrayType extends Type {
     protected boolean addTypes (int typeCodeFilter,
                                 HashSet checked,
                                 Vector matching) {
-		
-	// Check self.
-		
-	boolean result = super.addTypes(typeCodeFilter,checked,matching);
-		
-	// Have we been checked before?
-		
-	if (result) {
-    	    
-    	    // No, so add element type...
-    	    
-    	    getElementType().addTypes(typeCodeFilter,checked,matching);
-    	}
-    	
-    	return result;
+                
+        // Check self.
+                
+        boolean result = super.addTypes(typeCodeFilter,checked,matching);
+                
+        // Have we been checked before?
+                
+        if (result) {
+            
+            // No, so add element type...
+            
+            getElementType().addTypes(typeCodeFilter,checked,matching);
+        }
+        
+        return result;
     }
 
     /**
@@ -237,27 +237,27 @@ public class ArrayType extends Type {
      */
     private ArrayType(ContextStack stack, Type type, int arrayDimension) {
         super(stack,TYPE_ARRAY);
-    	this.type = type;
+        this.type = type;
         this.arrayDimension = arrayDimension;
-		
-	// Create our brackets string...
-		
-	brackets = "";
-	bracketsSig = "";
-	for (int i = 0; i < arrayDimension; i ++) {
-	    brackets += "[]";
-	    bracketsSig += "[";
-	}
+                
+        // Create our brackets string...
+                
+        brackets = "";
+        bracketsSig = "";
+        for (int i = 0; i < arrayDimension; i ++) {
+            brackets += "[]";
+            bracketsSig += "[";
+        }
 
-    	// Now set our names...
-    	
-	String idlName = IDLNames.getArrayName(type,arrayDimension);	
-	String[] module = IDLNames.getArrayModuleNames(type);
-	setNames(type.getIdentifier(),module,idlName);
-		
-	// Set our repositoryID...
-		
-	setRepositoryID();
+        // Now set our names...
+        
+        String idlName = IDLNames.getArrayName(type,arrayDimension);    
+        String[] module = IDLNames.getArrayModuleNames(type);
+        setNames(type.getIdentifier(),module,idlName);
+                
+        // Set our repositoryID...
+                
+        setRepositoryID();
     }
 
 
@@ -268,21 +268,21 @@ public class ArrayType extends Type {
         Class result = null;
         Class elementClass = type.getClassInstance();
         if (elementClass != null) {
-	    result = Array.newInstance(elementClass, new int[arrayDimension]).getClass();
+            result = Array.newInstance(elementClass, new int[arrayDimension]).getClass();
         }
         return result;
     }
     
     /**
      * Release all resources
-     */ 	
+     */         
     protected void destroy () {
         super.destroy();
-	if (type != null) {
-	    type.destroy();
-	    type = null;
-	}
-	brackets = null;
-	bracketsSig = null;
+        if (type != null) {
+            type.destroy();
+            type = null;
+        }
+        brackets = null;
+        bracketsSig = null;
     }
 }

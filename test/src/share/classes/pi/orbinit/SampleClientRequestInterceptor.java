@@ -62,15 +62,15 @@ public class SampleClientRequestInterceptor
     static int destroyCount = 0;
 
     public SampleClientRequestInterceptor( String name ) {
-	this.name = name;
+        this.name = name;
     }
 
     public String name() {
-	return name;
+        return name;
     }
 
     public void destroy() {
-	destroyCount++;
+        destroyCount++;
     }
 
     public void send_request (ClientRequestInfo ri) 

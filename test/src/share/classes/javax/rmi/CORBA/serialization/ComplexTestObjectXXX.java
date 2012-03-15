@@ -81,20 +81,20 @@ public class ComplexTestObjectXXX implements Serializable
     public boolean equals(Object o)
     {
         try
-	    {
-		ComplexTestObjectXXX ctbo = (ComplexTestObjectXXX)o;
-		return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) && 
-			(ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && 
-			(ctbo.fDouble == fDouble)
-			&& (ctbo.fHandleAsAny.equals(fHandleAsAny))
-			&& (ctbo.fOne.equals(fOne)) 
-			&& (ctbo.fTwo.equals(fTwo))
-			);
-	    }
+            {
+                ComplexTestObjectXXX ctbo = (ComplexTestObjectXXX)o;
+                return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) && 
+                        (ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && 
+                        (ctbo.fDouble == fDouble)
+                        && (ctbo.fHandleAsAny.equals(fHandleAsAny))
+                        && (ctbo.fOne.equals(fOne)) 
+                        && (ctbo.fTwo.equals(fTwo))
+                        );
+            }
         catch(Exception e)
-	    {
-		return false;
-	    }
+            {
+                return false;
+            }
     }
 
     public String toString()

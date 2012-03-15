@@ -38,28 +38,28 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
-import com.sun.corba.se.spi.protocol.ClientRequestDispatcher;
-import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.ee.spi.protocol.ClientRequestDispatcher;
+import com.sun.corba.ee.spi.transport.Connection;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.protocol.MessageMediator;
-import com.sun.corba.se.spi.transport.ContactInfo;
-import com.sun.corba.se.spi.transport.ContactInfoList;
-import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.transport.ContactInfoList;
+import com.sun.corba.ee.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.encoding.BufferManagerFactory;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.protocol.MessageMediatorImpl;
-import com.sun.corba.se.impl.protocol.SharedCDRClientRequestDispatcherImpl;
+import com.sun.corba.ee.impl.encoding.BufferManagerFactory;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.impl.protocol.MessageMediatorImpl;
+import com.sun.corba.ee.impl.protocol.SharedCDRClientRequestDispatcherImpl;
 
 public class SharedCDRContactInfoImpl
     extends 
-	ContactInfoBase
+        ContactInfoBase
 {
     // This is only necessary for the pi.clientrequestinfo test.
     // It tests that request ids are different.
@@ -71,97 +71,97 @@ public class SharedCDRContactInfoImpl
 
     public SharedCDRContactInfoImpl(
         ORB orb,
-	ContactInfoList contactInfoList,
-	IOR effectiveTargetIOR,
-	short addressingDisposition)
+        ContactInfoList contactInfoList,
+        IOR effectiveTargetIOR,
+        short addressingDisposition)
     {
-	this.orb = orb;
-	this.contactInfoList = contactInfoList;
-	this.effectiveTargetIOR = effectiveTargetIOR;
+        this.orb = orb;
+        this.contactInfoList = contactInfoList;
+        this.effectiveTargetIOR = effectiveTargetIOR;
         this.addressingDisposition = addressingDisposition;
     }
 
     public String getType()
     {
-	throw wrapper.undefinedSocketinfoOperation() ;
+        throw wrapper.undefinedSocketinfoOperation() ;
     }
 
     public String getHost()
     {
-	throw wrapper.undefinedSocketinfoOperation() ;
+        throw wrapper.undefinedSocketinfoOperation() ;
     }
 
     public int getPort()
     {
-	throw wrapper.undefinedSocketinfoOperation() ;
+        throw wrapper.undefinedSocketinfoOperation() ;
     }
 
     public ClientRequestDispatcher getClientRequestDispatcher()
     {
-	// REVISIT - use registry
-	return new SharedCDRClientRequestDispatcherImpl();
+        // REVISIT - use registry
+        return new SharedCDRClientRequestDispatcherImpl();
     }
 
     public boolean isConnectionBased()
     {
-	return false;
+        return false;
     }
 
     public boolean shouldCacheConnection()
     {
-	return false;
+        return false;
     }
 
     public String getConnectionCacheType()
     {
-	throw wrapper.methodShouldNotBeCalled();
+        throw wrapper.methodShouldNotBeCalled();
     }
     
     public Connection createConnection()
     {
-	throw wrapper.methodShouldNotBeCalled();
+        throw wrapper.methodShouldNotBeCalled();
     }
 
     // Called when client making an invocation.    
     @Override
     public MessageMediator createMessageMediator(ORB broker,
-						 ContactInfo contactInfo,
-						 Connection connection,
-						 String methodName,
-						 boolean isOneWay)
+                                                 ContactInfo contactInfo,
+                                                 Connection connection,
+                                                 String methodName,
+                                                 boolean isOneWay)
     {
-	if (connection != null) {
+        if (connection != null) {
             throw wrapper.connectionNotNullInCreateMessageMediator( connection ) ;
-	}
+        }
 
-	MessageMediator messageMediator =
- 	    new MessageMediatorImpl(
-	        (ORB) broker,
-		(ContactInfo)contactInfo,
- 		null, // Connection;
- 		GIOPVersion.chooseRequestVersion( (ORB)broker,
-		     effectiveTargetIOR),
- 		effectiveTargetIOR,
-		requestId++, // Fake RequestId
- 		getAddressingDisposition(),
- 		methodName,
- 		isOneWay);
+        MessageMediator messageMediator =
+            new MessageMediatorImpl(
+                (ORB) broker,
+                (ContactInfo)contactInfo,
+                null, // Connection;
+                GIOPVersion.chooseRequestVersion( (ORB)broker,
+                     effectiveTargetIOR),
+                effectiveTargetIOR,
+                requestId++, // Fake RequestId
+                getAddressingDisposition(),
+                methodName,
+                isOneWay);
 
-	return messageMediator;
+        return messageMediator;
     }
 
     public CDROutputObject createOutputObject(MessageMediator messageMediator)
     {
-	MessageMediator corbaMessageMediator = (MessageMediator)
-	    messageMediator;
-	// NOTE: GROW.
-	CDROutputObject outputObject =
-	    new CDROutputObject(orb, messageMediator, 
-				corbaMessageMediator.getRequestHeader(),
-				corbaMessageMediator.getStreamFormatVersion(),
-				BufferManagerFactory.GROW);
-	messageMediator.setOutputObject(outputObject);
-	return outputObject;
+        MessageMediator corbaMessageMediator = (MessageMediator)
+            messageMediator;
+        // NOTE: GROW.
+        CDROutputObject outputObject =
+            new CDROutputObject(orb, messageMediator, 
+                                corbaMessageMediator.getRequestHeader(),
+                                corbaMessageMediator.getStreamFormatVersion(),
+                                BufferManagerFactory.GROW);
+        messageMediator.setOutputObject(outputObject);
+        return outputObject;
     }
 
     ////////////////////////////////////////////////////
@@ -171,7 +171,7 @@ public class SharedCDRContactInfoImpl
 
     public String getMonitoringName()
     {
-	throw wrapper.methodShouldNotBeCalled();
+        throw wrapper.methodShouldNotBeCalled();
     }
 
     ////////////////////////////////////////////////////
@@ -184,23 +184,23 @@ public class SharedCDRContactInfoImpl
 
     // This calculation must be identical to SocketOrChannelContactInfoImpl.
     private int hashCode = 
-	SocketInfo.IIOP_CLEAR_TEXT.hashCode() + "localhost".hashCode() ^ -1;
+        SocketInfo.IIOP_CLEAR_TEXT.hashCode() + "localhost".hashCode() ^ -1;
 
     public int hashCode()
     {
-	return hashCode;
+        return hashCode;
     }
 
     public boolean equals(Object obj)
     {
-	return obj instanceof SharedCDRContactInfoImpl;
+        return obj instanceof SharedCDRContactInfoImpl;
     }
 
     public String toString()
     {
-	return
-	    "SharedCDRContactInfoImpl[" 
-	    + "]";
+        return
+            "SharedCDRContactInfoImpl[" 
+            + "]";
     }
 
     //////////////////////////////////////////////////

@@ -129,30 +129,30 @@ public class StreamReader extends Thread
 
             int inputReceivedThreshold = 0;
             while (true) {
-		String input = null ;
+                String input = null ;
 
-		try {
-		    input = in.readLine();
-		    if (Test.debug) 
-			System.out.println( "Streamreader.read: " + input ) ;
+                try {
+                    input = in.readLine();
+                    if (Test.debug) 
+                        System.out.println( "Streamreader.read: " + input ) ;
 
-		    // readLine should return null at the end of the
-		    // stream
-		    if (input == null)
-			break;
+                    // readLine should return null at the end of the
+                    // stream
+                    if (input == null)
+                        break;
                     if (++inputReceivedThreshold > 10000) {
                        inputReceived.clear();
                     }
         
-		} catch (java.io.IOException exc) {
-		    // We also can get errors due to the InputStream being
-		    // closed.  Simply treat these as termination.  This
-		    // seems to happen on JDK 1.4.1 only?
-		    break ;
-		}
+                } catch (java.io.IOException exc) {
+                    // We also can get errors due to the InputStream being
+                    // closed.  Simply treat these as termination.  This
+                    // seems to happen on JDK 1.4.1 only?
+                    break ;
+                }
 
-		// For seeing what when wrong if no handshake.
-		inputReceived.add(input);
+                // For seeing what when wrong if no handshake.
+                inputReceived.add(input);
 
                 output(input);
 
@@ -181,15 +181,15 @@ public class StreamReader extends Thread
     }
     
     private synchronized void signalBadHandshake() {
-	if (Test.debug)
-	    System.out.println( "Streamreader.signalBadHandshake called" ) ;
+        if (Test.debug)
+            System.out.println( "Streamreader.signalBadHandshake called" ) ;
         handshakeStatus = ERROR;
         this.notifyAll();
     }
 
     private synchronized void signalHandshakeReceived() {
-	if (Test.debug)
-	    System.out.println( "Streamreader.signalHandshakeReceived called" ) ;
+        if (Test.debug)
+            System.out.println( "Streamreader.signalHandshakeReceived called" ) ;
         handshakeStatus = RECEIVED;
         this.notifyAll();
     }
@@ -210,29 +210,29 @@ public class StreamReader extends Thread
             if (handshakeStatus == ERROR)
                 throw new Exception("Terminated before reading handshake ("
                                     + handshake + ')' + '\n'
-				    + formatInputReceived());
+                                    + formatInputReceived());
 
             if (handshakeStatus != RECEIVED)
                 throw new Exception("Timed out waiting for handshake ("
                                     + handshake + ")" + "\n"
-				    + formatInputReceived());
+                                    + formatInputReceived());
         }
     }
 
     private String formatInputReceived()
     {
-	boolean headerWritten = false;
-	StringBuffer sb = new StringBuffer();
-	Iterator i = inputReceived.iterator();
-	while (i.hasNext()) {
-	    if (! headerWritten) {
-		sb.append("Tail of input received so far:\n");
-		headerWritten = true;
-	    }
-	    String line = (String) i.next();
-	    sb.append(line + '\n');
-	}
-	return sb.toString();
+        boolean headerWritten = false;
+        StringBuffer sb = new StringBuffer();
+        Iterator i = inputReceived.iterator();
+        while (i.hasNext()) {
+            if (! headerWritten) {
+                sb.append("Tail of input received so far:\n");
+                headerWritten = true;
+            }
+            String line = (String) i.next();
+            sb.append(line + '\n');
+        }
+        return sb.toString();
     }
 
     private static final class NullOutputStream extends java.io.OutputStream

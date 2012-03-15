@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.misc ;
+package com.sun.corba.ee.spi.misc ;
 
 /**
  * Based on feedback from bug report 4452016, all class loading
@@ -57,7 +57,7 @@ public class ORBClassLoader
 
     public static ClassLoader getClassLoader() 
     {
-	ClassLoader ccl = Thread.currentThread().getContextClassLoader() ;
+        ClassLoader ccl = Thread.currentThread().getContextClassLoader() ;
         if (ccl != null)
             return ccl; 
         else

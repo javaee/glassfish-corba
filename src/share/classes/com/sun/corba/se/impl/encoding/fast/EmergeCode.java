@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 import org.glassfish.pfl.basic.fsm.Input;
 
@@ -72,42 +72,42 @@ public interface EmergeCode extends Input {
      */
     public enum EmergeKind {
     // OPTIONAL_VALUE section: must cover 0...7
-	BYTE,		    // 0 
-	CHAR,		    // 1 
-	SHORT,		    // 2
-	INT,		    // 3
-	LONG,		    // 4
-	FLOAT,		    // 5
-	DOUBLE,		    // 6
-	KIND_UNUSED_7,	    // 7
+        BYTE,               // 0 
+        CHAR,               // 1 
+        SHORT,              // 2
+        INT,                // 3
+        LONG,               // 4
+        FLOAT,              // 5
+        DOUBLE,             // 6
+        KIND_UNUSED_7,      // 7
     
     // ENCODED section: must cover 8...15
-	BOOL,		    // 8
-	TUPLE,		    // 9
-	PART,		    // 10
-	MSG,		    // 11
-	LABEL_MSG,	    // 12
-	KIND_UNUSED_13,	    // 13
-	KIND_UNUSED_14,	    // 14
-	KIND_UNUSED_15,	    // 15
+        BOOL,               // 8
+        TUPLE,              // 9
+        PART,               // 10
+        MSG,                // 11
+        LABEL_MSG,          // 12
+        KIND_UNUSED_13,     // 13
+        KIND_UNUSED_14,     // 14
+        KIND_UNUSED_15,     // 15
 
     // SIMPLE section: must cover 16...31
-	NULL,		    // 16 
-	INDIR,		    // 17
-	BOOL_ARR,	    // 18
-	BYTE_ARR,	    // 19
-	CHAR_ARR,	    // 20
-	SHORT_ARR,	    // 21
-	INT_ARR,	    // 22
-	LONG_ARR,	    // 23
-	FLOAT_ARR,	    // 24
-	DOUBLE_ARR,	    // 25
-	REF_ARR,	    // 26
-	FLIST,		    // 27
-	CLOSE_SESSION,	    // 28
-	REJECT_REQUEST,	    // 29
-	REF,		    // 30
-	KIND_UNUSED_31	    // 31
+        NULL,               // 16 
+        INDIR,              // 17
+        BOOL_ARR,           // 18
+        BYTE_ARR,           // 19
+        CHAR_ARR,           // 20
+        SHORT_ARR,          // 21
+        INT_ARR,            // 22
+        LONG_ARR,           // 23
+        FLOAT_ARR,          // 24
+        DOUBLE_ARR,         // 25
+        REF_ARR,            // 26
+        FLIST,              // 27
+        CLOSE_SESSION,      // 28
+        REJECT_REQUEST,     // 29
+        REF,                // 30
+        KIND_UNUSED_31      // 31
     } ;
     
     // Value for TUPLE. Encoded according to its ordinal.

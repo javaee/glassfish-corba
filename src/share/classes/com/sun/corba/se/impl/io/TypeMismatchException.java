@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.io;
+package com.sun.corba.ee.impl.io;
 
 public class TypeMismatchException extends Error
 {

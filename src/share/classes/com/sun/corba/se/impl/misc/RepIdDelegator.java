@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.misc;
+package com.sun.corba.ee.impl.misc;
 
 
 import java.io.Serializable;
@@ -46,15 +46,15 @@ import java.io.Serializable;
 
 import java.net.MalformedURLException;
 
-import com.sun.corba.se.impl.io.TypeMismatchException;
+import com.sun.corba.ee.impl.io.TypeMismatchException;
 
-import com.sun.corba.se.impl.util.RepositoryId;
+import com.sun.corba.ee.impl.util.RepositoryId;
 
-import com.sun.corba.se.impl.misc.ClassInfoCache ;
+import com.sun.corba.ee.impl.misc.ClassInfoCache ;
 
 /**
  * Delegates to the current RepositoryId implementation in
- * com.sun.corba.se.impl.util.  This is necessary to
+ * com.sun.corba.ee.impl.util.  This is necessary to
  * overcome the fact that many of RepositoryId's methods
  * are static.
  */
@@ -150,7 +150,7 @@ public final class RepIdDelegator
     }
 
     public int getStandardRMIUnchunkedNoRepStrId() {
-	return RepositoryId.kPreComputed_StandardRMIUnchunked_NoRep;
+        return RepositoryId.kPreComputed_StandardRMIUnchunked_NoRep;
     }
 
     public int getCodeBaseRMIUnchunkedNoRepStrId() {
@@ -206,6 +206,6 @@ public final class RepIdDelegator
     }
 
     public int hashCode() {
-	return delegate.hashCode() ;
+        return delegate.hashCode() ;
     }
 }

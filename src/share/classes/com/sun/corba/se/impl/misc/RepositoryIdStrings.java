@@ -38,12 +38,12 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.misc;
+package com.sun.corba.ee.impl.misc;
 
 import java.io.Serializable;
-import com.sun.corba.se.impl.io.TypeMismatchException;
+import com.sun.corba.ee.impl.io.TypeMismatchException;
 
-import com.sun.corba.se.impl.misc.ClassInfoCache ;
+import com.sun.corba.ee.impl.misc.ClassInfoCache ;
 
 /**
  * Factory methods for creating various repository ID strings

@@ -47,7 +47,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.io;
+package com.sun.corba.ee.impl.io;
 
 import java.lang.reflect.Field;
 import java.lang.Comparable;
@@ -57,7 +57,7 @@ import sun.corba.Bridge ;
 import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 
-import com.sun.corba.se.impl.misc.ClassInfoCache ;
+import com.sun.corba.ee.impl.misc.ClassInfoCache ;
 
 /**
  * A description of a field in a serializable class.
@@ -68,117 +68,117 @@ import com.sun.corba.se.impl.misc.ClassInfoCache ;
 public class ObjectStreamField implements Comparable 
 {
     private static final Bridge bridge = 
-	AccessController.doPrivileged(
-	    new PrivilegedAction<Bridge>() {
-		public Bridge run() {
-		    return Bridge.get() ;
-		}
-	    } 
-	) ;
+        AccessController.doPrivileged(
+            new PrivilegedAction<Bridge>() {
+                public Bridge run() {
+                    return Bridge.get() ;
+                }
+            } 
+        ) ;
 
     // Create a named field with the specified type.
     public ObjectStreamField(String n, Class clazz) {
-    	name = n;
-    	this.clazz = clazz;
-	cinfo = ClassInfoCache.get( clazz ) ;
+        name = n;
+        this.clazz = clazz;
+        cinfo = ClassInfoCache.get( clazz ) ;
 
-	// Compute the typecode for easy switching
-	if (clazz.isPrimitive()) {
-	    if (clazz == Integer.TYPE) {
-		type = 'I';
-	    } else if (clazz == Byte.TYPE) {
-		type = 'B';
-	    } else if (clazz == Long.TYPE) {
-		type = 'J';
-	    } else if (clazz == Float.TYPE) {
-		type = 'F';
-	    } else if (clazz == Double.TYPE) {
-		type = 'D';
-	    } else if (clazz == Short.TYPE) {
-		type = 'S';
-	    } else if (clazz == Character.TYPE) {
-		type = 'C';
-	    } else if (clazz == Boolean.TYPE) {
-		type = 'Z';
-	    }
-	} else if (cinfo.isArray()) {
-	    type = '[';
-	    typeString = ObjectStreamClass.getSignature(clazz);
-	} else {
-	    type = 'L';
-	    typeString = ObjectStreamClass.getSignature(clazz);
-	}
+        // Compute the typecode for easy switching
+        if (clazz.isPrimitive()) {
+            if (clazz == Integer.TYPE) {
+                type = 'I';
+            } else if (clazz == Byte.TYPE) {
+                type = 'B';
+            } else if (clazz == Long.TYPE) {
+                type = 'J';
+            } else if (clazz == Float.TYPE) {
+                type = 'F';
+            } else if (clazz == Double.TYPE) {
+                type = 'D';
+            } else if (clazz == Short.TYPE) {
+                type = 'S';
+            } else if (clazz == Character.TYPE) {
+                type = 'C';
+            } else if (clazz == Boolean.TYPE) {
+                type = 'Z';
+            }
+        } else if (cinfo.isArray()) {
+            type = '[';
+            typeString = ObjectStreamClass.getSignature(clazz);
+        } else {
+            type = 'L';
+            typeString = ObjectStreamClass.getSignature(clazz);
+        }
 
-	if (typeString != null)
-	    signature = typeString;
-	else
-	    signature = String.valueOf(type);
+        if (typeString != null)
+            signature = typeString;
+        else
+            signature = String.valueOf(type);
 
     }
 
     public ObjectStreamField(Field field) {
-	this(field.getName(), field.getType());
-	setField( field ) ;
+        this(field.getName(), field.getType());
+        setField( field ) ;
     }
 
     /**
      * Get the name of this field.
      */
     public String getName() {
-    	return name;
+        return name;
     }
 
     public ClassInfoCache.ClassInfo getClassInfo() {
-	return cinfo ;
+        return cinfo ;
     }
 
     /**
      * Get the type of the field.
      */
     public Class getType() {
-    	if (clazz != null)
-    	    return clazz;
-	switch (type) {
-	case 'B': clazz = Byte.TYPE;
-	    break;
-	case 'C': clazz = Character.TYPE;
-	    break;
-	case 'S': clazz = Short.TYPE;
-	    break;
-	case 'I': clazz = Integer.TYPE;
-	    break;
-	case 'J': clazz = Long.TYPE;
-	    break;
-	case 'F': clazz = Float.TYPE;
-	    break;
-	case 'D': clazz = Double.TYPE;
-	    break;
-	case 'Z': clazz = Boolean.TYPE;
-	    break;
-	case '[':
-	case 'L':
-	    clazz = Object.class;
-	    break;
-	}
+        if (clazz != null)
+            return clazz;
+        switch (type) {
+        case 'B': clazz = Byte.TYPE;
+            break;
+        case 'C': clazz = Character.TYPE;
+            break;
+        case 'S': clazz = Short.TYPE;
+            break;
+        case 'I': clazz = Integer.TYPE;
+            break;
+        case 'J': clazz = Long.TYPE;
+            break;
+        case 'F': clazz = Float.TYPE;
+            break;
+        case 'D': clazz = Double.TYPE;
+            break;
+        case 'Z': clazz = Boolean.TYPE;
+            break;
+        case '[':
+        case 'L':
+            clazz = Object.class;
+            break;
+        }
 
-    	return clazz;
+        return clazz;
     }
 
     public char getTypeCode() {
-	return type;
+        return type;
     }
 
     public String getTypeString() {
-	return typeString;
+        return typeString;
     }
 
     Field getField() {
- 	return field;
+        return field;
     }
 
     void setField(Field field) {
- 	this.field = field;
- 	this.fieldID = bridge.objectFieldOffset( field ) ;
+        this.field = field;
+        this.fieldID = bridge.objectFieldOffset( field ) ;
     }
 
 
@@ -186,7 +186,7 @@ public class ObjectStreamField implements Comparable
      * test if this field is a primitive or not.
      */
     public boolean isPrimitive() {
-	return (type != '[' && type != 'L');
+        return (type != '[' && type != 'L');
     }
 
     /**
@@ -196,14 +196,14 @@ public class ObjectStreamField implements Comparable
      * if equal, the names are compared.
      */
     public int compareTo(Object o) {
-	ObjectStreamField f2 = (ObjectStreamField)o;
-	boolean thisprim = (this.typeString == null);
-	boolean otherprim = (f2.typeString == null);
+        ObjectStreamField f2 = (ObjectStreamField)o;
+        boolean thisprim = (this.typeString == null);
+        boolean otherprim = (f2.typeString == null);
 
-	if (thisprim != otherprim) {
-	    return (thisprim ? -1 : 1);
-	}
-	return this.name.compareTo(f2.name);
+        if (thisprim != otherprim) {
+            return (thisprim ? -1 : 1);
+        }
+        return this.name.compareTo(f2.name);
     }
 
     /**
@@ -212,16 +212,16 @@ public class ObjectStreamField implements Comparable
      * or if they are both objects and the object types match.
      */
     public boolean typeEquals(ObjectStreamField other) {
-	if (other == null || type != other.type)
-	    return false;
+        if (other == null || type != other.type)
+            return false;
 
-	/* Return true if the primitive types matched */
-	if (typeString == null && other.typeString == null)
-	    return true;
+        /* Return true if the primitive types matched */
+        if (typeString == null && other.typeString == null)
+            return true;
 
-	return ObjectStreamClass.compareClassNames(typeString,
-						   other.typeString,
-						   '/');
+        return ObjectStreamClass.compareClassNames(typeString,
+                                                   other.typeString,
+                                                   '/');
     }
 
     /* Returns the signature of the Field.
@@ -229,7 +229,7 @@ public class ObjectStreamField implements Comparable
      */
     public String getSignature() {
 
-	return signature;
+        return signature;
 
     }
 
@@ -237,10 +237,10 @@ public class ObjectStreamField implements Comparable
      * Return a string describing this field.
      */
     public String toString() {
-	if (typeString != null)
-	    return typeString + " " + name;
-	else
-	    return type + " " + name;
+        if (typeString != null)
+            return typeString + " " + name;
+        else
+            return type + " " + name;
     }
 
     public Class getClazz() {
@@ -251,14 +251,14 @@ public class ObjectStreamField implements Comparable
      *
      */
     public long getFieldID() {
-	return fieldID ;
+        return fieldID ;
     }
 
-    private String name;		// the name of the field
-    private char type;			// type first byte of the type signature
-    private Field field;		// Reflected field
-    private String typeString;		// iff object, typename
-    private Class clazz;		// the type of this field, if has been resolved
+    private String name;                // the name of the field
+    private char type;                  // type first byte of the type signature
+    private Field field;                // Reflected field
+    private String typeString;          // iff object, typename
+    private Class clazz;                // the type of this field, if has been resolved
     private ClassInfoCache.ClassInfo cinfo ;
 
     // the next 2 things are RMI-IIOP specific, it can be easily

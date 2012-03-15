@@ -50,7 +50,7 @@ import java.util.Properties;
 
 class SendRecursiveTypePOAServant
     extends 
-	sendRecursiveTypePOA
+        sendRecursiveTypePOA
 {
     public static final String baseMsg = SendRecursiveTypePOAServant.class.getName();
 
@@ -58,17 +58,17 @@ class SendRecursiveTypePOAServant
 
     public SendRecursiveTypePOAServant(ORB orb)
     {
-	this.orb = orb;
+        this.orb = orb;
     }
 
     public Any sendAsAny (Any x)
     {
-	return x;
+        return x;
     }
 
     public recursiveType sendAsType(recursiveType x)
     {
-	return x;
+        return x;
     }
 }
 

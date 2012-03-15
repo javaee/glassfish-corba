@@ -38,12 +38,12 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.protocol;
+package com.sun.corba.ee.spi.protocol;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.ContactInfo;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.ContactInfo;
 
 /**
  * <code>ClientRequestDispatcher</code> coordinates the request (and possible
@@ -66,9 +66,9 @@ public interface ClientRequestDispatcher
      * @return OutputObject
      */
     public CDROutputObject beginRequest(Object self,
-				     String methodName,
-				     boolean isOneWay,
-				     ContactInfo contactInfo);
+                                     String methodName,
+                                     boolean isOneWay,
+                                     ContactInfo contactInfo);
 
     /**
      * After the presentation block has set data on the CDROutputObject
@@ -89,11 +89,11 @@ public interface ClientRequestDispatcher
      * if the PEPt runtime would like the presentation block to start over.
      */
     public CDRInputObject marshalingComplete(java.lang.Object self,
-					  CDROutputObject outputObject)
+                                          CDROutputObject outputObject)
     // REVISIT EXCEPTIONS
-	throws
-	    org.omg.CORBA.portable.ApplicationException, 
-	    org.omg.CORBA.portable.RemarshalException;
+        throws
+            org.omg.CORBA.portable.ApplicationException, 
+            org.omg.CORBA.portable.RemarshalException;
 
     /**
      * After the presentation block completes a request it signals
@@ -106,8 +106,8 @@ public interface ClientRequestDispatcher
      * @param inputObject -
      */
     public void endRequest(ORB broker,
-			   java.lang.Object self, 
-			   CDRInputObject inputObject);
+                           java.lang.Object self, 
+                           CDRInputObject inputObject);
 }
 
 // End of file.

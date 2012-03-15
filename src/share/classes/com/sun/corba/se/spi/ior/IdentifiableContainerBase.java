@@ -38,12 +38,12 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior;
+package com.sun.corba.ee.spi.ior;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.sun.corba.se.impl.ior.FreezableList ;
+import com.sun.corba.ee.impl.ior.FreezableList ;
 
 /** Convenience class for defining objects that contain lists of Identifiables.
  * Mainly implements iteratorById.  Also note that the constructor creates the
@@ -59,7 +59,7 @@ public class IdentifiableContainerBase<E extends Identifiable>
      */
     public IdentifiableContainerBase() 
     {
-	super( new ArrayList<E>() ) ;
+        super( new ArrayList<E>() ) ;
     }
     
     /** Return an iterator which iterates over all contained Identifiables
@@ -67,38 +67,38 @@ public class IdentifiableContainerBase<E extends Identifiable>
      */
     public Iterator<E> iteratorById( final int id) 
     {
-	return new Iterator<E>() {
-	    Iterator<E> iter = 
-		IdentifiableContainerBase.this.iterator() ;
-	    E current = advance() ;
+        return new Iterator<E>() {
+            Iterator<E> iter = 
+                IdentifiableContainerBase.this.iterator() ;
+            E current = advance() ;
 
-	    private E advance()
-	    {
-		while (iter.hasNext()) {
-		    E ide = iter.next() ;
-		    if (ide.getId() == id)
-			return ide ;
-		}
+            private E advance()
+            {
+                while (iter.hasNext()) {
+                    E ide = iter.next() ;
+                    if (ide.getId() == id)
+                        return ide ;
+                }
 
-		return null ;
-	    }
+                return null ;
+            }
 
-	    public boolean hasNext() 
-	    {
-		return current != null ;
-	    }
+            public boolean hasNext() 
+            {
+                return current != null ;
+            }
 
-	    public E next()
-	    {
-		E result = current ;
-		current = advance() ;
-		return result ;
-	    }
+            public E next()
+            {
+                E result = current ;
+                current = advance() ;
+                return result ;
+            }
 
-	    public void remove()
-	    {
-		iter.remove() ;
-	    }
-	} ;
+            public void remove()
+            {
+                iter.remove() ;
+            }
+        } ;
     }
 }

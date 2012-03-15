@@ -53,7 +53,7 @@ import java.io.Serializable ;
 
 import javax.rmi.PortableRemoteObject ;
 
-import com.sun.corba.se.spi.logging.UtilSystemException ;
+import com.sun.corba.ee.spi.logging.UtilSystemException ;
 import org.glassfish.pfl.basic.contain.SPair;
 
 public class TestServant
@@ -63,14 +63,14 @@ public class TestServant
     public static final String baseMsg = TestServant.class.getName();
 
     public TestServant()
-	throws RemoteException
+        throws RemoteException
     {
     }
 
     public int echo(int x, float y, short[] z, String str, Map m )
-	throws RemoteException
+        throws RemoteException
     {
-	System.out.println(baseMsg + ".echo: " + x);
+        System.out.println(baseMsg + ".echo: " + x);
         return x;
     }
 

@@ -57,14 +57,14 @@ public class DogServer extends DogImpl implements RemoteDog
 {
     public DogServer(String bark) throws RemoteException
     {
-	super (bark);
-	PortableRemoteObject.exportObject (this);
+        super (bark);
+        PortableRemoteObject.exportObject (this);
     }
 
     public void die () throws RemoteException
     {
-	super.die ();
-	PortableRemoteObject.unexportObject (this);
+        super.die ();
+        PortableRemoteObject.unexportObject (this);
     }
 
 }

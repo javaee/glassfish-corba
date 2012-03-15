@@ -58,11 +58,11 @@ public class TestEnv extends sun.rmi.rmic.iiop.BatchEnvironment {
     private boolean firstLine = true;
     
     public TestEnv(ClassPath path, OutputStream out) {
-    	super(out,path,new Main(System.out, "rmic"));
+        super(out,path,new Main(System.out, "rmic"));
     }
     
     public TestEnv(ClassPath path) {
-    	super(System.out,path,new Main(System.out, "rmic"));
+        super(System.out,path,new Main(System.out, "rmic"));
     }
 
     public void reset() {
@@ -74,11 +74,11 @@ public class TestEnv extends sun.rmi.rmic.iiop.BatchEnvironment {
     }
     
     public void output(String msg) {
-	if (firstLine) {
-	    System.out.println();
-	    firstLine = false;
-	}
-	System.out.println("          " + msg);
+        if (firstLine) {
+            System.out.println();
+            firstLine = false;
+        }
+        System.out.println("          " + msg);
     }
 }
 

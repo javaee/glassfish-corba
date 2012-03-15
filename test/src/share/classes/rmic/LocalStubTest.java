@@ -61,9 +61,9 @@ import org.omg.CORBA.portable.ServantObject;
 import org.omg.CORBA.portable.Delegate;
 import org.omg.CORBA.BAD_OPERATION;
 import java.io.File;
-import com.sun.corba.se.impl.util.JDKBridge;
+import com.sun.corba.ee.impl.util.JDKBridge;
 import java.rmi.MarshalException;
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter ;
 import org.glassfish.pfl.test.JUnitReportHelper;
 
 /*
@@ -84,7 +84,7 @@ public class LocalStubTest extends RemoteTest {
      * empty array if none.
      */
     protected String[] getRemoteServantClasses () {
-	/*
+        /*
         
         // If we can, delete the rmic.LocalHello and
         // rmic.LocalHelloServant class files so that
@@ -99,18 +99,18 @@ public class LocalStubTest extends RemoteTest {
             for (int i = 0; i < 2; i++) {
                 ClassFile cls = path.getFile(compileEm[i].replace('.',File.separatorChar) + ".class");
                 if (cls != null && !cls.isZipped()) {
-		    File file = new File(cls.getPath());
-		    File newName = new File(cls.getPath()+"X");
-		    if (file.renameTo(newName)) {
-			classFiles[i] = newName;
-		    }
+                    File file = new File(cls.getPath());
+                    File newName = new File(cls.getPath()+"X");
+                    if (file.renameTo(newName)) {
+                        classFiles[i] = newName;
+                    }
                 }
             }
         
             path.close();
         } catch (Exception e) {}
-	
-	*/
+        
+        */
 
         return compileEm;  
     }
@@ -156,7 +156,7 @@ public class LocalStubTest extends RemoteTest {
             newTest( "startServant" ) ;
             // Start up our servant. (The 'iiop' flag is set to true by RemoteTest
             // unless the -jrmp flag was used).
-	    Remote remote = context.startServant(servantClass,publishName,true,iiop);
+            Remote remote = context.startServant(servantClass,publishName,true,iiop);
 
             if (remote == null) {
                 throw new Exception ("Could not start servant: " + servantClass);
@@ -171,10 +171,10 @@ public class LocalStubTest extends RemoteTest {
             
             newTest( "remoteRefIsRemoteStub" ) ;
             // Make sure that remoteRef is really a remote stub...
-	    Delegate del = StubAdapter.getDelegate( remoteRef ) ;
+            Delegate del = StubAdapter.getDelegate( remoteRef ) ;
             ORB orb = del.orb((org.omg.CORBA.Object)remoteRef);
             ServantObject so = del.servant_preinvoke(
-		(org.omg.CORBA.Object)remoteRef,"method",LocalHello.class);
+                (org.omg.CORBA.Object)remoteRef,"method",LocalHello.class);
             if (so != null) {
                 throw new Exception("Got local stub for remoteRef.");   
             }
@@ -193,9 +193,9 @@ public class LocalStubTest extends RemoteTest {
             // local servant...
             
             newTest( "localRefIsLocal" ) ;
-	    del = StubAdapter.getDelegate( localRef1 ) ;
+            del = StubAdapter.getDelegate( localRef1 ) ;
             so = del.servant_preinvoke((org.omg.CORBA.Object)localRef1,
-		"method",LocalHello.class);
+                "method",LocalHello.class);
             if (so == null) {
                 throw new Exception("servant_preinvoke() returned null");
             }
@@ -213,9 +213,9 @@ public class LocalStubTest extends RemoteTest {
       
             // Now make sure it is local...
             
-	    del = StubAdapter.getDelegate( localRef2 ) ;
+            del = StubAdapter.getDelegate( localRef2 ) ;
             so = del.servant_preinvoke( (org.omg.CORBA.Object)localRef2,
-		"method",LocalHello.class);
+                "method",LocalHello.class);
             if (so == null) {
                 throw new Exception("servant_preinvoke() returned null");
             }
@@ -272,7 +272,7 @@ public class LocalStubTest extends RemoteTest {
                 throw new Exception("localValue1Hash hash == localValue1Hash!");
             }
 
-	    int[] hash = localRef2.identityHash(localString1,localString1,localString1);
+            int[] hash = localRef2.identityHash(localString1,localString1,localString1);
 
             hash = localRef2.identityHash(localString1,localString1,localValue1);
             if (hash[0] == localString1Hash ||
@@ -314,9 +314,9 @@ public class LocalStubTest extends RemoteTest {
                 throw new Exception("localRef2.echoString() succeeded on unexported impl.");    
             }
             
-	    del = StubAdapter.getDelegate( localRef2 ) ;
+            del = StubAdapter.getDelegate( localRef2 ) ;
             so = del.servant_preinvoke( (org.omg.CORBA.Object)localRef2,
-		"method",LocalHello.class);
+                "method",LocalHello.class);
             if (so != null) {
                 throw new Exception("servant_preinvoke() did not return null");
             }

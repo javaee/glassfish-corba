@@ -136,8 +136,8 @@ module CosTransactions {
 
     // Current transaction
     interface Current : CORBA::Current {
-	// This pragma makes Current to be treated as a corba local object.
-	#pragma sun_local Current ""
+        // This pragma makes Current to be treated as a corba local object.
+        #pragma sun_local Current ""
         void begin()
         raises(SubtransactionsUnavailable);
         void commit(in boolean report_heuristics)
@@ -216,24 +216,24 @@ module CosTransactions {
         Vote prepare()
             raises(
                 HeuristicMixed,
-            	HeuristicHazard
+                HeuristicHazard
             );
         void rollback()
             raises(
-            	HeuristicCommit,
-            	HeuristicMixed,
-            	HeuristicHazard
+                HeuristicCommit,
+                HeuristicMixed,
+                HeuristicHazard
             );
         void commit()
             raises(
-            	NotPrepared,
-            	HeuristicRollback,
-            	HeuristicMixed,
-            	HeuristicHazard
+                NotPrepared,
+                HeuristicRollback,
+                HeuristicMixed,
+                HeuristicHazard
             );
         void commit_one_phase()
             raises(
-            	HeuristicHazard
+                HeuristicHazard
             );
         void forget();
     };

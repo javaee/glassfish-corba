@@ -60,22 +60,22 @@
             - gmbal
             - management-api
             - wagon-svn
-	    - bnd
-	    - maven-ant-tasks
+            - bnd
+            - maven-ant-tasks
             - felix
-	    - the PFL bundles
+            - the PFL bundles
 -->
 
 <project name="corba-src" default="all" basedir="..">
     <description>
-	This is the Ant file that builds the GlassFish ORB.
+        This is the Ant file that builds the GlassFish ORB.
     </description>
 
     <import file="modules.xml"/>
 
-    <property name="root.dir"			value="${basedir}"/>
+    <property name="root.dir"                   value="${basedir}"/>
     <property file="make/build.properties"/>
-    <property name="orb.version"		value="${release.version}-${build.version}"/>
+    <property name="orb.version"                value="${release.version}-${build.version}"/>
     <property name="gmbal.version"              value="3.2.0-b003"/>
     <property name="pfl.version"                value="3.2.0-b001"/>
     <echo message="Version is ${release.version}-${build.version}"/>
@@ -91,40 +91,40 @@
         <echo message="java.home=${java.home}"/> <!-- Why does this end in jre? -->
 
         <!-- Required JAR files -->
-        <property name="tools-jar"		value="${java.home}/../lib/tools.jar"/>
-        <property name="emma-jar"		value="${root.dir}/lib/emma.jar"/>
+        <property name="tools-jar"              value="${java.home}/../lib/tools.jar"/>
+        <property name="emma-jar"               value="${root.dir}/lib/emma.jar"/>
 
         <!-- Places where the build puts things -->
         <property name="build.dir"              location="build"/>
         <property name="lib.dir"                location="${build.dir}/lib"/>
-	<property name="gensrc.dir"             location="${build.dir}/gensrc"/>
-	<property name="classes.dir"            location="${build.dir}/classes"/>
-	<property name="releaselib.dir"         location="${build.dir}/release/lib"/>   
+        <property name="gensrc.dir"             location="${build.dir}/gensrc"/>
+        <property name="classes.dir"            location="${build.dir}/classes"/>
+        <property name="releaselib.dir"         location="${build.dir}/release/lib"/>   
         <property name="libcache.dir"           location="${build.dir}/libcache"/>
 
         <!-- Main ORB build directories -->
-        <property name="src.dir"		value="src/share/classes"/>
-        <property name="javadoc.dir"		value="www/javadoc"/>
-        <property name="build.sysclasspath"	value="ignore"/>
+        <property name="src.dir"                value="src/share/classes"/>
+        <property name="javadoc.dir"            value="www/javadoc"/>
+        <property name="build.sysclasspath"     value="ignore"/>
 
         <!-- javac flags -->
         <property name="deprecation"            value="off"/>
-        <property name="javac.optimize"		value="true"/>
-        <property name="javac.debug"		value="true"/>
+        <property name="javac.optimize"         value="true"/>
+        <property name="javac.debug"            value="true"/>
 
-	<mkdir dir="${build.dir}"/>
-	<mkdir dir="${lib.dir}"/>
-	<mkdir dir="${gensrc.dir}"/>
-	<mkdir dir="${classes.dir}"/>
-	<mkdir dir="${releaselib.dir}"/>
-	<mkdir dir="${releaselib.dir}/bundles"/>
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${lib.dir}"/>
+        <mkdir dir="${gensrc.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${releaselib.dir}"/>
+        <mkdir dir="${releaselib.dir}/bundles"/>
 
-	<!-- properties needed for updating and validating copyright headers -->
-	<property name="copyright.file"
+        <!-- properties needed for updating and validating copyright headers -->
+        <property name="copyright.file"
             value="${root.dir}/make/copyright-information/copyright.txt"/>
-	<property name="copyright.roots"
+        <property name="copyright.roots"
             value="lib,make,nbproject,src,test,tools,www"/>
-	<property name="copyright.skip"
+        <property name="copyright.skip"
             value=".hg,.DS_Store,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom,felix-cache"/>
 
         <property name="gmbal-jar"              location="${libcache.dir}/gmbal.jar"/>
@@ -167,214 +167,214 @@
             </dependency-list>
         </get-and-copy-dependencies>
 
-	<path id="classpath.master">
+        <path id="classpath.master">
             <path refid="dependency.classpath"/>
 
-	    <pathelement location="${classes.dir}"/>
-	    <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
-	</path>
+            <pathelement location="${classes.dir}"/>
+            <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
+        </path>
 
-	<!-- Definitions for java packaging -->
+        <!-- Definitions for java packaging -->
 
-	<patternset id="asm.export">
-	    <include name="org.objectweb.asm"/>
-	    <include name="org.objectweb.asm.util"/>
-	    <include name="org.objectweb.asm.tree"/>
-	    <include name="org.objectweb.asm.tree.analysis"/>
-	    <include name="org.objectweb.asm.signature"/>
-	    <include name="org.objectweb.asm.commons"/>
-	    <include name="org.objectweb.asm.optimizer"/>
-	</patternset>
+        <patternset id="asm.export">
+            <include name="org.objectweb.asm"/>
+            <include name="org.objectweb.asm.util"/>
+            <include name="org.objectweb.asm.tree"/>
+            <include name="org.objectweb.asm.tree.analysis"/>
+            <include name="org.objectweb.asm.signature"/>
+            <include name="org.objectweb.asm.commons"/>
+            <include name="org.objectweb.asm.optimizer"/>
+        </patternset>
 
-	<patternset id="csiv2-idl.export">
-	    <include name="com.sun.corba.se.org.omg.GSSUP"/>
-	    <include name="com.sun.corba.se.org.omg.CSIIOP"/>
-	    <include name="com.sun.corba.se.org.omg.CSI"/>
-	</patternset>
+        <patternset id="csiv2-idl.export">
+            <include name="com.sun.corba.ee.org.omg.GSSUP"/>
+            <include name="com.sun.corba.ee.org.omg.CSIIOP"/>
+            <include name="com.sun.corba.ee.org.omg.CSI"/>
+        </patternset>
 
-	<patternset id="internal-api.export">
-	    <include name="com.sun.corba.se.impl.txpoa"/>
-	    <include name="com.sun.corba.se.spi.costransactions"/>
-	    <include name="com.sun.corba.se.spi.folb"/>
-	    <include name="com.sun.corba.se.spi.threadpool"/>
-	    <include name="com.sun.corba.se.spi.logex.stdcorba"/>
-	    <include name="com.sun.corba.se.impl.threadpool"/>
-	</patternset>
+        <patternset id="internal-api.export">
+            <include name="com.sun.corba.ee.impl.txpoa"/>
+            <include name="com.sun.corba.ee.spi.costransactions"/>
+            <include name="com.sun.corba.ee.spi.folb"/>
+            <include name="com.sun.corba.ee.spi.threadpool"/>
+            <include name="com.sun.corba.ee.spi.logex.stdcorba"/>
+            <include name="com.sun.corba.ee.impl.threadpool"/>
+        </patternset>
 
-	<patternset id="newtimer.export">
-	    <include name="com.sun.corba.se.spi.orbutil.newtimer"/>
-	    <include name="com.sun.corba.se.spi.orbutil.tf"/>
-	    <include name="com.sun.corba.se.spi.orbutil.tf.annotation"/>
-	    <include name="com.sun.corba.se.impl.orbutil.newtimer"/>
-	</patternset>
+        <patternset id="newtimer.export">
+            <include name="com.sun.corba.ee.spi.orbutil.newtimer"/>
+            <include name="com.sun.corba.ee.spi.orbutil.tf"/>
+            <include name="com.sun.corba.ee.spi.orbutil.tf.annotation"/>
+            <include name="com.sun.corba.ee.impl.orbutil.newtimer"/>
+        </patternset>
 
-	<patternset id="omgapi.export">
-	    <include name="org.omg.CosTransactions"/>
-	    <include name="org.omg.stub.java.rmi"/>
-	    <include name="org.omg.DynamicAny"/>
-	    <include name="org.omg.DynamicAny.DynAnyPackage"/>
-	    <include name="org.omg.DynamicAny.DynAnyFactoryPackage"/>
-	    <include name="org.omg.CosTSPortability"/>
-	    <include name="org.omg.CORBA_2_3"/>
-	    <include name="org.omg.CORBA_2_3.portable"/>
-	    <include name="org.omg.CosTSInteroperation"/>
-	    <include name="org.omg.Dynamic"/>
-	    <include name="org.omg.SendingContext"/>
-	    <include name="org.omg.IOP"/>
-	    <include name="org.omg.IOP.CodecPackage"/>
-	    <include name="org.omg.IOP.CodecFactoryPackage"/>
-	    <include name="org.omg.PortableServer"/>
-	    <include name="org.omg.PortableServer.POAPackage"/>
-	    <include name="org.omg.PortableServer.CurrentPackage"/>
-	    <include name="org.omg.PortableServer.POAManagerPackage"/>
-	    <include name="org.omg.CosNaming"/>
-	    <include name="org.omg.CosNaming.NamingContextPackage"/>
-	    <include name="org.omg.CosNaming.NamingContextExtPackage"/>
-	    <include name="org.omg.Messaging"/>
-	    <include name="org.omg.PortableInterceptor"/>
-	    <include name="org.omg.PortableInterceptor.ORBInitInfoPackage"/>
-	    <include name="org.omg.CORBA"/>
-	    <include name="org.omg.CORBA.ORBPackage"/>
-	    <include name="org.omg.CORBA.DynAnyPackage"/>
-	    <include name="org.omg.CORBA.TypeCodePackage"/>
-	    <include name="org.omg.CORBA.portable"/>
-	    <include name="org.omg.CORBA.TSIdentificationPackage"/>
-	    <include name="com.sun.corba.se.org.omg.CORBA"/>
-	    <include name="javax.rmi.CORBA"/>
-	</patternset>
+        <patternset id="omgapi.export">
+            <include name="org.omg.CosTransactions"/>
+            <include name="org.omg.stub.java.rmi"/>
+            <include name="org.omg.DynamicAny"/>
+            <include name="org.omg.DynamicAny.DynAnyPackage"/>
+            <include name="org.omg.DynamicAny.DynAnyFactoryPackage"/>
+            <include name="org.omg.CosTSPortability"/>
+            <include name="org.omg.CORBA_2_3"/>
+            <include name="org.omg.CORBA_2_3.portable"/>
+            <include name="org.omg.CosTSInteroperation"/>
+            <include name="org.omg.Dynamic"/>
+            <include name="org.omg.SendingContext"/>
+            <include name="org.omg.IOP"/>
+            <include name="org.omg.IOP.CodecPackage"/>
+            <include name="org.omg.IOP.CodecFactoryPackage"/>
+            <include name="org.omg.PortableServer"/>
+            <include name="org.omg.PortableServer.POAPackage"/>
+            <include name="org.omg.PortableServer.CurrentPackage"/>
+            <include name="org.omg.PortableServer.POAManagerPackage"/>
+            <include name="org.omg.CosNaming"/>
+            <include name="org.omg.CosNaming.NamingContextPackage"/>
+            <include name="org.omg.CosNaming.NamingContextExtPackage"/>
+            <include name="org.omg.Messaging"/>
+            <include name="org.omg.PortableInterceptor"/>
+            <include name="org.omg.PortableInterceptor.ORBInitInfoPackage"/>
+            <include name="org.omg.CORBA"/>
+            <include name="org.omg.CORBA.ORBPackage"/>
+            <include name="org.omg.CORBA.DynAnyPackage"/>
+            <include name="org.omg.CORBA.TypeCodePackage"/>
+            <include name="org.omg.CORBA.portable"/>
+            <include name="org.omg.CORBA.TSIdentificationPackage"/>
+            <include name="com.sun.corba.ee.org.omg.CORBA"/>
+            <include name="javax.rmi.CORBA"/>
+        </patternset>
 
 
-	<patternset id="orb.export">
-	    <include name="com.sun.corba.se.impl.naming.cosnaming"/>
-	    <include name="com.sun.corba.se.impl.naming.namingutil"/>
-	    <include name="com.sun.corba.se.impl.presentation.rmi.codegen"/>
-	    <include name="com.sun.corba.se.impl.orb"/>
-	    <include name="com.sun.corba.se.impl.javax.rmi"/>
-	    <include name="com.sun.corba.se.impl.javax.rmi.CORBA"/>
-	    <include name="com.sun.corba.se.impl.encoding"/>
-	    <include name="com.sun.corba.se.impl.folb"/>
-	    <include name="com.sun.corba.se.spi.misc"/>
-	    <include name="com.sun.corba.se.impl.misc"/>
-	    <include name="com.sun.corba.se.spi.copyobject"/>
-	    <include name="com.sun.corba.se.impl.copyobject"/>
-	    <include name="com.sun.corba.se.spi.extension"/>
-	    <include name="com.sun.corba.se.spi.ior"/>
-	    <include name="com.sun.corba.se.spi.ior.iiop"/>
-	    <include name="com.sun.corba.se.spi.legacy.connection"/>
-	    <include name="com.sun.corba.se.spi.legacy.interceptor"/>
-	    <include name="com.sun.corba.se.spi.logging"/>
-	    <include name="com.sun.corba.se.spi.logex.corba"/>
-	    <include name="com.sun.corba.se.spi.oa"/>
-	    <include name="com.sun.corba.se.spi.oa.rfm"/>
-	    <include name="com.sun.corba.se.spi.orb"/>
-	    <include name="com.sun.corba.se.spi.osgi"/>
-	    <include name="com.sun.corba.se.spi.presentation.rmi"/>
-	    <include name="com.sun.corba.se.spi.protocol"/>
-	    <include name="com.sun.corba.se.spi.resolver"/>
-	    <include name="com.sun.corba.se.spi.servicecontext"/>
-	    <include name="com.sun.corba.se.spi.transport"/>
-	    <include name="com.sun.corba.se.spi.trace"/>
-	    <include name="com.sun.org.omg.CORBA"/>
-	    <include name="com.sun.org.omg.CORBA.ValueDefPackage"/>
-	    <include name="com.sun.org.omg.CORBA.portable"/>
-	    <include name="com.sun.org.omg.SendingContext"/>
-	    <include name="com.sun.org.omg.SendingContext.CodeBasePackage"/>
-	</patternset>
+        <patternset id="orb.export">
+            <include name="com.sun.corba.ee.impl.naming.cosnaming"/>
+            <include name="com.sun.corba.ee.impl.naming.namingutil"/>
+            <include name="com.sun.corba.ee.impl.presentation.rmi.codegen"/>
+            <include name="com.sun.corba.ee.impl.orb"/>
+            <include name="com.sun.corba.ee.impl.javax.rmi"/>
+            <include name="com.sun.corba.ee.impl.javax.rmi.CORBA"/>
+            <include name="com.sun.corba.ee.impl.encoding"/>
+            <include name="com.sun.corba.ee.impl.folb"/>
+            <include name="com.sun.corba.ee.spi.misc"/>
+            <include name="com.sun.corba.ee.impl.misc"/>
+            <include name="com.sun.corba.ee.spi.copyobject"/>
+            <include name="com.sun.corba.ee.impl.copyobject"/>
+            <include name="com.sun.corba.ee.spi.extension"/>
+            <include name="com.sun.corba.ee.spi.ior"/>
+            <include name="com.sun.corba.ee.spi.ior.iiop"/>
+            <include name="com.sun.corba.ee.spi.legacy.connection"/>
+            <include name="com.sun.corba.ee.spi.legacy.interceptor"/>
+            <include name="com.sun.corba.ee.spi.logging"/>
+            <include name="com.sun.corba.ee.spi.logex.corba"/>
+            <include name="com.sun.corba.ee.spi.oa"/>
+            <include name="com.sun.corba.ee.spi.oa.rfm"/>
+            <include name="com.sun.corba.ee.spi.orb"/>
+            <include name="com.sun.corba.ee.spi.osgi"/>
+            <include name="com.sun.corba.ee.spi.presentation.rmi"/>
+            <include name="com.sun.corba.ee.spi.protocol"/>
+            <include name="com.sun.corba.ee.spi.resolver"/>
+            <include name="com.sun.corba.ee.spi.servicecontext"/>
+            <include name="com.sun.corba.ee.spi.transport"/>
+            <include name="com.sun.corba.ee.spi.trace"/>
+            <include name="com.sun.org.omg.CORBA"/>
+            <include name="com.sun.org.omg.CORBA.ValueDefPackage"/>
+            <include name="com.sun.org.omg.CORBA.portable"/>
+            <include name="com.sun.org.omg.SendingContext"/>
+            <include name="com.sun.org.omg.SendingContext.CodeBasePackage"/>
+        </patternset>
 
-	<patternset id="orb.private">
-	    <include name="com.sun.corba.se.impl.corba"/>
-	    <include name="com.sun.corba.se.impl.copyobject"/>
-	    <include name="com.sun.corba.se.impl.dynamicany"/>
-	    <include name="com.sun.corba.se.impl.interceptors"/>
-	    <include name="com.sun.corba.se.impl.io"/>
-	    <include name="com.sun.corba.se.impl.ior"/>
-	    <include name="com.sun.corba.se.impl.ior.iiop"/>
-	    <include name="com.sun.corba.se.impl.legacy.connection"/>
-	    <include name="com.sun.corba.se.impl.util"/>
-	    <include name="com.sun.corba.se.impl.oa"/>
-	    <include name="com.sun.corba.se.impl.oa.poa"/>
-	    <include name="com.sun.corba.se.impl.oa.toa"/>
-	    <include name="com.sun.corba.se.impl.oa.rfm"/>
-	    <include name="com.sun.corba.se.impl.osgi.loader"/>
-	    <include name="com.sun.corba.se.impl.plugin.hwlb"/>
-	    <include name="com.sun.corba.se.impl.presentation.rmi"/>
-	    <include name="com.sun.corba.se.impl.protocol"/>
-	    <include name="com.sun.corba.se.impl.protocol.giopmsgheaders"/>
-	    <include name="com.sun.corba.se.impl.resolver"/>
-	    <include name="com.sun.corba.se.impl.servicecontext"/>
-	    <include name="com.sun.corba.se.impl.transport"/>
-	</patternset>
+        <patternset id="orb.private">
+            <include name="com.sun.corba.ee.impl.corba"/>
+            <include name="com.sun.corba.ee.impl.copyobject"/>
+            <include name="com.sun.corba.ee.impl.dynamicany"/>
+            <include name="com.sun.corba.ee.impl.interceptors"/>
+            <include name="com.sun.corba.ee.impl.io"/>
+            <include name="com.sun.corba.ee.impl.ior"/>
+            <include name="com.sun.corba.ee.impl.ior.iiop"/>
+            <include name="com.sun.corba.ee.impl.legacy.connection"/>
+            <include name="com.sun.corba.ee.impl.util"/>
+            <include name="com.sun.corba.ee.impl.oa"/>
+            <include name="com.sun.corba.ee.impl.oa.poa"/>
+            <include name="com.sun.corba.ee.impl.oa.toa"/>
+            <include name="com.sun.corba.ee.impl.oa.rfm"/>
+            <include name="com.sun.corba.ee.impl.osgi.loader"/>
+            <include name="com.sun.corba.ee.impl.plugin.hwlb"/>
+            <include name="com.sun.corba.ee.impl.presentation.rmi"/>
+            <include name="com.sun.corba.ee.impl.protocol"/>
+            <include name="com.sun.corba.ee.impl.protocol.giopmsgheaders"/>
+            <include name="com.sun.corba.ee.impl.resolver"/>
+            <include name="com.sun.corba.ee.impl.servicecontext"/>
+            <include name="com.sun.corba.ee.impl.transport"/>
+        </patternset>
 
-	<patternset id="orb.orb-class-provider">
-	    <include name="com.sun.corba.se.impl.oa.rfm.ReferenceManagerConfigurator"/>
-	    <include name="com.sun.corba.se.impl.folb.ClientGroupManager"/>
-	    <include name="com.sun.corba.se.impl.folb.ServerGroupManager"/>
-	    <include name="com.sun.corba.se.impl.plugin.hwlb.VirtualAddressAgentImpl"/>
-	    <include name="com.sun.corba.se.impl.plugin.hwlb.NoConnectionCacheImpl"/>
-	</patternset>
+        <patternset id="orb.orb-class-provider">
+            <include name="com.sun.corba.ee.impl.oa.rfm.ReferenceManagerConfigurator"/>
+            <include name="com.sun.corba.ee.impl.folb.ClientGroupManager"/>
+            <include name="com.sun.corba.ee.impl.folb.ServerGroupManager"/>
+            <include name="com.sun.corba.ee.impl.plugin.hwlb.VirtualAddressAgentImpl"/>
+            <include name="com.sun.corba.ee.impl.plugin.hwlb.NoConnectionCacheImpl"/>
+        </patternset>
 
-	<patternset id="orb.probe-provider-class-names">
-	    <include name="com.sun.corba.se.impl.transport.InboundConnectionCacheProbeProvider"/>
-	    <include name="com.sun.corba.se.impl.transport.OutboundConnectionCacheProbeProvider"/>
-	</patternset>
+        <patternset id="orb.probe-provider-class-names">
+            <include name="com.sun.corba.ee.impl.transport.InboundConnectionCacheProbeProvider"/>
+            <include name="com.sun.corba.ee.impl.transport.OutboundConnectionCacheProbeProvider"/>
+        </patternset>
 
-	<patternset id="osgi-test.private">
-	    <include name="com.sun.corba.se.impl.osgi.main"/>
-	</patternset>
+        <patternset id="osgi-test.private">
+            <include name="com.sun.corba.ee.impl.osgi.main"/>
+        </patternset>
 
-	<patternset id="orb.testable.source">
-	    <patternset refid="internal-api.export"/>
-	    <patternset refid="orb.private"/>
-	    <patternset refid="orb.export"/>
-	</patternset>
+        <patternset id="orb.testable.source">
+            <patternset refid="internal-api.export"/>
+            <patternset refid="orb.private"/>
+            <patternset refid="orb.export"/>
+        </patternset>
     </target>
 
     <!-- artifact subsets delivered to GlassFish -->
 
-	<!-- =================== The ORB implementation ========================= -->
+        <!-- =================== The ORB implementation ========================= -->
         <property name="subset1" value="glassfish-corba-orb"/>
-        <property name="subset1-doc-includes" value="com.sun.corba.se.spi.*,com.sun.corba.se.impl.*,com.sun.org.omg.CORBA.*,com.sun.org.omg.SendingConext.*"/>
-        <property name="subset1-doc-excludes" value="com.sun.corba.se.impl.threadpool.*,com.sun.corba.se.impl.txpoa.*,com.sun.corba.se.spi.costransactions.*,com.sun.corba.se.spi.folb.*,com.sun.corba.se.spi.logex.*,com.sun.corba.se.spi.threadpool.*"/>
-	<patternset id="subset1-patternset">
-                <include name="com/sun/corba/se/spi/**/*.java"/>
-                <include name="com/sun/corba/se/impl/**/*.java"/>
+        <property name="subset1-doc-includes" value="com.sun.corba.ee.spi.*,com.sun.corba.ee.impl.*,com.sun.org.omg.CORBA.*,com.sun.org.omg.SendingConext.*"/>
+        <property name="subset1-doc-excludes" value="com.sun.corba.ee.impl.threadpool.*,com.sun.corba.ee.impl.txpoa.*,com.sun.corba.ee.spi.costransactions.*,com.sun.corba.ee.spi.folb.*,com.sun.corba.ee.spi.logex.*,com.sun.corba.ee.spi.threadpool.*"/>
+        <patternset id="subset1-patternset">
+                <include name="com/sun/corba/ee/spi/**/*.java"/>
+                <include name="com/sun/corba/ee/impl/**/*.java"/>
                 <include name="com/sun/org/omg/CORBA/**/*.java"/>
                 <include name="com/sun/org/omg/SendingContext/**/*.java"/>
-                <exclude name="com/sun/corba/se/impl/threadpool/**/*.java"/>
-                <exclude name="com/sun/corba/se/impl/txpoa/**/*.java"/>
-                <exclude name="com/sun/corba/se/spi/costransactions/**/*.java"/>
-                <exclude name="com/sun/corba/se/spi/folb/**/*.java"/>
-                <exclude name="com/sun/corba/se/spi/logex/**/*.java"/>
-                <exclude name="com/sun/corba/se/spi/threadpool/**/*.java"/>
-	</patternset>
+                <exclude name="com/sun/corba/ee/impl/threadpool/**/*.java"/>
+                <exclude name="com/sun/corba/ee/impl/txpoa/**/*.java"/>
+                <exclude name="com/sun/corba/ee/spi/costransactions/**/*.java"/>
+                <exclude name="com/sun/corba/ee/spi/folb/**/*.java"/>
+                <exclude name="com/sun/corba/ee/spi/logex/**/*.java"/>
+                <exclude name="com/sun/corba/ee/spi/threadpool/**/*.java"/>
+        </patternset>
         <!-- ================= ORB API for IIOP FOLB ========================== -->
         <property name="subset2" value="glassfish-corba-internal-api"/>
-        <property name="subset2-doc-includes" value="com.sun.corba.se.impl.threadpool.*,com.sun.corba.se.impl.txpoa.*,com.sun.corba.se.spi.costransactions.*,com.sun.corba.se.spi.folb.*,com.sun.corba.se.spi.logex.*,com.sun.corba.se.spi.threadpool.*"/>
-	<patternset id="subset2-patternset">
-                <include name="com/sun/corba/se/impl/threadpool/**/*.java"/>
-                <include name="com/sun/corba/se/impl/txpoa/**/*.java"/>
-                <include name="com/sun/corba/se/spi/costransactions/**/*.java"/>
-                <include name="com/sun/corba/se/spi/folb/**/*.java"/>
-                <include name="com/sun/corba/se/spi/logex/**/*.java"/>
-                <include name="com/sun/corba/se/spi/threadpool/**/*.java"/>
-	</patternset>
+        <property name="subset2-doc-includes" value="com.sun.corba.ee.impl.threadpool.*,com.sun.corba.ee.impl.txpoa.*,com.sun.corba.ee.spi.costransactions.*,com.sun.corba.ee.spi.folb.*,com.sun.corba.ee.spi.logex.*,com.sun.corba.ee.spi.threadpool.*"/>
+        <patternset id="subset2-patternset">
+                <include name="com/sun/corba/ee/impl/threadpool/**/*.java"/>
+                <include name="com/sun/corba/ee/impl/txpoa/**/*.java"/>
+                <include name="com/sun/corba/ee/spi/costransactions/**/*.java"/>
+                <include name="com/sun/corba/ee/spi/folb/**/*.java"/>
+                <include name="com/sun/corba/ee/spi/logex/**/*.java"/>
+                <include name="com/sun/corba/ee/spi/threadpool/**/*.java"/>
+        </patternset>
         <!-- ============= OMG standard CORBA APIs ============================ -->
 
         <property name="subset3" value="glassfish-corba-omgapi"/>
-        <property name="subset3-doc-includes" value="com.sun.corba.se.org.omg.CORBA.*,javax.rmi.CORBA.*,org.omg.*"/>
-	<patternset id="subset3-patternset">
-                <include name="com/sun/corba/se/org/omg/CORBA/**/*.java"/>
+        <property name="subset3-doc-includes" value="com.sun.corba.ee.org.omg.CORBA.*,javax.rmi.CORBA.*,org.omg.*"/>
+        <patternset id="subset3-patternset">
+                <include name="com/sun/corba/ee/org/omg/CORBA/**/*.java"/>
                 <include name="javax/rmi/CORBA/**/*.java"/>
                 <include name="org/omg/**/*.java"/>
-	</patternset>
+        </patternset>
         <!-- ================ IDL generated definitions for CSIv2 ==================== -->
         <property name="subset4" value="glassfish-corba-csiv2-idl"/>
-        <property name="subset4-doc-includes" value="com.sun.corba.se.org.omg.CSI.*,com.sun.corba.se.org.omg.CSIIOP.*,com.sun.corba.se.org.omg.GSSUP.*"/>
-	<patternset id="subset4-patternset">
-                <include name="com/sun/corba/se/org/omg/CSI/**/*.java"/>
-                <include name="com/sun/corba/se/org/omg/CSIIOP/**/*.java"/>
-                <include name="com/sun/corba/se/org/omg/GSSUP/**/*.java"/>
-	</patternset>
+        <property name="subset4-doc-includes" value="com.sun.corba.ee.org.omg.CSI.*,com.sun.corba.ee.org.omg.CSIIOP.*,com.sun.corba.ee.org.omg.GSSUP.*"/>
+        <patternset id="subset4-patternset">
+                <include name="com/sun/corba/ee/org/omg/CSI/**/*.java"/>
+                <include name="com/sun/corba/ee/org/omg/CSIIOP/**/*.java"/>
+                <include name="com/sun/corba/ee/org/omg/GSSUP/**/*.java"/>
+        </patternset>
 
     <!-- OSGi bundle construction -->
 
@@ -394,100 +394,100 @@
         <jar jarfile="${releaselib.dir}/bundles/${subset1}-source.jar"
             duplicate="fail">
             <fileset dir="${src.dir}">
-		<patternset refid="subset1-patternset"/>
+                <patternset refid="subset1-patternset"/>
             </fileset>
             <fileset dir="${gensrc.dir}">   
-		<patternset refid="subset1-patternset"/>             
+                <patternset refid="subset1-patternset"/>             
             </fileset>
         </jar>
         <jar jarfile="${releaselib.dir}/bundles/${subset2}-source.jar"
             duplicate="fail">
             <fileset dir="${src.dir}">
-		<patternset refid="subset2-patternset"/>
+                <patternset refid="subset2-patternset"/>
             </fileset>
             <fileset dir="${gensrc.dir}">   
-		<patternset refid="subset2-patternset"/>             
+                <patternset refid="subset2-patternset"/>             
             </fileset>
         </jar>
         <jar jarfile="${releaselib.dir}/bundles/${subset3}-source.jar"
             duplicate="fail">
             <fileset dir="${src.dir}">
-		<patternset refid="subset3-patternset"/>
+                <patternset refid="subset3-patternset"/>
             </fileset>
             <fileset dir="${gensrc.dir}">   
-		<patternset refid="subset3-patternset"/>             
+                <patternset refid="subset3-patternset"/>             
             </fileset>
         </jar>
         <jar jarfile="${releaselib.dir}/bundles/${subset4}-source.jar"
             duplicate="fail">
             <fileset dir="${src.dir}">
-		<patternset refid="subset4-patternset"/>
+                <patternset refid="subset4-patternset"/>
             </fileset>
             <fileset dir="${gensrc.dir}">   
-		<patternset refid="subset4-patternset"/>             
+                <patternset refid="subset4-patternset"/>             
             </fileset>
         </jar>
     </target>
 
     <target name="make-bundles" depends="init, make-src-bundle">
-	<make-bundle 
-	    classpath="${classes.dir}" 
-	    version="${orb.version}"
-	    outDir="${releaselib.dir}/bundles"
+        <make-bundle 
+            classpath="${classes.dir}" 
+            version="${orb.version}"
+            outDir="${releaselib.dir}/bundles"
             bundlename="glassfish-corba-orb"
-	    outFile="glassfish-corba-orb.jar">
-	    <directive-list>
-		<directive type="Export-Package" name="orb.export"/>
-		<directive type="Private-Package" name="orb.private"/>
-		<directive type="ORB-Class-Provider" name="orb.orb-class-provider"/>
-		<directive type="Bundle-Activator" value="com.sun.corba.se.impl.osgi.loader.OSGIListener"/>
-		<directive type="DynamicImport-Package" value="org.glassfish.flashlight.provider"/>
-		<directive type="Probe-Provider-Class-Names" name="orb.probe-provider-class-names"/>
-	    </directive-list>
-	</make-bundle>
-	<make-bundle 
-	    classpath="${classes.dir}" 
-	    version="${orb.version}"
-	    outDir="${releaselib.dir}/bundles"
+            outFile="glassfish-corba-orb.jar">
+            <directive-list>
+                <directive type="Export-Package" name="orb.export"/>
+                <directive type="Private-Package" name="orb.private"/>
+                <directive type="ORB-Class-Provider" name="orb.orb-class-provider"/>
+                <directive type="Bundle-Activator" value="com.sun.corba.ee.impl.osgi.loader.OSGIListener"/>
+                <directive type="DynamicImport-Package" value="org.glassfish.flashlight.provider"/>
+                <directive type="Probe-Provider-Class-Names" name="orb.probe-provider-class-names"/>
+            </directive-list>
+        </make-bundle>
+        <make-bundle 
+            classpath="${classes.dir}" 
+            version="${orb.version}"
+            outDir="${releaselib.dir}/bundles"
             bundlename="glassfish-corba-omgapi"
-	    outFile="glassfish-corba-omgapi.jar">
-	    <directive-list>
-		<directive type="Export-Package" name="omgapi.export"/>
-		<directive type="Import-Package" value="!*"/>
-		<directive type="Fragment-Host" value="system.bundle; extension:=framework"/>
-	    </directive-list>
-	</make-bundle>
-	<make-bundle 
-	    classpath="${classes.dir}" 
-	    version="${orb.version}"
-	    outDir="${releaselib.dir}/bundles"
+            outFile="glassfish-corba-omgapi.jar">
+            <directive-list>
+                <directive type="Export-Package" name="omgapi.export"/>
+                <directive type="Import-Package" value="!*"/>
+                <directive type="Fragment-Host" value="system.bundle; extension:=framework"/>
+            </directive-list>
+        </make-bundle>
+        <make-bundle 
+            classpath="${classes.dir}" 
+            version="${orb.version}"
+            outDir="${releaselib.dir}/bundles"
             bundlename="glassfish-corba-csiv2-idl"
-	    outFile="glassfish-corba-csiv2-idl.jar">
-	    <directive-list>
-		<directive type="Export-Package" name="csiv2-idl.export"/>
-	    </directive-list>
-	</make-bundle>
-	<make-bundle 
-	    classpath="${classes.dir}" 
-	    version="${orb.version}"
-	    outDir="${releaselib.dir}/bundles"
+            outFile="glassfish-corba-csiv2-idl.jar">
+            <directive-list>
+                <directive type="Export-Package" name="csiv2-idl.export"/>
+            </directive-list>
+        </make-bundle>
+        <make-bundle 
+            classpath="${classes.dir}" 
+            version="${orb.version}"
+            outDir="${releaselib.dir}/bundles"
             bundlename="glassfish-corba-internal-api"
-	    outFile="glassfish-corba-internal-api.jar">
-	    <directive-list>
-		<directive type="Export-Package" name="internal-api.export"/>
-	    </directive-list>
-	</make-bundle>
-	<make-bundle 
-	    classpath="${classes.dir}" 
-	    version="${orb.version}"
-	    outDir="${releaselib.dir}/bundles"
+            outFile="glassfish-corba-internal-api.jar">
+            <directive-list>
+                <directive type="Export-Package" name="internal-api.export"/>
+            </directive-list>
+        </make-bundle>
+        <make-bundle 
+            classpath="${classes.dir}" 
+            version="${orb.version}"
+            outDir="${releaselib.dir}/bundles"
             bundlename="glassfish-corba-osgi-test"
-	    outFile="glassfish-corba-osgi-test.jar">
-	    <directive-list>
-		<directive type="Private-Package" name="osgi-test.private"/>
-		<directive type="Bundle-Activator" value="com.sun.corba.se.impl.osgi.main"/>
-	    </directive-list>
-	</make-bundle>
+            outFile="glassfish-corba-osgi-test.jar">
+            <directive-list>
+                <directive type="Private-Package" name="osgi-test.private"/>
+                <directive type="Bundle-Activator" value="com.sun.corba.ee.impl.osgi.main"/>
+            </directive-list>
+        </make-bundle>
     </target>
 
     <target name="make-subset-bundles" depends="src-bundle-subsets, javadoc-bundle-subsets">
@@ -496,83 +496,83 @@
     <!-- Maven POM files and release targets -->
 
     <macrodef name="make-corba-pom">
-	<attribute name="artifactId"/>
-	<attribute name="description"/>
-	<element name="dep-list" optional="true"/>
-	<sequential>
-	    <make-pom 
-		outdir="${releaselib.dir}/bundles"
-		groupId="com.sun.corba" 
-		artifactId="@{artifactId}" 
-		version="${orb.version}"
-		description="@{description}"
-		url="http://kenai.com/hg/gf-corba-v3-mirror~staging">
-		<element-list>
-		    <developer
+        <attribute name="artifactId"/>
+        <attribute name="description"/>
+        <element name="dep-list" optional="true"/>
+        <sequential>
+            <make-pom 
+                outdir="${releaselib.dir}/bundles"
+                groupId="com.sun.corba" 
+                artifactId="@{artifactId}" 
+                version="${orb.version}"
+                description="@{description}"
+                url="http://kenai.com/hg/gf-corba-v3-mirror~staging">
+                <element-list>
+                    <developer
                         id="hvilekar"
                         name="Harshad Vilekar"
                         email="harshad.vilekar@oracle.com"/>
-		    <license
-			name="CDDL+GPL"
-			url="https://glassfish.java.net/public/CDDL+GPL.html"/>
-		    <issueManagement
-			system="JIRA"
-			url="http://kenai.com/jira/browse/GF_CORBA_V3_MIRROR"/>
-		    <mailingLists
-			name="CORBA Developer"
-			archive="dev@gf-v3-corba-mirror.kenai.com"/>
-		    <dep-list/>
-		</element-list>
-	    </make-pom>
-	</sequential>
+                    <license
+                        name="CDDL+GPL"
+                        url="https://glassfish.java.net/public/CDDL+GPL.html"/>
+                    <issueManagement
+                        system="JIRA"
+                        url="http://kenai.com/jira/browse/GF_CORBA_V3_MIRROR"/>
+                    <mailingLists
+                        name="CORBA Developer"
+                        archive="dev@gf-v3-corba-mirror.kenai.com"/>
+                    <dep-list/>
+                </element-list>
+            </make-pom>
+        </sequential>
     </macrodef>
 
     <target name="make-poms" depends="init">
-	<make-corba-pom artifactid="glassfish-corba-csiv2-idl" 
-	    description="IDL generated definitions for CSIv2">
-	</make-corba-pom>
-	<make-corba-pom artifactid="glassfish-corba-internal-api" 
-	    description="ORB API for IIOP FOLB">
-	</make-corba-pom>
-	<make-corba-pom artifactid="glassfish-corba-omgapi" 
-	    description="OMG standard CORBA APIs">
-	</make-corba-pom>
-	<make-corba-pom artifactid="glassfish-corba-orb" 
-	    description="The ORB implementation">
-	    <dep-list>
-		<dependency
-		    groupId="com.sun.corba"
-		    artifactId="glassfish-corba-internal-api"
-		    version="${orb.version}"/>
-		<dependency
-		    groupId="com.sun.corba"
-		    artifactId="glassfish-corba-omgapi"
-		    version="${orb.version}"/>
-		<dependency
-		    groupId="org.glassfish.pfl"
-		    artifactId="pfl-basic"
-		    version="${pfl.version}"/>
-		<dependency
-		    groupId="org.glassfish.pfl"
-		    artifactId="pfl-tf"
-		    version="${pfl.version}"/>
-		<dependency
-		    groupId="org.glassfish.pfl"
-		    artifactId="pfl-dynamic"
-		    version="${pfl.version}"/>
-		<dependency
-		    groupId="org.glassfish.external"
-		    artifactId="management-api"
-		    version="3.1.0-b001"/>
-		<dependency
-		    groupId="org.glassfish.gmbal"
-		    artifactId="gmbal"
-		    version="${gmbal.version}"/>
-	    </dep-list>
-	</make-corba-pom>
-	<make-corba-pom artifactid="glassfish-corba-source" 
-	    description="All ORB source code">
-	</make-corba-pom>
+        <make-corba-pom artifactid="glassfish-corba-csiv2-idl" 
+            description="IDL generated definitions for CSIv2">
+        </make-corba-pom>
+        <make-corba-pom artifactid="glassfish-corba-internal-api" 
+            description="ORB API for IIOP FOLB">
+        </make-corba-pom>
+        <make-corba-pom artifactid="glassfish-corba-omgapi" 
+            description="OMG standard CORBA APIs">
+        </make-corba-pom>
+        <make-corba-pom artifactid="glassfish-corba-orb" 
+            description="The ORB implementation">
+            <dep-list>
+                <dependency
+                    groupId="com.sun.corba"
+                    artifactId="glassfish-corba-internal-api"
+                    version="${orb.version}"/>
+                <dependency
+                    groupId="com.sun.corba"
+                    artifactId="glassfish-corba-omgapi"
+                    version="${orb.version}"/>
+                <dependency
+                    groupId="org.glassfish.pfl"
+                    artifactId="pfl-basic"
+                    version="${pfl.version}"/>
+                <dependency
+                    groupId="org.glassfish.pfl"
+                    artifactId="pfl-tf"
+                    version="${pfl.version}"/>
+                <dependency
+                    groupId="org.glassfish.pfl"
+                    artifactId="pfl-dynamic"
+                    version="${pfl.version}"/>
+                <dependency
+                    groupId="org.glassfish.external"
+                    artifactId="management-api"
+                    version="3.1.0-b001"/>
+                <dependency
+                    groupId="org.glassfish.gmbal"
+                    artifactId="gmbal"
+                    version="${gmbal.version}"/>
+            </dep-list>
+        </make-corba-pom>
+        <make-corba-pom artifactid="glassfish-corba-source" 
+            description="All ORB source code">
+        </make-corba-pom>
     </target>
 
     <target name="make-subset-poms" depends="make-poms">
@@ -581,45 +581,45 @@
         </make-corba-pom>
         <make-corba-pom artifactid="${subset1}-javadocs" 
             description="The ORB implementation: javadocs">
-	</make-corba-pom>
-	<!-- =================== -->
+        </make-corba-pom>
+        <!-- =================== -->
         <make-corba-pom artifactid="${subset2}-source" 
             description="ORB API for IIOP FOLB: source code">
         </make-corba-pom>
         <make-corba-pom artifactid="${subset2}-javadocs" 
             description="ORB API for IIOP FOLB: javadocs">
         </make-corba-pom>
-	<!-- =================== -->
+        <!-- =================== -->
         <make-corba-pom artifactid="${subset3}-source" 
             description="OMG standard CORBA APIs: source code">
         </make-corba-pom>
         <make-corba-pom artifactid="${subset3}-javadocs" 
             description="OMG standard CORBA APIs: javadocs">
-	</make-corba-pom>
-	<!-- =================== -->
+        </make-corba-pom>
+        <!-- =================== -->
         <make-corba-pom artifactid="${subset4}-source" 
             description="IDL generated definitions for CSIv2: source code">
         </make-corba-pom>
         <make-corba-pom artifactid="${subset4}-javadocs" 
             description="IDL generated definitions for CSIv2: javadocs">
-	</make-corba-pom>
+        </make-corba-pom>
     </target>
 
     <macrodef name="corba-push-to-local-maven">
-	<attribute name="module"/>
-	<sequential>
-	    <push-to-local-maven outdir="${releaselib.dir}/bundles"
-		module="@{module}"/>
-	</sequential>
+        <attribute name="module"/>
+        <sequential>
+            <push-to-local-maven outdir="${releaselib.dir}/bundles"
+                module="@{module}"/>
+        </sequential>
     </macrodef>
 
     <macrodef name="corba-push-to-maven">
-	<attribute name="module"/>
-	<attribute name="destination"/>
-	<sequential>
-	    <push-to-maven outdir="${releaselib.dir}/bundles"
-		module="@{module}" destination="@{destination}"/>
-	</sequential>
+        <attribute name="module"/>
+        <attribute name="destination"/>
+        <sequential>
+            <push-to-maven outdir="${releaselib.dir}/bundles"
+                module="@{module}" destination="@{destination}"/>
+        </sequential>
     </macrodef>
 
     <macrodef name="release-to-maven">
@@ -649,15 +649,15 @@
     <!-- Enhance the ORB for the tracing faciliy -->
 
     <target name="compile-enhancer" depends="init">
-	<echo message="Compiling enhancer"/>
-	<javac srcdir="${src.dir}" destdir="${classes.dir}" 
-		classpathref="classpath.master" 
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-		failonerror="true">
-	    <include name="com/sun/tools/corba/se/enhancer/**"/>
-	</javac>
+        <echo message="Compiling enhancer"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" 
+                classpathref="classpath.master" 
+                deprecation="${deprecation}"
+                debug="${javac.debug}" 
+                optimize="${javac.optimize}"
+                failonerror="true">
+            <include name="com/sun/tools/corba/se/enhancer/**"/>
+        </javac>
     </target>
 
 
@@ -666,19 +666,19 @@
         <sequential>
             <java classname="org.glassfish.pfl.tf.tools.enhancer.EnhanceTool"
                 classpathref="test-classpath.master" fork="true" dir="${classes.dir}">
-		<jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
+                <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
                 <arg value="-dir"/>
-                <arg value="com/sun/corba/se/"/>
+                <arg value="com/sun/corba/ee/"/>
                 <arg value="-debug"/>
                 <arg value="false"/>
                 <arg value="-verbose"/>
                 <arg value="1"/>
                 <arg value="-rf"/>
-                <arg value="com/sun/corba/se/spi/tfannotations.properties"/>
+                <arg value="com/sun/corba/ee/spi/tfannotations.properties"/>
                 <arg value="-mode"/>
                 <arg value="@{mode}"/>
                 <arg value="-timingPointClass"/>
-                <arg value="com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints"/>
+                <arg value="com.sun.corba.ee.impl.orbutil.newtimer.generated.TimingPoints"/>
                 <arg value="-timingPointDir"/>
                 <arg value="${gensrc.dir}"/>
             </java>
@@ -699,247 +699,247 @@
 
     <target name="compile" depends="init, compile-enhancer, 
         compile-idl-compiler, run-all-idl, delete-java-sources, copy-resources">
-	<echo message="Compiling ORB sources"/>
-	<javac destdir="${classes.dir}" 
-		classpathref="classpath.master"
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-	       	failonerror="true"
-		fork="true"
-		memoryMaximumSize="512m"> 
-	    <src path="${src.dir}"/>
-	    <src path="${gensrc.dir}"/>
-	    <include name="org/omg/**"/>
-	    <exclude name="org/omg/PortableInterceptor/UNKNOWN.java"/>
-	    <include name="com/sun/corba/se/org/omg/**"/>
-	    <exclude name="com/sun/corba/se/org/omg/CORBA/**"/>
-	    <include name="javax/rmi/**"/>
-	    <include name="javax/transaction/**"/>
-	    <include name="javax/activity/**"/>
-	    <include name="com/sun/corba/se/internal/**"/>
-	    <include name="com/sun/corba/se/pept/**"/>
-	    <include name="com/sun/corba/se/spi/**"/>
-	    <include name="com/sun/corba/se/impl/**"/>
-	    <include name="com/sun/corba/se/impl/**"/>
-	    <include name="com/sun/corba/se/tool/**"/>
-	    <include name="sun/corba/**"/>
-	    <include name="sun/rmi/rmic/**"/>
-	    <compilerarg
+        <echo message="Compiling ORB sources"/>
+        <javac destdir="${classes.dir}" 
+                classpathref="classpath.master"
+                deprecation="${deprecation}"
+                debug="${javac.debug}" 
+                optimize="${javac.optimize}"
+                failonerror="true"
+                fork="true"
+                memoryMaximumSize="512m"> 
+            <src path="${src.dir}"/>
+            <src path="${gensrc.dir}"/>
+            <include name="org/omg/**"/>
+            <exclude name="org/omg/PortableInterceptor/UNKNOWN.java"/>
+            <include name="com/sun/corba/ee/org/omg/**"/>
+            <exclude name="com/sun/corba/ee/org/omg/CORBA/**"/>
+            <include name="javax/rmi/**"/>
+            <include name="javax/transaction/**"/>
+            <include name="javax/activity/**"/>
+            <include name="com/sun/corba/ee/internal/**"/>
+            <include name="com/sun/corba/ee/pept/**"/>
+            <include name="com/sun/corba/ee/spi/**"/>
+            <include name="com/sun/corba/ee/impl/**"/>
+            <include name="com/sun/corba/ee/impl/**"/>
+            <include name="com/sun/corba/ee/tool/**"/>
+            <include name="sun/corba/**"/>
+            <include name="sun/rmi/rmic/**"/>
+            <compilerarg
                 value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-	    <compilerarg
-		value="-Xbootclasspath/p:${toString:classpath.master}"/>
-	</javac>
+            <compilerarg
+                value="-Xbootclasspath/p:${toString:classpath.master}"/>
+        </javac>
     </target>
 
     <target name="generate-orb-resources"
      depends="init, compile">
-	<java classname="org.glassfish.pfl.basic.tools.logex.ExceptionResourceGenerator"
+        <java classname="org.glassfish.pfl.basic.tools.logex.ExceptionResourceGenerator"
             fork="true"
             classpathref="classpath.master"
-	    dir="${root.dir}">
+            dir="${root.dir}">
 
             <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
 
 <!--
-	    <jvmarg value="-Xdebug"/>
-	    <jvmarg value="-Xnoagent"/>
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xnoagent"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=12321"/>
 -->
-	    <arg value="-verbose"/>
-	    <arg value="1"/>
+            <arg value="-verbose"/>
+            <arg value="1"/>
             <arg value="-source"/>
             <arg value="${classes.dir}"/>
             <arg value="-destination"/>
             <arg value="${classes.dir}"/>
-	</java>
+        </java>
     </target>
 
 
     <!-- ========================= COPY-RESOURCES ========================= -->
     <target name="copy-resources" depends="init">
-	<echo message="Copying resources files"/>
-	<copy todir="${classes.dir}" overwrite="false">
-	    <fileset dir="${src.dir}">
-		<include name="com/sun/corba/se/impl/orbutil/resources/sunorb.properties"/>
-		<include name="sun/rmi/rmic/resources/rmic.properties"/>
-	    </fileset>
-	</copy>
-	<copy todir="${classes.dir}" flatten="true" overwrite="false">
-	    <fileset dir="${src.dir}">
-		<include
-                    name="com/sun/corba/se/impl/presentation/rmi/jndi.properties"/>
-	    </fileset>
-	</copy>
+        <echo message="Copying resources files"/>
+        <copy todir="${classes.dir}" overwrite="false">
+            <fileset dir="${src.dir}">
+                <include name="com/sun/corba/ee/impl/orbutil/resources/sunorb.properties"/>
+                <include name="sun/rmi/rmic/resources/rmic.properties"/>
+            </fileset>
+        </copy>
+        <copy todir="${classes.dir}" flatten="true" overwrite="false">
+            <fileset dir="${src.dir}">
+                <include
+                    name="com/sun/corba/ee/impl/presentation/rmi/jndi.properties"/>
+            </fileset>
+        </copy>
     </target>
 
     <!-- ========================= DELETE-JAVA-SOURCE ===================== -->
     <target name="delete-java-sources" depends="init">
-	<!-- Delete duplicate files and unwanted files. -->
-	<delete>
-	    <fileset dir="${gensrc.dir}">
-		<include name="org/omg/CORBA/OctetSeqHolder.java"/>
-		<include name="org/omg/CORBA/OctetSeqHelper.java"/>
-		<include name="org/omg/CORBA/RepositoryIdHelper.java"/>
-		<include name="org/omg/CORBA/PolicyError.java"/>
+        <!-- Delete duplicate files and unwanted files. -->
+        <delete>
+            <fileset dir="${gensrc.dir}">
+                <include name="org/omg/CORBA/OctetSeqHolder.java"/>
+                <include name="org/omg/CORBA/OctetSeqHelper.java"/>
+                <include name="org/omg/CORBA/RepositoryIdHelper.java"/>
+                <include name="org/omg/CORBA/PolicyError.java"/>
 
-		<include name="org/omg/Dynamic/ContextListHelper.java"/>
-		<include name="org/omg/Dynamic/ExceptionListHelper.java"/>
-		<include name="org/omg/Dynamic/ExceptionListHolder.java"/>
-		<include name="org/omg/Dynamic/ParameterHelper.java"/>
-		<include name="org/omg/Dynamic/ParameterHolder.java"/>
-		<include name="org/omg/Dynamic/ParameterListHelper.java"/>
-		<include name="org/omg/Dynamic/ParameterListHolder.java"/>
-		<include name="org/omg/Dynamic/RequestContextHelper.java"/>
-		<include name="org/omg/DynamicAny/DynAnyFactoryPOA.java"/>
-		<include name="org/omg/DynamicAny/DynAnyFactoryPackage/InconsistentTypeCodeHolder.java"/>
-		<include name="org/omg/DynamicAny/DynAnyPOA.java"/>
-		<include name="org/omg/DynamicAny/DynAnyPackage/InvalidValueHolder.java"/>
-		<include name="org/omg/DynamicAny/DynAnyPackage/TypeMismatchHolder.java"/>
-		<include name="org/omg/DynamicAny/DynArrayPOA.java"/>
-		<include name="org/omg/DynamicAny/DynEnumPOA.java"/>
-		<include name="org/omg/DynamicAny/DynFixedPOA.java"/>
-		<include name="org/omg/DynamicAny/DynSequencePOA.java"/>
-		<include name="org/omg/DynamicAny/DynStructPOA.java"/>
-		<include name="org/omg/DynamicAny/DynUnionPOA.java"/>
-		<include name="org/omg/DynamicAny/DynValueBox.java"/>
-		<include name="org/omg/DynamicAny/DynValueBoxHelper.java"/>
-		<include name="org/omg/DynamicAny/DynValueBoxHolder.java"/>
-		<include name="org/omg/DynamicAny/DynValueBoxOperations.java"/>
-		<include name="org/omg/DynamicAny/DynValueBoxPOA.java"/>
-		<include name="org/omg/DynamicAny/DynValueCommon.java"/>
-		<include name="org/omg/DynamicAny/DynValueCommonHelper.java"/>
-		<include name="org/omg/DynamicAny/DynValueCommonHolder.java"/>
-		<include name="org/omg/DynamicAny/DynValueCommonOperations.java"/>
-		<include name="org/omg/DynamicAny/DynValueCommonPOA.java"/>
-		<include name="org/omg/DynamicAny/DynValuePOA.java"/>
-		<include name="org/omg/DynamicAny/_DynAnyFactoryStub.java"/>
-		<include name="org/omg/DynamicAny/_DynAnyStub.java"/>
-		<include name="org/omg/DynamicAny/_DynArrayStub.java"/>
-		<include name="org/omg/DynamicAny/_DynEnumStub.java"/>
-		<include name="org/omg/DynamicAny/_DynFixedStub.java"/>
-		<include name="org/omg/DynamicAny/_DynSequenceStub.java"/>
-		<include name="org/omg/DynamicAny/_DynStructStub.java"/>
-		<include name="org/omg/DynamicAny/_DynUnionStub.java"/>
-		<include name="org/omg/DynamicAny/_DynValueBoxStub.java"/>
-		<include name="org/omg/DynamicAny/_DynValueCommonStub.java"/>
-		<include name="org/omg/DynamicAny/_DynValueStub.java"/>
-		<include name="org/omg/IOP/BI_DIR_IIOP.java"/>
-		<include name="org/omg/IOP/ChainBypassCheck.java"/>
-		<include name="org/omg/IOP/ChainBypassInfo.java"/>
-		<include name="org/omg/IOP/CodecFactoryHolder.java"/>
-		<include name="org/omg/IOP/CodecFactoryPackage/UnknownEncodingHolder.java"/>
-		<include name="org/omg/IOP/CodecHelper.java"/>
-		<include name="org/omg/IOP/CodecHolder.java"/>
-		<include name="org/omg/IOP/CodecPackage/FormatMismatchHolder.java"/>
-		<include name="org/omg/IOP/CodecPackage/InvalidTypeForEncodingHolder.java"/>
-		<include name="org/omg/IOP/CodecPackage/TypeMismatchHolder.java"/>
-		<include name="org/omg/IOP/EncodingFormatHelper.java"/>
-		<include name="org/omg/IOP/EncodingHelper.java"/>
-		<include name="org/omg/IOP/EncodingHolder.java"/>
-		<include name="org/omg/IOP/FORWARDED_IDENTITY.java"/>
-		<include name="org/omg/IOP/INVOCATION_POLICIES.java"/>
-		<include name="org/omg/IOP/LogicalThreadId.java"/>
-		<include name="org/omg/IOP/SendingContextRunTime.java"/>
-		<include name="org/omg/IOP/TaggedComponentSeqHelper.java"/>
-		<include name="org/omg/IOP/TaggedComponentSeqHolder.java"/>
-		<include name="org/omg/IOP/UnknownExceptionInfo.java"/>
-		<include name="org/omg/PortableInterceptor/ClientRequestInfoHelper.java"/>
-		<include name="org/omg/PortableInterceptor/ClientRequestInfoHolder.java"/>
-		<include name="org/omg/PortableInterceptor/ClientRequestInterceptorHelper.java"/>
-		<include name="org/omg/PortableInterceptor/ClientRequestInterceptorHolder.java"/>
-		<include name="org/omg/PortableInterceptor/CurrentHolder.java"/>
-		<include name="org/omg/PortableInterceptor/ForwardRequestHolder.java"/>
-		<include name="org/omg/PortableInterceptor/IORInfoHelper.java"/>
-		<include name="org/omg/PortableInterceptor/IORInfoHolder.java"/>
-		<include name="org/omg/PortableInterceptor/IORInterceptorHelper.java"/>
-		<include name="org/omg/PortableInterceptor/IORInterceptorHolder.java"/>
-		<include name="org/omg/PortableInterceptor/InterceptorHelper.java"/>
-		<include name="org/omg/PortableInterceptor/InterceptorHolder.java"/>
-		<include name="org/omg/PortableInterceptor/InvalidSlotHolder.java"/>
-		<include name="org/omg/PortableInterceptor/ORBInitInfoHelper.java"/>
-		<include name="org/omg/PortableInterceptor/ORBInitInfoHolder.java"/>
-		<include name="org/omg/PortableInterceptor/ORBInitInfoPackage/DuplicateNameHolder.java"/>
-		<include name="org/omg/PortableInterceptor/ORBInitInfoPackage/InvalidNameHolder.java"/>
-		<include name="org/omg/PortableInterceptor/ORBInitializerHelper.java"/>
-		<include name="org/omg/PortableInterceptor/ORBInitializerHolder.java"/>
-		<include name="org/omg/PortableInterceptor/PolicyFactoryHelper.java"/>
-		<include name="org/omg/PortableInterceptor/PolicyFactoryHolder.java"/>
-		<include name="org/omg/PortableInterceptor/ReplyStatusHelper.java"/>
-		<include name="org/omg/PortableInterceptor/RequestInfoHelper.java"/>
-		<include name="org/omg/PortableInterceptor/RequestInfoHolder.java"/>
-		<include name="org/omg/PortableInterceptor/ServerRequestInfoHelper.java"/>
-		<include name="org/omg/PortableInterceptor/ServerRequestInfoHolder.java"/>
-		<include name="org/omg/PortableInterceptor/ServerRequestInterceptorHelper.java"/>
-		<include name="org/omg/PortableInterceptor/ServerRequestInterceptorHolder.java"/>
-		<include name="org/omg/PortableInterceptor/SlotIdHelper.java"/>
-		<include name="org/omg/PortableServer/CurrentPackage/NoContextHolder.java"/>
-		<include name="org/omg/PortableServer/ForwardRequestHolder.java"/>
-		<include name="org/omg/PortableServer/IdAssignmentPolicyValueHelper.java"/>
-		<include name="org/omg/PortableServer/IdAssignmentPolicyValueHolder.java"/>
-		<include name="org/omg/PortableServer/IdUniquenessPolicyValueHelper.java"/>
-		<include name="org/omg/PortableServer/IdUniquenessPolicyValueHolder.java"/>
-		<include name="org/omg/PortableServer/ImplicitActivationPolicyValueHelper.java"/>
-		<include name="org/omg/PortableServer/ImplicitActivationPolicyValueHolder.java"/>
-		<include name="org/omg/PortableServer/LifespanPolicyValueHelper.java"/>
-		<include name="org/omg/PortableServer/LifespanPolicyValueHolder.java"/>
-		<include name="org/omg/PortableServer/ObjectIdHelper.java"/>
-		<include name="org/omg/PortableServer/ObjectIdHolder.java"/>
-		<include name="org/omg/PortableServer/POAListHelper.java"/>
-		<include name="org/omg/PortableServer/POAListHolder.java"/>
-		<include name="org/omg/PortableServer/POAManagerPackage/AdapterInactiveHolder.java"/>
-		<include name="org/omg/PortableServer/POAManagerPackage/StateHelper.java"/>
-		<include name="org/omg/PortableServer/POAManagerPackage/StateHolder.java"/>
-		<include name="org/omg/PortableServer/POAPackage/AdapterAlreadyExistsHolder.java"/>
-		<include name="org/omg/PortableServer/POAPackage/AdapterNonExistentHolder.java"/>
-		<include name="org/omg/PortableServer/POAPackage/InvalidPolicyHolder.java"/>
-		<include name="org/omg/PortableServer/POAPackage/NoServantHolder.java"/>
-		<include name="org/omg/PortableServer/POAPackage/ObjectAlreadyActiveHolder.java"/>
-		<include name="org/omg/PortableServer/POAPackage/ObjectNotActiveHolder.java"/>
-		<include name="org/omg/PortableServer/POAPackage/ServantAlreadyActiveHolder.java"/>
-		<include name="org/omg/PortableServer/POAPackage/ServantNotActiveHolder.java"/>
-		<include name="org/omg/PortableServer/POAPackage/WrongAdapterHolder.java"/>
-		<include name="org/omg/PortableServer/POAPackage/WrongPolicyHolder.java"/>
-		<include name="org/omg/PortableServer/RequestProcessingPolicyValueHelper.java"/>
-		<include name="org/omg/PortableServer/RequestProcessingPolicyValueHolder.java"/>
-		<include name="org/omg/PortableServer/ServantActivatorHolder.java"/>
-		<include name="org/omg/PortableServer/ServantLocatorHolder.java"/>
-		<include name="org/omg/PortableServer/ServantRetentionPolicyValueHelper.java"/>
-		<include name="org/omg/PortableServer/ServantRetentionPolicyValueHolder.java"/>
-		<include name="org/omg/PortableServer/ThreadPolicyValueHelper.java"/>
-		<include name="org/omg/PortableServer/ThreadPolicyValueHolder.java"/>
-	    </fileset>
-	</delete>
+                <include name="org/omg/Dynamic/ContextListHelper.java"/>
+                <include name="org/omg/Dynamic/ExceptionListHelper.java"/>
+                <include name="org/omg/Dynamic/ExceptionListHolder.java"/>
+                <include name="org/omg/Dynamic/ParameterHelper.java"/>
+                <include name="org/omg/Dynamic/ParameterHolder.java"/>
+                <include name="org/omg/Dynamic/ParameterListHelper.java"/>
+                <include name="org/omg/Dynamic/ParameterListHolder.java"/>
+                <include name="org/omg/Dynamic/RequestContextHelper.java"/>
+                <include name="org/omg/DynamicAny/DynAnyFactoryPOA.java"/>
+                <include name="org/omg/DynamicAny/DynAnyFactoryPackage/InconsistentTypeCodeHolder.java"/>
+                <include name="org/omg/DynamicAny/DynAnyPOA.java"/>
+                <include name="org/omg/DynamicAny/DynAnyPackage/InvalidValueHolder.java"/>
+                <include name="org/omg/DynamicAny/DynAnyPackage/TypeMismatchHolder.java"/>
+                <include name="org/omg/DynamicAny/DynArrayPOA.java"/>
+                <include name="org/omg/DynamicAny/DynEnumPOA.java"/>
+                <include name="org/omg/DynamicAny/DynFixedPOA.java"/>
+                <include name="org/omg/DynamicAny/DynSequencePOA.java"/>
+                <include name="org/omg/DynamicAny/DynStructPOA.java"/>
+                <include name="org/omg/DynamicAny/DynUnionPOA.java"/>
+                <include name="org/omg/DynamicAny/DynValueBox.java"/>
+                <include name="org/omg/DynamicAny/DynValueBoxHelper.java"/>
+                <include name="org/omg/DynamicAny/DynValueBoxHolder.java"/>
+                <include name="org/omg/DynamicAny/DynValueBoxOperations.java"/>
+                <include name="org/omg/DynamicAny/DynValueBoxPOA.java"/>
+                <include name="org/omg/DynamicAny/DynValueCommon.java"/>
+                <include name="org/omg/DynamicAny/DynValueCommonHelper.java"/>
+                <include name="org/omg/DynamicAny/DynValueCommonHolder.java"/>
+                <include name="org/omg/DynamicAny/DynValueCommonOperations.java"/>
+                <include name="org/omg/DynamicAny/DynValueCommonPOA.java"/>
+                <include name="org/omg/DynamicAny/DynValuePOA.java"/>
+                <include name="org/omg/DynamicAny/_DynAnyFactoryStub.java"/>
+                <include name="org/omg/DynamicAny/_DynAnyStub.java"/>
+                <include name="org/omg/DynamicAny/_DynArrayStub.java"/>
+                <include name="org/omg/DynamicAny/_DynEnumStub.java"/>
+                <include name="org/omg/DynamicAny/_DynFixedStub.java"/>
+                <include name="org/omg/DynamicAny/_DynSequenceStub.java"/>
+                <include name="org/omg/DynamicAny/_DynStructStub.java"/>
+                <include name="org/omg/DynamicAny/_DynUnionStub.java"/>
+                <include name="org/omg/DynamicAny/_DynValueBoxStub.java"/>
+                <include name="org/omg/DynamicAny/_DynValueCommonStub.java"/>
+                <include name="org/omg/DynamicAny/_DynValueStub.java"/>
+                <include name="org/omg/IOP/BI_DIR_IIOP.java"/>
+                <include name="org/omg/IOP/ChainBypassCheck.java"/>
+                <include name="org/omg/IOP/ChainBypassInfo.java"/>
+                <include name="org/omg/IOP/CodecFactoryHolder.java"/>
+                <include name="org/omg/IOP/CodecFactoryPackage/UnknownEncodingHolder.java"/>
+                <include name="org/omg/IOP/CodecHelper.java"/>
+                <include name="org/omg/IOP/CodecHolder.java"/>
+                <include name="org/omg/IOP/CodecPackage/FormatMismatchHolder.java"/>
+                <include name="org/omg/IOP/CodecPackage/InvalidTypeForEncodingHolder.java"/>
+                <include name="org/omg/IOP/CodecPackage/TypeMismatchHolder.java"/>
+                <include name="org/omg/IOP/EncodingFormatHelper.java"/>
+                <include name="org/omg/IOP/EncodingHelper.java"/>
+                <include name="org/omg/IOP/EncodingHolder.java"/>
+                <include name="org/omg/IOP/FORWARDED_IDENTITY.java"/>
+                <include name="org/omg/IOP/INVOCATION_POLICIES.java"/>
+                <include name="org/omg/IOP/LogicalThreadId.java"/>
+                <include name="org/omg/IOP/SendingContextRunTime.java"/>
+                <include name="org/omg/IOP/TaggedComponentSeqHelper.java"/>
+                <include name="org/omg/IOP/TaggedComponentSeqHolder.java"/>
+                <include name="org/omg/IOP/UnknownExceptionInfo.java"/>
+                <include name="org/omg/PortableInterceptor/ClientRequestInfoHelper.java"/>
+                <include name="org/omg/PortableInterceptor/ClientRequestInfoHolder.java"/>
+                <include name="org/omg/PortableInterceptor/ClientRequestInterceptorHelper.java"/>
+                <include name="org/omg/PortableInterceptor/ClientRequestInterceptorHolder.java"/>
+                <include name="org/omg/PortableInterceptor/CurrentHolder.java"/>
+                <include name="org/omg/PortableInterceptor/ForwardRequestHolder.java"/>
+                <include name="org/omg/PortableInterceptor/IORInfoHelper.java"/>
+                <include name="org/omg/PortableInterceptor/IORInfoHolder.java"/>
+                <include name="org/omg/PortableInterceptor/IORInterceptorHelper.java"/>
+                <include name="org/omg/PortableInterceptor/IORInterceptorHolder.java"/>
+                <include name="org/omg/PortableInterceptor/InterceptorHelper.java"/>
+                <include name="org/omg/PortableInterceptor/InterceptorHolder.java"/>
+                <include name="org/omg/PortableInterceptor/InvalidSlotHolder.java"/>
+                <include name="org/omg/PortableInterceptor/ORBInitInfoHelper.java"/>
+                <include name="org/omg/PortableInterceptor/ORBInitInfoHolder.java"/>
+                <include name="org/omg/PortableInterceptor/ORBInitInfoPackage/DuplicateNameHolder.java"/>
+                <include name="org/omg/PortableInterceptor/ORBInitInfoPackage/InvalidNameHolder.java"/>
+                <include name="org/omg/PortableInterceptor/ORBInitializerHelper.java"/>
+                <include name="org/omg/PortableInterceptor/ORBInitializerHolder.java"/>
+                <include name="org/omg/PortableInterceptor/PolicyFactoryHelper.java"/>
+                <include name="org/omg/PortableInterceptor/PolicyFactoryHolder.java"/>
+                <include name="org/omg/PortableInterceptor/ReplyStatusHelper.java"/>
+                <include name="org/omg/PortableInterceptor/RequestInfoHelper.java"/>
+                <include name="org/omg/PortableInterceptor/RequestInfoHolder.java"/>
+                <include name="org/omg/PortableInterceptor/ServerRequestInfoHelper.java"/>
+                <include name="org/omg/PortableInterceptor/ServerRequestInfoHolder.java"/>
+                <include name="org/omg/PortableInterceptor/ServerRequestInterceptorHelper.java"/>
+                <include name="org/omg/PortableInterceptor/ServerRequestInterceptorHolder.java"/>
+                <include name="org/omg/PortableInterceptor/SlotIdHelper.java"/>
+                <include name="org/omg/PortableServer/CurrentPackage/NoContextHolder.java"/>
+                <include name="org/omg/PortableServer/ForwardRequestHolder.java"/>
+                <include name="org/omg/PortableServer/IdAssignmentPolicyValueHelper.java"/>
+                <include name="org/omg/PortableServer/IdAssignmentPolicyValueHolder.java"/>
+                <include name="org/omg/PortableServer/IdUniquenessPolicyValueHelper.java"/>
+                <include name="org/omg/PortableServer/IdUniquenessPolicyValueHolder.java"/>
+                <include name="org/omg/PortableServer/ImplicitActivationPolicyValueHelper.java"/>
+                <include name="org/omg/PortableServer/ImplicitActivationPolicyValueHolder.java"/>
+                <include name="org/omg/PortableServer/LifespanPolicyValueHelper.java"/>
+                <include name="org/omg/PortableServer/LifespanPolicyValueHolder.java"/>
+                <include name="org/omg/PortableServer/ObjectIdHelper.java"/>
+                <include name="org/omg/PortableServer/ObjectIdHolder.java"/>
+                <include name="org/omg/PortableServer/POAListHelper.java"/>
+                <include name="org/omg/PortableServer/POAListHolder.java"/>
+                <include name="org/omg/PortableServer/POAManagerPackage/AdapterInactiveHolder.java"/>
+                <include name="org/omg/PortableServer/POAManagerPackage/StateHelper.java"/>
+                <include name="org/omg/PortableServer/POAManagerPackage/StateHolder.java"/>
+                <include name="org/omg/PortableServer/POAPackage/AdapterAlreadyExistsHolder.java"/>
+                <include name="org/omg/PortableServer/POAPackage/AdapterNonExistentHolder.java"/>
+                <include name="org/omg/PortableServer/POAPackage/InvalidPolicyHolder.java"/>
+                <include name="org/omg/PortableServer/POAPackage/NoServantHolder.java"/>
+                <include name="org/omg/PortableServer/POAPackage/ObjectAlreadyActiveHolder.java"/>
+                <include name="org/omg/PortableServer/POAPackage/ObjectNotActiveHolder.java"/>
+                <include name="org/omg/PortableServer/POAPackage/ServantAlreadyActiveHolder.java"/>
+                <include name="org/omg/PortableServer/POAPackage/ServantNotActiveHolder.java"/>
+                <include name="org/omg/PortableServer/POAPackage/WrongAdapterHolder.java"/>
+                <include name="org/omg/PortableServer/POAPackage/WrongPolicyHolder.java"/>
+                <include name="org/omg/PortableServer/RequestProcessingPolicyValueHelper.java"/>
+                <include name="org/omg/PortableServer/RequestProcessingPolicyValueHolder.java"/>
+                <include name="org/omg/PortableServer/ServantActivatorHolder.java"/>
+                <include name="org/omg/PortableServer/ServantLocatorHolder.java"/>
+                <include name="org/omg/PortableServer/ServantRetentionPolicyValueHelper.java"/>
+                <include name="org/omg/PortableServer/ServantRetentionPolicyValueHolder.java"/>
+                <include name="org/omg/PortableServer/ThreadPolicyValueHelper.java"/>
+                <include name="org/omg/PortableServer/ThreadPolicyValueHolder.java"/>
+            </fileset>
+        </delete>
     </target>
 
     <!-- ========================= COMPILE-IDL-COMPILER ================== -->
     <!-- Compile the IDL compiler -->
     <target name="compile-idl-compiler" depends="init">
-	<echo message="Copying .prp files"/>
-	<copy todir="${classes.dir}" overwrite="false">
-	    <fileset dir="${src.dir}"
+        <echo message="Copying .prp files"/>
+        <copy todir="${classes.dir}" overwrite="false">
+            <fileset dir="${src.dir}"
                 includes="com/sun/tools/corba/se/idl/**/*.prp"/>
-	</copy>
-	<echo message="Compiling idl compiler"/>
-	<javac srcdir="${src.dir}" destdir="${classes.dir}" 
-		classpathref="classpath.master" 
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-		failonerror="true">
-	    <include name="com/sun/tools/corba/se/idl/**"/>
-	</javac>
-	<echo message="Copying .idl files"/>
-	<copy todir="${lib.dir}" flatten="yes" overwrite="false">
-	    <fileset dir="${src.dir}" includes="org/omg/CORBA/*.idl"/>
-	</copy>
+        </copy>
+        <echo message="Compiling idl compiler"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" 
+                classpathref="classpath.master" 
+                deprecation="${deprecation}"
+                debug="${javac.debug}" 
+                optimize="${javac.optimize}"
+                failonerror="true">
+            <include name="com/sun/tools/corba/se/idl/**"/>
+        </javac>
+        <echo message="Copying .idl files"/>
+        <copy todir="${lib.dir}" flatten="yes" overwrite="false">
+            <fileset dir="${src.dir}" includes="org/omg/CORBA/*.idl"/>
+        </copy>
     </target>
 
 
     <!-- ========================= Build the ORB library ====================  
-	Note that this must work either renamed or not renamed, so both 
-	the relocated directory and the non-relocated directory for
-	ASM are included here.
+        Note that this must work either renamed or not renamed, so both 
+        the relocated directory and the non-relocated directory for
+        ASM are included here.
 
         There are some classes in the ORB library that are not used at
         all at runtime.  These classes are excluded from the delivered
@@ -949,110 +949,110 @@
     <!-- =================== Copyright header mainenance ================== -->
 
     <target name="update-copyright-headers" depends="init">
-	<!--
-		This target is used when it is necessary to update the 
+        <!--
+                This target is used when it is necessary to update the 
                 copyright headers.  See
-                com.sun.corba.se.spi.orbutil.file.CopyrightProcessor
+                com.sun.corba.ee.spi.orbutil.file.CopyrightProcessor
                 for all of the details.
-		Notes:
-		    - Certain directories are ignored, mainly Mercurial
+                Notes:
+                    - Certain directories are ignored, mainly Mercurial
                       and CodeManager related directories.
-		    - Files are classified as follows:
-			- Java-like; uses /* ... */ style block comments
-			- JavaLine-like; uses // ... style line comments
-			- XML-like; uses <- -! ... - -> style block comments
-			- Scheme-like; uses ; ... line comments
-			- Shell-like; uses # ... line comments
-			- Binary-like; can not be modified by this tool
-		    - The classification is done as follows, in the order listed:
-			1. Some files are recognized by exact name (primarily
+                    - Files are classified as follows:
+                        - Java-like; uses /* ... */ style block comments
+                        - JavaLine-like; uses // ... style line comments
+                        - XML-like; uses <- -! ... - -> style block comments
+                        - Scheme-like; uses ; ... line comments
+                        - Shell-like; uses # ... line comments
+                        - Binary-like; can not be modified by this tool
+                    - The classification is done as follows, in the order listed:
+                        1. Some files are recognized by exact name (primarily
                            makefiles)
-			2. Most files are classified by suffix
-			3. If a file starts with "#!", it is a shell script.
-			4. Otherwise we stop and complain, because we need to
+                        2. Most files are classified by suffix
+                        3. If a file starts with "#!", it is a shell script.
+                        4. Otherwise we stop and complain, because we need to
                            be correct for all files.
-		    - The current copyright text lives in
+                    - The current copyright text lives in
                       make/headers/copyright.txt.  This is just
-		      the text: it must be formatted appropriately based on
+                      the text: it must be formatted appropriately based on
                       the file type.
-		    - CopyrightProcessor supports a verbose flag, and a 
+                    - CopyrightProcessor supports a verbose flag, and a 
                       dryrun flag.  Turning both of these on gives the details
                       of what will happen, without actually changing anything.
-		    - DO NOT INTERRUPT THIS TARGET!  It can destroy files,
+                    - DO NOT INTERRUPT THIS TARGET!  It can destroy files,
                       which is hardly catastrophic,
-		      because the file is still in the version control system.
-		    - Do NOT mix header comment changes with other changes!
+                      because the file is still in the version control system.
+                    - Do NOT mix header comment changes with other changes!
 
-		Arguments to command:
-		    -verbose: normally set to false, except when debugging this
-		    -dryrun: normally set to false, except when debugging this
-		    -root: set to the root directories to process: 
-			make, nbproject, src, test, tools, www
-		    -skipdirs: set to the directories to skip:
-			.hg, Codemgr_wsdata, deleted_files, headers, freezepoint
-		    -copyright: this is set to the copyright template, currently
+                Arguments to command:
+                    -verbose: normally set to false, except when debugging this
+                    -dryrun: normally set to false, except when debugging this
+                    -root: set to the root directories to process: 
+                        make, nbproject, src, test, tools, www
+                    -skipdirs: set to the directories to skip:
+                        .hg, Codemgr_wsdata, deleted_files, headers, freezepoint
+                    -copyright: this is set to the copyright template, currently
                      in make/headers/copyrights.txt
-		    -startYear: set to the default start year for the header
+                    -startYear: set to the default start year for the header
                      (1997)
-			
-		The tool is flexible enough to remove old Sun or Oracle
+                        
+                The tool is flexible enough to remove old Sun or Oracle
                 copyright headers, leave non-Sun/Oracle copyright headers in
                 place, ignore copyright info that is not in comments, and
                 insert the correct start year into the new copyright header.
-	-->
-	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor"
+        -->
+        <java classname="com.sun.corba.ee.spi.orbutil.file.CopyrightProcessor"
             fork="true"
-	    dir="${root.dir}">
-	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-	    <classpathref refid="classpath.master"/>
-	    <arg value="-validate"/>
-	    <arg value="false"/>
-	    <arg value="-verbose"/>
-	    <arg value="0"/>
-	    <arg value="-dryrun"/>
-	    <arg value="false"/>
-	    <arg value="-root"/>
-	    <arg value="."/>
-	    <arg value="-skipdirs"/>
-	    <arg value="${copyright.skip}"/>
-	    <arg value="-copyright"/>
-	    <arg value="${copyright.file}"/>
-	    <arg value="-startyear"/>
-	    <arg value="1997"/>
-	</java>
+            dir="${root.dir}">
+            <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
+            <classpathref refid="classpath.master"/>
+            <arg value="-validate"/>
+            <arg value="false"/>
+            <arg value="-verbose"/>
+            <arg value="0"/>
+            <arg value="-dryrun"/>
+            <arg value="false"/>
+            <arg value="-root"/>
+            <arg value="."/>
+            <arg value="-skipdirs"/>
+            <arg value="${copyright.skip}"/>
+            <arg value="-copyright"/>
+            <arg value="${copyright.file}"/>
+            <arg value="-startyear"/>
+            <arg value="1997"/>
+        </java>
     </target>
 
     <target name="validate-copyright-headers" depends="init">
-	<!--
-	    This target is similar to update-copyright-headers,
-	    but instead it validates that all files have the correct headers.
+        <!--
+            This target is similar to update-copyright-headers,
+            but instead it validates that all files have the correct headers.
 
-	-->
-	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor"
+        -->
+        <java classname="com.sun.corba.ee.spi.orbutil.file.CopyrightProcessor"
             fork="true"
-	    dir="${root.dir}">
-	    <!--
+            dir="${root.dir}">
+            <!--
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xnoagent"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=42365"/>
-	    -->
-	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-	    <classpathref refid="classpath.master"/>
-	    <arg value="-validate"/>
-	    <arg value="true"/>
-	    <arg value="-verbose"/>
-	    <arg value="0"/>
-	    <arg value="-dryrun"/>
-	    <arg value="false"/>
-	    <arg value="-root"/>
-	    <arg value="."/>
-	    <arg value="-skipdirs"/>
-	    <arg value="${copyright.skip}"/>
-	    <arg value="-copyright"/>
-	    <arg value="${copyright.file}"/>
-	    <arg value="-startyear"/>
-	    <arg value="1997"/>
-	</java>
+            -->
+            <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
+            <classpathref refid="classpath.master"/>
+            <arg value="-validate"/>
+            <arg value="true"/>
+            <arg value="-verbose"/>
+            <arg value="0"/>
+            <arg value="-dryrun"/>
+            <arg value="false"/>
+            <arg value="-root"/>
+            <arg value="."/>
+            <arg value="-skipdirs"/>
+            <arg value="${copyright.skip}"/>
+            <arg value="-copyright"/>
+            <arg value="${copyright.file}"/>
+            <arg value="-startyear"/>
+            <arg value="1997"/>
+        </java>
     </target>
 
     <!-- ================= Timing points file generation ================ -->
@@ -1061,43 +1061,43 @@
         <property name="tsrcfile"
             value="${src.dir}/com/sun/tools/corba/se/timer/timing.xml"/>
         <property name="tjavafile"
-            value="${gensrc.dir}/com/sun/corba/se/impl/orbutil/newtimer/generated/TimingPoints.java"/>
-	<condition property="timing-file-changed">
-	    <or>
-		<not>
-		    <available file="${tjavafile}"/>
-		</not>
-		<not>
-		    <uptodate targetfile="${tjavafile}" srcfile="${tsrcfile}"/>
-		</not>
-	    </or>
-	</condition>
+            value="${gensrc.dir}/com/sun/corba/ee/impl/orbutil/newtimer/generated/TimingPoints.java"/>
+        <condition property="timing-file-changed">
+            <or>
+                <not>
+                    <available file="${tjavafile}"/>
+                </not>
+                <not>
+                    <uptodate targetfile="${tjavafile}" srcfile="${tsrcfile}"/>
+                </not>
+            </or>
+        </condition>
     </target>
 
     <target name="compile-timing-points" depends="init">
-	<echo message="Compiling TimingPoints class"/>
-	<javac destdir="${classes.dir}" 
-		classpathref="classpath.master"
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-	       	failonerror="true"
-		fork="true"
-		memoryMaximumSize="512m"> 
-	    <src path="${gensrc.dir}"/>
-            <include name="com/sun/corba/se/impl/orbutil/newtimer/generated/*"/>
-	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-	    <compilerarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-	</javac>
+        <echo message="Compiling TimingPoints class"/>
+        <javac destdir="${classes.dir}" 
+                classpathref="classpath.master"
+                deprecation="${deprecation}"
+                debug="${javac.debug}" 
+                optimize="${javac.optimize}"
+                failonerror="true"
+                fork="true"
+                memoryMaximumSize="512m"> 
+            <src path="${gensrc.dir}"/>
+            <include name="com/sun/corba/ee/impl/orbutil/newtimer/generated/*"/>
+            <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
+            <compilerarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
+        </javac>
     </target>
 
     <!-- ========================= CLEAN ========================= -->
 
     <target name="clean"
         depends="init,clean-cobertura,clean-emma,clean-tests">
-	<delete dir="${build.dir}"/>
-	<delete dir="${test-build.dir}"/>
-	<delete dir="${javadoc.dir}"/>
+        <delete dir="${build.dir}"/>
+        <delete dir="${test-build.dir}"/>
+        <delete dir="${javadoc.dir}"/>
     </target>
 
     <target name="clean-cobertura" depends="init">
@@ -1105,71 +1105,71 @@
     </target>
 
     <target name="clean-emma" depends="init">
-	<delete dir="${emma.dir}"/>
+        <delete dir="${emma.dir}"/>
     </target>
 
     <target name="clean-tests" depends="init">
-	<delete dir="${test.run.base}"/>
+        <delete dir="${test.run.base}"/>
     </target>
 
     <!-- ========================= JAVADOC ========================= -->
 
     <target name="javadoc" depends="init">
         <mkdir dir="${javadoc.dir}"/>
-	<javadoc packagenames="com.sun.corba.se.spi.*"
-	         sourcepath="${src.dir}:${gensrc.dir}"
-		 classpathref="classpath.master"
+        <javadoc packagenames="com.sun.corba.ee.spi.*"
+                 sourcepath="${src.dir}:${gensrc.dir}"
+                 classpathref="classpath.master"
                  destdir="${javadoc.dir}/glassfish-corba"
-		 author="true"
-		 version="true"
-		 use="true"
-		 windowtitle="Sun Java CORBA ORB SPI"/>
+                 author="true"
+                 version="true"
+                 use="true"
+                 windowtitle="Sun Java CORBA ORB SPI"/>
     </target>
 
     <target name="javadoc-subsets" depends="init">
         <mkdir dir="${javadoc.dir}/${subset1}"/>
         <javadoc packagenames="${subset1-doc-includes}"
                  excludepackagenames="${subset1-doc-excludes}"
-	         sourcepath="${src.dir}:${gensrc.dir}"
-		 classpathref="classpath.master"
+                 sourcepath="${src.dir}:${gensrc.dir}"
+                 classpathref="classpath.master"
                  destdir="${javadoc.dir}/${subset1}"
-		 author="true"
-		 version="true"
-		 use="true"
+                 author="true"
+                 version="true"
+                 use="true"
                  windowtitle="${subset1}"/>
 
-	<!-- =================================================== -->
+        <!-- =================================================== -->
         <mkdir dir="${javadoc.dir}/${subset2}"/>
         <javadoc packagenames="${subset2-doc-includes}"
-	         sourcepath="${src.dir}:${gensrc.dir}"
-		 classpathref="classpath.master"
+                 sourcepath="${src.dir}:${gensrc.dir}"
+                 classpathref="classpath.master"
                  destdir="${javadoc.dir}/${subset2}"
-		 author="true"
-		 version="true"
-		 use="true"
+                 author="true"
+                 version="true"
+                 use="true"
                  windowtitle="${subset2}"/>
 
-	<!-- =================================================== -->
+        <!-- =================================================== -->
 
         <mkdir dir="${javadoc.dir}/${subset3}"/>
         <javadoc packagenames="${subset3-doc-includes}"
-	         sourcepath="${src.dir}:${gensrc.dir}"
-		 classpathref="classpath.master"
+                 sourcepath="${src.dir}:${gensrc.dir}"
+                 classpathref="classpath.master"
                  destdir="${javadoc.dir}/${subset3}"
-		 author="true"
-		 version="true"
-		 use="true"
+                 author="true"
+                 version="true"
+                 use="true"
                  windowtitle="${subset3}"/>
-	<!-- =================================================== -->
+        <!-- =================================================== -->
 
         <mkdir dir="${javadoc.dir}/${subset4}"/>
         <javadoc packagenames="${subset4-doc-includes}"
-	         sourcepath="${src.dir}:${gensrc.dir}"
-		 classpathref="classpath.master"
+                 sourcepath="${src.dir}:${gensrc.dir}"
+                 classpathref="classpath.master"
                  destdir="${javadoc.dir}/${subset4}"
-		 author="true"
-		 version="true"
-		 use="true"
+                 author="true"
+                 version="true"
+                 use="true"
                  windowtitle="${subset4}"/>
     </target>
 
@@ -1177,28 +1177,28 @@
         <jar jarfile="${releaselib.dir}/bundles/${subset1}-javadocs.jar"
             duplicate="fail">
             <fileset dir="${javadoc.dir}/${subset1}">
-		<include name="**/**"/>
+                <include name="**/**"/>
             </fileset>
         </jar>
 
         <jar jarfile="${releaselib.dir}/bundles/${subset2}-javadocs.jar"
             duplicate="fail">
             <fileset dir="${javadoc.dir}/${subset2}">
-		<include name="**/**"/>
+                <include name="**/**"/>
             </fileset>
         </jar>
 
         <jar jarfile="${releaselib.dir}/bundles/${subset3}-javadocs.jar"
             duplicate="fail">
             <fileset dir="${javadoc.dir}/${subset3}">
-		<include name="**/**"/>
+                <include name="**/**"/>
             </fileset>
         </jar>
 
         <jar jarfile="${releaselib.dir}/bundles/${subset4}-javadocs.jar"
             duplicate="fail">
             <fileset dir="${javadoc.dir}/${subset4}">
-		<include name="**/**"/>
+                <include name="**/**"/>
             </fileset>
         </jar>
 
@@ -1207,45 +1207,45 @@
     <!-- ========================= Renaming ========================= -->
 
     <target name="rename" depends="init">
-	<mkdir dir="build/rename/ee"/>
-	<java classname="org.glassfish.pfl.basic.tools.file.WorkspaceRename"
+        <mkdir dir="build/rename/ee"/>
+        <java classname="org.glassfish.pfl.basic.tools.file.WorkspaceRename"
          fork="true" classpathref="classpath.master"
-	    dir="${root.dir}" failonerror="true">
-	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-	    <arg value="-verbose"/>
-	    <arg value="1"/>
-	    <arg value="-dryrun"/>
-	    <arg value="false"/>
-	    <arg value="-source"/>
-	    <arg value="."/>
-	    <arg value="-destination"/>
-	    <arg value="build/rename/ee"/>
-	    <arg value="-version"/>
-	    <arg value="ee"/>
+            dir="${root.dir}" failonerror="true">
+            <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
+            <arg value="-verbose"/>
+            <arg value="1"/>
+            <arg value="-dryrun"/>
+            <arg value="false"/>
+            <arg value="-source"/>
+            <arg value="."/>
+            <arg value="-destination"/>
+            <arg value="build/rename/ee"/>
+            <arg value="-version"/>
+            <arg value="ee"/>
             <arg value="-patterns"/>
-            <arg value="com.sun.corba.se:com.sun.corba.VERSION"/>
-	</java>
+            <arg value="com.sun.corba.ee:com.sun.corba.VERSION"/>
+        </java>
     </target>
 
     <target name="rename-quiet" depends="init">
-	<mkdir dir="build/rename/ee"/>
-	<java classname="org.glassfish.pfl.basic.tools.file.WorkspaceRename"
+        <mkdir dir="build/rename/ee"/>
+        <java classname="org.glassfish.pfl.basic.tools.file.WorkspaceRename"
          fork="true" classpathref="classpath.master"
-	    dir="${root.dir}" failonerror="true">
-	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-	    <arg value="-verbose"/>
-	    <arg value="0"/>
-	    <arg value="-dryrun"/>
-	    <arg value="false"/>
-	    <arg value="-source"/>
-	    <arg value="."/>
-	    <arg value="-destination"/>
-	    <arg value="build/rename/ee"/>
-	    <arg value="-version"/>
-	    <arg value="ee"/>
+            dir="${root.dir}" failonerror="true">
+            <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
+            <arg value="-verbose"/>
+            <arg value="0"/>
+            <arg value="-dryrun"/>
+            <arg value="false"/>
+            <arg value="-source"/>
+            <arg value="."/>
+            <arg value="-destination"/>
+            <arg value="build/rename/ee"/>
+            <arg value="-version"/>
+            <arg value="ee"/>
             <arg value="-patterns"/>
-            <arg value="com.sun.corba.se:com.sun.corba.VERSION"/>
-	</java>
+            <arg value="com.sun.corba.ee:com.sun.corba.VERSION"/>
+        </java>
     </target>
 
     
@@ -1436,69 +1436,69 @@
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
             <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/se/org/omg/CSI"/>
+             value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/ee/org/omg/CSI"/>
             <param name="corba-value" value=""/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value=""/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes"
-             value="-pkgPrefix CSI com.sun.corba.se.org.omg"/>
+             value="-pkgPrefix CSI com.sun.corba.ee.org.omg"/>
             <param name="idl-value"
-             value="${src.dir}/com/sun/corba/se/org/omg/CSI/CSI.idl"/>
+             value="${src.dir}/com/sun/corba/ee/org/omg/CSI/CSI.idl"/>
             <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/com/sun/corba/se/org/omg/CSI"/>
+             value="${gensrc.dir}/com/sun/corba/ee/org/omg/CSI"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
             <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/se/org/omg/CSI"/>
+             value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/ee/org/omg/CSI"/>
             <param name="corba-value" value=""/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value=""/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes"
-             value="-pkgPrefix GSSUP com.sun.corba.se.org.omg -pkgPrefix CSI com.sun.corba.se.org.omg"/>
+             value="-pkgPrefix GSSUP com.sun.corba.ee.org.omg -pkgPrefix CSI com.sun.corba.ee.org.omg"/>
             <param name="idl-value"
-             value="${src.dir}/com/sun/corba/se/org/omg/GSSUP/GSSUP.idl"/>
+             value="${src.dir}/com/sun/corba/ee/org/omg/GSSUP/GSSUP.idl"/>
             <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/com/sun/corba/se/org/omg/GSSUP"/>
+             value="${gensrc.dir}/com/sun/corba/ee/org/omg/GSSUP"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
             <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/se/org/omg/CSI"/>
+             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/ee/org/omg/CSI"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value="-D CORBA3"/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value="-pkgTranslate IOP org.omg.IOP"/>
             <param name="pkg-prefixes"
-             value="-pkgPrefix CSIIOP com.sun.corba.se.org.omg -pkgPrefix CSI com.sun.corba.se.org.omg"/>
+             value="-pkgPrefix CSIIOP com.sun.corba.ee.org.omg -pkgPrefix CSI com.sun.corba.ee.org.omg"/>
             <param name="idl-value"
-             value="${src.dir}/com/sun/corba/se/org/omg/CSIIOP/CSIIOP.idl"/>
+             value="${src.dir}/com/sun/corba/ee/org/omg/CSIIOP/CSIIOP.idl"/>
             <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/com/sun/corba/se/org/omg/CSIIOP"/>
+             value="${gensrc.dir}/com/sun/corba/ee/org/omg/CSIIOP"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
             <param name="includes-value"
-             value="-i ${gensrc.dir}/com/sun/corba/se/spi/activation"/>
+             value="-i ${gensrc.dir}/com/sun/corba/ee/spi/activation"/>
             <param name="corba-value" value=""/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value=""/>
             <param name="oldImplBase-value" value="-oldImplBase"/>
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes"
-             value="-pkgPrefix activation com.sun.corba.se.spi"/>
+             value="-pkgPrefix activation com.sun.corba.ee.spi"/>
             <param name="idl-value"
-             value="${src.dir}/com/sun/corba/se/spi/activation/activation.idl"/>
+             value="${src.dir}/com/sun/corba/ee/spi/activation/activation.idl"/>
             <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/com/sun/corba/se/spi/activation"/>
+             value="${gensrc.dir}/com/sun/corba/ee/spi/activation"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
     </target>

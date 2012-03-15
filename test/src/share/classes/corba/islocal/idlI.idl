@@ -47,9 +47,9 @@ module corba
     module islocal
     {
         interface idlI
-	{
-	    string o(in string x);
-	};
+        {
+            string o(in string x);
+        };
     };
 };
 

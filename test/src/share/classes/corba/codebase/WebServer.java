@@ -184,7 +184,7 @@ public class WebServer extends Thread implements HttpConstants {
             }
             
             while (run) {
-		try {
+                try {
                     Socket s = ss.accept();
                     Worker w = null;
                     synchronized (threads) {
@@ -198,7 +198,7 @@ public class WebServer extends Thread implements HttpConstants {
                             w.setSocket(s);
                         }
                     }
-		} catch (IOException e) {}
+                } catch (IOException e) {}
             }
             
             
@@ -288,7 +288,7 @@ class Worker implements HttpConstants, Runnable {
              */
             int nread = 0, r = 0;
 
-	outerloop:
+        outerloop:
             while (nread < BUF_SIZE) {
                 r = is.read(buf, nread, BUF_SIZE - nread);
                 if (r == -1) {
@@ -328,7 +328,7 @@ class Worker implements HttpConstants, Runnable {
             } else {
                 /* we don't support this method */
                 ps.print("HTTP/1.0 " + HTTP_BAD_METHOD +
-			 " unsupported method type: ");
+                         " unsupported method type: ");
                 ps.write(buf, 0, 5);
                 ps.write(EOL);
                 ps.flush();
@@ -394,7 +394,7 @@ class Worker implements HttpConstants, Runnable {
                 result = temp;
             }
         }
-	server.log.println("checkAliases: " + name + " --> " + result);
+        server.log.println("checkAliases: " + name + " --> " + result);
         return result;
     }
     
@@ -413,7 +413,7 @@ class Worker implements HttpConstants, Runnable {
             ret = true;
         }
         server.log("From " +s.getInetAddress().getHostAddress()+": GET " +
-		   targ.getAbsolutePath()+"-->"+rCode);
+                   targ.getAbsolutePath()+"-->"+rCode);
         ps.print("Server: Simple java");
         ps.write(EOL);
         ps.print("Date: " + (new Date()));
@@ -423,7 +423,7 @@ class Worker implements HttpConstants, Runnable {
                 ps.print("Content-length: "+targ.length());
                 ps.write(EOL);
                 ps.print("Last Modified: " + (new
-					      Date(targ.lastModified())));
+                                              Date(targ.lastModified())));
                 ps.write(EOL);
                 String name = targ.getName();
                 int ind = name.lastIndexOf('.');
@@ -449,34 +449,34 @@ void send404(File targ, PrintStream ps) throws IOException {
     ps.write(EOL);
     ps.write(EOL);
     ps.println("Not Found\n\n"+
-	       "The requested resource was not found.\n");
+               "The requested resource was not found.\n");
 }
 
 void sendFile(File targ, PrintStream ps) throws IOException {
     InputStream is = null;
     if (targ.isDirectory()) {
-	listDirectory(targ, ps);
-	return;
+        listDirectory(targ, ps);
+        return;
     } else {
-	server.log.print("sendFile: " + targ.getAbsolutePath() + ", length = " + targ.length());
-	is = new FileInputStream(targ.getAbsolutePath());
+        server.log.print("sendFile: " + targ.getAbsolutePath() + ", length = " + targ.length());
+        is = new FileInputStream(targ.getAbsolutePath());
     }
     int sent = 0;
     try {
-	int n;
-	while ((n = is.read(buf)) > 0) {
-	    ps.write(buf, 0, n);
-	    sent += n;
-	}
-	server.log.println(", sent = " + sent);
+        int n;
+        while ((n = is.read(buf)) > 0) {
+            ps.write(buf, 0, n);
+            sent += n;
+        }
+        server.log.println(", sent = " + sent);
 
         System.out.println("Sent file: " + targ.getAbsolutePath());
 
     } catch (Exception e) {
-	server.log.println(", CAUGHT = " + e);
+        server.log.println(", CAUGHT = " + e);
     } finally {
-	//            ps.flush();
-	is.close();
+        //            ps.flush();
+        is.close();
     }
 }
 

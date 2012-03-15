@@ -55,7 +55,7 @@ import org.testng.TestNG ;
 
 import mymath.BigDecimal ;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
 
 import corba.framework.TestngRunner ;
@@ -162,8 +162,8 @@ public class Client
     }
 
     private void setSerializationDebug( boolean flag ) {
-        com.sun.corba.se.spi.orb.ORB morb =
-            (com.sun.corba.se.spi.orb.ORB)orb ;
+        com.sun.corba.ee.spi.orb.ORB morb =
+            (com.sun.corba.ee.spi.orb.ORB)orb ;
         if (flag) {
             morb.setDebugFlags( "cdr", "streamFormatVersion", "valueHandler" ) ;
         } else {

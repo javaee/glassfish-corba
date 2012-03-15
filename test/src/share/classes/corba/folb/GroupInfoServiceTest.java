@@ -56,19 +56,19 @@ public interface GroupInfoServiceTest
     extends Remote
 {
     public boolean addInstance(String x)
-	throws RemoteException;
+        throws RemoteException;
 
     public boolean removeInstance(String x)
-	throws RemoteException;
+        throws RemoteException;
 
     public boolean addAcceptor(String x)
-	throws RemoteException;
+        throws RemoteException;
 
     public boolean removeAcceptorAndConnections(String x)
-	throws RemoteException;
+        throws RemoteException;
 
     public void doThreadDump()
-	throws RemoteException;
+        throws RemoteException;
 }
 
 // End of file.

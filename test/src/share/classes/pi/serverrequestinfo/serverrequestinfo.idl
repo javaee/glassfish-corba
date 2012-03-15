@@ -52,11 +52,11 @@ module ServerRequestInfo
         void saySystemException();
         void sayUserException() raises (ExampleException);
         oneway void sayOneway();
-	void sayInvokeAgain( in long n );
+        void sayInvokeAgain( in long n );
 
-	// exceptionRaised is true if the last invocation resulted in
-	// an exception.  Returns the name of the method to invoke next.
-	string syncWithServer( in boolean exceptionRaised );
+        // exceptionRaised is true if the last invocation resulted in
+        // an exception.  Returns the name of the method to invoke next.
+        string syncWithServer( in boolean exceptionRaised );
     };
 };
 

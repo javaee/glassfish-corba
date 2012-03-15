@@ -37,11 +37,11 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.protocol ;
+package com.sun.corba.ee.spi.protocol ;
 
-import com.sun.corba.se.spi.transport.ContactInfoList ;
+import com.sun.corba.ee.spi.transport.ContactInfoList ;
 
-import com.sun.corba.se.spi.protocol.ClientDelegate ;
+import com.sun.corba.ee.spi.protocol.ClientDelegate ;
 
 /** Interface used to create a ClientDelegate from a ContactInfoList.
  */

@@ -45,7 +45,7 @@ import junit.framework.TestSuite;
 import junit.framework.Assert;
 
 import corba.dynamicrmiiiop.testclasses.*;
-import com.sun.corba.se.impl.presentation.rmi.IDLTypesUtil ;
+import com.sun.corba.ee.impl.presentation.rmi.IDLTypesUtil ;
 
 public class TestRMIIDLTypes extends TestCase {
 

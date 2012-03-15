@@ -96,7 +96,7 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * constructed instance.
      */
     protected boolean requireNewInstance() {
-	return false;
+        return false;
     }
 
     /**
@@ -104,7 +104,7 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param stack The context stack.
      */
     protected boolean parseNonConforming(ContextStack stack) {
-	return valueMethods;
+        return valueMethods;
     }
 
     /**
@@ -114,8 +114,8 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return An RemoteType or null if is non-conforming.
      */
     protected sun.rmi.rmic.iiop.CompoundType getTopType(ClassDefinition cdef,
-							ContextStack stack) {
-	return CompoundType.forCompound(cdef,stack);
+                                                        ContextStack stack) {
+        return CompoundType.forCompound(cdef,stack);
     }
 
 
@@ -127,46 +127,46 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return the new identifier.
      */
     protected Identifier getOutputId (
-				      OutputType ot ) {
-	Identifier id = super.getOutputId( ot );
+                                      OutputType ot ) {
+        Identifier id = super.getOutputId( ot );
 
-	Type t = ot.getType();
-	String fName = ot.getName();
+        Type t = ot.getType();
+        String fName = ot.getName();
 
-	if ( id == idJavaLangClass )                 //java.lang.Class and array of
-	    if ( t.isArray() )
-		return Identifier.lookup(
-					 "org.omg.boxedRMI.javax.rmi.CORBA." + fName  );
-	    else return idClassDesc;
+        if ( id == idJavaLangClass )                 //java.lang.Class and array of
+            if ( t.isArray() )
+                return Identifier.lookup(
+                                         "org.omg.boxedRMI.javax.rmi.CORBA." + fName  );
+            else return idClassDesc;
 
-	if ( id == idJavaLangString &&                  //array of java.lang.String
-	     t.isArray() )
-	    return Identifier.lookup( "org.omg.boxedRMI.CORBA." + fName );
+        if ( id == idJavaLangString &&                  //array of java.lang.String
+             t.isArray() )
+            return Identifier.lookup( "org.omg.boxedRMI.CORBA." + fName );
 
-	if ( "org.omg.CORBA.Object".equals( t.getQualifiedName() ) &&
-	     t.isArray() )                          //array of org.omg.CORBA.Object
-	    return Identifier.lookup( "org.omg.boxedRMI." + fName );
+        if ( "org.omg.CORBA.Object".equals( t.getQualifiedName() ) &&
+             t.isArray() )                          //array of org.omg.CORBA.Object
+            return Identifier.lookup( "org.omg.boxedRMI." + fName );
 
-	if ( t.isArray()) {                                                 //array
-	    ArrayType at = (ArrayType)t;
-	    Type et = at.getElementType();
-	    if ( et.isCompound() ) {
-		CompoundType ct = (CompoundType)et;
-		String qName = ct.getQualifiedName();
-		if ( ct.isIDLEntity() )
-		    return Identifier.lookup( getQualifiedName( at ) );
-	    }
-	    return Identifier.lookup( idBoxedRMI,id );
-	}
+        if ( t.isArray()) {                                                 //array
+            ArrayType at = (ArrayType)t;
+            Type et = at.getElementType();
+            if ( et.isCompound() ) {
+                CompoundType ct = (CompoundType)et;
+                String qName = ct.getQualifiedName();
+                if ( ct.isIDLEntity() )
+                    return Identifier.lookup( getQualifiedName( at ) );
+            }
+            return Identifier.lookup( idBoxedRMI,id );
+        }
 
-	if ( t.isCompound() ) {                                   //boxed IDLEntity
-	    CompoundType ct = (CompoundType)t;
-	    String qName = ct.getQualifiedName();
-	    if ( ct.isBoxed() )
-		return Identifier.lookup( getQualifiedName( ct ) );
-	}
+        if ( t.isCompound() ) {                                   //boxed IDLEntity
+            CompoundType ct = (CompoundType)t;
+            String qName = ct.getQualifiedName();
+            if ( ct.isBoxed() )
+                return Identifier.lookup( getQualifiedName( ct ) );
+        }
 
-	return id;
+        return id;
     }
 
 
@@ -179,7 +179,7 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param outputType One of the items returned by getOutputTypesFor(...)
      */
     protected String getFileNameExtensionFor(OutputType outputType) {
-	return IDL_FILE_EXTENSION;
+        return IDL_FILE_EXTENSION;
     }
 
 
@@ -192,67 +192,67 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      */
     public boolean parseArgs(String argv[], Main main) {
         boolean result = super.parseArgs(argv,main);
-	String idlFrom;
-	String idlTo;
+        String idlFrom;
+        String idlTo;
         if (result) {
-	nextArg:
+        nextArg:
             for (int i = 0; i < argv.length; i++) {
                 if (argv[i] != null) {
                     if (argv[i].equalsIgnoreCase("-idl")) {
                         idl = true;
-			argv[i] = null;
-		    }
-		    else if ( argv[i].equalsIgnoreCase( "-valueMethods" ) ) {
-			valueMethods = true;
-			argv[i] = null;
-		    }
-		    else if ( argv[i].equalsIgnoreCase( "-noValueMethods" ) ) {
-			valueMethods = false;
-			argv[i] = null;
+                        argv[i] = null;
                     }
-		    else if ( argv[i].equalsIgnoreCase( "-init" ) ) {
-			factory = false;
-			argv[i] = null;
+                    else if ( argv[i].equalsIgnoreCase( "-valueMethods" ) ) {
+                        valueMethods = true;
+                        argv[i] = null;
+                    }
+                    else if ( argv[i].equalsIgnoreCase( "-noValueMethods" ) ) {
+                        valueMethods = false;
+                        argv[i] = null;
+                    }
+                    else if ( argv[i].equalsIgnoreCase( "-init" ) ) {
+                        factory = false;
+                        argv[i] = null;
                 }
-		    else if ( argv[i].equalsIgnoreCase( "-factory" ) ) {
-			factory = true;
-			argv[i] = null;
+                    else if ( argv[i].equalsIgnoreCase( "-factory" ) ) {
+                        factory = true;
+                        argv[i] = null;
             }
-		    else if ( argv[i].equalsIgnoreCase( "-idlfile" ) ) {
-			argv[i] = null;
-			if ( ++i < argv.length && argv[i] != null && !argv[i].startsWith("-") ) {
-			    idlFrom = argv[i];
-			    argv[i] = null;
-			    if ( ++i < argv.length && argv[i] != null && !argv[i].startsWith("-") ) {
-				idlTo = argv[i];
-				argv[i] = null;
-				ifHash.put( idlFrom,idlTo );
-				continue nextArg;
+                    else if ( argv[i].equalsIgnoreCase( "-idlfile" ) ) {
+                        argv[i] = null;
+                        if ( ++i < argv.length && argv[i] != null && !argv[i].startsWith("-") ) {
+                            idlFrom = argv[i];
+                            argv[i] = null;
+                            if ( ++i < argv.length && argv[i] != null && !argv[i].startsWith("-") ) {
+                                idlTo = argv[i];
+                                argv[i] = null;
+                                ifHash.put( idlFrom,idlTo );
+                                continue nextArg;
         }
-			}
-			main.error("rmic.option.requires.argument", "-idlfile");
-			result = false;
-		    }
-		    else if ( argv[i].equalsIgnoreCase( "-idlmodule" ) ) {
-			argv[i] = null;
-			if ( ++i < argv.length && argv[i] != null && !argv[i].startsWith("-") ) {
-			    idlFrom = argv[i];
-			    argv[i] = null;
-			    if ( ++i < argv.length && argv[i] != null && !argv[i].startsWith("-") ) {
-				idlTo = argv[i];
-				argv[i] = null;
-				imHash.put( idlFrom,idlTo );
-				continue nextArg;
-			    }
-			}
-			main.error("rmic.option.requires.argument", "-idlmodule");
-			result = false;
-		    }
+                        }
+                        main.error("rmic.option.requires.argument", "-idlfile");
+                        result = false;
+                    }
+                    else if ( argv[i].equalsIgnoreCase( "-idlmodule" ) ) {
+                        argv[i] = null;
+                        if ( ++i < argv.length && argv[i] != null && !argv[i].startsWith("-") ) {
+                            idlFrom = argv[i];
+                            argv[i] = null;
+                            if ( ++i < argv.length && argv[i] != null && !argv[i].startsWith("-") ) {
+                                idlTo = argv[i];
+                                argv[i] = null;
+                                imHash.put( idlFrom,idlTo );
+                                continue nextArg;
+                            }
+                        }
+                        main.error("rmic.option.requires.argument", "-idlmodule");
+                        result = false;
+                    }
 
 
-		}
-	    }
-	}
+                }
+            }
+        }
         return result;
     }
 
@@ -267,37 +267,37 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return Array of OutputTypes to generate
      */
     protected OutputType[] getOutputTypesFor(
-					     CompoundType topType,
-					     HashSet alreadyChecked ) {
-	Vector refVec = getAllReferencesFor( topType );
-	Vector outVec = new Vector();
-	for ( int i1 = 0; i1 < refVec.size(); i1++ ) {          //forall references
-	    Type t = (Type)refVec.elementAt( i1 );
-	    if ( t.isArray() ) {
-		ArrayType at = (ArrayType)t;
-		int dim = at.getArrayDimension();
-		Type et = at.getElementType();
-		String fName = unEsc( et.getIDLName() ).replace( ' ','_' );
-		for ( int i2 = 0; i2 < dim; i2++ ) {                //foreach dimension
-		    String fileName = "seq" + ( i2 + 1 ) + "_" + fName;
-		    outVec.addElement( new OutputType( fileName,at ) );
-		}
-	    }
-	    else if ( t.isCompound() ) {
-		String fName = unEsc( t.getIDLName() );
-		outVec.addElement( new OutputType( fName.replace( ' ','_' ),t ) );
-	    if ( t.isClass() ) {
-		ClassType ct = (ClassType)t;
-		    if ( ct.isException() ) {                            //exception file
-			fName = unEsc( ct.getIDLExceptionName() );
-			outVec.addElement( new OutputType( fName.replace( ' ','_' ),t ) );
-	    }
-	}
+                                             CompoundType topType,
+                                             HashSet alreadyChecked ) {
+        Vector refVec = getAllReferencesFor( topType );
+        Vector outVec = new Vector();
+        for ( int i1 = 0; i1 < refVec.size(); i1++ ) {          //forall references
+            Type t = (Type)refVec.elementAt( i1 );
+            if ( t.isArray() ) {
+                ArrayType at = (ArrayType)t;
+                int dim = at.getArrayDimension();
+                Type et = at.getElementType();
+                String fName = unEsc( et.getIDLName() ).replace( ' ','_' );
+                for ( int i2 = 0; i2 < dim; i2++ ) {                //foreach dimension
+                    String fileName = "seq" + ( i2 + 1 ) + "_" + fName;
+                    outVec.addElement( new OutputType( fileName,at ) );
+                }
+            }
+            else if ( t.isCompound() ) {
+                String fName = unEsc( t.getIDLName() );
+                outVec.addElement( new OutputType( fName.replace( ' ','_' ),t ) );
+            if ( t.isClass() ) {
+                ClassType ct = (ClassType)t;
+                    if ( ct.isException() ) {                            //exception file
+                        fName = unEsc( ct.getIDLExceptionName() );
+                        outVec.addElement( new OutputType( fName.replace( ' ','_' ),t ) );
+            }
+        }
     }
     }
-	OutputType[] outArr = new OutputType[outVec.size()];
-	outVec.copyInto( outArr );
-	return outArr;
+        OutputType[] outArr = new OutputType[outVec.size()];
+        outVec.copyInto( outArr );
+        return outArr;
     }
 
     /**
@@ -307,46 +307,46 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return Vector of Types for which IDL must be generated.
      */
     protected Vector getAllReferencesFor(
-					 CompoundType ct ) {
-	Hashtable refHash = new Hashtable();
-	Hashtable spcHash = new Hashtable();
-	Hashtable arrHash = new Hashtable();
-	int refSize;
-	refHash.put( ct.getQualifiedName(),ct );               //put the given type
-	accumulateReferences( refHash,spcHash,arrHash );
-	do {
-	    refSize = refHash.size();
-	    accumulateReferences( refHash,spcHash,arrHash );
-	}
-	while ( refSize < refHash.size() );        //till hashtable stays same size
+                                         CompoundType ct ) {
+        Hashtable refHash = new Hashtable();
+        Hashtable spcHash = new Hashtable();
+        Hashtable arrHash = new Hashtable();
+        int refSize;
+        refHash.put( ct.getQualifiedName(),ct );               //put the given type
+        accumulateReferences( refHash,spcHash,arrHash );
+        do {
+            refSize = refHash.size();
+            accumulateReferences( refHash,spcHash,arrHash );
+        }
+        while ( refSize < refHash.size() );        //till hashtable stays same size
 
-	Vector outVec = new Vector();
-	Enumeration e = refHash.elements();                   //ordinary references
-	while ( e.hasMoreElements() ) {
-	    CompoundType t = (CompoundType)e.nextElement();
-	    outVec.addElement( t );
-	}
-	e = spcHash.elements();                                //special references
-	while ( e.hasMoreElements() ) {
-	    CompoundType t = (CompoundType)e.nextElement();
-	    outVec.addElement( t );
+        Vector outVec = new Vector();
+        Enumeration e = refHash.elements();                   //ordinary references
+        while ( e.hasMoreElements() ) {
+            CompoundType t = (CompoundType)e.nextElement();
+            outVec.addElement( t );
+        }
+        e = spcHash.elements();                                //special references
+        while ( e.hasMoreElements() ) {
+            CompoundType t = (CompoundType)e.nextElement();
+            outVec.addElement( t );
     }
-	e = arrHash.elements();                                  //array references
-					 nextSequence:
-	while ( e.hasMoreElements() ) {
-	    ArrayType at = (ArrayType)e.nextElement();
-	    int dim = at.getArrayDimension();
-	    Type et = at.getElementType();
-	    Enumeration e2 = arrHash.elements();
-	    while ( e2.hasMoreElements() ) {                   //eliminate duplicates
-		ArrayType at2 = (ArrayType)e2.nextElement();
-		if ( et == at2.getElementType() &&                //same element type &
-		     dim < at2.getArrayDimension() )               //smaller dimension?
-		    continue nextSequence;                              //ignore this one
-	    }
-	    outVec.addElement( at );
-	}
-	return outVec;
+        e = arrHash.elements();                                  //array references
+                                         nextSequence:
+        while ( e.hasMoreElements() ) {
+            ArrayType at = (ArrayType)e.nextElement();
+            int dim = at.getArrayDimension();
+            Type et = at.getElementType();
+            Enumeration e2 = arrHash.elements();
+            while ( e2.hasMoreElements() ) {                   //eliminate duplicates
+                ArrayType at2 = (ArrayType)e2.nextElement();
+                if ( et == at2.getElementType() &&                //same element type &
+                     dim < at2.getArrayDimension() )               //smaller dimension?
+                    continue nextSequence;                              //ignore this one
+            }
+            outVec.addElement( at );
+        }
+        return outVec;
     }
 
 
@@ -359,30 +359,30 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param arrHash Hashtable containing referenced arrays (dimensioned)
      */
     protected void accumulateReferences(
-					Hashtable refHash,
-					Hashtable spcHash,
-					Hashtable arrHash ) {
-	Enumeration e = refHash.elements();
-	while ( e.hasMoreElements() ) {
-	    CompoundType t = (CompoundType)e.nextElement();
-	    Vector datVec = getData( t );                     //collect and sort data
-	    Vector mthVec = getMethods( t );             //collect and filter methods
-	    getInterfaces( t,refHash );                          //collect interfaces
-	    getInheritance( t,refHash );                            //add inheritance
-	    getMethodReferences( mthVec,refHash,spcHash,arrHash,refHash );
-	    getMemberReferences( datVec,refHash,spcHash,arrHash );
-	}
-	e = arrHash.elements();                      //add array element references
-	while ( e.hasMoreElements() ) {
-	    ArrayType at = (ArrayType)e.nextElement();
-	    Type et = at.getElementType();
-	    addReference( et,refHash,spcHash,arrHash );
-	}
-	e = refHash.elements();
-	while ( e.hasMoreElements() ) {
-	    CompoundType t = (CompoundType)e.nextElement();
-	    if ( !isIDLGeneratedFor( t ) )              //remove if no IDL generation
-		refHash.remove( t.getQualifiedName() );
+                                        Hashtable refHash,
+                                        Hashtable spcHash,
+                                        Hashtable arrHash ) {
+        Enumeration e = refHash.elements();
+        while ( e.hasMoreElements() ) {
+            CompoundType t = (CompoundType)e.nextElement();
+            Vector datVec = getData( t );                     //collect and sort data
+            Vector mthVec = getMethods( t );             //collect and filter methods
+            getInterfaces( t,refHash );                          //collect interfaces
+            getInheritance( t,refHash );                            //add inheritance
+            getMethodReferences( mthVec,refHash,spcHash,arrHash,refHash );
+            getMemberReferences( datVec,refHash,spcHash,arrHash );
+        }
+        e = arrHash.elements();                      //add array element references
+        while ( e.hasMoreElements() ) {
+            ArrayType at = (ArrayType)e.nextElement();
+            Type et = at.getElementType();
+            addReference( et,refHash,spcHash,arrHash );
+        }
+        e = refHash.elements();
+        while ( e.hasMoreElements() ) {
+            CompoundType t = (CompoundType)e.nextElement();
+            if ( !isIDLGeneratedFor( t ) )              //remove if no IDL generation
+                refHash.remove( t.getQualifiedName() );
     }
     }
 
@@ -400,20 +400,20 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return true or false
      */
     protected boolean isIDLGeneratedFor(
-				 CompoundType t ) {
-	if ( t.isCORBAObject() ) return false;
-	if ( t.isIDLEntity() )
-	    if ( t.isBoxed() ) return true;
-	    else if ( "org.omg.CORBA.portable.IDLEntity"
-		      .equals( t.getQualifiedName() ) ) return true;
-	    else if ( t.isCORBAUserException() ) return true;
-	    else return false;
-	Hashtable inhHash = new Hashtable();
-	getInterfaces( t,inhHash );
-	if ( t.getTypeCode() == TYPE_IMPLEMENTATION )
-	    if ( inhHash.size() < 2 ) return false;         //no multiple inheritance
-	    else return true;
-	return true;                                   //generate IDL for this type
+                                 CompoundType t ) {
+        if ( t.isCORBAObject() ) return false;
+        if ( t.isIDLEntity() )
+            if ( t.isBoxed() ) return true;
+            else if ( "org.omg.CORBA.portable.IDLEntity"
+                      .equals( t.getQualifiedName() ) ) return true;
+            else if ( t.isCORBAUserException() ) return true;
+            else return false;
+        Hashtable inhHash = new Hashtable();
+        getInterfaces( t,inhHash );
+        if ( t.getTypeCode() == TYPE_IMPLEMENTATION )
+            if ( inhHash.size() < 2 ) return false;         //no multiple inheritance
+            else return true;
+        return true;                                   //generate IDL for this type
     }
 
 
@@ -427,57 +427,57 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeOutputFor(
-				  OutputType ot,
-				  HashSet alreadyChecked,
-				  IndentingWriter p )
-	throws IOException {
-	Type t = ot.getType();
-	if ( t.isArray() ) {                                //specialcase: sequence
-	    writeSequence( ot,p );
-	    return;
-	}
-	if ( isSpecialReference( t ) ) {                //specialcase: IDL typecode
-	    writeSpecial( t,p );
-	    return;
-	}
-	if ( t.isCompound() ) {                            //specialcase: boxed IDL
-	    CompoundType ct = (CompoundType)t;
-	    if ( ct.isIDLEntity() && ct.isBoxed() ) {
-		writeBoxedIDL( ct,p );
-		return;
-	    }
-	}
-	if ( t.isClass() ) {                               //specialcase: exception
-	    ClassType ct = (ClassType)t;
-	    if ( ct.isException() ) {
-		String eName = unEsc( ct.getIDLExceptionName() );
-		String fName = ot.getName();
-		if ( fName.equals( eName.replace( ' ','_' ) ) ) {
-		    writeException( ct,p );
-		    return;
-		}
-	    }
-	}
-	switch ( t.getTypeCode() ) {                                 //general case
-	case TYPE_IMPLEMENTATION:
-	    writeImplementation( (ImplementationType)t,p );
-	    break;
-	case TYPE_NC_CLASS:
-	case TYPE_NC_INTERFACE:
-	    writeNCType( (CompoundType)t,p );
-	    break;
-	case TYPE_ABSTRACT:                        //AbstractType is a RemoteType
-	case TYPE_REMOTE:
-	    writeRemote( (RemoteType)t,p );
-	    break;
-	case TYPE_VALUE:
-	    writeValue( (ValueType)t,p );
-	    break;
-	default:
-	    throw new CompilerError(
-				    "IDLGenerator got unexpected type code: "
-				    + t.getTypeCode());
-	}
+                                  OutputType ot,
+                                  HashSet alreadyChecked,
+                                  IndentingWriter p )
+        throws IOException {
+        Type t = ot.getType();
+        if ( t.isArray() ) {                                //specialcase: sequence
+            writeSequence( ot,p );
+            return;
+        }
+        if ( isSpecialReference( t ) ) {                //specialcase: IDL typecode
+            writeSpecial( t,p );
+            return;
+        }
+        if ( t.isCompound() ) {                            //specialcase: boxed IDL
+            CompoundType ct = (CompoundType)t;
+            if ( ct.isIDLEntity() && ct.isBoxed() ) {
+                writeBoxedIDL( ct,p );
+                return;
+            }
+        }
+        if ( t.isClass() ) {                               //specialcase: exception
+            ClassType ct = (ClassType)t;
+            if ( ct.isException() ) {
+                String eName = unEsc( ct.getIDLExceptionName() );
+                String fName = ot.getName();
+                if ( fName.equals( eName.replace( ' ','_' ) ) ) {
+                    writeException( ct,p );
+                    return;
+                }
+            }
+        }
+        switch ( t.getTypeCode() ) {                                 //general case
+        case TYPE_IMPLEMENTATION:
+            writeImplementation( (ImplementationType)t,p );
+            break;
+        case TYPE_NC_CLASS:
+        case TYPE_NC_INTERFACE:
+            writeNCType( (CompoundType)t,p );
+            break;
+        case TYPE_ABSTRACT:                        //AbstractType is a RemoteType
+        case TYPE_REMOTE:
+            writeRemote( (RemoteType)t,p );
+            break;
+        case TYPE_VALUE:
+            writeValue( (ValueType)t,p );
+            break;
+        default:
+            throw new CompilerError(
+                                    "IDLGenerator got unexpected type code: "
+                                    + t.getTypeCode());
+        }
     }
 
 
@@ -487,28 +487,28 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeImplementation(
-				       ImplementationType t,
-				       IndentingWriter p )
-	throws IOException {
-	Hashtable inhHash = new Hashtable();
-	Hashtable refHash = new Hashtable();
-	getInterfaces( t,inhHash );                            //collect interfaces
+                                       ImplementationType t,
+                                       IndentingWriter p )
+        throws IOException {
+        Hashtable inhHash = new Hashtable();
+        Hashtable refHash = new Hashtable();
+        getInterfaces( t,inhHash );                            //collect interfaces
 
-	writeBanner( t,0,!isException,p );
-	writeInheritedIncludes( inhHash,p );
-	writeIfndef( t,0,!isException,!isForward,p );
-	writeIncOrb( p );
-	writeModule1( t,p );
-	p.pln();p.pI();
-	p.p( "interface " + t.getIDLName() );
-	writeInherits( inhHash,!forValuetype,p );
+        writeBanner( t,0,!isException,p );
+        writeInheritedIncludes( inhHash,p );
+        writeIfndef( t,0,!isException,!isForward,p );
+        writeIncOrb( p );
+        writeModule1( t,p );
+        p.pln();p.pI();
+        p.p( "interface " + t.getIDLName() );
+        writeInherits( inhHash,!forValuetype,p );
 
-	p.pln( " {" );
-	p.pln( "};" );
+        p.pln( " {" );
+        p.pln( "};" );
 
-	p.pO();p.pln();
-	writeModule2( t,p );
-	writeEpilog( t,refHash,p );
+        p.pO();p.pln();
+        writeModule2( t,p );
+        writeEpilog( t,refHash,p );
     }
 
 
@@ -520,40 +520,40 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeNCType(
-			       CompoundType t,
-			       IndentingWriter p )
-	throws IOException {
-	Vector conVec = getConstants( t );                      //collect constants
-	Vector mthVec = getMethods( t );                          //collect methods
-	Hashtable inhHash = new Hashtable();
-	Hashtable refHash = new Hashtable();
-	Hashtable spcHash = new Hashtable();
-	Hashtable arrHash = new Hashtable();
-	Hashtable excHash = new Hashtable();
-	getInterfaces( t,inhHash );                            //collect interfaces
-	getInheritance( t,inhHash );                              //add inheritance
-	getMethodReferences( mthVec,refHash,spcHash,arrHash,excHash );
+                               CompoundType t,
+                               IndentingWriter p )
+        throws IOException {
+        Vector conVec = getConstants( t );                      //collect constants
+        Vector mthVec = getMethods( t );                          //collect methods
+        Hashtable inhHash = new Hashtable();
+        Hashtable refHash = new Hashtable();
+        Hashtable spcHash = new Hashtable();
+        Hashtable arrHash = new Hashtable();
+        Hashtable excHash = new Hashtable();
+        getInterfaces( t,inhHash );                            //collect interfaces
+        getInheritance( t,inhHash );                              //add inheritance
+        getMethodReferences( mthVec,refHash,spcHash,arrHash,excHash );
 
-	writeProlog( t,refHash,spcHash,arrHash,excHash,inhHash,p );
-	writeModule1( t,p );
-	p.pln();p.pI();
-	p.p( "abstract valuetype " + t.getIDLName() );
-	writeInherits( inhHash,!forValuetype,p );
+        writeProlog( t,refHash,spcHash,arrHash,excHash,inhHash,p );
+        writeModule1( t,p );
+        p.pln();p.pI();
+        p.p( "abstract valuetype " + t.getIDLName() );
+        writeInherits( inhHash,!forValuetype,p );
 
-	p.pln( " {" );
-	if ( conVec.size() + mthVec.size() > 0 ) {                   //any content?
-	    p.pln();p.pI();
-	    for ( int i1 = 0; i1 < conVec.size(); i1++ )            //write constants
-		writeConstant( (CompoundType.Member)conVec.elementAt( i1 ),p );
-	    for ( int i1 = 0; i1 < mthVec.size(); i1++ )              //write methods
-		writeMethod( (CompoundType.Method)mthVec.elementAt( i1 ),p );
-	    p.pO();p.pln();
-	}
-	p.pln( "};" );
+        p.pln( " {" );
+        if ( conVec.size() + mthVec.size() > 0 ) {                   //any content?
+            p.pln();p.pI();
+            for ( int i1 = 0; i1 < conVec.size(); i1++ )            //write constants
+                writeConstant( (CompoundType.Member)conVec.elementAt( i1 ),p );
+            for ( int i1 = 0; i1 < mthVec.size(); i1++ )              //write methods
+                writeMethod( (CompoundType.Method)mthVec.elementAt( i1 ),p );
+            p.pO();p.pln();
+        }
+        p.pln( "};" );
 
-		p.pO();p.pln();
-	writeModule2( t,p );
-	writeEpilog( t,refHash,p );
+                p.pO();p.pln();
+        writeModule2( t,p );
+        writeEpilog( t,refHash,p );
     }
 
 
@@ -566,42 +566,42 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeRemote(
-			       RemoteType t,
-			       IndentingWriter p )
-	throws IOException {
-	Vector conVec = getConstants( t );                      //collect constants
-	Vector mthVec = getMethods( t );                          //collect methods
-	Hashtable inhHash = new Hashtable();
-	Hashtable refHash = new Hashtable();
-	Hashtable spcHash = new Hashtable();
-	Hashtable arrHash = new Hashtable();
-	Hashtable excHash = new Hashtable();
-	getInterfaces( t,inhHash );                            //collect interfaces
-	getMethodReferences( mthVec,refHash,spcHash,arrHash,excHash );
+                               RemoteType t,
+                               IndentingWriter p )
+        throws IOException {
+        Vector conVec = getConstants( t );                      //collect constants
+        Vector mthVec = getMethods( t );                          //collect methods
+        Hashtable inhHash = new Hashtable();
+        Hashtable refHash = new Hashtable();
+        Hashtable spcHash = new Hashtable();
+        Hashtable arrHash = new Hashtable();
+        Hashtable excHash = new Hashtable();
+        getInterfaces( t,inhHash );                            //collect interfaces
+        getMethodReferences( mthVec,refHash,spcHash,arrHash,excHash );
 
-	writeProlog( t,refHash,spcHash,arrHash,excHash,inhHash,p );
-	writeModule1( t,p );
-	p.pln();p.pI();
-	if ( t.getTypeCode() == TYPE_ABSTRACT ) p.p( "abstract " );
-	p.p( "interface " + t.getIDLName() );
-	writeInherits( inhHash,!forValuetype,p );
+        writeProlog( t,refHash,spcHash,arrHash,excHash,inhHash,p );
+        writeModule1( t,p );
+        p.pln();p.pI();
+        if ( t.getTypeCode() == TYPE_ABSTRACT ) p.p( "abstract " );
+        p.p( "interface " + t.getIDLName() );
+        writeInherits( inhHash,!forValuetype,p );
 
-	p.pln( " {" );
-	if ( conVec.size() + mthVec.size() > 0 ) {      //any constants or methods?
-	    p.pln();p.pI();
-	    for ( int i1 = 0; i1 < conVec.size(); i1++ )                  //constants
-		writeConstant( (CompoundType.Member)conVec.elementAt( i1 ),p );
-	    for ( int i1 = 0; i1 < mthVec.size(); i1++ )        //methods, attributes
-		writeMethod( (CompoundType.Method)mthVec.elementAt( i1 ),p );
-	    p.pO();p.pln();
-	}
-	p.pln( "};" );
+        p.pln( " {" );
+        if ( conVec.size() + mthVec.size() > 0 ) {      //any constants or methods?
+            p.pln();p.pI();
+            for ( int i1 = 0; i1 < conVec.size(); i1++ )                  //constants
+                writeConstant( (CompoundType.Member)conVec.elementAt( i1 ),p );
+            for ( int i1 = 0; i1 < mthVec.size(); i1++ )        //methods, attributes
+                writeMethod( (CompoundType.Method)mthVec.elementAt( i1 ),p );
+            p.pO();p.pln();
+        }
+        p.pln( "};" );
 
-	p.pO();p.pln();
-	writeRepositoryID ( t,p );
-	p.pln();
-	writeModule2( t,p );
-	writeEpilog( t,refHash,p );
+        p.pO();p.pln();
+        writeRepositoryID ( t,p );
+        p.pln();
+        writeModule2( t,p );
+        writeEpilog( t,refHash,p );
     }
 
 
@@ -612,56 +612,56 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeValue(
-			      ValueType t,
-			      IndentingWriter p )
-	throws IOException {
-	Vector datVec = getData( t );                       //collect and sort data
-	Vector conVec = getConstants( t );                      //collect constants
-	Vector mthVec = getMethods( t );               //collect and filter methods
-	Hashtable inhHash = new Hashtable();
-	Hashtable refHash = new Hashtable();
-	Hashtable spcHash = new Hashtable();
-	Hashtable arrHash = new Hashtable();
-	Hashtable excHash = new Hashtable();
-	getInterfaces( t,inhHash );                            //collect interfaces
-	getInheritance( t,inhHash );                              //add inheritance
-	getMethodReferences( mthVec,refHash,spcHash,arrHash,excHash );
-	getMemberReferences( datVec,refHash,spcHash,arrHash );
+                              ValueType t,
+                              IndentingWriter p )
+        throws IOException {
+        Vector datVec = getData( t );                       //collect and sort data
+        Vector conVec = getConstants( t );                      //collect constants
+        Vector mthVec = getMethods( t );               //collect and filter methods
+        Hashtable inhHash = new Hashtable();
+        Hashtable refHash = new Hashtable();
+        Hashtable spcHash = new Hashtable();
+        Hashtable arrHash = new Hashtable();
+        Hashtable excHash = new Hashtable();
+        getInterfaces( t,inhHash );                            //collect interfaces
+        getInheritance( t,inhHash );                              //add inheritance
+        getMethodReferences( mthVec,refHash,spcHash,arrHash,excHash );
+        getMemberReferences( datVec,refHash,spcHash,arrHash );
 
-	writeProlog( t,refHash,spcHash,arrHash,excHash,inhHash,p );
-	writeModule1( t,p );
-	p.pln();p.pI();
-	if ( t.isCustom() ) p.p( "custom " );
-	p.p( "valuetype " + t.getIDLName() );
-	writeInherits( inhHash,forValuetype,p );
+        writeProlog( t,refHash,spcHash,arrHash,excHash,inhHash,p );
+        writeModule1( t,p );
+        p.pln();p.pI();
+        if ( t.isCustom() ) p.p( "custom " );
+        p.p( "valuetype " + t.getIDLName() );
+        writeInherits( inhHash,forValuetype,p );
 
-	p.pln( " {" );
-	if ( conVec.size() + datVec.size() + mthVec.size() > 0 ) {   //any content?
-	    p.pln();p.pI();
-	    for ( int i1 = 0; i1 < conVec.size(); i1++ )            //write constants
-		writeConstant( (CompoundType.Member)conVec.elementAt( i1 ),p );
-	    for ( int i1 = 0; i1 < datVec.size(); i1++ ) {
-		CompoundType.Member mem = (CompoundType.Member)datVec.elementAt( i1 );
-		if ( mem.getType().isPrimitive() )
-		    writeData( mem,p );                            //write primitive data
-	    }
-	    for ( int i1 = 0; i1 < datVec.size(); i1++ ) {
-		CompoundType.Member mem = (CompoundType.Member)datVec.elementAt( i1 );
-		if ( !mem.getType().isPrimitive() )
-		    writeData( mem,p );                        //write non-primitive data
-	    }
-	    for ( int i1 = 0; i1 < mthVec.size(); i1++ )              //write methods
-		writeMethod( (CompoundType.Method)mthVec.elementAt( i1 ),p );
-	    p.pO();p.pln();
-	}
-	p.pln( "};" );
+        p.pln( " {" );
+        if ( conVec.size() + datVec.size() + mthVec.size() > 0 ) {   //any content?
+            p.pln();p.pI();
+            for ( int i1 = 0; i1 < conVec.size(); i1++ )            //write constants
+                writeConstant( (CompoundType.Member)conVec.elementAt( i1 ),p );
+            for ( int i1 = 0; i1 < datVec.size(); i1++ ) {
+                CompoundType.Member mem = (CompoundType.Member)datVec.elementAt( i1 );
+                if ( mem.getType().isPrimitive() )
+                    writeData( mem,p );                            //write primitive data
+            }
+            for ( int i1 = 0; i1 < datVec.size(); i1++ ) {
+                CompoundType.Member mem = (CompoundType.Member)datVec.elementAt( i1 );
+                if ( !mem.getType().isPrimitive() )
+                    writeData( mem,p );                        //write non-primitive data
+            }
+            for ( int i1 = 0; i1 < mthVec.size(); i1++ )              //write methods
+                writeMethod( (CompoundType.Method)mthVec.elementAt( i1 ),p );
+            p.pO();p.pln();
+        }
+        p.pln( "};" );
 
-	p.pO();p.pln();
-	writeRepositoryID ( t,p );
-	    p.pln();
-	writeModule2( t,p );
-	writeEpilog( t,refHash,p );
-	}
+        p.pO();p.pln();
+        writeRepositoryID ( t,p );
+            p.pln();
+        writeModule2( t,p );
+        writeEpilog( t,refHash,p );
+        }
 
 
     /**
@@ -675,23 +675,23 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeProlog(
-			       CompoundType t,
-			       Hashtable refHash,
-			       Hashtable spcHash,
-			       Hashtable arrHash,
-			       Hashtable excHash,
-			       Hashtable inhHash,
-			       IndentingWriter p )
-	throws IOException {
-	writeBanner( t,0,!isException,p );
-	writeForwardReferences( refHash,p );
-	writeIncludes( excHash,isThrown,p );      //#includes for exceptions thrown
-	writeInheritedIncludes( inhHash,p );
-	writeIncludes( spcHash,!isThrown,p );         //#includes for special types
-	writeBoxedRMIIncludes( arrHash,p );
-	writeIDLEntityIncludes( refHash,p );
-	writeIncOrb( p );
-	writeIfndef( t,0,!isException,!isForward,p );
+                               CompoundType t,
+                               Hashtable refHash,
+                               Hashtable spcHash,
+                               Hashtable arrHash,
+                               Hashtable excHash,
+                               Hashtable inhHash,
+                               IndentingWriter p )
+        throws IOException {
+        writeBanner( t,0,!isException,p );
+        writeForwardReferences( refHash,p );
+        writeIncludes( excHash,isThrown,p );      //#includes for exceptions thrown
+        writeInheritedIncludes( inhHash,p );
+        writeIncludes( spcHash,!isThrown,p );         //#includes for special types
+        writeBoxedRMIIncludes( arrHash,p );
+        writeIDLEntityIncludes( refHash,p );
+        writeIncOrb( p );
+        writeIfndef( t,0,!isException,!isForward,p );
     }
 
 
@@ -702,12 +702,12 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeEpilog(
-			       CompoundType t,
-			       Hashtable refHash,
-			       IndentingWriter p )
-	throws IOException {
-	writeIncludes( refHash,!isThrown,p );     //#includes for forward dcl types
-	writeEndif( p );
+                               CompoundType t,
+                               Hashtable refHash,
+                               IndentingWriter p )
+        throws IOException {
+        writeIncludes( refHash,!isThrown,p );     //#includes for forward dcl types
+        writeEndif( p );
     }
 
 
@@ -718,20 +718,20 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeSpecial(
-				Type t,
-				IndentingWriter p )
-	throws IOException {
-	String spcName = t.getQualifiedName();
-	if ( "java.io.Serializable".equals( spcName ) )
-	    writeJavaIoSerializable( t,p );
-	else if ( "java.io.Externalizable".equals( spcName ) )
-	    writeJavaIoExternalizable( t,p );
-	else if ( "java.lang.Object".equals( spcName) )
-	    writeJavaLangObject( t,p );
-	else if ( "java.rmi.Remote".equals( spcName) )
-	    writeJavaRmiRemote( t,p );
-	else if ( "org.omg.CORBA.portable.IDLEntity".equals( spcName) )
-	    writeIDLEntity( t,p );
+                                Type t,
+                                IndentingWriter p )
+        throws IOException {
+        String spcName = t.getQualifiedName();
+        if ( "java.io.Serializable".equals( spcName ) )
+            writeJavaIoSerializable( t,p );
+        else if ( "java.io.Externalizable".equals( spcName ) )
+            writeJavaIoExternalizable( t,p );
+        else if ( "java.lang.Object".equals( spcName) )
+            writeJavaLangObject( t,p );
+        else if ( "java.rmi.Remote".equals( spcName) )
+            writeJavaRmiRemote( t,p );
+        else if ( "org.omg.CORBA.portable.IDLEntity".equals( spcName) )
+            writeIDLEntity( t,p );
     }
 
 
@@ -743,17 +743,17 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeJavaIoSerializable(
-					   Type t,
-					   IndentingWriter p )
-	throws IOException {
-	writeBanner( t,0,!isException,p );
-	writeIfndef( t,0,!isException,!isForward,p );
-	writeModule1( t,p );
-	p.pln();p.pI();
-	p.pln( "typedef any Serializable;" );
-	p.pO();p.pln();
-	writeModule2( t,p );
-	writeEndif( p );
+                                           Type t,
+                                           IndentingWriter p )
+        throws IOException {
+        writeBanner( t,0,!isException,p );
+        writeIfndef( t,0,!isException,!isForward,p );
+        writeModule1( t,p );
+        p.pln();p.pI();
+        p.pln( "typedef any Serializable;" );
+        p.pO();p.pln();
+        writeModule2( t,p );
+        writeEndif( p );
     }
 
 
@@ -764,17 +764,17 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeJavaIoExternalizable(
-					     Type t,
-					     IndentingWriter p )
-	throws IOException {
-	writeBanner( t,0,!isException,p );
-	writeIfndef( t,0,!isException,!isForward,p );
-	writeModule1( t,p );
-	p.pln();p.pI();
-	p.pln( "typedef any Externalizable;" );
-	p.pO();p.pln();
-	writeModule2( t,p );
-	writeEndif( p );
+                                             Type t,
+                                             IndentingWriter p )
+        throws IOException {
+        writeBanner( t,0,!isException,p );
+        writeIfndef( t,0,!isException,!isForward,p );
+        writeModule1( t,p );
+        p.pln();p.pI();
+        p.pln( "typedef any Externalizable;" );
+        p.pO();p.pln();
+        writeModule2( t,p );
+        writeEndif( p );
     }
 
 
@@ -785,17 +785,17 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeJavaLangObject(
-				       Type t,
-				       IndentingWriter p )
-	throws IOException {
-	writeBanner( t,0,!isException,p );
-	writeIfndef( t,0,!isException,!isForward,p );
-	writeModule1( t,p );
-	p.pln();p.pI();
-	p.pln( "typedef any _Object;" );
-	p.pO();p.pln();
-	writeModule2( t,p );
-	writeEndif( p );
+                                       Type t,
+                                       IndentingWriter p )
+        throws IOException {
+        writeBanner( t,0,!isException,p );
+        writeIfndef( t,0,!isException,!isForward,p );
+        writeModule1( t,p );
+        p.pln();p.pI();
+        p.pln( "typedef any _Object;" );
+        p.pO();p.pln();
+        writeModule2( t,p );
+        writeEndif( p );
     }
 
 
@@ -806,17 +806,17 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeJavaRmiRemote(
-				      Type t,
-				      IndentingWriter p )
-	throws IOException {
-	writeBanner( t,0,!isException,p );
-	writeIfndef( t,0,!isException,!isForward,p );
-	writeModule1( t,p );
-	p.pln();p.pI();
-	p.pln( "typedef Object Remote;" );
-	p.pO();p.pln();
-	writeModule2( t,p );
-	writeEndif( p );
+                                      Type t,
+                                      IndentingWriter p )
+        throws IOException {
+        writeBanner( t,0,!isException,p );
+        writeIfndef( t,0,!isException,!isForward,p );
+        writeModule1( t,p );
+        p.pln();p.pI();
+        p.pln( "typedef Object Remote;" );
+        p.pO();p.pln();
+        writeModule2( t,p );
+        writeEndif( p );
     }
 
 
@@ -828,17 +828,17 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeIDLEntity(
-				  Type t,
-				  IndentingWriter p )
-	throws IOException {
-	writeBanner( t,0,!isException,p );
-	writeIfndef( t,0,!isException,!isForward,p );
-	writeModule1( t,p );
-	p.pln();p.pI();
-	p.pln( "typedef any IDLEntity;" );
-	p.pO();p.pln();
-	writeModule2( t,p );
-	writeEndif( p );
+                                  Type t,
+                                  IndentingWriter p )
+        throws IOException {
+        writeBanner( t,0,!isException,p );
+        writeIfndef( t,0,!isException,!isForward,p );
+        writeModule1( t,p );
+        p.pln();p.pI();
+        p.pln( "typedef any IDLEntity;" );
+        p.pO();p.pln();
+        writeModule2( t,p );
+        writeEndif( p );
     }
 
 
@@ -848,27 +848,27 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param inhHash Hashtable containing the inherited interfaces
      */
     protected void getInterfaces(
-				 CompoundType ct,
-				 Hashtable inhHash ) {
-	InterfaceType[] infs = ct.getInterfaces();
-				 nextInterface:
-	for ( int i1 = 0; i1 < infs.length; i1++ ) {  //forall inherited interfaces
-	    String inhName = infs[i1].getQualifiedName();
-	    switch ( ct.getTypeCode() ) {
-	    case TYPE_NC_CLASS:
-	    case TYPE_VALUE:                                   //filter for classes
-		if ( "java.io.Externalizable".equals( inhName ) ||
-		     "java.io.Serializable".equals( inhName ) ||
-		     "org.omg.CORBA.portable.IDLEntity".equals( inhName ) )
-		    continue nextInterface;
-		break;
-	    default:                                        //filter for all others
-		if ( "java.rmi.Remote".equals( inhName ) )
-		    continue nextInterface;
-		break;
-	    }
-	    inhHash.put( inhName,infs[i1] );                           //add this one
-	}
+                                 CompoundType ct,
+                                 Hashtable inhHash ) {
+        InterfaceType[] infs = ct.getInterfaces();
+                                 nextInterface:
+        for ( int i1 = 0; i1 < infs.length; i1++ ) {  //forall inherited interfaces
+            String inhName = infs[i1].getQualifiedName();
+            switch ( ct.getTypeCode() ) {
+            case TYPE_NC_CLASS:
+            case TYPE_VALUE:                                   //filter for classes
+                if ( "java.io.Externalizable".equals( inhName ) ||
+                     "java.io.Serializable".equals( inhName ) ||
+                     "org.omg.CORBA.portable.IDLEntity".equals( inhName ) )
+                    continue nextInterface;
+                break;
+            default:                                        //filter for all others
+                if ( "java.rmi.Remote".equals( inhName ) )
+                    continue nextInterface;
+                break;
+            }
+            inhHash.put( inhName,infs[i1] );                           //add this one
+        }
     }
 
 
@@ -878,20 +878,20 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param inhHash Hashtable containing inherited types
      */
     protected void getInheritance(
-				  CompoundType ct,
-				  Hashtable inhHash ) {
-	ClassType par = ct.getSuperclass();                            //get parent
-	if ( par == null ) return;
-	String parName = par.getQualifiedName();
-	switch ( ct.getTypeCode() ) {
-	case TYPE_NC_CLASS:
-	case TYPE_VALUE:
-	    if ( "java.lang.Object".equals( parName ) )          //this is implicit
-		return;
-	    break;
-	default: return;                                     //ignore other types
-	}
-	inhHash.put( parName,par );                          //add valid base class
+                                  CompoundType ct,
+                                  Hashtable inhHash ) {
+        ClassType par = ct.getSuperclass();                            //get parent
+        if ( par == null ) return;
+        String parName = par.getQualifiedName();
+        switch ( ct.getTypeCode() ) {
+        case TYPE_NC_CLASS:
+        case TYPE_VALUE:
+            if ( "java.lang.Object".equals( parName ) )          //this is implicit
+                return;
+            break;
+        default: return;                                     //ignore other types
+        }
+        inhHash.put( parName,par );                          //add valid base class
     }
 
 
@@ -904,20 +904,20 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param excHash Hashtable for exceptions thrown
      */
     protected void getMethodReferences(
-				       Vector mthVec,
-				       Hashtable refHash,
-				       Hashtable spcHash,
-				       Hashtable arrHash,
-				       Hashtable excHash ) {
-	for ( int i1 = 0; i1 < mthVec.size(); i1++ ) {             //forall methods
-	    CompoundType.Method mth = (CompoundType.Method)mthVec.elementAt( i1 );
-	    Type[] args = mth.getArguments();
-	    Type ret = mth.getReturnType();
-	    getExceptions( mth,excHash );                 //collect exceptions thrown
-	    for ( int i2 = 0; i2 < args.length; i2++ )             //forall arguments
-		addReference( args[i2],refHash,spcHash,arrHash );
-	    addReference( ret,refHash,spcHash,arrHash );
-	}
+                                       Vector mthVec,
+                                       Hashtable refHash,
+                                       Hashtable spcHash,
+                                       Hashtable arrHash,
+                                       Hashtable excHash ) {
+        for ( int i1 = 0; i1 < mthVec.size(); i1++ ) {             //forall methods
+            CompoundType.Method mth = (CompoundType.Method)mthVec.elementAt( i1 );
+            Type[] args = mth.getArguments();
+            Type ret = mth.getReturnType();
+            getExceptions( mth,excHash );                 //collect exceptions thrown
+            for ( int i2 = 0; i2 < args.length; i2++ )             //forall arguments
+                addReference( args[i2],refHash,spcHash,arrHash );
+            addReference( ret,refHash,spcHash,arrHash );
+        }
     }
 
 
@@ -929,15 +929,15 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param arrHash Hashtable for array references
      */
     protected void getMemberReferences(
-				       Vector datVec,
-				       Hashtable refHash,
-				       Hashtable spcHash,
-				       Hashtable arrHash ) {
-	for ( int i1 = 0; i1 < datVec.size(); i1++ ) {         //forall datamembers
-	    CompoundType.Member mem = (CompoundType.Member)datVec.elementAt( i1 );
-	    Type dat = mem.getType();
-	    addReference( dat,refHash,spcHash,arrHash );
-	}
+                                       Vector datVec,
+                                       Hashtable refHash,
+                                       Hashtable spcHash,
+                                       Hashtable arrHash ) {
+        for ( int i1 = 0; i1 < datVec.size(); i1++ ) {         //forall datamembers
+            CompoundType.Member mem = (CompoundType.Member)datVec.elementAt( i1 );
+            Type dat = mem.getType();
+            addReference( dat,refHash,spcHash,arrHash );
+        }
     }
 
 
@@ -951,30 +951,30 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param arrHash Hashtable for array references
      */
     protected void addReference(
-				Type ref,
-				Hashtable refHash,
-				Hashtable spcHash,
-				Hashtable arrHash ) {
-	String rName = ref.getQualifiedName();
-	switch ( ref.getTypeCode() ) {
-	case TYPE_ABSTRACT:
-	case TYPE_REMOTE:
-	case TYPE_NC_CLASS:
-	case TYPE_NC_INTERFACE:
-	case TYPE_VALUE:
-	    refHash.put( rName,ref );
-	    return;
-	case TYPE_CORBA_OBJECT:
-	    if ( "org.omg.CORBA.Object".equals( rName ) ) return;      //don't want
-	    refHash.put( rName,ref );
-	    return;
-	case TYPE_ARRAY:                                                 //array?
-	    arrHash.put( rName + ref.getArrayDimension(),ref );
-	    return;
-	default:
-	    if ( isSpecialReference( ref ) )                 //special IDL typedef?
-		spcHash.put( rName,ref );
-	}
+                                Type ref,
+                                Hashtable refHash,
+                                Hashtable spcHash,
+                                Hashtable arrHash ) {
+        String rName = ref.getQualifiedName();
+        switch ( ref.getTypeCode() ) {
+        case TYPE_ABSTRACT:
+        case TYPE_REMOTE:
+        case TYPE_NC_CLASS:
+        case TYPE_NC_INTERFACE:
+        case TYPE_VALUE:
+            refHash.put( rName,ref );
+            return;
+        case TYPE_CORBA_OBJECT:
+            if ( "org.omg.CORBA.Object".equals( rName ) ) return;      //don't want
+            refHash.put( rName,ref );
+            return;
+        case TYPE_ARRAY:                                                 //array?
+            arrHash.put( rName + ref.getArrayDimension(),ref );
+            return;
+        default:
+            if ( isSpecialReference( ref ) )                 //special IDL typedef?
+                spcHash.put( rName,ref );
+        }
     }
 
 
@@ -989,14 +989,14 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return boolean indicating whether it's a special reference
      */
     protected boolean isSpecialReference(
-					 Type ref ) {
-	String rName = ref.getQualifiedName();
-	if ( "java.io.Serializable".equals( rName ) ) return true;
-	if ( "java.io.Externalizable".equals( rName ) ) return true;
-	if ( "java.lang.Object".equals( rName) ) return true;
-	if ( "java.rmi.Remote".equals( rName) ) return true;
-	if ( "org.omg.CORBA.portable.IDLEntity".equals( rName) ) return true;
-	return false;
+                                         Type ref ) {
+        String rName = ref.getQualifiedName();
+        if ( "java.io.Serializable".equals( rName ) ) return true;
+        if ( "java.io.Externalizable".equals( rName ) ) return true;
+        if ( "java.lang.Object".equals( rName) ) return true;
+        if ( "java.rmi.Remote".equals( rName) ) return true;
+        if ( "org.omg.CORBA.portable.IDLEntity".equals( rName) ) return true;
+        return false;
     }
 
 
@@ -1008,15 +1008,15 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param excHash Hashtable containing non-duplicate thrown exceptions
      */
     protected void getExceptions(
-				      CompoundType.Method mth,
-				      Hashtable excHash ) {
-	ClassType[] excs = mth.getExceptions();
-	for ( int i1 = 0; i1 < excs.length; i1++ ) {            //forall exceptions
-	    ClassType exc = excs[i1];
-	    if ( exc.isCheckedException() &&
-		 !exc.isRemoteExceptionOrSubclass() ) {
-		excHash.put( exc.getQualifiedName(),exc );
-	}
+                                      CompoundType.Method mth,
+                                      Hashtable excHash ) {
+        ClassType[] excs = mth.getExceptions();
+        for ( int i1 = 0; i1 < excs.length; i1++ ) {            //forall exceptions
+            ClassType exc = excs[i1];
+            if ( exc.isCheckedException() &&
+                 !exc.isRemoteExceptionOrSubclass() ) {
+                excHash.put( exc.getQualifiedName(),exc );
+        }
     }
     }
 
@@ -1028,39 +1028,39 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return Vector containing the methods
      */
     protected Vector getMethods(
-				CompoundType ct ) {
-	Vector vec = new Vector();
-	int ctType = ct.getTypeCode();
-	switch ( ctType ) {
-	case TYPE_ABSTRACT:
-	case TYPE_REMOTE:       break;
-	case TYPE_NC_CLASS:
-	case TYPE_NC_INTERFACE:
-	case TYPE_VALUE:        if ( valueMethods ) break;
-	default: return vec;
-	}
-	Identifier ctId = ct.getIdentifier();
-	CompoundType.Method[] mths = ct.getMethods();
-				nextMethod:
-	for ( int i1 = 0; i1 < mths.length; i1++ ) {               //forall methods
-	    if ( mths[i1].isPrivate() ||                            //private method?
-		 mths[i1].isInherited() )                         //inherited method?
-		continue nextMethod;                                   //yes..ignore it
-	    if ( ctType == TYPE_VALUE ) {
-		String mthName = mths[i1].getName();
-		if ( "readObject"  .equals( mthName ) ||
-		     "writeObject" .equals( mthName ) ||
-		     "readExternal".equals( mthName ) ||
-		     "writeExternal".equals( mthName ) )
-		    continue nextMethod;                                //ignore this one
-	    }
-	    if ( ( ctType == TYPE_NC_CLASS ||
-		   ctType == TYPE_NC_INTERFACE ) &&
-		 mths[i1].isConstructor() )   //init not valid for abstract valuetype
-		continue nextMethod;                                  //ignore this one
-	    vec.addElement( mths[i1] );                                //add this one
-	}
-	return vec;
+                                CompoundType ct ) {
+        Vector vec = new Vector();
+        int ctType = ct.getTypeCode();
+        switch ( ctType ) {
+        case TYPE_ABSTRACT:
+        case TYPE_REMOTE:       break;
+        case TYPE_NC_CLASS:
+        case TYPE_NC_INTERFACE:
+        case TYPE_VALUE:        if ( valueMethods ) break;
+        default: return vec;
+        }
+        Identifier ctId = ct.getIdentifier();
+        CompoundType.Method[] mths = ct.getMethods();
+                                nextMethod:
+        for ( int i1 = 0; i1 < mths.length; i1++ ) {               //forall methods
+            if ( mths[i1].isPrivate() ||                            //private method?
+                 mths[i1].isInherited() )                         //inherited method?
+                continue nextMethod;                                   //yes..ignore it
+            if ( ctType == TYPE_VALUE ) {
+                String mthName = mths[i1].getName();
+                if ( "readObject"  .equals( mthName ) ||
+                     "writeObject" .equals( mthName ) ||
+                     "readExternal".equals( mthName ) ||
+                     "writeExternal".equals( mthName ) )
+                    continue nextMethod;                                //ignore this one
+            }
+            if ( ( ctType == TYPE_NC_CLASS ||
+                   ctType == TYPE_NC_INTERFACE ) &&
+                 mths[i1].isConstructor() )   //init not valid for abstract valuetype
+                continue nextMethod;                                  //ignore this one
+            vec.addElement( mths[i1] );                                //add this one
+        }
+        return vec;
     }
 
 
@@ -1072,20 +1072,20 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return Vector containing the constants
      */
     protected Vector getConstants(
-				  CompoundType ct ) {
-	Vector vec = new Vector();
-	CompoundType.Member[] mems = ct.getMembers();
-	for ( int i1 = 0; i1 < mems.length; i1++ ) {               //forall members
-	    Type   memType  = mems[i1].getType();
-	    String memValue = mems[i1].getValue();
-	    if ( mems[i1].isPublic() &&
-		 mems[i1].isFinal()  &&
-		 mems[i1].isStatic() &&
-		 ( memType.isPrimitive() || "String".equals( memType.getName() ) ) &&
-		 memValue != null )
-		vec.addElement( mems[i1] );                              //add this one
-	}
-	return vec;
+                                  CompoundType ct ) {
+        Vector vec = new Vector();
+        CompoundType.Member[] mems = ct.getMembers();
+        for ( int i1 = 0; i1 < mems.length; i1++ ) {               //forall members
+            Type   memType  = mems[i1].getType();
+            String memValue = mems[i1].getValue();
+            if ( mems[i1].isPublic() &&
+                 mems[i1].isFinal()  &&
+                 mems[i1].isStatic() &&
+                 ( memType.isPrimitive() || "String".equals( memType.getName() ) ) &&
+                 memValue != null )
+                vec.addElement( mems[i1] );                              //add this one
+        }
+        return vec;
     }
 
 
@@ -1099,26 +1099,26 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return Vector containing the data fields
      */
     protected Vector getData(
-			     CompoundType t ) {
-	Vector vec = new Vector();
-	if ( t.getTypeCode() != TYPE_VALUE ) return vec;
-	ValueType vt = (ValueType)t;
-	CompoundType.Member[] mems = vt.getMembers();
-	boolean notCust = !vt.isCustom();
-	for ( int i1 = 0; i1 < mems.length; i1++ ) {               //forall members
-	    if ( !mems[i1].isStatic()    &&
-		 !mems[i1].isTransient() &&
-		 (  mems[i1].isPublic() || notCust ) ) {
-		int i2;
-		String memName = mems[i1].getName();
-		for ( i2 = 0; i2 < vec.size(); i2++ ) {      //insert in java lex order
-		    CompoundType.Member aMem = (CompoundType.Member)vec.elementAt( i2 );
-		    if ( memName.compareTo( aMem.getName() ) < 0 ) break;
-		}
-		vec.insertElementAt( mems[i1],i2 );                   //insert this one
-	    }
-	}
-	return vec;
+                             CompoundType t ) {
+        Vector vec = new Vector();
+        if ( t.getTypeCode() != TYPE_VALUE ) return vec;
+        ValueType vt = (ValueType)t;
+        CompoundType.Member[] mems = vt.getMembers();
+        boolean notCust = !vt.isCustom();
+        for ( int i1 = 0; i1 < mems.length; i1++ ) {               //forall members
+            if ( !mems[i1].isStatic()    &&
+                 !mems[i1].isTransient() &&
+                 (  mems[i1].isPublic() || notCust ) ) {
+                int i2;
+                String memName = mems[i1].getName();
+                for ( i2 = 0; i2 < vec.size(); i2++ ) {      //insert in java lex order
+                    CompoundType.Member aMem = (CompoundType.Member)vec.elementAt( i2 );
+                    if ( memName.compareTo( aMem.getName() ) < 0 ) break;
+                }
+                vec.insertElementAt( mems[i1],i2 );                   //insert this one
+            }
+        }
+        return vec;
     }
 
 
@@ -1129,20 +1129,20 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeForwardReferences(
-					  Hashtable refHash,
-					  IndentingWriter p )
-	throws IOException {
-	Enumeration refEnum = refHash.elements();
-	nextReference:
-	while ( refEnum.hasMoreElements() ) {
-	    Type t = (Type)refEnum.nextElement();
-	    if ( t.isCompound() ) {
-		CompoundType ct = (CompoundType)t;
-		if ( ct.isIDLEntity() )
-		    continue nextReference;                  //ignore IDLEntity reference
-	    }
-	    writeForwardReference( t,p );
-	}
+                                          Hashtable refHash,
+                                          IndentingWriter p )
+        throws IOException {
+        Enumeration refEnum = refHash.elements();
+        nextReference:
+        while ( refEnum.hasMoreElements() ) {
+            Type t = (Type)refEnum.nextElement();
+            if ( t.isCompound() ) {
+                CompoundType ct = (CompoundType)t;
+                if ( ct.isIDLEntity() )
+                    continue nextReference;                  //ignore IDLEntity reference
+            }
+            writeForwardReference( t,p );
+        }
     }
 
 
@@ -1152,30 +1152,30 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeForwardReference(
-					 Type t,
-					 IndentingWriter p )
-	throws IOException {
-	String qName = t.getQualifiedName();
-	if ( "java.lang.String".equals( qName ) ) ;
-	else if ( "org.omg.CORBA.Object".equals( qName ) ) return ;    //no fwd dcl
+                                         Type t,
+                                         IndentingWriter p )
+        throws IOException {
+        String qName = t.getQualifiedName();
+        if ( "java.lang.String".equals( qName ) ) ;
+        else if ( "org.omg.CORBA.Object".equals( qName ) ) return ;    //no fwd dcl
 
-	writeIfndef( t,0,!isException,isForward,p );
-	    writeModule1( t,p );
-	    p.pln();p.pI();
-	    switch ( t.getTypeCode() ) {
-	case TYPE_NC_CLASS:
-	    case TYPE_NC_INTERFACE: p.p( "abstract valuetype " ); break;
-	    case TYPE_ABSTRACT:     p.p( "abstract interface " ); break;
-	    case TYPE_VALUE:        p.p( "valuetype " ); break;
-	case TYPE_REMOTE:
-	case TYPE_CORBA_OBJECT: p.p( "interface " ); break;
-	    default: ;                              //all other types were filtered
-	    }
-	    p.pln( t.getIDLName() + ";" );
-	    p.pO();p.pln();
-	    writeModule2( t,p );
-	writeEndif( p );
-	}
+        writeIfndef( t,0,!isException,isForward,p );
+            writeModule1( t,p );
+            p.pln();p.pI();
+            switch ( t.getTypeCode() ) {
+        case TYPE_NC_CLASS:
+            case TYPE_NC_INTERFACE: p.p( "abstract valuetype " ); break;
+            case TYPE_ABSTRACT:     p.p( "abstract interface " ); break;
+            case TYPE_VALUE:        p.p( "valuetype " ); break;
+        case TYPE_REMOTE:
+        case TYPE_CORBA_OBJECT: p.p( "interface " ); break;
+            default: ;                              //all other types were filtered
+            }
+            p.pln( t.getIDLName() + ";" );
+            p.pO();p.pln();
+            writeModule2( t,p );
+        writeEndif( p );
+        }
 
 
     /**
@@ -1188,36 +1188,36 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeForwardReference(
-					 ArrayType at,
-					 int dim,
-					 IndentingWriter p)
-	throws IOException {
-	Type et = at.getElementType();
-	if ( dim < 1 ) {
-	    if ( et.isCompound() ) {
-		CompoundType ct = (CompoundType)et;
-		writeForwardReference( et,p);
+                                         ArrayType at,
+                                         int dim,
+                                         IndentingWriter p)
+        throws IOException {
+        Type et = at.getElementType();
+        if ( dim < 1 ) {
+            if ( et.isCompound() ) {
+                CompoundType ct = (CompoundType)et;
+                writeForwardReference( et,p);
     }
-	    return;
-	}
-	String fName = unEsc( et.getIDLName() ).replace( ' ','_' );
+            return;
+        }
+        String fName = unEsc( et.getIDLName() ).replace( ' ','_' );
 
-	writeIfndef( at,dim,!isException,isForward,p );
-	writeModule1( at,p );
-	p.pln();p.pI();
-	switch ( et.getTypeCode() ) {
-	case TYPE_NC_CLASS:
-	case TYPE_NC_INTERFACE: p.p( "abstract valuetype " ); break;
-	case TYPE_ABSTRACT:     p.p( "abstract interface " ); break;
-	case TYPE_VALUE:        p.p( "valuetype " ); break;
-	case TYPE_REMOTE:
-	case TYPE_CORBA_OBJECT: p.p( "interface " ); break;
-	default: ;                              //all other types were filtered
-	}
-	p.pln( "seq" + dim + "_" + fName + ";" );
-	p.pO();p.pln();
-	writeModule2( at,p );
-	writeEndif( p );
+        writeIfndef( at,dim,!isException,isForward,p );
+        writeModule1( at,p );
+        p.pln();p.pI();
+        switch ( et.getTypeCode() ) {
+        case TYPE_NC_CLASS:
+        case TYPE_NC_INTERFACE: p.p( "abstract valuetype " ); break;
+        case TYPE_ABSTRACT:     p.p( "abstract interface " ); break;
+        case TYPE_VALUE:        p.p( "valuetype " ); break;
+        case TYPE_REMOTE:
+        case TYPE_CORBA_OBJECT: p.p( "interface " ); break;
+        default: ;                              //all other types were filtered
+        }
+        p.pln( "seq" + dim + "_" + fName + ";" );
+        p.pO();p.pln();
+        writeModule2( at,p );
+        writeEndif( p );
     }
 
 
@@ -1227,20 +1227,20 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeIDLEntityIncludes(
-					  Hashtable refHash,
-					  IndentingWriter p )
-	throws IOException {
-	Enumeration refEnum = refHash.elements();
-	while ( refEnum.hasMoreElements() ) {
-	    Type t = (Type)refEnum.nextElement();
-	    if ( t.isCompound() ) {
-		CompoundType ct = (CompoundType)t;
-		if ( ct.isIDLEntity() ) {                          //select IDLEntities
-		    writeInclude( ct,0,!isThrown,p );
-		    refHash.remove( ct.getQualifiedName() );     //avoid another #include
-		}
-	    }
-	}
+                                          Hashtable refHash,
+                                          IndentingWriter p )
+        throws IOException {
+        Enumeration refEnum = refHash.elements();
+        while ( refEnum.hasMoreElements() ) {
+            Type t = (Type)refEnum.nextElement();
+            if ( t.isCompound() ) {
+                CompoundType ct = (CompoundType)t;
+                if ( ct.isIDLEntity() ) {                          //select IDLEntities
+                    writeInclude( ct,0,!isThrown,p );
+                    refHash.remove( ct.getQualifiedName() );     //avoid another #include
+                }
+            }
+        }
     }
 
 
@@ -1251,15 +1251,15 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeIncludes(
-				 Hashtable incHash,
-				 boolean isThrown,
-				 IndentingWriter p )
-	throws IOException {
-	Enumeration incEnum = incHash.elements();
-	while ( incEnum.hasMoreElements() ) {
-	    CompoundType t = (CompoundType)incEnum.nextElement();
-	    writeInclude( t,0,isThrown,p );
-	    }
+                                 Hashtable incHash,
+                                 boolean isThrown,
+                                 IndentingWriter p )
+        throws IOException {
+        Enumeration incEnum = incHash.elements();
+        while ( incEnum.hasMoreElements() ) {
+            CompoundType t = (CompoundType)incEnum.nextElement();
+            writeInclude( t,0,isThrown,p );
+            }
     }
 
 
@@ -1270,24 +1270,24 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeBoxedRMIIncludes(
-					 Hashtable arrHash,
-					 IndentingWriter p)
-	throws IOException {
-	Enumeration e1 = arrHash.elements();
-	nextSequence:
-	while ( e1.hasMoreElements() ) {
-	    ArrayType at = (ArrayType)e1.nextElement();
-	    int dim = at.getArrayDimension();
-	    Type et = at.getElementType();
+                                         Hashtable arrHash,
+                                         IndentingWriter p)
+        throws IOException {
+        Enumeration e1 = arrHash.elements();
+        nextSequence:
+        while ( e1.hasMoreElements() ) {
+            ArrayType at = (ArrayType)e1.nextElement();
+            int dim = at.getArrayDimension();
+            Type et = at.getElementType();
 
-	    Enumeration e2 = arrHash.elements();
-	    while ( e2.hasMoreElements() ) {                   //eliminate duplicates
-		ArrayType at2 = (ArrayType)e2.nextElement();
-		if ( et == at2.getElementType() &&                //same element type &
-		     dim < at2.getArrayDimension() )               //smaller dimension?
-		    continue nextSequence;                              //ignore this one
-	}
-	    writeInclude( at,dim,!isThrown,p );
+            Enumeration e2 = arrHash.elements();
+            while ( e2.hasMoreElements() ) {                   //eliminate duplicates
+                ArrayType at2 = (ArrayType)e2.nextElement();
+                if ( et == at2.getElementType() &&                //same element type &
+                     dim < at2.getArrayDimension() )               //smaller dimension?
+                    continue nextSequence;                              //ignore this one
+        }
+            writeInclude( at,dim,!isThrown,p );
     }
     }
 
@@ -1298,14 +1298,14 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeInheritedIncludes(
-					  Hashtable inhHash,
-				 IndentingWriter p )
-	throws IOException {
-	Enumeration inhEnum = inhHash.elements();
-	while ( inhEnum.hasMoreElements() ) {
-	    CompoundType t = (CompoundType)inhEnum.nextElement();
-	    writeInclude( t,0,!isThrown,p );
-	}
+                                          Hashtable inhHash,
+                                 IndentingWriter p )
+        throws IOException {
+        Enumeration inhEnum = inhHash.elements();
+        while ( inhEnum.hasMoreElements() ) {
+            CompoundType t = (CompoundType)inhEnum.nextElement();
+            writeInclude( t,0,!isThrown,p );
+        }
     }
 
 
@@ -1317,52 +1317,52 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeInclude(
-				Type t,
-				int dim,
-				boolean isThrown,
-				  IndentingWriter p)
-	throws IOException {
-	CompoundType ct;
-	String tName;
-	String[] modNames;
-	if ( t.isCompound() ) {
-	    ct = (CompoundType)t;
-	    String qName = ct.getQualifiedName();
-	    if ( "java.lang.String".equals( qName ) ) {
-		writeIncOrb( p );                         //#include orb.idl for String
-		return;
-	    }
-	    if ( "org.omg.CORBA.Object".equals( qName ) )
-		return;                                 //Object treated like primitive
-	    modNames = getIDLModuleNames( ct );                   //module name array
-	    tName = unEsc( ct.getIDLName() );                     //file name default
+                                Type t,
+                                int dim,
+                                boolean isThrown,
+                                  IndentingWriter p)
+        throws IOException {
+        CompoundType ct;
+        String tName;
+        String[] modNames;
+        if ( t.isCompound() ) {
+            ct = (CompoundType)t;
+            String qName = ct.getQualifiedName();
+            if ( "java.lang.String".equals( qName ) ) {
+                writeIncOrb( p );                         //#include orb.idl for String
+                return;
+            }
+            if ( "org.omg.CORBA.Object".equals( qName ) )
+                return;                                 //Object treated like primitive
+            modNames = getIDLModuleNames( ct );                   //module name array
+            tName = unEsc( ct.getIDLName() );                     //file name default
 
-	    if ( ct.isException() )
-		if ( ct.isIDLEntityException() )
-		    if ( ct.isCORBAUserException() )
-			if ( isThrown ) tName = unEsc( ct.getIDLExceptionName() );
-			else ;
-		    else tName = ct.getName();                    //use original IDL name
-		else if ( isThrown )
-		    tName = unEsc( ct.getIDLExceptionName() );
-	    }
-	else if ( t.isArray() ) {
-	    Type et = t.getElementType();                    //file name for sequence
-	    if ( dim > 0 ) {
-		modNames = getIDLModuleNames( t );                  //module name array
-		tName = "seq" + dim + "_" + unEsc( et.getIDLName().replace( ' ','_' ) );
-	    }
-	    else{                                                  //#include element
-		if ( !et.isCompound() ) return;       //no include needed for primitive
-		ct = (CompoundType) et;
-		modNames = getIDLModuleNames( ct );           //no boxedRMI for element
-		tName = unEsc( ct.getIDLName() );
-		writeInclude( ct,modNames,tName,p );
-		return;
-	    }
-	}
-	else return;                              //no include needed for primitive
-	writeInclude( t,modNames,tName,p );
+            if ( ct.isException() )
+                if ( ct.isIDLEntityException() )
+                    if ( ct.isCORBAUserException() )
+                        if ( isThrown ) tName = unEsc( ct.getIDLExceptionName() );
+                        else ;
+                    else tName = ct.getName();                    //use original IDL name
+                else if ( isThrown )
+                    tName = unEsc( ct.getIDLExceptionName() );
+            }
+        else if ( t.isArray() ) {
+            Type et = t.getElementType();                    //file name for sequence
+            if ( dim > 0 ) {
+                modNames = getIDLModuleNames( t );                  //module name array
+                tName = "seq" + dim + "_" + unEsc( et.getIDLName().replace( ' ','_' ) );
+            }
+            else{                                                  //#include element
+                if ( !et.isCompound() ) return;       //no include needed for primitive
+                ct = (CompoundType) et;
+                modNames = getIDLModuleNames( ct );           //no boxedRMI for element
+                tName = unEsc( ct.getIDLName() );
+                writeInclude( ct,modNames,tName,p );
+                return;
+            }
+        }
+        else return;                              //no include needed for primitive
+        writeInclude( t,modNames,tName,p );
     }
 
 
@@ -1375,36 +1375,36 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeInclude(
-				Type t,
-				String[] modNames,
-				String tName,
-				IndentingWriter p)
-	throws IOException {
-	if ( t.isCompound() ) {
-	    CompoundType it = (CompoundType)t;
+                                Type t,
+                                String[] modNames,
+                                String tName,
+                                IndentingWriter p)
+        throws IOException {
+        if ( t.isCompound() ) {
+            CompoundType it = (CompoundType)t;
 
-	    if ( ifHash.size() > 0 &&             //any -idlFile translation to apply
-		 it.isIDLEntity() ) {                         //..for this IDLEntity?
-		String qName = t.getQualifiedName();   //fully qualified orig Java name
+            if ( ifHash.size() > 0 &&             //any -idlFile translation to apply
+                 it.isIDLEntity() ) {                         //..for this IDLEntity?
+                String qName = t.getQualifiedName();   //fully qualified orig Java name
 
-		Enumeration k = ifHash.keys();
-		while ( k.hasMoreElements() ) {      //loop thro user-defined -idlFiles
-		    String from = (String)k.nextElement();
-		    if ( qName.startsWith( from ) ) {                    //found a match?
-			String to = (String)ifHash.get( from );
-			p.pln( "#include \"" + to + "\"" );   //user-specified idl filename
-			return;                                   //don't look for any more
-		    }
-		}
-	    }
-	}
-	else if ( t.isArray() ) ;        //no -idlFile translation needed for array
-	else return;                             //no #include needed for primitive
+                Enumeration k = ifHash.keys();
+                while ( k.hasMoreElements() ) {      //loop thro user-defined -idlFiles
+                    String from = (String)k.nextElement();
+                    if ( qName.startsWith( from ) ) {                    //found a match?
+                        String to = (String)ifHash.get( from );
+                        p.pln( "#include \"" + to + "\"" );   //user-specified idl filename
+                        return;                                   //don't look for any more
+                    }
+                }
+            }
+        }
+        else if ( t.isArray() ) ;        //no -idlFile translation needed for array
+        else return;                             //no #include needed for primitive
 
-	p.p( "#include \"" );                    //no -idlFile translation required
-	for ( int i1 = 0; i1 < modNames.length; i1++ ) p.p( modNames[i1] + "/" );
-	p.p( tName + ".idl\"" );
-	p.pln();
+        p.p( "#include \"" );                    //no -idlFile translation required
+        for ( int i1 = 0; i1 < modNames.length; i1++ ) p.p( modNames[i1] + "/" );
+        p.p( tName + ".idl\"" );
+        p.pln();
     }
 
 
@@ -1415,14 +1415,14 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return Array containing the original module nesting.
      */
     protected String getQualifiedName(
-				      Type t ) {
-	String[] modNames = getIDLModuleNames( t );
-	int len = modNames.length;
-	StringBuffer buf = new StringBuffer();
-	for ( int i1 = 0; i1 < len; i1++ )
-	    buf.append( modNames[i1] + "." );
-	buf.append( t.getIDLName() );
-	return buf.toString();
+                                      Type t ) {
+        String[] modNames = getIDLModuleNames( t );
+        int len = modNames.length;
+        StringBuffer buf = new StringBuffer();
+        for ( int i1 = 0; i1 < len; i1++ )
+            buf.append( modNames[i1] + "." );
+        buf.append( t.getIDLName() );
+        return buf.toString();
     }
 
 
@@ -1433,14 +1433,14 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return Array containing the original module nesting.
      */
     protected String getQualifiedIDLName(Type t) {
-	if ( t.isPrimitive() )
-	    return t.getIDLName();
-	if ( !t.isArray() &&
-	     "org.omg.CORBA.Object".equals( t.getQualifiedName() ) )
-	    return t.getIDLName();
+        if ( t.isPrimitive() )
+            return t.getIDLName();
+        if ( !t.isArray() &&
+             "org.omg.CORBA.Object".equals( t.getQualifiedName() ) )
+            return t.getIDLName();
 
-	String[] modNames = getIDLModuleNames( t );
-	int len = modNames.length;
+        String[] modNames = getIDLModuleNames( t );
+        int len = modNames.length;
         if (len > 0) {
             StringBuffer buf = new StringBuffer();
             for ( int i1 = 0; i1 < len; i1++ )
@@ -1463,46 +1463,46 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return Array containing the original module nesting.
      */
     protected String[] getIDLModuleNames(Type t) {
-	String[] modNames = t.getIDLModuleNames();      //default module name array
-	CompoundType ct;
-	if ( t.isCompound() ) {
-	    ct = (CompoundType)t;
-	    if ( !ct.isIDLEntity ) return modNames;     //normal (non-IDLEntity) case
-	    if ( "org.omg.CORBA.portable.IDLEntity"
-		 .equals( t.getQualifiedName() ) )
-		return modNames;
-	}
-	else if ( t.isArray() ) {
-	    Type et = t.getElementType();
-	    if ( et.isCompound() ) {
-		ct = (CompoundType)et;
-		if ( !ct.isIDLEntity ) return modNames;   //normal (non-IDLEntity) case
-		if ( "org.omg.CORBA.portable.IDLEntity"
-		     .equals( t.getQualifiedName() ) )
-		    return modNames;
-	    }
-	    else return modNames;
-	}
-	else return modNames;              //no preprocessing needed for primitives
+        String[] modNames = t.getIDLModuleNames();      //default module name array
+        CompoundType ct;
+        if ( t.isCompound() ) {
+            ct = (CompoundType)t;
+            if ( !ct.isIDLEntity ) return modNames;     //normal (non-IDLEntity) case
+            if ( "org.omg.CORBA.portable.IDLEntity"
+                 .equals( t.getQualifiedName() ) )
+                return modNames;
+        }
+        else if ( t.isArray() ) {
+            Type et = t.getElementType();
+            if ( et.isCompound() ) {
+                ct = (CompoundType)et;
+                if ( !ct.isIDLEntity ) return modNames;   //normal (non-IDLEntity) case
+                if ( "org.omg.CORBA.portable.IDLEntity"
+                     .equals( t.getQualifiedName() ) )
+                    return modNames;
+            }
+            else return modNames;
+        }
+        else return modNames;              //no preprocessing needed for primitives
 
-	//it's an IDLEntity or an array of...
-	Vector mVec = new Vector();
-	if ( !translateJavaPackage( ct,mVec ) )      //apply -idlModule translation
-	    stripJavaPackage( ct,mVec );             //..or strip prefixes (not both)
+        //it's an IDLEntity or an array of...
+        Vector mVec = new Vector();
+        if ( !translateJavaPackage( ct,mVec ) )      //apply -idlModule translation
+            stripJavaPackage( ct,mVec );             //..or strip prefixes (not both)
 
-	if ( ct.isBoxed() ) {                            //add boxedIDL if required
-	    mVec.insertElementAt( "org",0 );
-	    mVec.insertElementAt( "omg",1 );
-	    mVec.insertElementAt( "boxedIDL",2 );
-	}
-	if ( t.isArray() ) {                             //add boxedRMI if required
-	    mVec.insertElementAt( "org",0 );
-	    mVec.insertElementAt( "omg",1 );
-	    mVec.insertElementAt( "boxedRMI",2 );
-	}
-	String[] outArr = new String[mVec.size()];
-	mVec.copyInto( outArr );
-	return outArr;
+        if ( ct.isBoxed() ) {                            //add boxedIDL if required
+            mVec.insertElementAt( "org",0 );
+            mVec.insertElementAt( "omg",1 );
+            mVec.insertElementAt( "boxedIDL",2 );
+        }
+        if ( t.isArray() ) {                             //add boxedRMI if required
+            mVec.insertElementAt( "org",0 );
+            mVec.insertElementAt( "omg",1 );
+            mVec.insertElementAt( "boxedRMI",2 );
+        }
+        String[] outArr = new String[mVec.size()];
+        mVec.copyInto( outArr );
+        return outArr;
     }
 
 
@@ -1515,58 +1515,58 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return boolean true if any translation was done.
      */
     protected boolean translateJavaPackage(
-					   CompoundType ct,
-					   Vector vec ) {
-	vec.removeAllElements();
-	boolean ret = false;
-	String fc = null;
-	if ( ! ct.isIDLEntity() ) return ret;
+                                           CompoundType ct,
+                                           Vector vec ) {
+        vec.removeAllElements();
+        boolean ret = false;
+        String fc = null;
+        if ( ! ct.isIDLEntity() ) return ret;
 
-	String pName = ct.getPackageName();         //start from Java package names
-	if ( pName == null ) return ret;
-	StringTokenizer pt = new StringTokenizer( pName,"." );
-	while ( pt.hasMoreTokens() ) vec.addElement( pt.nextToken() );
+        String pName = ct.getPackageName();         //start from Java package names
+        if ( pName == null ) return ret;
+        StringTokenizer pt = new StringTokenizer( pName,"." );
+        while ( pt.hasMoreTokens() ) vec.addElement( pt.nextToken() );
 
-	if ( imHash.size() > 0 ) {           //any -idlModule translation to apply?
-	    Enumeration k = imHash.keys();
+        if ( imHash.size() > 0 ) {           //any -idlModule translation to apply?
+            Enumeration k = imHash.keys();
 
-	nextModule:
-	    while ( k.hasMoreElements() ) {      //loop thro user-defined -idlModules
-		String from = (String)k.nextElement();                  //from String..
-		StringTokenizer ft = new StringTokenizer( from,"." );
-		int vecLen = vec.size();
-		int ifr;
-		for ( ifr = 0; ifr < vecLen && ft.hasMoreTokens(); ifr++ )
-		    if ( ! vec.elementAt(ifr).equals( ft.nextToken() ) )
-			continue nextModule;                                  //..no match
+        nextModule:
+            while ( k.hasMoreElements() ) {      //loop thro user-defined -idlModules
+                String from = (String)k.nextElement();                  //from String..
+                StringTokenizer ft = new StringTokenizer( from,"." );
+                int vecLen = vec.size();
+                int ifr;
+                for ( ifr = 0; ifr < vecLen && ft.hasMoreTokens(); ifr++ )
+                    if ( ! vec.elementAt(ifr).equals( ft.nextToken() ) )
+                        continue nextModule;                                  //..no match
 
-		if ( ft.hasMoreTokens() ) {                          //matched so far..
-		    fc = ft.nextToken();                         //a 'from' token remains
-		    if ( ! ct.getName().equals( fc ) ||             //matches class name?
-			 ft.hasMoreTokens() )
-			continue nextModule;                                   //..no match
-		}
+                if ( ft.hasMoreTokens() ) {                          //matched so far..
+                    fc = ft.nextToken();                         //a 'from' token remains
+                    if ( ! ct.getName().equals( fc ) ||             //matches class name?
+                         ft.hasMoreTokens() )
+                        continue nextModule;                                   //..no match
+                }
 
-		ret = true;                                             //found a match
-		for ( int i4 = 0; i4 < ifr; i4++ )
-		    vec.removeElementAt( 0 );                     //remove 'from' package
+                ret = true;                                             //found a match
+                for ( int i4 = 0; i4 < ifr; i4++ )
+                    vec.removeElementAt( 0 );                     //remove 'from' package
 
-		String to = (String)imHash.get( from );                   //..to String
-		StringTokenizer tt = new StringTokenizer( to,IDL_NAME_SEPARATOR );
+                String to = (String)imHash.get( from );                   //..to String
+                StringTokenizer tt = new StringTokenizer( to,IDL_NAME_SEPARATOR );
 
-		int itoco = tt.countTokens();
-		int ito = 0;
-		if ( fc != null ) itoco--;               //user may have given IDL type
-		for ( ito = 0; ito < itoco; ito++ )
-		    vec.insertElementAt( tt.nextToken(),ito );      //insert 'to' modules
-		if ( fc != null ) {
-		    String tc = tt.nextToken();
-		    if ( ! ct.getName().equals( tc ) )           //not the IDL type, so..
-			vec.insertElementAt( tc,ito );           //insert final 'to' module
-		}
-	    }
-	}
-	return ret;
+                int itoco = tt.countTokens();
+                int ito = 0;
+                if ( fc != null ) itoco--;               //user may have given IDL type
+                for ( ito = 0; ito < itoco; ito++ )
+                    vec.insertElementAt( tt.nextToken(),ito );      //insert 'to' modules
+                if ( fc != null ) {
+                    String tc = tt.nextToken();
+                    if ( ! ct.getName().equals( tc ) )           //not the IDL type, so..
+                        vec.insertElementAt( tc,ito );           //insert final 'to' module
+                }
+            }
+        }
+        return ret;
     }
 
 
@@ -1580,35 +1580,35 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param vec Returned Vector of stripped IDL module names.
      */
     protected void stripJavaPackage(
-				    CompoundType ct,
-				    Vector vec ) {
-	vec.removeAllElements();
-	if ( ! ct.isIDLEntity() ) return;
+                                    CompoundType ct,
+                                    Vector vec ) {
+        vec.removeAllElements();
+        if ( ! ct.isIDLEntity() ) return;
 
-	String repID = ct.getRepositoryID().substring( 4 );
-	StringTokenizer rept = new StringTokenizer( repID,"/" );
-	if ( rept.countTokens() < 2 ) return;
+        String repID = ct.getRepositoryID().substring( 4 );
+        StringTokenizer rept = new StringTokenizer( repID,"/" );
+        if ( rept.countTokens() < 2 ) return;
 
-	while ( rept.hasMoreTokens() )
-	    vec.addElement( rept.nextToken() );
-	vec.removeElementAt( vec.size() - 1 );
+        while ( rept.hasMoreTokens() )
+            vec.addElement( rept.nextToken() );
+        vec.removeElementAt( vec.size() - 1 );
 
-	String pName = ct.getPackageName();         //start from Java package names
-	if ( pName == null ) return;
-	Vector pVec = new Vector();
-	StringTokenizer pt = new StringTokenizer( pName,"." );
-	while ( pt.hasMoreTokens() ) pVec.addElement( pt.nextToken() );
+        String pName = ct.getPackageName();         //start from Java package names
+        if ( pName == null ) return;
+        Vector pVec = new Vector();
+        StringTokenizer pt = new StringTokenizer( pName,"." );
+        while ( pt.hasMoreTokens() ) pVec.addElement( pt.nextToken() );
 
-	int i1 = vec.size() - 1;
-	int i2 = pVec.size() - 1;
-	while ( i1 >= 0 && i2 >= 0 ) {                      //go R->L till mismatch
-	    String rep = (String)( vec.elementAt( i1 ) );
-	    String pkg = (String)( pVec.elementAt( i2 ) );
-	    if ( ! pkg.equals( rep ) ) break;
-	    i1--; i2--;
-	}
-	for ( int i3 = 0; i3 <= i1; i3++ )
-	    vec.removeElementAt( 0 );                                  //strip prefix
+        int i1 = vec.size() - 1;
+        int i2 = pVec.size() - 1;
+        while ( i1 >= 0 && i2 >= 0 ) {                      //go R->L till mismatch
+            String rep = (String)( vec.elementAt( i1 ) );
+            String pkg = (String)( pVec.elementAt( i2 ) );
+            if ( ! pkg.equals( rep ) ) break;
+            i1--; i2--;
+        }
+        for ( int i3 = 0; i3 <= i1; i3++ )
+            vec.removeElementAt( 0 );                                  //strip prefix
     }
 
 
@@ -1622,66 +1622,66 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeSequence(
-				 OutputType ot,
-				 IndentingWriter p)
-	throws IOException {
-	ArrayType at = (ArrayType)ot.getType();
-	Type et = at.getElementType();
-	String fName = ot.getName();
-	int dim = Integer.parseInt( fName.substring( 3,fName.indexOf( "_" ) ) );
-	String idlName = unEsc( et.getIDLName() ).replace( ' ','_' );
-	String qIdlName = getQualifiedIDLName( et );
-	String qName = et.getQualifiedName();
+                                 OutputType ot,
+                                 IndentingWriter p)
+        throws IOException {
+        ArrayType at = (ArrayType)ot.getType();
+        Type et = at.getElementType();
+        String fName = ot.getName();
+        int dim = Integer.parseInt( fName.substring( 3,fName.indexOf( "_" ) ) );
+        String idlName = unEsc( et.getIDLName() ).replace( ' ','_' );
+        String qIdlName = getQualifiedIDLName( et );
+        String qName = et.getQualifiedName();
 
-	String repID = at.getRepositoryID();
-	int rix1 = repID.indexOf( '[' );                       //edit repository id
-	int rix2 = repID.lastIndexOf( '[' ) + 1;
-	    StringBuffer rid = new StringBuffer(
-					    repID.substring( 0,rix1 ) +
-					    repID.substring( rix2 ) );
-	for ( int i1 = 0; i1 < dim; i1++ ) rid.insert( rix1,'[' );
+        String repID = at.getRepositoryID();
+        int rix1 = repID.indexOf( '[' );                       //edit repository id
+        int rix2 = repID.lastIndexOf( '[' ) + 1;
+            StringBuffer rid = new StringBuffer(
+                                            repID.substring( 0,rix1 ) +
+                                            repID.substring( rix2 ) );
+        for ( int i1 = 0; i1 < dim; i1++ ) rid.insert( rix1,'[' );
 
-	String vtName = "seq" + dim + "_" + idlName;
-	boolean isFromIDL = false;
-	if ( et.isCompound() ) {
-	    CompoundType ct = (CompoundType)et;
-	    isFromIDL = ct.isIDLEntity() || ct.isCORBAObject();
-	}
-	boolean isForwardInclude =
-	    et.isCompound() &&
-	    !isSpecialReference( et ) &&
-	    dim == 1 &&
-	    !isFromIDL &&
-	    !"org.omg.CORBA.Object".equals(qName) &&
-	    !"java.lang.String".equals(qName);
+        String vtName = "seq" + dim + "_" + idlName;
+        boolean isFromIDL = false;
+        if ( et.isCompound() ) {
+            CompoundType ct = (CompoundType)et;
+            isFromIDL = ct.isIDLEntity() || ct.isCORBAObject();
+        }
+        boolean isForwardInclude =
+            et.isCompound() &&
+            !isSpecialReference( et ) &&
+            dim == 1 &&
+            !isFromIDL &&
+            !"org.omg.CORBA.Object".equals(qName) &&
+            !"java.lang.String".equals(qName);
 
-	writeBanner( at,dim,!isException,p );
-	if ( dim == 1 && "java.lang.String".equals(qName) )          //special case
-	    writeIncOrb( p );
-	if ( dim == 1 && "org.omg.CORBA.Object".equals(qName) ) ;
-	else if ( isSpecialReference( et ) || dim > 1 || isFromIDL )
-	    writeInclude( at,dim-1,!isThrown,p );               //"trivial" include
-	writeIfndef( at,dim,!isException,!isForward,p );
-	if ( isForwardInclude )
-	    writeForwardReference( at,dim-1,p );                    //forward declare
-	writeModule1( at,p );
-		p.pln();p.pI();
-		p.p( "valuetype " + vtName );
-		p.p( " sequence<" );
-	if ( dim == 1 ) p.p( qIdlName );
-		else {
-	    p.p( "seq" + ( dim - 1 ) + "_"  );
-		    p.p( idlName );
-		}
-		p.pln( ">;" );
-		p.pO();p.pln();
-		p.pln( "#pragma ID " + vtName + " \"" + rid + "\"" );
-		p.pln();
-	writeModule2( at,p );
-	if ( isForwardInclude )
-	    writeInclude( at,dim-1,!isThrown,p );      //#include for forward declare
-		writeEndif( p );
-	    }
+        writeBanner( at,dim,!isException,p );
+        if ( dim == 1 && "java.lang.String".equals(qName) )          //special case
+            writeIncOrb( p );
+        if ( dim == 1 && "org.omg.CORBA.Object".equals(qName) ) ;
+        else if ( isSpecialReference( et ) || dim > 1 || isFromIDL )
+            writeInclude( at,dim-1,!isThrown,p );               //"trivial" include
+        writeIfndef( at,dim,!isException,!isForward,p );
+        if ( isForwardInclude )
+            writeForwardReference( at,dim-1,p );                    //forward declare
+        writeModule1( at,p );
+                p.pln();p.pI();
+                p.p( "valuetype " + vtName );
+                p.p( " sequence<" );
+        if ( dim == 1 ) p.p( qIdlName );
+                else {
+            p.p( "seq" + ( dim - 1 ) + "_"  );
+                    p.p( idlName );
+                }
+                p.pln( ">;" );
+                p.pO();p.pln();
+                p.pln( "#pragma ID " + vtName + " \"" + rid + "\"" );
+                p.pln();
+        writeModule2( at,p );
+        if ( isForwardInclude )
+            writeInclude( at,dim-1,!isThrown,p );      //#include for forward declare
+                writeEndif( p );
+            }
 
 
     /**
@@ -1690,32 +1690,32 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeBoxedIDL(
-				 CompoundType t,
-				 IndentingWriter p)
-	throws IOException {
-	String[] boxNames = getIDLModuleNames( t );
-	int len = boxNames.length;
-	String[] modNames = new String[len - 3];               //remove box modules
-	for ( int i1 = 0; i1 < len - 3; i1++ ) modNames[i1] = boxNames[i1 + 3];
-	String tName = unEsc( t.getIDLName() );
+                                 CompoundType t,
+                                 IndentingWriter p)
+        throws IOException {
+        String[] boxNames = getIDLModuleNames( t );
+        int len = boxNames.length;
+        String[] modNames = new String[len - 3];               //remove box modules
+        for ( int i1 = 0; i1 < len - 3; i1++ ) modNames[i1] = boxNames[i1 + 3];
+        String tName = unEsc( t.getIDLName() );
 
-	writeBanner( t,0,!isException,p );
-	writeInclude( t,modNames,tName,p );
-	writeIfndef( t,0,!isException,!isForward,p );
-	writeModule1( t,p );
-	p.pln();p.pI();
+        writeBanner( t,0,!isException,p );
+        writeInclude( t,modNames,tName,p );
+        writeIfndef( t,0,!isException,!isForward,p );
+        writeModule1( t,p );
+        p.pln();p.pI();
 
-	p.p( "valuetype " + tName + " " );
-	for ( int i1 = 0; i1 < modNames.length; i1++ )
-	    p.p( IDL_NAME_SEPARATOR + modNames[i1] );
-	p.pln( IDL_NAME_SEPARATOR + tName + ";" );
+        p.p( "valuetype " + tName + " " );
+        for ( int i1 = 0; i1 < modNames.length; i1++ )
+            p.p( IDL_NAME_SEPARATOR + modNames[i1] );
+        p.pln( IDL_NAME_SEPARATOR + tName + ";" );
 
-	p.pO();p.pln();
-	writeRepositoryID( t,p );
-	p.pln();
-	writeModule2( t,p );
-	writeEndif( p );
-	}
+        p.pO();p.pln();
+        writeRepositoryID( t,p );
+        p.pln();
+        writeModule2( t,p );
+        writeEndif( p );
+        }
 
 
     /**
@@ -1724,25 +1724,25 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeException(
-				  ClassType t,
-				  IndentingWriter p)
-	throws IOException {
-	writeBanner( t,0,isException,p );
-	writeIfndef( t,0,isException,!isForward,p );
-	writeForwardReference( t,p );
-	writeModule1( t,p );
-	p.pln();p.pI();
+                                  ClassType t,
+                                  IndentingWriter p)
+        throws IOException {
+        writeBanner( t,0,isException,p );
+        writeIfndef( t,0,isException,!isForward,p );
+        writeForwardReference( t,p );
+        writeModule1( t,p );
+        p.pln();p.pI();
 
-	p.pln( "exception " + t.getIDLExceptionName() + " {" );
-	p.pln();p.pI();
-	p.pln( t.getIDLName() + " value;" );
-	p.pO();p.pln();
-	p.pln( "};" );
+        p.pln( "exception " + t.getIDLExceptionName() + " {" );
+        p.pln();p.pI();
+        p.pln( t.getIDLName() + " value;" );
+        p.pO();p.pln();
+        p.pln( "};" );
 
-	p.pO();p.pln();
-	writeModule2( t,p );
-	writeInclude( t,0,!isThrown,p );               //include valuetype idl file
-	writeEndif( p );
+        p.pO();p.pln();
+        writeModule2( t,p );
+        writeInclude( t,0,!isThrown,p );               //include valuetype idl file
+        writeEndif( p );
     }
 
 
@@ -1752,18 +1752,18 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeRepositoryID(
-				     Type t,
-				     IndentingWriter p )
-	throws IOException {
-	String repid = t.getRepositoryID();
-	if ( t.isCompound() ) {
-	    CompoundType ct = (CompoundType)t;
-	    if ( ct.isBoxed() )
-		repid = ct.getBoxedRepositoryID();
+                                     Type t,
+                                     IndentingWriter p )
+        throws IOException {
+        String repid = t.getRepositoryID();
+        if ( t.isCompound() ) {
+            CompoundType ct = (CompoundType)t;
+            if ( ct.isBoxed() )
+                repid = ct.getBoxedRepositoryID();
         }
 
-	p.pln( "#pragma ID " + t.getIDLName() + " \"" +
-	       repid + "\"" );
+        p.pln( "#pragma ID " + t.getIDLName() + " \"" +
+               repid + "\"" );
     }
 
     /**
@@ -1776,58 +1776,58 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeInherits(
-				 Hashtable inhHash,
-				 boolean forValuetype,
-				 IndentingWriter p )
-	throws IOException {
-	int itot = inhHash.size();
-	int iinh = 0;
-	int isup = 0;
-	if ( itot < 1 ) return;                         //any inheritance to write?
-	Enumeration inhEnum = inhHash.elements();
-	CompoundType ct;
-	if ( forValuetype )
-	    while ( inhEnum.hasMoreElements() ) {
-		ct = (CompoundType)inhEnum.nextElement();
-		if ( ct.getTypeCode() == TYPE_ABSTRACT ) isup++;
-	    }
-	iinh = itot - isup;
+                                 Hashtable inhHash,
+                                 boolean forValuetype,
+                                 IndentingWriter p )
+        throws IOException {
+        int itot = inhHash.size();
+        int iinh = 0;
+        int isup = 0;
+        if ( itot < 1 ) return;                         //any inheritance to write?
+        Enumeration inhEnum = inhHash.elements();
+        CompoundType ct;
+        if ( forValuetype )
+            while ( inhEnum.hasMoreElements() ) {
+                ct = (CompoundType)inhEnum.nextElement();
+                if ( ct.getTypeCode() == TYPE_ABSTRACT ) isup++;
+            }
+        iinh = itot - isup;
 
-	if ( iinh > 0 ) {
-	p.p( ": " );
-	    inhEnum = inhHash.elements();
-	while ( inhEnum.hasMoreElements() ) {         //write any class inheritance
-		ct = (CompoundType)inhEnum.nextElement();
-		if ( ct.isClass() ) {
-		    p.p( getQualifiedIDLName( ct ) );
-		    if ( iinh > 1 ) p.p( ", " );               //delimit them with commas
-		    else if ( itot > 1 ) p.p( " " );
-		break;                                                //only one parent
-	    }
-	}
-	    int i = 0;
-	inhEnum = inhHash.elements();
-	while ( inhEnum.hasMoreElements() ) {     //write any interface inheritance
-		ct = (CompoundType)inhEnum.nextElement();
-		if ( !ct.isClass() &&
-		     !( ct.getTypeCode() == TYPE_ABSTRACT ) ) {
-		    if ( i++ > 0 ) p.p( ", " );                     //delimit with commas
-		    p.p( getQualifiedIDLName( ct ) );
-	    }
-	}
+        if ( iinh > 0 ) {
+        p.p( ": " );
+            inhEnum = inhHash.elements();
+        while ( inhEnum.hasMoreElements() ) {         //write any class inheritance
+                ct = (CompoundType)inhEnum.nextElement();
+                if ( ct.isClass() ) {
+                    p.p( getQualifiedIDLName( ct ) );
+                    if ( iinh > 1 ) p.p( ", " );               //delimit them with commas
+                    else if ( itot > 1 ) p.p( " " );
+                break;                                                //only one parent
+            }
+        }
+            int i = 0;
+        inhEnum = inhHash.elements();
+        while ( inhEnum.hasMoreElements() ) {     //write any interface inheritance
+                ct = (CompoundType)inhEnum.nextElement();
+                if ( !ct.isClass() &&
+                     !( ct.getTypeCode() == TYPE_ABSTRACT ) ) {
+                    if ( i++ > 0 ) p.p( ", " );                     //delimit with commas
+                    p.p( getQualifiedIDLName( ct ) );
+            }
+        }
     }
-	if ( isup > 0 ) {                    //write abstract interface inheritance
-	    p.p( " supports " );
-	    int i = 0;
-	    inhEnum = inhHash.elements();
-	    while ( inhEnum.hasMoreElements() ) {
-		ct = (CompoundType)inhEnum.nextElement();
-		if ( ct.getTypeCode() == TYPE_ABSTRACT ) {
-		    if ( i++ > 0 ) p.p( ", " );                     //delimit with commas
-		    p.p( getQualifiedIDLName( ct ) );
-		}
-	    }
-	}
+        if ( isup > 0 ) {                    //write abstract interface inheritance
+            p.p( " supports " );
+            int i = 0;
+            inhEnum = inhHash.elements();
+            while ( inhEnum.hasMoreElements() ) {
+                ct = (CompoundType)inhEnum.nextElement();
+                if ( ct.getTypeCode() == TYPE_ABSTRACT ) {
+                    if ( i++ > 0 ) p.p( ", " );                     //delimit with commas
+                    p.p( getQualifiedIDLName( ct ) );
+                }
+            }
+        }
     }
 
 
@@ -1837,14 +1837,14 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeConstant(
-				 CompoundType.Member constant,
-				 IndentingWriter p )
-	throws IOException {
-	Type t = constant.getType();
-	p.p( "const " );
-	p.p( getQualifiedIDLName( t ) );
+                                 CompoundType.Member constant,
+                                 IndentingWriter p )
+        throws IOException {
+        Type t = constant.getType();
+        p.p( "const " );
+        p.p( getQualifiedIDLName( t ) );
         p.p( " " + constant.getIDLName() + " = " + constant.getValue() );
-	p.pln( ";" );
+        p.pln( ";" );
     }
 
 
@@ -1855,16 +1855,16 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeData(
-			     CompoundType.Member data,
-			     IndentingWriter p )
-	throws IOException {
-	if ( data.isInnerClassDeclaration() ) return;                      //ignore
-	Type t = data.getType();
-	if ( data.isPublic() )
-	    p.p( "public " );
-	else p.p( "private " );
-	p.pln( getQualifiedIDLName( t ) +  " " +
-	       data.getIDLName() + ";" );
+                             CompoundType.Member data,
+                             IndentingWriter p )
+        throws IOException {
+        if ( data.isInnerClassDeclaration() ) return;                      //ignore
+        Type t = data.getType();
+        if ( data.isPublic() )
+            p.p( "public " );
+        else p.p( "private " );
+        p.pln( getQualifiedIDLName( t ) +  " " +
+               data.getIDLName() + ";" );
     }
 
 
@@ -1875,14 +1875,14 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeAttribute(
-				  CompoundType.Method attr,
-				  IndentingWriter p )
-	throws IOException {
-	if ( attr.getAttributeKind() == ATTRIBUTE_SET ) return;  //use getters only
-	Type t = attr.getReturnType();
-	if ( !attr.isReadWriteAttribute() ) p.p( "readonly " );
-	p.p( "attribute " + getQualifiedIDLName( t ) + " " );
-	p.pln( attr.getAttributeName() + ";" );
+                                  CompoundType.Method attr,
+                                  IndentingWriter p )
+        throws IOException {
+        if ( attr.getAttributeKind() == ATTRIBUTE_SET ) return;  //use getters only
+        Type t = attr.getReturnType();
+        if ( !attr.isReadWriteAttribute() ) p.p( "readonly " );
+        p.p( "attribute " + getQualifiedIDLName( t ) + " " );
+        p.pln( attr.getAttributeName() + ";" );
     }
 
 
@@ -1893,63 +1893,63 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeMethod(
-			       CompoundType.Method method,
-			       IndentingWriter p )
-	throws IOException {
-	if ( method.isAttribute() ) {
-	    writeAttribute( method,p );
-	    return;
-	}
-	Type[]    pts = method.getArguments();
-	String[]  paramNames = method.getArgumentNames();
-	Type      rt = method.getReturnType();
-	Hashtable excHash = new Hashtable();
-	getExceptions( method,excHash );
+                               CompoundType.Method method,
+                               IndentingWriter p )
+        throws IOException {
+        if ( method.isAttribute() ) {
+            writeAttribute( method,p );
+            return;
+        }
+        Type[]    pts = method.getArguments();
+        String[]  paramNames = method.getArgumentNames();
+        Type      rt = method.getReturnType();
+        Hashtable excHash = new Hashtable();
+        getExceptions( method,excHash );
 
-	if ( method.isConstructor() )
-	    if ( factory ) p.p( "factory " + method.getIDLName() + "(" );
-	    else p.p( "init(" );                                    //IDL initializer
-	else {
-	    p.p( getQualifiedIDLName( rt ) );
-	    p.p( " " + method.getIDLName() + "(" );
-	}
-	p.pI();
+        if ( method.isConstructor() )
+            if ( factory ) p.p( "factory " + method.getIDLName() + "(" );
+            else p.p( "init(" );                                    //IDL initializer
+        else {
+            p.p( getQualifiedIDLName( rt ) );
+            p.p( " " + method.getIDLName() + "(" );
+        }
+        p.pI();
 
-	for ( int i=0; i < pts.length; i++ ) {
-	    if ( i > 0 ) p.pln( "," );               //delimit with comma and newline
-	    else p.pln();
-	    p.p( "in " );
-	    p.p( getQualifiedIDLName( pts[i] ) );
-	    p.p( " " + paramNames[i] );
-	}
-	p.pO();
-	p.p( " )" );
+        for ( int i=0; i < pts.length; i++ ) {
+            if ( i > 0 ) p.pln( "," );               //delimit with comma and newline
+            else p.pln();
+            p.p( "in " );
+            p.p( getQualifiedIDLName( pts[i] ) );
+            p.p( " " + paramNames[i] );
+        }
+        p.pO();
+        p.p( " )" );
 
-	if ( excHash.size() > 0 ) {                      //any exceptions to write?
-	    p.pln( " raises (" );
-	    p.pI();
-	    int i = 0;
-	    Enumeration excEnum = excHash.elements();
-	    while ( excEnum.hasMoreElements() ) {
-		ValueType exc = (ValueType)excEnum.nextElement();
-		if ( i > 0 ) p.pln( "," );                   //delimit them with commas
-		if ( exc.isIDLEntityException() )
-		    if ( exc.isCORBAUserException() )
-			p.p( "::org::omg::CORBA::UserEx" );
-		    else {
-			String[] modNames = getIDLModuleNames( exc );
-			for ( int i2 = 0; i2 < modNames.length; i2++ )
-			    p.p( IDL_NAME_SEPARATOR + modNames[i2] );
-			p.p( IDL_NAME_SEPARATOR + exc.getName() );
-		    }
-		else p.p( exc.getQualifiedIDLExceptionName( true ) );
-		i++;
-	    }
-	    p.pO();
-	    p.p( " )" );
-	}
+        if ( excHash.size() > 0 ) {                      //any exceptions to write?
+            p.pln( " raises (" );
+            p.pI();
+            int i = 0;
+            Enumeration excEnum = excHash.elements();
+            while ( excEnum.hasMoreElements() ) {
+                ValueType exc = (ValueType)excEnum.nextElement();
+                if ( i > 0 ) p.pln( "," );                   //delimit them with commas
+                if ( exc.isIDLEntityException() )
+                    if ( exc.isCORBAUserException() )
+                        p.p( "::org::omg::CORBA::UserEx" );
+                    else {
+                        String[] modNames = getIDLModuleNames( exc );
+                        for ( int i2 = 0; i2 < modNames.length; i2++ )
+                            p.p( IDL_NAME_SEPARATOR + modNames[i2] );
+                        p.p( IDL_NAME_SEPARATOR + exc.getName() );
+                    }
+                else p.p( exc.getQualifiedIDLExceptionName( true ) );
+                i++;
+            }
+            p.pO();
+            p.p( " )" );
+        }
 
-	p.pln( ";" );
+        p.pln( ";" );
     }
 
 
@@ -1959,9 +1959,9 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return String with any escape character removed
      */
     protected String unEsc(
-			   String name ) {
-	if ( name.startsWith( "_" ) ) return name.substring( 1 );
-	else return name;
+                           String name ) {
+        if ( name.startsWith( "_" ) ) return name.substring( 1 );
+        else return name;
     }
 
 
@@ -1973,39 +1973,39 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeBanner(
-			       Type t,
-			       int dim,
-			       boolean isException,
-			       IndentingWriter p )
-	throws IOException {
-	String[] modNames = getIDLModuleNames( t );             //module name array
-	String fName = unEsc( t.getIDLName() );                 //file name default
-	if ( isException && t.isClass() ) {
-	    ClassType ct = (ClassType)t;                    //file name for Exception
-	    fName = unEsc( ct.getIDLExceptionName() );
-	}
-	if ( dim > 0 && t.isArray() ) {
-	    Type et = t.getElementType();                    //file name for sequence
-	    fName = "seq" + dim + "_" + unEsc( et.getIDLName().replace( ' ','_' ) );
-	}
+                               Type t,
+                               int dim,
+                               boolean isException,
+                               IndentingWriter p )
+        throws IOException {
+        String[] modNames = getIDLModuleNames( t );             //module name array
+        String fName = unEsc( t.getIDLName() );                 //file name default
+        if ( isException && t.isClass() ) {
+            ClassType ct = (ClassType)t;                    //file name for Exception
+            fName = unEsc( ct.getIDLExceptionName() );
+        }
+        if ( dim > 0 && t.isArray() ) {
+            Type et = t.getElementType();                    //file name for sequence
+            fName = "seq" + dim + "_" + unEsc( et.getIDLName().replace( ' ','_' ) );
+        }
 
-	p.pln( "/**" );
-	p.p( " * " );
-	for ( int i1 = 0; i1 < modNames.length; i1++ )
-	    p.p( modNames[i1] + "/" );
-	p.pln( fName + ".idl" );
-	p.pln( " * Generated by rmic -idl. Do not edit" );
-	String d = DateFormat.getDateTimeInstance(
-						  DateFormat.FULL,DateFormat.FULL,Locale.getDefault() )
-	    .format( new Date() );
-	String ocStr = "o'clock";
-	int ocx = d.indexOf( ocStr );             //remove unwanted o'clock, if any
-	p.p ( " * " );
-	if ( ocx > -1 )
-	    p.pln( d.substring( 0,ocx ) + d.substring( ocx + ocStr.length() ) );
-	else p.pln( d );
-	p.pln( " */" );
-	p.pln();
+        p.pln( "/**" );
+        p.p( " * " );
+        for ( int i1 = 0; i1 < modNames.length; i1++ )
+            p.p( modNames[i1] + "/" );
+        p.pln( fName + ".idl" );
+        p.pln( " * Generated by rmic -idl. Do not edit" );
+        String d = DateFormat.getDateTimeInstance(
+                                                  DateFormat.FULL,DateFormat.FULL,Locale.getDefault() )
+            .format( new Date() );
+        String ocStr = "o'clock";
+        int ocx = d.indexOf( ocStr );             //remove unwanted o'clock, if any
+        p.p ( " * " );
+        if ( ocx > -1 )
+            p.pln( d.substring( 0,ocx ) + d.substring( ocx + ocStr.length() ) );
+        else p.pln( d );
+        p.pln( " */" );
+        p.pln();
     }
 
 
@@ -2014,9 +2014,9 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeIncOrb(
-			       IndentingWriter p )
-	throws IOException {
-	p.pln( "#include \"orb.idl\"" );
+                               IndentingWriter p )
+        throws IOException {
+        p.pln( "#include \"orb.idl\"" );
     }
 
 
@@ -2029,31 +2029,31 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeIfndef(
-			       Type t,
-			       int dim,
-			       boolean isException,
-			       boolean isForward,
-			       IndentingWriter p )
-	throws IOException {
-	String[] modNames = getIDLModuleNames( t );             //module name array
-	String fName = unEsc( t.getIDLName() );                 //file name default
-	if ( isException && t.isClass() ) {
-	    ClassType ct = (ClassType)t;                    //file name for Exception
-	    fName = unEsc( ct.getIDLExceptionName() );
-	}
-	if ( dim > 0 && t.isArray() ) {
-	    Type et = t.getElementType();                    //file name for sequence
-	    fName = "seq" + dim + "_" + unEsc( et.getIDLName().replace( ' ','_' ) );
-	}
-	p.pln();
-	p.p( "#ifndef __" );
-	for ( int i = 0; i < modNames.length; i++ ) p.p( modNames[i] + "_" );
-	p.pln( fName + "__" );
-	if ( !isForward ) {
-	p.p( "#define __" );
-	for ( int i = 0; i < modNames.length; i++ ) p.p( modNames[i] + "_" );
-	    p.pln( fName + "__" );
-	    p.pln();
+                               Type t,
+                               int dim,
+                               boolean isException,
+                               boolean isForward,
+                               IndentingWriter p )
+        throws IOException {
+        String[] modNames = getIDLModuleNames( t );             //module name array
+        String fName = unEsc( t.getIDLName() );                 //file name default
+        if ( isException && t.isClass() ) {
+            ClassType ct = (ClassType)t;                    //file name for Exception
+            fName = unEsc( ct.getIDLExceptionName() );
+        }
+        if ( dim > 0 && t.isArray() ) {
+            Type et = t.getElementType();                    //file name for sequence
+            fName = "seq" + dim + "_" + unEsc( et.getIDLName().replace( ' ','_' ) );
+        }
+        p.pln();
+        p.p( "#ifndef __" );
+        for ( int i = 0; i < modNames.length; i++ ) p.p( modNames[i] + "_" );
+        p.pln( fName + "__" );
+        if ( !isForward ) {
+        p.p( "#define __" );
+        for ( int i = 0; i < modNames.length; i++ ) p.p( modNames[i] + "_" );
+            p.pln( fName + "__" );
+            p.pln();
     }
     }
 
@@ -2063,10 +2063,10 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeEndif(
-			      IndentingWriter p )
-	throws IOException {
-	p.pln("#endif");
-	p.pln();
+                              IndentingWriter p )
+        throws IOException {
+        p.pln("#endif");
+        p.pln();
     }
 
     /**
@@ -2075,14 +2075,14 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeModule1(
-				Type t,
-				IndentingWriter p )
-	throws IOException {
+                                Type t,
+                                IndentingWriter p )
+        throws IOException {
 
-	String[] modNames = getIDLModuleNames( t );
-	p.pln();
-	for ( int i = 0; i < modNames.length; i++ )
-	    p.pln( "module " + modNames[i] + " {" );
+        String[] modNames = getIDLModuleNames( t );
+        p.pln();
+        for ( int i = 0; i < modNames.length; i++ )
+            p.pln( "module " + modNames[i] + " {" );
     }
 
     /**
@@ -2091,12 +2091,12 @@ public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param p The output stream.
      */
     protected void writeModule2(
-				Type t,
-				IndentingWriter p )
-	throws IOException {
-	String[] modNames = getIDLModuleNames( t );
-	for ( int i=0; i < modNames.length; i++ ) p.pln( "};" );
-	p.pln();
+                                Type t,
+                                IndentingWriter p )
+        throws IOException {
+        String[] modNames = getIDLModuleNames( t );
+        for ( int i=0; i < modNames.length; i++ ) p.pln( "};" );
+        p.pln();
     }
 
 }

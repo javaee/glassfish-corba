@@ -82,9 +82,9 @@ public class ServantManagerImpl implements ServantManager {
      * @param iiop True if iiop.
      */
     public synchronized Remote startServant(
-					    String servantClass, String servantName, boolean publishName, 
-					    String nameServerHost, int nameServerPort, 
-					    boolean iiop ) throws java.rmi.RemoteException {
+                                            String servantClass, String servantName, boolean publishName, 
+                                            String nameServerHost, int nameServerPort, 
+                                            boolean iiop ) throws java.rmi.RemoteException {
         try {
             if (nameServerHost != null && nameServerHost.equals("")) {
                 nameServerHost = null;
@@ -107,7 +107,7 @@ public class ServantManagerImpl implements ServantManager {
                             orb = tie.orb();
                         } else {
                             orb = Util.createORB(nameServerHost,nameServerPort,
-						 null );
+                                                 null );
                         }
                     }
                 }
@@ -123,9 +123,9 @@ public class ServantManagerImpl implements ServantManager {
                 Class theClass = Class.forName(servantClass);
                 Remote servant = (Remote) theClass.newInstance();
 
-		if (!(servant instanceof PortableRemoteObject)) {
-		    PortableRemoteObject.exportObject(servant);
-		}
+                if (!(servant instanceof PortableRemoteObject)) {
+                    PortableRemoteObject.exportObject(servant);
+                }
                                 
                 // Are we supposed to publish it?
                 
@@ -133,30 +133,30 @@ public class ServantManagerImpl implements ServantManager {
                     
                     // Yes, so do it...
                     
-            	    context.rebind(servantName, servant);
-            	    
-            	    // Set the result with the stub
-            	    // returned by the lookup. This is needed
-            	    // to workaround a bug in the CNCtx class
-            	    // which causes it to ALWAYS connect the tie
-            	    // even if it has already been connected. By
-            	    // doing this lookup, we ensure that the IOR
-            	    // we know this guy by is correct.
-            	    
-            	    result = (Remote)context.lookup(servantName);
-            	    
-            	} else {
+                    context.rebind(servantName, servant);
+                    
+                    // Set the result with the stub
+                    // returned by the lookup. This is needed
+                    // to workaround a bug in the CNCtx class
+                    // which causes it to ALWAYS connect the tie
+                    // even if it has already been connected. By
+                    // doing this lookup, we ensure that the IOR
+                    // we know this guy by is correct.
+                    
+                    result = (Remote)context.lookup(servantName);
+                    
+                } else {
                 
                     // No, so get it's tie and connect it to the orb...
                     
                     if (iiop) {
                         Tie tie = javax.rmi.CORBA.Util.getTie(servant);
-            	        tie.orb(orb);
+                        tie.orb(orb);
                         result = PortableRemoteObject.toStub(servant);
                     } else {
                         result = servant;
                     }
-            	}
+                }
                     
                 // Stash it away in our table...
 
@@ -165,18 +165,18 @@ public class ServantManagerImpl implements ServantManager {
                 state.published = publishName;
                 table.put(servantName,state);
 
-	    } else {
-        	
-		// Just return the original one...
-        	    
-		result = state.remote;
-	    }
-        	
-	    return result;
-        	
+            } else {
+                
+                // Just return the original one...
+                    
+                result = state.remote;
+            }
+                
+            return result;
+                
         } catch (Exception e) {
             RemoteException rexc = new RemoteException (e.toString(), e );
-	    throw rexc ;
+            throw rexc ;
         }
     }
 
@@ -185,7 +185,7 @@ public class ServantManagerImpl implements ServantManager {
      */
     public synchronized void stopServant(String servantName) throws java.rmi.RemoteException {
         
-	try {
+        try {
             State state = (State) table.get(servantName);
             
             if (state != null) {
@@ -205,8 +205,8 @@ public class ServantManagerImpl implements ServantManager {
             }
         } catch (Exception e) {
             RemoteException rexc = new RemoteException (e.toString());
-	    rexc.initCause(e) ;
-	    throw rexc ;
+            rexc.initCause(e) ;
+            throw rexc ;
         }
     }
 

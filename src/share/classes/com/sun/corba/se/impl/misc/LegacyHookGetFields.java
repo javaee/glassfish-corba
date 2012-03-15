@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.misc;
+package com.sun.corba.ee.impl.misc;
 
 import java.io.*;
 import java.util.Hashtable;
@@ -55,7 +55,7 @@ class LegacyHookGetFields extends ObjectInputStream.GetField {
     public java.io.ObjectStreamClass getObjectStreamClass() {
         return null;
     }
-		
+                
     /**
      * Return true if the named field is defaulted and has no value
      * in this stream.
@@ -64,7 +64,7 @@ class LegacyHookGetFields extends ObjectInputStream.GetField {
         throws IOException, IllegalArgumentException  {
         return (!fields.containsKey(name));
     }
-		
+                
     /**
      * Get the value of the named boolean field from the persistent field.
      */
@@ -74,7 +74,7 @@ class LegacyHookGetFields extends ObjectInputStream.GetField {
             return defvalue;
         else return ((Boolean)fields.get(name)).booleanValue();
     }
-		
+                
     /**
      * Get the value of the named char field from the persistent fields.
      */
@@ -85,7 +85,7 @@ class LegacyHookGetFields extends ObjectInputStream.GetField {
         else return ((Character)fields.get(name)).charValue();
 
     }
-		
+                
     /**
      * Get the value of the named byte field from the persistent fields.
      */
@@ -96,7 +96,7 @@ class LegacyHookGetFields extends ObjectInputStream.GetField {
         else return ((Byte)fields.get(name)).byteValue();
 
     }
-		
+                
     /**
      * Get the value of the named short field from the persistent fields.
      */
@@ -107,7 +107,7 @@ class LegacyHookGetFields extends ObjectInputStream.GetField {
         else return ((Short)fields.get(name)).shortValue();
 
     }
-		
+                
     /**
      * Get the value of the named int field from the persistent fields.
      */
@@ -118,7 +118,7 @@ class LegacyHookGetFields extends ObjectInputStream.GetField {
         else return ((Integer)fields.get(name)).intValue();
 
     }
-		
+                
     /**
      * Get the value of the named long field from the persistent fields.
      */
@@ -129,7 +129,7 @@ class LegacyHookGetFields extends ObjectInputStream.GetField {
         else return ((Long)fields.get(name)).longValue();
 
     }
-		
+                
     /**
      * Get the value of the named float field from the persistent fields.
      */
@@ -140,7 +140,7 @@ class LegacyHookGetFields extends ObjectInputStream.GetField {
         else return ((Float)fields.get(name)).floatValue();
 
     }
-		
+                
     /**
      * Get the value of the named double field from the persistent field.
      */
@@ -151,7 +151,7 @@ class LegacyHookGetFields extends ObjectInputStream.GetField {
         else return ((Double)fields.get(name)).doubleValue();
 
     }
-		
+                
     /**
      * Get the value of the named Object field from the persistent field.
      */
@@ -162,7 +162,7 @@ class LegacyHookGetFields extends ObjectInputStream.GetField {
         else return fields.get(name);
 
     }
-		
+                
     public String toString(){
         return fields.toString();
     }

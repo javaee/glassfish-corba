@@ -63,7 +63,7 @@ public final class TRANSACTION_ROLLEDBACK extends SystemException {
      * and a null description.
      */
     public TRANSACTION_ROLLEDBACK() {
-	this("");
+        this("");
     }
 
     /**

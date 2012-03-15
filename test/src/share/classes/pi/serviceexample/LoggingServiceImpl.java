@@ -62,7 +62,7 @@ class LoggingServiceImpl
 
     public void log(String a1)
     {
-	System.out.println(a1);
+        System.out.println(a1);
     }
 
     //
@@ -71,37 +71,37 @@ class LoggingServiceImpl
 
     public static void main(String[] av)
     {
-	try {
-	    if (orb == null) {
-		orb = ORB.init(av, null);
-	    }
-	    
-	    POA rootPOA =  (POA) orb.resolve_initial_references("RootPOA");
-	    rootPOA.the_POAManager().activate();
-	    
-	    byte[] objectId =
-		rootPOA.activate_object(new LoggingServiceImpl());
-	    org.omg.CORBA.Object ref = rootPOA.id_to_reference(objectId);
+        try {
+            if (orb == null) {
+                orb = ORB.init(av, null);
+            }
+            
+            POA rootPOA =  (POA) orb.resolve_initial_references("RootPOA");
+            rootPOA.the_POAManager().activate();
+            
+            byte[] objectId =
+                rootPOA.activate_object(new LoggingServiceImpl());
+            org.omg.CORBA.Object ref = rootPOA.id_to_reference(objectId);
 
-	    NamingContext nameService = 
-		NamingContextHelper.narrow(
+            NamingContext nameService = 
+                NamingContextHelper.narrow(
                     orb.resolve_initial_references("NameService"));
-	    NameComponent path[] =
-	        { new NameComponent("LoggingService", "") };
-	    nameService.rebind(path, ref);
+            NameComponent path[] =
+                { new NameComponent("LoggingService", "") };
+            nameService.rebind(path, ref);
 
-	    // Only relevant for colocated example.
-	    ColocatedServers.colocatedBootstrapDone = true;
+            // Only relevant for colocated example.
+            ColocatedServers.colocatedBootstrapDone = true;
 
-	    System.out.println("Server is ready.");
+            System.out.println("Server is ready.");
 
-	    orb.run();
+            orb.run();
 
         } catch (Exception e) {
-	    e.printStackTrace();
-	    System.exit(-1);
+            e.printStackTrace();
+            System.exit(-1);
         }
-	System.exit(0);
+        System.exit(0);
     }
 }
 

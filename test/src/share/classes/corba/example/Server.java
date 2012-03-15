@@ -63,9 +63,9 @@ public class Server
     public static void main(String args[])
     {
         try {
-      	    Properties props = new Properties(System.getProperties());
+            Properties props = new Properties(System.getProperties());
 // Examples of how to set ORB debug properties and default fragment size
-//	    props.put(ORBConstants.DEBUG_PROPERTY, "transport,giop");
+//          props.put(ORBConstants.DEBUG_PROPERTY, "transport,giop");
 //            props.put(ORBConstants.GIOP_FRAGMENT_SIZE, "32");
             ORB orb = ORB.init(args, props);
       

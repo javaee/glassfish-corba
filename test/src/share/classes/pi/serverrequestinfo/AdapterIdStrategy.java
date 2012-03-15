@@ -41,10 +41,10 @@
 package pi.serverrequestinfo;
 
 import org.omg.CORBA.*;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.Messaging.*;
-import com.sun.corba.se.impl.misc.HexOutputStream;
+import com.sun.corba.ee.impl.misc.HexOutputStream;
 
 import java.util.*;
 import java.io.*;
@@ -66,92 +66,92 @@ public class AdapterIdStrategy
     private byte[] expectedAdapterId;
 
     public AdapterIdStrategy( byte[] expectedAdapterId ) {
-	this.expectedAdapterId = expectedAdapterId;
+        this.expectedAdapterId = expectedAdapterId;
     }
 
     public void receive_request_service_contexts (
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
         throws ForwardRequest
     {
-	// We already checked that adapter_id is invalid in rrsc.
-	try {
-	    super.receive_request_service_contexts( interceptor, ri );
-	    count++;
-	}
-	catch( Exception ex ) {
-	    failException( "rrsc", ex );
-	}
+        // We already checked that adapter_id is invalid in rrsc.
+        try {
+            super.receive_request_service_contexts( interceptor, ri );
+            count++;
+        }
+        catch( Exception ex ) {
+            failException( "rrsc", ex );
+        }
     }
 
     public void receive_request (
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
     {
-	try {
-	    super.receive_request( interceptor, ri );
-	    checkAdapterId( "receive_request", ri.adapter_id() );
-	}
-	catch( Exception ex ) {
-	    failException( "receive_request", ex );
-	}
+        try {
+            super.receive_request( interceptor, ri );
+            checkAdapterId( "receive_request", ri.adapter_id() );
+        }
+        catch( Exception ex ) {
+            failException( "receive_request", ex );
+        }
     }
 
     public void send_reply (
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
     {
-	try {
-	    super.send_reply( interceptor, ri );
-	    checkAdapterId( "send_reply", ri.adapter_id() );
-	}
-	catch( Exception ex ) {
-	    failException( "send_reply", ex );
-	}
+        try {
+            super.send_reply( interceptor, ri );
+            checkAdapterId( "send_reply", ri.adapter_id() );
+        }
+        catch( Exception ex ) {
+            failException( "send_reply", ex );
+        }
     }
 
     public void send_exception (
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
         throws ForwardRequest
     {
-	try {
-	    super.send_exception( interceptor, ri );
-	    checkAdapterId( "send_exception", ri.adapter_id() );
-	}
-	catch( Exception ex ) {
-	    failException( "send_exception", ex );
-	}
+        try {
+            super.send_exception( interceptor, ri );
+            checkAdapterId( "send_exception", ri.adapter_id() );
+        }
+        catch( Exception ex ) {
+            failException( "send_exception", ex );
+        }
     }
 
     public void send_other (
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
         throws ForwardRequest
     {
-	try {
-	    super.send_other( interceptor, ri );
-	    checkAdapterId( "send_other", ri.adapter_id() );
-	}
-	catch( Exception ex ) {
-	    failException( "send_other", ex );
-	}
+        try {
+            super.send_other( interceptor, ri );
+            checkAdapterId( "send_other", ri.adapter_id() );
+        }
+        catch( Exception ex ) {
+            failException( "send_other", ex );
+        }
     }
 
     private void checkAdapterId( String method, byte[] adapterId ) {
-	log( method + "(): Actual adapter id = " + dumpHex( adapterId ) );
-	if( Arrays.equals( adapterId, expectedAdapterId ) ) {
-	    log( method + "(): Adapter id compares." );
-	}
-	else {
-	    fail( method + "(): Adapter id does not compare.  " +
-		"(expected id: " + dumpHex( expectedAdapterId ) + ")" );
-	}
+        log( method + "(): Actual adapter id = " + dumpHex( adapterId ) );
+        if( Arrays.equals( adapterId, expectedAdapterId ) ) {
+            log( method + "(): Adapter id compares." );
+        }
+        else {
+            fail( method + "(): Adapter id does not compare.  " +
+                "(expected id: " + dumpHex( expectedAdapterId ) + ")" );
+        }
     }
 
     private String dumpHex( byte[] bytes ) {
-	StringWriter sw = new StringWriter();
+        StringWriter sw = new StringWriter();
         HexOutputStream out = new HexOutputStream( sw );
-	try {
-	    out.write( bytes );
-	}
-	catch( IOException e ) {}
-	return sw.toString();
+        try {
+            out.write( bytes );
+        }
+        catch( IOException e ) {}
+        return sw.toString();
     }
 
 }

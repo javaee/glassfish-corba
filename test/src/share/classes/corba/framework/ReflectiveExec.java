@@ -51,15 +51,15 @@ public class ReflectiveExec extends ExternalExec {
         // [java executable]
         // [arguments to the java executable]
         // [-D environment variables]
-	// [debug arguments to the java executable]
+        // [debug arguments to the java executable]
         // corba.framwork.ReflectiveWrapper
         // [class name]
         // [arguments to the program]
 
-	String[] debugArgs = getDebugVMArgs() ;
+        String[] debugArgs = getDebugVMArgs() ;
 
         int size = 2 + debugArgs.length + VMArgs.length +
-	    environment.size() + programArgs.length + 1;
+            environment.size() + programArgs.length + 1;
 
         String cmd [] = new String [size];
 
@@ -79,9 +79,9 @@ public class ReflectiveExec extends ExternalExec {
                 + environment.getProperty(name);
         }
 
-	// Debugging arguments, if any
-	for(int i = 0; i < debugArgs.length; i++ )
-	    cmd[idx++] = debugArgs[i];
+        // Debugging arguments, if any
+        for(int i = 0; i < debugArgs.length; i++ )
+            cmd[idx++] = debugArgs[i];
 
 
         cmd[idx++] = "corba.framework.ReflectiveWrapper";

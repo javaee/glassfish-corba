@@ -91,8 +91,8 @@ module CosNaming
    */
   enum BindingType 
   {
-    nobject, 	// name is bound to an object
-    ncontext	// name is bound to a naming context
+    nobject,    // name is bound to an object
+    ncontext    // name is bound to a naming context
   };
     
   /**
@@ -100,8 +100,8 @@ module CosNaming
    */
   struct Binding 
   {
-    Name binding_name; 		// name
-    BindingType binding_type;	// whether name is bound to an object
+    Name binding_name;          // name
+    BindingType binding_type;   // whether name is bound to an object
                                 //  or a naming context
   };
     
@@ -136,7 +136,7 @@ module CosNaming
      * @param bl the returned bindings
      */ 
     boolean next_n(in unsigned long how_many, 
-		   out BindingList bl);
+                   out BindingList bl);
         
     // Destroy binding iterator
     /**
@@ -230,11 +230,11 @@ module CosNaming
  * Indicates an object is already bound to the specified name.<p> 
  */ 
         void bind(in Name n, 
-	      in Object obj)
+              in Object obj)
         raises(NotFound, 
-	     CannotProceed, 
-	     InvalidName, 
-	     AlreadyBound);
+             CannotProceed, 
+             InvalidName, 
+             AlreadyBound);
     
 /**
  * Names an object that is a naming context. Naming contexts that
@@ -257,11 +257,11 @@ module CosNaming
  * bound to the specified name.<p>
  */ 
     void bind_context(in Name n, 
-		      in NamingContext nc)
+                      in NamingContext nc)
       raises(NotFound, 
-	     CannotProceed, 
-	     InvalidName, 
-	     AlreadyBound);
+             CannotProceed, 
+             InvalidName, 
+             AlreadyBound);
     
 /**
  * Creates a binding of a name and an object in the naming context
@@ -282,10 +282,10 @@ module CosNaming
  * @exception org.omg.CosNaming.NamingContextPackage.InvalidName Indicates that the name is invalid. <p>
  */ 
     void rebind(in Name n, 
-		in Object obj)
+                in Object obj)
       raises(NotFound, 
-	     CannotProceed, 
-	     InvalidName);
+             CannotProceed, 
+             InvalidName);
     
 /** 
  * Creates a binding of a name and a naming context in the naming
@@ -306,10 +306,10 @@ module CosNaming
  * @exception org.omg.CosNaming.NamingContextPackage.InvalidName Indicates that the name is invalid. <p>
  */ 
     void rebind_context(in Name n, 
-			in NamingContext nc)
+                        in NamingContext nc)
       raises(NotFound, 
-	     CannotProceed, 
-	     InvalidName);
+             CannotProceed, 
+             InvalidName);
 
 /** 
  * The resolve operation is the process of retrieving an object
@@ -331,8 +331,8 @@ module CosNaming
  */ 
     Object resolve(in Name n)
       raises(NotFound, 
-	     CannotProceed, 
-	     InvalidName);
+             CannotProceed, 
+             InvalidName);
     
 /** 
  * The unbind operation removes a name binding from a context.
@@ -349,8 +349,8 @@ module CosNaming
  */ 
     void unbind(in Name n)
       raises(NotFound, 
-	     CannotProceed, 
-	     InvalidName);
+             CannotProceed, 
+             InvalidName);
     
 /**
  * The list operation allows a client to iterate through a set of
@@ -373,8 +373,8 @@ module CosNaming
  * @param bi the returned binding iterator <p>
  */ 
     void list(in unsigned long how_many, 
-	      out BindingList bl, 
-	      out BindingIterator bi);
+              out BindingList bl, 
+              out BindingIterator bi);
 
 /**
  * This operation returns a naming context implemented by the same
@@ -405,9 +405,9 @@ module CosNaming
  */ 
     NamingContext bind_new_context(in Name n)
       raises(NotFound, 
-	     AlreadyBound, 
-	     CannotProceed, 
-	     InvalidName);
+             AlreadyBound, 
+             CannotProceed, 
+             InvalidName);
     
 /** 
  * The destroy operation deletes a naming context. If the naming 
@@ -440,18 +440,18 @@ module CosNaming
  * StringName is the Stringified Name, Array of Name Components 
  * represented as a String.
  */
-	typedef string StringName;
+        typedef string StringName;
 
 /**
  * Address is the Host and Port information represented as a String.
  */
-	typedef string Address;
+        typedef string Address;
    
 /**
  * URLString is the URL address (corbaloc: or corbaname:) represented as
  * a String.
  */
-	typedef string URLString;
+        typedef string URLString;
 
 /**
  * This operation creates a stringified name from the array of Name
@@ -463,7 +463,7 @@ module CosNaming
  * Indicates the name does not identify a binding.<p>
  * 
  */ 
-	StringName to_string( in Name n ) raises (InvalidName);
+        StringName to_string( in Name n ) raises (InvalidName);
 
 /**
  * This operation  converts a Stringified Name into an  equivalent array
@@ -475,15 +475,15 @@ module CosNaming
  * Indicates the name does not identify a binding.<p>
  * 
  */ 
-	Name to_name( in StringName sn ) raises (InvalidName);
+        Name to_name( in StringName sn ) raises (InvalidName);
 
 
 /** 
  * Indicates the invalid Stringified name for the object, The
  * reason could be invalid syntax. 
  */
-	exception InvalidAddress 
-	{ };
+        exception InvalidAddress 
+        { };
 
 /**
  * This operation creates a URL based "iiopname://" format name
@@ -499,8 +499,8 @@ module CosNaming
  * incorrect <p>
  * 
  */ 
-	URLString to_url( in Address addr, in StringName sn )
-			raises( InvalidAddress, InvalidName );
+        URLString to_url( in Address addr, in StringName sn )
+                        raises( InvalidAddress, InvalidName );
 
 
 /**
@@ -517,9 +517,9 @@ module CosNaming
  * Indicates the name does not identify a binding.<p>
  * 
  */ 
-	Object resolve_str( in StringName sn)
-		raises( NotFound, CannotProceed,
-			InvalidName);
+        Object resolve_str( in StringName sn)
+                raises( NotFound, CannotProceed,
+                        InvalidName);
 
   };
 

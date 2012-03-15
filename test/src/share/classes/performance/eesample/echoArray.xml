@@ -49,8 +49,8 @@
     <param name="japex.classPath" value="../../../../../../test/build/classes"/>
     
     <driver name="StandardTest" xmlns="http://www.sun.com/japex/testSuite">
-	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
-	<param name="description" value="TestService IIOP Driver"/>
+        <param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+        <param name="description" value="TestService IIOP Driver"/>
     </driver>
     
     <!--

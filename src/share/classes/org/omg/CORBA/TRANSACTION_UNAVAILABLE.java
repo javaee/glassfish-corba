@@ -62,7 +62,7 @@ public final class TRANSACTION_UNAVAILABLE extends SystemException {
      * CompletionStatus.COMPLETED_NO, and a null description.
      */
     public TRANSACTION_UNAVAILABLE() {
-	this("");
+        this("");
     }
 
     /**
@@ -93,7 +93,7 @@ public final class TRANSACTION_UNAVAILABLE extends SystemException {
      * @param completed the completion status
      */
     public TRANSACTION_UNAVAILABLE(String s, int minor, 
-				   CompletionStatus completed) {
+                                   CompletionStatus completed) {
         super(s, minor, completed);
     }
 }

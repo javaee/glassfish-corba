@@ -99,7 +99,7 @@ public class SymtabEntry
     else
       _container = that._container;
     initDynamicVars ();
-	_comment = that._comment;  	// <21jul1997daz>
+        _comment = that._comment;       // <21jul1997daz>
   } // ctor
 
   /** This is a shallow copy constructor */
@@ -118,8 +118,8 @@ public class SymtabEntry
       ((ForwardEntry)_type).types.addElement (this);
 
     initDynamicVars ();
-	// <21JUL1997>
-	_comment = that._comment;
+        // <21JUL1997>
+        _comment = that._comment;
   } // ctor
 
   void initDynamicVars ()

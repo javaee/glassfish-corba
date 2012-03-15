@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport.connection;
+package com.sun.corba.ee.impl.transport.connection;
 
 import java.util.Queue ;
 import java.util.Collection ;
@@ -53,7 +53,7 @@ import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;
 
-import com.sun.corba.se.spi.transport.connection.Connection ;
+import com.sun.corba.ee.spi.transport.connection.Connection ;
 import java.util.ArrayList;
 
 // Represents an entry in the outbound connection cache.  

@@ -37,13 +37,13 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.misc;
+package com.sun.corba.ee.impl.misc;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
-import com.sun.corba.se.spi.trace.Cdr;
+import com.sun.corba.ee.spi.trace.Cdr;
 
 /** This is a hash table implementation that simultaneously maps key to value
  * and value to key.  It is used for marshalling and unmarshalling value types,
@@ -73,7 +73,7 @@ public class CacheTable<K> {
             key = k;
             val = v;
             next = null;
-	    rnext = null;
+            rnext = null;
         } 
     }
 
@@ -94,17 +94,17 @@ public class CacheTable<K> {
 
     public  CacheTable(String cacheType, ORB orb, boolean u) {
         this.orb = orb;
-	this.cacheType = cacheType ;
-	noReverseMap = u;
+        this.cacheType = cacheType ;
+        noReverseMap = u;
         size = INITIAL_SIZE;
-	threshhold = INITIAL_THRESHHOLD ;
-	entryCount = 0;
-	initTables();
+        threshhold = INITIAL_THRESHHOLD ;
+        entryCount = 0;
+        initTables();
     }
 
     private void initTables() {
-	map = new Entry[size];
-	if (noReverseMap) {
+        map = new Entry[size];
+        if (noReverseMap) {
             rmap = null;
         } else {
             rmap = new Entry[size];
@@ -112,40 +112,40 @@ public class CacheTable<K> {
     }
 
     private void grow() {
-	if (size == MAX_SIZE) {
+        if (size == MAX_SIZE) {
             return;
         }
 
-	Entry<K>[] oldMap = map;
+        Entry<K>[] oldMap = map;
         int oldSize = size;
-	size <<= 1;
-	threshhold <<= 1 ;
+        size <<= 1;
+        threshhold <<= 1 ;
 
-	initTables();
-	// now rehash the entries into the new table
-	for (int i = 0; i < oldSize; i++) {
-	    for (Entry<K> e = oldMap[i]; e != null; e = e.next) {
+        initTables();
+        // now rehash the entries into the new table
+        for (int i = 0; i < oldSize; i++) {
+            for (Entry<K> e = oldMap[i]; e != null; e = e.next) {
                 put_table(e.key, e.val);
             }
-	}
+        }
     }
 
     private int hashModTableSize(int h) {
-	// This is taken from the hash method in the JDK 6 HashMap.
-	// This is used for both the
-	// key and the value side of the mapping.  It's not clear
-	// how useful this is in this application, as the low-order
-	// bits change a lot for both sides.  
-	h ^= (h >>> 20) ^ (h >>> 12) ;
-	return (h ^ (h >>> 7) ^ (h >>> 4)) & (size - 1) ;
+        // This is taken from the hash method in the JDK 6 HashMap.
+        // This is used for both the
+        // key and the value side of the mapping.  It's not clear
+        // how useful this is in this application, as the low-order
+        // bits change a lot for both sides.  
+        h ^= (h >>> 20) ^ (h >>> 12) ;
+        return (h ^ (h >>> 7) ^ (h >>> 4)) & (size - 1) ;
     }
 
     private int hash(K key) {
-	return hashModTableSize(System.identityHashCode(key));
+        return hashModTableSize(System.identityHashCode(key));
     }
 
     private int hash(int val) {
-	return hashModTableSize(val);
+        return hashModTableSize(val);
     }
 
     /** Store the (key,val) pair in the hash table, unless 
@@ -154,56 +154,56 @@ public class CacheTable<K> {
      * this is not checked.
      */
     public final void put(K key, int val) {
-	if (put_table(key, val)) {
-	    entryCount++;
-	    if (entryCount > threshhold) {
+        if (put_table(key, val)) {
+            entryCount++;
+            if (entryCount > threshhold) {
                 grow();
             }
-	}
+        }
     }
 
     @Cdr
     private boolean put_table(K key, int val) {
-	int index = hash(key);
+        int index = hash(key);
 
-	for (Entry<K> e = map[index]; e != null; e = e.next) {
-	    if (e.key == key) {
-	        if (e.val != val) {
-		    // duplicateIndirectionOffset error here is not an error:
-		    // A serializable/externalizable class that defines 
-		    // a readResolve method that creates a canonical representation
-		    // of a value can legally have the same key occuring at 
-		    // multiple values.  This is GlassFish issue 1605.
-		    // Note: we store this anyway, so that getVal can find the key.
+        for (Entry<K> e = map[index]; e != null; e = e.next) {
+            if (e.key == key) {
+                if (e.val != val) {
+                    // duplicateIndirectionOffset error here is not an error:
+                    // A serializable/externalizable class that defines 
+                    // a readResolve method that creates a canonical representation
+                    // of a value can legally have the same key occuring at 
+                    // multiple values.  This is GlassFish issue 1605.
+                    // Note: we store this anyway, so that getVal can find the key.
                     wrapper.duplicateIndirectionOffset();
-		} else {	
-		    // if we get here we are trying to put in the same key/val pair
-		    // this is a no-op, so we just return
-		    return false;
-		}
-	    }
+                } else {        
+                    // if we get here we are trying to put in the same key/val pair
+                    // this is a no-op, so we just return
+                    return false;
+                }
+            }
         }
-	
-	Entry<K> newEntry = new Entry<K>(key, val);
-	newEntry.next = map[index];
-	map[index] = newEntry;
-	if (!noReverseMap) {
-	    int rindex = hash(val);
-	    newEntry.rnext = rmap[rindex];
-	    rmap[rindex] = newEntry;
+        
+        Entry<K> newEntry = new Entry<K>(key, val);
+        newEntry.next = map[index];
+        map[index] = newEntry;
+        if (!noReverseMap) {
+            int rindex = hash(val);
+            newEntry.rnext = rmap[rindex];
+            rmap[rindex] = newEntry;
         }
 
-	return true;
+        return true;
     }
 
     public final boolean containsKey(K key) {
-	return (getVal(key) != -1);
+        return (getVal(key) != -1);
     }
 
     /** Returns some int val where (key,val) is in this CacheTable.
      */
     public final int getVal(K key) {
-	int index = hash(key);
+        int index = hash(key);
         for (Entry<K> e = map[index]; e != null; e = e.next) {
             if (e.key == key) {
                 return e.val;
@@ -214,17 +214,17 @@ public class CacheTable<K> {
     }
 
     public final boolean containsVal(int val) {
-	return (getKey(val) != null); 
+        return (getKey(val) != null); 
     }
 
     /** Return the key where (key,val) is present in the map.
      */
     public final K getKey(int val) {
-	if (noReverseMap) {
+        if (noReverseMap) {
             throw wrapper.getKeyInvalidInCacheTable();
         }
 
-	int index = hash(val);
+        int index = hash(val);
         for (Entry<K> e = rmap[index]; e != null; e = e.rnext) {
             if (e.val == val) {
                 return e.key;
@@ -235,7 +235,7 @@ public class CacheTable<K> {
     }
 
     public void done() {
-	map = null;
+        map = null;
         rmap = null;
     }
 }

@@ -51,24 +51,24 @@ public class TimedTest extends RepeatedTest
 
     public TimedTest( Test test, int reps )
     {
-	super( test, reps ) ;
+        super( test, reps ) ;
     }
 
     public void run( TestResult result )
     {
-	long startTime = System.nanoTime() ;
-	long stopTime = 0 ;
-	try {
-	    super.run( result ) ;
-	} finally {
-	    stopTime = System.nanoTime() ;
-	}
-	duration = stopTime - startTime ;
+        long startTime = System.nanoTime() ;
+        long stopTime = 0 ;
+        try {
+            super.run( result ) ;
+        } finally {
+            stopTime = System.nanoTime() ;
+        }
+        duration = stopTime - startTime ;
     }
 
     public long getDuration() 
     {
-	return duration ;
+        return duration ;
     }
 }
 

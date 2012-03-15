@@ -55,7 +55,7 @@ public interface Test
     extends Remote
 {
     public int echo(int x)
-	throws RemoteException;
+        throws RemoteException;
 }
 
 // End of file.

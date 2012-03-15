@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.namingutil;
+package com.sun.corba.ee.impl.naming.namingutil;
 
-import com.sun.corba.se.spi.logging.OMGSystemException ;
+import com.sun.corba.ee.spi.logging.OMGSystemException ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 /** The corbaloc: URL definitions from the -ORBInitDef and -ORBDefaultInitDef's
  *  will be stored in this object. This object is capable of storing multiple
@@ -69,12 +69,12 @@ public abstract class INSURLBase implements INSURL {
      */
     protected void badAddress( String name )
     {
-	throw wrapper.soBadAddress( name ) ;
+        throw wrapper.soBadAddress( name ) ;
     }
 
     protected void badAddress( java.lang.Throwable e, String name )
     {
-	throw wrapper.soBadAddress( e, name ) ;
+        throw wrapper.soBadAddress( e, name ) ;
     }
 
     public boolean getRIRFlag( ) {

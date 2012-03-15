@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)OBVTestObjectOne.java	1.7 99/06/07 */
+/* @(#)OBVTestObjectOne.java    1.7 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -83,7 +83,7 @@ public abstract class OBVTestObjectOne implements org.omg.CORBA.portable.Streama
     ostream.write_float (this.fFloat);
     ostream.write_double (this.fDouble);
     ostream.write_string (this.fString);
-	    }
+            }
 
   public org.omg.CORBA.TypeCode _type ()
     {

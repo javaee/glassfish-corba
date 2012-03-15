@@ -54,7 +54,7 @@ public final class TypeMismatch
      * Constructs a <code>TypeMismatch</code> object.
      */
     public TypeMismatch() {
-	super();
+        super();
     }
 
     /**
@@ -63,6 +63,6 @@ public final class TypeMismatch
      * regarding the exception.
      */
     public TypeMismatch(String reason) {
-	super(reason);
+        super(reason);
     }
 }

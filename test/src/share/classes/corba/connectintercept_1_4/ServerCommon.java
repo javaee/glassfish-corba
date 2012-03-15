@@ -51,7 +51,7 @@ import org.omg.CORBA.Policy;
 import org.omg.PortableServer.LifespanPolicyValue;
 import org.omg.PortableServer.POA;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 class ExIServant extends ExIPOA
 {
@@ -59,7 +59,7 @@ class ExIServant extends ExIPOA
 
     public ExIServant(ORB orb) 
     {
-	this.orb = orb;
+        this.orb = orb;
     }
 
     public String sayHello()
@@ -83,55 +83,55 @@ public class ServerCommon
 
     public static void main(String av[])
     {
-	if (av[0].equals(Common.Transient)) {
-	    isTransient = true;
-	} else if (av[0].equals(Common.Persistent)) {
-	    isTransient = false;
-	} else {
-	    System.out.println(baseMsg + ".main: unknown: " + av[0]);
-	    System.exit(-1);
-	}
-	    
+        if (av[0].equals(Common.Transient)) {
+            isTransient = true;
+        } else if (av[0].equals(Common.Persistent)) {
+            isTransient = false;
+        } else {
+            System.out.println(baseMsg + ".main: unknown: " + av[0]);
+            System.exit(-1);
+        }
+            
         try {
 
-	    Properties props = System.getProperties();
+            Properties props = System.getProperties();
 
-	    props.setProperty(Common.ORBClassKey, MyPIORB.class.getName());
+            props.setProperty(Common.ORBClassKey, MyPIORB.class.getName());
 
-	    props.setProperty(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
-			      ServerORBInitializer.class.getName(),
-			      "dummy");
+            props.setProperty(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
+                              ServerORBInitializer.class.getName(),
+                              "dummy");
 
-	    props.setProperty(ORBConstants.LEGACY_SOCKET_FACTORY_CLASS_PROPERTY,
-			      Common.CUSTOM_FACTORY_CLASS);
+            props.setProperty(ORBConstants.LEGACY_SOCKET_FACTORY_CLASS_PROPERTY,
+                              Common.CUSTOM_FACTORY_CLASS);
 
-	    String value;
-	    if (isTransient) {
-		// It makes sense to assign specific ports for
-		// transient servers.
-		value =
-		    Common.MyType1 + ":" + Common.MyType1TransientPort + "," +
-		    Common.MyType2 + ":" + Common.MyType2TransientPort + "," +
-		    Common.MyType3 + ":" + Common.MyType3TransientPort;
-	    } else {
-		// It makes sense to assign emphemeral ports
-		// to persistent servers since the ORBD will most
-		// likely be assigned the fixed ports.
-		value =
-		    Common.MyType1 + ":" + Common.MyType1PersistentPort + "," +
-		    Common.MyType2 + ":" + Common.MyType2PersistentPort + "," +
-		    Common.MyType3 + ":" + Common.MyType3PersistentPort;
-	    }
-	    props.setProperty(ORBConstants.LISTEN_SOCKET_PROPERTY, value);
+            String value;
+            if (isTransient) {
+                // It makes sense to assign specific ports for
+                // transient servers.
+                value =
+                    Common.MyType1 + ":" + Common.MyType1TransientPort + "," +
+                    Common.MyType2 + ":" + Common.MyType2TransientPort + "," +
+                    Common.MyType3 + ":" + Common.MyType3TransientPort;
+            } else {
+                // It makes sense to assign emphemeral ports
+                // to persistent servers since the ORBD will most
+                // likely be assigned the fixed ports.
+                value =
+                    Common.MyType1 + ":" + Common.MyType1PersistentPort + "," +
+                    Common.MyType2 + ":" + Common.MyType2PersistentPort + "," +
+                    Common.MyType3 + ":" + Common.MyType3PersistentPort;
+            }
+            props.setProperty(ORBConstants.LISTEN_SOCKET_PROPERTY, value);
 
-	    // REVISIT: not sure why I have to explicitly set these here
-	    // but not in other tests.
-	    props.setProperty(ORBConstants.INITIAL_PORT_PROPERTY, "1049");
+            // REVISIT: not sure why I have to explicitly set these here
+            // but not in other tests.
+            props.setProperty(ORBConstants.INITIAL_PORT_PROPERTY, "1049");
 
             orb = ORB.init(av, props);
 
-	    createAndBind(Common.serverName1);
-	    createAndBind(Common.serverName2);
+            createAndBind(Common.serverName1);
+            createAndBind(Common.serverName2);
       
             System.out.println ("Server is ready.");
 
@@ -145,36 +145,36 @@ public class ServerCommon
     }
 
     public static void createAndBind (String name)
-	throws
-	    Exception
+        throws
+            Exception
     {
         if (rootPoa == null) {
-	    // Get rootPOA
+            // Get rootPOA
             rootPoa =
-	      (POA)orb.resolve_initial_references(ORBConstants.ROOT_POA_NAME);
-	    rootPoa.the_POAManager().activate();
+              (POA)orb.resolve_initial_references(ORBConstants.ROOT_POA_NAME);
+            rootPoa.the_POAManager().activate();
 
-	    // Create POAs.
+            // Create POAs.
 
             Policy[] policies = new Policy[1];
 
-	    // Create child POA
+            // Create child POA
             policies[0] =
-		isTransient ?
-		rootPoa.create_lifespan_policy(LifespanPolicyValue.TRANSIENT):
-		rootPoa.create_lifespan_policy(LifespanPolicyValue.PERSISTENT);
+                isTransient ?
+                rootPoa.create_lifespan_policy(LifespanPolicyValue.TRANSIENT):
+                rootPoa.create_lifespan_policy(LifespanPolicyValue.PERSISTENT);
             childPoa =rootPoa.create_POA("childPoa", null, policies);
             childPoa.the_POAManager().activate();
-	}
+        }
 
-	// REVISIT - bind a root and transient.
+        // REVISIT - bind a root and transient.
 
-	// create servant and register it with the ORB
-	ExIServant exIServant = new ExIServant(orb);
-	byte[] id = childPoa.activate_object(exIServant);
-	org.omg.CORBA.Object ref = childPoa.id_to_reference(id);
+        // create servant and register it with the ORB
+        ExIServant exIServant = new ExIServant(orb);
+        byte[] id = childPoa.activate_object(exIServant);
+        org.omg.CORBA.Object ref = childPoa.id_to_reference(id);
 
-	Common.getNameService(orb).rebind(Common.makeNameComponent(name), ref);
+        Common.getNameService(orb).rebind(Common.makeNameComponent(name), ref);
     }
 }
 

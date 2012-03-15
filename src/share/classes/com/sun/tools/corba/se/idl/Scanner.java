@@ -434,7 +434,7 @@ class Scanner
     //  System.out.println ("Scanner.getToken returns token.name = " + token.name);
 
     if (debug)
-	System.out.println( "Token: " + token ) ;
+        System.out.println( "Token: " + token ) ;
 
     return token;
   } // getToken
@@ -673,19 +673,19 @@ class Scanner
     // <f46082.40> An escaped id. begins with '_', which is followed by a normal
     // identifier.  Disallow prefixes of '_' having length > 1.
     if (data.ch == '_') {
-	sbuf.append( data.ch ) ;
+        sbuf.append( data.ch ) ;
         readChar ();
         if (escaped = escapedOK) 
-	    if (data.ch == '_')
-		throw new InvalidCharacter (data.filename, currentLine (), 
-		    currentLineNumber (), currentLinePosition (), data.ch);
+            if (data.ch == '_')
+                throw new InvalidCharacter (data.filename, currentLine (), 
+                    currentLineNumber (), currentLinePosition (), data.ch);
     }
 
     // Build up the string of valid characters until a non-string
     // character is encountered.
     while (Character.isLetterOrDigit( data.ch ) || (data.ch == '_')) {
-	sbuf.append( data.ch ) ;
-	readChar() ;
+        sbuf.append( data.ch ) ;
+        readChar() ;
     }
 
     String string = sbuf.toString() ;
@@ -695,9 +695,9 @@ class Scanner
 
     if (!escaped) { // Escaped id ==> ignore keyword check
         Token result = Token.makeKeywordToken( string, corbaLevel, escapedOK,
-	    collidesWithKeyword ) ;
-	if (result != null) 
-	    return result ;
+            collidesWithKeyword ) ;
+        if (result != null) 
+            return result ;
     }
 
     // At this point the string is an identifier.  If it is a

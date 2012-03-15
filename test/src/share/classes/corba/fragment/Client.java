@@ -46,8 +46,8 @@ import java.util.* ;
 import java.rmi.RemoteException;
 import java.io.*;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
 public class Client
 {
@@ -87,18 +87,18 @@ public class Client
     }
 
     public static org.omg.CORBA.Object readObjref(String file, org.omg.CORBA.ORB orb) {
-	String fil = System.getProperty("output.dir")+System.getProperty("file.separator")+file;
-	try {
-	    java.io.DataInputStream in = 
-		new java.io.DataInputStream(new FileInputStream(fil));
-	    String ior = in.readLine();
-	    System.out.println("IOR: "+ior);
-	    return orb.string_to_object(ior);
-	} catch (java.io.IOException e) {
-	    System.err.println("Unable to open file "+fil);
-	    System.exit(1);
-	}
-	return null;
+        String fil = System.getProperty("output.dir")+System.getProperty("file.separator")+file;
+        try {
+            java.io.DataInputStream in = 
+                new java.io.DataInputStream(new FileInputStream(fil));
+            String ior = in.readLine();
+            System.out.println("IOR: "+ior);
+            return orb.string_to_object(ior);
+        } catch (java.io.IOException e) {
+            System.err.println("Unable to open file "+fil);
+            System.exit(1);
+        }
+        return null;
     }
 
     public static void main(String args[])
@@ -107,14 +107,14 @@ public class Client
 
             ORB orb = ORB.init(args, System.getProperties());
 
-            com.sun.corba.se.spi.orb.ORB ourORB
-                = (com.sun.corba.se.spi.orb.ORB)orb;
+            com.sun.corba.ee.spi.orb.ORB ourORB
+                = (com.sun.corba.ee.spi.orb.ORB)orb;
 
             System.out.println("==== Client GIOP version "
                                + ourORB.getORBData().getGIOPVersion()
                                + " with strategy "
                                + ourORB.getORBData().getGIOPBuffMgrStrategy(
-				    ourORB.getORBData().getGIOPVersion())
+                                    ourORB.getORBData().getGIOPVersion())
                                + "====");
 
             /*
@@ -130,7 +130,7 @@ public class Client
 
             org.omg.CORBA.Object obj = readObjref("IOR", orb);
 
-	    FragmentTester tester = 
+            FragmentTester tester = 
                 (FragmentTester) PortableRemoteObject.narrow(obj, 
                                                             FragmentTester.class);
 

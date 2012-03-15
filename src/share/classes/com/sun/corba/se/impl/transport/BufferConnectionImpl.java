@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -56,29 +56,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.omg.CORBA.SystemException;
 
 import com.sun.org.omg.SendingContext.CodeBase;
-import com.sun.corba.se.spi.transport.Acceptor;
+import com.sun.corba.ee.spi.transport.Acceptor;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.threadpool.Work;
-import com.sun.corba.se.spi.protocol.RequestId;
-import com.sun.corba.se.spi.transport.Connection;
-import com.sun.corba.se.spi.transport.ResponseWaitingRoom;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.threadpool.Work;
+import com.sun.corba.ee.spi.protocol.RequestId;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.ResponseWaitingRoom;
 
-import com.sun.corba.se.impl.encoding.CachedCodeBase;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
-import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
-import com.sun.corba.se.spi.protocol.MessageMediator;
-import com.sun.corba.se.spi.transport.ConnectionCache;
-import com.sun.corba.se.spi.transport.ContactInfo;
-import com.sun.corba.se.spi.transport.EventHandler;
+import com.sun.corba.ee.impl.encoding.CachedCodeBase;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.impl.encoding.CodeSetComponentInfo;
+import com.sun.corba.ee.impl.encoding.OSFCodeSetRegistry;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.transport.ConnectionCache;
+import com.sun.corba.ee.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.transport.EventHandler;
 
 
 /**
@@ -86,10 +86,10 @@ import com.sun.corba.se.spi.transport.EventHandler;
  */
 public class BufferConnectionImpl
     extends
-	EventHandlerBase
+        EventHandlerBase
     implements
         Connection,
-	Work
+        Work
 {
     protected static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
@@ -102,7 +102,7 @@ public class BufferConnectionImpl
 
     public SocketChannel getSocketChannel()
     {
-	return null;
+        return null;
     }
 
     // REVISIT:
@@ -131,7 +131,7 @@ public class BufferConnectionImpl
                       new HashMap<Integer, MessageMediator>() ;
 
     ConcurrentHashMap<RequestId,Queue> fragmentMap =
-	new ConcurrentHashMap<RequestId,Queue>();
+        new ConcurrentHashMap<RequestId,Queue>();
     
     // This is a flag associated per connection telling us if the
     // initial set of sending contexts were sent to the receiver
@@ -152,8 +152,8 @@ public class BufferConnectionImpl
 
     public BufferConnectionImpl(ORB orb)
     {
-	this.orb = orb;
-	buffers = new ArrayList() ;
+        this.orb = orb;
+        buffers = new ArrayList() ;
     }
 
     ////////////////////////////////////////////////////
@@ -163,37 +163,37 @@ public class BufferConnectionImpl
 
     public boolean isClosed()
     {
-	return false ;
+        return false ;
     }
 
     public boolean shouldRegisterReadEvent()
     {
-	return false;
+        return false;
     }
 
     public boolean shouldRegisterServerReadEvent()
     {
-	return false;
+        return false;
     }
 
     public boolean read()
     {
-	return true ;
+        return true ;
     }
 
     protected MessageMediator readBits()
     {
-	return null ;
+        return null ;
     }
 
     protected boolean dispatch(MessageMediator messageMediator)
     {
-	return false ;
+        return false ;
     }
 
     public boolean shouldUseDirectByteBuffers()
     {
-	return false ;
+        return false ;
     }
 
     // Only called from readGIOPMessage with (12, 0, 12) as arguments
@@ -201,13 +201,13 @@ public class BufferConnectionImpl
     // offset is offset from start of message in buffer
     // length is length to read
     public ByteBuffer read(int size, int offset, int length)
-	throws IOException
+        throws IOException
     {
-	byte[] buf = new byte[size];
-	readFully( buf, offset, length);
-	ByteBuffer byteBuffer = ByteBuffer.wrap(buf);
-	byteBuffer.limit(size);
-	return byteBuffer;
+        byte[] buf = new byte[size];
+        readFully( buf, offset, length);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(buf);
+        byteBuffer.limit(size);
+        return byteBuffer;
     }
 
     // Only called as read( buf, 12, msgsize-12 ) in readGIOPMessage
@@ -215,46 +215,46 @@ public class BufferConnectionImpl
     // offset is the starting position to place data in the result
     // length is the length of the data to read
     public ByteBuffer read(ByteBuffer byteBuffer, int offset, int length
-	) throws IOException
+        ) throws IOException
     {
-	int size = offset + length;
-	byte[] buf = new byte[size];
-	readFully(buf, offset, length);
-	return ByteBuffer.wrap(buf);
+        int size = offset + length;
+        byte[] buf = new byte[size];
+        readFully(buf, offset, length);
+        return ByteBuffer.wrap(buf);
     }
 
     // Read size bytes from buffer list and place the data
     // starting at offset in buf.
     private void readFully(byte[] buf, int offset, int size) 
-	throws IOException
+        throws IOException
     {
-	int remaining = size ;
-	int position = offset ;
-	int index = 0 ;
-	while (remaining > 0) {
-	    ByteBuffer buff = (ByteBuffer)buffers.get(0) ; 
-	    if (buff == null) {
+        int remaining = size ;
+        int position = offset ;
+        int index = 0 ;
+        while (remaining > 0) {
+            ByteBuffer buff = (ByteBuffer)buffers.get(0) ; 
+            if (buff == null) {
                 throw new IOException("No more data");
             }
-	    int dataSize = buff.remaining() ;
-	    int xferSize = dataSize ;
-	    if (dataSize >= remaining) {
-		xferSize = remaining ;
-	    } else {
-		buffers.remove(0) ;
-	    }
-	    
-	    buff.get( buf, offset, xferSize ) ;
+            int dataSize = buff.remaining() ;
+            int xferSize = dataSize ;
+            if (dataSize >= remaining) {
+                xferSize = remaining ;
+            } else {
+                buffers.remove(0) ;
+            }
+            
+            buff.get( buf, offset, xferSize ) ;
 
-	    offset += xferSize ;
-	    remaining -= xferSize ;
-	}
+            offset += xferSize ;
+            remaining -= xferSize ;
+        }
     }    
 
     public void write(ByteBuffer byteBuffer)
-	throws IOException
+        throws IOException
     {
-	buffers.add( byteBuffer ) ;
+        buffers.add( byteBuffer ) ;
     }
 
     public void closeConnectionResources() 
@@ -270,23 +270,23 @@ public class BufferConnectionImpl
 
     public Acceptor getAcceptor()
     {
-	return null;
+        return null;
     }
 
     public ContactInfo getContactInfo()
     {
-	return null;
+        return null;
     }
 
     public EventHandler getEventHandler()
     {
-	return this;
+        return this;
     }
 
     public CDROutputObject createOutputObject(MessageMediator messageMediator)
     {
-	// REVISIT - remove this method from Connection and all it subclasses.
-	throw new RuntimeException("*****SocketOrChannelConnectionImpl.createOutputObject - should not be called.");
+        // REVISIT - remove this method from Connection and all it subclasses.
+        throw new RuntimeException("*****SocketOrChannelConnectionImpl.createOutputObject - should not be called.");
     }
 
     // This is used by the GIOPOutputObject in order to
@@ -300,29 +300,29 @@ public class BufferConnectionImpl
 
     public boolean isBusy()
     {
-	return false ;
+        return false ;
     }
 
     public long getTimeStamp()
     {
-	return timeStamp;
+        return timeStamp;
     }
 
     public void setTimeStamp(long time)
     {
-	timeStamp = time;
+        timeStamp = time;
     }
 
     public void setState(String stateString)
     {
-	synchronized (stateEvent) {
-	    if (stateString.equals("ESTABLISHED")) {
-		state =  ESTABLISHED;
-		stateEvent.notifyAll();
-	    } else {
-		// REVISIT: ASSERT
-	    }
-	}
+        synchronized (stateEvent) {
+            if (stateString.equals("ESTABLISHED")) {
+                state =  ESTABLISHED;
+                stateEvent.notifyAll();
+            } else {
+                // REVISIT: ASSERT
+            }
+        }
     }
 
     public void writeLock()
@@ -347,7 +347,7 @@ public class BufferConnectionImpl
 
     public CDRInputObject waitForResponse(MessageMediator messageMediator)
     {
-	return null ;
+        return null ;
     }
 
     public void setConnectionCache(ConnectionCache connectionCache)
@@ -356,7 +356,7 @@ public class BufferConnectionImpl
 
     public ConnectionCache getConnectionCache()
     {
-	return null;	
+        return null;    
     }
 
     ////////////////////////////////////////////////////
@@ -366,19 +366,19 @@ public class BufferConnectionImpl
 
     public SelectableChannel getChannel()
     {
-	return null;
+        return null;
     }
 
     public int getInterestOps()
     {
-	return 0;
+        return 0;
     }
 
     //    public Acceptor getAcceptor() - already defined above.
 
     public Connection getConnection()
     {
-	return this;
+        return this;
     }
 
     ////////////////////////////////////////////////////
@@ -388,7 +388,7 @@ public class BufferConnectionImpl
 
     public String getName()
     {
-	return this.toString();
+        return this.toString();
     }
 
     public void doWork()
@@ -397,12 +397,12 @@ public class BufferConnectionImpl
 
     public void setEnqueueTime(long timeInMillis)
     {
-	enqueueTime = timeInMillis;
+        enqueueTime = timeInMillis;
     }
 
     public long getEnqueueTime()
     {
-	return enqueueTime;
+        return enqueueTime;
     }
 
     ////////////////////////////////////////////////////
@@ -412,7 +412,7 @@ public class BufferConnectionImpl
 
     public ResponseWaitingRoom getResponseWaitingRoom()
     {
-	return null ;
+        return null ;
     }
 
     // REVISIT - inteface defines isServer but already defined in 
@@ -420,19 +420,19 @@ public class BufferConnectionImpl
 
 
     public void serverRequestMapPut(int requestId, 
-				    MessageMediator messageMediator)
+                                    MessageMediator messageMediator)
     {
-	serverRequestMap.put(requestId, messageMediator);
+        serverRequestMap.put(requestId, messageMediator);
     }
 
     public MessageMediator serverRequestMapGet(int requestId)
     {
-	return serverRequestMap.get(requestId);
+        return serverRequestMap.get(requestId);
     }
 
     public void serverRequestMapRemove(int requestId)
     {
-	serverRequestMap.remove(requestId);
+        serverRequestMap.remove(requestId);
     }
 
     public Queue<MessageMediator> getFragmentList(RequestId requestId) {
@@ -444,10 +444,10 @@ public class BufferConnectionImpl
     }
 
     // REVISIT: this is also defined in:
-    // com.sun.corba.se.spi.legacy.connection.Connection
+    // com.sun.corba.ee.spi.legacy.connection.Connection
     public java.net.Socket getSocket()
     {
-	return null;
+        return null;
     }
 
     /** It is possible for a Close Connection to have been
@@ -474,7 +474,7 @@ public class BufferConnectionImpl
 
     public synchronized int getNextRequestId() 
     {
-	return requestId++;
+        return requestId++;
     }
 
     // Negotiated code sets for char and wchar data
@@ -498,7 +498,7 @@ public class BufferConnectionImpl
                 // If the client says it's negotiated a code set that
                 // isn't a fallback and we never said we support, then
                 // it has a bug.
-		throw wrapper.badCodesetsFromClient() ;
+                throw wrapper.badCodesetsFromClient() ;
             }
 
             codeSetContext = csc;
@@ -518,41 +518,41 @@ public class BufferConnectionImpl
 
     public MessageMediator clientRequestMapGet(int requestId)
     {
-	return null ;
+        return null ;
     }
 
     protected MessageMediator clientReply_1_1;
 
     public void clientReply_1_1_Put(MessageMediator x)
     {
-	clientReply_1_1 = x;
+        clientReply_1_1 = x;
     }
 
     public MessageMediator clientReply_1_1_Get()
     {
-	return 	clientReply_1_1;
+        return  clientReply_1_1;
     }
 
     public void clientReply_1_1_Remove()
     {
-	clientReply_1_1 = null;
+        clientReply_1_1 = null;
     }
 
     protected MessageMediator serverRequest_1_1;
 
     public void serverRequest_1_1_Put(MessageMediator x)
     {
-	serverRequest_1_1 = x;
+        serverRequest_1_1 = x;
     }
 
     public MessageMediator serverRequest_1_1_Get()
     {
-	return 	serverRequest_1_1;
+        return  serverRequest_1_1;
     }
 
     public void serverRequest_1_1_Remove()
     {
-	serverRequest_1_1 = null;
+        serverRequest_1_1 = null;
     }
 
     protected String getStateString( int state ) 
@@ -592,7 +592,7 @@ public class BufferConnectionImpl
      * @param die Kill the reader thread (this thread) before exiting.
      */
     public void purgeCalls(SystemException systemException,
-			   boolean die, boolean lockHeld)
+                           boolean die, boolean lockHeld)
     {
     }
 
@@ -602,17 +602,17 @@ public class BufferConnectionImpl
     **************************************************************************/
 
     public void sendCloseConnection(GIOPVersion giopVersion)
-	throws IOException 
+        throws IOException 
     {
         Message msg = MessageBase.createCloseConnection(giopVersion);
-	sendHelper(giopVersion, msg);
+        sendHelper(giopVersion, msg);
     }
 
     public void sendMessageError(GIOPVersion giopVersion)
-	throws IOException 
+        throws IOException 
     {
         Message msg = MessageBase.createMessageError(giopVersion);
-	sendHelper(giopVersion, msg);
+        sendHelper(giopVersion, msg);
     }
 
     /**
@@ -621,35 +621,35 @@ public class BufferConnectionImpl
      * @exception IOException - could be due to abortive connection closure.
      */
     public void sendCancelRequest(GIOPVersion giopVersion, int requestId)
-	throws IOException 
+        throws IOException 
     {
 
         Message msg = MessageBase.createCancelRequest(giopVersion, requestId);
-	sendHelper(giopVersion, msg);
+        sendHelper(giopVersion, msg);
     }
 
     protected void sendHelper(GIOPVersion giopVersion, Message msg)
-	throws IOException
+        throws IOException
     {
-	// REVISIT: See comments in CDROutputObject constructor.
+        // REVISIT: See comments in CDROutputObject constructor.
         CDROutputObject outputObject = 
-	    new CDROutputObject((ORB)orb, null, giopVersion, this, msg,
-				ORBConstants.STREAM_FORMAT_VERSION_1);
+            new CDROutputObject((ORB)orb, null, giopVersion, this, msg,
+                                ORBConstants.STREAM_FORMAT_VERSION_1);
         msg.write(outputObject);
 
-	outputObject.writeTo(this);
+        outputObject.writeTo(this);
     }
 
     public void sendCancelRequestWithLock(GIOPVersion giopVersion,
-					  int requestId)
-	throws IOException 
+                                          int requestId)
+        throws IOException 
     {
-	writeLock();
-	try {
-	    sendCancelRequest(giopVersion, requestId);
-	} finally {
-	    writeUnlock();
-	}
+        writeLock();
+        try {
+            sendCancelRequest(giopVersion, requestId);
+        } finally {
+            writeUnlock();
+        }
     }
 
     // Begin Code Base methods ---------------------------------------
@@ -692,24 +692,24 @@ public class BufferConnectionImpl
     {
         synchronized ( stateEvent ){
             return 
-		"BufferConnectionImpl[" + " "
-		+ getStateString( state ) + " "
-		+ shouldUseSelectThreadToWait() + " "
-		+ shouldUseWorkerThreadForEvent()
-		+ "]" ;
+                "BufferConnectionImpl[" + " "
+                + getStateString( state ) + " "
+                + shouldUseSelectThreadToWait() + " "
+                + shouldUseWorkerThreadForEvent()
+                + "]" ;
         }
     }
     
     // Must be public - used in encoding.
     public void dprint(String msg) 
     {
-	ORBUtility.dprint("SocketOrChannelConnectionImpl", msg);
+        ORBUtility.dprint("SocketOrChannelConnectionImpl", msg);
     }
 
     protected void dprint(String msg, Throwable t)
     {
-	dprint(msg);
-	t.printStackTrace(System.out);
+        dprint(msg);
+        t.printStackTrace(System.out);
     }
 }
 

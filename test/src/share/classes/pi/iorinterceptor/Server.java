@@ -40,16 +40,16 @@
 
 package pi.iorinterceptor;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.IORFactories;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfile ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate ;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.IORFactories;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.encoding.EncapsInputStream;
-import com.sun.corba.se.impl.encoding.EncapsOutputStream;
-import com.sun.corba.se.impl.ior.GenericIdentifiable ;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.encoding.EncapsInputStream;
+import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
+import com.sun.corba.ee.impl.ior.GenericIdentifiable ;
 import corba.framework.InternalProcess;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -83,18 +83,18 @@ public class Server
     private ORB orb;
 
     public static void main(String args[]) {
-	try {
-	    (new Server()).run( System.getProperties(),
-	                	args, System.out, System.err, null );
-	}
-	catch( Exception e ) {
-	    e.printStackTrace( System.err );
-	    System.exit( 1 );
-	}
+        try {
+            (new Server()).run( System.getProperties(),
+                                args, System.out, System.err, null );
+        }
+        catch( Exception e ) {
+            e.printStackTrace( System.err );
+            System.exit( 1 );
+        }
     }
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
         try {
@@ -259,12 +259,12 @@ public class Server
             // Obtain the IOR for this object by writing it to an OutputStream
             // and reading it back from an input stream.
             EncapsOutputStream encapsOutputStream = new EncapsOutputStream( 
-                (com.sun.corba.se.spi.orb.ORB)orb, GIOPVersion.V1_2 );
+                (com.sun.corba.ee.spi.orb.ORB)orb, GIOPVersion.V1_2 );
             encapsOutputStream.write_Object( obj );
             EncapsInputStream encapsInputStream = 
                 (EncapsInputStream)encapsOutputStream.create_input_stream();
             IOR ior = IORFactories.makeIOR( 
-                (com.sun.corba.se.spi.orb.ORB)orb, encapsInputStream );
+                (com.sun.corba.ee.spi.orb.ORB)orb, encapsInputStream );
             
             // Check if the appropriate tagged components are present in the IOR.
             out.println( "    + Searching for tagged components..." );
@@ -332,7 +332,7 @@ public class Server
         // data.
         for( int i = 0; i < componentList.size(); i++ ) {
             GenericIdentifiable encaps = null;
-	    try {
+            try {
                 encaps = (GenericIdentifiable)componentList.get( i );
             }
             catch( ClassCastException e ) {
@@ -366,8 +366,8 @@ public class Server
     private org.omg.CORBA.Object createSampleObject() 
         throws Exception 
     {
-	// Create from the child POA, not the root POA.  The IORInterceptor
-	// does not get activated for the root POA.
+        // Create from the child POA, not the root POA.  The IORInterceptor
+        // does not get activated for the root POA.
         
         // Set up hello object:
         return createAndBind( policyPOA, "Simple1" );
@@ -377,25 +377,25 @@ public class Server
      * Implementation borrowed from corba.socket.HelloServer test
      */
     public org.omg.CORBA.Object createAndBind (POA poa, String name)
-	throws Exception
+        throws Exception
     {
         org.omg.CORBA.Object result;
-	// create servant and register it with the ORB
-	SimpleServant simpleRef = new SimpleServant();
+        // create servant and register it with the ORB
+        SimpleServant simpleRef = new SimpleServant();
       
-	byte[] id = poa.activate_object(simpleRef);
-	result = poa.id_to_reference(id);
+        byte[] id = poa.activate_object(simpleRef);
+        result = poa.id_to_reference(id);
       
-	// get the root naming context
-	org.omg.CORBA.Object objRef = 
-	    orb.resolve_initial_references("NameService");
-	NamingContext ncRef = NamingContextHelper.narrow(objRef);
+        // get the root naming context
+        org.omg.CORBA.Object objRef = 
+            orb.resolve_initial_references("NameService");
+        NamingContext ncRef = NamingContextHelper.narrow(objRef);
       
-	// bind the Object Reference in Naming
-	NameComponent nc = new NameComponent(name, "");
-	NameComponent path[] = {nc};
+        // bind the Object Reference in Naming
+        NameComponent nc = new NameComponent(name, "");
+        NameComponent path[] = {nc};
             
-	ncRef.rebind( path, result );
+        ncRef.rebind( path, result );
         
         return result;
     }

@@ -38,14 +38,14 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.protocol;
+package com.sun.corba.ee.spi.protocol;
 
 import java.util.Set;
 
-import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory ;
+import com.sun.corba.ee.spi.protocol.ServerRequestDispatcher ;
+import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcherFactory ;
 
-import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
+import com.sun.corba.ee.spi.oa.ObjectAdapterFactory ;
 
 /**
  * This is a registry of all subcontract ID dependent objects.  This includes:

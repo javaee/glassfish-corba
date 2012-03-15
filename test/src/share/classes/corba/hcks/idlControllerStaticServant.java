@@ -48,31 +48,31 @@ import org.omg.CORBA.ORB;
 
 class idlControllerStaticServant
     extends 
-	_idlControllerIImplBase 
+        _idlControllerIImplBase 
 {
     public static final String baseMsg =
-	idlControllerStaticServant.class.getName();
+        idlControllerStaticServant.class.getName();
 
     public ORB ridlStaticORB;
 
     public void setRidlStaticORB (ORB ridlStaticORB)
     {
-	this.ridlStaticORB = ridlStaticORB;
+        this.ridlStaticORB = ridlStaticORB;
     }
 
     public String action (String action)
     {
-	if (action.equals(C.disconnectRidlStaticServant)) {
+        if (action.equals(C.disconnectRidlStaticServant)) {
 
-	    ridlStaticORB.disconnect(Server.ridlStaticForDisconnect);
+            ridlStaticORB.disconnect(Server.ridlStaticForDisconnect);
 
-	} else {
+        } else {
 
-	    U.sopShouldNotSeeThis(action);
-	    return U.SHOULD_NOT_SEE_THIS;
+            U.sopShouldNotSeeThis(action);
+            return U.SHOULD_NOT_SEE_THIS;
 
-	}
-	return action;
+        }
+        return action;
     }
 }
 

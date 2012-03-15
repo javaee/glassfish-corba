@@ -59,7 +59,7 @@ public abstract class ORB extends org.omg.CORBA.ORB {
  *      comments for unimplemented features</a>
  */
     public org.omg.CORBA.portable.ValueFactory register_value_factory(String id,
-								     org.omg.CORBA.portable.ValueFactory factory)
+                                                                     org.omg.CORBA.portable.ValueFactory factory)
     {
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }

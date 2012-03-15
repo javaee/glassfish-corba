@@ -60,9 +60,9 @@ module TestIdlj {
     interface A5: A4 {
         typedef A4_Enum A5_Enum;
         struct A5_Struct {
-	    A4_Enum x;
-	    A5_Enum y;
-	};
+            A4_Enum x;
+            A5_Enum y;
+        };
     };
 
     interface B1 {
@@ -76,14 +76,14 @@ module TestIdlj {
     };
 
     interface B4 : B2 {
-	typedef B1_long B4_long;
+        typedef B1_long B4_long;
     };
 
     interface B5 : B4 {
         typedef B4_long B5_long;
         exception BB_Exception { 
-	    B4_long  x;
-	    B5_long y;
-	};
+            B4_long  x;
+            B5_long y;
+        };
     };
 };

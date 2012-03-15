@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.orb ;
+package com.sun.corba.ee.impl.orb ;
 
 import java.util.Properties ;
 import java.util.List ;
@@ -47,11 +47,11 @@ import java.util.Iterator ;
 
 import java.lang.reflect.Array ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orb.Operation ;
+import com.sun.corba.ee.spi.orb.Operation ;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 import org.glassfish.pfl.basic.contain.Pair;
 
 public class PrefixParserAction extends ParserActionBase {
@@ -61,10 +61,10 @@ public class PrefixParserAction extends ParserActionBase {
     private Class componentType ;
 
     public PrefixParserAction( String propertyName, 
-	Operation operation, String fieldName, Class componentType )
+        Operation operation, String fieldName, Class componentType )
     {
-	super( propertyName, true, operation, fieldName ) ;
-	this.componentType = componentType ;
+        super( propertyName, true, operation, fieldName ) ;
+        this.componentType = componentType ;
     }
 
     /** For each String s that matches the prefix given by getPropertyName(),
@@ -75,59 +75,59 @@ public class PrefixParserAction extends ParserActionBase {
      */
     public Object apply( Properties props ) 
     {
-	String prefix = getPropertyName() ;
-	int prefixLength = prefix.length() ;
-	if (prefix.charAt( prefixLength - 1 ) != '.') {
-	    prefix += '.' ;
-	    prefixLength++ ;
-	}
-	    
-	List matches = new LinkedList() ;
+        String prefix = getPropertyName() ;
+        int prefixLength = prefix.length() ;
+        if (prefix.charAt( prefixLength - 1 ) != '.') {
+            prefix += '.' ;
+            prefixLength++ ;
+        }
+            
+        List matches = new LinkedList() ;
 
-	// Find all keys in props that start with propertyName
-	Iterator iter = props.keySet().iterator() ;
-	while (iter.hasNext()) {
-	    String key = (String)(iter.next()) ;
-	    if (key.startsWith( prefix )) {
-		String suffix = key.substring( prefixLength ) ;
-		String value = props.getProperty( key ) ;
-		Pair<String,String> data = new Pair<String,String>( suffix, value ) ;
-		Object result = getOperation().operate( data ) ;
-		matches.add( result ) ;
-	    }
-	}
+        // Find all keys in props that start with propertyName
+        Iterator iter = props.keySet().iterator() ;
+        while (iter.hasNext()) {
+            String key = (String)(iter.next()) ;
+            if (key.startsWith( prefix )) {
+                String suffix = key.substring( prefixLength ) ;
+                String value = props.getProperty( key ) ;
+                Pair<String,String> data = new Pair<String,String>( suffix, value ) ;
+                Object result = getOperation().operate( data ) ;
+                matches.add( result ) ;
+            }
+        }
 
-	int size = matches.size() ;
-	if (size > 0) {
-	    // Convert the list into an array of the proper type.
-	    // An Object[] as a result does NOT work.  Also report
-	    // any errors carefully, as errors here or in parsers that
-	    // use this Operation often show up at ORB.init().
-	    Object result = null ;
-	    try {
-		result = Array.newInstance( componentType, size ) ;
-	    } catch (Throwable thr) {
-		throw wrapper.couldNotCreateArray( thr,
-		    getPropertyName(), componentType, size ) ;
-	    }
+        int size = matches.size() ;
+        if (size > 0) {
+            // Convert the list into an array of the proper type.
+            // An Object[] as a result does NOT work.  Also report
+            // any errors carefully, as errors here or in parsers that
+            // use this Operation often show up at ORB.init().
+            Object result = null ;
+            try {
+                result = Array.newInstance( componentType, size ) ;
+            } catch (Throwable thr) {
+                throw wrapper.couldNotCreateArray( thr,
+                    getPropertyName(), componentType, size ) ;
+            }
 
-	    Iterator iter2 = matches.iterator() ;
-	    int ctr = 0 ;
-	    while (iter2.hasNext()) {
-		Object obj = iter2.next() ;
+            Iterator iter2 = matches.iterator() ;
+            int ctr = 0 ;
+            while (iter2.hasNext()) {
+                Object obj = iter2.next() ;
 
-		try {
-		    Array.set( result, ctr, obj ) ;
-		} catch (Throwable thr) {
-		    throw wrapper.couldNotSetArray( thr,
-			getPropertyName(), ctr, componentType, size,
-			obj ) ;
-		}
-		ctr++ ;
-	    }
+                try {
+                    Array.set( result, ctr, obj ) ;
+                } catch (Throwable thr) {
+                    throw wrapper.couldNotSetArray( thr,
+                        getPropertyName(), ctr, componentType, size,
+                        obj ) ;
+                }
+                ctr++ ;
+            }
 
-	    return result ;
-	} else {
+            return result ;
+        } else {
             return null;
         }
     }

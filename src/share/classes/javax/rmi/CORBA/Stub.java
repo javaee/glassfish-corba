@@ -63,7 +63,7 @@ import java.security.PrivilegedAction;
 import java.util.Properties;
 import java.rmi.server.RMIClassLoader;
 
-import com.sun.corba.se.org.omg.CORBA.GetPropertyAction;
+import com.sun.corba.ee.org.omg.CORBA.GetPropertyAction;
 
 
 /**
@@ -78,13 +78,13 @@ public abstract class Stub extends ObjectImpl
     private transient StubDelegate stubDelegate = null;
     private static Class stubDelegateClass = null;
     private static final String StubClassKey = "javax.rmi.CORBA.StubClass";
-    private static final String defaultStubImplName = "com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl";
+    private static final String defaultStubImplName = "com.sun.corba.ee.impl.javax.rmi.CORBA.StubDelegateImpl";
 
     static {
         Object stubDelegateInstance = (Object) createDelegateIfSpecified(StubClassKey, defaultStubImplName);
-	if (stubDelegateInstance != null)
-	    stubDelegateClass = stubDelegateInstance.getClass();
-	
+        if (stubDelegateInstance != null)
+            stubDelegateClass = stubDelegateInstance.getClass();
+        
     }
 
 
@@ -95,15 +95,15 @@ public abstract class Stub extends ObjectImpl
      */
     public int hashCode() {
 
-	if (stubDelegate == null) {
-	    setDefaultDelegate();
-	}
+        if (stubDelegate == null) {
+            setDefaultDelegate();
+        }
 
-	if (stubDelegate != null) {
-	    return stubDelegate.hashCode(this);
-	}
+        if (stubDelegate != null) {
+            return stubDelegate.hashCode(this);
+        }
 
-	return 0;
+        return 0;
     }
 
     /**
@@ -115,13 +115,13 @@ public abstract class Stub extends ObjectImpl
      */
     public boolean equals(java.lang.Object obj) {
 
-	if (stubDelegate == null) {
-	    setDefaultDelegate();
-	}
+        if (stubDelegate == null) {
+            setDefaultDelegate();
+        }
 
-	if (stubDelegate != null) {
-	    return stubDelegate.equals(this, obj);
-	}
+        if (stubDelegate != null) {
+            return stubDelegate.equals(this, obj);
+        }
 
         return false;
     }
@@ -134,19 +134,19 @@ public abstract class Stub extends ObjectImpl
     public String toString() {
 
 
-	if (stubDelegate == null) {
-	    setDefaultDelegate();
-	}
+        if (stubDelegate == null) {
+            setDefaultDelegate();
+        }
 
-	String ior;
-	if (stubDelegate != null) {
-	    ior = stubDelegate.toString(this);
-	    if (ior == null) {
-	        return super.toString();
-	    } else {
-	        return ior;
-	    }
-	}
+        String ior;
+        if (stubDelegate != null) {
+            ior = stubDelegate.toString(this);
+            if (ior == null) {
+                return super.toString();
+            } else {
+                return ior;
+            }
+        }
         return super.toString();
     }
     
@@ -163,13 +163,13 @@ public abstract class Stub extends ObjectImpl
      */
     public void connect(ORB orb) throws RemoteException {
         
-	if (stubDelegate == null) {
-	    setDefaultDelegate();
-	}
+        if (stubDelegate == null) {
+            setDefaultDelegate();
+        }
 
-	if (stubDelegate != null) {
-	    stubDelegate.connect(this, orb);
-	}
+        if (stubDelegate != null) {
+            stubDelegate.connect(this, orb);
+        }
 
     }
 
@@ -179,13 +179,13 @@ public abstract class Stub extends ObjectImpl
     private void readObject(java.io.ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
 
-	if (stubDelegate == null) {
-	    setDefaultDelegate();
-	}
+        if (stubDelegate == null) {
+            setDefaultDelegate();
+        }
 
-	if (stubDelegate != null) {
-	    stubDelegate.readObject(this, stream);
-	} 
+        if (stubDelegate != null) {
+            stubDelegate.readObject(this, stream);
+        } 
 
     }
 
@@ -199,25 +199,25 @@ public abstract class Stub extends ObjectImpl
      */
     private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
 
-	if (stubDelegate == null) {
-	    setDefaultDelegate();
-	}
+        if (stubDelegate == null) {
+            setDefaultDelegate();
+        }
 
-	if (stubDelegate != null) {
-	    stubDelegate.writeObject(this, stream);
-	} 
+        if (stubDelegate != null) {
+            stubDelegate.writeObject(this, stream);
+        } 
     }
 
     private void setDefaultDelegate() {
         if (stubDelegateClass != null) {
             try {
                  stubDelegate = (javax.rmi.CORBA.StubDelegate) stubDelegateClass.newInstance();
-	    } catch (Exception ex) {
-	    // what kind of exception to throw
-	    // delegate not set therefore it is null and will return default
+            } catch (Exception ex) {
+            // what kind of exception to throw
+            // delegate not set therefore it is null and will return default
             // values
             }
- 	}
+        }
     }
 
     // Same code as in PortableRemoteObject. Can not be shared because they
@@ -225,7 +225,7 @@ public abstract class Stub extends ObjectImpl
     // security reasons. If you know a better solution how to share this code
     // then remove it from PortableRemoteObject. Also in Util.java
     private static Object createDelegateIfSpecified(String classKey, 
-	String defaultClassName) {
+        String defaultClassName) {
 
         String className = 
             (String)AccessController.doPrivileged(new GetPropertyAction(classKey));
@@ -236,40 +236,40 @@ public abstract class Stub extends ObjectImpl
             }
         }
 
-	if (className == null) {
-	    className = defaultClassName;
-	}
+        if (className == null) {
+            className = defaultClassName;
+        }
 
         try {
             return loadDelegateClass(className).newInstance();
         } catch (ClassNotFoundException ex) {
-	    INITIALIZE exc = new INITIALIZE( "Cannot instantiate " + className);
-	    exc.initCause( ex ) ;
-	    throw exc ;
+            INITIALIZE exc = new INITIALIZE( "Cannot instantiate " + className);
+            exc.initCause( ex ) ;
+            throw exc ;
         } catch (Exception ex) {
-	    INITIALIZE exc = new INITIALIZE( "Error while instantiating" + className);
-	    exc.initCause( ex ) ;
-	    throw exc ;
+            INITIALIZE exc = new INITIALIZE( "Error while instantiating" + className);
+            exc.initCause( ex ) ;
+            throw exc ;
         }
 
     }
 
     private static Class loadDelegateClass( String className )  throws ClassNotFoundException
     {
-	try {
-	    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-	    return Class.forName(className, false, loader);
-	} catch (ClassNotFoundException e) {
-	    // ignore, then try RMIClassLoader
-	}
+        try {
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            return Class.forName(className, false, loader);
+        } catch (ClassNotFoundException e) {
+            // ignore, then try RMIClassLoader
+        }
 
-	try {
-	    return RMIClassLoader.loadClass(className);
-	} catch (MalformedURLException e) {
-	    String msg = "Could not load " + className + ": " + e.toString();
-	    ClassNotFoundException exc = new ClassNotFoundException( msg ) ; 
-	    throw exc ;
-	}
+        try {
+            return RMIClassLoader.loadClass(className);
+        } catch (MalformedURLException e) {
+            String msg = "Could not load " + className + ": " + e.toString();
+            ClassNotFoundException exc = new ClassNotFoundException( msg ) ; 
+            throw exc ;
+        }
     }
 
     /**

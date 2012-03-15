@@ -49,15 +49,15 @@ import java.nio.ByteBuffer ;
 import org.testng.annotations.Test ;
 import org.testng.Assert ;
 
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.Allocator ;
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.AllocatorFactory ;
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.BufferWrapper ;
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.Reader ;
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.Writer ;
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.StreamFactory ;
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.Allocator ;
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.AllocatorFactory ;
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.BufferWrapper ;
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.Reader ;
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.Writer ;
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.StreamFactory ;
 
-import com.sun.corba.se.impl.encoding.fast.EmergeCodeFactory ;
-import com.sun.corba.se.impl.encoding.fast.VarOctetUtility ;
+import com.sun.corba.ee.impl.encoding.fast.EmergeCodeFactory ;
+import com.sun.corba.ee.impl.encoding.fast.VarOctetUtility ;
 
 public class ByteBufferTest {
     // Basic idea:

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,27 +47,27 @@ import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantReadWriteLock ;
 import java.util.concurrent.locks.ReadWriteLock ;
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
-import com.sun.corba.se.spi.ior.iiop.LoadBalancingComponent ;
-import com.sun.corba.se.spi.ior.TaggedProfile ;
-import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
-import com.sun.corba.se.spi.ior.TaggedComponent ;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher;
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory;
-import com.sun.corba.se.spi.transport.ContactInfoList ;
-import com.sun.corba.se.spi.transport.SocketInfo;
-import com.sun.corba.se.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPAddress ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfile ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate ;
+import com.sun.corba.ee.spi.ior.iiop.LoadBalancingComponent ;
+import com.sun.corba.ee.spi.ior.TaggedProfile ;
+import com.sun.corba.ee.spi.ior.TaggedProfileTemplate ;
+import com.sun.corba.ee.spi.ior.TaggedComponent ;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcher;
+import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcherFactory;
+import com.sun.corba.ee.spi.transport.ContactInfoList ;
+import com.sun.corba.ee.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.transport.ContactInfo;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.protocol.NotLocalLocalCRDImpl;
-import com.sun.corba.se.spi.trace.IsLocal;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.protocol.NotLocalLocalCRDImpl;
+import com.sun.corba.ee.spi.trace.IsLocal;
+import com.sun.corba.ee.spi.trace.Transport;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 import org.glassfish.pfl.basic.func.UnaryPredicate;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
@@ -174,21 +174,21 @@ public class ContactInfoListImpl implements ContactInfoList {
     // XREVISIT - is this used?
     public ContactInfoListImpl(ORB orb)
     {
-	this.orb = orb;
+        this.orb = orb;
     }
 
     public ContactInfoListImpl(ORB orb, IOR targetIOR)
     {
-	this(orb);
-	setTargetIOR(targetIOR);
+        this(orb);
+        setTargetIOR(targetIOR);
     }
     
     public synchronized Iterator<ContactInfo> iterator()
     {
-	createContactInfoList();
-	Iterator<ContactInfo> result = new ContactInfoListIteratorImpl(
+        createContactInfoList();
+        Iterator<ContactInfo> result = new ContactInfoListIteratorImpl(
             orb, this, primaryContactInfo, 
-	    rotate( effectiveTargetIORContactInfoList ),
+            rotate( effectiveTargetIORContactInfoList ),
             usePerRequestLoadBalancing );
 
         /* This doesn't work due to some strange behavior in FOLB: we are getting far
@@ -215,13 +215,13 @@ public class ContactInfoListImpl implements ContactInfoList {
 
     public synchronized void setTargetIOR(IOR targetIOR)
     {
-	this.targetIOR = targetIOR;
-	setEffectiveTargetIOR(targetIOR);
+        this.targetIOR = targetIOR;
+        setEffectiveTargetIOR(targetIOR);
     }
 
     public synchronized IOR getTargetIOR()
     {
-	return targetIOR;
+        return targetIOR;
     }
     
     private IIOPAddress getPrimaryAddress( IOR ior ) {
@@ -264,17 +264,17 @@ public class ContactInfoListImpl implements ContactInfoList {
             changingEffectiveAddress( oldAddress, newAddress ) ;
         }
 
-	this.effectiveTargetIOR = newIOR;
+        this.effectiveTargetIOR = newIOR;
 
-	effectiveTargetIORContactInfoList = null;
-	if (primaryContactInfo != null &&
-	    orb.getORBData().getIIOPPrimaryToContactInfo() != null)
-	{
-	    orb.getORBData().getIIOPPrimaryToContactInfo()
-		.reset(primaryContactInfo);
-	}
-	primaryContactInfo = null;
-	setLocalSubcontract();
+        effectiveTargetIORContactInfoList = null;
+        if (primaryContactInfo != null &&
+            orb.getORBData().getIIOPPrimaryToContactInfo() != null)
+        {
+            orb.getORBData().getIIOPPrimaryToContactInfo()
+                .reset(primaryContactInfo);
+        }
+        primaryContactInfo = null;
+        setLocalSubcontract();
 
         // Set the per request load balancing flag.
         IIOPProfile prof = newIOR.getProfile() ;
@@ -291,7 +291,7 @@ public class ContactInfoListImpl implements ContactInfoList {
 
     public synchronized IOR getEffectiveTargetIOR()
     {
-	return effectiveTargetIOR;
+        return effectiveTargetIOR;
     }
 
     public synchronized LocalClientRequestDispatcher getLocalClientRequestDispatcher()
@@ -319,7 +319,7 @@ public class ContactInfoListImpl implements ContactInfoList {
     @Override
     public synchronized int hashCode()
     {
-	return targetIOR.hashCode();
+        return targetIOR.hashCode();
     }
 
     @Override
@@ -345,88 +345,88 @@ public class ContactInfoListImpl implements ContactInfoList {
 
     @Transport
     private void createContactInfoList() {
-	IIOPProfile iiopProfile = effectiveTargetIOR.getProfile();
+        IIOPProfile iiopProfile = effectiveTargetIOR.getProfile();
         final boolean isLocal = iiopProfile.isLocal() ;
 
-	if (effectiveTargetIORContactInfoList == null) {
-	    effectiveTargetIORContactInfoList = 
-		new ArrayList<ContactInfo>();
+        if (effectiveTargetIORContactInfoList == null) {
+            effectiveTargetIORContactInfoList = 
+                new ArrayList<ContactInfo>();
 
-	    String hostname = 
-		((IIOPProfileTemplate)iiopProfile.getTaggedProfileTemplate())
-	            .getPrimaryAddress().getHost().toLowerCase();
-	    int    port     = 
-		((IIOPProfileTemplate)iiopProfile.getTaggedProfileTemplate())
-	            .getPrimaryAddress().getPort();
-	    // For use by "sticky manager" if one is registered.
-	    primaryContactInfo = 
-		createContactInfo(SocketInfo.IIOP_CLEAR_TEXT, hostname, port);
+            String hostname = 
+                ((IIOPProfileTemplate)iiopProfile.getTaggedProfileTemplate())
+                    .getPrimaryAddress().getHost().toLowerCase();
+            int    port     = 
+                ((IIOPProfileTemplate)iiopProfile.getTaggedProfileTemplate())
+                    .getPrimaryAddress().getPort();
+            // For use by "sticky manager" if one is registered.
+            primaryContactInfo = 
+                createContactInfo(SocketInfo.IIOP_CLEAR_TEXT, hostname, port);
 
-	    if (isLocal) {
-		// NOTE: IMPORTANT:
-		// Only do local.  The APP Server interceptors check
-		// effectiveTarget.isLocal - which is determined via
-		// the IOR - so if we added other addresses then
-		// transactions and interceptors would not execute.
-		ContactInfo contactInfo = new SharedCDRContactInfoImpl(
-	            orb, this, effectiveTargetIOR, 
-	    	    orb.getORBData().getGIOPAddressDisposition());
-		effectiveTargetIORContactInfoList.add(contactInfo);
-	    } else {
-		addRemoteContactInfos(effectiveTargetIOR,
-				      effectiveTargetIORContactInfoList);
-	    }
+            if (isLocal) {
+                // NOTE: IMPORTANT:
+                // Only do local.  The APP Server interceptors check
+                // effectiveTarget.isLocal - which is determined via
+                // the IOR - so if we added other addresses then
+                // transactions and interceptors would not execute.
+                ContactInfo contactInfo = new SharedCDRContactInfoImpl(
+                    orb, this, effectiveTargetIOR, 
+                    orb.getORBData().getGIOPAddressDisposition());
+                effectiveTargetIORContactInfoList.add(contactInfo);
+            } else {
+                addRemoteContactInfos(effectiveTargetIOR,
+                                      effectiveTargetIORContactInfoList);
+            }
             display( "First time for iiopProfile", iiopProfile ) ;
-	} else {
-	    if (!isLocal) {
+        } else {
+            if (!isLocal) {
                 display( "Subsequent time for iiopProfile", iiopProfile ) ;
-		// 6152681 - this is so SSL can change its selection on each
-		// invocation
-		addRemoteContactInfos(effectiveTargetIOR,
-				      effectiveTargetIORContactInfoList);
-	    } else {
+                // 6152681 - this is so SSL can change its selection on each
+                // invocation
+                addRemoteContactInfos(effectiveTargetIOR,
+                                      effectiveTargetIORContactInfoList);
+            } else {
                 display( "Subsequent time for (colocated) iiopProfile",
                     iiopProfile ) ;
-	    }
-	}
+            }
+        }
 
         display( "effective list", effectiveTargetIORContactInfoList ) ;
     }
 
     @Transport
     private void addRemoteContactInfos( IOR  effectiveTargetIOR,
-	List<ContactInfo> effectiveTargetIORContactInfoList) {
+        List<ContactInfo> effectiveTargetIORContactInfoList) {
 
-	ContactInfo contactInfo;
-	List<? extends SocketInfo> socketInfos = orb.getORBData()
-	    .getIORToSocketInfo().getSocketInfo(
+        ContactInfo contactInfo;
+        List<? extends SocketInfo> socketInfos = orb.getORBData()
+            .getIORToSocketInfo().getSocketInfo(
                 effectiveTargetIOR,
-		// 6152681
-		effectiveTargetIORContactInfoList);
+                // 6152681
+                effectiveTargetIORContactInfoList);
 
-	if (socketInfos == effectiveTargetIORContactInfoList) {
+        if (socketInfos == effectiveTargetIORContactInfoList) {
             display( "socketInfos", socketInfos ) ;
-	    return;
-	}
+            return;
+        }
 
-	for (SocketInfo socketInfo : socketInfos) {
-	    String type = socketInfo.getType();
-	    String host = socketInfo.getHost().toLowerCase();
-	    int    port = socketInfo.getPort();
-	    contactInfo = createContactInfo(type, host, port);
-	    effectiveTargetIORContactInfoList.add(contactInfo);
-	}
+        for (SocketInfo socketInfo : socketInfos) {
+            String type = socketInfo.getType();
+            String host = socketInfo.getHost().toLowerCase();
+            int    port = socketInfo.getPort();
+            contactInfo = createContactInfo(type, host, port);
+            effectiveTargetIORContactInfoList.add(contactInfo);
+        }
     }
 
     protected ContactInfo createContactInfo(String type, String hostname,
         int port) {
 
-	return new ContactInfoImpl(
-	    orb, this, 
-	    // XREVISIT - See Base Line 62
-	    effectiveTargetIOR,
-	    orb.getORBData().getGIOPAddressDisposition(),
-	    type, hostname, port);
+        return new ContactInfoImpl(
+            orb, this, 
+            // XREVISIT - See Base Line 62
+            effectiveTargetIOR,
+            orb.getORBData().getGIOPAddressDisposition(),
+            type, hostname, port);
     }
 
     /**
@@ -447,9 +447,9 @@ public class ContactInfoListImpl implements ContactInfoList {
             }
 
             // Note that we have no plan to support multi-profile IORs.
-	    int scid = effectiveTargetIOR.getProfile().getObjectKeyTemplate().
-	        getSubcontractId() ;
-	    LocalClientRequestDispatcherFactory lcsf = 
+            int scid = effectiveTargetIOR.getProfile().getObjectKeyTemplate().
+                getSubcontractId() ;
+            LocalClientRequestDispatcherFactory lcsf = 
                 orb.getRequestDispatcherRegistry().
                     getLocalClientRequestDispatcherFactory( scid ) ;
             if (lcsf != null) {
@@ -462,7 +462,7 @@ public class ContactInfoListImpl implements ContactInfoList {
 
     // For timing test.
     public ContactInfo getPrimaryContactInfo() {
-	return primaryContactInfo;
+        return primaryContactInfo;
     }
 }
 

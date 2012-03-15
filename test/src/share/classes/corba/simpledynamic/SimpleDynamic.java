@@ -47,16 +47,16 @@ public class SimpleDynamic extends CORBATest
     @Override
     protected void doTest() throws Throwable
     {
-	Controller client = createClient( "corba.simpledynamic.Client" ) ;
+        Controller client = createClient( "corba.simpledynamic.Client" ) ;
 
-	client.start();
+        client.start();
 
-	// Wait for the client to finish for up to 2 minutes, then
-	// throw an exception.
-	client.waitFor(120000);
+        // Wait for the client to finish for up to 2 minutes, then
+        // throw an exception.
+        client.waitFor(120000);
 
-	// Make sure all the processes are shut down.
-	client.stop();
+        // Make sure all the processes are shut down.
+        client.stop();
     }
 }
 

@@ -56,7 +56,7 @@ final public class InvalidName extends org.omg.CORBA.UserException {
      * Constructs an <code>InvalidName</code> exception with no reason message.
      */
     public InvalidName() {
-	super();
+        super();
     }
 
     /**
@@ -65,6 +65,6 @@ final public class InvalidName extends org.omg.CORBA.UserException {
      * @param reason the String containing a reason message
      */
     public InvalidName(String reason) {
-	super(reason);
+        super(reason);
     }
 }

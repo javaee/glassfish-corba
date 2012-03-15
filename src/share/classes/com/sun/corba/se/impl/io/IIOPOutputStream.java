@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.io;
+package com.sun.corba.ee.impl.io;
 
 import org.omg.CORBA.portable.OutputStream;
 
@@ -65,13 +65,13 @@ import java.util.Stack;
 
 import sun.corba.Bridge ;
 
-import com.sun.corba.se.impl.util.Utility;
-import com.sun.corba.se.impl.util.RepositoryId;
+import com.sun.corba.ee.impl.util.Utility;
+import com.sun.corba.ee.impl.util.RepositoryId;
 
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
+import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.impl.misc.ClassInfoCache ;
-import com.sun.corba.se.spi.trace.ValueHandlerWrite;
+import com.sun.corba.ee.impl.misc.ClassInfoCache ;
+import com.sun.corba.ee.spi.trace.ValueHandlerWrite;
 
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod ;
 
@@ -86,16 +86,16 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod ;
 
 @ValueHandlerWrite
 public class IIOPOutputStream
-    extends com.sun.corba.se.impl.io.OutputStreamHook
+    extends com.sun.corba.ee.impl.io.OutputStreamHook
 {
     private static Bridge bridge = 
-	AccessController.doPrivileged(
-	    new PrivilegedAction<Bridge>() {
-		public Bridge run() {
-		    return Bridge.get() ;
-		}
-	    } 
-	) ;
+        AccessController.doPrivileged(
+            new PrivilegedAction<Bridge>() {
+                public Bridge run() {
+                    return Bridge.get() ;
+                }
+            } 
+        ) ;
 
     private org.omg.CORBA_2_3.portable.OutputStream orbStream;
 
@@ -110,12 +110,12 @@ public class IIOPOutputStream
     private IOException abortIOException = null;
 
     private Stack<ObjectStreamClass> classDescStack = 
-	new Stack<ObjectStreamClass>();
+        new Stack<ObjectStreamClass>();
 
     public IIOPOutputStream()
-	throws java.io.IOException
+        throws java.io.IOException
    {
-	super();
+        super();
     }
 
     // If using RMI-IIOP stream format version 2, this tells
@@ -134,11 +134,11 @@ public class IIOPOutputStream
     }
 
     public final void setOrbStream(org.omg.CORBA_2_3.portable.OutputStream os) {
-    	orbStream = os;
+        orbStream = os;
     }
 
     public final org.omg.CORBA_2_3.portable.OutputStream getOrbStream() {
-    	return orbStream;
+        return orbStream;
     }
 
     @InfoMethod
@@ -146,13 +146,13 @@ public class IIOPOutputStream
 
     @ValueHandlerWrite
     public final void increaseRecursionDepth(){
-	recursionDepth++;
+        recursionDepth++;
         recursionDepthInfo( recursionDepth ) ;
     }
 
     @ValueHandlerWrite
     public final int decreaseRecursionDepth(){
-	--recursionDepth;
+        --recursionDepth;
         recursionDepthInfo(recursionDepth);
         return recursionDepth ;
     }
@@ -170,7 +170,7 @@ public class IIOPOutputStream
     @ValueHandlerWrite
     @Override
     public final void writeObjectOverride(Object obj)
-	throws IOException {
+        throws IOException {
 
         writeObjectState.writeData(this);
 
@@ -236,18 +236,18 @@ public class IIOPOutputStream
     /* throws IOException */
     {
         try {
-	    if (currentObject == null || currentClassDesc == null) {
+            if (currentObject == null || currentClassDesc == null) {
                 throw new NotActiveException("defaultWriteObjectDelegate");
             }
 
-	    ObjectStreamField[] fields =
-		currentClassDesc.getFieldsNoCopy();
-	    if (fields.length > 0) {
-		outputClassFields(currentObject, currentClassDesc.forClass(),
-				  fields);
-	    }
+            ObjectStreamField[] fields =
+                currentClassDesc.getFieldsNoCopy();
+            if (fields.length > 0) {
+                outputClassFields(currentObject, currentClassDesc.forClass(),
+                                  fields);
+            }
         } catch(IOException ioe) {
-	    bridge.throwException(ioe);
+            bridge.throwException(ioe);
         }
     }
 
@@ -260,7 +260,7 @@ public class IIOPOutputStream
     /* throws SecurityException */
     {
         return false;
-		
+                
     }
 
 
@@ -285,8 +285,8 @@ public class IIOPOutputStream
         try{
             orbStream.flush();
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -311,13 +311,13 @@ public class IIOPOutputStream
         try{
             //orbStream.reset();
 
-	    if (currentObject != null || currentClassDesc != null) {
+            if (currentObject != null || currentClassDesc != null) {
                 throw new IOException("Illegal call to reset");
             }
 
-	    abortIOException = null;
+            abortIOException = null;
 
-	    if (classDescStack == null) {
+            if (classDescStack == null) {
                 classDescStack =
                     new Stack<ObjectStreamClass>();
             } else {
@@ -325,8 +325,8 @@ public class IIOPOutputStream
             }
 
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -337,8 +337,8 @@ public class IIOPOutputStream
 
             orbStream.write_octet_array(b, 0, b.length);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -349,8 +349,8 @@ public class IIOPOutputStream
 
             orbStream.write_octet_array(b, off, len);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -361,8 +361,8 @@ public class IIOPOutputStream
 
             orbStream.write_octet((byte)(data & 0xFF));
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -373,8 +373,8 @@ public class IIOPOutputStream
 
             orbStream.write_boolean(data);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -385,8 +385,8 @@ public class IIOPOutputStream
 
             orbStream.write_octet((byte)data);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -398,8 +398,8 @@ public class IIOPOutputStream
             byte buf[] = data.getBytes();
             orbStream.write_octet_array(buf, 0, buf.length);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -410,8 +410,8 @@ public class IIOPOutputStream
 
             orbStream.write_wchar((char)data);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -423,8 +423,8 @@ public class IIOPOutputStream
             char buf[] = data.toCharArray();
             orbStream.write_wchar_array(buf, 0, buf.length);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -435,8 +435,8 @@ public class IIOPOutputStream
 
             orbStream.write_double(data);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -447,8 +447,8 @@ public class IIOPOutputStream
 
             orbStream.write_float(data);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -459,8 +459,8 @@ public class IIOPOutputStream
 
             orbStream.write_long(data);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -471,8 +471,8 @@ public class IIOPOutputStream
 
             orbStream.write_longlong(data);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @ValueHandlerWrite
@@ -483,8 +483,8 @@ public class IIOPOutputStream
 
             orbStream.write_short((short)data);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     @Override
@@ -512,8 +512,8 @@ public class IIOPOutputStream
 
             internalWriteUTF(orbStream, data);
         } catch(Error e) {
-	    throw new IOException(e) ;
-	}
+            throw new IOException(e) ;
+        }
     }
 
     // INTERNAL UTILITY METHODS
@@ -523,18 +523,18 @@ public class IIOPOutputStream
      */
     private boolean checkSpecialClasses(Object obj) throws IOException {
 
-    	/*
-    	 * If this is a class, don't allow substitution
-    	 */
-    	//if (obj instanceof Class) {
+        /*
+         * If this is a class, don't allow substitution
+         */
+        //if (obj instanceof Class) {
         //    throw new IOException("Serialization of Class not supported");
-    	//}
+        //}
 
-    	if (obj instanceof ObjectStreamClass) {
+        if (obj instanceof ObjectStreamClass) {
             throw Exceptions.self.serializationObjectStreamClassNotSupported() ;
-    	}
+        }
 
-    	return false;
+        return false;
     }
 
     /*
@@ -542,14 +542,14 @@ public class IIOPOutputStream
      * These classes are replaceable.
      */
     private boolean checkSubstitutableSpecialClasses(Object obj)
-	throws IOException
+        throws IOException
     {
-    	if (obj instanceof String) {
-    	    orbStream.write_value((java.io.Serializable)obj);
-    	    return true;
-    	}
+        if (obj instanceof String) {
+            orbStream.write_value((java.io.Serializable)obj);
+            return true;
+        }
 
-    	return false;
+        return false;
     }
 
     /*
@@ -632,7 +632,7 @@ public class IIOPOutputStream
      */
     @ValueHandlerWrite
     private void invokeObjectWriter(ObjectStreamClass osc, Object obj)
-	throws IOException {
+        throws IOException {
 
         Class<?> c = osc.forClass() ;
 
@@ -674,65 +674,65 @@ public class IIOPOutputStream
                 } else {
                     orbStream.write_octet(((Byte) value).byteValue());
                 }
-		break;
-	    case 'C':
+                break;
+            case 'C':
                 if (value == null) {
                     orbStream.write_wchar((char) 0);
                 } else {
                     orbStream.write_wchar(((Character) value).charValue());
                 }
-		break;
-	    case 'F':
+                break;
+            case 'F':
                 if (value == null) {
                     orbStream.write_float((float) 0);
                 } else {
                     orbStream.write_float(((Float) value).floatValue());
                 }
-		break;
+                break;
             case 'D':
                 if (value == null) {
                     orbStream.write_double((double) 0);
                 } else {
                     orbStream.write_double(((Double) value).doubleValue());
                 }
-		break;
-	    case 'I':
+                break;
+            case 'I':
                 if (value == null) {
                     orbStream.write_long(0);
                 } else {
                     orbStream.write_long(((Integer) value).intValue());
                 }
-		break;
-	    case 'J':
+                break;
+            case 'J':
                 if (value == null) {
                     orbStream.write_longlong((long) 0);
                 } else {
                     orbStream.write_longlong(((Long) value).longValue());
                 }
-		break;
-	    case 'S':
+                break;
+            case 'S':
                 if (value == null) {
                     orbStream.write_short((short) 0);
                 } else {
                     orbStream.write_short(((Short) value).shortValue());
                 }
-		break;
-	    case 'Z':
+                break;
+            case 'Z':
                 if (value == null) {
                     orbStream.write_boolean(false);
                 } else {
                     orbStream.write_boolean(((Boolean) value).booleanValue());
                 }
-		break;
-	    case '[':
-	    case 'L':
+                break;
+            case '[':
+            case 'L':
                 // What to do if it's null?
                 writeObjectField(field, value);
-		break;
-	    default:
+                break;
+            default:
                 throw Exceptions.self.invalidClassForWrite(
                     currentClassDesc.getName());
-	    }
+            }
     }
 
     @ValueHandlerWrite
@@ -745,15 +745,15 @@ public class IIOPOutputStream
         else {
             Class<?> type = field.getType();
             int callType = ValueHandlerImpl.kValueType;
-	    ClassInfoCache.ClassInfo cinfo = field.getClassInfo() ;
+            ClassInfoCache.ClassInfo cinfo = field.getClassInfo() ;
 
             if (cinfo.isInterface()) { 
                 String className = type.getName();
                 
-		if (cinfo.isARemote(type)) {
+                if (cinfo.isARemote(type)) {
                     // RMI Object reference...
                     callType = ValueHandlerImpl.kRemoteType;
-		} else if (cinfo.isACORBAObject(type)) {
+                } else if (cinfo.isACORBAObject(type)) {
                     // IDL Object reference...
                     callType = ValueHandlerImpl.kRemoteType;
                 } else if (RepositoryId.isAbstractBase(type)) {
@@ -763,7 +763,7 @@ public class IIOPOutputStream
                     callType = ValueHandlerImpl.kAbstractType;
                 }
             }
-					
+                                        
             switch (callType) {
             case ValueHandlerImpl.kRemoteType: 
                 Util.getInstance().writeRemoteObject(orbStream, objectValue);
@@ -774,7 +774,7 @@ public class IIOPOutputStream
             case ValueHandlerImpl.kValueType:
                 try{
                     orbStream.write_value((java.io.Serializable)objectValue, 
-			type);
+                        type);
                 } catch(ClassCastException cce){
                     if (objectValue instanceof java.io.Serializable) {
                         throw cce;
@@ -792,65 +792,65 @@ public class IIOPOutputStream
      */
     @ValueHandlerWrite
     private void outputClassFields(Object o, Class cl,
-				   ObjectStreamField[] fields)
-	throws IOException, InvalidClassException {
+                                   ObjectStreamField[] fields)
+        throws IOException, InvalidClassException {
 
-	// replace this all with
-    	// for (int i = 0; i < fields.length; i++) {
-	//     fields[i].write( o, orbStream ) ;
-	// Should we just put this into ObjectStreamClass?
-	// Could also unroll and codegen this.
+        // replace this all with
+        // for (int i = 0; i < fields.length; i++) {
+        //     fields[i].write( o, orbStream ) ;
+        // Should we just put this into ObjectStreamClass?
+        // Could also unroll and codegen this.
 
-    	for (int i = 0; i < fields.length; i++) {
-	    ObjectStreamField field = fields[i] ;
-	    final long offset = field.getFieldID() ;
-    	    if (offset == Bridge.INVALID_FIELD_OFFSET) {
+        for (int i = 0; i < fields.length; i++) {
+            ObjectStreamField field = fields[i] ;
+            final long offset = field.getFieldID() ;
+            if (offset == Bridge.INVALID_FIELD_OFFSET) {
                 throw new InvalidClassException(cl.getName(),
                     "Nonexistent field " + fields[i].getName());
             }
-	    switch (field.getTypeCode()) {
-		case 'B':
-		    byte byteValue = bridge.getByte( o, offset ) ;
-		    orbStream.write_octet(byteValue);
-		    break;
-		case 'C':
-		    char charValue = bridge.getChar( o, offset ) ;
-		    orbStream.write_wchar(charValue);
-		    break;
-		case 'F':
-		    float floatValue = bridge.getFloat( o, offset ) ;
-		    orbStream.write_float(floatValue);
-		    break;
-		case 'D' :
-		    double doubleValue = bridge.getDouble( o, offset ) ;
-		    orbStream.write_double(doubleValue);
-		    break;
-		case 'I':
-		    int intValue = bridge.getInt( o, offset ) ;
-		    orbStream.write_long(intValue);
-		    break;
-		case 'J':
-		    long longValue = bridge.getLong( o, offset ) ;
-		    orbStream.write_longlong(longValue);
-		    break;
-		case 'S':
-		    short shortValue = bridge.getShort( o, offset ) ;
-		    orbStream.write_short(shortValue);
-		    break;
-		case 'Z':
-		    boolean booleanValue = bridge.getBoolean( o, offset ) ;
-		    orbStream.write_boolean(booleanValue);
-		    break;
-		case '[':
-		case 'L':
-		    Object objectValue = bridge.getObject( o, offset ) ;
-		    writeObjectField(fields[i], objectValue);
-		    break;
-		default:
+            switch (field.getTypeCode()) {
+                case 'B':
+                    byte byteValue = bridge.getByte( o, offset ) ;
+                    orbStream.write_octet(byteValue);
+                    break;
+                case 'C':
+                    char charValue = bridge.getChar( o, offset ) ;
+                    orbStream.write_wchar(charValue);
+                    break;
+                case 'F':
+                    float floatValue = bridge.getFloat( o, offset ) ;
+                    orbStream.write_float(floatValue);
+                    break;
+                case 'D' :
+                    double doubleValue = bridge.getDouble( o, offset ) ;
+                    orbStream.write_double(doubleValue);
+                    break;
+                case 'I':
+                    int intValue = bridge.getInt( o, offset ) ;
+                    orbStream.write_long(intValue);
+                    break;
+                case 'J':
+                    long longValue = bridge.getLong( o, offset ) ;
+                    orbStream.write_longlong(longValue);
+                    break;
+                case 'S':
+                    short shortValue = bridge.getShort( o, offset ) ;
+                    orbStream.write_short(shortValue);
+                    break;
+                case 'Z':
+                    boolean booleanValue = bridge.getBoolean( o, offset ) ;
+                    orbStream.write_boolean(booleanValue);
+                    break;
+                case '[':
+                case 'L':
+                    Object objectValue = bridge.getObject( o, offset ) ;
+                    writeObjectField(fields[i], objectValue);
+                    break;
+                default:
                     throw Exceptions.self.invalidClassForWrite(
                         cl.getName() ) ;
-	    }
-    	}
+            }
+        }
     }
 }
 

@@ -38,28 +38,28 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi ;
+package com.sun.corba.ee.impl.presentation.rmi ;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
 
-import com.sun.corba.se.spi.misc.ORBClassLoader ;
+import com.sun.corba.ee.spi.misc.ORBClassLoader ;
 
 public abstract class StubFactoryDynamicBase extends StubFactoryBase  
 {
     protected final ClassLoader loader ;
 
     public StubFactoryDynamicBase( PresentationManager.ClassData classData, 
-	ClassLoader loader ) 
+        ClassLoader loader ) 
     {
-	super( classData ) ;
+        super( classData ) ;
 
-	// this.loader must not be null, or the newProxyInstance call
-	// will fail.  
-	if (loader == null) {
-	    this.loader = ORBClassLoader.getClassLoader() ;
-	} else {
-	    this.loader = loader ;
-	}
+        // this.loader must not be null, or the newProxyInstance call
+        // will fail.  
+        if (loader == null) {
+            this.loader = ORBClassLoader.getClassLoader() ;
+        } else {
+            this.loader = loader ;
+        }
     }
 
     public abstract org.omg.CORBA.Object makeStub() ;

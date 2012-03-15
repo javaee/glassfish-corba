@@ -37,21 +37,21 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.resolver ;
+package com.sun.corba.ee.spi.resolver ;
 
 import java.io.File ;
 
-import com.sun.corba.se.impl.resolver.LocalResolverImpl ;
-import com.sun.corba.se.impl.resolver.ORBInitRefResolverImpl ;
-import com.sun.corba.se.impl.resolver.ORBDefaultInitRefResolverImpl ;
-import com.sun.corba.se.impl.resolver.BootstrapResolverImpl ;
-import com.sun.corba.se.impl.resolver.CompositeResolverImpl ;
-import com.sun.corba.se.impl.resolver.INSURLOperationImpl ;
-import com.sun.corba.se.impl.resolver.SplitLocalResolverImpl ;
-import com.sun.corba.se.impl.resolver.FileResolverImpl ;
+import com.sun.corba.ee.impl.resolver.LocalResolverImpl ;
+import com.sun.corba.ee.impl.resolver.ORBInitRefResolverImpl ;
+import com.sun.corba.ee.impl.resolver.ORBDefaultInitRefResolverImpl ;
+import com.sun.corba.ee.impl.resolver.BootstrapResolverImpl ;
+import com.sun.corba.ee.impl.resolver.CompositeResolverImpl ;
+import com.sun.corba.ee.impl.resolver.INSURLOperationImpl ;
+import com.sun.corba.ee.impl.resolver.SplitLocalResolverImpl ;
+import com.sun.corba.ee.impl.resolver.FileResolverImpl ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orb.Operation ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.Operation ;
 import org.glassfish.pfl.basic.contain.Pair;
 
 /** Utility class that provides factory methods for all of the 
@@ -62,22 +62,22 @@ public class ResolverDefault {
     */
     public static LocalResolver makeLocalResolver( ) 
     {
-	return new LocalResolverImpl() ;
+        return new LocalResolverImpl() ;
     }
 
     /** Return a resolver that relies on configured values of ORBInitRef for data.
     */
     public static Resolver makeORBInitRefResolver( Operation urlOperation,
-	Pair<String,String>[] initRefs ) 
+        Pair<String,String>[] initRefs ) 
     {
-	return new ORBInitRefResolverImpl( urlOperation, initRefs ) ;
+        return new ORBInitRefResolverImpl( urlOperation, initRefs ) ;
     }
 
     public static Resolver makeORBDefaultInitRefResolver( Operation urlOperation,
-	String defaultInitRef ) 
+        String defaultInitRef ) 
     {
-	return new ORBDefaultInitRefResolverImpl( urlOperation,
-	    defaultInitRef ) ;
+        return new ORBDefaultInitRefResolverImpl( urlOperation,
+            defaultInitRef ) ;
     }
 
     /** Return a resolver that uses the proprietary bootstrap protocol 
@@ -86,7 +86,7 @@ public class ResolverDefault {
     */
     public static Resolver makeBootstrapResolver( ORB orb, String host, int port ) 
     {
-	return new BootstrapResolverImpl( orb, host, port ) ;
+        return new BootstrapResolverImpl( orb, host, port ) ;
     }
 
     /** Return a resolver composed of the two given resolvers.  result.list() is the 
@@ -96,23 +96,23 @@ public class ResolverDefault {
     */
     public static Resolver makeCompositeResolver( Resolver first, Resolver second ) 
     {
-	return new CompositeResolverImpl( first, second ) ;
+        return new CompositeResolverImpl( first, second ) ;
     }
 
     public static Operation makeINSURLOperation( ORB orb )
     {
-	return new INSURLOperationImpl( orb ) ;
+        return new INSURLOperationImpl( orb ) ;
     }
 
     public static LocalResolver makeSplitLocalResolver( Resolver resolver,
-	LocalResolver localResolver ) 
+        LocalResolver localResolver ) 
     {
-	return new SplitLocalResolverImpl( resolver, localResolver ) ;
+        return new SplitLocalResolverImpl( resolver, localResolver ) ;
     }
 
     public static Resolver makeFileResolver( ORB orb, File file ) 
     {
-	return new FileResolverImpl( orb, file ) ;
+        return new FileResolverImpl( orb, file ) ;
     }
 }
 

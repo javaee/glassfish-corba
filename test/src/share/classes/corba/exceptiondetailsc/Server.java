@@ -61,10 +61,10 @@ public class Server
     public static final String baseMsg = Server.class.getName();
     public static final String main = baseMsg + ".main";
     public static final String thisPackage = 
-	Server.class.getPackage().getName();
+        Server.class.getPackage().getName();
 
     public static final String rmiiIServantPOA_Tie = 
-	thisPackage + "._rmiiIServantPOA_Tie";
+        thisPackage + "._rmiiIServantPOA_Tie";
 
     public static final String idlIConnect  = "idlIConnect";
     public static final String idlIPOA      = "idlIPOA";
@@ -78,57 +78,57 @@ public class Server
     public static void main(String[] av)
     {
         try {
-	    U.sop(main + " starting");
+            U.sop(main + " starting");
 
-	    if (! ColocatedClientServer.isColocated) {
-		U.sop(main + " : creating ORB.");
-		orb = (ORB) ORB.init(av, null);
-		U.sop(main + " : creating InitialContext.");
-		initialContext = C.createInitialContext(orb);
-	    }
+            if (! ColocatedClientServer.isColocated) {
+                U.sop(main + " : creating ORB.");
+                orb = (ORB) ORB.init(av, null);
+                U.sop(main + " : creating InitialContext.");
+                initialContext = C.createInitialContext(orb);
+            }
 
-	    rootPOA = U.getRootPOA(orb);
+            rootPOA = U.getRootPOA(orb);
             rootPOA.the_POAManager().activate();
 
-	    //
-	    // IDL references.
-	    //
+            //
+            // IDL references.
+            //
 
-	    U.sop("Creating/binding IDL references.");
+            U.sop("Creating/binding IDL references.");
 
-	    U.createWithConnectAndBind(idlIConnect, 
-				       new idlIServantConnect(), orb);
-	    U.createWithServantAndBind(idlIPOA,
-				       new idlIServantPOA(), rootPOA, orb);
+            U.createWithConnectAndBind(idlIConnect, 
+                                       new idlIServantConnect(), orb);
+            U.createWithServantAndBind(idlIPOA,
+                                       new idlIServantPOA(), rootPOA, orb);
 
-	    //
-	    // RMI-IIOP references.
-	    //
+            //
+            // RMI-IIOP references.
+            //
 
-	    U.sop("Creating/binding RMI-IIOP references.");
+            U.sop("Creating/binding RMI-IIOP references.");
 
-	    initialContext.rebind(rmiiIConnect, new rmiiIServantConnect());
+            initialContext.rebind(rmiiIConnect, new rmiiIServantConnect());
 
-	    Servant servant = (Servant)
-		javax.rmi.CORBA.Util.getTie(new rmiiIServantPOA());
+            Servant servant = (Servant)
+                javax.rmi.CORBA.Util.getTie(new rmiiIServantPOA());
             U.createWithServantAndBind(rmiiIPOA, servant, rootPOA, orb);
 
-	    U.sop(main + " ready");
-	    U.sop(Options.defServerHandshake);
-	    System.out.flush();
+            U.sop(main + " ready");
+            U.sop(Options.defServerHandshake);
+            System.out.flush();
 
-	    synchronized (ColocatedClientServer.signal) {
-		ColocatedClientServer.signal.notifyAll();
-	    }
-	    
-	    orb.run();
+            synchronized (ColocatedClientServer.signal) {
+                ColocatedClientServer.signal.notifyAll();
+            }
+            
+            orb.run();
 
         } catch (Exception e) {
-	    U.sopUnexpectedException(main, e);
-	    System.exit(1);
+            U.sopUnexpectedException(main, e);
+            System.exit(1);
         }
-	U.sop(main + " ending successfully");
-	System.exit(Controller.SUCCESS);
+        U.sop(main + " ending successfully");
+        System.exit(Controller.SUCCESS);
     }
 }
 

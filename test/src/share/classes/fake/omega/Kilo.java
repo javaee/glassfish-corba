@@ -59,9 +59,9 @@ public final class Kilo implements org.omg.CORBA.portable.IDLEntity
 
     public Kilo (int _tango, int _uniform, int _quickstep)
     {
-	tango = _tango;
-	uniform = _uniform;
-	quickstep = _quickstep;
+        tango = _tango;
+        uniform = _uniform;
+        quickstep = _quickstep;
     } // ctor
 
 } // class Kilo

@@ -51,7 +51,7 @@ package org.omg.CORBA;
  */
 // @SuppressWarnings({"serial"})
 public final class UnionMember implements org.omg.CORBA.portable.IDLEntity {
-    //	instance variables
+    //  instance variables
 
     /**
      * The name of the union member described by this
@@ -81,7 +81,7 @@ public final class UnionMember implements org.omg.CORBA.portable.IDLEntity {
      */
     public org.omg.CORBA.IDLType type_def;
 
-    //	constructors
+    //  constructors
 
     /**
      * Constructs a new <code>UnionMember</code> object with its fields initialized
@@ -103,9 +103,9 @@ public final class UnionMember implements org.omg.CORBA.portable.IDLEntity {
      *        IDL type of this <code>UnionMember</code> object
      */
     public UnionMember(String __name, org.omg.CORBA.Any __label, org.omg.CORBA.TypeCode __type, org.omg.CORBA.IDLType __type_def) {
-	name = __name;
-	label = __label;
-	type = __type;
-	type_def = __type_def;
+        name = __name;
+        label = __label;
+        type = __type;
+        type_def = __type_def;
     }
 }

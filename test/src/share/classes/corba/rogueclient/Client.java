@@ -46,7 +46,7 @@ import java.util.Properties;
 import javax.rmi.PortableRemoteObject;
 import javax.naming.InitialContext;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import corba.hcks.U;
 
 public class Client extends Thread
@@ -60,21 +60,21 @@ public class Client extends Thread
     private static String tmpString = null;
 
     private static void initializeReallyBigString() {
-	StringBuffer sb = new StringBuffer(stringSize);
-	int index = 0;
+        StringBuffer sb = new StringBuffer(stringSize);
+        int index = 0;
         final int lengthOfStr = stringOf36.length();
-	for (int i = 0; i < stringSize; i++) {
-	    index = i % lengthOfStr;
-	    sb.append(stringOf36.charAt(index));
-	}
+        for (int i = 0; i < stringSize; i++) {
+            index = i % lengthOfStr;
+            sb.append(stringOf36.charAt(index));
+        }
         reallyReallyBigString = sb.toString();
     }
 
     private void runTest(Tester tester, int iterations)
-       	throws RemoteException {
-	for (int i = 0; i < iterations; i++) {
-	    tmpString = tester.passString(reallyReallyBigString);
-	}
+        throws RemoteException {
+        for (int i = 0; i < iterations; i++) {
+            tmpString = tester.passString(reallyReallyBigString);
+        }
     }
 
     public void run() {
@@ -96,12 +96,12 @@ public class Client extends Thread
     }
 
     public static void main(String args[]) {
-	if (dprint) {
-	    Properties props = new Properties();
-	    props.put(ORBConstants.DEBUG_PROPERTY, "transport, giop");
-	}
+        if (dprint) {
+            Properties props = new Properties();
+            props.put(ORBConstants.DEBUG_PROPERTY, "transport, giop");
+        }
 
-	initializeReallyBigString();
+        initializeReallyBigString();
 
         Client[] clients = new Client[NUMBER_OF_CLIENTS];
         for (int i = 0; i < clients.length; i++) {

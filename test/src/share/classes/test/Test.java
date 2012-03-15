@@ -69,8 +69,8 @@ import sun.tools.java.ClassPath;
 import sun.tools.java.ClassFile;
 import java.net.ServerSocket;
 import java.util.Properties;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 /**
  * The abstract Test class.  The simplest way to use this class is to inherit from it
@@ -87,38 +87,38 @@ public abstract class Test implements java.lang.Runnable
     private static final boolean DEBUG_CLASS_LOADER = false ;
 
     static {
-	displayRuntimeInformation() ;
+        displayRuntimeInformation() ;
     } 
 
     public static String display( String[] args ) {
-	String result = null ;
-	for (String str : args) {
-	    if (result == null) 
-		result = "[" + str ;
-	    else
-		result += ", " + str ;
-	}
-	result += "]" ;
-	return result ;
+        String result = null ;
+        for (String str : args) {
+            if (result == null) 
+                result = "[" + str ;
+            else
+                result += ", " + str ;
+        }
+        result += "]" ;
+        return result ;
     }
 
     public static void displayRuntimeInformation() {
-	if (DEBUG_CLASS_LOADER) {
-	    RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean() ;
+        if (DEBUG_CLASS_LOADER) {
+            RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean() ;
 
-	    System.out.println( "Boot classpath = " ) ;
-	    for (String str : bean.getBootClassPath().split(":")) 
-		System.out.println( "\t" + str ) ;
+            System.out.println( "Boot classpath = " ) ;
+            for (String str : bean.getBootClassPath().split(":")) 
+                System.out.println( "\t" + str ) ;
 
-	    System.out.println( "System classpath = " ) ;
-	    for (String str : bean.getClassPath().split(":")) 
-		System.out.println( "\t" + str ) ;
+            System.out.println( "System classpath = " ) ;
+            for (String str : bean.getClassPath().split(":")) 
+                System.out.println( "\t" + str ) ;
 
-	    List<String> args = bean.getInputArguments() ;
-	    System.out.println( "VM arguments:" ) ;
-	    for (String str : args ) 
-		System.out.println( "\t" + str ) ;
-	}
+            List<String> args = bean.getInputArguments() ;
+            System.out.println( "VM arguments:" ) ;
+            for (String str : args ) 
+                System.out.println( "\t" + str ) ;
+        }
     }
 
     // Set this to true to turn on the use of a security manager
@@ -142,11 +142,11 @@ public abstract class Test implements java.lang.Runnable
     public static String STATUS                         = "status";
     public static String FVD_FLAG                       = "-fvd";
     public static String DEBUG_FLAG                     = "-debug";
-    public static String FORK_DEBUG_LEVEL		= "-forkdebuglevel";
-    public static String IF_PRESENT_FLAG		= "-ifpresent";
+    public static String FORK_DEBUG_LEVEL               = "-forkdebuglevel";
+    public static String IF_PRESENT_FLAG                = "-ifpresent";
 
     public static final String ORB_CLASS_KEY = "org.omg.CORBA.ORBClass";
-    public static final String ORB_CLASS = "com.sun.corba.se.impl.orb.ORBImpl";
+    public static final String ORB_CLASS = "com.sun.corba.ee.impl.orb.ORBImpl";
 
     protected Hashtable args;
     protected Error status = null;
@@ -168,8 +168,8 @@ public abstract class Test implements java.lang.Runnable
 
     public static void dprint( String msg ) 
     {
-	if (debug)
-	    System.out.println( "TEST: " + msg ) ;
+        if (debug)
+            System.out.println( "TEST: " + msg ) ;
     }
 
     public static void UsageAndExit()
@@ -203,36 +203,36 @@ public abstract class Test implements java.lang.Runnable
      **/
     public static Hashtable createFromConsolePairs(String  args[])
     {
-	int i = 0;
-	Hashtable table = new Hashtable();
-	String key = null, value = null;
+        int i = 0;
+        Hashtable table = new Hashtable();
+        String key = null, value = null;
 
-	while(i < args.length){
-	    key = args[i].toLowerCase();
+        while(i < args.length){
+            key = args[i].toLowerCase();
 
-	    if (key.charAt(0) != '-')
-		throw new Error(key + " is not a key");
+            if (key.charAt(0) != '-')
+                throw new Error(key + " is not a key");
 
-	    i++;
-	    if (i == args.length)
-		value = new String();
-	    else {
-		value = args[i];
+            i++;
+            if (i == args.length)
+                value = new String();
+            else {
+                value = args[i];
 
-		if (value.charAt(0) == '-') {
-		    value = new String();
-		} else
-		    i++;
-	    }
+                if (value.charAt(0) == '-') {
+                    value = new String();
+                } else
+                    i++;
+            }
 
-	    table.put(key, value);
+            table.put(key, value);
 
-	}
+        }
 
-	if (table.containsKey( DEBUG_FLAG ))
-	    dprint( "Contents of argument table: " + table ) ;
+        if (table.containsKey( DEBUG_FLAG ))
+            dprint( "Contents of argument table: " + table ) ;
 
-	return table;
+        return table;
     }
 
     /**
@@ -264,18 +264,18 @@ public abstract class Test implements java.lang.Runnable
      **/
     public void setArgs(Hashtable args)
     {
-	try {
-	    this.args = args;
-	    verbose = args.containsKey(VERBOSE_FLAG);
-	    demure = args.containsKey(DEMURE_FLAG);
+        try {
+            this.args = args;
+            verbose = args.containsKey(VERBOSE_FLAG);
+            demure = args.containsKey(DEMURE_FLAG);
 
-	    // If FVD_FLAG exists, set test boolean on IIOPInputStream.
-	    // This forces the runtime to always use FullValueDescription 
-	    // instead of ObjectStreamClass
-	} catch (java.lang.Throwable thr) {
-	    System.out.println( "Caught exception " + thr ) ;
-	    thr.printStackTrace() ;
-	}
+            // If FVD_FLAG exists, set test boolean on IIOPInputStream.
+            // This forces the runtime to always use FullValueDescription 
+            // instead of ObjectStreamClass
+        } catch (java.lang.Throwable thr) {
+            System.out.println( "Caught exception " + thr ) ;
+            thr.printStackTrace() ;
+        }
     }
 
     /**
@@ -301,34 +301,34 @@ public abstract class Test implements java.lang.Runnable
 
     public void createResultsTable( int num ) 
     {
-	results = new Hashtable[num] ;
+        results = new Hashtable[num] ;
     }
 
     public static void checkSunTools() {
-	String className = "sun.tools.java.Constants" ;
-	try {
-	    Class cls = Class.forName( className ) ;
-	    System.out.println( "Successfully loaded " + className ) ;
-	    System.out.println( className + " ClassLoader is " + cls.getClassLoader() ) ;
-	    System.out.println( "My ClassLoader = " + Test.class.getClassLoader() ) ;
-	} catch (Exception exc) {
-	    System.out.println( "Could not load " + className ) ;
-	    System.out.println( "classpath = " + System.getProperty( "java.class.path" )) ;
-	}
+        String className = "sun.tools.java.Constants" ;
+        try {
+            Class cls = Class.forName( className ) ;
+            System.out.println( "Successfully loaded " + className ) ;
+            System.out.println( className + " ClassLoader is " + cls.getClassLoader() ) ;
+            System.out.println( "My ClassLoader = " + Test.class.getClassLoader() ) ;
+        } catch (Exception exc) {
+            System.out.println( "Could not load " + className ) ;
+            System.out.println( "classpath = " + System.getProperty( "java.class.path" )) ;
+        }
     }
 
     public static void main(String args[])
     {
-	// checkSunTools() ;
+        // checkSunTools() ;
 
-	if (System.getProperty( "jcov" ) != null)
-	    Runtime.getRuntime().addShutdownHook(
-		new ShutdownHook() ) ;
+        if (System.getProperty( "jcov" ) != null)
+            Runtime.getRuntime().addShutdownHook(
+                new ShutdownHook() ) ;
 
         try {
-	    if (USE_REAL_SECURITY_MANAGER)
-		System.setSecurityManager( new SecurityManager() ) ;
-	    else
+            if (USE_REAL_SECURITY_MANAGER)
+                System.setSecurityManager( new SecurityManager() ) ;
+            else
                 // This disables all security checks. 
                 System.setSecurityManager(new javax.rmi.download.SecurityManager());
 
@@ -366,7 +366,7 @@ public abstract class Test implements java.lang.Runnable
             }
         } catch (Throwable thr) {
             System.out.println("Unexpected throwable: " + thr ) ;
-	    thr.printStackTrace() ;
+            thr.printStackTrace() ;
             mainResult = 1;
         } finally {
             // Make sure we clean up...
@@ -385,7 +385,7 @@ public abstract class Test implements java.lang.Runnable
      **/
     public static InputStreamReader getResource (   String className,
                                                     String extensionName)
-	throws ClassNotFoundException {
+        throws ClassNotFoundException {
 
         // Get the class instance...
 
@@ -426,7 +426,7 @@ public abstract class Test implements java.lang.Runnable
     protected String[] getResourceAsArray ( String className,
                                             String extensionName,
                                             String ignoreLinesStartingWith)
-	throws ClassNotFoundException, IOException {
+        throws ClassNotFoundException, IOException {
 
         String[] result = null;
         InputStreamReader inStream = getResource(className,extensionName);
@@ -474,8 +474,8 @@ public abstract class Test implements java.lang.Runnable
                                             String sourceExtension,
                                             String targetExtension,
                                             String[] ignorePrefix)
-	throws ClassNotFoundException,
-	       IOException {
+        throws ClassNotFoundException,
+               IOException {
 
         // Get resources as string arrays and check them...
 
@@ -549,8 +549,8 @@ public abstract class Test implements java.lang.Runnable
 
                     // Nope, so tokenize, sort and re-compare...
 
-		    StringTokenizer s = new StringTokenizer(source[i],", \n\t\r");
-		    StringTokenizer t = new StringTokenizer(target[i],", \n\t\r");
+                    StringTokenizer s = new StringTokenizer(source[i],", \n\t\r");
+                    StringTokenizer t = new StringTokenizer(target[i],", \n\t\r");
 
                     int sLen = s.countTokens();
                     int tLen = t.countTokens();
@@ -597,8 +597,8 @@ public abstract class Test implements java.lang.Runnable
     public void compareResources (  String className,
                                     String sourceExtension,
                                     String targetExtension)
-	throws ClassNotFoundException,
-	       IOException {
+        throws ClassNotFoundException,
+               IOException {
         boolean done = false;
         InputStreamReader inStream = null;
         InputStreamReader refStream = null;
@@ -668,79 +668,79 @@ public abstract class Test implements java.lang.Runnable
         }
     }
 
-	
+        
     // Returns a platform specific build classes directory (either windows or unix ONLY). 
     // Returns null if tests are in test jar or build directory does not exist.
     //
     // NOTE : This is meant strictly for the original RMI-IIOP workspace structure.
     public static String getClassesDirectory(String childWorkspace) {
-		
-	String className = "com.sun.corba.se.impl.orb.ORBImpl";
-	ClassPath classPath = new ClassPath(System.getProperty("java.class.path"));
-	ClassFile cls = classPath.getFile(className.replace('.',File.separatorChar) + ".class");
-	try {
-	    classPath.close();
-	} catch (IOException e) {}
-		
-	if (cls != null) {
-			
-	    File pathDir = null;
-			
-	    // Ok, we have a ClassFile for com.sun.corba.se.impl.orb.ORBImpl.class. Is it in 
-	    // a zip file?
-			
-	    if (cls.isZipped()) {
-				
+                
+        String className = "com.sun.corba.ee.impl.orb.ORBImpl";
+        ClassPath classPath = new ClassPath(System.getProperty("java.class.path"));
+        ClassFile cls = classPath.getFile(className.replace('.',File.separatorChar) + ".class");
+        try {
+            classPath.close();
+        } catch (IOException e) {}
+                
+        if (cls != null) {
+                        
+            File pathDir = null;
+                        
+            // Ok, we have a ClassFile for com.sun.corba.ee.impl.orb.ORBImpl.class. Is it in 
+            // a zip file?
+                        
+            if (cls.isZipped()) {
+                                
                 return null;
 
-	    } else {
-		String platform = "win32";
+            } else {
+                String platform = "win32";
 
-				// No, so walk back to root...
-				
-		String path = cls.getPath();
-		if (File.separatorChar == '\\') {
-		    path = path.replace('/',File.separatorChar);
-		} else {
-		    platform = "solaris";
-		    path = path.replace('\\',File.separatorChar);
-		}
-		File dir = new File(path);
-				
+                                // No, so walk back to root...
+                                
+                String path = cls.getPath();
+                if (File.separatorChar == '\\') {
+                    path = path.replace('/',File.separatorChar);
+                } else {
+                    platform = "solaris";
+                    path = path.replace('\\',File.separatorChar);
+                }
+                File dir = new File(path);
+                                
 
-		// the hardcoded number 10 has to be changed depending on
-		// the hierarchy presented by the className, if the hierarchy
-		// changes then this number needs to be changed
+                // the hardcoded number 10 has to be changed depending on
+                // the hierarchy presented by the className, if the hierarchy
+                // changes then this number needs to be changed
 
-		for (int i = 0; i < 10; i++) {
-		    dir = new File(dir.getParent());
-					
-		}
-				
-		pathDir = new File(dir,
-				   childWorkspace+File.separatorChar+
-				   "build"+File.separatorChar+
-				   platform+File.separatorChar+
-				   "classes");
-	    }
-			
-	    // If we have a directory, update the Hashtable...
-			
-	    if (pathDir != null && pathDir.exists() && pathDir.isDirectory()) {
-		return pathDir.getPath();
-	    }
-	    else return null;
-	}
-	else return null;
+                for (int i = 0; i < 10; i++) {
+                    dir = new File(dir.getParent());
+                                        
+                }
+                                
+                pathDir = new File(dir,
+                                   childWorkspace+File.separatorChar+
+                                   "build"+File.separatorChar+
+                                   platform+File.separatorChar+
+                                   "classes");
+            }
+                        
+            // If we have a directory, update the Hashtable...
+                        
+            if (pathDir != null && pathDir.exists() && pathDir.isDirectory()) {
+                return pathDir.getPath();
+            }
+            else return null;
+        }
+        else return null;
     }
-	
+        
     private static void setDefaultOutputDir (Hashtable flags) {
         String outputDir = (String) flags.get(OUTPUT_DIRECTORY);
         if (outputDir == null) {
-    	
-    	    // No output dir, so set to gen if present...
+        
+            // No output dir, so set to gen if present...
  
-            String className = "com.sun.corba.se.spi.orb.ORB";
+            String className = "com.sun.corba.ee.spi.orb.ORB";
             ClassPath classPath = new ClassPath(System.getProperty("java.class.path"));
             ClassFile cls = classPath.getFile(className.replace('.',File.separatorChar) + ".class");
             try {
@@ -751,14 +751,14 @@ public abstract class Test implements java.lang.Runnable
 
                 File genDir = null;
                 
-                // Ok, we have a ClassFile for com.sun.corba.se.spi.orb.ORB.class. Is it in 
+                // Ok, we have a ClassFile for com.sun.corba.ee.spi.orb.ORB.class. Is it in 
                 // a zip file?
                 
                 if (cls.isZipped()) {
                     
                     // Yes. _REVISIT_
                     
-                    System.out.println("test.Test found com.sun.corba.se.spi.orb.ORB.class in: " + cls.getPath());
+                    System.out.println("test.Test found com.sun.corba.ee.spi.orb.ORB.class in: " + cls.getPath());
                     System.out.println("The output directory did not default to 'gen'.");
                 
                 } else {
@@ -783,10 +783,10 @@ public abstract class Test implements java.lang.Runnable
 
                 // If we have a directory, update the Hashtable...
                 
-		if (genDir != null && genDir.exists() && genDir.isDirectory()) {
-		    flags.put(OUTPUT_DIRECTORY,genDir.getPath());
-		}
-	    }
+                if (genDir != null && genDir.exists() && genDir.isDirectory()) {
+                    flags.put(OUTPUT_DIRECTORY,genDir.getPath());
+                }
+            }
         }
     }
     
@@ -799,47 +799,47 @@ public abstract class Test implements java.lang.Runnable
 
         if (value != null && (value.startsWith("%") || value.startsWith("@"))) {
 
-	    // Yes, do we already have our test directory?
+            // Yes, do we already have our test directory?
 
-	    if (testPackageDir == null) {
+            if (testPackageDir == null) {
 
                 // Nope, so look it up...
 
-		testPackageDir = ClassUtils.packageDirectory("test.Test",true);
+                testPackageDir = ClassUtils.packageDirectory("test.Test",true);
 
-		if (testPackageDir == null || !testPackageDir.isDirectory()) {
-		    System.out.println("Cannot find directory for 'test'.");
-		    System.exit(1);
-		}
+                if (testPackageDir == null || !testPackageDir.isDirectory()) {
+                    System.out.println("Cannot find directory for 'test'.");
+                    System.exit(1);
+                }
 
-		// Make an output dir also...
+                // Make an output dir also...
 
-		outputDir = new File(testPackageDir.getParent());
-	    }
+                outputDir = new File(testPackageDir.getParent());
+            }
 
-	    // Make a new value...
+            // Make a new value...
 
-	    String magicValue = null;
+            String magicValue = null;
 
-	    if (key.equals(OUTPUT_DIRECTORY)) {
-		magicValue = outputDir.getPath();
-	    } else {
+            if (key.equals(OUTPUT_DIRECTORY)) {
+                magicValue = outputDir.getPath();
+            } else {
 
-		if (value.length() > 1) {
-		    File theFile = new File(testPackageDir,value.substring(1));
-		    magicValue = theFile.getPath();
-		} else {
-		    magicValue = testPackageDir.getPath();
-		}
-	    }
+                if (value.length() > 1) {
+                    File theFile = new File(testPackageDir,value.substring(1));
+                    magicValue = theFile.getPath();
+                } else {
+                    magicValue = testPackageDir.getPath();
+                }
+            }
 
-	    // Change the value in the hashtable...
+            // Change the value in the hashtable...
 
-	    flags.put(key,magicValue);
-	    result = true;
-	}
+            flags.put(key,magicValue);
+            result = true;
+        }
 
-	return result;
+        return result;
     }
 
     public String getPassed() {
@@ -875,7 +875,7 @@ public abstract class Test implements java.lang.Runnable
 
 
         if (testClassName != null) {
-	    runTestClass(testClassName,flags,args);
+            runTestClass(testClassName,flags,args);
         } else {
             // No, are we running a test file?
             String testFileName = (String)flags.get(TEST_FILE_NAME_FLAG);
@@ -894,146 +894,146 @@ public abstract class Test implements java.lang.Runnable
     
     private static boolean useDynamicStubs()
     {
-	// return Boolean.getBoolean( 
-	    // ORBConstants.USE_DYNAMIC_STUB_PROPERTY ) ;
-	return ORB.getPresentationManager().useDynamicStubs() ;
+        // return Boolean.getBoolean( 
+            // ORBConstants.USE_DYNAMIC_STUB_PROPERTY ) ;
+        return ORB.getPresentationManager().useDynamicStubs() ;
     }
 
     private static boolean useCodegenReflectiveCopyobject()
     {
-	return Boolean.getBoolean( 
-	    ORBConstants.USE_CODEGEN_REFLECTIVE_COPYOBJECT ) ;
+        return Boolean.getBoolean( 
+            ORBConstants.USE_CODEGEN_REFLECTIVE_COPYOBJECT ) ;
     }
 
     // This is needed in several tests.
     public static boolean useJavaSerialization()
     {
-	return Boolean.getBoolean( 
-	    ORBConstants.ENABLE_JAVA_SERIALIZATION_PROPERTY ) ;
+        return Boolean.getBoolean( 
+            ORBConstants.ENABLE_JAVA_SERIALIZATION_PROPERTY ) ;
     }
 
     public static boolean debugORBInit()
     {
-	return Boolean.getBoolean( 
-	    ORBConstants.INIT_DEBUG_PROPERTY ) ;
+        return Boolean.getBoolean( 
+            ORBConstants.INIT_DEBUG_PROPERTY ) ;
     }
 
     public static void identifyEnvironment() 
     {
-	System.out.println( "Running on " + new Date() ) ;
-	System.out.println( "Running with " + (useCodegenReflectiveCopyobject() ?
-	    "codegen" : "standard") + " reflective object copier" ) ;
-	System.out.println( "Running with " + (useDynamicStubs() ? 
-	    "dynamic" : "static") + " stubs" ) ;
-	System.out.println("Running with serialization encoding: " +
-			   (useJavaSerialization() ? "JSG" : "CDR"));
-	System.out.println( "Dynamic StubFactoryFactory: " +
-	    ORB.getPresentationManager().getStubFactoryFactory(true) ) ;
+        System.out.println( "Running on " + new Date() ) ;
+        System.out.println( "Running with " + (useCodegenReflectiveCopyobject() ?
+            "codegen" : "standard") + " reflective object copier" ) ;
+        System.out.println( "Running with " + (useDynamicStubs() ? 
+            "dynamic" : "static") + " stubs" ) ;
+        System.out.println("Running with serialization encoding: " +
+                           (useJavaSerialization() ? "JSG" : "CDR"));
+        System.out.println( "Dynamic StubFactoryFactory: " +
+            ORB.getPresentationManager().getStubFactoryFactory(true) ) ;
         System.out.println("Encoding is " +
-	    (useJavaSerialization() ? "JSG" : "CDR"));
+            (useJavaSerialization() ? "JSG" : "CDR"));
         System.out.println("ORB initialization debugging is " +
-	    (debugORBInit() ? "on" : "off"));
-	System.out.println( "Environment:" ) ;
-	System.out.println( "    java.version               = " + 
-	    System.getProperty( "java.version" ) ) ;
-	System.out.println( "    java.vm.name               = " + 
-	    System.getProperty( "java.vm.name" ) ) ;
-	System.out.println( "    os.name                    = " + 
-	    System.getProperty( "os.name" ) ) ;
-	System.out.println( "    os.arch                    = " + 
-	    System.getProperty( "os.arch" ) ) ;
-	System.out.println( "    os.version                 = " + 
-	    System.getProperty( "os.version" ) ) ;
+            (debugORBInit() ? "on" : "off"));
+        System.out.println( "Environment:" ) ;
+        System.out.println( "    java.version               = " + 
+            System.getProperty( "java.version" ) ) ;
+        System.out.println( "    java.vm.name               = " + 
+            System.getProperty( "java.vm.name" ) ) ;
+        System.out.println( "    os.name                    = " + 
+            System.getProperty( "os.name" ) ) ;
+        System.out.println( "    os.arch                    = " + 
+            System.getProperty( "os.arch" ) ) ;
+        System.out.println( "    os.version                 = " + 
+            System.getProperty( "os.version" ) ) ;
     }
 
     public static void runTestFile(String testFile, String[] args) {
         if (testFile == null) 
-	    UsageAndExit();
+            UsageAndExit();
 
         // Open up the file...
-	Vector lines = new Vector();
+        Vector lines = new Vector();
         DataInputStream stream = null;
 
-	try {
+        try {
             // Make sure the file exists...
 
-	    File theFile = new File(testFile);
+            File theFile = new File(testFile);
 
             if (!theFile.exists()) {
-		System.out.println("Test file does not exist: " + 
-				   theFile.getPath());
-		System.exit(1);
-	    }
+                System.out.println("Test file does not exist: " + 
+                                   theFile.getPath());
+                System.exit(1);
+            }
 
-	    // Read all the lines into the 'lines' vector...
-	    stream = new DataInputStream(new FileInputStream(theFile));
+            // Read all the lines into the 'lines' vector...
+            stream = new DataInputStream(new FileInputStream(theFile));
 
-	    String line = stream.readLine();
+            String line = stream.readLine();
 
-	    while (line != null) {
-		line = line.trim();
+            while (line != null) {
+                line = line.trim();
 
-		if (line.startsWith("//") == false && line.equals("") == false) {
-		    lines.addElement(line);
-		}
+                if (line.startsWith("//") == false && line.equals("") == false) {
+                    lines.addElement(line);
+                }
 
-		line = stream.readLine();
-	    }
+                line = stream.readLine();
+            }
 
             stream.close();
 
-	    System.out.println( "======================================================================" ) ;
-	    System.out.println( "CORBA test suite " + testFile ) ;
-	    identifyEnvironment() ;
-	    System.out.println( "======================================================================" ) ;
+            System.out.println( "======================================================================" ) ;
+            System.out.println( "CORBA test suite " + testFile ) ;
+            identifyEnvironment() ;
+            System.out.println( "======================================================================" ) ;
 
-	    // Run all tests...
-	    int testCount = lines.size();
-	    for (int i = 0; i < testCount; i++) {
-		line = (String) lines.elementAt(i);
+            // Run all tests...
+            int testCount = lines.size();
+            for (int i = 0; i < testCount; i++) {
+                line = (String) lines.elementAt(i);
 
-		// Parse the line -- format is same as for main...
-		StringTokenizer parser = new StringTokenizer(line,
-							     ", \t\n\r", false);
+                // Parse the line -- format is same as for main...
+                StringTokenizer parser = new StringTokenizer(line,
+                                                             ", \t\n\r", false);
 
-		int count = parser.countTokens();
-		String[] testArgs = new String[count];
-		for (int j = 0; j < count; j++) {
-		    testArgs[j] = parser.nextToken();
-		}
+                int count = parser.countTokens();
+                String[] testArgs = new String[count];
+                for (int j = 0; j < count; j++) {
+                    testArgs[j] = parser.nextToken();
+                }
 
-		// Concatenate the two sets of args...
-		String[] theArgs = new String[args.length + testArgs.length];
+                // Concatenate the two sets of args...
+                String[] theArgs = new String[args.length + testArgs.length];
                 System.arraycopy(args,0,theArgs,0,args.length);
                 System.arraycopy(testArgs,0,theArgs,args.length,testArgs.length);
 
                 // See if we have -separateprocess flag...
-		boolean ownProcess = false;
-		for (int j = 0; j < testArgs.length; j++) {
-		    if (testArgs[j].equalsIgnoreCase(SEPARATE_PROCESS_FLAG)) {
-			ownProcess = true;
-			break;
-		    }
-		}
+                boolean ownProcess = false;
+                for (int j = 0; j < testArgs.length; j++) {
+                    if (testArgs[j].equalsIgnoreCase(SEPARATE_PROCESS_FLAG)) {
+                        ownProcess = true;
+                        break;
+                    }
+                }
 
-		// Now run it...
+                // Now run it...
                 if (ownProcess) {
                     Vector command = new Vector();
                     command.addElement(System.getProperty("java.home") + "/bin/java");
                     command.addElement("-classpath");
                     command.addElement(System.getProperty("java.class.path"));
 
-		    command.addElement(
-			"-Djavax.rmi.CORBA.UtilClass=" + 
-			"com.sun.corba.se.impl.javax.rmi.CORBA.Util");
-		    command.addElement(
-			"-Djavax.rmi.CORBA.StubClass=" +
-			"com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl");
-		    command.addElement(
-			"-Djavax.rmi.CORBA.PortableRemoteObjectClass=" +
-			"com.sun.corba.se.impl.javax.rmi.PortableRemoteObject");
+                    command.addElement(
+                        "-Djavax.rmi.CORBA.UtilClass=" + 
+                        "com.sun.corba.ee.impl.javax.rmi.CORBA.Util");
+                    command.addElement(
+                        "-Djavax.rmi.CORBA.StubClass=" +
+                        "com.sun.corba.ee.impl.javax.rmi.CORBA.StubDelegateImpl");
+                    command.addElement(
+                        "-Djavax.rmi.CORBA.PortableRemoteObjectClass=" +
+                        "com.sun.corba.ee.impl.javax.rmi.PortableRemoteObject");
                 
-		    Util.inheritProperties( command ) ;
+                    Util.inheritProperties( command ) ;
 
                     command.addElement("test.Test");
                     
@@ -1051,23 +1051,23 @@ public abstract class Test implements java.lang.Runnable
                     
                     String[] theCommand = new String[command.size()];
                     command.copyInto(theCommand);
-		    
-		    if (forkDebugLevel >= DISPLAY) {
-			System.out.println( "Forking Test:" ) ;
-			for (String str : theCommand) 
-			    System.out.println( "\t" + str ) ;
-		    }
+                    
+                    if (forkDebugLevel >= DISPLAY) {
+                        System.out.println( "Forking Test:" ) ;
+                        for (String str : theCommand) 
+                            System.out.println( "\t" + str ) ;
+                    }
 
                     int result = Util.execAndWaitFor(theCommand,System.out,
-						     System.err);
+                                                     System.err);
 
                     if (result != 0) {
                         mainResult = result;   
                     }
                 } else {
-		    run(theArgs);
-		}
-	    }
+                    run(theArgs);
+                }
+            }
         } catch (IOException e1) {
             try {
                 stream.close();
@@ -1076,38 +1076,38 @@ public abstract class Test implements java.lang.Runnable
     }
 
     private static int getInt( String str ) {
-	dprint( "getInt called with " + str ) ;
-	if (str == null)
-	    return 0 ;
+        dprint( "getInt called with " + str ) ;
+        if (str == null)
+            return 0 ;
 
-	try {
-	    return Integer.parseInt( str ) ;
-	} catch (NumberFormatException exc) {
-	    return 0 ;
-	}
+        try {
+            return Integer.parseInt( str ) ;
+        } catch (NumberFormatException exc) {
+            return 0 ;
+        }
     }
 
     public static void runTestClass(String testClassName, Hashtable flags, 
-				    String args[]) {
-	dprint( "Running test " + testClassName ) ;
+                                    String args[]) {
+        dprint( "Running test " + testClassName ) ;
 
         if (testClassName == null) 
-	    UsageAndExit();
+            UsageAndExit();
 
         Test testObj = null;
 
         try{
             testObj = (Test)Class.forName(testClassName).newInstance();
-	} catch(ClassNotFoundException cnfe) {
-	    System.out.print( "    " + testClassName + ": not found - " ) ;
-	    if (flags.containsKey( IF_PRESENT_FLAG ) ) {
-		System.out.println( "skipping execution" ) ;
-		return ;
-	    } else {
-		System.out.println( cnfe ) ;
-		cnfe.printStackTrace() ;
-		UsageAndExit() ;
-	    }
+        } catch(ClassNotFoundException cnfe) {
+            System.out.print( "    " + testClassName + ": not found - " ) ;
+            if (flags.containsKey( IF_PRESENT_FLAG ) ) {
+                System.out.println( "skipping execution" ) ;
+                return ;
+            } else {
+                System.out.println( cnfe ) ;
+                cnfe.printStackTrace() ;
+                UsageAndExit() ;
+            }
         } catch(Throwable e) {
             e.printStackTrace();
             UsageAndExit();
@@ -1117,23 +1117,23 @@ public abstract class Test implements java.lang.Runnable
         testObj.setArgs(flags);
 
         debug = flags.containsKey (DEBUG_FLAG);
-	forkDebugLevel = getInt( (String)flags.get( FORK_DEBUG_LEVEL ) ) ;
-	dprint( "forkDebugLevel = " + forkDebugLevel ) ;
+        forkDebugLevel = getInt( (String)flags.get( FORK_DEBUG_LEVEL ) ) ;
+        dprint( "forkDebugLevel = " + forkDebugLevel ) ;
 
         int iterations = 1;
         long sum = 0;
         boolean noIterate = flags.containsKey(NO_ITERATE_FLAG);
         if (!noIterate && flags.containsKey(NUMBER_OF_ITERATIONS_FLAG))
             iterations = Integer.parseInt(
-		(String)flags.get( NUMBER_OF_ITERATIONS_FLAG));
-	testObj.createResultsTable( iterations ) ;
+                (String)flags.get( NUMBER_OF_ITERATIONS_FLAG));
+        testObj.createResultsTable( iterations ) ;
 
         try {
             boolean verbose = flags.containsKey(VERBOSE_FLAG);
             boolean demure = flags.containsKey(DEMURE_FLAG);
-	    String info = "";
-	    if (flags.containsKey(FVD_FLAG))
-		info = " (Using FVD) ";
+            String info = "";
+            if (flags.containsKey(FVD_FLAG))
+                info = " (Using FVD) ";
 
             if (verbose) {
                 System.out.print("    " + testClassName + info + ": ");
@@ -1141,32 +1141,32 @@ public abstract class Test implements java.lang.Runnable
                 System.out.print("    " + testObj.getName() + " ... ");
             }
 
-	    dprint( "setup called on test" ) ;
+            dprint( "setup called on test" ) ;
             testObj.setup();
 
             for (int i = 0; i < iterations; i++) {
-		dprint( "Iteration " + i + " begins" ) ;
+                dprint( "Iteration " + i + " begins" ) ;
                 if (verbose) {
                     System.out.print("Run " + (i+1) + " : ");
                     System.out.flush();
                 }
 
-		dprint( "beginAnIteration called" ) ;
+                dprint( "beginAnIteration called" ) ;
                 testObj.beginAnIteration();
 
                 long start = System.currentTimeMillis();
 
-		dprint( "run called" ) ;
+                dprint( "run called" ) ;
                 try {
                     testObj.run();
                 } catch (Error e) {
-		    dprint( "run returned error " + e ) ;
+                    dprint( "run returned error " + e ) ;
                     testObj.status = e;
                 }
 
                 long duration = System.currentTimeMillis() - start;
                 sum = sum + duration;
-		dprint( "finishAnIteration called" ) ;
+                dprint( "finishAnIteration called" ) ;
                 Error status = testObj.finishAnIteration(i+1, duration);
                 testObj.results[i] = new Hashtable();
                 testObj.results[i].put(DURATION, Long.valueOf(duration));
@@ -1193,7 +1193,7 @@ public abstract class Test implements java.lang.Runnable
                 }
             }
 
-	    if (verbose && iterations > 1) {
+            if (verbose && iterations > 1) {
                 System.out.println("   AVERAGE TIME (MS) = " + (sum/iterations));
             }
 
@@ -1205,7 +1205,7 @@ public abstract class Test implements java.lang.Runnable
             } else {
                 mainResult = 1;
                 System.out.print( "    " + testClassName + 
-				  " failed, caught: " + e);
+                                  " failed, caught: " + e);
                 e.printStackTrace();
             }
         }
@@ -1259,7 +1259,7 @@ public abstract class Test implements java.lang.Runnable
 
     public static void sort(String a[])
     {
-	quickSort(a, 0, a.length - 1);
+        quickSort(a, 0, a.length - 1);
     }
 
 
@@ -1278,60 +1278,60 @@ public abstract class Test implements java.lang.Runnable
      * @param hi0     right boundary of array partition
      */
     private static void quickSort(String a[], int lo0, int hi0) {
-	int lo = lo0;
-	int hi = hi0;
-	String mid;
+        int lo = lo0;
+        int hi = hi0;
+        String mid;
 
-	if ( hi0 > lo0) {
+        if ( hi0 > lo0) {
 
-	    /* Arbitrarily establishing partition element as the midpoint of
-	     * the array.
-	     */
-	    mid = a[ ( lo0 + hi0 ) / 2 ];
+            /* Arbitrarily establishing partition element as the midpoint of
+             * the array.
+             */
+            mid = a[ ( lo0 + hi0 ) / 2 ];
 
-	    // loop through the array until indices cross
-	    while( lo <= hi ) {
-		/* find the first element that is greater than or equal to
-		 * the partition element starting from the left Index.
-		 */
-		while( ( lo < hi0 ) && ( a[lo].compareTo(mid) < 0 ))
-		    ++lo;
+            // loop through the array until indices cross
+            while( lo <= hi ) {
+                /* find the first element that is greater than or equal to
+                 * the partition element starting from the left Index.
+                 */
+                while( ( lo < hi0 ) && ( a[lo].compareTo(mid) < 0 ))
+                    ++lo;
 
-		/* find an element that is smaller than or equal to
-		 * the partition element starting from the right Index.
-		 */
-		while( ( hi > lo0 ) && ( a[hi].compareTo(mid) > 0 ))
-		    --hi;
+                /* find an element that is smaller than or equal to
+                 * the partition element starting from the right Index.
+                 */
+                while( ( hi > lo0 ) && ( a[hi].compareTo(mid) > 0 ))
+                    --hi;
 
-		// if the indexes have not crossed, swap
-		if( lo <= hi )
-		    {
-			swap(a, lo, hi);
-			++lo;
-			--hi;
-		    }
-	    }
+                // if the indexes have not crossed, swap
+                if( lo <= hi )
+                    {
+                        swap(a, lo, hi);
+                        ++lo;
+                        --hi;
+                    }
+            }
 
-	    /* If the right index has not reached the left side of array
-	     * must now sort the left partition.
-	     */
-	    if( lo0 < hi )
-		quickSort( a, lo0, hi );
+            /* If the right index has not reached the left side of array
+             * must now sort the left partition.
+             */
+            if( lo0 < hi )
+                quickSort( a, lo0, hi );
 
-	    /* If the left index has not reached the right side of array
-	     * must now sort the right partition.
-	     */
-	    if( lo < hi0 )
-		quickSort( a, lo, hi0 );
-	}
+            /* If the left index has not reached the right side of array
+             * must now sort the right partition.
+             */
+            if( lo < hi0 )
+                quickSort( a, lo, hi0 );
+        }
     }
 
     private static void swap(String a[], int i, int j)
     {
-	String T;
-	T = a[i];
-	a[i] = a[j];
-	a[j] = T;
+        String T;
+        T = a[i];
+        a[i] = a[j];
+        a[j] = T;
 
     }
 }

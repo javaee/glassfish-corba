@@ -37,20 +37,20 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.transport ;
+package com.sun.corba.ee.spi.transport ;
 
 
-import com.sun.corba.se.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.IOR;
 import java.util.Iterator;
 
 public abstract interface ContactInfoListIterator
     extends Iterator<ContactInfo> {
 
     public void reportAddrDispositionRetry(ContactInfo contactInfo,
-					   short disposition);
+                                           short disposition);
 
     public void reportRedirect(ContactInfo contactInfo,
-			       IOR forwardedIOR);
+                               IOR forwardedIOR);
 
     public ContactInfoList getContactInfoList();
 

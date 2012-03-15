@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.internal.io;
+package com.sun.corba.ee.internal.io;
 
 public class IIOPInputStream {
     private static native Object allocateNewObject(Class aclass,

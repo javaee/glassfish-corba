@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 /** Codes used for fast marshaling. Code defines (usually) a type,
  * which may be followed by a value.  LABEL denotes a positive int,
@@ -88,33 +88,33 @@ public final class Codes {
      * non-primitive value.
      */
     enum NonPrimitive { NULL, INDIR, REF, BOOL_ARR, BYTE_ARR, CHAR_ARR, SHORT_ARR,
-	INT_ARR, LONG_ARR, FLOAT_ARR, DOUBLE_ARR, REF_ARR, MSG, FLIST, CLOSE_SESSION,
-	REJECT_REQUEST } ;
+        INT_ARR, LONG_ARR, FLOAT_ARR, DOUBLE_ARR, REF_ARR, MSG, FLIST, CLOSE_SESSION,
+        REJECT_REQUEST } ;
 
     /** Determine whether a byte represents a primitive or non-primitive type,
      * possibly with an attached value.
      */
     public static boolean isPrimitive( byte code ) {
-	return code > 0 ;
+        return code > 0 ;
     }
 
     /** Returns true if a value is encoded with this type.
      * Returns false if code represents a NonPrimitive.
      */
     public static boolean hasEncodedValue( byte code ) {
-	return isPrimitive( code ) && ((code & 7) != 7) ;
+        return isPrimitive( code ) && ((code & 7) != 7) ;
     }
 
     /** Encode a NonPrimitive as a byte.
      */
     public static byte encodeNonPrimitive( NonPrimitive np ) {
-	return (byte)((np.ordinal() << 3) & (byte)0x80) ;
+        return (byte)((np.ordinal() << 3) & (byte)0x80) ;
     }
 
     /** Decode a Primitive from a byte.
      */
     public static NonPrimitive decodeNonPrimitive( byte code ) {
-	return NonPrimitive.values()[ (code & 0x7F) >> 3 ] ;
+        return NonPrimitive.values()[ (code & 0x7F) >> 3 ] ;
     }
    
 // Primitives
@@ -125,29 +125,29 @@ public final class Codes {
     /** Return the code for a boolean value.
      */
     public static byte encodeBoolean( boolean value ) {
-	if (value)
-	    return BOOL_TRUE ;
-	else 
-	    return BOOL_FALSE ;
+        if (value)
+            return BOOL_TRUE ;
+        else 
+            return BOOL_FALSE ;
     }
 
     /** Return true if code represents a BOOL.
      */
     public static boolean isBoolean( byte code ) {
-	return isPrimitive( code ) && ((code >> 3) == Primitive.BOOL.ordinal()) ;
+        return isPrimitive( code ) && ((code >> 3) == Primitive.BOOL.ordinal()) ;
     }
 
     /** If code represents a BOOL, return the value, otherwise
      * throw IllegalArgumentException.
      */
     public static boolean decodeBoolean( byte code ) {
-	if (code == BOOL_TRUE)
-	    return true ;
-	else if (code == BOOL_FALSE)
-	    return false ;
-	else
-	    throw new IllegalArgumentException( "Code " + code 
-		+ " is not a boolean" ) ;
+        if (code == BOOL_TRUE)
+            return true ;
+        else if (code == BOOL_FALSE)
+            return false ;
+        else
+            throw new IllegalArgumentException( "Code " + code 
+                + " is not a boolean" ) ;
     }
 
 // byte
@@ -155,140 +155,140 @@ public final class Codes {
      * encodable as a single byte.
      */
     public static boolean byteValueIsEncodable( byte value ) {
-	return (value >= (byte)(-1)) && (value <= (byte)5) ;
+        return (value >= (byte)(-1)) && (value <= (byte)5) ;
     }
 
     /** If byteValueIsEncodable( value ), return the encoded byte,
      * otherwise throw IllegalArgumentException.
      */
     public static byte encodeByte( byte value ) {
-	if (!byteValueIsEncodable( value )) 
-	    throw new IllegalArgumentException( "Value " + value 
-		+ " cannot be encoded in the BYTE primitive" ) ;
+        if (!byteValueIsEncodable( value )) 
+            throw new IllegalArgumentException( "Value " + value 
+                + " cannot be encoded in the BYTE primitive" ) ;
 
-	byte encValue = (byte)(value + (byte)1) ;
-	byte code =(byte)((Primitive.BYTE.ordinal() << 3) & encValue) ;
-	return code ;
+        byte encValue = (byte)(value + (byte)1) ;
+        byte code =(byte)((Primitive.BYTE.ordinal() << 3) & encValue) ;
+        return code ;
     }
 
     /** Return true if code represent a byte.
      */
     public static boolean isByte( byte code ) {
-	return (code >> 3) == Primitive.BYTE.ordinal() ;
+        return (code >> 3) == Primitive.BYTE.ordinal() ;
     }
 
     /** If isByte(code) and hasEncodedValue(code),
      * return the encoded byte value, otherwise throw IllegalArgumentException.
      */
     public static byte decodeByte( byte code ) {
-	if (isByte(code) && hasEncodedValue(code)) {
-	    byte value = (byte)(code & 7) ;
-	    return (byte)(value-1) ;
-	}
+        if (isByte(code) && hasEncodedValue(code)) {
+            byte value = (byte)(code & 7) ;
+            return (byte)(value-1) ;
+        }
 
-	throw new IllegalArgumentException( "Code " + code 
-	    + " does not contain a byte value" ) ;
+        throw new IllegalArgumentException( "Code " + code 
+            + " does not contain a byte value" ) ;
     }
 
 // char
     public static boolean charValueIsEncodable( char value ) {
-	return false ;
+        return false ;
     }
 
     public static char encodeChar( char value ) {
-	return ' '  ;
+        return ' '  ;
     }
 
     public static boolean isChar( byte code ) {
-	return false ;
+        return false ;
     }
 
     public static char decodeChar( byte code ) {
-	return ' '  ;
+        return ' '  ;
     }
 
     // short
     public static boolean shortValueIsEncodable( short value ) {
-	return false ;
+        return false ;
     }
 
     public static short encodeShort( short value ) {
-	return 0 ;
+        return 0 ;
     }
 
     public static boolean isShort( byte code ) {
-	return false ;
+        return false ;
     }
 
     public static short decodeShort( byte code ) {
-	return 0 ;
+        return 0 ;
     }
 
     // int
     public static boolean intValueIsEncodable( int value ) {
-	return false ;
+        return false ;
     }
 
     public static int encodeInt( int value ) {
-	return 0 ;
+        return 0 ;
     }
 
     public static boolean isInt( byte code ) {
-	return false ;
+        return false ;
     }
 
     public static int decodeInt( byte code ) {
-	return 0 ;
+        return 0 ;
     }
 
     // long
     public static boolean longValueIsEncodable( long value ) {
-	return false ;
+        return false ;
     }
 
     public static long encodeLong( long value ) {
-	return 0 ;
+        return 0 ;
     }
 
     public static boolean isLong( byte code ) {
-	return false ;
+        return false ;
     }
 
     public static long decodeLong( byte code ) {
-	return 0 ;
+        return 0 ;
     }
 
     // float
     public static boolean floatValueIsEncodable( float value ) {
-	return false ;
+        return false ;
     }
 
     public static float encodeFloat( float value ) {
-	return 0 ;
+        return 0 ;
     }
 
     public static boolean isFloat( byte code ) {
-	return false ;
+        return false ;
     }
 
     public static float decodeFloat( byte code ) {
-	return 0 ;
+        return 0 ;
     }
 
     // double
     public static boolean doubleValueIsEncodable( double value ) {
-	return false ;
+        return false ;
     }
 
     public static double encodeDouble( double value ) {
-	return 0 ;
+        return 0 ;
     }
 
     public static boolean isDouble( byte code ) {
-	return false ;
+        return false ;
     }
 
     public static double decodeDouble( byte code ) {
-	return 0 ;
+        return 0 ;
     }
 }

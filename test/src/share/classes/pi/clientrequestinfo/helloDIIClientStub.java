@@ -80,11 +80,11 @@ public class helloDIIClientStub
       Any result = orb.create_any();
       result.insert_string( "dummy" );
       NamedValue resultVal = orb.create_named_value( "result", result, 
-	  org.omg.CORBA.ARG_OUT.value );
+          org.omg.CORBA.ARG_OUT.value );
 
       // Invoke method:
       Request thisReq = object._create_request( null, "sayHello", 
-	  argList, resultVal );
+          argList, resultVal );
       thisReq.invoke();
 
       // Return result:
@@ -100,11 +100,11 @@ public class helloDIIClientStub
       Any result = orb.create_any();
       result.insert_string( "dummy" );
       NamedValue resultVal = orb.create_named_value( "result", result, 
-	  org.omg.CORBA.ARG_OUT.value );
+          org.omg.CORBA.ARG_OUT.value );
 
       // Invoke method:
       Request thisReq = object._create_request( null, "saySystemException", 
-	  argList, resultVal );
+          argList, resultVal );
       thisReq.invoke();
 
       // Return result:
@@ -122,7 +122,7 @@ public class helloDIIClientStub
       Any result = orb.create_any();
       result.insert_string( "dummy" );
       NamedValue resultVal = orb.create_named_value( "result", result, 
-	  org.omg.CORBA.ARG_OUT.value );
+          org.omg.CORBA.ARG_OUT.value );
 
       // Exception list:
       ExceptionList excList = orb.create_exception_list();
@@ -130,7 +130,7 @@ public class helloDIIClientStub
 
       // Invoke method:
       Request thisReq = object._create_request( null, "sayUserException", 
-	  argList, resultVal, excList, null );
+          argList, resultVal, excList, null );
       thisReq.invoke();
 
       // Analyze environment to see if UserException was thrown.
@@ -143,14 +143,14 @@ public class helloDIIClientStub
       // RequestImpl.doInvocation)
 
       if( exc instanceof UnknownUserException ) {
-	  throw (UnknownUserException)exc;
+          throw (UnknownUserException)exc;
       }
       else if( exc instanceof ExampleException ) {
-	  throw (ExampleException)exc;
+          throw (ExampleException)exc;
       }
       else {
-	  throw new RuntimeException( 
-	      "sayUserException: Unexpected exception: " + exc );
+          throw new RuntimeException( 
+              "sayUserException: Unexpected exception: " + exc );
       }
   }
 
@@ -162,7 +162,7 @@ public class helloDIIClientStub
 
       // Invoke method as a oneway:
       Request thisReq = object._create_request( null, "sayOneway", 
-	  argList, null );
+          argList, null );
       thisReq.send_oneway();
   }
 
@@ -188,11 +188,11 @@ public class helloDIIClientStub
       Any result = orb.create_any();
       result.insert_string( "dummy" );
       NamedValue resultVal = orb.create_named_value( "result", result, 
-	  org.omg.CORBA.ARG_OUT.value );
+          org.omg.CORBA.ARG_OUT.value );
 
       // Invoke method:
       Request thisReq = object._create_request( null, "sayArguments", 
-	  argList, resultVal, null, ctxList );
+          argList, resultVal, null, ctxList );
       thisReq.invoke();
 
       // Return result:
@@ -208,7 +208,7 @@ public class helloDIIClientStub
 
       // Invoke method:
       Request thisReq = object._create_request( null, "clearInvoked", 
-	  argList, null );
+          argList, null );
       thisReq.invoke();
   }
 
@@ -220,11 +220,11 @@ public class helloDIIClientStub
       Any result = orb.create_any();
       result.insert_boolean( false );
       NamedValue resultVal = orb.create_named_value( "result", result, 
-	  org.omg.CORBA.ARG_OUT.value );
+          org.omg.CORBA.ARG_OUT.value );
 
       // Invoke method:
       Request thisReq = object._create_request( null, "wasInvoked", 
-	  argList, resultVal );
+          argList, resultVal );
       thisReq.invoke();
 
       // Return result:
@@ -240,7 +240,7 @@ public class helloDIIClientStub
 
       // Invoke method:
       Request thisReq = object._create_request( null, "resetServant", 
-	  argList, null );
+          argList, null );
       thisReq.invoke();
   }
 

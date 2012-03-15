@@ -50,9 +50,9 @@ import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.Servant;
 
-import com.sun.corba.se.impl.plugin.hwlb.RetryServerRequestInterceptor ;
+import com.sun.corba.ee.impl.plugin.hwlb.RetryServerRequestInterceptor ;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
 /**
  * @author Harold Carr
@@ -60,11 +60,11 @@ import com.sun.corba.se.spi.misc.ORBConstants ;
 public class Server
 {
     static {
-	// This is needed to guarantee that this test will ALWAYS use dynamic
-	// RMI-IIOP.  Currently the default is dynamic when renamed to "ee",
-	// but static in the default "se" packaging, and this test will
-	// fail without dynamic RMI-IIOP.
-	System.setProperty( ORBConstants.USE_DYNAMIC_STUB_PROPERTY, "true" ) ;
+        // This is needed to guarantee that this test will ALWAYS use dynamic
+        // RMI-IIOP.  Currently the default is dynamic when renamed to "ee",
+        // but static in the default "se" packaging, and this test will
+        // fail without dynamic RMI-IIOP.
+        System.setProperty( ORBConstants.USE_DYNAMIC_STUB_PROPERTY, "true" ) ;
     }
 
     private static final String baseMsg = Server.class.getName();
@@ -73,68 +73,68 @@ public class Server
 
     public static void main(String[] av)
     {
-	try {
+        try {
 
-	    Properties props = new Properties();
+            Properties props = new Properties();
 
-	    props.setProperty(
+            props.setProperty(
                 "org.omg.PortableInterceptor.ORBInitializerClass."
-		+ RetryServerRequestInterceptor.class.getName(),
-		"dummy");
+                + RetryServerRequestInterceptor.class.getName(),
+                "dummy");
 
-	    ORB orb = ORB.init(av, props);
+            ORB orb = ORB.init(av, props);
 
-	    POA rootPOA = (POA) orb.resolve_initial_references("RootPOA");
-	    rootPOA.the_POAManager().activate();
+            POA rootPOA = (POA) orb.resolve_initial_references("RootPOA");
+            rootPOA.the_POAManager().activate();
 
-	    Servant servant = (Servant)
-		javax.rmi.CORBA.Util.getTie(new TestServant());
+            Servant servant = (Servant)
+                javax.rmi.CORBA.Util.getTie(new TestServant());
 
-	    createWithServantAndBind(Common.ReferenceName, servant, 
-				     rootPOA, orb);
+            createWithServantAndBind(Common.ReferenceName, servant, 
+                                     rootPOA, orb);
 
-	    System.out.println("--------------------------------------------");
-	    System.out.println("Server is ready.");
-	    System.out.println("--------------------------------------------");
+            System.out.println("--------------------------------------------");
+            System.out.println("Server is ready.");
+            System.out.println("--------------------------------------------");
 
-	    long startTime = System.currentTimeMillis();
-	    while (System.currentTimeMillis() - startTime < SERVER_RUN_LENGTH){
-		RetryServerRequestInterceptor.setRejectingRequests(true);
-		Thread.sleep(1000 * 10);
-		RetryServerRequestInterceptor.setRejectingRequests(false);
-		Thread.sleep(1000 * 10);
-	    }
+            long startTime = System.currentTimeMillis();
+            while (System.currentTimeMillis() - startTime < SERVER_RUN_LENGTH){
+                RetryServerRequestInterceptor.setRejectingRequests(true);
+                Thread.sleep(1000 * 10);
+                RetryServerRequestInterceptor.setRejectingRequests(false);
+                Thread.sleep(1000 * 10);
+            }
 
-	    RetryServerRequestInterceptor.setRejectingRequests(true);
-	    Thread.sleep(SERVER_RUN_LENGTH);
+            RetryServerRequestInterceptor.setRejectingRequests(true);
+            Thread.sleep(SERVER_RUN_LENGTH);
 
-	    System.out.println("--------------------------------------------");
-	    System.out.println("Server exiting correctly...");
-	    System.out.println("--------------------------------------------");
-	    System.exit(0);
+            System.out.println("--------------------------------------------");
+            System.out.println("Server exiting correctly...");
+            System.out.println("--------------------------------------------");
+            System.exit(0);
 
-	} catch (Exception e) {
-	    e.printStackTrace(System.out);
-	    System.out.println("--------------------------------------------");
-	    System.out.println("!!!! Server exiting INCORRECTLY...");
-	    System.out.println("--------------------------------------------");
-	    System.exit(1);
-	}
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+            System.out.println("--------------------------------------------");
+            System.out.println("!!!! Server exiting INCORRECTLY...");
+            System.out.println("--------------------------------------------");
+            System.exit(1);
+        }
     }
 
     public static org.omg.CORBA.Object 
-	createWithServantAndBind (String  name,
-				  Servant servant,
-				  POA     poa,
-				  ORB     orb)
-	throws
-	    Exception
+        createWithServantAndBind (String  name,
+                                  Servant servant,
+                                  POA     poa,
+                                  ORB     orb)
+        throws
+            Exception
     {
-	byte[] id = name.getBytes();
-	poa.activate_object_with_id(id, servant);
-	org.omg.CORBA.Object ref = poa.id_to_reference(id);
-	Common.rebind(name, ref, orb);
-	return ref;
+        byte[] id = name.getBytes();
+        poa.activate_object_with_id(id, servant);
+        org.omg.CORBA.Object ref = poa.id_to_reference(id);
+        Common.rebind(name, ref, orb);
+        return ref;
     }
 
 } 

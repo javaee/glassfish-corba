@@ -40,7 +40,7 @@
 
 package pi.serverrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.CORBA.*;
 
@@ -58,35 +58,35 @@ public class InvokeVisitAll
     private String methodPrefix = "";
 
     public InvokeVisitAll( String methodPrefix ) {
-	this.methodPrefix = methodPrefix;
+        this.methodPrefix = methodPrefix;
     }
 
     public InvokeVisitAll() {
-	this( "" );
+        this( "" );
     }
 
     public void invoke() throws Exception {
-	super.invoke();
+        super.invoke();
 
-	// Invoke rrsc, rr, sr
-	invokeMethod( methodPrefix + "sayHello" );
+        // Invoke rrsc, rr, sr
+        invokeMethod( methodPrefix + "sayHello" );
 
-	// Invoke rrsc, rr, se
-	try {
-	    invokeMethod( methodPrefix + "saySystemException" );
-	}
-	catch( IMP_LIMIT e ) {
-	    // We expect this, but no other exception.
-	}
-
-	// Invoke rrsc, rr, so
-	try {
-	    SampleServerRequestInterceptor.exceptionRedirectToOther = true;
-	    SampleServerRequestInterceptor.invokeOnForwardedObject = false;
-	    invokeMethod( methodPrefix + "saySystemException" );
+        // Invoke rrsc, rr, se
+        try {
+            invokeMethod( methodPrefix + "saySystemException" );
         }
-	catch( IMP_LIMIT e ) {
-	    // We expect this, but no other exception.
-	}
+        catch( IMP_LIMIT e ) {
+            // We expect this, but no other exception.
+        }
+
+        // Invoke rrsc, rr, so
+        try {
+            SampleServerRequestInterceptor.exceptionRedirectToOther = true;
+            SampleServerRequestInterceptor.invokeOnForwardedObject = false;
+            invokeMethod( methodPrefix + "saySystemException" );
+        }
+        catch( IMP_LIMIT e ) {
+            // We expect this, but no other exception.
+        }
     }
 }

@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.ior;
+package com.sun.corba.ee.impl.ior;
 
-import com.sun.corba.se.spi.ior.TaggedProfile ;
+import com.sun.corba.ee.spi.ior.TaggedProfile ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 
 import org.omg.CORBA_2_3.portable.InputStream ;
@@ -55,11 +55,11 @@ public class TaggedProfileFactoryFinderImpl extends
 {
     public TaggedProfileFactoryFinderImpl( ORB orb ) 
     {
-	super( orb ) ;
+        super( orb ) ;
     }
 
     public TaggedProfile handleMissingFactory( int id, InputStream is) 
     {
-	return new GenericTaggedProfile( id, is ) ;
+        return new GenericTaggedProfile( id, is ) ;
     }
 }

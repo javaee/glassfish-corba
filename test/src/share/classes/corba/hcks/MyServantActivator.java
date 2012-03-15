@@ -55,9 +55,9 @@ import org.omg.PortableServer.ServantActivator;
 
 public class MyServantActivator
     extends
-	org.omg.CORBA.LocalObject
+        org.omg.CORBA.LocalObject
     implements
-	ServantActivator
+        ServantActivator
 {
 
     public static final String baseMsg = MyServantActivator.class.getName();
@@ -67,58 +67,58 @@ public class MyServantActivator
     public MyServantActivator(ORB orb) { this.orb = orb; }
 
     public Servant incarnate(byte[] oid, POA poa)
-	throws
-	    ForwardRequest
+        throws
+            ForwardRequest
     {
-	String soid = new String(oid);
-	U.sop(baseMsg + ".incarnate " + soid);
+        String soid = new String(oid);
+        U.sop(baseMsg + ".incarnate " + soid);
 
-	if (soid.startsWith("idl")) {
+        if (soid.startsWith("idl")) {
 
-	    // IDL.
+            // IDL.
 
-	    if (soid.equals(C.idlSAI1)) {
-		throw new ForwardRequest(
+            if (soid.equals(C.idlSAI1)) {
+                throw new ForwardRequest(
                     poa.create_reference_with_id(C.idlSAI2.getBytes(),
-						 idlSAIHelper.id()));
-	    } else if (soid.equals(C.idlSAIRaiseObjectNotExistInIncarnate)) {
-		throw new OBJECT_NOT_EXIST();
-	    } else if (soid.equals(C.idlSAIRaiseSystemExceptionInIncarnate)){
-		throw new IMP_LIMIT();
-	    }
-	    return new idlSAIServant(orb);
+                                                 idlSAIHelper.id()));
+            } else if (soid.equals(C.idlSAIRaiseObjectNotExistInIncarnate)) {
+                throw new OBJECT_NOT_EXIST();
+            } else if (soid.equals(C.idlSAIRaiseSystemExceptionInIncarnate)){
+                throw new IMP_LIMIT();
+            }
+            return new idlSAIServant(orb);
 
-	} else if (soid.startsWith("rmii")) {
-	    
-	    // RMII
+        } else if (soid.startsWith("rmii")) {
+            
+            // RMII
 
-	    return makermiiIServant(orb, soid);
+            return makermiiIServant(orb, soid);
 
-	} else {
-	    SystemException e = new INTERNAL(U.SHOULD_NOT_SEE_THIS);
-	    U.sopUnexpectedException(baseMsg + ".incarnate", e);
-	    throw e;
-	}
+        } else {
+            SystemException e = new INTERNAL(U.SHOULD_NOT_SEE_THIS);
+            U.sopUnexpectedException(baseMsg + ".incarnate", e);
+            throw e;
+        }
     }
 
     public void  etherealize(byte[] oid, POA poa, Servant servant,
-			     boolean cleanupInProgress,
-			     boolean remainingActivations)
+                             boolean cleanupInProgress,
+                             boolean remainingActivations)
     {
-	String soid = new String(oid);
-	U.sop(baseMsg + ".etherealize " + soid);
+        String soid = new String(oid);
+        U.sop(baseMsg + ".etherealize " + soid);
     }
 
     static Servant makermiiIServant(ORB orb, String name)
     {
-	Servant servant = null;
-	try {
-	    servant = 
-		(Servant)javax.rmi.CORBA.Util.getTie(new rmiiIServantPOA(orb, name));
-	} catch (Exception e) {
-	    U.sopUnexpectedException(baseMsg + ".makermiiIServant", e);
-	}
-	return servant;
+        Servant servant = null;
+        try {
+            servant = 
+                (Servant)javax.rmi.CORBA.Util.getTie(new rmiiIServantPOA(orb, name));
+        } catch (Exception e) {
+            U.sopUnexpectedException(baseMsg + ".makermiiIServant", e);
+        }
+        return servant;
     }
 }
 

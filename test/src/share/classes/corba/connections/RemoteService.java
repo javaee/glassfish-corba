@@ -48,13 +48,13 @@ import java.rmi.RemoteException;
 import javax.rmi.PortableRemoteObject;
 import javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
 public class RemoteService
     extends 
-	PortableRemoteObject
+        PortableRemoteObject
     implements 
-	RemoteInterface
+        RemoteInterface
 {
     ORB orb;
     String serverName;
@@ -62,47 +62,47 @@ public class RemoteService
     ConnectionStatistics stats;
 
     public RemoteService (ORB orb, String serverName)
-	throws RemoteException 
+        throws RemoteException 
     {
         super();
-	this.orb = orb;
-	this.serverName = serverName;
-	this.blocker = new Object();
-	this.stats = new ConnectionStatistics( orb );
+        this.orb = orb;
+        this.serverName = serverName;
+        this.blocker = new Object();
+        this.stats = new ConnectionStatistics( orb );
     }
 
     public Struct[] method(Struct[] in)
-	throws RemoteException 
+        throws RemoteException 
     {
-	return in;
+        return in;
     }
 
     public void block()
-	throws RemoteException
+        throws RemoteException
     {
-	synchronized (blocker) {
-	    try {
-		blocker.wait();
-	    } catch (InterruptedException e) {
-	    }
-	}
+        synchronized (blocker) {
+            try {
+                blocker.wait();
+            } catch (InterruptedException e) {
+            }
+        }
     }
 
     public void resume()
-	throws RemoteException
+        throws RemoteException
     {
-	synchronized (blocker) {
-	    blocker.notifyAll();
-	}
+        synchronized (blocker) {
+            blocker.notifyAll();
+        }
     }
 
     public String testMonitoring ()
-	throws RemoteException
+        throws RemoteException
     {
-	return
-	    stats.outbound(serverName, orb)
-	    +
-	    stats.inbound(serverName, orb);
+        return
+            stats.outbound(serverName, orb)
+            +
+            stats.inbound(serverName, orb);
     }
 }
 

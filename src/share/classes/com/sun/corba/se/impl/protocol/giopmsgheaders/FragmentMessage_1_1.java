@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
 /**
  * This implements the GIOP 1.1 Fragment header.

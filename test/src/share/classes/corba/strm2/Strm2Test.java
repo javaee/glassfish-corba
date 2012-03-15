@@ -43,7 +43,7 @@ import test.Test;
 import corba.framework.*;
 import java.util.*;
 import java.io.*;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
 public class Strm2Test extends CORBATest 
 {
@@ -119,10 +119,10 @@ public class Strm2Test extends CORBATest
 
         // Add these for debugging:
         // Properties clientProps = Options.getExtraClientProperties();
-        // clientProps.setProperty("com.sun.corba.se.ORBDebug", "transport,subcontract,giop");
+        // clientProps.setProperty("com.sun.corba.ee.ORBDebug", "transport,subcontract,giop");
 
         // Properties serverProps = Options.getExtraServerProperties();
-        // serverProps.setProperty("com.sun.corba.se.ORBDebug", "transport,subcontract,giop");
+        // serverProps.setProperty("com.sun.corba.ee.ORBDebug", "transport,subcontract,giop");
 
         String oldClasspath = Options.getClasspath();
         for (int i = 0; i < Versions.testableVersions.length; i++) {

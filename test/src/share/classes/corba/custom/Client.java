@@ -183,7 +183,7 @@ public class Client
     {
         try {
 
-            String fragmentSize = System.getProperty(com.sun.corba.se.spi.misc.ORBConstants.GIOP_FRAGMENT_SIZE);
+            String fragmentSize = System.getProperty(com.sun.corba.ee.spi.misc.ORBConstants.GIOP_FRAGMENT_SIZE);
 
             if (fragmentSize != null)
                 System.out.println("---- Fragment size: " + fragmentSize);
@@ -199,7 +199,7 @@ public class Client
 
             org.omg.CORBA.Object obj = ncRef.resolve(path);
 
-	    Verifier verifier = 
+            Verifier verifier = 
                 (Verifier) PortableRemoteObject.narrow(obj, 
                                                        Verifier.class);
 

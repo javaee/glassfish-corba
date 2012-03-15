@@ -69,9 +69,9 @@ public final class Foxtrot implements org.omg.CORBA.portable.IDLEntity
 
     public Foxtrot (int _tango, int _uniform, int _quickstep)
     {
-	tango = _tango;
-	uniform = _uniform;
-	quickstep = _quickstep;
+        tango = _tango;
+        uniform = _uniform;
+        quickstep = _quickstep;
     } // ctor
 
 } // class Foxtrot

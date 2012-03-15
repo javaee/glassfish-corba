@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.resolver ;
+package com.sun.corba.ee.impl.resolver ;
 
-import com.sun.corba.se.spi.resolver.LocalResolver ;
+import com.sun.corba.ee.spi.resolver.LocalResolver ;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -51,19 +51,19 @@ public class LocalResolverImpl implements LocalResolver {
         new HashMap<String,NullaryFunction<org.omg.CORBA.Object>>() ;
 
     public synchronized org.omg.CORBA.Object resolve( String name ) {
-	NullaryFunction<org.omg.CORBA.Object> cl = nameToClosure.get( name ) ;
-	if (cl == null)
-	    return null ;
+        NullaryFunction<org.omg.CORBA.Object> cl = nameToClosure.get( name ) ;
+        if (cl == null)
+            return null ;
 
-	return cl.evaluate() ;
+        return cl.evaluate() ;
     }
 
     public synchronized Set<String> list() {
-	return nameToClosure.keySet() ;
+        return nameToClosure.keySet() ;
     }
 
     public synchronized void register( String name, 
         NullaryFunction<org.omg.CORBA.Object> closure ) {
-	nameToClosure.put( name, closure ) ;
+        nameToClosure.put( name, closure ) ;
     }
 }

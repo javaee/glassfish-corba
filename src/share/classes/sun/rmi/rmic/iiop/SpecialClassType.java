@@ -65,8 +65,8 @@ import sun.tools.java.ClassDefinition;
  * The static forSpecial(...) method must be used to obtain an instance, and
  * will return null if the type is non-conforming.
  *
- * @version	1.0, 2/27/98
- * @author	Bryan Atsatt
+ * @version     1.0, 2/27/98
+ * @author      Bryan Atsatt
  */
 public class SpecialClassType extends ClassType {
 
@@ -82,43 +82,43 @@ public class SpecialClassType extends ClassType {
      * supplied BatchEnvironment.
      */
     public static SpecialClassType forSpecial (ClassDefinition theClass,
-					       ContextStack stack) {
-	if (stack.anyErrors()) return null;
-		
-	sun.tools.java.Type type = theClass.getType();
-	
-    	// Do we already have it?
-	
-	String typeKey = type.toString() + stack.getContextCodeString();
-		
-	Type existing = getType(typeKey,stack);
-		
-	if (existing != null) {
-			
-	    if (!(existing instanceof SpecialClassType)) return null; // False hit.
-			
-	    // Yep, so return it...
-			
-	    return (SpecialClassType) existing;
-	}
-    	
-    	// Is it a special type?
-    	
-    	int typeCode = getTypeCode(type,theClass,stack);
-    	
-    	if (typeCode != TYPE_NONE) {
-    	    
-    	    // Yes...
-    	    
-	    SpecialClassType result = new SpecialClassType(stack,typeCode,theClass);
-	    putType(typeKey,result,stack);
-	    stack.push(result);
-	    stack.pop(true);
-	    return result;
-        	
+                                               ContextStack stack) {
+        if (stack.anyErrors()) return null;
+                
+        sun.tools.java.Type type = theClass.getType();
+        
+        // Do we already have it?
+        
+        String typeKey = type.toString() + stack.getContextCodeString();
+                
+        Type existing = getType(typeKey,stack);
+                
+        if (existing != null) {
+                        
+            if (!(existing instanceof SpecialClassType)) return null; // False hit.
+                        
+            // Yep, so return it...
+                        
+            return (SpecialClassType) existing;
+        }
+        
+        // Is it a special type?
+        
+        int typeCode = getTypeCode(type,theClass,stack);
+        
+        if (typeCode != TYPE_NONE) {
+            
+            // Yes...
+            
+            SpecialClassType result = new SpecialClassType(stack,typeCode,theClass);
+            putType(typeKey,result,stack);
+            stack.push(result);
+            stack.pop(true);
+            return result;
+                
         } else {
 
-	    return null;
+            return null;
         }
     }
 
@@ -126,7 +126,7 @@ public class SpecialClassType extends ClassType {
      * Return a string describing this type.
      */
     public String getTypeDescription () {
-	return "Special class";
+        return "Special class";
     }
 
     //_____________________________________________________________________
@@ -137,32 +137,32 @@ public class SpecialClassType extends ClassType {
      * Create an SpecialClassType instance for the given class.
      */
     private SpecialClassType(ContextStack stack, int typeCode,
-			     ClassDefinition theClass) {
+                             ClassDefinition theClass) {
         super(stack,typeCode | TM_SPECIAL_CLASS | TM_CLASS | TM_COMPOUND, theClass);
-	Identifier id = theClass.getName();
-	String idlName = null;
-	String[] idlModuleName = null;
+        Identifier id = theClass.getName();
+        String idlName = null;
+        String[] idlModuleName = null;
         boolean constant = stack.size() > 0 && stack.getContext().isConstant();
         
         // Set names...
         
         switch (typeCode) {
-	case TYPE_STRING:   {
-	    idlName = IDLNames.getTypeName(typeCode,constant);
-	    if (!constant) {
-		idlModuleName = IDL_CORBA_MODULE;
-	    }
-	    break;
-	}
+        case TYPE_STRING:   {
+            idlName = IDLNames.getTypeName(typeCode,constant);
+            if (!constant) {
+                idlModuleName = IDL_CORBA_MODULE;
+            }
+            break;
+        }
             
-	case TYPE_ANY:   {
-	    idlName = IDL_JAVA_LANG_OBJECT;
-	    idlModuleName = IDL_JAVA_LANG_MODULE;
-	    break;
-	}
+        case TYPE_ANY:   {
+            idlName = IDL_JAVA_LANG_OBJECT;
+            idlModuleName = IDL_JAVA_LANG_MODULE;
+            break;
+        }
         }
         
-	setNames(id,idlModuleName,idlName);
+        setNames(id,idlModuleName,idlName);
 
         // Init parents...
         
@@ -179,11 +179,11 @@ public class SpecialClassType extends ClassType {
     }
     
     private static int getTypeCode(sun.tools.java.Type type, ClassDefinition theClass, ContextStack stack) {
-    	if (type.isType(TC_CLASS)) {
-	    Identifier id = type.getClassName();
-	    if (id == idJavaLangString) return TYPE_STRING;
-	    if (id == idJavaLangObject) return TYPE_ANY;
+        if (type.isType(TC_CLASS)) {
+            Identifier id = type.getClassName();
+            if (id == idJavaLangString) return TYPE_STRING;
+            if (id == idJavaLangObject) return TYPE_ANY;
         }
-	return TYPE_NONE;
+        return TYPE_NONE;
     }
 }

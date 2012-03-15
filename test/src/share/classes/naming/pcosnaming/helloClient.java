@@ -38,7 +38,7 @@
  * holder.
  */
 /*
- * @(#)helloClient.java	1.2 99/10/29
+ * @(#)helloClient.java 1.2 99/10/29
  *
  * Copyright 1999 Sun Microsystems, Inc. All Rights Reserved.
  * 
@@ -75,18 +75,18 @@ public class helloClient
             // resolve the Object Reference (Little Complex Case -Two Level )
             NameComponent nc2 = new NameComponent("HelloContext1", "");
 
-	    NameComponent temppath[] = {nc2};
-	    NamingContext temp = (NamingContext) ncRef.resolve( temppath );
-	    System.out.println( "NC Resolve worked" );
-	    System.out.flush( );
+            NameComponent temppath[] = {nc2};
+            NamingContext temp = (NamingContext) ncRef.resolve( temppath );
+            System.out.println( "NC Resolve worked" );
+            System.out.flush( );
 
             NameComponent nc3 = new NameComponent("HelloObj2", "");
 
             NameComponent temppath1[] = {nc3};
             helloRef = helloHelper.narrow(temp.resolve(temppath1));
-	    System.out.println( "First Resolve Worked" );
-	    System.out.flush( );
-	    helloRef.sayHello( );
+            System.out.println( "First Resolve Worked" );
+            System.out.flush( );
+            helloRef.sayHello( );
 /*
 
             NameComponent path2[] = {nc2, nc3};

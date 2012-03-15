@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.io;
+package com.sun.corba.ee.impl.io;
 
 import java.io.IOException;
 import java.io.StreamCorruptedException;
@@ -55,12 +55,12 @@ import java.io.ObjectInputStream;
 
 import org.omg.CORBA.portable.ValueInputStream;
 
-import com.sun.corba.se.spi.orb.ORBVersion;
-import com.sun.corba.se.spi.orb.ORBVersionFactory;
-import com.sun.corba.se.spi.logging.UtilSystemException;
-import com.sun.corba.se.spi.logging.OMGSystemException;
+import com.sun.corba.ee.spi.orb.ORBVersion;
+import com.sun.corba.ee.spi.orb.ORBVersionFactory;
+import com.sun.corba.ee.spi.logging.UtilSystemException;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
 
-import com.sun.corba.se.spi.trace.StreamFormatVersion;
+import com.sun.corba.ee.spi.trace.StreamFormatVersion;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,157 +76,157 @@ public abstract class InputStreamHook extends ObjectInputStream
 
 
     private class HookGetFields extends ObjectInputStream.GetField {
-	private Map<String,Object> fields = null;
+        private Map<String,Object> fields = null;
 
-	HookGetFields(Map<String,Object> fields){
-	    this.fields = fields;
-	}
+        HookGetFields(Map<String,Object> fields){
+            this.fields = fields;
+        }
 
-	/**
-	 * Get the ObjectStreamClass that describes the fields in the stream.
+        /**
+         * Get the ObjectStreamClass that describes the fields in the stream.
          *
          * REVISIT!  This doesn't work since we have our own ObjectStreamClass.
-	 */
-	public java.io.ObjectStreamClass getObjectStreamClass() {
-	    return null;
-	}
-		
-	/**
-	 * Return true if the named field is defaulted and has no value
-	 * in this stream.
-	 */
-	public boolean defaulted(String name)
-	    throws IOException, IllegalArgumentException  {
-	    return (!fields.containsKey(name));
-	}
-		
-	/**
-	 * Get the value of the named boolean field from the persistent field.
-	 */
-	public boolean get(String name, boolean defvalue) 
-	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name)) {
+         */
+        public java.io.ObjectStreamClass getObjectStreamClass() {
+            return null;
+        }
+                
+        /**
+         * Return true if the named field is defaulted and has no value
+         * in this stream.
+         */
+        public boolean defaulted(String name)
+            throws IOException, IllegalArgumentException  {
+            return (!fields.containsKey(name));
+        }
+                
+        /**
+         * Get the value of the named boolean field from the persistent field.
+         */
+        public boolean get(String name, boolean defvalue) 
+            throws IOException, IllegalArgumentException {
+            if (defaulted(name)) {
                 return defvalue;
             } else {
                 return ((Boolean) fields.get(name)).booleanValue();
             }
-	}
-		
-	/**
-	 * Get the value of the named char field from the persistent fields.
-	 */
-	public char get(String name, char defvalue) 
-	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name)) {
+        }
+                
+        /**
+         * Get the value of the named char field from the persistent fields.
+         */
+        public char get(String name, char defvalue) 
+            throws IOException, IllegalArgumentException {
+            if (defaulted(name)) {
                 return defvalue;
             } else {
                 return ((Character) fields.get(name)).charValue();
             }
 
-	}
-		
-	/**
-	 * Get the value of the named byte field from the persistent fields.
-	 */
-	public byte get(String name, byte defvalue) 
-	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name)) {
+        }
+                
+        /**
+         * Get the value of the named byte field from the persistent fields.
+         */
+        public byte get(String name, byte defvalue) 
+            throws IOException, IllegalArgumentException {
+            if (defaulted(name)) {
                 return defvalue;
             } else {
                 return ((Byte) fields.get(name)).byteValue();
             }
 
-	}
-		
-	/**
-	 * Get the value of the named short field from the persistent fields.
-	 */
-	public short get(String name, short defvalue) 
-	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name)) {
+        }
+                
+        /**
+         * Get the value of the named short field from the persistent fields.
+         */
+        public short get(String name, short defvalue) 
+            throws IOException, IllegalArgumentException {
+            if (defaulted(name)) {
                 return defvalue;
             } else {
                 return ((Short) fields.get(name)).shortValue();
             }
 
-	}
-		
-	/**
-	 * Get the value of the named int field from the persistent fields.
-	 */
-	public int get(String name, int defvalue) 
-	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name)) {
+        }
+                
+        /**
+         * Get the value of the named int field from the persistent fields.
+         */
+        public int get(String name, int defvalue) 
+            throws IOException, IllegalArgumentException {
+            if (defaulted(name)) {
                 return defvalue;
             } else {
                 return ((Integer) fields.get(name)).intValue();
             }
-	}
-		
-	/**
-	 * Get the value of the named long field from the persistent fields.
-	 */
-	public long get(String name, long defvalue)
-	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name)) {
+        }
+                
+        /**
+         * Get the value of the named long field from the persistent fields.
+         */
+        public long get(String name, long defvalue)
+            throws IOException, IllegalArgumentException {
+            if (defaulted(name)) {
                 return defvalue;
             } else {
                 return ((Long) fields.get(name)).longValue();
             }
-	}
-		
-	/**
-	 * Get the value of the named float field from the persistent fields.
-	 */
-	public float get(String name, float defvalue) 
-	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name)) {
+        }
+                
+        /**
+         * Get the value of the named float field from the persistent fields.
+         */
+        public float get(String name, float defvalue) 
+            throws IOException, IllegalArgumentException {
+            if (defaulted(name)) {
                 return defvalue;
             } else {
                 return ((Float) fields.get(name)).floatValue();
             }
-	}
-		
-	/**
-	 * Get the value of the named double field from the persistent field.
-	 */
-	public double get(String name, double defvalue) 
-	    throws IOException, IllegalArgumentException  {
-	    if (defaulted(name)) {
+        }
+                
+        /**
+         * Get the value of the named double field from the persistent field.
+         */
+        public double get(String name, double defvalue) 
+            throws IOException, IllegalArgumentException  {
+            if (defaulted(name)) {
                 return defvalue;
             } else {
                 return ((Double) fields.get(name)).doubleValue();
             }
-	}
-		
-	/**
-	 * Get the value of the named Object field from the persistent field.
-	 */
-	public Object get(String name, Object defvalue) 
-	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name)) {
+        }
+                
+        /**
+         * Get the value of the named Object field from the persistent field.
+         */
+        public Object get(String name, Object defvalue) 
+            throws IOException, IllegalArgumentException {
+            if (defaulted(name)) {
                 return defvalue;
             } else {
                 return fields.get(name);
             }
 
-	}
-		
+        }
+                
         @Override
-	public String toString(){
-	    return fields.toString();
-	}
+        public String toString(){
+            return fields.toString();
+        }
     }
 
     public InputStreamHook()
-	throws IOException {
-	super();
+        throws IOException {
+        super();
     }
 
     @Override
     @StreamFormatVersion
     public void defaultReadObject()
-	throws IOException, ClassNotFoundException, NotActiveException
+        throws IOException, ClassNotFoundException, NotActiveException
     {
         readObjectState.beginDefaultReadObject(this);
 
@@ -247,7 +247,7 @@ public abstract class InputStreamHook extends ObjectInputStream
     // in RMI-IIOP
     @Override
     public ObjectInputStream.GetField readFields()
-    	throws IOException, ClassNotFoundException, NotActiveException {
+        throws IOException, ClassNotFoundException, NotActiveException {
 
         Map<String,Object> fieldValueMap = new HashMap<String,Object>();
 
@@ -268,7 +268,7 @@ public abstract class InputStreamHook extends ObjectInputStream
 
         readObjectState.endDefaultReadObject(this);
 
-	return new HookGetFields(fieldValueMap);
+        return new HookGetFields(fieldValueMap);
     }
 
     // The following is a State pattern implementation of what
@@ -403,8 +403,8 @@ public abstract class InputStreamHook extends ObjectInputStream
         public void beginUnmarshalCustomValueOverride(InputStreamHook stream,
                                               boolean calledDefaultWriteObject,
                                               boolean hasReadObject) 
-	{
-	    throw utilWrapper.badBeginUnmarshalCustomValue() ;
+        {
+            throw utilWrapper.badBeginUnmarshalCustomValue() ;
         }
 
         @Override
@@ -424,13 +424,13 @@ public abstract class InputStreamHook extends ObjectInputStream
         public void beginUnmarshalCustomValueOverride(InputStreamHook stream,
                                               boolean calledDefaultWriteObject,
                                               boolean hasReadObject)
-	{
-	    throw utilWrapper.badBeginUnmarshalCustomValue() ;
+        {
+            throw utilWrapper.badBeginUnmarshalCustomValue() ;
         }
 
         @Override
         public void beginDefaultReadObjectOverride(InputStreamHook stream) throws IOException 
-	{
+        {
             throw Exceptions.self.defaultDataAlreadyRead() ;
         }
 
@@ -443,7 +443,7 @@ public abstract class InputStreamHook extends ObjectInputStream
 
     protected void throwOptionalDataIncompatibleException() 
     {
-	throw omgWrapper.rmiiiopOptionalDataIncompatible2() ;
+        throw omgWrapper.rmiiiopOptionalDataIncompatible2() ;
     }
 
 
@@ -454,7 +454,7 @@ public abstract class InputStreamHook extends ObjectInputStream
                                               boolean calledDefaultWriteObject,
                                               boolean hasReadObject) {
             // This should never happen.
-	    throw utilWrapper.badBeginUnmarshalCustomValue() ;
+            throw utilWrapper.badBeginUnmarshalCustomValue() ;
         }
 
         @Override
@@ -485,23 +485,23 @@ public abstract class InputStreamHook extends ObjectInputStream
 
         @Override
         public void readDataOverride(InputStreamHook stream) throws IOException {
-	    org.omg.CORBA.ORB orb = stream.getOrbStream().orb();
-	    if ((orb == null) ||
-		    !(orb instanceof com.sun.corba.se.spi.orb.ORB)) {
-		throw new StreamCorruptedException(
-				     "Default data must be read first");
-	    }
-	    ORBVersion clientOrbVersion = 
-		((com.sun.corba.se.spi.orb.ORB)orb).getORBVersion();
+            org.omg.CORBA.ORB orb = stream.getOrbStream().orb();
+            if ((orb == null) ||
+                    !(orb instanceof com.sun.corba.ee.spi.orb.ORB)) {
+                throw new StreamCorruptedException(
+                                     "Default data must be read first");
+            }
+            ORBVersion clientOrbVersion = 
+                ((com.sun.corba.ee.spi.orb.ORB)orb).getORBVersion();
 
-	    // Fix Date interop bug. For older versions of the ORB don't do
-	    // anything for readData(). Before this used to throw 
-	    // StreamCorruptedException for older versions of the ORB where
-	    // calledDefaultWriteObject always returns true.
-	    if ((ORBVersionFactory.getPEORB().compareTo(clientOrbVersion) <= 0) || 
-		    (clientOrbVersion.equals(ORBVersionFactory.getFOREIGN()))) {
+            // Fix Date interop bug. For older versions of the ORB don't do
+            // anything for readData(). Before this used to throw 
+            // StreamCorruptedException for older versions of the ORB where
+            // calledDefaultWriteObject always returns true.
+            if ((ORBVersionFactory.getPEORB().compareTo(clientOrbVersion) <= 0) || 
+                    (clientOrbVersion.equals(ORBVersionFactory.getFOREIGN()))) {
                 throw Exceptions.self.defaultDataMustBeReadFirst() ;
-	    }
+            }
         }
     }
 
@@ -511,14 +511,14 @@ public abstract class InputStreamHook extends ObjectInputStream
         public void beginUnmarshalCustomValueOverride(InputStreamHook stream,
                                               boolean calledDefaultWriteObject,
                                               boolean hasReadObject) 
-	{
+        {
             // This should never happen.
-	    throw utilWrapper.badBeginUnmarshalCustomValue() ;
+            throw utilWrapper.badBeginUnmarshalCustomValue() ;
         }
 
         @Override
         public void endUnmarshalCustomValueOverride(InputStreamHook stream) throws IOException 
-	{
+        {
             if (stream.getStreamFormatVersion() == 2) {
                 ((ValueInputStream)stream.getOrbStream()).end_value();
             }
@@ -527,7 +527,7 @@ public abstract class InputStreamHook extends ObjectInputStream
         
         @Override
         public void beginDefaultReadObjectOverride(InputStreamHook stream) throws IOException 
-	{
+        {
             throw Exceptions.self.defaultDataNotPresent() ;
         }
 

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.legacy.connection;
+package com.sun.corba.ee.impl.legacy.connection;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -47,23 +47,23 @@ import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.CompletionStatus;
 
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
-import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.legacy.connection.LegacyServerSocketEndPointInfo;
+import com.sun.corba.ee.spi.legacy.connection.LegacyServerSocketManager;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 public class LegacyServerSocketManagerImpl 
     implements
-	LegacyServerSocketManager
+        LegacyServerSocketManager
 {
     protected ORB orb;
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
     
     public LegacyServerSocketManagerImpl(ORB orb) {
-	this.orb = orb;
+        this.orb = orb;
     }
 
     ////////////////////////////////////////////////////
@@ -74,30 +74,30 @@ public class LegacyServerSocketManagerImpl
     // Only used in ServerManagerImpl.
     public int legacyGetTransientServerPort(String type)
     {
-	return legacyGetServerPort(type, false);
+        return legacyGetServerPort(type, false);
     }
 
     // Only used by POAPolicyMediatorBase.
     public synchronized int legacyGetPersistentServerPort(String socketType)
     {
-	if (orb.getORBData().getServerIsORBActivated()) {
-	    // this server is activated by orbd
-	    return legacyGetServerPort(socketType, true);
-	} else if (orb.getORBData().getPersistentPortInitialized()) {
-	    // this is a user-activated server
-	    return orb.getORBData().getPersistentServerPort();
-	} else {
-	    throw wrapper.persistentServerportNotSet();
-	}
+        if (orb.getORBData().getServerIsORBActivated()) {
+            // this server is activated by orbd
+            return legacyGetServerPort(socketType, true);
+        } else if (orb.getORBData().getPersistentPortInitialized()) {
+            // this is a user-activated server
+            return orb.getORBData().getPersistentServerPort();
+        } else {
+            throw wrapper.persistentServerportNotSet();
+        }
     }
 
     // Only used by PI IORInfoImpl.
     public synchronized int legacyGetTransientOrPersistentServerPort(
         String socketType)
     {
-	    return legacyGetServerPort(socketType, 
-				       orb.getORBData()
-				       .getServerIsORBActivated());
+            return legacyGetServerPort(socketType, 
+                                       orb.getORBData()
+                                       .getServerIsORBActivated());
     }
 
     // Used in RepositoryImpl, ServerManagerImpl, POAImpl,
@@ -106,14 +106,14 @@ public class LegacyServerSocketManagerImpl
     public synchronized LegacyServerSocketEndPointInfo legacyGetEndpoint(
         String name)
     {
-	Iterator iterator = getAcceptorIterator();
-	while (iterator.hasNext()) {
-	    LegacyServerSocketEndPointInfo endPoint = cast(iterator.next());
-	    if (endPoint != null && name.equals(endPoint.getName())) {
-		return endPoint;
-	    }
-	}
-	throw new INTERNAL("No acceptor for: " + name);
+        Iterator iterator = getAcceptorIterator();
+        while (iterator.hasNext()) {
+            LegacyServerSocketEndPointInfo endPoint = cast(iterator.next());
+            if (endPoint != null && name.equals(endPoint.getName())) {
+                return endPoint;
+            }
+        }
+        throw new INTERNAL("No acceptor for: " + name);
     }
 
     // Check to see if the given port is equal to any of the ORB Server Ports.
@@ -127,13 +127,13 @@ public class LegacyServerSocketManagerImpl
             return true ;
         }
 
-	Iterator iterator = getAcceptorIterator();
-	while (iterator.hasNext()) { 
-	    LegacyServerSocketEndPointInfo endPoint = cast(iterator.next());
-	    if (endPoint != null && endPoint.getPort() == port) {
-		return true;
-	    }
-	}
+        Iterator iterator = getAcceptorIterator();
+        while (iterator.hasNext()) { 
+            LegacyServerSocketEndPointInfo endPoint = cast(iterator.next());
+            if (endPoint != null && endPoint.getPort() == port) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -144,42 +144,42 @@ public class LegacyServerSocketManagerImpl
 
     private int legacyGetServerPort (String socketType, boolean isPersistent)
     {
-	Iterator endpoints = getAcceptorIterator();
-	while (endpoints.hasNext()) {
-	    LegacyServerSocketEndPointInfo ep = cast(endpoints.next());
-	    if (ep != null && ep.getType().equals(socketType)) {
-		if (isPersistent) {
-		    return ep.getLocatorPort();
-		} else {
-		    return ep.getPort();
-		}
-	    }
-	}
-	return -1;
+        Iterator endpoints = getAcceptorIterator();
+        while (endpoints.hasNext()) {
+            LegacyServerSocketEndPointInfo ep = cast(endpoints.next());
+            if (ep != null && ep.getType().equals(socketType)) {
+                if (isPersistent) {
+                    return ep.getLocatorPort();
+                } else {
+                    return ep.getPort();
+                }
+            }
+        }
+        return -1;
     }
 
     private Iterator getAcceptorIterator()
     {
         Collection acceptors = 
-	    orb.getCorbaTransportManager().getAcceptors(null, null);
+            orb.getCorbaTransportManager().getAcceptors(null, null);
         if (acceptors != null) {
             return acceptors.iterator();
-	}
+        }
 
-	throw wrapper.getServerPortCalledBeforeEndpointsInitialized() ;
+        throw wrapper.getServerPortCalledBeforeEndpointsInitialized() ;
     }
 
     private LegacyServerSocketEndPointInfo cast(Object o)
     {
-	if (o instanceof LegacyServerSocketEndPointInfo) {
-	    return (LegacyServerSocketEndPointInfo) o;
-	}
-	return null;
+        if (o instanceof LegacyServerSocketEndPointInfo) {
+            return (LegacyServerSocketEndPointInfo) o;
+        }
+        return null;
     }
 
     protected void dprint(String msg)
     {
-	ORBUtility.dprint("LegacyServerSocketManagerImpl", msg);
+        ORBUtility.dprint("LegacyServerSocketManagerImpl", msg);
     }
 }
 

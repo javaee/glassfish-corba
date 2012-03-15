@@ -69,7 +69,7 @@ CORBA IDL
 
 <interface_dcl>      :, {
 
-<interface_body>	  typedef, struct, union, enum, const, exception, readonly, attribute, oneway, float, double, long, short, unsigned, char, boolean, octet, any, string, id, ::, void, state
+<interface_body>          typedef, struct, union, enum, const, exception, readonly, attribute, oneway, float, double, long, short, unsigned, char, boolean, octet, any, string, id, ::, void, state
 
 <interface_body'>    <FOLLOW>, typedef, struct, union, enum, const, exception, readonly, attribute, oneway, float, double, long, short, unsigned, char, boolean, octet, any, string, id, ::, void, state
 

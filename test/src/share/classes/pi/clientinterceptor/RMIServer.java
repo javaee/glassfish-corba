@@ -47,8 +47,8 @@ import org.omg.PortableServer.*;
 import org.omg.PortableServer.POAPackage.*;
 import org.omg.PortableInterceptor.*;
 import corba.framework.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.interceptors.*;
 
 import java.util.*;
 import java.io.*;
@@ -63,36 +63,36 @@ public class RMIServer
     // Set from run()
     private PrintStream out;
     
-    private com.sun.corba.se.spi.orb.ORB orb;
+    private com.sun.corba.ee.spi.orb.ORB orb;
 
     InitialContext initialNamingContext;
 
     public static void main(String args[]) {
-	try {
-	    (new RMIServer()).run( System.getProperties(),
-	                	args, System.out, System.err, null );
-	}
-	catch( Exception e ) {
-	    e.printStackTrace( System.err );
-	    System.exit( 1 );
-	}
+        try {
+            (new RMIServer()).run( System.getProperties(),
+                                args, System.out, System.err, null );
+        }
+        catch( Exception e ) {
+            e.printStackTrace( System.err );
+            System.exit( 1 );
+        }
     }
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
-	this.out = out;
+        this.out = out;
 
-	out.println( "Instantiating ORB" );
-	out.println( "=================" );
+        out.println( "Instantiating ORB" );
+        out.println( "=================" );
 
-	// create and initialize the ORB
-	Properties props = new Properties() ;
-	props.put( "org.omg.CORBA.ORBClass", 
+        // create and initialize the ORB
+        Properties props = new Properties() ;
+        props.put( "org.omg.CORBA.ORBClass", 
                    System.getProperty("org.omg.CORBA.ORBClass"));
-	ORB orb = ORB.init(args, props);
-        this.orb = (com.sun.corba.se.spi.orb.ORB)orb;
+        ORB orb = ORB.init(args, props);
+        this.orb = (com.sun.corba.ee.spi.orb.ORB)orb;
 
 
         out.println( "+ Creating Initial naming context..." );
@@ -104,18 +104,18 @@ public class RMIServer
         initialNamingContext = new InitialContext( env );
 
         out.println( "+ Creating and binding hello objects..." );
-	createAndBind( RMIClient.NAME1 );
-	createAndBind( RMIClient.NAME2 );
+        createAndBind( RMIClient.NAME1 );
+        createAndBind( RMIClient.NAME2 );
 
         //handshake:
         out.println("Server is ready.");
         out.flush();
 
-	// wait for invocations from clients
-	java.lang.Object sync = new java.lang.Object();
-	synchronized (sync) {
-	    sync.wait();
-	}
+        // wait for invocations from clients
+        java.lang.Object sync = new java.lang.Object();
+        synchronized (sync) {
+            sync.wait();
+        }
 
     }
     
@@ -123,10 +123,10 @@ public class RMIServer
      * Creates and binds a hello object using RMI
      */
     public void createAndBind (String name)
-	throws Exception
+        throws Exception
     {
-	helloRMIIIOP obj = new helloRMIIIOP( out );
-	initialNamingContext.rebind( name, obj );
+        helloRMIIIOP obj = new helloRMIIIOP( out );
+        initialNamingContext.rebind( name, obj );
     }
 
 }

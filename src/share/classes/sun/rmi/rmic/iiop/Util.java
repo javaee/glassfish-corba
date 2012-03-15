@@ -52,7 +52,7 @@ package sun.rmi.rmic.iiop;
 import java.io.File;
 import sun.tools.java.Identifier;
 
-import com.sun.corba.se.impl.util.PackagePrefixChecker;
+import com.sun.corba.ee.impl.util.PackagePrefixChecker;
 
 /**
  * Util provides static utility methods used by other rmic classes.
@@ -74,48 +74,48 @@ public final class Util implements sun.rmi.rmic.Constants {
      * working directory is used as the root.
      */
     private static File getOutputDirectoryFor(Identifier theClass,
-	                                     File rootDir,
-	                                     BatchEnvironment env,
+                                             File rootDir,
+                                             BatchEnvironment env,
                                              boolean idl ) {
         File outputDir = null;
-        String className = theClass.getFlatName().toString().replace('.', SIGC_INNERCLASS);    		
-	String qualifiedClassName = className;
- 	String packagePath = null;
- 	String packageName = theClass.getQualifier().toString();
+        String className = theClass.getFlatName().toString().replace('.', SIGC_INNERCLASS);             
+        String qualifiedClassName = className;
+        String packagePath = null;
+        String packageName = theClass.getQualifier().toString();
         //Shift package names for stubs generated for interfaces.
         /*if(type.isInterface())*/ 
         packageName = 
                 correctPackageName(packageName, idl, env.getStandardPackage());
         //Done.
-	if (packageName.length() > 0) {
-    	    qualifiedClassName = packageName + "." + className;
- 	    packagePath = packageName.replace('.', File.separatorChar);
- 	}
+        if (packageName.length() > 0) {
+            qualifiedClassName = packageName + "." + className;
+            packagePath = packageName.replace('.', File.separatorChar);
+        }
 
         // Do we have a root directory?
         
-	if (rootDir != null) {
-		    
+        if (rootDir != null) {
+                    
             // Yes, do we have a package name?
                 
             if (packagePath != null) {
-            	    
-    		// Yes, so use it as the root. Open the directory...
-        		    
-    		outputDir = new File(rootDir, packagePath);
-        		    
-    		// Make sure the directory exists...
-        		    
+                    
+                // Yes, so use it as the root. Open the directory...
+                            
+                outputDir = new File(rootDir, packagePath);
+                            
+                // Make sure the directory exists...
+                            
                 ensureDirectory(outputDir,env);
                     
             } else {
-            	    
-        	// Default package, so use root as output dir...
-            	    
-        	outputDir = rootDir;
-            }		    
-	} else {
-		    
+                    
+                // Default package, so use root as output dir...
+                    
+                outputDir = rootDir;
+            }               
+        } else {
+                    
             // No root directory. Get the current working directory...
                     
             String workingDirPath = System.getProperty("user.dir");
@@ -133,39 +133,39 @@ public final class Util implements sun.rmi.rmic.Constants {
                         
                 // Yes, so use working directory as the root...
                             
-      		outputDir = new File(workingDir, packagePath);
-                		    
-    		// Make sure the directory exists...
-                		    
-    		ensureDirectory(outputDir,env);
+                outputDir = new File(workingDir, packagePath);
+                                    
+                // Make sure the directory exists...
+                                    
+                ensureDirectory(outputDir,env);
             }
-	}
+        }
 
-	// Finally, return the directory...
-	    
-	return outputDir;
+        // Finally, return the directory...
+            
+        return outputDir;
     }
 
     public static File getOutputDirectoryForIDL(Identifier theClass,
-	                                     File rootDir,
-	                                     BatchEnvironment env) {
+                                             File rootDir,
+                                             BatchEnvironment env) {
         return getOutputDirectoryFor(theClass, rootDir, env, true);
     }
 
     public static File getOutputDirectoryForStub(Identifier theClass,
-	                                     File rootDir,
-	                                     BatchEnvironment env) {
+                                             File rootDir,
+                                             BatchEnvironment env) {
         return getOutputDirectoryFor(theClass, rootDir, env, false);
     }
 
     private static void ensureDirectory (File dir, BatchEnvironment env) {
-    	if (!dir.exists()) {
+        if (!dir.exists()) {
             dir.mkdirs();
             if (!dir.exists()) {
                 env.error(0,"rmic.cannot.create.dir",dir.getAbsolutePath());
                 throw new InternalError();
             }
-    	}
+        }
     }
 
     public static String correctPackageName(

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)DogImpl.java	1.4 99/06/07 */
+/* @(#)DogImpl.java     1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -59,12 +59,12 @@ public class DogImpl implements Dog, java.io.Serializable
 
     public DogImpl (String bark)
     {
-	fBark = bark;
+        fBark = bark;
     }
 
     public String bark () throws RemoteException
     {
-	return fBark;
+        return fBark;
     }
 
     public void die () throws RemoteException

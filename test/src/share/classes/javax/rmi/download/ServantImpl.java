@@ -56,37 +56,37 @@ public class ServantImpl implements Servant {
     }
 
     public TheValue getValue() throws java.rmi.RemoteException{
-	try{
+        try{
             String url = System.getProperty("java.rmi.server.codebase");
-	    return (TheValue)java.rmi.server.RMIClassLoader.loadClass(new java.net.URL(url),"javax.rmi.download.values.TheValueImpl").newInstance();
-	}
-	catch(Throwable t){
-	    java.io.CharArrayWriter cw = new java.io.CharArrayWriter();
-	    t.printStackTrace(new java.io.PrintWriter(cw));
+            return (TheValue)java.rmi.server.RMIClassLoader.loadClass(new java.net.URL(url),"javax.rmi.download.values.TheValueImpl").newInstance();
+        }
+        catch(Throwable t){
+            java.io.CharArrayWriter cw = new java.io.CharArrayWriter();
+            t.printStackTrace(new java.io.PrintWriter(cw));
 
-	    return new TheErrorValue(cw.toString());
-	}
+            return new TheErrorValue(cw.toString());
+        }
     }
 
     public void forceNotSerializableException(java.io.Serializable val) throws java.rmi.RemoteException {
-	// no op
+        // no op
     }
 
     public java.io.Serializable forceNotSerializableException() throws java.rmi.RemoteException {
-	return new ContainerOfBadVal();
+        return new ContainerOfBadVal();
     }
 
     public void throwRemoteExceptionWithNonSerializableValue() throws java.rmi.RemoteException {
-	throw new TheBadException();
+        throw new TheBadException();
     }
 
     public String passClass(Class clz) throws java.rmi.RemoteException {
-	return "Name:"+clz.getName();
-    }	
+        return "Name:"+clz.getName();
+    }   
 
     public java.lang.Object testWriteReadObject(java.lang.Object o) 
-	throws java.rmi.RemoteException {
-	return o;
+        throws java.rmi.RemoteException {
+        return o;
     }
 
 }

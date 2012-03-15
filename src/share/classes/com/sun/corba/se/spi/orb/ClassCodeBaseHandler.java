@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orb;
+package com.sun.corba.ee.spi.orb;
 
 public interface ClassCodeBaseHandler {
     /** Returns some sort of codebase for the given class, or null.

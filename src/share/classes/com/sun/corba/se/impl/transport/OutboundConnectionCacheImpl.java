@@ -38,18 +38,18 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.ContactInfo;
 
-import com.sun.corba.se.spi.trace.Transport;
-import com.sun.corba.se.spi.transport.Connection;
-import com.sun.corba.se.spi.transport.OutboundConnectionCache;
+import com.sun.corba.ee.spi.trace.Transport;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.OutboundConnectionCache;
 
 import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.AMXMetadata ;
@@ -64,9 +64,9 @@ import org.glassfish.gmbal.Description ;
 @AMXMetadata( type="corba-outbound-connection-cache-mon", group="monitoring" )
 public class OutboundConnectionCacheImpl
     extends
-	ConnectionCacheBase
+        ConnectionCacheBase
     implements
-	OutboundConnectionCache
+        OutboundConnectionCache
 {
     protected Map<ContactInfo, Connection> connectionCache;
     private OutboundConnectionCacheProbeProvider pp =
@@ -74,41 +74,41 @@ public class OutboundConnectionCacheImpl
 
     public OutboundConnectionCacheImpl(ORB orb, ContactInfo contactInfo)
     {
-	super(orb, contactInfo.getConnectionCacheType(),
-	      ((ContactInfo)contactInfo).getMonitoringName());
-	this.connectionCache = new HashMap<ContactInfo,Connection>();
+        super(orb, contactInfo.getConnectionCacheType(),
+              ((ContactInfo)contactInfo).getMonitoringName());
+        this.connectionCache = new HashMap<ContactInfo,Connection>();
     }
 
     @Transport
     public Connection get(ContactInfo contactInfo)
     {
-	synchronized (backingStore()) {
-	    cacheStatisticsInfo();
-	    return connectionCache.get(contactInfo);
-	}
+        synchronized (backingStore()) {
+            cacheStatisticsInfo();
+            return connectionCache.get(contactInfo);
+        }
     }
     
     @Transport
     public void put(ContactInfo contactInfo, Connection connection)
     {
-	synchronized (backingStore()) {
-	    connectionCache.put(contactInfo, connection);
-	    connection.setConnectionCache(this);
+        synchronized (backingStore()) {
+            connectionCache.put(contactInfo, connection);
+            connection.setConnectionCache(this);
             pp.connectionOpenedEvent( contactInfo.toString(), connection.toString() ) ;
-	    cacheStatisticsInfo();
-	}
+            cacheStatisticsInfo();
+        }
     }
 
     @Transport
     public void remove(ContactInfo contactInfo)
     {
-	synchronized (backingStore()) {
-	    if (contactInfo != null) {
-		Connection connection = connectionCache.remove(contactInfo);
+        synchronized (backingStore()) {
+            if (contactInfo != null) {
+                Connection connection = connectionCache.remove(contactInfo);
                 pp.connectionClosedEvent( contactInfo.toString(), connection.toString() ) ;
-	    }
-	    cacheStatisticsInfo();
-	}
+            }
+            cacheStatisticsInfo();
+        }
     }
 
     ////////////////////////////////////////////////////
@@ -118,20 +118,20 @@ public class OutboundConnectionCacheImpl
 
     public Collection values()
     {
-	return connectionCache.values();
+        return connectionCache.values();
     }
 
     protected Object backingStore()
     {
-	return connectionCache;
+        return connectionCache;
     }
 
     @Override
     public String toString()
     {
-	return "CorbaOutboundConnectionCacheImpl["
-	    + connectionCache
-	    + "]";
+        return "CorbaOutboundConnectionCacheImpl["
+            + connectionCache
+            + "]";
     }
 }
 

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package com.sun.corba.ee.impl.dynamicany;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
@@ -49,10 +49,10 @@ import org.omg.DynamicAny.*;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
 {
@@ -112,7 +112,7 @@ abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
     protected DynAnyFactory factory() {
         try {
             return (DynAnyFactory)orb.resolve_initial_references( 
-		ORBConstants.DYN_ANY_FACTORY_NAME );
+                ORBConstants.DYN_ANY_FACTORY_NAME );
         } catch (InvalidName in) {
             throw new RuntimeException("Unable to find DynAnyFactory");
         }
@@ -152,7 +152,7 @@ abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
 
     public org.omg.CORBA.TypeCode type() {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         return any.type();
     }
@@ -162,7 +162,7 @@ abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
         throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         if ((any != null) && (! any.type().equal(dyn_any.type()))) {
             throw new TypeMismatch();
@@ -176,7 +176,7 @@ abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
                org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         if ((any != null) && (! any.type().equal(value.type()))) {
             throw new TypeMismatch();

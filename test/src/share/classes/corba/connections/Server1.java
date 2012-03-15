@@ -48,8 +48,8 @@ public class Server1
 {
     public static void main(String[] av)
     {    
-	String[] args = { Server.server1, Server.service11, Server.service12 };
-	Server.main(args);
+        String[] args = { Server.server1, Server.service11, Server.service12 };
+        Server.main(args);
     }
 }
 

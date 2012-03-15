@@ -44,27 +44,27 @@ import org.omg.PortableServer.POA;
 
 public class HelloServer {
     public static void main(String[] args) {
-	try {
-	    Utility u = new Utility(args);
-	    POA rootPoa = (POA) u.getORB().resolve_initial_references("RootPOA");
-	    POA poa = rootPoa.create_POA("AnotherPOA", null, null);
+        try {
+            Utility u = new Utility(args);
+            POA rootPoa = (POA) u.getORB().resolve_initial_references("RootPOA");
+            POA poa = rootPoa.create_POA("AnotherPOA", null, null);
             rootPoa.the_POAManager().activate();
 
-	    FactoryImpl theFactory = new FactoryImpl(poa);
+            FactoryImpl theFactory = new FactoryImpl(poa);
 
             byte[] id = rootPoa.activate_object(theFactory);
-	    
-	    u.writeFactory(GenericFactoryHelper.narrow(
+            
+            u.writeFactory(GenericFactoryHelper.narrow(
                 rootPoa.servant_to_reference(theFactory)));
-	    
-	    poa.the_POAManager().activate();
+            
+            poa.the_POAManager().activate();
 
             System.out.println("Server is ready.");
             u.getORB().run();
 
-	} catch (Exception e) {
-	    e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             System.exit(1);
-	}
+        }
     }
 }

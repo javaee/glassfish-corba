@@ -44,7 +44,7 @@
 
 package corba.purgecalls;
 
-import com.sun.corba.se.spi.legacy.connection.Connection;
+import com.sun.corba.ee.spi.legacy.connection.Connection;
 import corba.framework.Controller;
 import corba.hcks.U;
 import java.net.Socket;
@@ -68,56 +68,56 @@ public class Client
     public static void main(String av[])
     {
         try {
-	    Properties props = new Properties();
-	    props.put(U.ORBInitializerClass + "." + "corba.purgecalls.ClientORBInitializer", "ignored");
-	    orb = ORB.init(av, props);
+            Properties props = new Properties();
+            props.put(U.ORBInitializerClass + "." + "corba.purgecalls.ClientORBInitializer", "ignored");
+            orb = ORB.init(av, props);
 
-	    
-	    rServerSide =  
-		ServerSideHelper.narrow(U.resolve(Server.ServerSide, orb));
+            
+            rServerSide =  
+                ServerSideHelper.narrow(U.resolve(Server.ServerSide, orb));
 
-	    runTests();
+            runTests();
 
-	    // Wait for other thread to do its thing.
-	    Thread.sleep(2000);
+            // Wait for other thread to do its thing.
+            Thread.sleep(2000);
 
-	    U.sop("Test complete.");
+            U.sop("Test complete.");
 
-	} catch (java.io.IOException e) {
+        } catch (java.io.IOException e) {
 
-	    U.sop(main + " Expected: " + e);
+            U.sop(main + " Expected: " + e);
 
         } catch (Throwable t) {
             U.sopUnexpectedException(main + " : ", t);
-	    System.exit(1);
+            System.exit(1);
         }
 
-	if (noExceptionExpected == null) {
-	    U.normalExit(main);
-	    // Do not explicitly exit to test that no non-daemon threads
-	    // are hanging.
-	    //System.exit(Controller.SUCCESS);
-	} else {
-	    U.sopUnexpectedException(main + " : ", noExceptionExpected);
-	    System.exit(1);
-	}
+        if (noExceptionExpected == null) {
+            U.normalExit(main);
+            // Do not explicitly exit to test that no non-daemon threads
+            // are hanging.
+            //System.exit(Controller.SUCCESS);
+        } else {
+            U.sopUnexpectedException(main + " : ", noExceptionExpected);
+            System.exit(1);
+        }
     }
 
     public static void runTests()
-	throws
-	    Exception
+        throws
+            Exception
     {
-	CallThread CallThread = new CallThread();
-	CallThread.start();
+        CallThread CallThread = new CallThread();
+        CallThread.start();
     
-	Thread.sleep(5000);
+        Thread.sleep(5000);
 
-	Socket socket = requestConnection.getSocket();
-	socket.shutdownInput();
-	socket.shutdownOutput();
-	socket.getInputStream().close();
-	socket.getOutputStream().close();
-	socket.close();
+        Socket socket = requestConnection.getSocket();
+        socket.shutdownInput();
+        socket.shutdownOutput();
+        socket.getInputStream().close();
+        socket.getOutputStream().close();
+        socket.close();
     }
 }
 
@@ -128,14 +128,14 @@ class CallThread extends Thread
     }
     public void run ()
     {
-	try {
-	    Client.rServerSide.neverReturns();
-	} catch (COMM_FAILURE e) {
-	    U.sop("Expected: " + e);
-	} catch (Throwable t) {
-	    Client.noExceptionExpected = t;
-	    t.printStackTrace();
-	}
+        try {
+            Client.rServerSide.neverReturns();
+        } catch (COMM_FAILURE e) {
+            U.sop("Expected: " + e);
+        } catch (Throwable t) {
+            Client.noExceptionExpected = t;
+            t.printStackTrace();
+        }
     }
 }
 

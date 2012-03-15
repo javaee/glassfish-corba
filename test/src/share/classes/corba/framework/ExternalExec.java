@@ -81,11 +81,11 @@ public class ExternalExec extends ControllerAdapter
     private boolean addOrbToXbootClasspath ;
     
     public ExternalExec( boolean addOrbToXbootClasspath ) {
-	this.addOrbToXbootClasspath = addOrbToXbootClasspath ;
+        this.addOrbToXbootClasspath = addOrbToXbootClasspath ;
     }
     
     public ExternalExec() {
-	this( false ) ;
+        this( false ) ;
     }
 
     /**
@@ -121,7 +121,7 @@ public class ExternalExec extends ControllerAdapter
                            OutputStream err,
                            Hashtable extra) throws Exception
     {
-	if (extra != null) {
+        if (extra != null) {
             handshake = (String) extra.get(HANDSHAKE_KEY);
         }
 
@@ -143,24 +143,24 @@ public class ExternalExec extends ControllerAdapter
     protected void addClasspath()
     {
         String[] cp = new String[] { "-classpath", 
-	    Options.getClasspath() };
+            Options.getClasspath() };
         VMArgs = CORBAUtil.combine(cp, VMArgs);
     
-	if (addOrbToXbootClasspath) {
-	    String[] bcp = new String[] { "-Xbootclasspath/p:" + 
-		System.getProperty( "corba.test.orb.classpath" ) } ;
-	    VMArgs = CORBAUtil.combine(bcp, VMArgs);
-	}	
+        if (addOrbToXbootClasspath) {
+            String[] bcp = new String[] { "-Xbootclasspath/p:" + 
+                System.getProperty( "corba.test.orb.classpath" ) } ;
+            VMArgs = CORBAUtil.combine(bcp, VMArgs);
+        }       
     }
    
     protected String[] getDebugVMArgs() 
     {
-	return new String[0] ;
+        return new String[0] ;
     }
 
     protected long getMaximumTimeout()
     {
-	return Options.getMaximumTimeout() ;
+        return Options.getMaximumTimeout() ;
     }
 
     /**
@@ -177,11 +177,11 @@ public class ExternalExec extends ControllerAdapter
         // [java executable]
         // [arguments to the java executable]
         // [-D environment variables]
-	// [debug arguments to the java executable]
+        // [debug arguments to the java executable]
         // [class name]
         // [arguments to the program]
 
-	String[] debugArgs = getDebugVMArgs() ;
+        String[] debugArgs = getDebugVMArgs() ;
 
         // Java executable
         cmd.add( Options.getJavaExec() ) ;
@@ -278,12 +278,12 @@ public class ExternalExec extends ControllerAdapter
 
     public void stop()
     {
-	terminate() ;
+        terminate() ;
     }
 
     public final void kill() 
     {
-	terminate() ;
+        terminate() ;
     }
 
     public int waitFor() throws InterruptedException

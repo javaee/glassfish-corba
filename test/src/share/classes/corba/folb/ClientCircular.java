@@ -48,7 +48,7 @@ import java.util.Properties;
 
 import org.omg.CORBA.SystemException;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import org.testng.annotations.BeforeSuite ;
 import org.testng.annotations.Test ;

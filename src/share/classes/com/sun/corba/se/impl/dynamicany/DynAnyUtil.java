@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package com.sun.corba.ee.impl.dynamicany;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
@@ -47,10 +47,10 @@ import org.omg.CORBA.portable.InputStream;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 import java.math.BigDecimal;
-import com.sun.corba.se.impl.corba.AnyImpl;
+import com.sun.corba.ee.impl.corba.AnyImpl;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 import org.omg.DynamicAny.DynAny;
 
 public class DynAnyUtil
@@ -265,9 +265,9 @@ public class DynAnyUtil
                 break;
             case TCKind._tk_longdouble:
                 // Unspecified for Java
-		throw wrapper.tkLongDoubleNotSupported() ;
+                throw wrapper.tkLongDoubleNotSupported() ;
             default:
-		throw wrapper.typecodeNotSupported() ;
+                throw wrapper.typecodeNotSupported() ;
         }
         return returnValue;
     }

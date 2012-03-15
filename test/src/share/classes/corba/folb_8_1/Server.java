@@ -50,7 +50,7 @@ import java.util.Properties ;
 import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import corba.hcks.U;
 
@@ -68,73 +68,73 @@ public class Server
 
     public static void setProperties(Properties props, int[] socketPorts)
     {
-	//
-	// Debugging flags.  Generally commented out.
-	//
-	/*
-	props.setProperty(ORBConstants.DEBUG_PROPERTY,
-			  "giop,transport,subcontract");
-	*/
+        //
+        // Debugging flags.  Generally commented out.
+        //
+        /*
+        props.setProperty(ORBConstants.DEBUG_PROPERTY,
+                          "giop,transport,subcontract");
+        */
 
-	//
-	// Tell the ORB to listen on user-defined port types.
-	//
+        //
+        // Tell the ORB to listen on user-defined port types.
+        //
 
-	String listenPorts = formatListenPorts();
-	props.setProperty(ORBConstants.LISTEN_SOCKET_PROPERTY, listenPorts);
-	System.out.println(listenPorts);
+        String listenPorts = formatListenPorts();
+        props.setProperty(ORBConstants.LISTEN_SOCKET_PROPERTY, listenPorts);
+        System.out.println(listenPorts);
 
-	//
-	// Register the socket factory that knows how to create
-	// Sockets of type X Y and Z.
-	//
+        //
+        // Register the socket factory that knows how to create
+        // Sockets of type X Y and Z.
+        //
 
-	props.setProperty(ORBConstants.SOCKET_FACTORY_CLASS_PROPERTY,
-			  SocketFactoryImpl.class.getName());
+        props.setProperty(ORBConstants.SOCKET_FACTORY_CLASS_PROPERTY,
+                          SocketFactoryImpl.class.getName());
 
-	//
-	// Register and IORInterceptor that will put port 
-	// type/address info into IORs.
-	// E.G.: X/<hostanme>:*, Y/<hostname>:4444, Z/<hostname>:5555
-	//
+        //
+        // Register and IORInterceptor that will put port 
+        // type/address info into IORs.
+        // E.G.: X/<hostanme>:*, Y/<hostname>:4444, Z/<hostname>:5555
+        //
 
-	props.setProperty("org.omg.PortableInterceptor.ORBInitializerClass." + IORInterceptorImpl.class.getName(),
-			  "dummy");
+        props.setProperty("org.omg.PortableInterceptor.ORBInitializerClass." + IORInterceptorImpl.class.getName(),
+                          "dummy");
     }
 
     public static String formatListenPorts()
     {
-	String result = "";
-	for (int i = 0; i < Common.socketTypes.length; i++) {
-	    result += Common.socketTypes[i] 
-		+ ":" 
-		+ Integer.toString(Common.socketPorts[i]);
-	    if (i + 1 < Common.socketTypes.length) {
-		result += ",";
-	    }
-	}
-	return result;
+        String result = "";
+        for (int i = 0; i < Common.socketTypes.length; i++) {
+            result += Common.socketTypes[i] 
+                + ":" 
+                + Integer.toString(Common.socketPorts[i]);
+            if (i + 1 < Common.socketTypes.length) {
+                result += ",";
+            }
+        }
+        return result;
     }
   
     public static void main(String av[])
     {
         try {
-	    if (! ColocatedCS.isColocated) {
-		Properties props = System.getProperties();
-		setProperties(props, Common.socketPorts);
-		orb = ORB.init(av, props);
-	    }
+            if (! ColocatedCS.isColocated) {
+                Properties props = System.getProperties();
+                setProperties(props, Common.socketPorts);
+                orb = ORB.init(av, props);
+            }
 
-	    POA poa = Common.createPOA("child", false, orb);
-	    ref = Common.createAndBind(Common.serverName1, orb, poa);
-	    Common.createAndBind(Common.serverName2, orb, poa);
+            POA poa = Common.createPOA("child", false, orb);
+            ref = Common.createAndBind(Common.serverName1, orb, poa);
+            Common.createAndBind(Common.serverName2, orb, poa);
       
             System.out.println ("Server is ready.");
 
-	    synchronized (ColocatedCS.signal) {
-		ColocatedCS.signal.notifyAll();
-	    }
-	    
+            synchronized (ColocatedCS.signal) {
+                ColocatedCS.signal.notifyAll();
+            }
+            
             orb.run();
             
         } catch (Throwable t) {
@@ -151,39 +151,39 @@ public class Server
 // an incorrect Tie.
 class I2Servant extends I2POA
 {
-    private com.sun.corba.se.spi.orb.ORB orb;
+    private com.sun.corba.ee.spi.orb.ORB orb;
 
     public I2Servant(ORB orb)
     {
-	this.orb = (com.sun.corba.se.spi.orb.ORB) orb;
+        this.orb = (com.sun.corba.ee.spi.orb.ORB) orb;
     }
 
     public int m(String x)
     {
         int result = new Integer(x).intValue();
-	System.out.println("I2Servant.m result: " + result);
-	System.out.flush();
+        System.out.println("I2Servant.m result: " + result);
+        System.out.flush();
         return result;
     }
   
     public org.omg.CORBA.Object n(String x)
     {
-	return Server.ref;
+        return Server.ref;
     }
 
     public int foo(int x)
     {
-	return x;
+        return x;
     }
 }
 
 class IServant extends IPOA
 {
-    private com.sun.corba.se.spi.orb.ORB orb;
+    private com.sun.corba.ee.spi.orb.ORB orb;
 
     public IServant(ORB orb)
     {
-	this.orb = (com.sun.corba.se.spi.orb.ORB) orb;
+        this.orb = (com.sun.corba.ee.spi.orb.ORB) orb;
     }
 
     public String m(String x)
@@ -193,25 +193,25 @@ class IServant extends IPOA
 
     public int n(String x)
     {
-	return 101;
+        return 101;
     }
 
     public int throwRuntimeException(int x)
     {
-	return 1/x;
+        return 1/x;
     }
 
     public boolean unregister(String socketType)
     {
-	return U.unregisterAcceptorAndCloseConnections(socketType, orb);
+        return U.unregisterAcceptorAndCloseConnections(socketType, orb);
     }
 
     public boolean register(String socketType)
     {
-	return U.registerAcceptor(socketType, 
-			  ((Integer) Common.socketTypeToPort.get(socketType))
-			      .intValue(),
-			  orb);
+        return U.registerAcceptor(socketType, 
+                          ((Integer) Common.socketTypeToPort.get(socketType))
+                              .intValue(),
+                          orb);
     }
 }
 

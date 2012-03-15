@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.logex.stdcorba;
+package com.sun.corba.ee.spi.logex.stdcorba;
 
 import org.glassfish.pfl.basic.logex.ExceptionWrapper;
 import org.glassfish.pfl.basic.logex.WrapperGenerator;
@@ -50,8 +50,8 @@ import org.glassfish.pfl.basic.logex.WrapperGenerator;
 public class StandardLogger extends WrapperGenerator.ExtensionBase {
     public static final StandardLogger self = new StandardLogger() ;
 
-    private static final String SPI_PREFIX = "com.sun.corba.se.spi." ;
-    private static final String IMPL_PREFIX = "com.sun.corba.se.impl." ;
+    private static final String SPI_PREFIX = "com.sun.corba.ee.spi." ;
+    private static final String IMPL_PREFIX = "com.sun.corba.ee.impl." ;
     public static final String CORBA_LOGGER_PREFIX =
         "javax.enterprise.resource.corba" ;
 

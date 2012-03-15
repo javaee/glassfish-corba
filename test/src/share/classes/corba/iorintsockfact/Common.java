@@ -49,7 +49,7 @@ import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.*;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 /**
  * @author Harold Carr
@@ -57,23 +57,23 @@ import com.sun.corba.se.spi.misc.ORBConstants;
 public abstract class Common
 {
     public static final String SOCKET_FACTORY_CLASS_PROPERTY =
-	ORBConstants.LEGACY_SOCKET_FACTORY_CLASS_PROPERTY;
+        ORBConstants.LEGACY_SOCKET_FACTORY_CLASS_PROPERTY;
 
     public static final String CUSTOM_FACTORY_CLASS =
-	SocketFactory.class.getName();
+        SocketFactory.class.getName();
 
     public static final String serverName1 = "I1";
 
     public static NamingContext getNameService(ORB orb)
     {
         org.omg.CORBA.Object objRef = null;
-	try {
-	    objRef = orb.resolve_initial_references("NameService");
-	} catch (Exception ex) {
-	    System.out.println("Common.getNameService: " + ex);
-	    ex.printStackTrace(System.out);
-	    System.exit(-1);
-	}
+        try {
+            objRef = orb.resolve_initial_references("NameService");
+        } catch (Exception ex) {
+            System.out.println("Common.getNameService: " + ex);
+            ex.printStackTrace(System.out);
+            System.exit(-1);
+        }
         return NamingContextHelper.narrow(objRef);
     }
 
@@ -81,7 +81,7 @@ public abstract class Common
     {
         NameComponent nc = new NameComponent(name, "");
         NameComponent path[] = {nc};
-	return path;
+        return path;
     }
 }
 

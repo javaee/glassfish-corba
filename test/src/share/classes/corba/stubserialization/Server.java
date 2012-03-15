@@ -52,9 +52,9 @@ import org.omg.CosNaming.*;
 
 import org.omg.PortableServer.*;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
                                                                                 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
 
 /**
@@ -80,7 +80,7 @@ public class Server {
             
             byte[] id = Constants.HELLO_SERVICE.getBytes();
             rootPOA.activate_object_with_id(id, 
-                (Servant)makeHelloServant((com.sun.corba.se.spi.orb.ORB)orb));
+                (Servant)makeHelloServant((com.sun.corba.ee.spi.orb.ORB)orb));
             org.omg.CORBA.Object obj = rootPOA.id_to_reference( id );
                                                                                 
             ncRef.rebind(path, obj);
@@ -97,12 +97,12 @@ public class Server {
         }
     }
 
-    static Tie makeHelloServant( com.sun.corba.se.spi.orb.ORB orb ) {
+    static Tie makeHelloServant( com.sun.corba.ee.spi.orb.ORB orb ) {
         try {
             HelloServant servant = new HelloServant( orb );
 
             Tie tie = orb.getPresentationManager().getTie();
-	    tie.orb( orb ) ;
+            tie.orb( orb ) ;
             tie.setTarget( (java.rmi.Remote)servant );
             return tie;
         } catch( Exception e ) {

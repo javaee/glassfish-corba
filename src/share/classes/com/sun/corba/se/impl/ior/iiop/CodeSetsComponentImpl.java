@@ -38,20 +38,20 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.ior.iiop;
+package com.sun.corba.ee.impl.ior.iiop;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
 
-import com.sun.corba.se.spi.ior.TaggedComponentBase ;
+import com.sun.corba.ee.spi.ior.TaggedComponentBase ;
 
-import com.sun.corba.se.spi.ior.iiop.CodeSetsComponent ;
+import com.sun.corba.ee.spi.ior.iiop.CodeSetsComponent ;
 
 import org.omg.IOP.TAG_CODE_SETS ;
 
-import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
-import com.sun.corba.se.impl.encoding.MarshalOutputStream ;
-import com.sun.corba.se.impl.encoding.MarshalInputStream ;
+import com.sun.corba.ee.impl.encoding.CodeSetComponentInfo ;
+import com.sun.corba.ee.impl.encoding.MarshalOutputStream ;
+import com.sun.corba.ee.impl.encoding.MarshalInputStream ;
 
 /**
  * @author 
@@ -63,37 +63,37 @@ public class CodeSetsComponentImpl extends TaggedComponentBase
  
     public boolean equals( Object obj )
     {
-	if (!(obj instanceof CodeSetsComponentImpl)) 
-	    return false ;
+        if (!(obj instanceof CodeSetsComponentImpl)) 
+            return false ;
 
-	CodeSetsComponentImpl other = (CodeSetsComponentImpl)obj ;
+        CodeSetsComponentImpl other = (CodeSetsComponentImpl)obj ;
 
-	return csci.equals( other.csci ) ;
+        return csci.equals( other.csci ) ;
     }
 
     public int hashCode()
     {
-	return csci.hashCode() ;
+        return csci.hashCode() ;
     }
 
     public String toString()
-    {	
-	return "CodeSetsComponentImpl[csci=" + csci + "]" ;
+    {   
+        return "CodeSetsComponentImpl[csci=" + csci + "]" ;
     }
 
     public CodeSetsComponentImpl() 
     {
         // Uses our default code sets (see CodeSetComponentInfo)
-	csci = new CodeSetComponentInfo() ;
+        csci = new CodeSetComponentInfo() ;
     }
 
     public CodeSetsComponentImpl( InputStream is )
     {
-	csci = new CodeSetComponentInfo() ;
-	csci.read( (MarshalInputStream)is ) ;
+        csci = new CodeSetComponentInfo() ;
+        csci.read( (MarshalInputStream)is ) ;
     }
 
-    public CodeSetsComponentImpl(com.sun.corba.se.spi.orb.ORB orb)
+    public CodeSetsComponentImpl(com.sun.corba.ee.spi.orb.ORB orb)
     {
         if (orb == null)
             csci = new CodeSetComponentInfo();
@@ -103,16 +103,16 @@ public class CodeSetsComponentImpl extends TaggedComponentBase
     
     public CodeSetComponentInfo getCodeSetComponentInfo()
     {
-	return csci ;
+        return csci ;
     }
 
     public void writeContents(OutputStream os) 
     {
-	csci.write( (MarshalOutputStream)os ) ;
+        csci.write( (MarshalOutputStream)os ) ;
     }
     
     public int getId() 
     {
-	return TAG_CODE_SETS.value ; // 1 in CORBA 2.3.1 13.6.3
+        return TAG_CODE_SETS.value ; // 1 in CORBA 2.3.1 13.6.3
     }
 }

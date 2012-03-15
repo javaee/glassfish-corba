@@ -48,7 +48,7 @@
  * US Government Users Restricted Rights - Use, duplication or
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  *
- * @(#)Skeleton.java	1.8 99/08/18
+ * @(#)Skeleton.java    1.8 99/08/18
  */
 
 package com.sun.tools.corba.se.idl.toJavaPortable;
@@ -103,10 +103,10 @@ public class Skeleton implements AuxGen
       if ((v.supports ().size () == 0) ||
           ((InterfaceEntry) v.supports ().elementAt (0)).isAbstract ()) {
         return;
-	}
+        }
     }
     if (((InterfaceEntry) entry).isAbstract ()) {
-    	return;
+        return;
     }
     // <d62739-end>
 
@@ -132,9 +132,9 @@ public class Skeleton implements AuxGen
     poa = ((Arguments)Compile.compiler.arguments).POAServer ;
 
     skeletonNameModifier = 
-	((Arguments)Compile.compiler.arguments).skeletonNameModifier ;
+        ((Arguments)Compile.compiler.arguments).skeletonNameModifier ;
     tieNameModifier = 
-	((Arguments)Compile.compiler.arguments).tieNameModifier ;
+        ((Arguments)Compile.compiler.arguments).tieNameModifier ;
     
     tieClassName = tieNameModifier.makeName( i.name() ) ; 
     skeletonClassName = skeletonNameModifier.makeName( i.name() ) ;
@@ -152,9 +152,9 @@ public class Skeleton implements AuxGen
   protected void openStream ()
   {
     if (tie)
-	stream = Util.stream( i, tieNameModifier, ".java" ) ;
+        stream = Util.stream( i, tieNameModifier, ".java" ) ;
     else
-	stream = Util.stream( i, skeletonNameModifier, ".java" ) ;
+        stream = Util.stream( i, skeletonNameModifier, ".java" ) ;
   } // openStream
 
   protected void writeHeading ()
@@ -171,7 +171,7 @@ public class Skeleton implements AuxGen
   protected void writeClassDeclaration ()
   {
     if (tie){
-	stream.println ("public class " + tieClassName + 
+        stream.println ("public class " + tieClassName + 
             " extends " + skeletonClassName ) ;
     } else { 
         if (poa) {
@@ -240,9 +240,9 @@ public class Skeleton implements AuxGen
   {
     stream.println ();
     if (tie){
-	stream.println ("} // class " + tieClassName);
+        stream.println ("} // class " + tieClassName);
     } else { 
-	stream.println ("} // class " + skeletonClassName);
+        stream.println ("} // class " + skeletonClassName);
     }
   } // writeClosing
 
@@ -259,11 +259,11 @@ public class Skeleton implements AuxGen
     stream.println ("  // Constructors");
     // Empty argument constructors
     if (!poa) {
-	if (tie){
+        if (tie){
             stream.println ("  public " + tieClassName + " ()");
             stream.println ("  {");
             stream.println ("  }");
-	} else { 
+        } else { 
             stream.println ("  public " + skeletonClassName + " ()");
             stream.println ("  {");
             stream.println ("  }");
@@ -389,7 +389,7 @@ public class Skeleton implements AuxGen
 
     boolean isLocalInterface = false;
     if (i instanceof InterfaceEntry) {
-	isLocalInterface = i.isLocalServant();
+        isLocalInterface = i.isLocalServant();
     }
 
     if (!isLocalInterface) {

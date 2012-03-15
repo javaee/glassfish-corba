@@ -50,12 +50,12 @@ public class TestngRunnerTest extends CORBATest
 {
     protected void doTest() throws Exception
     {
-	String thisPackage = this.getClass().getPackage().getName() ;
-	
-	Controller client = createClient(thisPackage+"."+"Client", "Client");
+        String thisPackage = this.getClass().getPackage().getName() ;
+        
+        Controller client = createClient(thisPackage+"."+"Client", "Client");
 
-	client.start();
-	client.waitFor(1000 * 60 * 2);
-	client.stop();
+        client.start();
+        client.waitFor(1000 * 60 * 2);
+        client.stop();
     }
 }

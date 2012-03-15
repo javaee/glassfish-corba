@@ -67,41 +67,41 @@ class helloDelegate implements helloIF {
 
     // See above comment for clientCallback.
     public static interface ClientCallback {
-	public String sayHello();
-	public void saySystemException();
+        public String sayHello();
+        public void saySystemException();
     }
 
     public helloDelegate( PrintStream out, String symbol, 
-	ClientCallback callback ) 
+        ClientCallback callback ) 
     {
-	super();
-	this.out = out;
-	this.symbol = symbol;
-	this.clientCallback = callback;
+        super();
+        this.out = out;
+        this.symbol = symbol;
+        this.clientCallback = callback;
     }
 
     public String sayHello() {
         out.println( "    - helloDelegate: sayHello() invoked" );
-	SampleServerRequestInterceptor.methodOrder += symbol;
+        SampleServerRequestInterceptor.methodOrder += symbol;
         return "Hello, world!";
     }
 
     public void sayOneway() {
         out.println( "    - helloDelegate: sayOneway() invoked" );
-	SampleServerRequestInterceptor.methodOrder += symbol;
+        SampleServerRequestInterceptor.methodOrder += symbol;
     }
     
     public void saySystemException() {
         out.println( "    - helloDelegate: saySystemException() invoked" );
-	SampleServerRequestInterceptor.methodOrder += symbol;
+        SampleServerRequestInterceptor.methodOrder += symbol;
         throw new IMP_LIMIT( SampleServerRequestInterceptor.VALID_MESSAGE );
     }
 
     public void sayUserException() 
-	throws ExampleException
+        throws ExampleException
     {
         out.println( "    - helloDelegate: sayUserException() invoked" );
-	SampleServerRequestInterceptor.methodOrder += symbol;
+        SampleServerRequestInterceptor.methodOrder += symbol;
         throw new ExampleException( "valid" );
     }
     
@@ -115,25 +115,25 @@ class helloDelegate implements helloIF {
     // @param exceptionRaised true if the last invocation resulted in
     //     an exception on the client side.
     public String syncWithServer( boolean exceptionRaised ) {
-	out.println( "    - helloDelegate: syncWithServer() invoked" );
-	// Notify the test case that the client is waiting for 
-	// syncWithServer to return:
-	ServerCommon.syncing = true;
-	ServerCommon.exceptionRaised = exceptionRaised;
-	
-	// Wait for the next test case to start:
-	synchronized( ServerCommon.syncObject ) {
-	    try {
-		ServerCommon.syncObject.wait();
-	    }
-	    catch( InterruptedException e ) {
-		// ignore, assume we are good to go.
-	    }
-	}
-	
-	ServerCommon.syncing = false;
-	
-	return ServerCommon.nextMethodToInvoke;
+        out.println( "    - helloDelegate: syncWithServer() invoked" );
+        // Notify the test case that the client is waiting for 
+        // syncWithServer to return:
+        ServerCommon.syncing = true;
+        ServerCommon.exceptionRaised = exceptionRaised;
+        
+        // Wait for the next test case to start:
+        synchronized( ServerCommon.syncObject ) {
+            try {
+                ServerCommon.syncObject.wait();
+            }
+            catch( InterruptedException e ) {
+                // ignore, assume we are good to go.
+            }
+        }
+        
+        ServerCommon.syncing = false;
+        
+        return ServerCommon.nextMethodToInvoke;
     }
 
     /**
@@ -142,23 +142,23 @@ class helloDelegate implements helloIF {
      */
     public void sayInvokeAgain( int n ) {
         out.println( "    - helloDelegate: sayInvokeAgain( " + n + 
-	    " ) invoked" );
-	SampleServerRequestInterceptor.methodOrder += symbol;
+            " ) invoked" );
+        SampleServerRequestInterceptor.methodOrder += symbol;
 
-	switch( n ) {
-	case INVOKE_SAY_HELLO.value:
-	    out.println( "    - helloDelegate: invoking sayHello..." );
-	    clientCallback.sayHello();
-	    break;
-	case INVOKE_SAY_SYSTEM_EXCEPTION.value:
-	    out.println( 
-		"    - helloDelegate: invoking saySystemException..." );
-	    clientCallback.saySystemException();
-	    break;
-	}
+        switch( n ) {
+        case INVOKE_SAY_HELLO.value:
+            out.println( "    - helloDelegate: invoking sayHello..." );
+            clientCallback.sayHello();
+            break;
+        case INVOKE_SAY_SYSTEM_EXCEPTION.value:
+            out.println( 
+                "    - helloDelegate: invoking saySystemException..." );
+            clientCallback.saySystemException();
+            break;
+        }
 
         out.println( "    - helloDelegate: sayInvokeAgain( " + n + 
-	    " ) returning..." );
+            " ) returning..." );
     }
 
 }

@@ -55,7 +55,7 @@ import org.omg.CORBA.COMM_FAILURE ;
 import org.omg.CORBA.ORB ;
 import org.omg.CORBA.Any ;
 
-import com.sun.corba.se.impl.misc.ORBUtility ;
+import com.sun.corba.ee.impl.misc.ORBUtility ;
 
 public class InterceptorTester extends LocalObject implements
     ORBInitializer, ClientRequestInterceptor {
@@ -67,89 +67,89 @@ public class InterceptorTester extends LocalObject implements
     private boolean exceptionExpected = false ;
 
     public InterceptorTester() {
-	theTester = this ;
+        theTester = this ;
     }
 
     public void clear() {
-	errors = 0 ;
-	exceptionExpected = false ;
+        errors = 0 ;
+        exceptionExpected = false ;
     }
     
     public int getErrors() {
-	return errors ;
+        return errors ;
     }
 
     public void setExceptionExpected() {
-	exceptionExpected = true ;
+        exceptionExpected = true ;
     }
     
     private void msg( String msg ) {
-	if (verbose) {
-	    System.out.println( "+++InterceptorTester: " + msg ) ;
-	}
+        if (verbose) {
+            System.out.println( "+++InterceptorTester: " + msg ) ;
+        }
     }
 
     private void error( String msg ) {
-	msg( "ERROR: " + msg ) ;
-	errors++ ;
+        msg( "ERROR: " + msg ) ;
+        errors++ ;
     }
 
     public void pre_init( ORBInitInfo info ) {
     }
 
     public void post_init( ORBInitInfo info ) {
-	try {
-	    info.add_client_request_interceptor( this ) ;
-	} catch (DuplicateName exc) {
-	    INTERNAL internal = new INTERNAL() ;
-	    internal.initCause( exc ) ;
-	    throw internal ;
-	}
+        try {
+            info.add_client_request_interceptor( this ) ;
+        } catch (DuplicateName exc) {
+            INTERNAL internal = new INTERNAL() ;
+            internal.initCause( exc ) ;
+            throw internal ;
+        }
     }
 
     public String name() {
-	return "ClientInterceptor" ;
+        return "ClientInterceptor" ;
     }
 
     public void destroy() {
     }
 
     public void send_request( ClientRequestInfo ri ) throws ForwardRequest {
-	msg( "send_request called" ) ;
+        msg( "send_request called" ) ;
     }
 
     public void send_poll( ClientRequestInfo ri ) {
-	error( "send_poll should not be called" ) ;
+        error( "send_poll should not be called" ) ;
     }
 
     public void receive_reply( ClientRequestInfo ri ) {
-	if (exceptionExpected) {
-	    error( "normal completion when exception expected!" ) ;
-	} else {
-	    msg( "normal completion" ) ;
-	}
+        if (exceptionExpected) {
+            error( "normal completion when exception expected!" ) ;
+        } else {
+            msg( "normal completion" ) ;
+        }
     }
 
     public void receive_exception( ClientRequestInfo ri ) throws ForwardRequest {
-	if (!exceptionExpected) {
-	    error( "exception when normal completion expected!" ) ;
-	} else {
-	    msg( "expected exception" ) ;
-	}
+        if (!exceptionExpected) {
+            error( "exception when normal completion expected!" ) ;
+        } else {
+            msg( "expected exception" ) ;
+        }
 
-	Any exception = ri.received_exception() ;
-	SystemException sysex = ORBUtility.extractSystemException( exception ) ;
+        Any exception = ri.received_exception() ;
+        SystemException sysex = ORBUtility.extractSystemException( exception ) ;
 
-	if (!(sysex instanceof COMM_FAILURE)) {
-	    error( "Expected COMM_FAILURE, got " + sysex ) ;
-	} else {
-	    msg( "expected COMM_FAILURE" ) ;
-	}
+        if (!(sysex instanceof COMM_FAILURE)) {
+            error( "Expected COMM_FAILURE, got " + sysex ) ;
+        } else {
+            msg( "expected COMM_FAILURE" ) ;
+        }
 
-	sysex.printStackTrace() ;
+        sysex.printStackTrace() ;
     }
 
     public void receive_other( ClientRequestInfo ri ) throws ForwardRequest {
-	error( "receive_other should not be called" ) ;
+        error( "receive_other should not be called" ) ;
     }
 }

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.resolver ;
+package com.sun.corba.ee.spi.resolver ;
 
 import org.glassfish.pfl.basic.func.NullaryFunction;
 

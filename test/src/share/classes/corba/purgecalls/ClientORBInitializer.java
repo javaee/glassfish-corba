@@ -52,19 +52,19 @@ public class ClientORBInitializer
     extends
         org.omg.CORBA.LocalObject
     implements
-	org.omg.PortableInterceptor.ORBInitializer
+        org.omg.PortableInterceptor.ORBInitializer
 {
     public static final String baseMsg = ClientORBInitializer.class.getName();
 
     public void pre_init(ORBInitInfo info)
     {
-	try {
-	    ClientInterceptor interceptor = new ClientInterceptor();
-	    info.add_client_request_interceptor(interceptor);
-	    U.sop(baseMsg + ".pre_init");
-	} catch (Throwable t) {
-	    U.sopUnexpectedException(baseMsg, t);
-	}
+        try {
+            ClientInterceptor interceptor = new ClientInterceptor();
+            info.add_client_request_interceptor(interceptor);
+            U.sop(baseMsg + ".pre_init");
+        } catch (Throwable t) {
+            U.sopUnexpectedException(baseMsg, t);
+        }
     }
 
     public void post_init(ORBInitInfo info)

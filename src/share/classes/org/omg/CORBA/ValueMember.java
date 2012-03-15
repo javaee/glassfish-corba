@@ -53,7 +53,7 @@ package org.omg.CORBA;
 // @SuppressWarnings({"serial"})
 public final class ValueMember implements org.omg.CORBA.portable.IDLEntity {
 
-    //	instance variables
+    //  instance variables
 
     /**
      * The name of the <code>value</code> member described by this
@@ -101,7 +101,7 @@ public final class ValueMember implements org.omg.CORBA.portable.IDLEntity {
      * @serial
      */
     public short access;
-    //	constructors
+    //  constructors
 
     /**
      * Constructs a default <code>ValueMember</code> object.
@@ -126,12 +126,12 @@ public final class ValueMember implements org.omg.CORBA.portable.IDLEntity {
      * member described by this <code>ValueMember</code> object.
      */
     public ValueMember(String __name, String __id, String __defined_in, String __version, org.omg.CORBA.TypeCode __type, org.omg.CORBA.IDLType __type_def, short __access) {
-	name = __name;
-	id = __id;
-	defined_in = __defined_in;
-	version = __version;
-	type = __type;
-	type_def = __type_def;
-	access = __access;
+        name = __name;
+        id = __id;
+        defined_in = __defined_in;
+        version = __version;
+        type = __type;
+        type_def = __type_def;
+        access = __access;
     }
 }

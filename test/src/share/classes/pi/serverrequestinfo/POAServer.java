@@ -47,9 +47,9 @@ import org.omg.PortableServer.*;
 import org.omg.PortableServer.POAPackage.*;
 import org.omg.PortableServer.ServantLocatorPackage.*;
 import org.omg.PortableInterceptor.*;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import corba.framework.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import java.util.*;
 import java.io.*;
@@ -78,16 +78,16 @@ public abstract class POAServer
     boolean dsi;
 
     public POAServer() {
-	this( false );
+        this( false );
     }
 
     public POAServer( boolean dsi ) {
-	this.dsi = dsi;
+        this.dsi = dsi;
     }
 
     // To be invoked by subclass after orb is created.
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
         try {
@@ -152,41 +152,41 @@ public abstract class POAServer
      * Implementation borrowed from corba.socket.HelloServer test
      */
     public org.omg.CORBA.Object createAndBind ( POA poa, String name, 
-	                                        String symbol )
-	throws Exception
+                                                String symbol )
+        throws Exception
     {
-	// create servant and register it with the ORB
-	Servant helloRef;
-	
-	if( dsi ) {
-	    helloRef = new helloDSIServant( orb, out, symbol, this );
-	}
-	else {
-	    helloRef = new helloServant( out, symbol, this );
-	}
+        // create servant and register it with the ORB
+        Servant helloRef;
+        
+        if( dsi ) {
+            helloRef = new helloDSIServant( orb, out, symbol, this );
+        }
+        else {
+            helloRef = new helloServant( out, symbol, this );
+        }
 
-	byte[] id = poa.activate_object(helloRef);
-	org.omg.CORBA.Object ref = poa.id_to_reference(id);
+        byte[] id = poa.activate_object(helloRef);
+        org.omg.CORBA.Object ref = poa.id_to_reference(id);
       
-	// get the root naming context
-	org.omg.CORBA.Object objRef = 
-	    orb.resolve_initial_references("NameService");
-	NamingContext ncRef = NamingContextHelper.narrow(objRef);
+        // get the root naming context
+        org.omg.CORBA.Object objRef = 
+            orb.resolve_initial_references("NameService");
+        NamingContext ncRef = NamingContextHelper.narrow(objRef);
       
-	// bind the Object Reference in Naming
-	NameComponent nc = new NameComponent(name, "");
-	NameComponent path[] = {nc};
+        // bind the Object Reference in Naming
+        NameComponent nc = new NameComponent(name, "");
+        NameComponent path[] = {nc};
             
-	ncRef.rebind(path, ref);
+        ncRef.rebind(path, ref);
 
-	return ref;
+        return ref;
     }
 
     /**
      * Passes in the appropriate valid and invalid repository ids for POA
      */
     protected void testAttributesValid() 
-	throws Exception
+        throws Exception
     {
         testAttributesValid( 
             "IDL:ServerRequestInfo/hello:1.0",
@@ -201,7 +201,7 @@ public abstract class POAServer
      * value for each.
      */
     protected void testAdapterId()
-	throws Exception
+        throws Exception
     {
         out.println( "+ Testing adapter_id with child POA 1..." );
         InterceptorStrategy interceptorStrategy =
@@ -222,7 +222,7 @@ public abstract class POAServer
      * policies from ServerRequestInfo
      */
     protected void testGetServerPolicy() 
-	throws Exception
+        throws Exception
     {
         out.println( "+ Testing get_server_policy..." );
         InterceptorStrategy interceptorStrategy =
@@ -237,71 +237,71 @@ public abstract class POAServer
      * to the POA so we can test get_server_policy later on.
      */
     private void createChildPOA( int n ) 
-	throws Exception
+        throws Exception
     {
-	Policy[] policies = new Policy[2];
+        Policy[] policies = new Policy[2];
 
-	policies[0] = rootPOA.create_id_uniqueness_policy(
-	    IdUniquenessPolicyValue.MULTIPLE_ID );
+        policies[0] = rootPOA.create_id_uniqueness_policy(
+            IdUniquenessPolicyValue.MULTIPLE_ID );
         Any value = orb.create_any();
-	value.insert_long( 99 );
-	policies[1] = orb.create_policy( 100, value );
+        value.insert_long( 99 );
+        policies[1] = orb.create_policy( 100, value );
 
-	POA tpoa = rootPOA.create_POA( "childPOA" + n, null, policies );
-	tpoa.the_POAManager().activate();
+        POA tpoa = rootPOA.create_POA( "childPOA" + n, null, policies );
+        tpoa.the_POAManager().activate();
         org.omg.CORBA.Object obj = 
-	    createAndBind( tpoa, "HelloChild" + n, "[HelloChild" + n + "]" );
+            createAndBind( tpoa, "HelloChild" + n, "[HelloChild" + n + "]" );
         byte[] id = tpoa.id();
 
         out.println( "  - Adpater id is " + id );
 
-	if( n == 1 ) {
-	    childPOA1 = tpoa;
-	    childPOA1Object = obj;
-	    childPOA1Id = id;
-	}
-	else {
-	    childPOA2 = tpoa;
-	    childPOA2Object = obj;
-	    childPOA2Id = id;
-	}
+        if( n == 1 ) {
+            childPOA1 = tpoa;
+            childPOA1Object = obj;
+            childPOA1Id = id;
+        }
+        else {
+            childPOA2 = tpoa;
+            childPOA2Object = obj;
+            childPOA2Id = id;
+        }
     }
 
     // ClientCallback interface for request info stack test:
     public String sayHello() {
-	String result = "";
+        String result = "";
 
         out.println( 
-	    "    + ClientCallback: resolving and invoking sayHello()..." );
-	try {
-	    hello helloRef = POAClient.resolve( orb, "Hello1" );
-	    result = helloRef.sayHello();
-	}
-	catch( Exception e ) {
-	    e.printStackTrace();
-	    throw new RuntimeException( "ClientCallback: exception thrown." );
-	}
+            "    + ClientCallback: resolving and invoking sayHello()..." );
+        try {
+            hello helloRef = POAClient.resolve( orb, "Hello1" );
+            result = helloRef.sayHello();
+        }
+        catch( Exception e ) {
+            e.printStackTrace();
+            throw new RuntimeException( "ClientCallback: exception thrown." );
+        }
 
-	return result;
+        return result;
 
     }
 
     public void saySystemException() {
         out.println( 
-	    "    + ClientCallback: resolving and invoking " + 
-	    "saySystemException()..." );
-	try {
-	    hello helloRef = POAClient.resolve( orb, "Hello1" );
-	    helloRef.saySystemException();
-	}
-	catch( SystemException e ) {
-	    // expected.
-	    throw e;
-	}
-	catch( Exception e ) {
-	    e.printStackTrace();
-	    throw new RuntimeException( "ClientCallback: exception thrown." );
-	}
+            "    + ClientCallback: resolving and invoking " + 
+            "saySystemException()..." );
+        try {
+            hello helloRef = POAClient.resolve( orb, "Hello1" );
+            helloRef.saySystemException();
+        }
+        catch( SystemException e ) {
+            // expected.
+            throw e;
+        }
+        catch( Exception e ) {
+            e.printStackTrace();
+            throw new RuntimeException( "ClientCallback: exception thrown." );
+        }
     }
 
 }

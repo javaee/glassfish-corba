@@ -55,34 +55,34 @@ public class ColocatedServers
 
     public static void main (String[] av)
     {
-	try {
+        try {
 
-	    //
-	    // Share an ORB between objects servers.
-	    //
+            //
+            // Share an ORB between objects servers.
+            //
 
-	    Properties props = new Properties();
-	    props.put("org.omg.PortableInterceptor.ORBInitializerClass."
-		      + "pi.serviceexample.AServiceORBInitializer",
-		      "");
-	    props.put("org.omg.PortableInterceptor.ORBInitializerClass."
-		      + "pi.serviceexample.LoggingServiceServerORBInitializer",
-		      "");
-	    ORB orb = ORB.init(av, props);
-	    ArbitraryObjectImpl.orb = orb;
-	    LoggingServiceImpl.orb = orb;
+            Properties props = new Properties();
+            props.put("org.omg.PortableInterceptor.ORBInitializerClass."
+                      + "pi.serviceexample.AServiceORBInitializer",
+                      "");
+            props.put("org.omg.PortableInterceptor.ORBInitializerClass."
+                      + "pi.serviceexample.LoggingServiceServerORBInitializer",
+                      "");
+            ORB orb = ORB.init(av, props);
+            ArbitraryObjectImpl.orb = orb;
+            LoggingServiceImpl.orb = orb;
 
-	    //
-	    // Start both object servers.
-	    //
+            //
+            // Start both object servers.
+            //
 
-	    ServerThread ServerThread = new ServerThread(av);
-	    ServerThread.start();
-	    ArbitraryObjectImpl.main(av);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    System.exit(-1);
-	}
+            ServerThread ServerThread = new ServerThread(av);
+            ServerThread.start();
+            ArbitraryObjectImpl.main(av);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
 }
 
@@ -91,11 +91,11 @@ class ServerThread extends Thread
     String[] av;
     ServerThread (String[] av)
     {
-	this.av = av;
+        this.av = av;
     }
     public void run ()
     {
-	LoggingServiceImpl.main(av);
+        LoggingServiceImpl.main(av);
     }
 }
 

@@ -39,8 +39,8 @@
  */
 package naming.rinameservice;
 
-import com.sun.corba.se.impl.naming.cosnaming.TransientNameService;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.naming.cosnaming.TransientNameService;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import org.omg.CORBA.ORB;
 import corba.framework.*;
 import java.util.*;
@@ -77,13 +77,13 @@ public class NameServer implements InternalProcess
             orbProperties.put( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
                 TestConstants.RI_NAMESERVICE_PORT );
             orbProperties.put( "org.omg.CORBA.ORBClass",
-                       "com.sun.corba.se.impl.orb.ORBImpl" );
-	    orbProperties.setProperty( ORBConstants.DEBUG_PROPERTY, "subcontract,giop,transport" ) ;
+                       "com.sun.corba.ee.impl.orb.ORBImpl" );
+            orbProperties.setProperty( ORBConstants.DEBUG_PROPERTY, "subcontract,giop,transport" ) ;
             ORB orb = ORB.init( args, orbProperties );
             TransientNameService standaloneNameService = 
                 new TransientNameService( 
-                    (com.sun.corba.se.spi.orb.ORB)orb );
-	    System.out.println( "Server is ready." ) ;
+                    (com.sun.corba.ee.spi.orb.ORB)orb );
+            System.out.println( "Server is ready." ) ;
             orb.run( );
         } catch( Exception e ) {
             System.err.println( "Exception In NameServer " + e );

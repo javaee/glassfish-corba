@@ -106,7 +106,7 @@ public class TestObjectSuper implements Serializable
     {
         System.out.println("TestObjectSuper readObject begin");
 
-	is.defaultReadObject();
+        is.defaultReadObject();
 
 //         try {
 //             is.defaultReadObject();

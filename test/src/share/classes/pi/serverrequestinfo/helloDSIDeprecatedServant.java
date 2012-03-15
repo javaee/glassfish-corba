@@ -61,17 +61,17 @@ class helloDSIDeprecatedServant
     public static String[] __ids = { "IDL:ServerRequestInfo/hello:1.0" };
 
     public String[] _ids() {
-	return __ids; 
+        return __ids; 
     }
 
     public helloDSIDeprecatedServant( ORB orb, PrintStream out, String symbol, 
-	helloDelegate.ClientCallback clientCallback ) 
+        helloDelegate.ClientCallback clientCallback ) 
     {
-	impl = new DSIImpl( orb, out, symbol, clientCallback );
+        impl = new DSIImpl( orb, out, symbol, clientCallback );
     }
 
     public void invoke( ServerRequest r ) {
-	impl.invoke( r );
+        impl.invoke( r );
     }
 
 }

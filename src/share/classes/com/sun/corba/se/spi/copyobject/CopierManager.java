@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.copyobject ;
+package com.sun.corba.ee.spi.copyobject ;
 
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory ;
 

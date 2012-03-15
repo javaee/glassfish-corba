@@ -39,7 +39,7 @@
  */
 module test {
 interface Hello {
-	string sayHello();
+        string sayHello();
 };
 };
 

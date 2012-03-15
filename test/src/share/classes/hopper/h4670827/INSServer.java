@@ -47,7 +47,7 @@ import org.omg.CORBA.*;
 import java.util.Properties;
 import java.util.Hashtable;
 import corba.framework.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class INSServer implements InternalProcess
 {
@@ -85,7 +85,7 @@ public class INSServer implements InternalProcess
 
             HelloImpl helloRef = new HelloImpl( );
             orb.connect( helloRef );
-            ((com.sun.corba.se.spi.orb.ORB)orb).register_initial_reference( 
+            ((com.sun.corba.ee.spi.orb.ORB)orb).register_initial_reference( 
                 TestConstants.INSServiceName, helloRef );
 
             //handshake:

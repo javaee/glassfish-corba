@@ -78,13 +78,13 @@ public class FleetImpl implements Fleet, java.io.Serializable
 
     public FleetImpl (ShipDesign design, int shipsInFleet, Player owner)
     {
-	fID = new ID ();
-	fDesign = design;
-	fShipsInFleet = shipsInFleet;
-	fOwner = owner;
-	fStation = null;
-	fJourney = null;
-	replentishFuel ();
+        fID = new ID ();
+        fDesign = design;
+        fShipsInFleet = shipsInFleet;
+        fOwner = owner;
+        fStation = null;
+        fJourney = null;
+        replentishFuel ();
     }
 
     //
@@ -93,65 +93,65 @@ public class FleetImpl implements Fleet, java.io.Serializable
 
     public ID getID ()
     {
-	return fID;
+        return fID;
     }
 
     public ShipDesign getDesign ()
     {
-	return fDesign;
+        return fDesign;
     }
 
     public int getNumberInFleet ()
     {
-	return fShipsInFleet;
+        return fShipsInFleet;
     }
 
     public int getMaximumRange ()
     {
-	return fDesign.getTechProfile().getRange ();
+        return fDesign.getTechProfile().getRange ();
     }
 
     public int getCurrentRange ()
     {
-	if ( isSatelite() )
-	    return 0;
-	else
-	    return fFuelLevel;
+        if ( isSatelite() )
+            return 0;
+        else
+            return fFuelLevel;
     }
   
     public boolean isOnJourney ()
     {
-	return ( fJourney == null ? false : true );
+        return ( fJourney == null ? false : true );
     }
 
     public String toString ()
     {
-	String s = String.valueOf (fShipsInFleet);
-	s += " " + fDesign.getName ();
+        String s = String.valueOf (fShipsInFleet);
+        s += " " + fDesign.getName ();
 
-	switch ( fDesign.getType () ) {
-	case ShipDesign.COLONY_SHIP:
-	    s += " Colony Ship ";
-	    break;
-	case ShipDesign.SCOUT:
-	    s += " Scout ";
-	    break;
-	case ShipDesign.FIGHTER:
-	    s += " Fighter ";
-	    break;
-	case ShipDesign.SATELITE:
-	    s += " Satelite ";
-	    break;
-	}
+        switch ( fDesign.getType () ) {
+        case ShipDesign.COLONY_SHIP:
+            s += " Colony Ship ";
+            break;
+        case ShipDesign.SCOUT:
+            s += " Scout ";
+            break;
+        case ShipDesign.FIGHTER:
+            s += " Fighter ";
+            break;
+        case ShipDesign.SATELITE:
+            s += " Satelite ";
+            break;
+        }
 
-	s += fDesign.getTechProfile().toString();
-	s += " " + String.valueOf (getCurrentRange());
+        s += fDesign.getTechProfile().toString();
+        s += " " + String.valueOf (getCurrentRange());
 
-	if ( isOnJourney() ) {
-	    s += " *";
-	}
+        if ( isOnJourney() ) {
+            s += " *";
+        }
 
-	return s;
+        return s;
     }
 
 
@@ -161,96 +161,96 @@ public class FleetImpl implements Fleet, java.io.Serializable
 
     public Player getOwner ()
     {
-	return fOwner;
+        return fOwner;
     }
 
     public PlanetImpl getStation ()
     {
-	return fStation;
+        return fStation;
     }
 
     public JourneyImpl getJourney ()
     {
-	return fJourney;
+        return fJourney;
     }
 
     public void setStation (PlanetImpl station)
     {
-	fStation = station;
+        fStation = station;
     }
 
     public void setJourney (JourneyImpl journey)
     {
-	fJourney = journey;
+        fJourney = journey;
     }
 
     public int getShipsInFleet ()
     {
-	return fShipsInFleet;
+        return fShipsInFleet;
     }
 
     public int getSpeed ()
     {
-	return fDesign.getTechProfile().getSpeed ();
+        return fDesign.getTechProfile().getSpeed ();
     }
 
     public boolean isColonyShip ()
     {
-	if ( fDesign.getType() == ShipDesign.COLONY_SHIP )
-	    return true;
-	else
-	    return false;
+        if ( fDesign.getType() == ShipDesign.COLONY_SHIP )
+            return true;
+        else
+            return false;
     }
 
     public boolean isFighter ()
     {
-	if ( fDesign.getType() == ShipDesign.FIGHTER )
-	    return true;
-	else
-	    return false;
+        if ( fDesign.getType() == ShipDesign.FIGHTER )
+            return true;
+        else
+            return false;
     }
 
     public boolean isSatelite ()
     {
-	if ( fDesign.getType() == ShipDesign.SATELITE )
-	    return true;
-	else
-	    return false;
+        if ( fDesign.getType() == ShipDesign.SATELITE )
+            return true;
+        else
+            return false;
     }
 
     public void move (int distance)
     {
-	fFuelLevel -= distance;
-	fFuelLevel = Math.max (fFuelLevel, 0);
+        fFuelLevel -= distance;
+        fFuelLevel = Math.max (fFuelLevel, 0);
     }
 
     public void replentishFuel ()
     {
-	fFuelLevel = getMaximumRange ();
+        fFuelLevel = getMaximumRange ();
     }
 
     public long getScrapMetal ()
     {
-	return fDesign.getScrapMetalPerShip() * fShipsInFleet;
+        return fDesign.getScrapMetalPerShip() * fShipsInFleet;
     }
 
     public int getStrenth ()
     {
-	int s = fDesign.getTechProfile().getWeapons() * fShipsInFleet;
-	if ( isFighter() ) s = (int)(s * 1.5);
-	return s;
+        int s = fDesign.getTechProfile().getWeapons() * fShipsInFleet;
+        if ( isFighter() ) s = (int)(s * 1.5);
+        return s;
     }
 
     public int getResistance ()
     {
-	int r = fDesign.getTechProfile().getShields() * fShipsInFleet;
-	if ( isSatelite() ) r = (int)(r * 1.5);
-	return r;
+        int r = fDesign.getTechProfile().getShields() * fShipsInFleet;
+        if ( isSatelite() ) r = (int)(r * 1.5);
+        return r;
     }
 
     public int getDamageLevel ()
     {
-	return fDamageLevel;
+        return fDamageLevel;
     }
 
 }

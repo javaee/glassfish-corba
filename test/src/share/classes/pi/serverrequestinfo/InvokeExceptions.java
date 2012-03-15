@@ -40,7 +40,7 @@
 
 package pi.serverrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.CORBA.*;
 import ServerRequestInfo.*;
@@ -56,28 +56,28 @@ public class InvokeExceptions
     extends InvokeStrategy
 {
     public void invoke() throws Exception {
-	super.invoke();
+        super.invoke();
 
-	// Invoke rrsc, rr, then sr
-	invokeMethod( "sayHello" );
+        // Invoke rrsc, rr, then sr
+        invokeMethod( "sayHello" );
 
-	// Invoke rrsc, rr, then se
-	try {
-	    invokeMethod( "saySystemException" );
-	}
-	catch( IMP_LIMIT e ) {
-	    // We expect this, but no other exception.
-	}
+        // Invoke rrsc, rr, then se
+        try {
+            invokeMethod( "saySystemException" );
+        }
+        catch( IMP_LIMIT e ) {
+            // We expect this, but no other exception.
+        }
 
-	// Invoke rrsc, rr, then se (user exception)
-	try {
-	    invokeMethod( "sayUserException" );
-	}
-	catch( ExampleException e ) {
-	    // We expect this, but no other exception.
-	}
+        // Invoke rrsc, rr, then se (user exception)
+        try {
+            invokeMethod( "sayUserException" );
+        }
+        catch( ExampleException e ) {
+            // We expect this, but no other exception.
+        }
 
-	// Invoke rrsc, rr, then so
+        // Invoke rrsc, rr, then so
         SampleServerRequestInterceptor.exceptionRedirectToOther = true;
         SampleServerRequestInterceptor.invokeOnForwardedObject = false;
         try {

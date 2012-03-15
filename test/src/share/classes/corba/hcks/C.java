@@ -55,7 +55,7 @@ import org.omg.CORBA.portable.UnknownException;
 import org.omg.PortableInterceptor.Current;
 import org.omg.PortableInterceptor.CurrentHelper;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import java.util.Hashtable;
 import java.util.Properties;
@@ -67,9 +67,9 @@ public class C
     // Custom classes.
 
     public static String MyPOAORB         = 
-	C.class.getPackage().getName() + ".MyPOAORB";
+        C.class.getPackage().getName() + ".MyPOAORB";
     public static String MyORBInitializer = 
-	C.class.getPackage().getName() + ".MyORBInitializer";
+        C.class.getPackage().getName() + ".MyORBInitializer";
 
     // Names for references in naming.
 
@@ -88,16 +88,16 @@ public class C
     public static String idlSAI1       = "idlSAI1";
     public static String idlSAI2       = "idlSAI2";
     public static String idlSAIRaiseObjectNotExistInIncarnate =
-	"idlSAIRaiseObjectNotExistInIncarnate";
+        "idlSAIRaiseObjectNotExistInIncarnate";
     public static String idlSAIRaiseSystemExceptionInIncarnate =
-	"idlSAIRaiseSystemExceptionInIncarnate";
+        "idlSAIRaiseSystemExceptionInIncarnate";
     public static String idlSLI1       = "idlSLI1";
     public static String idlSLI2       = "idlSLI2";
     public static String idlAlwaysForward = "idlAlwaysForward";
     public static String idlAlwaysForwardedToo = "idlAlwaysForwardedToo";
 
     public static String idlNonExistentDefaultServant =
-	"idlNonExistentDefaultServant";
+        "idlNonExistentDefaultServant";
 
     public static String sendRecursiveType = "sendRecursiveType";
 
@@ -107,55 +107,55 @@ public class C
 
     public static String ServantActivator = "ServantActivator";
     public static String raiseForwardRequestInIncarnate =
-	"raiseForwardRequestInIncarnate";
+        "raiseForwardRequestInIncarnate";
     public static String raiseObjectNotExistInIncarnate =
-	"raiseObjectNotExistInIncarnate";
+        "raiseObjectNotExistInIncarnate";
     public static String raiseSystemExceptionInIncarnate =
-	"raiseSystemExceptionInIncarnate";
+        "raiseSystemExceptionInIncarnate";
 
     public static String ServantLocator = "ServantLocator";
     public static String raiseForwardRequestInPreinvoke =
-	"raiseForwardRequestInPreinvoke";
+        "raiseForwardRequestInPreinvoke";
     public static String raiseObjectNotExistInPreinvoke =
-	"raiseObjectNotExistInPreinvoke";
+        "raiseObjectNotExistInPreinvoke";
     public static String raiseSystemExceptionInPreinvoke =
-	"raiseSystemExceptionInPreinvoke";
+        "raiseSystemExceptionInPreinvoke";
     public static String raiseSystemExceptionInPostinvoke =
-	"raiseSystemExceptionInPostinvoke";
+        "raiseSystemExceptionInPostinvoke";
     public static String raiseUserInServantThenSystemInPOThenSE =
-	"raiseUserInServantThenSystemInPOThenSE";
+        "raiseUserInServantThenSystemInPOThenSE";
     public static String raiseSystemInServantThenPOThenSE = 
-	"raiseSystemInServantThenPOThenSE";
+        "raiseSystemInServantThenPOThenSE";
 
     public static String throwThreadDeathInReceiveRequestServiceContexts =
-	"throwThreadDeathInReceiveRequestServiceContexts";
+        "throwThreadDeathInReceiveRequestServiceContexts";
     public static String throwThreadDeathInPreinvoke =
-	"throwThreadDeathInPreinvoke";
+        "throwThreadDeathInPreinvoke";
     public static String throwThreadDeathInReceiveRequest =
-	"throwThreadDeathInReceiveRequest";
+        "throwThreadDeathInReceiveRequest";
     public static String throwThreadDeathInServant =
-	"throwThreadDeathInServant";
+        "throwThreadDeathInServant";
     public static String throwThreadDeathInPostinvoke =
-	"throwThreadDeathInPostinvoke";
+        "throwThreadDeathInPostinvoke";
     public static String throwThreadDeathInSendReply =
-	"throwThreadDeathInSendReply";
+        "throwThreadDeathInSendReply";
     public static String throwThreadDeathInServantThenSysInPostThenSysInSendException =
-	"throwThreadDeathInServantThenSysInPostThenSysInSendException";
+        "throwThreadDeathInServantThenSysInPostThenSysInSendException";
 
     public static String sPic1 = "sPic1";
     public static String sPic2 = "sPic2";
 
     public static String makeColocatedCallFromServant =
-	"makeColocatedCallFromServant";
+        "makeColocatedCallFromServant";
     public static String colocatedCallFromServant =
-	"colocatedCallFromServant";
+        "colocatedCallFromServant";
 
     public static String sayHello              = "sayHello";
     public static String sendBytes             = "sendBytes";
     public static String sendOneObject         = "sendOneObject";
     public static String sendTwoObjects        = "sendTwoObjects";
     public static String returnObjectFromServer=
-	"returnObjectFromServer";
+        "returnObjectFromServer";
 
     public static String syncOK                = "syncOK";
     public static String _get_interface_def    = "_get_interface_def";
@@ -174,13 +174,13 @@ public class C
     public static String sendValue              = "sendValue";
     public static String object_to_string       = "object_to_string";
     public static String isIdenticalWithSavedIOR = 
-	"isIdenticalWithSavedIOR";
+        "isIdenticalWithSavedIOR";
 
 
     // Controller actions.
 
     public static String disconnectRidlStaticServant =
-	"disconnectRidlStaticServant";
+        "disconnectRidlStaticServant";
 
     // Misc.
 
@@ -197,13 +197,13 @@ public class C
     public static final int minorCodeForTestExceptions = -45;
 
     public static String rmiiColocatedCallResult = 
-	"makeColocatedCallFromServant colocatedCallFromServant makeColocatedCallFromServant makeColocatedCallFromServant makeColocatedCallFromServant makeColocatedCallFromServant makeColocatedCallFromServant";
+        "makeColocatedCallFromServant colocatedCallFromServant makeColocatedCallFromServant makeColocatedCallFromServant makeColocatedCallFromServant makeColocatedCallFromServant makeColocatedCallFromServant";
 
     public static String idlSAI1ColocatedCallResult =
-	"makeColocatedCallFromServant idlSAI2 colocatedCallFromServant idlSAI2 -- makeColocatedCallFromServant idlSAI2";
+        "makeColocatedCallFromServant idlSAI2 colocatedCallFromServant idlSAI2 -- makeColocatedCallFromServant idlSAI2";
 
     public static String idlSLI1ColocatedResult =
-	"makeColocatedCallFromServant idlSLI2 colocatedCallFromServant idlSLI1 -- makeColocatedCallFromServant idlSLI2";
+        "makeColocatedCallFromServant idlSLI2 colocatedCallFromServant idlSLI1 -- makeColocatedCallFromServant idlSLI2";
 
     //
     // Initialization.
@@ -212,38 +212,38 @@ public class C
     public static ORB createORB(String[] av, int fragmentSize)
     {
         return createORB(av, 
-			 GIOP_VERSION_1_2, 
-			 (fragmentSize > 0 ? BUFFMGR_STRATEGY_STREAM :
-			                     BUFFMGR_STRATEGY_GROW),
-			 fragmentSize);
+                         GIOP_VERSION_1_2, 
+                         (fragmentSize > 0 ? BUFFMGR_STRATEGY_STREAM :
+                                             BUFFMGR_STRATEGY_GROW),
+                         fragmentSize);
     }
 
     public static ORB createORB(String [] av,
-				String giopVersion,
-				String buffMgrStrategy,
-				int fragmentSize)
+                                String giopVersion,
+                                String buffMgrStrategy,
+                                int fragmentSize)
     {
-	Properties props = new Properties();
-	props.put(U.ORBClass, MyPOAORB);
-	props.put(U.ORBInitializerClass + "." + MyORBInitializer, "ignored");
+        Properties props = new Properties();
+        props.put(U.ORBClass, MyPOAORB);
+        props.put(U.ORBInitializerClass + "." + MyORBInitializer, "ignored");
 
-	props.put(ORBConstants.GIOP_VERSION, giopVersion);
-	props.put(ORBConstants.GIOP_11_BUFFMGR, buffMgrStrategy);
-	props.put(ORBConstants.GIOP_12_BUFFMGR, buffMgrStrategy);
-	if (fragmentSize > 0) {
-	    props.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
-	}
+        props.put(ORBConstants.GIOP_VERSION, giopVersion);
+        props.put(ORBConstants.GIOP_11_BUFFMGR, buffMgrStrategy);
+        props.put(ORBConstants.GIOP_12_BUFFMGR, buffMgrStrategy);
+        if (fragmentSize > 0) {
+            props.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
+        }
 
-	return ORB.init(av, props);
+        return ORB.init(av, props);
     }
 
     public static InitialContext createInitialContext(ORB orb)
-	throws
-	    NamingException
+        throws
+            NamingException
     {
-	Hashtable env = new Hashtable();                  
-	env.put(U.javaNamingCorbaOrb, orb);          
-	return new InitialContext(env); 
+        Hashtable env = new Hashtable();                  
+        env.put(U.javaNamingCorbaOrb, orb);          
+        return new InitialContext(env); 
     }
 
     //
@@ -251,75 +251,75 @@ public class C
     //
 
     public static String makeColocatedCallFromServant(String name, 
-						      ORB orb, 
-						      String delegator)
+                                                      ORB orb, 
+                                                      String delegator)
     {
-	String result = null;
-	try {
-	    result = U.getPOACurrentInfo(orb);
+        String result = null;
+        try {
+            result = U.getPOACurrentInfo(orb);
 
-	    idlSMI ridlSMI = null;
-	    ridlSMI = idlSMIHelper.narrow(U.resolve(name, orb));
-	    result = doCall(ridlSMI, result, orb);
+            idlSMI ridlSMI = null;
+            ridlSMI = idlSMIHelper.narrow(U.resolve(name, orb));
+            result = doCall(ridlSMI, result, orb);
 
-	} catch (Exception e) {
-	    U.sopUnexpectedException(delegator + "." + 
-				     C.makeColocatedCallFromServant,
-				     e);
-	}
-	return result;
+        } catch (Exception e) {
+            U.sopUnexpectedException(delegator + "." + 
+                                     C.makeColocatedCallFromServant,
+                                     e);
+        }
+        return result;
     }
 
     private static String doCall(idlSMI ridlSMI, String resultSoFar, ORB orb)
-	throws
-	    Exception
+        throws
+            Exception
     {
-	String result = ridlSMI.colocatedCallFromServant(resultSoFar);
-	String info = U.getPOACurrentInfo(orb);
-	return info + " " + result;
+        String result = ridlSMI.colocatedCallFromServant(resultSoFar);
+        String info = U.getPOACurrentInfo(orb);
+        return info + " " + result;
     }
 
     public static String colocatedCallFromServant(String a, 
-						  ORB orb,
-						  String delegator)
+                                                  ORB orb,
+                                                  String delegator)
     {
-	String result = "";
-	try {
-	    String now = U.getPOACurrentInfo(orb);
-	    result = now + " -- " + a;
-	} catch (Exception e) {
-	    U.sopUnexpectedException(delegator + "." +
-				     C.colocatedCallFromServant,
-				     e);
-	}
-	return result;
+        String result = "";
+        try {
+            String now = U.getPOACurrentInfo(orb);
+            result = now + " -- " + a;
+        } catch (Exception e) {
+            U.sopUnexpectedException(delegator + "." +
+                                     C.colocatedCallFromServant,
+                                     e);
+        }
+        return result;
     }
 
     public static void throwUserException(String message)
-	throws
-	    idlExampleException
+        throws
+            idlExampleException
     {
-	throw new idlExampleException(message);
+        throw new idlExampleException(message);
     }
 
     public static void throwSystemException(String message)
     {
-	throw new IMP_LIMIT(message, 
-			    minorCodeForTestExceptions,
-			    CompletionStatus.COMPLETED_NO);
+        throw new IMP_LIMIT(message, 
+                            minorCodeForTestExceptions,
+                            CompletionStatus.COMPLETED_NO);
 
     }
 
     public static void throwUnknownException(String message)
     {
-	throw new UnknownException(new idlExampleException(message));
+        throw new UnknownException(new idlExampleException(message));
     }
 
     public static void throwUNKNOWN(String message)
     {
-	throw new UNKNOWN(message,
-			  minorCodeForTestExceptions,
-			  CompletionStatus.COMPLETED_NO);	
+        throw new UNKNOWN(message,
+                          minorCodeForTestExceptions,
+                          CompletionStatus.COMPLETED_NO);       
     }
 
     //
@@ -327,46 +327,46 @@ public class C
     //
 
     public static boolean testAndIncrementPICSlot(boolean ensure,
-						  String message,
-						  int id, 
-						  int shouldBe,
-						  ORB orb)
+                                                  String message,
+                                                  int id, 
+                                                  int shouldBe,
+                                                  ORB orb)
     {
-	Current piCurrent = null;
-	try {
-	    piCurrent = 
-		CurrentHelper.narrow(
+        Current piCurrent = null;
+        try {
+            piCurrent = 
+                CurrentHelper.narrow(
                     orb.resolve_initial_references(U.PICurrent));
-	} catch (org.omg.CORBA.ORBPackage.InvalidName e) {
-	    U.sopShouldNotSeeThis("testAndIncrementPICSlot");
-	}
-	return testAndIncrementPICSlot(ensure, message,
-				       id, shouldBe, piCurrent);
+        } catch (org.omg.CORBA.ORBPackage.InvalidName e) {
+            U.sopShouldNotSeeThis("testAndIncrementPICSlot");
+        }
+        return testAndIncrementPICSlot(ensure, message,
+                                       id, shouldBe, piCurrent);
     }
 
     public static boolean testAndIncrementPICSlot(boolean ensure,
-						  String message,
-						  int id,
-						  int shouldBe,
-						  Current piCurrent)
+                                                  String message,
+                                                  int id,
+                                                  int shouldBe,
+                                                  Current piCurrent)
     {
-	try {
-	    Any any = piCurrent.get_slot(id);
-	    if (U.isTkLong(any)) {
-		int currentValue = any.extract_long();
-		if (currentValue == shouldBe) {
-		    any.insert_long(++currentValue);
-		    piCurrent.set_slot(id, any);
-		    return true;
-		}
-	    }
-	    if (ensure) {
-		U.sopShouldNotSeeThis(message);
-	    }
-	} catch (org.omg.PortableInterceptor.InvalidSlot e) {
-	    U.sopShouldNotSeeThis("testAndIncrementPICSlot");
-	}
-	return false;
+        try {
+            Any any = piCurrent.get_slot(id);
+            if (U.isTkLong(any)) {
+                int currentValue = any.extract_long();
+                if (currentValue == shouldBe) {
+                    any.insert_long(++currentValue);
+                    piCurrent.set_slot(id, any);
+                    return true;
+                }
+            }
+            if (ensure) {
+                U.sopShouldNotSeeThis(message);
+            }
+        } catch (org.omg.PortableInterceptor.InvalidSlot e) {
+            U.sopShouldNotSeeThis("testAndIncrementPICSlot");
+        }
+        return false;
     }
 }
 

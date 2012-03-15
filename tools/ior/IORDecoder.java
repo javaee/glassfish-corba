@@ -190,7 +190,7 @@ public class IORDecoder implements Utility
 
 
     /**
-     * Copied from com.sun.corba.se.impl.corba.IOR
+     * Copied from com.sun.corba.ee.impl.corba.IOR
      */
     private static final String STRINGIFY_PREFIX = "IOR:" ;
     private static final int PREFIX_LENGTH = STRINGIFY_PREFIX.length() ;
@@ -271,11 +271,11 @@ public class IORDecoder implements Utility
     }
 
     /**
-     * Copied from com.sun.corba.se.impl.util.Utility.
+     * Copied from com.sun.corba.ee.impl.util.Utility.
      */
     public static int hexOf(char x)
     {
-	int val;
+        int val;
 
         val = x - '0';
         if (val >=0 && val <= 9)

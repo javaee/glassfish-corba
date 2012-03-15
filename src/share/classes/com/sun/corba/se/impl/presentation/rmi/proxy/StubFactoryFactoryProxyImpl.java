@@ -38,18 +38,18 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi.proxy;
+package com.sun.corba.ee.impl.presentation.rmi.proxy;
 
-import com.sun.corba.se.impl.presentation.rmi.*;
-import com.sun.corba.se.impl.presentation.rmi.proxy.StubFactoryProxyImpl;
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.ee.impl.presentation.rmi.*;
+import com.sun.corba.ee.impl.presentation.rmi.proxy.StubFactoryProxyImpl;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
 
 public class StubFactoryFactoryProxyImpl extends StubFactoryFactoryDynamicBase 
 {
     public PresentationManager.StubFactory makeDynamicStubFactory( 
-	PresentationManager pm, PresentationManager.ClassData classData, 
-	ClassLoader classLoader ) 
+        PresentationManager pm, PresentationManager.ClassData classData, 
+        ClassLoader classLoader ) 
     {
-	return new StubFactoryProxyImpl( classData, classLoader ) ;
+        return new StubFactoryProxyImpl( classData, classLoader ) ;
     }
 }

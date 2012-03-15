@@ -57,12 +57,12 @@ public class InvalidTransactionException extends java.rmi.RemoteException
 {
     public InvalidTransactionException()
     {
-	super();
+        super();
     }
 
     public InvalidTransactionException(String msg)
     {
-	super(msg);
+        super(msg);
     }
 }
 

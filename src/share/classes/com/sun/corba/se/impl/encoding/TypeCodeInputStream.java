@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,10 +48,10 @@ import java.nio.ByteBuffer;
 
 import org.omg.CORBA_2_3.portable.InputStream;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.impl.corba.TypeCodeImpl;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.impl.corba.TypeCodeImpl;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
 
 public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeReader
 {
@@ -90,7 +90,7 @@ public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeRe
 
     public TypeCodeImpl getTypeCodeAtPosition(int position) {
         if (typeMap == null)
-	    return null;
+            return null;
         //if (TypeCodeImpl.debug) {
             //System.out.println("Getting tc " + typeMap.get(position) +
                                //" at position " + position);
@@ -135,16 +135,16 @@ public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeRe
     }
 
     public static TypeCodeInputStream readEncapsulation(InputStream is, org.omg.CORBA.ORB _orb) {
-	// _REVISIT_ Would be nice if we didn't have to copy the buffer!
-	TypeCodeInputStream encap;
+        // _REVISIT_ Would be nice if we didn't have to copy the buffer!
+        TypeCodeInputStream encap;
 
         int encapLength = is.read_long();
 
         // read off part of the buffer corresponding to the encapsulation
-	byte[] encapBuffer = new byte[encapLength];
-	is.read_octet_array(encapBuffer, 0, encapBuffer.length);
+        byte[] encapBuffer = new byte[encapLength];
+        is.read_octet_array(encapBuffer, 0, encapBuffer.length);
 
-	// create an encapsulation using the marshal buffer
+        // create an encapsulation using the marshal buffer
         if (is instanceof CDRInputObject) {
             encap = new TypeCodeInputStream((ORB)_orb, encapBuffer, encapBuffer.length,
                                             ((CDRInputObject)is).isLittleEndian(),
@@ -152,9 +152,9 @@ public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeRe
         } else {
             encap = new TypeCodeInputStream((ORB)_orb, encapBuffer, encapBuffer.length);
         }
-	encap.setEnclosingInputStream(is);
+        encap.setEnclosingInputStream(is);
         encap.makeEncapsulation();
-	return encap;
+        return encap;
     }
 
     protected void makeEncapsulation() {
@@ -165,10 +165,10 @@ public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeRe
 
     public void printTypeMap() {
         System.out.println("typeMap = {");
-	for (Integer pos : typeMap.keySet() ) {
-	    System.out.println( "  key = " + pos + ", value = " +
-		typeMap.get(pos).description() ) ;
-	}
-	System.out.println("}") ;
+        for (Integer pos : typeMap.keySet() ) {
+            System.out.println( "  key = " + pos + ", value = " +
+                typeMap.get(pos).description() ) ;
+        }
+        System.out.println("}") ;
     }
 }

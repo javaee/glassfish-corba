@@ -40,7 +40,7 @@
 
 package pi.clientrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.CORBA.*;
 import ClientRequestInfo.*;
@@ -56,30 +56,30 @@ public class InvokeExceptions
     extends InvokeStrategy
 {
     public void invoke() throws Exception {
-	super.invoke();
+        super.invoke();
 
-	// Invoke send_request then receive_reply
-	invokeMethod( "sayHello" );
+        // Invoke send_request then receive_reply
+        invokeMethod( "sayHello" );
 
-	// Invoke send_request then receive_exception:
-	try {
-	    invokeMethod( "saySystemException" );
-	}
-	catch( UNKNOWN e ) {
-	    // We expect this, but no other exception.
-	}
+        // Invoke send_request then receive_exception:
+        try {
+            invokeMethod( "saySystemException" );
+        }
+        catch( UNKNOWN e ) {
+            // We expect this, but no other exception.
+        }
 
-	// Invoke send_request then receive_exception (user exception):
-	try {
-	    invokeMethod( "sayUserException" );
-	}
-	catch( ExampleException e ) {
-	    // We expect these, but no other exceptions.
-	}
-	catch( UnknownUserException e ) {
-	    // We expect these, but no other exceptions.
-	    // This occurs in the DII case.
-	}
+        // Invoke send_request then receive_exception (user exception):
+        try {
+            invokeMethod( "sayUserException" );
+        }
+        catch( ExampleException e ) {
+            // We expect these, but no other exceptions.
+        }
+        catch( UnknownUserException e ) {
+            // We expect these, but no other exceptions.
+            // This occurs in the DII case.
+        }
 
         // Invoke send_request then receive_other:
         SampleClientRequestInterceptor.exceptionRedirectToOther = true;

@@ -42,9 +42,9 @@ package pi.serverrequestinfo;
 
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.corba.AnyImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.IOP.*;
 import org.omg.IOP.CodecPackage.*;
@@ -73,11 +73,11 @@ public abstract class POAClient
 
     // To be invoked after the orb is created by subclasses.
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
-	this.out = out;
-	this.err = err;
+        this.out = out;
+        this.err = err;
 
         // Obey the server's commands:
         obeyServer();
@@ -90,15 +90,15 @@ public abstract class POAClient
         out.println( "    - Resolved." );
 
         out.println( "    - Resolving Hello1Forward..." );
-	helloRefForward = resolve( orb, "Hello1Forward" );
+        helloRefForward = resolve( orb, "Hello1Forward" );
         out.println( "    - Resolved." );
 
         out.println( "    - Resolving HelloChild1..." );
-	helloChild1 = resolve( orb, "HelloChild1" );
+        helloChild1 = resolve( orb, "HelloChild1" );
         out.println( "    - Resolved." );
 
         out.println( "    - Resolving HelloChild2..." );
-	helloChild2 = resolve( orb, "HelloChild2" );
+        helloChild2 = resolve( orb, "HelloChild2" );
         out.println( "    - Resolved." );
     }
 
@@ -110,60 +110,60 @@ public abstract class POAClient
      * Invoke the method with the given name on the object
      */
     protected void invokeMethod( String methodName ) 
-	throws Exception 
+        throws Exception 
     {
-	if( methodName.equals( "sayHello" ) ) {
-	    helloRef.sayHello();
-	}
-	else if( methodName.equals( "child1.sayHello" ) ) {
-	    helloChild1.sayHello();
-	}
-	else if( methodName.equals( "child2.sayHello" ) ) {
-	    helloChild2.sayHello();
-	}
-	else if( methodName.equals( "sayOneway" ) ) {
-	    helloRef.sayOneway();
-	}
-	else if( methodName.equals( "saySystemException" ) ) { 
-	    helloRef.saySystemException();
-	}
-	else if( methodName.equals( "child1.saySystemException" ) ) { 
-	    helloChild1.saySystemException();
-	}
-	else if( methodName.equals( "child2.saySystemException" ) ) { 
-	    helloChild2.saySystemException();
-	}
-	else if( methodName.equals( "sayUserException" ) ) { 
-	    try {
-		helloRef.sayUserException();
-		out.println( "    - Did not catch ForwardRequest user " +
-		    "exception (error)" );
-		throw new RuntimeException( 
-		    "Did not catch ForwardRequest user exception " +
-		    "on sayUserException" );
-	    }
-	    catch( ExampleException e ) {
-		out.println( "    - Caught ExampleException user " +
-		    "exception (ok)" );
-	    }
-	}
-	else if( methodName.equals( "sayInvokeAgain.sayHello" ) ) {
-	    helloRef.sayInvokeAgain( INVOKE_SAY_HELLO.value );
-	}
-	else if( methodName.equals( "sayInvokeAgain.saySystemException" ) ) {
-	    helloRef.sayInvokeAgain( INVOKE_SAY_SYSTEM_EXCEPTION.value );
-	}
-	else {
-	    throw new RuntimeException( "Unknown method: '" + 
-		methodName + "'" );
-	}
+        if( methodName.equals( "sayHello" ) ) {
+            helloRef.sayHello();
+        }
+        else if( methodName.equals( "child1.sayHello" ) ) {
+            helloChild1.sayHello();
+        }
+        else if( methodName.equals( "child2.sayHello" ) ) {
+            helloChild2.sayHello();
+        }
+        else if( methodName.equals( "sayOneway" ) ) {
+            helloRef.sayOneway();
+        }
+        else if( methodName.equals( "saySystemException" ) ) { 
+            helloRef.saySystemException();
+        }
+        else if( methodName.equals( "child1.saySystemException" ) ) { 
+            helloChild1.saySystemException();
+        }
+        else if( methodName.equals( "child2.saySystemException" ) ) { 
+            helloChild2.saySystemException();
+        }
+        else if( methodName.equals( "sayUserException" ) ) { 
+            try {
+                helloRef.sayUserException();
+                out.println( "    - Did not catch ForwardRequest user " +
+                    "exception (error)" );
+                throw new RuntimeException( 
+                    "Did not catch ForwardRequest user exception " +
+                    "on sayUserException" );
+            }
+            catch( ExampleException e ) {
+                out.println( "    - Caught ExampleException user " +
+                    "exception (ok)" );
+            }
+        }
+        else if( methodName.equals( "sayInvokeAgain.sayHello" ) ) {
+            helloRef.sayInvokeAgain( INVOKE_SAY_HELLO.value );
+        }
+        else if( methodName.equals( "sayInvokeAgain.saySystemException" ) ) {
+            helloRef.sayInvokeAgain( INVOKE_SAY_SYSTEM_EXCEPTION.value );
+        }
+        else {
+            throw new RuntimeException( "Unknown method: '" + 
+                methodName + "'" );
+        }
     }
     
     /**
      * Implementation borrwed from corba.socket.HelloClient.java test
      */
     static hello resolve(ORB orb, String name)
-	throws Exception
+        throws Exception
     {
         // Get the root naming context
         org.omg.CORBA.Object objRef = 

@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.cosnaming;
+package com.sun.corba.ee.impl.naming.cosnaming;
 
 // Import general CORBA classes
 import org.omg.CORBA.Object;
@@ -69,7 +69,7 @@ public interface NamingContextDataStore {
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
     void bindImpl(NameComponent n, org.omg.CORBA.Object obj, BindingType bt)
-	throws org.omg.CORBA.SystemException;
+        throws org.omg.CORBA.SystemException;
 
     /**
      * Method which implements resolving the specified name,
@@ -82,7 +82,7 @@ public interface NamingContextDataStore {
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
     org.omg.CORBA.Object resolveImpl(NameComponent n,BindingTypeHolder bth)
-	throws org.omg.CORBA.SystemException;
+        throws org.omg.CORBA.SystemException;
 
     /**
      * Method which implements unbinding a name.
@@ -90,7 +90,7 @@ public interface NamingContextDataStore {
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
     org.omg.CORBA.Object unbindImpl(NameComponent n)
-	throws org.omg.CORBA.SystemException;
+        throws org.omg.CORBA.SystemException;
 
     /**
      * Method which implements listing the contents of this
@@ -101,7 +101,7 @@ public interface NamingContextDataStore {
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
     void listImpl(int how_many, BindingListHolder bl, BindingIteratorHolder bi)
-	throws org.omg.CORBA.SystemException;
+        throws org.omg.CORBA.SystemException;
 
     /**
      * Method which implements creating a new NamingContext.
@@ -110,14 +110,14 @@ public interface NamingContextDataStore {
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
     NamingContext newContextImpl()
-	throws org.omg.CORBA.SystemException;
+        throws org.omg.CORBA.SystemException;
 
     /**
      * Method which implements destroying this NamingContext.
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
     void destroyImpl()
-	throws org.omg.CORBA.SystemException;
+        throws org.omg.CORBA.SystemException;
   
     /**
      * Method which returns whether this NamingContext is empty

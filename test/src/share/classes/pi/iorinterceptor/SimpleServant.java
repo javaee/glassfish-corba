@@ -49,10 +49,10 @@ public class SimpleServant extends simplePOA {
     private short x;
 
     public short x() {
-	return x;
+        return x;
     }
 
     public void x( short newX ) {
-	this.x = newX;
+        this.x = newX;
     }
 }

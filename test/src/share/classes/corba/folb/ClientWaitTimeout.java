@@ -52,9 +52,9 @@ import org.omg.CORBA.COMM_FAILURE;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 import corba.framework.Controller;
 import corba.hcks.U;
@@ -71,15 +71,15 @@ public class ClientWaitTimeout extends ClientBase {
 
     @BeforeSuite
     public void clientSetup() throws Exception {
-	    Properties props = getDefaultProperties();
+            Properties props = getDefaultProperties();
             
-	    // Set retry timeout to 5 seconds.
-	    props.setProperty(ORBConstants.WAIT_FOR_RESPONSE_TIMEOUT, "5000");
-	    props.setProperty(ORBConstants.DEBUG_PROPERTY,
-			      "transport,subcontract");
+            // Set retry timeout to 5 seconds.
+            props.setProperty(ORBConstants.WAIT_FOR_RESPONSE_TIMEOUT, "5000");
+            props.setProperty(ORBConstants.DEBUG_PROPERTY,
+                              "transport,subcontract");
 
-	    setup(props);
-	    circularSetup();
+            setup(props);
+            circularSetup();
     }
 
     @Test

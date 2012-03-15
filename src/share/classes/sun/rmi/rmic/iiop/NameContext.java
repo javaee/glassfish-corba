@@ -55,8 +55,8 @@ import java.util.Hashtable;
  * A NameContext enables detection of strings which differ only
  * in case.
  *
- * @version	1.0, 3/19/98
- * @author	Bryan Atsatt
+ * @version     1.0, 3/19/98
+ * @author      Bryan Atsatt
  */
 class NameContext {
 
@@ -216,11 +216,11 @@ class NameContext {
 
             for (int i = 0; i < length; i++) {
 
-		if (Character.isUpperCase(name.charAt(i))) {
+                if (Character.isUpperCase(name.charAt(i))) {
                     result += "_";
                     result += i;
                     allLower = false;
-		}
+                }
             }
 
             if (allLower) {
@@ -228,7 +228,7 @@ class NameContext {
             }
         }
 
-    	return result;
+        return result;
     }
 
     /**

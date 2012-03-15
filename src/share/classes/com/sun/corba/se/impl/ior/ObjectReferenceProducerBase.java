@@ -38,17 +38,17 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.ior ;
+package com.sun.corba.ee.impl.ior ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.ior.IORFactory ;
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.ior.IORFactories ;
-import com.sun.corba.se.spi.ior.IORTemplateList ;
-import com.sun.corba.se.spi.ior.ObjectId ;
+import com.sun.corba.ee.spi.ior.IORFactory ;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.IORFactories ;
+import com.sun.corba.ee.spi.ior.IORTemplateList ;
+import com.sun.corba.ee.spi.ior.ObjectId ;
 
-import com.sun.corba.se.impl.misc.ORBUtility ;
+import com.sun.corba.ee.impl.misc.ORBUtility ;
 import java.io.Serializable;
 
 
@@ -66,16 +66,16 @@ public abstract class ObjectReferenceProducerBase implements Serializable {
 
     public ObjectReferenceProducerBase( ORB orb ) 
     {
-	this.orb = orb ;
+        this.orb = orb ;
     }
 
     public org.omg.CORBA.Object make_object (String repositoryId, 
-	byte[] objectId)
+        byte[] objectId)
     {
-	ObjectId oid = IORFactories.makeObjectId( objectId ) ;
-	IOR ior = getIORFactory().makeIOR( orb, repositoryId, oid ) ;
+        ObjectId oid = IORFactories.makeObjectId( objectId ) ;
+        IOR ior = getIORFactory().makeIOR( orb, repositoryId, oid ) ;
 
-	return ORBUtility.makeObjectReference( ior ) ;
+        return ORBUtility.makeObjectReference( ior ) ;
     }
 }
 

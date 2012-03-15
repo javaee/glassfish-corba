@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast.bytebuffer ;
+package com.sun.corba.ee.impl.encoding.fast.bytebuffer ;
 
 import java.nio.ByteBuffer ;
 import java.nio.ByteOrder ;
@@ -68,12 +68,12 @@ public class WriterImpl implements Writer {
      * the disposition of the contents of the old buffer.
      */
     public WriterImpl( BufferHandler handler ) {
-	this.handler = handler ;
+        this.handler = handler ;
         byteOrder = ByteOrder.BIG_ENDIAN ;
     }
 
     public BufferHandler bufferHandler() {
-	return handler ;
+        return handler ;
     }
 
     public ByteOrder order() {
@@ -86,19 +86,19 @@ public class WriterImpl implements Writer {
     
     private void overflow() {
         // Why was this here: buffer.buffer().limit( buffer.buffer().position() ) ;
-	initBuffer( handler.overflow( buffer ) ) ;
+        initBuffer( handler.overflow( buffer ) ) ;
     }
 
     private void initBuffer( BufferWrapper buffer ) {
-	this.buffer = buffer ;
-	buffer.buffer().clear() ;
+        this.buffer = buffer ;
+        buffer.buffer().clear() ;
         buffer.buffer().order( byteOrder ) ;
     }
 
     /** Cause the overflow handler to be called even if buffer is not full.
      */
     public synchronized void flush() {
-	overflow() ;
+        overflow() ;
     }
 
     public synchronized void close() {
@@ -114,193 +114,193 @@ public class WriterImpl implements Writer {
             throw new IllegalStateException( 
                 "ByteBufferWriter is closed" ) ;
 
-	if ((buffer == null) || (buffer.remaining() < size)) {
-	    overflow() ;
-	}
+        if ((buffer == null) || (buffer.remaining() < size)) {
+            overflow() ;
+        }
 
-	if (buffer.remaining() < size) {
+        if (buffer.remaining() < size) {
             throw new RuntimeException( "Newly allocated buffer is too small" ) ;
         }
     }
 
     public void putBoolean( boolean data ) {
         ensure( 1 ) ;
-	byte value = data ? (byte)1 : (byte)0 ;
-	buffer.buffer().put( value ) ;
+        byte value = data ? (byte)1 : (byte)0 ;
+        buffer.buffer().put( value ) ;
     }
 
     public void putByte( byte data ) {
         ensure( 1 ) ;
-	buffer.buffer().put( data ) ;
+        buffer.buffer().put( data ) ;
     }
 
     public void putChar( char data ) {
         ensure( 2 ) ;
-	buffer.buffer().putChar( data ) ;
+        buffer.buffer().putChar( data ) ;
     }
 
     public void putShort( short data ) {
         ensure( 2 ) ;
-	buffer.buffer().putShort( data ) ;
+        buffer.buffer().putShort( data ) ;
     }
 
     public void putInt( int data ) {
         ensure( 4 ) ;
-	buffer.buffer().putInt( data ) ;
+        buffer.buffer().putInt( data ) ;
     }
 
     public void putLong( long data ) {
         ensure( 8 ) ;
-	buffer.buffer().putLong( data ) ;
+        buffer.buffer().putLong( data ) ;
     }
 
     public void putFloat( float data ) {
         ensure( 4 ) ;
-	buffer.buffer().putFloat( data ) ;
+        buffer.buffer().putFloat( data ) ;
     }
 
     public void putDouble( double data ) {
         ensure( 8 ) ;
-	buffer.buffer().putDouble( data ) ;
+        buffer.buffer().putDouble( data ) ;
     }
 
     public void putBooleanArray( boolean[] data ) {
         ensure(1) ;
-	int ctr = 0 ;
-	while (ctr < data.length) {
-	    int dataSizeToWrite = Math.min( data.length - ctr, 
-		buffer.buffer().remaining()) ;
+        int ctr = 0 ;
+        while (ctr < data.length) {
+            int dataSizeToWrite = Math.min( data.length - ctr, 
+                buffer.buffer().remaining()) ;
 
-	    for (int ctr2 = ctr; ctr2<ctr+dataSizeToWrite; ctr2++) {
-		buffer.buffer().put( (byte)(data[ctr2] ? 1 : 0) ) ;
-	    }
-	    ctr += dataSizeToWrite ;
+            for (int ctr2 = ctr; ctr2<ctr+dataSizeToWrite; ctr2++) {
+                buffer.buffer().put( (byte)(data[ctr2] ? 1 : 0) ) ;
+            }
+            ctr += dataSizeToWrite ;
 
-	    if (ctr == data.length)
-		break ;
+            if (ctr == data.length)
+                break ;
 
             overflow() ;
-	}
+        }
     }
 
     public void putByteArray( byte[] data ) {
         ensure(1) ;
-	int ctr = 0 ;
-	while (true) {
-	    int dataSizeToWrite = Math.min( data.length - ctr, 
-		buffer.buffer().remaining()) ;
+        int ctr = 0 ;
+        while (true) {
+            int dataSizeToWrite = Math.min( data.length - ctr, 
+                buffer.buffer().remaining()) ;
 
-	    buffer.buffer().put( data, ctr, dataSizeToWrite ) ;
-	    ctr += dataSizeToWrite ;
-	    
-	    if (ctr == data.length)
-		break ;
+            buffer.buffer().put( data, ctr, dataSizeToWrite ) ;
+            ctr += dataSizeToWrite ;
+            
+            if (ctr == data.length)
+                break ;
 
-	    overflow() ;
-	}
+            overflow() ;
+        }
     }
 
     public void putCharArray( final char[] data ) {
         ensure(2) ;
-	final CharBuffer typedBuffer = buffer.buffer().asCharBuffer() ;
-	int ctr = 0 ;
-	while (true) {
-	    int dataSizeToWrite = Math.min( data.length - ctr, 
-		typedBuffer.remaining()) ;
+        final CharBuffer typedBuffer = buffer.buffer().asCharBuffer() ;
+        int ctr = 0 ;
+        while (true) {
+            int dataSizeToWrite = Math.min( data.length - ctr, 
+                typedBuffer.remaining()) ;
 
-	    typedBuffer.put( data, ctr, dataSizeToWrite ) ;
-	    ctr += dataSizeToWrite ;
-	    
-	    if (ctr == data.length)
-		break ;
+            typedBuffer.put( data, ctr, dataSizeToWrite ) ;
+            ctr += dataSizeToWrite ;
+            
+            if (ctr == data.length)
+                break ;
 
-	    overflow() ;
-	}
+            overflow() ;
+        }
     }
 
     public void putShortArray( short[] data ) {
         ensure(2) ;
-	final ShortBuffer typedBuffer = buffer.buffer().asShortBuffer() ;
-	int ctr = 0 ;
-	while (true) {
-	    int dataSizeToWrite = Math.min( data.length - ctr, 
-		typedBuffer.limit() - typedBuffer.position() ) ;
-	    typedBuffer.put( data, ctr, dataSizeToWrite ) ;
-	    ctr += dataSizeToWrite ;
-	    
-	    if (ctr == data.length)
-		break ;
+        final ShortBuffer typedBuffer = buffer.buffer().asShortBuffer() ;
+        int ctr = 0 ;
+        while (true) {
+            int dataSizeToWrite = Math.min( data.length - ctr, 
+                typedBuffer.limit() - typedBuffer.position() ) ;
+            typedBuffer.put( data, ctr, dataSizeToWrite ) ;
+            ctr += dataSizeToWrite ;
+            
+            if (ctr == data.length)
+                break ;
 
-	    overflow() ;
-	}
+            overflow() ;
+        }
     }
 
     public void putIntArray( int[] data ) {
         ensure(4) ;
-	final IntBuffer typedBuffer = buffer.buffer().asIntBuffer() ;
-	int ctr = 0 ;
-	while (true) {
-	    int dataSizeToWrite = Math.min( data.length - ctr, 
-		typedBuffer.limit() - typedBuffer.position() ) ;
-	    typedBuffer.put( data, ctr, dataSizeToWrite ) ;
-	    ctr += dataSizeToWrite ;
-	    
-	    if (ctr == data.length)
-		break ;
+        final IntBuffer typedBuffer = buffer.buffer().asIntBuffer() ;
+        int ctr = 0 ;
+        while (true) {
+            int dataSizeToWrite = Math.min( data.length - ctr, 
+                typedBuffer.limit() - typedBuffer.position() ) ;
+            typedBuffer.put( data, ctr, dataSizeToWrite ) ;
+            ctr += dataSizeToWrite ;
+            
+            if (ctr == data.length)
+                break ;
 
-	    overflow() ;
-	}
+            overflow() ;
+        }
     }
 
     public void putLongArray( long[] data ) {
         ensure(8) ;
-	final LongBuffer typedBuffer = buffer.buffer().asLongBuffer() ;
-	int ctr = 0 ;
-	while (true) {
-	    int dataSizeToWrite = Math.min( data.length - ctr, 
-		typedBuffer.limit() - typedBuffer.position() ) ;
-	    typedBuffer.put( data, ctr, dataSizeToWrite ) ;
-	    ctr += dataSizeToWrite ;
-	    
-	    if (ctr == data.length)
-		break ;
+        final LongBuffer typedBuffer = buffer.buffer().asLongBuffer() ;
+        int ctr = 0 ;
+        while (true) {
+            int dataSizeToWrite = Math.min( data.length - ctr, 
+                typedBuffer.limit() - typedBuffer.position() ) ;
+            typedBuffer.put( data, ctr, dataSizeToWrite ) ;
+            ctr += dataSizeToWrite ;
+            
+            if (ctr == data.length)
+                break ;
 
-	    overflow() ;
-	}
+            overflow() ;
+        }
     }
 
     public void putFloatArray( float[] data ) {
         ensure(4) ;
-	final FloatBuffer typedBuffer = buffer.buffer().asFloatBuffer() ;
-	int ctr = 0 ;
-	while (true) {
-	    int dataSizeToWrite = Math.min( data.length - ctr, 
-		typedBuffer.limit() - typedBuffer.position() ) ;
-	    typedBuffer.put( data, ctr, dataSizeToWrite ) ;
-	    ctr += dataSizeToWrite ;
-	    
-	    if (ctr == data.length)
-		break ;
+        final FloatBuffer typedBuffer = buffer.buffer().asFloatBuffer() ;
+        int ctr = 0 ;
+        while (true) {
+            int dataSizeToWrite = Math.min( data.length - ctr, 
+                typedBuffer.limit() - typedBuffer.position() ) ;
+            typedBuffer.put( data, ctr, dataSizeToWrite ) ;
+            ctr += dataSizeToWrite ;
+            
+            if (ctr == data.length)
+                break ;
 
-	    overflow() ;
-	}
+            overflow() ;
+        }
     }
 
     public void putDoubleArray( double[] data ) {
         ensure(8) ;
-	final DoubleBuffer typedBuffer = buffer.buffer().asDoubleBuffer() ;
-	int ctr = 0 ;
-	while (true) {
-	    int dataSizeToWrite = Math.min( data.length - ctr, 
-		typedBuffer.limit() - typedBuffer.position() ) ;
-	    typedBuffer.put( data, ctr, dataSizeToWrite ) ;
-	    ctr += dataSizeToWrite ;
-	    
-	    if (ctr == data.length)
-		break ;
+        final DoubleBuffer typedBuffer = buffer.buffer().asDoubleBuffer() ;
+        int ctr = 0 ;
+        while (true) {
+            int dataSizeToWrite = Math.min( data.length - ctr, 
+                typedBuffer.limit() - typedBuffer.position() ) ;
+            typedBuffer.put( data, ctr, dataSizeToWrite ) ;
+            ctr += dataSizeToWrite ;
+            
+            if (ctr == data.length)
+                break ;
 
-	    overflow() ;
-	}
+            overflow() ;
+        }
     }
 }
 

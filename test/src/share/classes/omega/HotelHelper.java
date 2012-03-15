@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)HotelHelper.java	1.4 99/06/07 */
+/* @(#)HotelHelper.java 1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -64,7 +64,7 @@ public final class HotelHelper implements com.sun.org.omg.CORBA.portable.ValueHe
     private static HotelHelper helper = new HotelHelper ();
 
     private static String[] _truncatable_ids = {
-	_id   };
+        _id   };
 
     public HotelHelper()
     {
@@ -72,122 +72,122 @@ public final class HotelHelper implements com.sun.org.omg.CORBA.portable.ValueHe
 
     public static void insert (org.omg.CORBA.Any a, omega.Hotel that)
     {
-	org.omg.CORBA.portable.OutputStream out = a.create_output_stream ();
-	a.type (type ());
-	write (out, that);
-	a.read_value (out.create_input_stream (), type ());
+        org.omg.CORBA.portable.OutputStream out = a.create_output_stream ();
+        a.type (type ());
+        write (out, that);
+        a.read_value (out.create_input_stream (), type ());
     }
 
     public static omega.Hotel extract (org.omg.CORBA.Any a)
     {
-	return read (a.create_input_stream ());
+        return read (a.create_input_stream ());
     }
 
     private static org.omg.CORBA.TypeCode __typeCode = null;
     private static boolean __active = false;
     synchronized public static org.omg.CORBA.TypeCode type ()
     {
-	if (__typeCode == null)
-	    {
-		synchronized (org.omg.CORBA.TypeCode.class)
-		    {
-			if (__typeCode == null)
-			    {
-				if (__active)
-				    {
-					return org.omg.CORBA.ORB.init().create_recursive_tc ( _id );
-				    }
-				__active = true;
-				org.omg.CORBA.ValueMember[] _members0 = new org.omg.CORBA.ValueMember[2];
-				org.omg.CORBA.TypeCode _tcOf_members0 = null;
+        if (__typeCode == null)
+            {
+                synchronized (org.omg.CORBA.TypeCode.class)
+                    {
+                        if (__typeCode == null)
+                            {
+                                if (__active)
+                                    {
+                                        return org.omg.CORBA.ORB.init().create_recursive_tc ( _id );
+                                    }
+                                __active = true;
+                                org.omg.CORBA.ValueMember[] _members0 = new org.omg.CORBA.ValueMember[2];
+                                org.omg.CORBA.TypeCode _tcOf_members0 = null;
 
-				// ValueMember instance for tango
-				_tcOf_members0 = org.omg.CORBA.ORB.init ().get_primitive_tc (org.omg.CORBA.TCKind.tk_long);
-				_members0[0] = new org.omg.CORBA.ValueMember ("tango", 
-									      "", 
-									      _id, 
-									      "", 
-									      _tcOf_members0, 
-									      null, 
-									      org.omg.CORBA.PUBLIC_MEMBER.value);
+                                // ValueMember instance for tango
+                                _tcOf_members0 = org.omg.CORBA.ORB.init ().get_primitive_tc (org.omg.CORBA.TCKind.tk_long);
+                                _members0[0] = new org.omg.CORBA.ValueMember ("tango", 
+                                                                              "", 
+                                                                              _id, 
+                                                                              "", 
+                                                                              _tcOf_members0, 
+                                                                              null, 
+                                                                              org.omg.CORBA.PUBLIC_MEMBER.value);
 
-				// ValueMember instance for quickstep
-				_tcOf_members0 = org.omg.CORBA.ORB.init ().get_primitive_tc (org.omg.CORBA.TCKind.tk_long);
-				_members0[1] = new org.omg.CORBA.ValueMember ("quickstep", 
-									      "", 
-									      _id, 
-									      "", 
-									      _tcOf_members0, 
-									      null, 
-									      org.omg.CORBA.PUBLIC_MEMBER.value);
+                                // ValueMember instance for quickstep
+                                _tcOf_members0 = org.omg.CORBA.ORB.init ().get_primitive_tc (org.omg.CORBA.TCKind.tk_long);
+                                _members0[1] = new org.omg.CORBA.ValueMember ("quickstep", 
+                                                                              "", 
+                                                                              _id, 
+                                                                              "", 
+                                                                              _tcOf_members0, 
+                                                                              null, 
+                                                                              org.omg.CORBA.PUBLIC_MEMBER.value);
 
-				__typeCode = org.omg.CORBA.ORB.init ().create_value_tc (_id, "Hotel", org.omg.CORBA.VM_NONE.value, null, _members0);
-				__active = false;
-			    }
-		    }
-	    }
-	return __typeCode;
+                                __typeCode = org.omg.CORBA.ORB.init ().create_value_tc (_id, "Hotel", org.omg.CORBA.VM_NONE.value, null, _members0);
+                                __active = false;
+                            }
+                    }
+            }
+        return __typeCode;
     }
 
     public static String id ()
     {
-	return _id;
+        return _id;
     }
 
     public static omega.Hotel read (org.omg.CORBA.portable.InputStream istream)
     {
-	return (omega.Hotel) ((org.omg.CORBA_2_3.portable.InputStream) istream).read_value (get_instance());
+        return (omega.Hotel) ((org.omg.CORBA_2_3.portable.InputStream) istream).read_value (get_instance());
     }
 
     public java.io.Serializable read_value (org.omg.CORBA.portable.InputStream istream)
     {
-	omega.Hotel value = new omega.Hotel ();
-	value.tango = istream.read_long ();
-	value.quickstep = istream.read_long ();
-	return value;
+        omega.Hotel value = new omega.Hotel ();
+        value.tango = istream.read_long ();
+        value.quickstep = istream.read_long ();
+        return value;
     }
 
     public static void read (org.omg.CORBA.portable.InputStream istream, omega.Hotel value)
     {
-	value.tango = istream.read_long ();
-	value.quickstep = istream.read_long ();
+        value.tango = istream.read_long ();
+        value.quickstep = istream.read_long ();
     }
 
     public static void write (org.omg.CORBA.portable.OutputStream ostream, omega.Hotel value)
     {
-	((org.omg.CORBA_2_3.portable.OutputStream) ostream).write_value (value, get_instance());
+        ((org.omg.CORBA_2_3.portable.OutputStream) ostream).write_value (value, get_instance());
     }
 
     public void write_value (org.omg.CORBA.portable.OutputStream ostream, java.io.Serializable obj)
     {
-	omega.Hotel value  = (omega.Hotel) obj;
-	ostream.write_long (value.tango);
-	ostream.write_long (value.quickstep);
+        omega.Hotel value  = (omega.Hotel) obj;
+        ostream.write_long (value.tango);
+        ostream.write_long (value.quickstep);
     }
 
     public String get_id ()
     {
-	return _id;
+        return _id;
     }
 
     public org.omg.CORBA.TypeCode get_type ()
     {
-	return type ();
+        return type ();
     }
 
     public static com.sun.org.omg.CORBA.portable.ValueHelper get_instance ()
     {
-	return helper;
+        return helper;
     }
 
     public Class get_class ()
     {
-	return omega.Hotel.class;
+        return omega.Hotel.class;
     }
 
     public String[] get_truncatable_base_ids ()
     {
-	return _truncatable_ids;
+        return _truncatable_ids;
     }
 
 }

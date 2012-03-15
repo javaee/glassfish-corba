@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)Graph.java	1.4 99/06/07 */
+/* @(#)Graph.java       1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -68,10 +68,10 @@ public class Graph implements Serializable {
 
     public Graph(String data, Graph next) {
         this._list = data;
-	this._bitset = new BitSet(64);
-	this._bitset.set(10);this._bitset.set(20);
-	this._bitset.set(30);this._bitset.set(40);
-	this._bitset.set(50);this._bitset.set(60);
+        this._bitset = new BitSet(64);
+        this._bitset.set(10);this._bitset.set(20);
+        this._bitset.set(30);this._bitset.set(40);
+        this._bitset.set(50);this._bitset.set(60);
         this._next = next;
     }
 
@@ -88,15 +88,15 @@ public class Graph implements Serializable {
     }
 
     public boolean equals(Graph o) {
-	try{
-	    Graph g = (Graph)o;
-	    return ((_list.equals(g._list)) && 
-		    (_next.equals(g._next)) &&
-		    (_bitset.equals(g._bitset)));
-	}
-	catch(Throwable t){
-	    return false;
-	}
+        try{
+            Graph g = (Graph)o;
+            return ((_list.equals(g._list)) && 
+                    (_next.equals(g._next)) &&
+                    (_bitset.equals(g._bitset)));
+        }
+        catch(Throwable t){
+            return false;
+        }
     }
 
     public String toString() {
@@ -107,5 +107,5 @@ public class Graph implements Serializable {
         return result.append("}").toString();
     }
 
-	
+        
 }

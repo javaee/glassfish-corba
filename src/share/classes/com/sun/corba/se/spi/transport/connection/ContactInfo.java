@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport.connection;
+package com.sun.corba.ee.spi.transport.connection;
 
 import java.io.IOException ;
 

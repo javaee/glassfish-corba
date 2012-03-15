@@ -45,17 +45,17 @@ public class HelloImpl extends HelloPOA
 {
     public byte[] id;
     public HelloImpl() {
-	id = null;
+        id = null;
     }
     public HelloImpl(byte[] oid) {
-	id = oid;
+        id = oid;
     }
     public String hi() {
-	if (id == null)
-	    return "Welcome, POA";
-	else
-	    return "Welcome, POA (oid = "+new String(id)+")";
+        if (id == null)
+            return "Welcome, POA";
+        else
+            return "Welcome, POA (oid = "+new String(id)+")";
     }
 }
-	
+        
 

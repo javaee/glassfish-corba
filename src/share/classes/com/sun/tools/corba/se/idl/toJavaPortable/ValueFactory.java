@@ -93,13 +93,13 @@ public class ValueFactory implements AuxGen
     this.entry       = entry;
     init ();
     if (hasFactoryMethods ()) { 
-	openStream ();
-	if (stream == null)
-	  return;
-	writeHeading ();
-	writeBody ();
-	writeClosing ();
-	closeStream ();
+        openStream ();
+        if (stream == null)
+          return;
+        writeHeading ();
+        writeBody ();
+        writeClosing ();
+        closeStream ();
     }
   } // generate
 

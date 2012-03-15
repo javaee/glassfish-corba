@@ -38,29 +38,29 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA_2_3.portable.InputStream;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.IORFactories ;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.IORFactories ;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextDefaults;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
-import com.sun.corba.se.spi.trace.Transport ;
+import com.sun.corba.ee.spi.trace.Transport ;
 
 /**
  * This implements the GIOP 1.2 Reply header.
@@ -90,7 +90,7 @@ public final class ReplyMessage_1_2 extends Message_1_2
     // Constructors
 
     ReplyMessage_1_2(ORB orb) {
-	this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
+        this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
         this.orb = orb;
     }
 
@@ -102,7 +102,7 @@ public final class ReplyMessage_1_2 extends Message_1_2
         request_id = _request_id;
         reply_status = _reply_status;
         service_contexts = _service_contexts;
-	if (service_contexts == null) {
+        if (service_contexts == null) {
             service_contexts =
                 ServiceContextDefaults.makeServiceContexts(orb);
         }
@@ -128,7 +128,7 @@ public final class ReplyMessage_1_2 extends Message_1_2
     }
 
     public SystemException getSystemException(String message) {
-	return MessageBase.getSystemException(
+        return MessageBase.getSystemException(
             exClassName, minorCode, completionStatus, message, wrapper);
     }
 
@@ -137,7 +137,7 @@ public final class ReplyMessage_1_2 extends Message_1_2
     }
 
     public void setIOR( IOR ior ) {
-	this.ior = ior;
+        this.ior = ior;
     }
 
     // IO methods
@@ -226,7 +226,7 @@ public final class ReplyMessage_1_2 extends Message_1_2
         case NEEDS_ADDRESSING_MODE :
             break;
         default :
-	    throw wrapper.illegalReplyStatus() ;
+            throw wrapper.illegalReplyStatus() ;
         }
     }
 

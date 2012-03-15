@@ -147,8 +147,8 @@ public interface MangleMethods extends Remote {
         
         private static String[][] ASSERTS = {
                                     
-	    //   Method Signature           Kind        Attribute Name      Wire Name
-	    //   ----------------------     ----------- ------------------- -------------------------
+            //   Method Signature           Kind        Attribute Name      Wire Name
+            //   ----------------------     ----------- ------------------- -------------------------
             {"int getFoo()",            "GET",      "foo",              "_get_foo"},
             {"int getAB()",             "GET",      "AB",               "_get_AB"},
             {"boolean isX()",           "IS",       "x",                "_get_x"},

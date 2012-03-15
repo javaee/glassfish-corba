@@ -49,7 +49,7 @@ import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.ServantLocatorPackage.*;
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 import corba.framework.ThreadProcess ;
 
 public class counterServer extends ThreadProcess {
@@ -60,17 +60,17 @@ public class counterServer extends ThreadProcess {
             // create and initialize the ORB
             Properties p = new Properties();
             p.put("org.omg.CORBA.ORBClass",  
-		"com.sun.corba.se.impl.orb.ORBImpl" ) ;
+                "com.sun.corba.ee.impl.orb.ORBImpl" ) ;
             p.put( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY, "9999");
             p.put( ORBConstants.ORB_SERVER_ID_PROPERTY, "9999");
-	    String[] args = null ;
+            String[] args = null ;
             ORB orb = ORB.init(args, p);
 
             POA rootPOA = (POA)orb.resolve_initial_references("RootPOA");
             rootPOA.the_POAManager().activate();
 
-	    POA poa = createPOA(orb, rootPOA);
-	    createCounter1(orb, poa);
+            POA poa = createPOA(orb, rootPOA);
+            createCounter1(orb, poa);
 
             // wait for invocations from clients
             System.out.println("Server is ready.");
@@ -84,25 +84,25 @@ public class counterServer extends ThreadProcess {
     }
 
     private POA createPOA(ORB orb, POA rootPOA)
-	throws Exception
+        throws Exception
     {
         // create a persistent POA
         Policy[] tpolicy = new Policy[3];
         tpolicy[0] = rootPOA.create_lifespan_policy(LifespanPolicyValue.TRANSIENT);
         tpolicy[1] = rootPOA.create_request_processing_policy(RequestProcessingPolicyValue.USE_SERVANT_MANAGER);
-	tpolicy[2] = rootPOA.create_servant_retention_policy(ServantRetentionPolicyValue.NON_RETAIN) ;
+        tpolicy[2] = rootPOA.create_servant_retention_policy(ServantRetentionPolicyValue.NON_RETAIN) ;
         POA tpoa = rootPOA.create_POA("PersistentPOA", null, tpolicy);
  
-	counterImpl impl = new counterImpl();
-	Servant servant = (Servant)(javax.rmi.CORBA.Util.getTie( impl ) ) ;
+        counterImpl impl = new counterImpl();
+        Servant servant = (Servant)(javax.rmi.CORBA.Util.getTie( impl ) ) ;
         CSLocator csl = new CSLocator(servant);
         tpoa.set_servant_manager(csl);
         tpoa.the_POAManager().activate();
-	return tpoa;
+        return tpoa;
     }
 
     private void createCounter1(ORB orb, POA tpoa)
-	throws Exception
+        throws Exception
     {
         // create an objref using POA
         byte[] id = "abcdef".getBytes();
@@ -137,7 +137,7 @@ class CSLocator extends org.omg.CORBA.LocalObject implements ServantLocator
                              CookieHolder the_cookie)
         throws org.omg.PortableServer.ForwardRequest
     {
-	return servant ;
+        return servant ;
     }
 
     public void postinvoke(byte[] oid, POA adapter, String operation, 

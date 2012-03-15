@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.protocol ;
+package com.sun.corba.ee.spi.protocol ;
 
 // Introduce more information about WHY we are re-trying a request
 // so we can properly handle the two cases:

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)TestOBV2.java	1.6 99/06/07 */
+/* @(#)TestOBV2.java    1.6 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -60,32 +60,32 @@ public class TestOBV2 extends TestOBV implements java.io.Serializable {
     public TestOBV2 arrayOfThis[];
 
     public TestOBV2(){
-    	super();
-    	self = this;
-	bar = new Random().nextInt();
-	arrayOfThis = new TestOBV2[3];
-	arrayOfThis[0] = null;
-	arrayOfThis[1] = this;
-	arrayOfThis[2] = null;
+        super();
+        self = this;
+        bar = new Random().nextInt();
+        arrayOfThis = new TestOBV2[3];
+        arrayOfThis[0] = null;
+        arrayOfThis[1] = this;
+        arrayOfThis[2] = null;
     }
 
     public boolean equals (Object o){
-	try
-	    {
-		TestOBV2 target = (TestOBV2)o;
-		return ((target != null) &&
-			(target.self == target) &&      
-			(target.arrayOfThis != null) &&
-			(target.arrayOfThis[0] == null) &&
-			(target.arrayOfThis[1] == target) &&
-			(target.arrayOfThis[0] == null) &&
-			(target.bar == bar) &&
-			(target.foo == foo) &&
-			(target.FOO == FOO));
-	    }
-	catch(Throwable t)
-	    {
-		return false;
-	    }
+        try
+            {
+                TestOBV2 target = (TestOBV2)o;
+                return ((target != null) &&
+                        (target.self == target) &&      
+                        (target.arrayOfThis != null) &&
+                        (target.arrayOfThis[0] == null) &&
+                        (target.arrayOfThis[1] == target) &&
+                        (target.arrayOfThis[0] == null) &&
+                        (target.bar == bar) &&
+                        (target.foo == foo) &&
+                        (target.FOO == FOO));
+            }
+        catch(Throwable t)
+            {
+                return false;
+            }
     }
 }

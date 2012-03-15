@@ -38,13 +38,13 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.ior ;
+package com.sun.corba.ee.impl.ior ;
 
 import java.util.Iterator ;
 
 import org.omg.CORBA_2_3.portable.OutputStream ;
 
-import com.sun.corba.se.spi.ior.ObjectAdapterId ;
+import com.sun.corba.ee.spi.ior.ObjectAdapterId ;
 
 abstract class ObjectAdapterIdBase implements ObjectAdapterId {
     @Override

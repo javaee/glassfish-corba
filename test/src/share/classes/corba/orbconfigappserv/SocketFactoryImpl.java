@@ -50,49 +50,49 @@ import java.net.Socket;
 
 import org.omg.CORBA.ORB;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
-import com.sun.corba.se.spi.legacy.connection.ORBSocketFactory;
-import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.legacy.connection.GetEndPointInfoAgainException;
+import com.sun.corba.ee.spi.legacy.connection.ORBSocketFactory;
+import com.sun.corba.ee.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.legacy.connection.DefaultSocketFactory;
-import com.sun.corba.se.impl.legacy.connection.EndPointInfoImpl;
+import com.sun.corba.ee.impl.legacy.connection.DefaultSocketFactory;
+import com.sun.corba.ee.impl.legacy.connection.EndPointInfoImpl;
 
 public class SocketFactoryImpl
     implements 
-	ORBSocketFactory
+        ORBSocketFactory
 {
     ORBSocketFactory socketFactory;
 
     public SocketFactoryImpl()
     {
-	System.out.println("SocketFactoryImpl()");
-	socketFactory = new DefaultSocketFactory();
+        System.out.println("SocketFactoryImpl()");
+        socketFactory = new DefaultSocketFactory();
     }
 
     public ServerSocket createServerSocket(String type, int port)
-	throws
-	    IOException
+        throws
+            IOException
     {
-	System.out.println("createServerSocket: " + type + " " + port);
-	return socketFactory.createServerSocket(type, port);
+        System.out.println("createServerSocket: " + type + " " + port);
+        return socketFactory.createServerSocket(type, port);
     }
 
     public SocketInfo getEndPointInfo(ORB orb,
-					IOR ior,
-					SocketInfo socketInfo)
+                                        IOR ior,
+                                        SocketInfo socketInfo)
     {
-	System.out.println("getEndPointInfo");
-	return socketFactory.getEndPointInfo(orb, ior, socketInfo);
+        System.out.println("getEndPointInfo");
+        return socketFactory.getEndPointInfo(orb, ior, socketInfo);
     }
 
     public Socket createSocket(SocketInfo socketInfo)
-	throws
-	    IOException,
-	    GetEndPointInfoAgainException
+        throws
+            IOException,
+            GetEndPointInfoAgainException
     {
-	System.out.println("createSocket: " + socketInfo);
-	return socketFactory.createSocket(socketInfo);
+        System.out.println("createSocket: " + socketInfo);
+        return socketFactory.createSocket(socketInfo);
     }
 }
 

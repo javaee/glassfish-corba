@@ -78,7 +78,7 @@ import java.util.TreeMap;
  */
 
 public class DescriptorSupport
-	 implements javax.management.Descriptor
+         implements javax.management.Descriptor
 {
 
     // Serialization compatibility stuff:
@@ -114,22 +114,22 @@ public class DescriptorSupport
     private static final ObjectStreamField[] serialPersistentFields;
     private static final String serialForm;
     static {
-	String form = null;
-	boolean compat = false;
-	try {
+        String form = null;
+        boolean compat = false;
+        try {
             form = System.getProperty( "jmx.serial.form" ) ;
-	    compat = "1.0".equals(form);  // form may be null
-	} catch (Exception e) {
-	    // OK: No compat with 1.0
-	}
-	serialForm = form;
-	if (compat) {
-	    serialPersistentFields = oldSerialPersistentFields;
-	    serialVersionUID = oldSerialVersionUID;
-	} else {
-	    serialPersistentFields = newSerialPersistentFields;
-	    serialVersionUID = newSerialVersionUID;
-	}
+            compat = "1.0".equals(form);  // form may be null
+        } catch (Exception e) {
+            // OK: No compat with 1.0
+        }
+        serialForm = form;
+        if (compat) {
+            serialPersistentFields = oldSerialPersistentFields;
+            serialVersionUID = oldSerialVersionUID;
+        } else {
+            serialPersistentFields = newSerialPersistentFields;
+            serialVersionUID = newSerialVersionUID;
+        }
     }
     //
     // END Serialization compatibility stuff
@@ -175,12 +175,12 @@ public class DescriptorSupport
      * initNumFields (&lt;= 0)
      */
     public DescriptorSupport(int initNumFields) {
-	if (initNumFields <= 0) {
-	    final String msg =
-		"Descriptor field limit invalid: " + initNumFields;
-	    final RuntimeException iae = new IllegalArgumentException(msg);
-	    throw new RuntimeException(msg, iae);
-	}
+        if (initNumFields <= 0) {
+            final String msg =
+                "Descriptor field limit invalid: " + initNumFields;
+            final RuntimeException iae = new IllegalArgumentException(msg);
+            throw new RuntimeException(msg, iae);
+        }
         init(null);
     }
 
@@ -194,7 +194,7 @@ public class DescriptorSupport
      * fields, an empty Descriptor will be created.
      */
     public DescriptorSupport(DescriptorSupport inDescr) {
-	if (inDescr == null)
+        if (inDescr == null)
             init(null);
         else
             init(inDescr.descriptorMap);
@@ -228,80 +228,80 @@ public class DescriptorSupport
        split the string being parsed at characters like > even if they
        occur in the middle of a field value. */
     public DescriptorSupport(String inStr) {
-	/* parse an XML-formatted string and populate internal
-	 * structure with it */
-	if (inStr == null) {
-	    final String msg = "String in parameter is null";
-	    final RuntimeException iae = new IllegalArgumentException(msg);
-	    throw new RuntimeException(msg, iae);
-	}
+        /* parse an XML-formatted string and populate internal
+         * structure with it */
+        if (inStr == null) {
+            final String msg = "String in parameter is null";
+            final RuntimeException iae = new IllegalArgumentException(msg);
+            throw new RuntimeException(msg, iae);
+        }
 
-	final String lowerInStr = inStr.toLowerCase();
-	if (!lowerInStr.startsWith("<descriptor>")
-	    || !lowerInStr.endsWith("</descriptor>")) {
-	    throw new RuntimeException("No <descriptor>, </descriptor> pair");
-	}
+        final String lowerInStr = inStr.toLowerCase();
+        if (!lowerInStr.startsWith("<descriptor>")
+            || !lowerInStr.endsWith("</descriptor>")) {
+            throw new RuntimeException("No <descriptor>, </descriptor> pair");
+        }
 
-	// parse xmlstring into structures
+        // parse xmlstring into structures
         init(null);
-	// create dummy descriptor: should have same size
-	// as number of fields in xmlstring
-	// loop through structures and put them in descriptor
+        // create dummy descriptor: should have same size
+        // as number of fields in xmlstring
+        // loop through structures and put them in descriptor
 
-	StringTokenizer st = new StringTokenizer(inStr, "<> \t\n\r\f");
+        StringTokenizer st = new StringTokenizer(inStr, "<> \t\n\r\f");
 
-	boolean inFld = false;
-	boolean inDesc = false;
-	String fieldName = null;
-	String fieldValue = null;
+        boolean inFld = false;
+        boolean inDesc = false;
+        String fieldName = null;
+        String fieldValue = null;
 
 
-	while (st.hasMoreTokens()) {  // loop through tokens
-	    String tok = st.nextToken();
+        while (st.hasMoreTokens()) {  // loop through tokens
+            String tok = st.nextToken();
 
-	    if (tok.equalsIgnoreCase("FIELD")) {
-		inFld = true;
-	    } else if (tok.equalsIgnoreCase("/FIELD")) {
-		if ((fieldName != null) && (fieldValue != null)) {
-		    fieldName =
-			fieldName.substring(fieldName.indexOf('"') + 1,
-					    fieldName.lastIndexOf('"'));
-		    final Object fieldValueObject =
-			parseQuotedFieldValue(fieldValue);
-		    setField(fieldName, fieldValueObject);
-		}
-		fieldName = null;
-		fieldValue = null;
-		inFld = false;
-	    } else if (tok.equalsIgnoreCase("DESCRIPTOR")) {
-		inDesc = true;
-	    } else if (tok.equalsIgnoreCase("/DESCRIPTOR")) {
-		inDesc = false;
-		fieldName = null;
-		fieldValue = null;
-		inFld = false;
-	    } else if (inFld && inDesc) {
-		// want kw=value, eg, name="myname" value="myvalue"
-		int eq_separator = tok.indexOf("=");
-		if (eq_separator > 0) {
-		    String kwPart = tok.substring(0,eq_separator);
-		    String valPart = tok.substring(eq_separator+1);
-		    if (kwPart.equalsIgnoreCase("NAME"))
-			fieldName = valPart;
-		    else if (kwPart.equalsIgnoreCase("VALUE"))
-			fieldValue = valPart;
-		    else {  // xml parse exception
-			final String msg =
-			    "Expected `name' or `value', got `" + tok + "'";
-			throw new RuntimeException(msg);
-		    }
-		} else { // xml parse exception
-		    final String msg =
-			"Expected `keyword=value', got `" + tok + "'";
-		    throw new RuntimeException(msg);
-		}
-	    }
-	}  // while tokens
+            if (tok.equalsIgnoreCase("FIELD")) {
+                inFld = true;
+            } else if (tok.equalsIgnoreCase("/FIELD")) {
+                if ((fieldName != null) && (fieldValue != null)) {
+                    fieldName =
+                        fieldName.substring(fieldName.indexOf('"') + 1,
+                                            fieldName.lastIndexOf('"'));
+                    final Object fieldValueObject =
+                        parseQuotedFieldValue(fieldValue);
+                    setField(fieldName, fieldValueObject);
+                }
+                fieldName = null;
+                fieldValue = null;
+                inFld = false;
+            } else if (tok.equalsIgnoreCase("DESCRIPTOR")) {
+                inDesc = true;
+            } else if (tok.equalsIgnoreCase("/DESCRIPTOR")) {
+                inDesc = false;
+                fieldName = null;
+                fieldValue = null;
+                inFld = false;
+            } else if (inFld && inDesc) {
+                // want kw=value, eg, name="myname" value="myvalue"
+                int eq_separator = tok.indexOf("=");
+                if (eq_separator > 0) {
+                    String kwPart = tok.substring(0,eq_separator);
+                    String valPart = tok.substring(eq_separator+1);
+                    if (kwPart.equalsIgnoreCase("NAME"))
+                        fieldName = valPart;
+                    else if (kwPart.equalsIgnoreCase("VALUE"))
+                        fieldValue = valPart;
+                    else {  // xml parse exception
+                        final String msg =
+                            "Expected `name' or `value', got `" + tok + "'";
+                        throw new RuntimeException(msg);
+                    }
+                } else { // xml parse exception
+                    final String msg =
+                        "Expected `keyword=value', got `" + tok + "'";
+                    throw new RuntimeException(msg);
+                }
+            }
+        }  // while tokens
 
     }
 
@@ -322,22 +322,22 @@ public class DescriptorSupport
      *
      */
     public DescriptorSupport(String[] fieldNames, Object[] fieldValues) {
-	if ((fieldNames == null) || (fieldValues == null) ||
-	    (fieldNames.length != fieldValues.length)) {
+        if ((fieldNames == null) || (fieldValues == null) ||
+            (fieldNames.length != fieldValues.length)) {
 
-	    final String msg =
-		"Null or invalid fieldNames or fieldValues";
-	    final RuntimeException iae = new IllegalArgumentException(msg);
-	    throw new RuntimeException(msg, iae);
-	}
+            final String msg =
+                "Null or invalid fieldNames or fieldValues";
+            final RuntimeException iae = new IllegalArgumentException(msg);
+            throw new RuntimeException(msg, iae);
+        }
 
-	/* populate internal structure with fields */
+        /* populate internal structure with fields */
         init(null);
-	for (int i=0; i < fieldNames.length; i++) {
-	    // setField will throw an exception if a fieldName is be null.
-	    // the fieldName and fieldValue will be validated in setField.
-	    setField(fieldNames[i], fieldValues[i]);
-	}
+        for (int i=0; i < fieldNames.length; i++) {
+            // setField will throw an exception if a fieldName is be null.
+            // the fieldName and fieldValue will be validated in setField.
+            setField(fieldNames[i], fieldValues[i]);
+        }
     }
 
     /**
@@ -363,39 +363,39 @@ public class DescriptorSupport
     public DescriptorSupport(String... fields)
     {
         init(null);
-	if (( fields == null ) || ( fields.length == 0))
+        if (( fields == null ) || ( fields.length == 0))
             return;
 
         init(null);
 
-	for (int i=0; i < fields.length; i++) {
-	    if ((fields[i] == null) || (fields[i].equals(""))) {
-		continue;
-	    }
-	    int eq_separator = fields[i].indexOf("=");
-	    if (eq_separator < 0) {
-		// illegal if no = or is first character
-		final String msg = "Field in invalid format: no equals sign";
-		final RuntimeException iae = new IllegalArgumentException(msg);
-		throw new RuntimeException(msg, iae);
-	    }
+        for (int i=0; i < fields.length; i++) {
+            if ((fields[i] == null) || (fields[i].equals(""))) {
+                continue;
+            }
+            int eq_separator = fields[i].indexOf("=");
+            if (eq_separator < 0) {
+                // illegal if no = or is first character
+                final String msg = "Field in invalid format: no equals sign";
+                final RuntimeException iae = new IllegalArgumentException(msg);
+                throw new RuntimeException(msg, iae);
+            }
 
-	    String fieldName = fields[i].substring(0,eq_separator);
-	    String fieldValue = null;
-	    if (eq_separator < fields[i].length()) {
-		// = is not in last character
-		fieldValue = fields[i].substring(eq_separator+1);
-	    }
+            String fieldName = fields[i].substring(0,eq_separator);
+            String fieldValue = null;
+            if (eq_separator < fields[i].length()) {
+                // = is not in last character
+                fieldValue = fields[i].substring(eq_separator+1);
+            }
 
-	    if (fieldName.equals("")) {
+            if (fieldName.equals("")) {
 
-		final String msg = "Field in invalid format: no fieldName";
-		final RuntimeException iae = new IllegalArgumentException(msg);
-		throw new RuntimeException(msg, iae);
-	    }
+                final String msg = "Field in invalid format: no fieldName";
+                final RuntimeException iae = new IllegalArgumentException(msg);
+                throw new RuntimeException(msg, iae);
+            }
 
-	    setField(fieldName,fieldValue);
-	}
+            setField(fieldName,fieldValue);
+        }
     }
     
     private void init(Map<String, ?> initMap) {
@@ -410,148 +410,148 @@ public class DescriptorSupport
 
     public synchronized Object getFieldValue(String fieldName) {
 
-	if ((fieldName == null) || (fieldName.equals(""))) {
-	    final String msg = "Fieldname requested is null";
-	    final RuntimeException iae = new IllegalArgumentException(msg);
-	    throw new RuntimeException(msg, iae);
-	}
-	Object retValue = descriptorMap.get(fieldName);
-	return(retValue);
+        if ((fieldName == null) || (fieldName.equals(""))) {
+            final String msg = "Fieldname requested is null";
+            final RuntimeException iae = new IllegalArgumentException(msg);
+            throw new RuntimeException(msg, iae);
+        }
+        Object retValue = descriptorMap.get(fieldName);
+        return(retValue);
     }
 
     public synchronized void setField(String fieldName, Object fieldValue) {
 
-	// field name cannot be null or empty
-	if ((fieldName == null) || (fieldName.equals(""))) {
+        // field name cannot be null or empty
+        if ((fieldName == null) || (fieldName.equals(""))) {
 
-	    final String msg = "Field name to be set is null or empty";
-	    final RuntimeException iae = new IllegalArgumentException(msg);
-	    throw new RuntimeException(msg, iae);
-	}
+            final String msg = "Field name to be set is null or empty";
+            final RuntimeException iae = new IllegalArgumentException(msg);
+            throw new RuntimeException(msg, iae);
+        }
 
-	if (!validateField(fieldName, fieldValue)) {
+        if (!validateField(fieldName, fieldValue)) {
 
-	    final String msg =
-		"Field value invalid: " + fieldName + "=" + fieldValue;
-	    final RuntimeException iae = new IllegalArgumentException(msg);
-	    throw new RuntimeException(msg, iae);
-	}
+            final String msg =
+                "Field value invalid: " + fieldName + "=" + fieldValue;
+            final RuntimeException iae = new IllegalArgumentException(msg);
+            throw new RuntimeException(msg, iae);
+        }
 
 
         // Since we do not remove any existing entry with this name,
-	// the field will preserve whatever case it had, ignoring
-	// any difference there might be in fieldName.
-	descriptorMap.put(fieldName, fieldValue);
+        // the field will preserve whatever case it had, ignoring
+        // any difference there might be in fieldName.
+        descriptorMap.put(fieldName, fieldValue);
     }
 
     public synchronized String[] getFields() {
-	int numberOfEntries = descriptorMap.size();
+        int numberOfEntries = descriptorMap.size();
 
-	String[] responseFields = new String[numberOfEntries];
-	Set returnedSet = descriptorMap.entrySet();
+        String[] responseFields = new String[numberOfEntries];
+        Set returnedSet = descriptorMap.entrySet();
 
-	int i = 0;
-	Object currValue = null;
-	Map.Entry currElement = null;
+        int i = 0;
+        Object currValue = null;
+        Map.Entry currElement = null;
 
-	for (Iterator iter = returnedSet.iterator(); iter.hasNext(); i++) {
-	    currElement = (Map.Entry) iter.next();
+        for (Iterator iter = returnedSet.iterator(); iter.hasNext(); i++) {
+            currElement = (Map.Entry) iter.next();
 
-	    if (currElement == null) {
-	    } else {
-		currValue = currElement.getValue();
-		if (currValue == null) {
-		    responseFields[i] = currElement.getKey() + "=";
-		} else {
-		    if (currValue instanceof java.lang.String) {
-			responseFields[i] =
-			    currElement.getKey() + "=" + currValue.toString();
-		    } else {
-			responseFields[i] =
-			    currElement.getKey() + "=(" +
-			    currValue.toString() + ")";
-		    }
-		}
-	    }
-	}
+            if (currElement == null) {
+            } else {
+                currValue = currElement.getValue();
+                if (currValue == null) {
+                    responseFields[i] = currElement.getKey() + "=";
+                } else {
+                    if (currValue instanceof java.lang.String) {
+                        responseFields[i] =
+                            currElement.getKey() + "=" + currValue.toString();
+                    } else {
+                        responseFields[i] =
+                            currElement.getKey() + "=(" +
+                            currValue.toString() + ")";
+                    }
+                }
+            }
+        }
 
 
-	return responseFields;
+        return responseFields;
     }
 
     public synchronized String[] getFieldNames() {
-	int numberOfEntries = descriptorMap.size();
+        int numberOfEntries = descriptorMap.size();
 
-	String[] responseFields = new String[numberOfEntries];
-	Set returnedSet = descriptorMap.entrySet();
+        String[] responseFields = new String[numberOfEntries];
+        Set returnedSet = descriptorMap.entrySet();
 
-	int i = 0;
-
-
-	for (Iterator iter = returnedSet.iterator(); iter.hasNext(); i++) {
-	    Map.Entry currElement = (Map.Entry) iter.next();
-
-	    if (( currElement == null ) || (currElement.getKey() == null)) {
-	    } else {
-		responseFields[i] = currElement.getKey().toString();
-	    }
-	}
+        int i = 0;
 
 
-	return responseFields;
+        for (Iterator iter = returnedSet.iterator(); iter.hasNext(); i++) {
+            Map.Entry currElement = (Map.Entry) iter.next();
+
+            if (( currElement == null ) || (currElement.getKey() == null)) {
+            } else {
+                responseFields[i] = currElement.getKey().toString();
+            }
+        }
+
+
+        return responseFields;
     }
 
 
     public synchronized Object[] getFieldValues(String... fieldNames) {
-	// if fieldNames == null return all values
-	// if fieldNames is String[0] return no values
+        // if fieldNames == null return all values
+        // if fieldNames is String[0] return no values
 
-	final int numberOfEntries =
-	    (fieldNames == null) ? descriptorMap.size() : fieldNames.length;
-	final Object[] responseFields = new Object[numberOfEntries];
+        final int numberOfEntries =
+            (fieldNames == null) ? descriptorMap.size() : fieldNames.length;
+        final Object[] responseFields = new Object[numberOfEntries];
 
-	int i = 0;
+        int i = 0;
 
-	if (fieldNames == null) {
-	    for (Iterator iter = descriptorMap.values().iterator();
-		 iter.hasNext(); i++)
-		responseFields[i] = iter.next();
-	} else {
-	    for (i=0; i < fieldNames.length; i++) {
-		if ((fieldNames[i] == null) || (fieldNames[i].equals(""))) {
-		    responseFields[i] = null;
-		} else {
-		    responseFields[i] = getFieldValue(fieldNames[i]);
-		}
-	    }
-	}
+        if (fieldNames == null) {
+            for (Iterator iter = descriptorMap.values().iterator();
+                 iter.hasNext(); i++)
+                responseFields[i] = iter.next();
+        } else {
+            for (i=0; i < fieldNames.length; i++) {
+                if ((fieldNames[i] == null) || (fieldNames[i].equals(""))) {
+                    responseFields[i] = null;
+                } else {
+                    responseFields[i] = getFieldValue(fieldNames[i]);
+                }
+            }
+        }
 
 
 
-	return responseFields;
+        return responseFields;
     }
 
     public synchronized void setFields(String[] fieldNames,
-				       Object[] fieldValues) {
+                                       Object[] fieldValues) {
 
 
-	if ((fieldNames == null) || (fieldValues == null) ||
-	    (fieldNames.length != fieldValues.length)) {
+        if ((fieldNames == null) || (fieldValues == null) ||
+            (fieldNames.length != fieldValues.length)) {
 
-	    final String msg = "fieldNames and fieldValues are null or invalid";
-	    final RuntimeException iae = new IllegalArgumentException(msg);
-	    throw new RuntimeException(msg, iae );
-	}
+            final String msg = "fieldNames and fieldValues are null or invalid";
+            final RuntimeException iae = new IllegalArgumentException(msg);
+            throw new RuntimeException(msg, iae );
+        }
 
-	for (int i=0; i < fieldNames.length; i++) {
-	    if (( fieldNames[i] == null) || (fieldNames[i].equals(""))) {
+        for (int i=0; i < fieldNames.length; i++) {
+            if (( fieldNames[i] == null) || (fieldNames[i].equals(""))) {
 
-		final String msg = "fieldNames is null or invalid";
-		final RuntimeException iae = new IllegalArgumentException(msg);
-		throw new RuntimeException(msg, iae);
-	    }
-	    setField(fieldNames[i], fieldValues[i]);
-	}
+                final String msg = "fieldNames is null or invalid";
+                final RuntimeException iae = new IllegalArgumentException(msg);
+                throw new RuntimeException(msg, iae);
+            }
+            setField(fieldNames[i], fieldValues[i]);
+        }
     }
 
     /**
@@ -560,15 +560,15 @@ public class DescriptorSupport
      */
 
     public synchronized Object clone() {
-	return(new DescriptorSupport(this));
+        return(new DescriptorSupport(this));
     }
 
     public synchronized void removeField(String fieldName) {
-	if ((fieldName == null) || (fieldName.equals(""))) {
-	    return;
-	}
+        if ((fieldName == null) || (fieldName.equals(""))) {
+            return;
+        }
 
-	descriptorMap.remove(fieldName);
+        descriptorMap.remove(fieldName);
     }
 
     /**
@@ -663,44 +663,44 @@ public class DescriptorSupport
      */
 
     public synchronized boolean isValid() {
-	// verify that the descriptor is valid, by iterating over each field...
+        // verify that the descriptor is valid, by iterating over each field...
 
-	Set returnedSet = descriptorMap.entrySet();
+        Set returnedSet = descriptorMap.entrySet();
 
-	if (returnedSet == null) {   // null descriptor, not valid
-	    return false;
-	}
-	// must have a name and descriptor type field
-	String thisName = (String)(this.getFieldValue("name"));
-	String thisDescType = (String)(getFieldValue("descriptorType"));
+        if (returnedSet == null) {   // null descriptor, not valid
+            return false;
+        }
+        // must have a name and descriptor type field
+        String thisName = (String)(this.getFieldValue("name"));
+        String thisDescType = (String)(getFieldValue("descriptorType"));
 
-	if ((thisName == null) || (thisDescType == null) ||
-	    (thisName.equals("")) || (thisDescType.equals(""))) {
-	    return false;
-	}
+        if ((thisName == null) || (thisDescType == null) ||
+            (thisName.equals("")) || (thisDescType.equals(""))) {
+            return false;
+        }
 
-	// According to the descriptor type we validate the fields contained
+        // According to the descriptor type we validate the fields contained
 
-	for (Iterator iter = returnedSet.iterator(); iter.hasNext();) {
-	    Map.Entry currElement = (Map.Entry) iter.next();
+        for (Iterator iter = returnedSet.iterator(); iter.hasNext();) {
+            Map.Entry currElement = (Map.Entry) iter.next();
 
-	    if (currElement != null) {
-		if (currElement.getValue() != null) {
-		    // validate the field valued...
-		    if (validateField((currElement.getKey()).toString(),
-				      (currElement.getValue()).toString())) {
-			continue;
-		    } else {
-			return false;
-		    }
-		}
-	    }
-	}
+            if (currElement != null) {
+                if (currElement.getValue() != null) {
+                    // validate the field valued...
+                    if (validateField((currElement.getKey()).toString(),
+                                      (currElement.getValue()).toString())) {
+                        continue;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
 
-	// fell through, all fields OK
+        // fell through, all fields OK
 
 
-	return true;
+        return true;
     }
 
 
@@ -720,82 +720,82 @@ public class DescriptorSupport
 
 
     private boolean validateField(String fldName, Object fldValue) {
-	if ((fldName == null) || (fldName.equals("")))
-	    return false;
-	String SfldValue = "";
-	boolean isAString = false;
-	if ((fldValue != null) && (fldValue instanceof java.lang.String)) {
-	    SfldValue = (String) fldValue;
-	    isAString = true;
-	}
+        if ((fldName == null) || (fldName.equals("")))
+            return false;
+        String SfldValue = "";
+        boolean isAString = false;
+        if ((fldValue != null) && (fldValue instanceof java.lang.String)) {
+            SfldValue = (String) fldValue;
+            isAString = true;
+        }
 
-	boolean nameOrDescriptorType =
-	    (fldName.equalsIgnoreCase("Name") ||
-	     fldName.equalsIgnoreCase("DescriptorType"));
-	if (nameOrDescriptorType ||
-	    fldName.equalsIgnoreCase("SetMethod") ||
-	    fldName.equalsIgnoreCase("GetMethod") ||
-	    fldName.equalsIgnoreCase("Role") ||
-	    fldName.equalsIgnoreCase("Class")) {
-	    if (fldValue == null || !isAString)
-		return false;
-	    if (nameOrDescriptorType && SfldValue.equals(""))
-		return false;
-	    return true;
-	} else if (fldName.equalsIgnoreCase("visibility")) {
-	    long v;
-	    if ((fldValue != null) && (isAString)) {
-		v = toNumeric(SfldValue);
-	    } else if (fldValue instanceof java.lang.Integer) {
-		v = ((Integer)fldValue).intValue();
-	    } else return false;
+        boolean nameOrDescriptorType =
+            (fldName.equalsIgnoreCase("Name") ||
+             fldName.equalsIgnoreCase("DescriptorType"));
+        if (nameOrDescriptorType ||
+            fldName.equalsIgnoreCase("SetMethod") ||
+            fldName.equalsIgnoreCase("GetMethod") ||
+            fldName.equalsIgnoreCase("Role") ||
+            fldName.equalsIgnoreCase("Class")) {
+            if (fldValue == null || !isAString)
+                return false;
+            if (nameOrDescriptorType && SfldValue.equals(""))
+                return false;
+            return true;
+        } else if (fldName.equalsIgnoreCase("visibility")) {
+            long v;
+            if ((fldValue != null) && (isAString)) {
+                v = toNumeric(SfldValue);
+            } else if (fldValue instanceof java.lang.Integer) {
+                v = ((Integer)fldValue).intValue();
+            } else return false;
 
-	    if (v >= 1 &&  v <= 4)
-		return true;
-	    else
-		return false;
-	} else if (fldName.equalsIgnoreCase("severity")) {
+            if (v >= 1 &&  v <= 4)
+                return true;
+            else
+                return false;
+        } else if (fldName.equalsIgnoreCase("severity")) {
 
-	    long v;
-	    if ((fldValue != null) && (isAString)) {
-		v = toNumeric(SfldValue);
-	    } else if (fldValue instanceof java.lang.Integer) {
-		v = ((Integer)fldValue).intValue();
-	    } else return false;
+            long v;
+            if ((fldValue != null) && (isAString)) {
+                v = toNumeric(SfldValue);
+            } else if (fldValue instanceof java.lang.Integer) {
+                v = ((Integer)fldValue).intValue();
+            } else return false;
 
-	    return (v >= 0 && v <= 6);
-	} else if (fldName.equalsIgnoreCase("PersistPolicy")) {
-	    return (((fldValue != null) && (isAString)) &&
-		    ( SfldValue.equalsIgnoreCase("OnUpdate") ||
-		      SfldValue.equalsIgnoreCase("OnTimer") ||
-		      SfldValue.equalsIgnoreCase("NoMoreOftenThan") ||
-		      SfldValue.equalsIgnoreCase("Always") ||
-		      SfldValue.equalsIgnoreCase("Never") ||
+            return (v >= 0 && v <= 6);
+        } else if (fldName.equalsIgnoreCase("PersistPolicy")) {
+            return (((fldValue != null) && (isAString)) &&
+                    ( SfldValue.equalsIgnoreCase("OnUpdate") ||
+                      SfldValue.equalsIgnoreCase("OnTimer") ||
+                      SfldValue.equalsIgnoreCase("NoMoreOftenThan") ||
+                      SfldValue.equalsIgnoreCase("Always") ||
+                      SfldValue.equalsIgnoreCase("Never") ||
                       SfldValue.equalsIgnoreCase("OnUnregister")));
-	} else if (fldName.equalsIgnoreCase("PersistPeriod") ||
-		   fldName.equalsIgnoreCase("CurrencyTimeLimit") ||
-		   fldName.equalsIgnoreCase("LastUpdatedTimeStamp") ||
-		   fldName.equalsIgnoreCase("LastReturnedTimeStamp")) {
+        } else if (fldName.equalsIgnoreCase("PersistPeriod") ||
+                   fldName.equalsIgnoreCase("CurrencyTimeLimit") ||
+                   fldName.equalsIgnoreCase("LastUpdatedTimeStamp") ||
+                   fldName.equalsIgnoreCase("LastReturnedTimeStamp")) {
 
-	    long v;
-	    if ((fldValue != null) && (isAString)) {
-		v = toNumeric(SfldValue);
-	    } else if (fldValue instanceof java.lang.Number) {
-		v = ((Number)fldValue).longValue();
-	    } else return false;
+            long v;
+            if ((fldValue != null) && (isAString)) {
+                v = toNumeric(SfldValue);
+            } else if (fldValue instanceof java.lang.Number) {
+                v = ((Number)fldValue).longValue();
+            } else return false;
 
-	    return (v >= -1);
-	} else if (fldName.equalsIgnoreCase("log")) {
-	    return ((fldValue instanceof java.lang.Boolean) ||
-		    (isAString &&
-		     (SfldValue.equalsIgnoreCase("T") ||
-		      SfldValue.equalsIgnoreCase("true") ||
-		      SfldValue.equalsIgnoreCase("F") ||
-		      SfldValue.equalsIgnoreCase("false") )));
-	}
+            return (v >= -1);
+        } else if (fldName.equalsIgnoreCase("log")) {
+            return ((fldValue instanceof java.lang.Boolean) ||
+                    (isAString &&
+                     (SfldValue.equalsIgnoreCase("T") ||
+                      SfldValue.equalsIgnoreCase("true") ||
+                      SfldValue.equalsIgnoreCase("F") ||
+                      SfldValue.equalsIgnoreCase("false") )));
+        }
 
-	// default to true, it is a field we aren't validating (user etc.)
-	return true;
+        // default to true, it is a field we aren't validating (user etc.)
+        return true;
     }
 
 
@@ -824,65 +824,65 @@ public class DescriptorSupport
      *
      */
     public synchronized String toXMLString() {
-	StringBuffer buf = new StringBuffer("<Descriptor>");
-	Set returnedSet = descriptorMap.entrySet();
-	for (Iterator iter = returnedSet.iterator(); iter.hasNext(); ) {
-	    final Map.Entry currElement = (Map.Entry) iter.next();
-	    final String name = currElement.getKey().toString();
-	    Object value = currElement.getValue();
-	    String valueString = null;
-	    /* Set valueString to non-null if and only if this is a string that
-	       cannot be confused with the encoding of an object.  If it
-	       could be so confused (surrounded by parentheses) then we
-	       call makeFieldValue as for any non-String object and end
-	       up with an encoding like "(java.lang.String/(thing))".  */
-	    if (value instanceof String) {
-		final String svalue = (String) value;
-		if (!svalue.startsWith("(") || !svalue.endsWith(")"))
-		    valueString = quote(svalue);
-	    }
-	    if (valueString == null)
-		valueString = makeFieldValue(value);
-	    buf.append("<field name=\"").append(name).append("\" value=\"")
-		.append(valueString).append("\"></field>");
-	}
-	buf.append("</Descriptor>");
-	return buf.toString();
+        StringBuffer buf = new StringBuffer("<Descriptor>");
+        Set returnedSet = descriptorMap.entrySet();
+        for (Iterator iter = returnedSet.iterator(); iter.hasNext(); ) {
+            final Map.Entry currElement = (Map.Entry) iter.next();
+            final String name = currElement.getKey().toString();
+            Object value = currElement.getValue();
+            String valueString = null;
+            /* Set valueString to non-null if and only if this is a string that
+               cannot be confused with the encoding of an object.  If it
+               could be so confused (surrounded by parentheses) then we
+               call makeFieldValue as for any non-String object and end
+               up with an encoding like "(java.lang.String/(thing))".  */
+            if (value instanceof String) {
+                final String svalue = (String) value;
+                if (!svalue.startsWith("(") || !svalue.endsWith(")"))
+                    valueString = quote(svalue);
+            }
+            if (valueString == null)
+                valueString = makeFieldValue(value);
+            buf.append("<field name=\"").append(name).append("\" value=\"")
+                .append(valueString).append("\"></field>");
+        }
+        buf.append("</Descriptor>");
+        return buf.toString();
     }
 
     private static final String[] entities = {
-	" &#32;",
-	"\"&quot;",
-	"<&lt;",
-	">&gt;",
-	"&&amp;",
-	"\r&#13;",
-	"\t&#9;",
-	"\n&#10;",
-	"\f&#12;",
+        " &#32;",
+        "\"&quot;",
+        "<&lt;",
+        ">&gt;",
+        "&&amp;",
+        "\r&#13;",
+        "\t&#9;",
+        "\n&#10;",
+        "\f&#12;",
     };
     private static final Map<String,Character> entityToCharMap =
-	new HashMap<String,Character>();
+        new HashMap<String,Character>();
     private static final String[] charToEntityMap;
 
     static {
-	char maxChar = 0;
-	for (int i = 0; i < entities.length; i++) {
-	    final char c = entities[i].charAt(0);
-	    if (c > maxChar)
-		maxChar = c;
-	}
-	charToEntityMap = new String[maxChar + 1];
-	for (int i = 0; i < entities.length; i++) {
-	    final char c = entities[i].charAt(0);
-	    final String entity = entities[i].substring(1);
-	    charToEntityMap[c] = entity;
-	    entityToCharMap.put(entity, new Character(c));
-	}
+        char maxChar = 0;
+        for (int i = 0; i < entities.length; i++) {
+            final char c = entities[i].charAt(0);
+            if (c > maxChar)
+                maxChar = c;
+        }
+        charToEntityMap = new String[maxChar + 1];
+        for (int i = 0; i < entities.length; i++) {
+            final char c = entities[i].charAt(0);
+            final String entity = entities[i].substring(1);
+            charToEntityMap[c] = entity;
+            entityToCharMap.put(entity, new Character(c));
+        }
     }
 
     private static boolean isMagic(char c) {
-	return (c < charToEntityMap.length && charToEntityMap[c] != null);
+        return (c < charToEntityMap.length && charToEntityMap[c] != null);
     }
 
     /*
@@ -893,46 +893,46 @@ public class DescriptorSupport
      * and only quote " plus either \ or & (depending on the quote syntax).
      */
     private static String quote(String s) {
-	boolean found = false;
-	for (int i = 0; i < s.length(); i++) {
-	    if (isMagic(s.charAt(i))) {
-		found = true;
-		break;
-	    }
-	}
-	if (!found)
-	    return s;
-	StringBuffer buf = new StringBuffer();
-	for (int i = 0; i < s.length(); i++) {
-	    char c = s.charAt(i);
-	    if (isMagic(c))
-		buf.append(charToEntityMap[c]);
-	    else
-		buf.append(c);
-	}
-	return buf.toString();
+        boolean found = false;
+        for (int i = 0; i < s.length(); i++) {
+            if (isMagic(s.charAt(i))) {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            return s;
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (isMagic(c))
+                buf.append(charToEntityMap[c]);
+            else
+                buf.append(c);
+        }
+        return buf.toString();
     }
 
     private static String unquote(String s) {
-	if (!s.startsWith("\"") || !s.endsWith("\""))
-	    throw new RuntimeException("Value must be quoted: <" + s + ">");
-	StringBuffer buf = new StringBuffer();
-	final int len = s.length() - 1;
-	for (int i = 1; i < len; i++) {
-	    final char c = s.charAt(i);
-	    final int semi;
-	    final Character quoted;
-	    if (c == '&'
-		&& (semi = s.indexOf(';', i + 1)) >= 0
-		&& ((quoted =
-		    (Character) entityToCharMap.get(s.substring(i, semi+1)))
-		    != null)) {
-		buf.append(quoted);
-		i = semi;
-	    } else
-		buf.append(c);
-	}
-	return buf.toString();
+        if (!s.startsWith("\"") || !s.endsWith("\""))
+            throw new RuntimeException("Value must be quoted: <" + s + ">");
+        StringBuffer buf = new StringBuffer();
+        final int len = s.length() - 1;
+        for (int i = 1; i < len; i++) {
+            final char c = s.charAt(i);
+            final int semi;
+            final Character quoted;
+            if (c == '&'
+                && (semi = s.indexOf(';', i + 1)) >= 0
+                && ((quoted =
+                    (Character) entityToCharMap.get(s.substring(i, semi+1)))
+                    != null)) {
+                buf.append(quoted);
+                i = semi;
+            } else
+                buf.append(c);
+        }
+        return buf.toString();
     }
 
     /**
@@ -940,27 +940,27 @@ public class DescriptorSupport
      * a plain String.
      */
     private static String makeFieldValue(Object value) {
-	if (value == null)
-	    return "(null)";
+        if (value == null)
+            return "(null)";
 
-	Class valueClass = value.getClass();
-	try {
-	    valueClass.getConstructor(new Class[] {String.class});
-	} catch (NoSuchMethodException e) {
-	    final String msg =
-		"Class " + valueClass + " does not have a public " +
-		"constructor with a single string arg";
-	    final RuntimeException iae = new IllegalArgumentException(msg);
-	    throw new RuntimeException( "Cannot make XML descriptor", iae);
-	} catch (SecurityException e) {
-	    // OK: we'll pretend the constructor is there
-	    // too bad if it's not: we'll find out when we try to
-	    // reconstruct the DescriptorSupport
-	}
+        Class valueClass = value.getClass();
+        try {
+            valueClass.getConstructor(new Class[] {String.class});
+        } catch (NoSuchMethodException e) {
+            final String msg =
+                "Class " + valueClass + " does not have a public " +
+                "constructor with a single string arg";
+            final RuntimeException iae = new IllegalArgumentException(msg);
+            throw new RuntimeException( "Cannot make XML descriptor", iae);
+        } catch (SecurityException e) {
+            // OK: we'll pretend the constructor is there
+            // too bad if it's not: we'll find out when we try to
+            // reconstruct the DescriptorSupport
+        }
 
-	final String quotedValueString = quote(value.toString());
-	
-	return "(" + valueClass.getName() + "/" + quotedValueString + ")";
+        final String quotedValueString = quote(value.toString());
+        
+        return "(" + valueClass.getName() + "/" + quotedValueString + ")";
     }
 
     /*
@@ -976,38 +976,38 @@ public class DescriptorSupport
      * without the parentheses.
      */
     private static Object parseQuotedFieldValue(String s) {
-	s = unquote(s);
-	if (s.equalsIgnoreCase("(null)"))
-	    return null;
-	if (!s.startsWith("(") || !s.endsWith(")"))
-	    return s;
-	final int slash = s.indexOf('/');
-	if (slash < 0) {
-	    // compatibility: old code didn't include class name
-	    return s.substring(1, s.length() - 1);
-	}
-	final String className = s.substring(1, slash);
-	final Constructor constr;
-	try {
-	    final ClassLoader contextClassLoader =
-		Thread.currentThread().getContextClassLoader();
+        s = unquote(s);
+        if (s.equalsIgnoreCase("(null)"))
+            return null;
+        if (!s.startsWith("(") || !s.endsWith(")"))
+            return s;
+        final int slash = s.indexOf('/');
+        if (slash < 0) {
+            // compatibility: old code didn't include class name
+            return s.substring(1, s.length() - 1);
+        }
+        final String className = s.substring(1, slash);
+        final Constructor constr;
+        try {
+            final ClassLoader contextClassLoader =
+                Thread.currentThread().getContextClassLoader();
             // if (contextClassLoader == null)
-		// ReflectUtil.checkPackageAccess(className);
+                // ReflectUtil.checkPackageAccess(className);
             final Class c =
-		Class.forName(className, false, contextClassLoader);
-	    constr = c.getConstructor(new Class[] {String.class});
-	} catch (Exception e) {
-	    throw new RuntimeException( "Cannot parse value: <" + s + ">", e);
-	}
-	final String arg = s.substring(slash + 1, s.length() - 1);
-	try {
-	    return constr.newInstance(new Object[] {arg});
-	} catch (Exception e) {
-	    final String msg =
-		"Cannot construct instance of " + className +
-		" with arg: <" + s + ">";
-	    throw new RuntimeException(msg, e);
-	}
+                Class.forName(className, false, contextClassLoader);
+            constr = c.getConstructor(new Class[] {String.class});
+        } catch (Exception e) {
+            throw new RuntimeException( "Cannot parse value: <" + s + ">", e);
+        }
+        final String arg = s.substring(slash + 1, s.length() - 1);
+        try {
+            return constr.newInstance(new Object[] {arg});
+        } catch (Exception e) {
+            final String msg =
+                "Cannot construct instance of " + className +
+                " with arg: <" + s + ">";
+            throw new RuntimeException(msg, e);
+        }
     }
 
     /**
@@ -1025,35 +1025,35 @@ public class DescriptorSupport
      */
     public synchronized String toString() {
 
-	String respStr = "";
-	String[] fields = getFields();
+        String respStr = "";
+        String[] fields = getFields();
 
-	if ((fields == null) || (fields.length == 0)) {
-	    return respStr;
-	}
+        if ((fields == null) || (fields.length == 0)) {
+            return respStr;
+        }
 
-	for (int i=0; i < fields.length; i++) {
-	    if (i == (fields.length - 1)) {
-		respStr = respStr.concat(fields[i]);
-	    } else {
-		respStr = respStr.concat(fields[i] + ", ");
-	    }
-	}
+        for (int i=0; i < fields.length; i++) {
+            if (i == (fields.length - 1)) {
+                respStr = respStr.concat(fields[i]);
+            } else {
+                respStr = respStr.concat(fields[i] + ", ");
+            }
+        }
 
 
-	return respStr;
+        return respStr;
     }
 
     // utility to convert to int, returns -2 if bogus.
 
     private long toNumeric(String inStr) {
-	long result = -2;
-	try {
-	    result = java.lang.Long.parseLong(inStr);
-	} catch (Exception e) {
-	    return -2;
-	}
-	return result;
+        long result = -2;
+        try {
+            result = java.lang.Long.parseLong(inStr);
+        } catch (Exception e) {
+            return -2;
+        }
+        return result;
     }
 
     /**
@@ -1061,14 +1061,14 @@ public class DescriptorSupport
      * ObjectInputStream}.
      */
     private void readObject(ObjectInputStream in)
-	    throws IOException, ClassNotFoundException {
-	ObjectInputStream.GetField fields = in.readFields();
-	Map<String, Object> descriptor = 
-	    (Map<String, Object>) fields.get("descriptor", null);
-	init(null);
-	if (descriptor != null) {
-	    descriptorMap.putAll(descriptor); 
-	}
+            throws IOException, ClassNotFoundException {
+        ObjectInputStream.GetField fields = in.readFields();
+        Map<String, Object> descriptor = 
+            (Map<String, Object>) fields.get("descriptor", null);
+        init(null);
+        if (descriptor != null) {
+            descriptorMap.putAll(descriptor); 
+        }
     }
 
 
@@ -1087,10 +1087,10 @@ public class DescriptorSupport
        find a field whose name is spelt with a different case.
     */
     private void writeObject(ObjectOutputStream out) throws IOException {
-	ObjectOutputStream.PutField fields = out.putFields();
-	boolean compat = "1.0".equals(serialForm);
-	if (compat)
-	    fields.put("currClass", currClass);
+        ObjectOutputStream.PutField fields = out.putFields();
+        boolean compat = "1.0".equals(serialForm);
+        if (compat)
+            fields.put("currClass", currClass);
 
         /* Purge the field "targetObject" from the DescriptorSupport before
          * serializing since the referenced object is typically not
@@ -1104,8 +1104,8 @@ public class DescriptorSupport
             startMap.remove("targetObject");
         }
 
-	final HashMap<String, Object> descriptor;
-	if (compat || "1.2.0".equals(serialForm) ||
+        final HashMap<String, Object> descriptor;
+        if (compat || "1.2.0".equals(serialForm) ||
                 "1.2.1".equals(serialForm)) {
             descriptor = new HashMap<String, Object>();
             for (Map.Entry<String, Object> entry : startMap.entrySet())
@@ -1113,8 +1113,8 @@ public class DescriptorSupport
         } else
             descriptor = new HashMap<String, Object>(startMap);
 
-	fields.put("descriptor", descriptor);
-	out.writeFields();
+        fields.put("descriptor", descriptor);
+        out.writeFields();
     }
 
 }

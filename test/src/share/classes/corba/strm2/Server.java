@@ -49,7 +49,7 @@ public class Server
     private static InitialContext rootContext ;
 
     public static void main(String[] args) {
-	try {
+        try {
 
             rootContext = new InitialContext();
 
@@ -66,10 +66,10 @@ public class Server
                 synchObj.wait();
             }
 
-	} catch (Throwable t) {
+        } catch (Throwable t) {
             t.printStackTrace();
             System.exit(1);
-	}
+        }
     }
 }
 

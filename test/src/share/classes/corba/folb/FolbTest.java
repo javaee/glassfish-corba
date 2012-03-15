@@ -50,88 +50,88 @@ import corba.framework.CORBATest;
 import corba.framework.Controller;
 import corba.framework.Options;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 /**
  * @author Harold Carr
  */
 public class FolbTest
     extends
-	CORBATest
+        CORBATest
 {
     protected void doTest()
-	throws Exception
+        throws Exception
     {
-	String thisPackage = FolbTest.class.getPackage().getName();
+        String thisPackage = FolbTest.class.getPackage().getName();
 
-	Controller orbd = createORBD();
-	Controller server;
-	Controller client;
+        Controller orbd = createORBD();
+        Controller server;
+        Controller client;
 
-	orbd.start();
+        orbd.start();
 
-	//
-	// Main test
-	//
+        //
+        // Main test
+        //
 
-	server = createServer(thisPackage+"."+"Server", "Server");
-	client = createClient(thisPackage+"."+"Client", "Client");
+        server = createServer(thisPackage+"."+"Server", "Server");
+        client = createClient(thisPackage+"."+"Client", "Client");
 
-	server.start();
-	client.start();
+        server.start();
+        client.start();
 
-	client.waitFor(180000);
+        client.waitFor(180000);
 
-	client.stop();
-	server.stop();
+        client.stop();
+        server.stop();
 
-	//
-	// ClientMulti test
-	//
+        //
+        // ClientMulti test
+        //
 
-	server = createServer(thisPackage+"."+"Server", "ServerMulti");
-	client = createClient(thisPackage+"."+"ClientMulti", "ClientMulti");
-	server.start();
-	client.start();
-	
-	client.waitFor(300000); // 5 minutes
-
-	client.stop();
-	server.stop();
+        server = createServer(thisPackage+"."+"Server", "ServerMulti");
+        client = createClient(thisPackage+"."+"ClientMulti", "ClientMulti");
+        server.start();
+        client.start();
         
-	//
-	// ClientCircular test
-	//
+        client.waitFor(300000); // 5 minutes
 
-	server = createServer(thisPackage+"."+"Server", "ServerCircular");
-	client = createClient(thisPackage+"."+"ClientCircular", "ClientCircular");
-	server.start();
-	client.start();
-	
-	client.waitFor(180000);
+        client.stop();
+        server.stop();
+        
+        //
+        // ClientCircular test
+        //
 
-	client.stop();
-	server.stop();
+        server = createServer(thisPackage+"."+"Server", "ServerCircular");
+        client = createClient(thisPackage+"."+"ClientCircular", "ClientCircular");
+        server.start();
+        client.start();
+        
+        client.waitFor(180000);
 
-	//
-	// ClientWaitTimeout test
-	//
+        client.stop();
+        server.stop();
 
-	server = createServer(thisPackage+"."+"Server", "ServerWaitTimeout");
-	client = createClient(thisPackage+"."+"ClientWaitTimeout", "ClientWaitTimeout");
-	server.start();
-	client.start();
-	
-	client.waitFor(120000);
+        //
+        // ClientWaitTimeout test
+        //
 
-	client.stop();
-	server.stop();
+        server = createServer(thisPackage+"."+"Server", "ServerWaitTimeout");
+        client = createClient(thisPackage+"."+"ClientWaitTimeout", "ClientWaitTimeout");
+        server.start();
+        client.start();
+        
+        client.waitFor(120000);
 
-	//
-	// Cleanup
-	//
+        client.stop();
+        server.stop();
 
-	orbd.stop();
+        //
+        // Cleanup
+        //
+
+        orbd.stop();
     }
 }
 

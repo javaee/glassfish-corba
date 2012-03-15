@@ -192,35 +192,35 @@ public class Client extends ClientBase {
     }
 
     private void doAddInstance( 
-	GroupInfoServiceTest gist,
-	String arg ) throws Exception {
+        GroupInfoServiceTest gist,
+        String arg ) throws Exception {
 
         dprint( "Adding instance " + arg ) ;
-	gist.addInstance(arg);
+        gist.addInstance(arg);
 
-	// Add a delay here to avoid race condition in test:
-	// We add instance asynchronously, and a call that
-	// completes after the start of RFM restartFactories
-	// does NOT get updated in order to avoid a serious
-	// deadlock problem.
+        // Add a delay here to avoid race condition in test:
+        // We add instance asynchronously, and a call that
+        // completes after the start of RFM restartFactories
+        // does NOT get updated in order to avoid a serious
+        // deadlock problem.
 
-	Thread.sleep( 2*1000 ) ;
+        Thread.sleep( 2*1000 ) ;
     }
 
     private void doRemoveInstance( 
-	GroupInfoServiceTest gist,
-	String arg ) throws Exception {
+        GroupInfoServiceTest gist,
+        String arg ) throws Exception {
 
         dprint( "Removing instance " + arg ) ;
-	gist.removeInstance(arg);
+        gist.removeInstance(arg);
 
-	// Add a delay here to avoid race condition in test:
-	// We remove instance asynchronously, and a call that
-	// completes after the start of RFM restartFactories
-	// does NOT get updated in order to avoid a serious
-	// deadlock problem.
+        // Add a delay here to avoid race condition in test:
+        // We remove instance asynchronously, and a call that
+        // completes after the start of RFM restartFactories
+        // does NOT get updated in order to avoid a serious
+        // deadlock problem.
 
-	Thread.sleep( 2*1000 ) ;
+        Thread.sleep( 2*1000 ) ;
     }
 
     public static void main(String[] av) {

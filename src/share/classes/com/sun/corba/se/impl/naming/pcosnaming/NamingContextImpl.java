@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.pcosnaming;
+package com.sun.corba.ee.impl.naming.pcosnaming;
 
 
 import org.omg.CORBA.Object;
@@ -54,16 +54,16 @@ import org.omg.PortableServer.ServantRetentionPolicyValue;
 import org.omg.CosNaming.*;
 import org.omg.CosNaming.NamingContextPackage.*;
 
-import com.sun.corba.se.impl.naming.cosnaming.NamingContextDataStore;
-import com.sun.corba.se.impl.naming.cosnaming.NamingUtils;
+import com.sun.corba.ee.impl.naming.cosnaming.NamingContextDataStore;
+import com.sun.corba.ee.impl.naming.cosnaming.NamingUtils;
 
-import com.sun.corba.se.impl.naming.namingutil.INSURLHandler;
+import com.sun.corba.ee.impl.naming.namingutil.INSURLHandler;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.logging.NamingSystemException;
-import com.sun.corba.se.spi.trace.Naming;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.logging.NamingSystemException;
+import com.sun.corba.ee.spi.trace.Naming;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
@@ -119,7 +119,7 @@ public class NamingContextImpl extends NamingContextExtPOA
 
     // All the INS (Interoperable Naming Service) methods are defined in this class
     // All the calls to INS will be delegated to this class.
-    private transient com.sun.corba.se.impl.naming.cosnaming.InterOperableNamingImpl insImpl;
+    private transient com.sun.corba.ee.impl.naming.cosnaming.InterOperableNamingImpl insImpl;
 
     private transient NamingSystemException wrapper =
         NamingSystemException.self ;
@@ -138,8 +138,8 @@ public class NamingContextImpl extends NamingContextExtPOA
         theNameServiceHandle = null ;
         theServantManagerImplHandle = null ;
 
-	insImpl = 
-            new com.sun.corba.se.impl.naming.cosnaming.InterOperableNamingImpl(); 
+        insImpl = 
+            new com.sun.corba.ee.impl.naming.cosnaming.InterOperableNamingImpl(); 
     }
 
     /**
@@ -154,34 +154,34 @@ public class NamingContextImpl extends NamingContextExtPOA
 
     public NamingContextImpl(ORB orb, String objKey, 
         NameService theNameService, ServantManagerImpl theServantManagerImpl  )
-	throws Exception
+        throws Exception
     {
-	super();
+        super();
 
         setORB( orb ) ;
 
-	this.objKey = objKey;
-	theNameServiceHandle = theNameService;
-	theServantManagerImplHandle = theServantManagerImpl;
-	insImpl = 
-            new com.sun.corba.se.impl.naming.cosnaming.InterOperableNamingImpl(); 
+        this.objKey = objKey;
+        theNameServiceHandle = theNameService;
+        theServantManagerImplHandle = theServantManagerImpl;
+        insImpl = 
+            new com.sun.corba.ee.impl.naming.cosnaming.InterOperableNamingImpl(); 
     }
 
     @Naming
     public void setRootNameService( NameService theNameService ) {
-	theNameServiceHandle = theNameService;
+        theNameServiceHandle = theNameService;
     }
 
     @Naming
     public void setORB( ORB theOrb ) {
-	this.orb = theOrb ;
+        this.orb = theOrb ;
     }
 
     @Naming
     public void setServantManagerImpl( 
-		ServantManagerImpl theServantManagerImpl )
+                ServantManagerImpl theServantManagerImpl )
     {
-	theServantManagerImplHandle = theServantManagerImpl;
+        theServantManagerImplHandle = theServantManagerImpl;
     }
 
     @Naming
@@ -220,7 +220,7 @@ public class NamingContextImpl extends NamingContextExtPOA
                org.omg.CosNaming.NamingContextPackage.AlreadyBound
     {
         if( obj == null ) {
-	    throw wrapper.objectIsNull() ;
+            throw wrapper.objectIsNull() ;
         }
 
         // doBind implements all four flavors of binding
@@ -257,7 +257,7 @@ public class NamingContextImpl extends NamingContextExtPOA
                org.omg.CosNaming.NamingContextPackage.AlreadyBound
     {
         if( nc == null ) {
-	    throw wrapper.objectIsNull() ;
+            throw wrapper.objectIsNull() ;
         }
         // doBind implements all four flavors of binding
         NamingContextDataStore impl = (NamingContextDataStore)this;
@@ -293,7 +293,7 @@ public class NamingContextImpl extends NamingContextExtPOA
     {
         if( obj == null )
         {
-	    throw wrapper.objectIsNull() ;
+            throw wrapper.objectIsNull() ;
         }
         try {
             // doBind implements all four flavors of binding
@@ -301,7 +301,7 @@ public class NamingContextImpl extends NamingContextExtPOA
             doBind(impl,n,obj,true,BindingType.nobject);
         } catch (org.omg.CosNaming.NamingContextPackage.AlreadyBound ex) {
             // This should not happen
-	    throw wrapper.namingCtxRebindAlreadyBound( ex ) ;
+            throw wrapper.namingCtxRebindAlreadyBound( ex ) ;
         }
     }
 
@@ -337,7 +337,7 @@ public class NamingContextImpl extends NamingContextExtPOA
             doBind(impl,n,nc,true,BindingType.ncontext);
         } catch (org.omg.CosNaming.NamingContextPackage.AlreadyBound ex) {
             // This should not happen
-	    throw wrapper.namingCtxRebindAlreadyBound( ex ) ;
+            throw wrapper.namingCtxRebindAlreadyBound( ex ) ;
         }
     }
 
@@ -628,7 +628,7 @@ public class NamingContextImpl extends NamingContextExtPOA
 
             default:
                 // This should not happen
-		throw wrapper.namingCtxBadBindingtype() ;
+                throw wrapper.namingCtxBadBindingtype() ;
             }
         }
     }
@@ -727,7 +727,7 @@ public class NamingContextImpl extends NamingContextExtPOA
                org.omg.CosNaming.NamingContextPackage.CannotProceed,
                org.omg.CosNaming.NamingContextPackage.InvalidName
     {
-	// Name valid?
+        // Name valid?
         if (n.length < 1) {
             throw new org.omg.CosNaming.NamingContextPackage.InvalidName();
         }
@@ -753,7 +753,7 @@ public class NamingContextImpl extends NamingContextExtPOA
 
             // Resolve first  - must be resolveable
             NamingContext context = resolveFirstAsContext(impl,n);
-	    
+            
             // Compute tail
             NameComponent[] tail = new NameComponent[n.length - 1];
             System.arraycopy(n,1,tail,0,n.length-1);
@@ -789,7 +789,7 @@ public class NamingContextImpl extends NamingContextExtPOA
             // Resolve first  - must be resolveable
             topRef = impl.resolveImpl(n[0],bth);
             if (topRef == null) {
-		// It was not bound
+                // It was not bound
                 throw new org.omg.CosNaming.NamingContextPackage.NotFound(NotFoundReason.missing_node,n);
             }
         }
@@ -855,52 +855,52 @@ public class NamingContextImpl extends NamingContextExtPOA
    @Naming
     public void bindImpl(NameComponent n, org.omg.CORBA.Object obj, BindingType bt)
     {
-	if( obj == null ) {
-	    // Raise a Valid Exception and Return
-	    return;
-	}
+        if( obj == null ) {
+            // Raise a Valid Exception and Return
+            return;
+        }
 
-	InternalBindingKey key = new InternalBindingKey(n);
-	InternalBindingValue value;
+        InternalBindingKey key = new InternalBindingKey(n);
+        InternalBindingValue value;
 
-	try {
-	    if( bt.value() == BindingType._nobject ) {
-		// If the BindingType is an ObjectRef then Stringify this ref and
-		// Store it in InternalBindingValue instance. This is required 
-		// because the Object References has to be stored in file
-		value = new InternalBindingValue(bt, orb.object_to_string(obj) );
-		value.setObjectRef( obj );
-	    } else {
-		// If the BindingType is a NamingContext then get it's object key
-		// from the NameService and store it in the Internal Binding Value instance
-		String theNCKey = theNameServiceHandle.getObjectKey( obj );
-		value = new InternalBindingValue( bt, theNCKey );
-		value.setObjectRef( obj );
-	    }
+        try {
+            if( bt.value() == BindingType._nobject ) {
+                // If the BindingType is an ObjectRef then Stringify this ref and
+                // Store it in InternalBindingValue instance. This is required 
+                // because the Object References has to be stored in file
+                value = new InternalBindingValue(bt, orb.object_to_string(obj) );
+                value.setObjectRef( obj );
+            } else {
+                // If the BindingType is a NamingContext then get it's object key
+                // from the NameService and store it in the Internal Binding Value instance
+                String theNCKey = theNameServiceHandle.getObjectKey( obj );
+                value = new InternalBindingValue( bt, theNCKey );
+                value.setObjectRef( obj );
+            }
 
-	    InternalBindingValue oldValue =
-		(InternalBindingValue)this.theHashtable.put(key,value);
+            InternalBindingValue oldValue =
+                (InternalBindingValue)this.theHashtable.put(key,value);
 
-	    if( oldValue != null) {
-		// There was an entry with this name in the Hashtable and hence throw CTX_ALREADY_BOUND
-		// exception
-		throw wrapper.namingCtxRebindAlreadyBound() ;
-	    } else {
-		try {
-		    // Everything went smooth so update the NamingContext file with the
-		    // latest Hashtable image
-		    theServantManagerImplHandle.updateContext( objKey, this );
-		} catch( Exception e ) {
-		    // Something went wrong while updating the context
-		    // so speak the error
-		    throw wrapper.bindUpdateContextFailed( e ) ;
-		}
-	    }
-	} catch( Exception e ) {
-	    // Something went wrong while Binding the Object Reference
-	    // Speak the error again.
-	    throw wrapper.bindFailure( e ) ;
-	}
+            if( oldValue != null) {
+                // There was an entry with this name in the Hashtable and hence throw CTX_ALREADY_BOUND
+                // exception
+                throw wrapper.namingCtxRebindAlreadyBound() ;
+            } else {
+                try {
+                    // Everything went smooth so update the NamingContext file with the
+                    // latest Hashtable image
+                    theServantManagerImplHandle.updateContext( objKey, this );
+                } catch( Exception e ) {
+                    // Something went wrong while updating the context
+                    // so speak the error
+                    throw wrapper.bindUpdateContextFailed( e ) ;
+                }
+            }
+        } catch( Exception e ) {
+            // Something went wrong while Binding the Object Reference
+            // Speak the error again.
+            throw wrapper.bindFailure( e ) ;
+        }
     }
 
     /**
@@ -915,57 +915,57 @@ public class NamingContextImpl extends NamingContextExtPOA
    @Naming
     public Object resolveImpl(NameComponent n, BindingTypeHolder bth)
     {
-	if( ( n.id.length() == 0 ) &&( n.kind.length() == 0 ) ) {
-	    // If the NameComponent list has no entry then it means the current
-	    // context was requested
-	    bth.value = BindingType.ncontext;
-	    return theNameServiceHandle.getObjectReferenceFromKey( 	
-		this.objKey );
-	}
+        if( ( n.id.length() == 0 ) &&( n.kind.length() == 0 ) ) {
+            // If the NameComponent list has no entry then it means the current
+            // context was requested
+            bth.value = BindingType.ncontext;
+            return theNameServiceHandle.getObjectReferenceFromKey(      
+                this.objKey );
+        }
 
-	InternalBindingKey key = new InternalBindingKey(n);
-	InternalBindingValue value = 
+        InternalBindingKey key = new InternalBindingKey(n);
+        InternalBindingValue value = 
             (InternalBindingValue) this.theHashtable.get(key);
 
-	if( value == null ) {
-	    // No entry was found for the given name and hence return NULL 
-	    // NamingContextDataStore throws appropriate exception if
-	    // required.
-	    return null;
-	}
+        if( value == null ) {
+            // No entry was found for the given name and hence return NULL 
+            // NamingContextDataStore throws appropriate exception if
+            // required.
+            return null;
+        }
 
-	Object theObjectFromStringifiedReference = null;
-	bth.value = value.theBindingType;
+        Object theObjectFromStringifiedReference = null;
+        bth.value = value.theBindingType;
 
-	try {
-	    // Check whether the entry found in the Hashtable starts with NC
-	    // Which means it's a name context. So get the NamingContext reference
-	    // from ServantManager, which would either return from the cache or
-	    // read it from the File.
-	    if( value.strObjectRef.startsWith( "NC" ) ) {
-		bth.value = BindingType.ncontext;
-		return theNameServiceHandle.getObjectReferenceFromKey( value.strObjectRef );
-	    } else { 
-		// Else, It is a Object Reference. Check whether Object Reference
-		// can be obtained directly, If not then convert the stringified
-		// reference to object and return.
-		theObjectFromStringifiedReference = value.getObjectRef( );
+        try {
+            // Check whether the entry found in the Hashtable starts with NC
+            // Which means it's a name context. So get the NamingContext reference
+            // from ServantManager, which would either return from the cache or
+            // read it from the File.
+            if( value.strObjectRef.startsWith( "NC" ) ) {
+                bth.value = BindingType.ncontext;
+                return theNameServiceHandle.getObjectReferenceFromKey( value.strObjectRef );
+            } else { 
+                // Else, It is a Object Reference. Check whether Object Reference
+                // can be obtained directly, If not then convert the stringified
+                // reference to object and return.
+                theObjectFromStringifiedReference = value.getObjectRef( );
 
-		if (theObjectFromStringifiedReference == null ) {
-		    try {
-			theObjectFromStringifiedReference = 
-			orb.string_to_object( value.strObjectRef );  	
-			value.setObjectRef( theObjectFromStringifiedReference );
-		    } catch( Exception e ) {
-			throw wrapper.resolveConversionFailure( e );
-		    }
-		}
-	    }
-	} catch ( Exception e ) {
-	    throw wrapper.resolveFailure( e );
-	}
+                if (theObjectFromStringifiedReference == null ) {
+                    try {
+                        theObjectFromStringifiedReference = 
+                        orb.string_to_object( value.strObjectRef );     
+                        value.setObjectRef( theObjectFromStringifiedReference );
+                    } catch( Exception e ) {
+                        throw wrapper.resolveConversionFailure( e );
+                    }
+                }
+            }
+        } catch ( Exception e ) {
+            throw wrapper.resolveFailure( e );
+        }
 
-	return theObjectFromStringifiedReference;
+        return theObjectFromStringifiedReference;
     }
 
    /**
@@ -980,40 +980,40 @@ public class NamingContextImpl extends NamingContextExtPOA
    @Naming
     public Object unbindImpl(NameComponent n) throws SystemException
     {
-	try {
-	    InternalBindingKey key = new InternalBindingKey(n);
-	    InternalBindingValue value = null;
+        try {
+            InternalBindingKey key = new InternalBindingKey(n);
+            InternalBindingValue value = null;
 
-	    try {
-		value = (InternalBindingValue) this.theHashtable.remove(key);
-	    } catch( Exception e ) {
-		// Ignore the exception in Hashtable.remove
-	    }
+            try {
+                value = (InternalBindingValue) this.theHashtable.remove(key);
+            } catch( Exception e ) {
+                // Ignore the exception in Hashtable.remove
+            }
 
-	    theServantManagerImplHandle.updateContext( objKey, this );
+            theServantManagerImplHandle.updateContext( objKey, this );
 
-	    if( value == null ) {
-		return null;
-	    }
+            if( value == null ) {
+                return null;
+            }
 
-	    if( value.strObjectRef.startsWith( "NC" ) ) {
-		theServantManagerImplHandle.readInContext( value.strObjectRef );
-		Object theObjectFromStringfiedReference = 
-		theNameServiceHandle.getObjectReferenceFromKey( value.strObjectRef );
-		return theObjectFromStringfiedReference;
-	    } else {
-		Object theObjectFromStringifiedReference = value.getObjectRef( );
+            if( value.strObjectRef.startsWith( "NC" ) ) {
+                theServantManagerImplHandle.readInContext( value.strObjectRef );
+                Object theObjectFromStringfiedReference = 
+                theNameServiceHandle.getObjectReferenceFromKey( value.strObjectRef );
+                return theObjectFromStringfiedReference;
+            } else {
+                Object theObjectFromStringifiedReference = value.getObjectRef( );
 
-		if( theObjectFromStringifiedReference == null ) { 
-		    theObjectFromStringifiedReference =
-		    orb.string_to_object( value.strObjectRef );  	
-		}
+                if( theObjectFromStringifiedReference == null ) { 
+                    theObjectFromStringifiedReference =
+                    orb.string_to_object( value.strObjectRef );         
+                }
 
-		return theObjectFromStringifiedReference;
-	    }
-	} catch( Exception e ) {
-	    throw wrapper.unbindFailure( e );
-	} 
+                return theObjectFromStringifiedReference;
+            }
+        } catch( Exception e ) {
+            throw wrapper.unbindFailure( e );
+        } 
     }
 
    /**
@@ -1029,7 +1029,7 @@ public class NamingContextImpl extends NamingContextExtPOA
 
    @Naming
     public void listImpl(int how_many, BindingListHolder bl,
-		     BindingIteratorHolder bi) throws SystemException
+                     BindingIteratorHolder bi) throws SystemException
     {
         if( biPOA == null ) {
             createbiPOA( );
@@ -1052,7 +1052,7 @@ public class NamingContextImpl extends NamingContextExtPOA
         } catch (org.omg.CORBA.SystemException e) {
             throw e;
         } catch( Exception e ) {
-	    throw wrapper.transNcListGotExc( e ) ;
+            throw wrapper.transNcListGotExc( e ) ;
         }
     }
 
@@ -1063,7 +1063,7 @@ public class NamingContextImpl extends NamingContextExtPOA
         }
         try {
             POA rootPOA = (POA) orb.resolve_initial_references(
-		ORBConstants.ROOT_POA_NAME );
+                ORBConstants.ROOT_POA_NAME );
             rootPOA.the_POAManager().activate( );
 
             int i = 0;
@@ -1077,7 +1077,7 @@ public class NamingContextImpl extends NamingContextExtPOA
             biPOA = rootPOA.create_POA("BindingIteratorPOA", null, poaPolicy );
             biPOA.the_POAManager().activate( );
         } catch( Exception e ) {
-	    throw wrapper.namingCtxBindingIteratorCreate( e ) ;
+            throw wrapper.namingCtxBindingIteratorCreate( e ) ;
         }
     }
 
@@ -1091,13 +1091,13 @@ public class NamingContextImpl extends NamingContextExtPOA
    @Naming
     public NamingContext newContextImpl() throws SystemException
     {
-	try {
-	    return  theNameServiceHandle.newContext( );
-	} catch( org.omg.CORBA.SystemException e ) {
-	    throw e;
-	} catch( Exception e ) {
-	    throw wrapper.transNcNewctxGotExc( e ) ;
-	}
+        try {
+            return  theNameServiceHandle.newContext( );
+        } catch( org.omg.CORBA.SystemException e ) {
+            throw e;
+        } catch( Exception e ) {
+            throw wrapper.transNcNewctxGotExc( e ) ;
+        }
      }
 
 
@@ -1107,24 +1107,24 @@ public class NamingContextImpl extends NamingContextExtPOA
    @Naming
     public void destroyImpl() throws SystemException
     {
-	// Note that orb.disconnect is illegal here, since the
-	// POA is used.  However, there may be some associated state
-	// that needs to be cleaned up in ServerManagerImpl which we will
-	// look into further at another time.
-	/*
-	// This needs to be replaced by cleaning up the
-	// file that backs up the naming context.  No explicit
-	// action is necessary at the POA level, since this is
-	// created with the non-retain policy.
-	/*
-	try { orb.disconnect(
-	    theNameServiceHandle.getObjectReferenceFromKey( this.objKey ) );
-	} catch( org.omg.CORBA.SystemException e ) {
-	    throw e;
-	} catch( Exception e ) {
-	    throw updateWrapper.transNcDestroyGotEx( e ) ;
-	}
-	*/
+        // Note that orb.disconnect is illegal here, since the
+        // POA is used.  However, there may be some associated state
+        // that needs to be cleaned up in ServerManagerImpl which we will
+        // look into further at another time.
+        /*
+        // This needs to be replaced by cleaning up the
+        // file that backs up the naming context.  No explicit
+        // action is necessary at the POA level, since this is
+        // created with the non-retain policy.
+        /*
+        try { orb.disconnect(
+            theNameServiceHandle.getObjectReferenceFromKey( this.objKey ) );
+        } catch( org.omg.CORBA.SystemException e ) {
+            throw e;
+        } catch( Exception e ) {
+            throw updateWrapper.transNcDestroyGotEx( e ) ;
+        }
+        */
     }
 
     /**
@@ -1284,7 +1284,7 @@ public class NamingContextImpl extends NamingContextExtPOA
    */
     public boolean isEmptyImpl()
     {
-	return this.theHashtable.isEmpty();
+        return this.theHashtable.isEmpty();
     }
 
    /**
@@ -1292,17 +1292,17 @@ public class NamingContextImpl extends NamingContextExtPOA
    */
     public void printSize( )
     {
-	System.out.println( "Hashtable Size = " + theHashtable.size( ) );
-	java.util.Enumeration e = theHashtable.keys( );
-	for( ; e.hasMoreElements(); )
-	{
-	      InternalBindingValue thevalue = 
-			(InternalBindingValue) this.theHashtable.get(e.nextElement());
-		if( thevalue != null )
-		{
-			System.out.println( "value = " + thevalue.strObjectRef);
-		}
-	}
+        System.out.println( "Hashtable Size = " + theHashtable.size( ) );
+        java.util.Enumeration e = theHashtable.keys( );
+        for( ; e.hasMoreElements(); )
+        {
+              InternalBindingValue thevalue = 
+                        (InternalBindingValue) this.theHashtable.get(e.nextElement());
+                if( thevalue != null )
+                {
+                        System.out.println( "value = " + thevalue.strObjectRef);
+                }
+        }
     }
 
 }

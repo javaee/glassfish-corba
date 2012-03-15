@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ComplexTestObjectTwoSubclassDefaults.java	1.5 99/06/07 */
+/* @(#)ComplexTestObjectTwoSubclassDefaults.java        1.5 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -59,7 +59,7 @@ public class ComplexTestObjectTwoSubclassDefaults extends ComplexTestObjectTwo
 
     public ComplexTestObjectTwoSubclassDefaults()
     {
-	super();
+        super();
         fInt2 = r.nextInt();
         fLong2 = r.nextLong();
     }
@@ -67,16 +67,16 @@ public class ComplexTestObjectTwoSubclassDefaults extends ComplexTestObjectTwo
     public boolean equals(Object o)
     {
         try
-	    {
-		ComplexTestObjectTwoSubclassDefaults ctbo = (ComplexTestObjectTwoSubclassDefaults)o;
-		return ((ctbo.fInt2 == fInt2) &&
-			(ctbo.fLong2 == fLong2)
-			);
-	    }
+            {
+                ComplexTestObjectTwoSubclassDefaults ctbo = (ComplexTestObjectTwoSubclassDefaults)o;
+                return ((ctbo.fInt2 == fInt2) &&
+                        (ctbo.fLong2 == fLong2)
+                        );
+            }
         catch(Exception e)
-	    {
-		return false;
-	    }
+            {
+                return false;
+            }
     }
 
     /**
@@ -85,14 +85,14 @@ public class ComplexTestObjectTwoSubclassDefaults extends ComplexTestObjectTwo
     private void writeObject(ObjectOutputStream s) throws IOException
     {
         try
-	    {
-		s.defaultWriteObject();
-		s.writeDouble(55.5);
-	    }
+            {
+                s.defaultWriteObject();
+                s.writeDouble(55.5);
+            }
         catch(IOException e)
-	    {
-		throw e;
-	    }
+            {
+                throw e;
+            }
     }
 
     /**
@@ -102,16 +102,16 @@ public class ComplexTestObjectTwoSubclassDefaults extends ComplexTestObjectTwo
     ClassNotFoundException
     {
         try
-	    {
-		s.defaultReadObject();
-		double d = s.readDouble();
-		if (d != 55.5)
-		    throw new IOException("ComplexTestObjectTwoSubclassDefaults  - Read after defaultReadObject Failed!");
-	    }
+            {
+                s.defaultReadObject();
+                double d = s.readDouble();
+                if (d != 55.5)
+                    throw new IOException("ComplexTestObjectTwoSubclassDefaults  - Read after defaultReadObject Failed!");
+            }
         catch(IOException e)
-	    {
-		throw e;
-	    }
+            {
+                throw e;
+            }
 
     }
 

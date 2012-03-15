@@ -65,28 +65,28 @@ public class Server
     {
         try {
 
-	    U.sop(main + " starting");
+            U.sop(main + " starting");
 
-	    orb = C.createORB(av, 1024);
+            orb = C.createORB(av, 1024);
             rRootPOA = U.getRootPOA(orb);
             rRootPOA.the_POAManager().activate();
 
-	    U.createWithServantAndBind(ServerSide,
-				       new ServerSideServant(),
-				       rRootPOA, orb);
+            U.createWithServantAndBind(ServerSide,
+                                       new ServerSideServant(),
+                                       rRootPOA, orb);
 
-	    U.sop(main + " ready");
-	    U.sop("Server is ready."); // CORBATest handshake.
+            U.sop(main + " ready");
+            U.sop("Server is ready."); // CORBATest handshake.
 
-	    System.out.flush();
+            System.out.flush();
 
-	    orb.run();
+            orb.run();
 
         } catch (Exception e) {
-	    U.sopUnexpectedException(main, e);
-	    System.exit(1);
+            U.sopUnexpectedException(main, e);
+            System.exit(1);
         }
-	System.exit(Controller.SUCCESS);
+        System.exit(Controller.SUCCESS);
     }
 }
 

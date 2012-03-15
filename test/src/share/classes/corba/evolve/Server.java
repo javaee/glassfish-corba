@@ -64,10 +64,10 @@ public class Server
             rootPOA.the_POAManager().activate();
 
             UserNameVerifierImpl impl = new UserNameVerifierImpl();
-	    javax.rmi.CORBA.Tie tie = javax.rmi.CORBA.Util.getTie(impl); 
+            javax.rmi.CORBA.Tie tie = javax.rmi.CORBA.Util.getTie(impl); 
 
-	    byte[] id = rootPOA.activate_object((org.omg.PortableServer.Servant)tie);
-	    org.omg.CORBA.Object obj = rootPOA.id_to_reference(id);
+            byte[] id = rootPOA.activate_object((org.omg.PortableServer.Servant)tie);
+            org.omg.CORBA.Object obj = rootPOA.id_to_reference(id);
 
             // get the root naming context
             org.omg.CORBA.Object objRef = 

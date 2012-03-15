@@ -84,18 +84,18 @@ public abstract class Compiler
                                      String reportDirectory,
                                      String compilerName) throws Exception
     {
-	// Make certain the directories exist
-	// Note: this must be done here as well as in the test harness
-	// in case a test (like corba.codebase) changes the output directory
-	// in the test itself!
+        // Make certain the directories exist
+        // Note: this must be done here as well as in the test harness
+        // in case a test (like corba.codebase) changes the output directory
+        // in the test itself!
         CORBAUtil.mkdir(outputDirectory);
         CORBAUtil.mkdir(reportDirectory);
 
         FileOutputDecorator exec 
             = new FileOutputDecorator(new ExternalExec(false));
    
-	Properties props = new Properties() ;
-	int emmaPort = EmmaControl.setCoverageProperties( props ) ;
+        Properties props = new Properties() ;
+        int emmaPort = EmmaControl.setCoverageProperties( props ) ;
         exec.initialize(className,
                         compilerName,
                         props,
@@ -104,19 +104,19 @@ public abstract class Compiler
                         reportDirectory + compilerName + ".out.txt",
                         reportDirectory + compilerName + ".err.txt",
                         null,
-			emmaPort ) ;
+                        emmaPort ) ;
     
         exec.start();
         int result = 1;
 
-	try {
+        try {
 
-	    result = exec.waitFor(Options.getMaximumTimeout());
+            result = exec.waitFor(Options.getMaximumTimeout());
 
-	} catch (Exception e) {
-	    exec.stop();
-	    throw e;
-	}
+        } catch (Exception e) {
+            exec.stop();
+            throw e;
+        }
 
         if (result != Controller.SUCCESS) 
             throw new Exception(compilerName 

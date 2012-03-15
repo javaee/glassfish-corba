@@ -64,8 +64,8 @@ public final class Initializer implements org.omg.CORBA.portable.IDLEntity
     //public Initializer (com.sun.org.omg.CORBA.StructMember[] _members, String _name)
     public Initializer (org.omg.CORBA.StructMember[] _members, String _name)
     {
-	members = _members;
-	name = _name;
+        members = _members;
+        name = _name;
     } // ctor
 
 } // class Initializer

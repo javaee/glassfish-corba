@@ -128,7 +128,7 @@ module DynamicAny {
     * An attempt to use a DynAny object with the DII may raise the NO_IMPLEMENT exception.
     */
     interface DynAny {
-	#pragma sun_localservant DynAny ""
+        #pragma sun_localservant DynAny ""
         exception InvalidValue {};
         exception TypeMismatch {};
 
@@ -673,7 +673,7 @@ module DynamicAny {
     * number of digits and arbitrary scale, the operations use the IDL string type.
     */
     interface DynFixed : DynAny {
-	#pragma sun_localservant DynFixed ""
+        #pragma sun_localservant DynFixed ""
 
         /**
         * Returns the value of a DynFixed.
@@ -701,7 +701,7 @@ module DynamicAny {
     * The current position of a DynEnum is always -1.
     */
     interface DynEnum : DynAny {
-	#pragma sun_localservant DynEnum ""
+        #pragma sun_localservant DynEnum ""
 
         /**
         * Returns the value of the DynEnum as an IDL identifier.
@@ -771,7 +771,7 @@ module DynamicAny {
     * Members of the exceptions are handled in the same way as members of a struct.
     */
     interface DynStruct : DynAny {
-	#pragma sun_localservant DynStruct ""
+        #pragma sun_localservant DynStruct ""
 
         /**
         * Returns the name of the member at the current position.
@@ -857,7 +857,7 @@ module DynamicAny {
     * it is 2 for a union whose discriminator indicates a named member, and 1 otherwise.
     */
     interface DynUnion : DynAny {
-	#pragma sun_localservant DynUnion ""
+        #pragma sun_localservant DynUnion ""
 
         /**
         * Returns the current discriminator value.
@@ -950,7 +950,7 @@ module DynamicAny {
     * DynSequence objects support the manipulation of IDL sequences.
     */
     interface DynSequence : DynAny {
-	#pragma sun_localservant DynSequence ""
+        #pragma sun_localservant DynSequence ""
 
         /**
         * Returns the current length of the sequence.
@@ -1022,7 +1022,7 @@ module DynamicAny {
     * through the type attribute. It can also be obtained by calling the component_count operation.
     */
     interface DynArray : DynAny {
-	#pragma sun_localservant DynArray ""
+        #pragma sun_localservant DynArray ""
 
         /**
         * Returns the elements of the DynArray.
@@ -1088,7 +1088,7 @@ module DynamicAny {
     * the encapsulation of the value type. 
     */
     interface DynValue : DynValueCommon {
-	#pragma sun_localservant DynValue ""
+        #pragma sun_localservant DynValue ""
 
         /**
         * Returns the name of the member at the current position.
@@ -1239,7 +1239,7 @@ module DynamicAny {
     * to create an any value from the constructed DynAny.
     */
     interface DynAnyFactory {
-	#pragma sun_localservant DynAnyFactory ""
+        #pragma sun_localservant DynAnyFactory ""
         exception InconsistentTypeCode {};
 
         /**

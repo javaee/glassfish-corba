@@ -38,14 +38,14 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.threadpool;
+package com.sun.corba.ee.impl.threadpool;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.sun.corba.se.spi.threadpool.ThreadPool;
-import com.sun.corba.se.spi.threadpool.Work;
-import com.sun.corba.se.spi.threadpool.WorkQueue;
+import com.sun.corba.ee.spi.threadpool.ThreadPool;
+import com.sun.corba.ee.spi.threadpool.Work;
+import com.sun.corba.ee.spi.threadpool.WorkQueue;
 
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.ManagedAttribute ;
@@ -66,7 +66,7 @@ public class WorkQueueImpl implements WorkQueue
     final private String name;
 
     public WorkQueueImpl() {
-	this.name = WORKQUEUE_DEFAULT_NAME;
+        this.name = WORKQUEUE_DEFAULT_NAME;
         this.queue = new LinkedList<Work>();
     }
 
@@ -76,7 +76,7 @@ public class WorkQueueImpl implements WorkQueue
 
     public WorkQueueImpl(ThreadPool workerThreadPool, String name) {
         this.workerThreadPool = workerThreadPool;
-	this.name = name;
+        this.name = name;
         this.queue = new LinkedList<Work>();
     }
 
@@ -163,11 +163,11 @@ public class WorkQueueImpl implements WorkQueue
     }
 
     public synchronized void setThreadPool(ThreadPool workerThreadPool) {
-	this.workerThreadPool = workerThreadPool;
+        this.workerThreadPool = workerThreadPool;
     }
 
     public synchronized ThreadPool getThreadPool() {
-	return workerThreadPool;
+        return workerThreadPool;
     }
 
     /**

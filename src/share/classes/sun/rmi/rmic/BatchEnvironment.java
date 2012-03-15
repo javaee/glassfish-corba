@@ -82,8 +82,8 @@ public class BatchEnvironment extends sun.tools.javac.BatchEnvironment {
      * Create a ClassPath object for rmic from a class path string.
      */
     public static ClassPath createClassPath(String classPathString) {
-	ClassPath[] paths = classPaths(null, classPathString, null, null);
-	return paths[1];
+        ClassPath[] paths = classPaths(null, classPathString, null, null);
+        return paths[1];
     }
 
     /**
@@ -91,14 +91,14 @@ public class BatchEnvironment extends sun.tools.javac.BatchEnvironment {
      * options for class path, boot class path, and extension directories.
      */
     public static ClassPath createClassPath(String classPathString,
-					    String sysClassPathString,
-					    String extDirsString)
+                                            String sysClassPathString,
+                                            String extDirsString)
     {
-	ClassPath[] paths = classPaths(null,
-				       classPathString,
-				       sysClassPathString,
-				       extDirsString);
-	return paths[1];
+        ClassPath[] paths = classPaths(null,
+                                       classPathString,
+                                       sysClassPathString,
+                                       extDirsString);
+        return paths[1];
     }
 
     /**
@@ -106,15 +106,15 @@ public class BatchEnvironment extends sun.tools.javac.BatchEnvironment {
      * stream for messages and Main.
      */
     public BatchEnvironment(OutputStream out, ClassPath path, Main main) {
-	super(out, path);
-	this.main = main;
+        super(out, path);
+        this.main = main;
     }
 
     /**
      * Get the instance of Main which created this environment.
      */
     public Main getMain() {
-	return main;
+        return main;
     }
 
     /**
@@ -132,7 +132,7 @@ public class BatchEnvironment extends sun.tools.javac.BatchEnvironment {
      * can be removed later, if appropriate.
      */
     public void addGeneratedFile(File file) {
-	generatedFiles.addElement(file);
+        generatedFiles.addElement(file);
     }
 
     /**
@@ -141,14 +141,14 @@ public class BatchEnvironment extends sun.tools.javac.BatchEnvironment {
      * "addGeneratedFile" method).
      */
     public void deleteGeneratedFiles() {
-	synchronized(generatedFiles) {
-	    Enumeration enumeration = generatedFiles.elements();
-	    while (enumeration.hasMoreElements()) {
-		File file = (File) enumeration.nextElement();
-		file.delete();
-	    }
-	    generatedFiles.removeAllElements();
-	}
+        synchronized(generatedFiles) {
+            Enumeration enumeration = generatedFiles.elements();
+            while (enumeration.hasMoreElements()) {
+                File file = (File) enumeration.nextElement();
+                file.delete();
+            }
+            generatedFiles.removeAllElements();
+        }
     }
 
     /**
@@ -167,21 +167,21 @@ public class BatchEnvironment extends sun.tools.javac.BatchEnvironment {
      * bundle; otherwise, defer to java's superclass method.
      */
     public String errorString(String err,
-			      Object arg0, Object arg1, Object arg2)
+                              Object arg0, Object arg1, Object arg2)
     {
-	if (err.startsWith("rmic.") || err.startsWith("warn.rmic.")) {
-	    String result =  Main.getText(err,
-					  (arg0 != null ? arg0.toString() : null),
-					  (arg1 != null ? arg1.toString() : null),
-					  (arg2 != null ? arg2.toString() : null));
+        if (err.startsWith("rmic.") || err.startsWith("warn.rmic.")) {
+            String result =  Main.getText(err,
+                                          (arg0 != null ? arg0.toString() : null),
+                                          (arg1 != null ? arg1.toString() : null),
+                                          (arg2 != null ? arg2.toString() : null));
 
-	    if (err.startsWith("warn.")) {
-		result = "warning: " + result;
-	    }
-	    return result;
-	} else {
-	    return super.errorString(err, arg0, arg1, arg2);
-	}
+            if (err.startsWith("warn.")) {
+                result = "warning: " + result;
+            }
+            return result;
+        } else {
+            return super.errorString(err, arg0, arg1, arg2);
+        }
     }
     public void reset() {
     }

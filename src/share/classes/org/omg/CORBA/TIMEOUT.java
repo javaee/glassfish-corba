@@ -58,7 +58,7 @@ public final class TIMEOUT extends SystemException {
      * minor code set to 0 and CompletionStatus set to COMPLETED_NO.
      */
     public TIMEOUT() {
-	this("");
+        this("");
     }
 
     /**

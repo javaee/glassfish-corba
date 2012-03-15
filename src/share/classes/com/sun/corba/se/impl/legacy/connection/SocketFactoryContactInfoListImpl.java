@@ -38,36 +38,36 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.legacy.connection;
+package com.sun.corba.ee.impl.legacy.connection;
 
 import java.util.Iterator;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.transport.ContactInfoListImpl;
-import com.sun.corba.se.impl.transport.ContactInfoListIteratorImpl;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.impl.transport.ContactInfoListImpl;
+import com.sun.corba.ee.impl.transport.ContactInfoListIteratorImpl;
 
 /**
  * @author Harold Carr
  */
 public class SocketFactoryContactInfoListImpl 
     extends
-	ContactInfoListImpl
+        ContactInfoListImpl
 {
     // XREVISIT - is this used?
     public SocketFactoryContactInfoListImpl(ORB orb)
     {
-	super(orb);
+        super(orb);
     }
 
     public SocketFactoryContactInfoListImpl(ORB orb, IOR targetIOR)
     {
-	super(orb, targetIOR);
+        super(orb, targetIOR);
     }
 
     public Iterator iterator()
     {
-	return new SocketFactoryContactInfoListIteratorImpl(orb, this);
+        return new SocketFactoryContactInfoListIteratorImpl(orb, this);
     }
 }
 

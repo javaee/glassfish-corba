@@ -66,53 +66,53 @@ public class BudgetItem implements Serializable
 
     public BudgetItem (Investment investment, int percentage)
     {
-	fInvestment = investment;
-	fPercentage = percentage;
+        fInvestment = investment;
+        fPercentage = percentage;
     }
 
     public BudgetItem (Investment investment)
     {
-	fInvestment = investment;
-	fPercentage = 0;
+        fInvestment = investment;
+        fPercentage = 0;
     }
 
     public Investment getInvestment ()
     {
-	return fInvestment;
+        return fInvestment;
     }
 
     public int getPercentage ()
     {
-	return fPercentage;
+        return fPercentage;
     }
 
     public void setInvestment (Investment investment)
     {
-	fInvestment = investment;
+        fInvestment = investment;
     }
 
     public void setPercentage (int percentage)
     {
-	fPercentage = percentage;
+        fPercentage = percentage;
     }
 
     public String getName ()
     {
-	return fInvestment.getName ();
+        return fInvestment.getName ();
     }
 
     public String toString ()
     {
-	String s = getName() + "(";
-	Object o = fInvestment;
-	if ( o.getClass().getName() == "Budget" ) {
-	    Budget b = (Budget)fInvestment;
-	    s += b.toString ();
-	} else {
-	    s += fInvestment.getName ();
-	}
-	s += "," + String.valueOf (fPercentage) + ")";
-	return s;
+        String s = getName() + "(";
+        Object o = fInvestment;
+        if ( o.getClass().getName() == "Budget" ) {
+            Budget b = (Budget)fInvestment;
+            s += b.toString ();
+        } else {
+            s += fInvestment.getName ();
+        }
+        s += "," + String.valueOf (fPercentage) + ")";
+        return s;
     }
 
 }

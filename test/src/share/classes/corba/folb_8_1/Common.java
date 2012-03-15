@@ -60,7 +60,7 @@ import org.omg.IOP.CodecFactoryHelper;
 import org.omg.IOP.Encoding;
 import org.omg.IOP.ENCODING_CDR_ENCAPS;
 
-import com.sun.corba.se.spi.extension.ZeroPortPolicy;
+import com.sun.corba.ee.spi.extension.ZeroPortPolicy;
 
 /**
  * @author Harold Carr
@@ -83,11 +83,11 @@ public abstract class Common
     public static HashMap socketTypeToPort = new HashMap();
     public static HashMap portToSocketType = new HashMap();
     static {
-	for (int i = 0; i < socketTypes.length; i++) {
-	    Integer port = new Integer(socketPorts[i]);
-	    socketTypeToPort.put(socketTypes[i], port);
-	    portToSocketType.put(port, socketTypes[i]);
-	}
+        for (int i = 0; i < socketTypes.length; i++) {
+            Integer port = new Integer(socketPorts[i]);
+            socketTypeToPort.put(socketTypes[i], port);
+            portToSocketType.put(port, socketTypes[i]);
+        }
     }
     public static final String serverName1 = "I1";
     public static final String serverName2 = "I2";
@@ -95,55 +95,55 @@ public abstract class Common
     public static final String zero2 = "zero2";
 
     public static POA createPOA(String name, boolean zeroPortP, ORB orb)
-	throws Exception
+        throws Exception
     {
-	// Get rootPOA
+        // Get rootPOA
 
-	POA rootPoa = (POA) orb.resolve_initial_references("RootPOA");
-	rootPoa.the_POAManager().activate();
+        POA rootPoa = (POA) orb.resolve_initial_references("RootPOA");
+        rootPoa.the_POAManager().activate();
 
-	// Create child
+        // Create child
 
-	List policies = new ArrayList();
+        List policies = new ArrayList();
 
-	// Create child POA
-	policies.add(
-	    rootPoa.create_lifespan_policy(LifespanPolicyValue.TRANSIENT));
-	if (zeroPortP) {
-	    policies.add(ZeroPortPolicy.getPolicy());
-	}
-	Policy[] policy = (Policy[]) policies.toArray(new Policy[0]);
-	POA childPoa = rootPoa.create_POA(name, null, policy);
-	childPoa.the_POAManager().activate();
-	return childPoa;
+        // Create child POA
+        policies.add(
+            rootPoa.create_lifespan_policy(LifespanPolicyValue.TRANSIENT));
+        if (zeroPortP) {
+            policies.add(ZeroPortPolicy.getPolicy());
+        }
+        Policy[] policy = (Policy[]) policies.toArray(new Policy[0]);
+        POA childPoa = rootPoa.create_POA(name, null, policy);
+        childPoa.the_POAManager().activate();
+        return childPoa;
     }
-	
+        
     // create servant and register it with a POA
     public static org.omg.CORBA.Object createAndBind(String name,
-						     ORB orb, POA poa)
-	throws Exception
+                                                     ORB orb, POA poa)
+        throws Exception
     {
-	Servant servant;
-	if (name.equals(Common.serverName1)) {
-	    servant = new IServant(orb);
-	} else {
-	    servant = new I2Servant(orb);
-	}
-	byte[] id = poa.activate_object(servant);
-	org.omg.CORBA.Object ref = poa.id_to_reference(id);
-	Common.getNameService(orb).rebind(Common.makeNameComponent(name), ref);
-	return ref;
+        Servant servant;
+        if (name.equals(Common.serverName1)) {
+            servant = new IServant(orb);
+        } else {
+            servant = new I2Servant(orb);
+        }
+        byte[] id = poa.activate_object(servant);
+        org.omg.CORBA.Object ref = poa.id_to_reference(id);
+        Common.getNameService(orb).rebind(Common.makeNameComponent(name), ref);
+        return ref;
     }
 
     public static NamingContext getNameService(ORB orb)
     {
         org.omg.CORBA.Object objRef = null;
-	try {
-	    objRef = orb.resolve_initial_references("NameService");
-	} catch (Exception ex) {
-	    System.out.println("Common.getNameService: " + ex);
-	    System.exit(1);
-	}
+        try {
+            objRef = orb.resolve_initial_references("NameService");
+        } catch (Exception ex) {
+            System.out.println("Common.getNameService: " + ex);
+            System.exit(1);
+        }
         return NamingContextHelper.narrow(objRef);
     }
 
@@ -151,53 +151,53 @@ public abstract class Common
     {
         NameComponent nc = new NameComponent(name, "");
         NameComponent path[] = {nc};
-	return path;
+        return path;
     }
 
 
     public static Codec getCodec(ORB orb)
     {
-	try {
-	    CodecFactory codecFactory = 
-		CodecFactoryHelper.narrow(orb.resolve_initial_references("CodecFactory"));
-	    return codecFactory.create_codec(new Encoding((short)ENCODING_CDR_ENCAPS.value, (byte)1, (byte)2));
-	} catch (Exception e) {
-	    System.out.println("Unexpected: " + e);
-	    System.exit(1);
-	}
-	return null;
+        try {
+            CodecFactory codecFactory = 
+                CodecFactoryHelper.narrow(orb.resolve_initial_references("CodecFactory"));
+            return codecFactory.create_codec(new Encoding((short)ENCODING_CDR_ENCAPS.value, (byte)1, (byte)2));
+        } catch (Exception e) {
+            System.out.println("Unexpected: " + e);
+            System.exit(1);
+        }
+        return null;
     }
 
     public static String[] concat(String[] a1, String[] a2)
     {
-	String[] result = new String[a1.length + a2.length];
+        String[] result = new String[a1.length + a2.length];
 
-	int index = 0;
-	
-	for (int i = 0; i < a1.length; ++i) {
-	    result[index++] = a1[i];
-	}
+        int index = 0;
+        
+        for (int i = 0; i < a1.length; ++i) {
+            result[index++] = a1[i];
+        }
 
-	for (int i = 0; i < a2.length; ++i) {
-	    result[index++] = a2[i];
-	}
+        for (int i = 0; i < a2.length; ++i) {
+            result[index++] = a2[i];
+        }
 
-	/*
+        /*
         System.out.println(formatStringArray(a1));
-	System.out.println(formatStringArray(a2));
-	System.out.println(formatStringArray(result));
-	*/
+        System.out.println(formatStringArray(a2));
+        System.out.println(formatStringArray(result));
+        */
 
-	return result;
+        return result;
     }
 
     public static String formatStringArray(String[] a)
     {
         String result = "";
-	for (int i = 0; i < a.length; ++i) {
-	    result += a[i] + " ";
-	}
-	return result;
+        for (int i = 0; i < a.length; ++i) {
+            result += a[i] + " ";
+        }
+        return result;
     }
 }
 

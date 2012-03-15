@@ -39,19 +39,19 @@
  */
 
 
-package com.sun.corba.se.spi.transport ;
+package com.sun.corba.ee.spi.transport ;
 
-import com.sun.corba.se.spi.protocol.ClientDelegate ;
-import com.sun.corba.se.spi.protocol.ClientDelegateFactory ;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.ior.IOR ;
+import com.sun.corba.ee.spi.protocol.ClientDelegate ;
+import com.sun.corba.ee.spi.protocol.ClientDelegateFactory ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.ior.IOR ;
 
 // Internal imports, not used in the interface to this package
-import com.sun.corba.se.impl.protocol.ClientDelegateImpl ;
-import com.sun.corba.se.impl.transport.AcceptorAcceptOnlyImpl;
-import com.sun.corba.se.impl.transport.ContactInfoListImpl;
-import com.sun.corba.se.impl.transport.AcceptorImpl ;
-import com.sun.corba.se.impl.transport.AcceptorLazyImpl ;
+import com.sun.corba.ee.impl.protocol.ClientDelegateImpl ;
+import com.sun.corba.ee.impl.transport.AcceptorAcceptOnlyImpl;
+import com.sun.corba.ee.impl.transport.ContactInfoListImpl;
+import com.sun.corba.ee.impl.transport.AcceptorImpl ;
+import com.sun.corba.ee.impl.transport.AcceptorLazyImpl ;
 import java.net.Socket;
 import org.glassfish.pfl.basic.func.UnaryVoidFunction;
 
@@ -62,32 +62,32 @@ public abstract class TransportDefault {
     private TransportDefault() {}
 
     public static ContactInfoListFactory makeCorbaContactInfoListFactory(
-	final ORB broker ) 
+        final ORB broker ) 
     {
-	return new ContactInfoListFactory() {
-	    public void setORB(ORB orb) { }
-	    public ContactInfoList create( IOR ior ) {
-		return new ContactInfoListImpl(
-		    (com.sun.corba.se.spi.orb.ORB)broker, ior ) ;
-	    }
-	};
+        return new ContactInfoListFactory() {
+            public void setORB(ORB orb) { }
+            public ContactInfoList create( IOR ior ) {
+                return new ContactInfoListImpl(
+                    (com.sun.corba.ee.spi.orb.ORB)broker, ior ) ;
+            }
+        };
     }
 
     public static ClientDelegateFactory makeClientDelegateFactory(
-	final ORB broker )
+        final ORB broker )
     {
-	return new ClientDelegateFactory() {
-	    public ClientDelegate create( ContactInfoList info ) {
-		return new ClientDelegateImpl(
-		    (com.sun.corba.se.spi.orb.ORB)broker, info ) ;
-	    }
-	};
+        return new ClientDelegateFactory() {
+            public ClientDelegate create( ContactInfoList info ) {
+                return new ClientDelegateImpl(
+                    (com.sun.corba.ee.spi.orb.ORB)broker, info ) ;
+            }
+        };
     }
 
     public static IORTransformer makeIORTransformer(
-	final ORB broker )
+        final ORB broker )
     {
-	return null ;
+        return null ;
     }
 
     public static Acceptor makeStandardCorbaAcceptor(

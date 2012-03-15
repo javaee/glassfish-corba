@@ -358,8 +358,8 @@ public class Helper implements AuxGen
     if (entry instanceof InterfaceEntry) {
         InterfaceEntry ie = (InterfaceEntry) entry;
 
-	// for #pragma sun_local or sun_localservant, or actual local
-	// local interface, set the flag by checking on both
+        // for #pragma sun_local or sun_localservant, or actual local
+        // local interface, set the flag by checking on both
         isLocalInterface = ie.isLocal() | ie.isLocalServant();
     }
 
@@ -385,8 +385,8 @@ public class Helper implements AuxGen
     if (entry instanceof InterfaceEntry) {
         InterfaceEntry ie = (InterfaceEntry) entry;
 
-	// for #pragma sun_local or sun_localservant, or actual local
-	// local interface, set the flag by checking on both
+        // for #pragma sun_local or sun_localservant, or actual local
+        // local interface, set the flag by checking on both
         isLocalInterface = ie.isLocal() | ie.isLocalServant();
     }
 

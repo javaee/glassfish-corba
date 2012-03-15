@@ -42,7 +42,7 @@ package corba.cdrext;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class CDRExtTest extends CORBATest {
 

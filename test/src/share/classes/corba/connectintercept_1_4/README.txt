@@ -43,8 +43,8 @@
 This tests connection interception.
 
 Be sure to read the JavaDoc in:
-   com/sun/corba/se/spi/legacy/connection/*
-   com/sun/corba/se/spi/legacy/interceptor/*
+   com/sun/corba/ee/spi/legacy/connection/*
+   com/sun/corba/ee/spi/legacy/interceptor/*
 
 Also tests:
 
@@ -100,9 +100,9 @@ ORBD:
 
 Start up with VM args:
 
-   -Dcom.sun.corba.se.POA.ORBBadServerIdHandlerClass=corba.connectintercept_1_4.ORBDBadServerIdHandler
-   -Dcom.sun.corba.se.connection.ORBSocketFactoryClass=corba.connectintercept_1_4.MySocketFactory
-   -Dcom.sun.corba.se.connection.ORBListenSocket=MyType1:2000,MyType2:2001,MyType3:0
+   -Dcom.sun.corba.ee.POA.ORBBadServerIdHandlerClass=corba.connectintercept_1_4.ORBDBadServerIdHandler
+   -Dcom.sun.corba.ee.connection.ORBSocketFactoryClass=corba.connectintercept_1_4.MySocketFactory
+   -Dcom.sun.corba.ee.connection.ORBListenSocket=MyType1:2000,MyType2:2001,MyType3:0
 
 SERVER:
 
@@ -110,7 +110,7 @@ Use ServerTool to register ServerPersistent no VM properties nor
 command line args). 
 
 ripServerTool -cmd register -applicationName "corba.connectintercept_1_4.ServerPersistent" \
-	-server corba.connectintercept_1_4.ServerPersistent -classpath ...
+        -server corba.connectintercept_1_4.ServerPersistent -classpath ...
 
 CLIENT:
 

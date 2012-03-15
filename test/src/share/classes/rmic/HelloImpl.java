@@ -68,8 +68,8 @@ public class HelloImpl //extends javax.rmi.PortableRemoteObject
     }
 
     public void initRemotes() throws java.rmi.RemoteException {
-	if (remotes == null) {
-	    remotes = new AbstractObject[3];
+        if (remotes == null) {
+            remotes = new AbstractObject[3];
             remotes[0] = new RemoteObjectServer(0);
             remotes[1] = new RemoteObjectServer(1);
             remotes[2] = new RemoteObjectServer(2);
@@ -87,13 +87,13 @@ public class HelloImpl //extends javax.rmi.PortableRemoteObject
             throw new java.rmi.RemoteException("publishRemoteException caught: "+e); 
         }
     }
-	
+        
     public String sayHello() throws java.rmi.RemoteException {
-	return "hello";
+        return "hello";
     }
 
     public int sum(int value1, int value2) throws java.rmi.RemoteException {
-	return value1 + value2;
+        return value1 + value2;
     }
 
     public String concatenate(String str1, String str2) throws java.rmi.RemoteException {
@@ -104,9 +104,9 @@ public class HelloImpl //extends javax.rmi.PortableRemoteObject
         this.obv = obv;
 
         return "The Results are: "  +
-	    (obv.getValue1() + obv.getValue2()) +
-	    obv.getString1()    +
-	    obv.getString2();
+            (obv.getValue1() + obv.getValue2()) +
+            obv.getString1()    +
+            obv.getString2();
     }
 
     public ObjectByValue getOBV() throws java.rmi.RemoteException {

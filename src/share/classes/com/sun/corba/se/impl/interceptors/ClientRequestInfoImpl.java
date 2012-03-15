@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.interceptors;
+package com.sun.corba.ee.impl.interceptors;
 
 import java.util.Map ;
 import java.util.HashMap ;
@@ -56,7 +56,7 @@ import org.omg.CORBA.Policy;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.portable.ApplicationException;
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
 
 import org.omg.IOP.ServiceContext;
 import org.omg.IOP.TaggedProfile;
@@ -70,19 +70,19 @@ import org.omg.PortableInterceptor.TRANSPORT_RETRY;
 import org.omg.PortableInterceptor.USER_EXCEPTION;
 
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
 // 6763340
-import com.sun.corba.se.spi.protocol.RetryType;
-import com.sun.corba.se.spi.transport.ContactInfo;
-import com.sun.corba.se.spi.transport.ContactInfoList;
-import com.sun.corba.se.spi.transport.ContactInfoListIterator;
+import com.sun.corba.ee.spi.protocol.RetryType;
+import com.sun.corba.ee.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.transport.ContactInfoList;
+import com.sun.corba.ee.spi.transport.ContactInfoListIterator;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.impl.protocol.InvocationInfo;
-import com.sun.corba.se.spi.trace.TraceInterceptor;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.protocol.InvocationInfo;
+import com.sun.corba.ee.spi.trace.TraceInterceptor;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
@@ -161,39 +161,39 @@ public final class ClientRequestInfoImpl
     @TraceInterceptor
     @Override
     void reset() {
-	super.reset();
+        super.reset();
 
-	// Please keep these in the same order that they're declared above.
+        // Please keep these in the same order that they're declared above.
 
-	// 6763340
-	retryRequest = RetryType.NONE;
+        // 6763340
+        retryRequest = RetryType.NONE;
 
-	// Do not reset entryCount because we need to know when to pop this
-	// from the stack.
+        // Do not reset entryCount because we need to know when to pop this
+        // from the stack.
 
-	request = null;
-	diiInitiate = false;
-	messageMediator = null;
+        request = null;
+        diiInitiate = false;
+        messageMediator = null;
 
-	// Clear cached attributes:
-	cachedTargetObject = null;
-	cachedEffectiveTargetObject = null;
-	cachedArguments = null;
-	cachedExceptions = null;
-	cachedContexts = null;
-	cachedOperationContext = null;
-	cachedReceivedExceptionId = null;
-	cachedResult = null;
-	cachedReceivedException = null;
-	cachedEffectiveProfile = null;
-	cachedRequestServiceContexts = null;
-	cachedReplyServiceContexts = null;
-	cachedEffectiveComponents = null;
+        // Clear cached attributes:
+        cachedTargetObject = null;
+        cachedEffectiveTargetObject = null;
+        cachedArguments = null;
+        cachedExceptions = null;
+        cachedContexts = null;
+        cachedOperationContext = null;
+        cachedReceivedExceptionId = null;
+        cachedResult = null;
+        cachedReceivedException = null;
+        cachedEffectiveProfile = null;
+        cachedRequestServiceContexts = null;
+        cachedReplyServiceContexts = null;
+        cachedEffectiveComponents = null;
 
-	piCurrentPushed = false;
+        piCurrentPushed = false;
 
-	startingPointCall = CALL_SEND_REQUEST;
-	endingPointCall = CALL_RECEIVE_REPLY;
+        startingPointCall = CALL_SEND_REQUEST;
+        endingPointCall = CALL_RECEIVE_REPLY;
     }
     
     /*
@@ -279,15 +279,15 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public org.omg.CORBA.Object target (){
-	// access is currently valid for all states:
-	//checkAccess( MID_TARGET );
-	if (messageMediator != null && cachedTargetObject == null) {
-	    ContactInfo corbaContactInfo = (ContactInfo)
-		messageMediator.getContactInfo();
-	    cachedTargetObject =
-		iorToObject(corbaContactInfo.getTargetIOR());
-	}
-	return cachedTargetObject;
+        // access is currently valid for all states:
+        //checkAccess( MID_TARGET );
+        if (messageMediator != null && cachedTargetObject == null) {
+            ContactInfo corbaContactInfo = (ContactInfo)
+                messageMediator.getContactInfo();
+            cachedTargetObject =
+                iorToObject(corbaContactInfo.getTargetIOR());
+        }
+        return cachedTargetObject;
     }
     
     /**
@@ -298,20 +298,20 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public org.omg.CORBA.Object effective_target() {
-	// access is currently valid for all states:
-	//checkAccess( MID_EFFECTIVE_TARGET );
+        // access is currently valid for all states:
+        //checkAccess( MID_EFFECTIVE_TARGET );
 
-	// Note: This is not necessarily the same as locatedIOR.
-	// Reason: See the way we handle COMM_FAILURES in
-	// ClientRequestDispatcher.createRequest, v1.32
+        // Note: This is not necessarily the same as locatedIOR.
+        // Reason: See the way we handle COMM_FAILURES in
+        // ClientRequestDispatcher.createRequest, v1.32
 
-	if (messageMediator != null && cachedEffectiveTargetObject == null) {
-	    ContactInfo corbaContactInfo = messageMediator.getContactInfo();
-	    // REVISIT - get through chain like getLocatedIOR helper below.
-	    cachedEffectiveTargetObject =
-		iorToObject(corbaContactInfo.getEffectiveTargetIOR());
-	}
-	return cachedEffectiveTargetObject;
+        if (messageMediator != null && cachedEffectiveTargetObject == null) {
+            ContactInfo corbaContactInfo = messageMediator.getContactInfo();
+            // REVISIT - get through chain like getLocatedIOR helper below.
+            cachedEffectiveTargetObject =
+                iorToObject(corbaContactInfo.getEffectiveTargetIOR());
+        }
+        return cachedEffectiveTargetObject;
     }
     
     /**
@@ -322,20 +322,20 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public TaggedProfile effective_profile (){
-	// access is currently valid for all states:
-	//checkAccess( MID_EFFECTIVE_PROFILE );
+        // access is currently valid for all states:
+        //checkAccess( MID_EFFECTIVE_PROFILE );
 
-	if(messageMediator != null && cachedEffectiveProfile == null ) {
-	    ContactInfo corbaContactInfo = messageMediator.getContactInfo();
-	    cachedEffectiveProfile =
-		corbaContactInfo.getEffectiveProfile().getIOPProfile();
-	}
+        if(messageMediator != null && cachedEffectiveProfile == null ) {
+            ContactInfo corbaContactInfo = messageMediator.getContactInfo();
+            cachedEffectiveProfile =
+                corbaContactInfo.getEffectiveProfile().getIOPProfile();
+        }
 
-	// Good citizen: In the interest of efficiency, we assume interceptors
-	// will not modify the returned TaggedProfile in any way so we need
-	// not make a deep copy of it.
+        // Good citizen: In the interest of efficiency, we assume interceptors
+        // will not modify the returned TaggedProfile in any way so we need
+        // not make a deep copy of it.
 
-	return cachedEffectiveProfile;
+        return cachedEffectiveProfile;
     }
     
     /**
@@ -343,17 +343,17 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public Any received_exception (){
-	checkAccess( MID_RECEIVED_EXCEPTION );
+        checkAccess( MID_RECEIVED_EXCEPTION );
 
-	if( cachedReceivedException == null ) {
-	    cachedReceivedException = exceptionToAny( exception );
-	}
+        if( cachedReceivedException == null ) {
+            cachedReceivedException = exceptionToAny( exception );
+        }
 
-	// Good citizen: In the interest of efficiency, we assume interceptors
-	// will not modify the returned Any in any way so we need
-	// not make a deep copy of it.
+        // Good citizen: In the interest of efficiency, we assume interceptors
+        // will not modify the returned Any in any way so we need
+        // not make a deep copy of it.
 
-	return cachedReceivedException;
+        return cachedReceivedException;
     }
     
     /**
@@ -361,30 +361,30 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public String received_exception_id (){
-	checkAccess( MID_RECEIVED_EXCEPTION_ID );
+        checkAccess( MID_RECEIVED_EXCEPTION_ID );
 
-	if( cachedReceivedExceptionId == null ) {
-	    String result = null;
+        if( cachedReceivedExceptionId == null ) {
+            String result = null;
 
-	    if( exception == null ) {
-		// Note: exception should never be null here since we will
-		// throw a BAD_INV_ORDER if this is not called from
-		// receive_exception.
-		throw wrapper.exceptionWasNull() ;
-	    } else if( exception instanceof SystemException ) {
-		String name = exception.getClass().getName();
-		result = ORBUtility.repositoryIdOf(name);
-	    } else if( exception instanceof ApplicationException ) {
-		result = ((ApplicationException)exception).getId();
-	    }
+            if( exception == null ) {
+                // Note: exception should never be null here since we will
+                // throw a BAD_INV_ORDER if this is not called from
+                // receive_exception.
+                throw wrapper.exceptionWasNull() ;
+            } else if( exception instanceof SystemException ) {
+                String name = exception.getClass().getName();
+                result = ORBUtility.repositoryIdOf(name);
+            } else if( exception instanceof ApplicationException ) {
+                result = ((ApplicationException)exception).getId();
+            }
 
-	    // _REVISIT_ We need to be able to handle a UserException in the
-	    // DII case.  How do we extract the ID from a UserException?
+            // _REVISIT_ We need to be able to handle a UserException in the
+            // DII case.  How do we extract the ID from a UserException?
 
-	    cachedReceivedExceptionId = result;
-	}
+            cachedReceivedExceptionId = result;
+        }
 
-	return cachedReceivedExceptionId;
+        return cachedReceivedExceptionId;
     }
     
     /**
@@ -395,7 +395,7 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public TaggedComponent get_effective_component (int id){
-	checkAccess( MID_GET_EFFECTIVE_COMPONENT );
+        checkAccess( MID_GET_EFFECTIVE_COMPONENT );
             
         TaggedComponent[] comps = get_effective_components( id ) ;
         if ((comps != null) && (comps.length > 0)) {
@@ -411,35 +411,35 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public TaggedComponent[] get_effective_components (int id){
-	checkAccess( MID_GET_EFFECTIVE_COMPONENTS );
-	TaggedComponent[] result = null;
-	boolean justCreatedCache = false;
+        checkAccess( MID_GET_EFFECTIVE_COMPONENTS );
+        TaggedComponent[] result = null;
+        boolean justCreatedCache = false;
 
-	if( cachedEffectiveComponents == null ) {
-	    cachedEffectiveComponents = new HashMap<Integer,TaggedComponent[]>();
-	    justCreatedCache = true;
-	} else {
-	    // Look in cache:
-	    result = cachedEffectiveComponents.get( id );
-	}
+        if( cachedEffectiveComponents == null ) {
+            cachedEffectiveComponents = new HashMap<Integer,TaggedComponent[]>();
+            justCreatedCache = true;
+        } else {
+            // Look in cache:
+            result = cachedEffectiveComponents.get( id );
+        }
 
-	// null could mean we cached null or not in cache.
-	if( (messageMediator != null) && (result == null) &&
-	    (justCreatedCache ||
-	    !cachedEffectiveComponents.containsKey( id ) ) )
-	{
-	    // Not in cache.  Get it from the profile:
-	    ContactInfo corbaContactInfo = messageMediator.getContactInfo();
-	    IIOPProfileTemplate ptemp =
-		(IIOPProfileTemplate)corbaContactInfo.getEffectiveProfile().
-		getTaggedProfileTemplate();
-	    result = ptemp.getIOPComponents(myORB, id);
-	    cachedEffectiveComponents.put( id, result );
-	}
+        // null could mean we cached null or not in cache.
+        if( (messageMediator != null) && (result == null) &&
+            (justCreatedCache ||
+            !cachedEffectiveComponents.containsKey( id ) ) )
+        {
+            // Not in cache.  Get it from the profile:
+            ContactInfo corbaContactInfo = messageMediator.getContactInfo();
+            IIOPProfileTemplate ptemp =
+                (IIOPProfileTemplate)corbaContactInfo.getEffectiveProfile().
+                getTaggedProfileTemplate();
+            result = ptemp.getIOPComponents(myORB, id);
+            cachedEffectiveComponents.put( id, result );
+        }
 
-	// As per ptc/00-08-06, section 21.3.13.6., If not found, raise
-	// BAD_PARAM with minor code INVALID_COMPONENT_ID.
-	if( (result == null) || (result.length == 0) ) {
+        // As per ptc/00-08-06, section 21.3.13.6., If not found, raise
+        // BAD_PARAM with minor code INVALID_COMPONENT_ID.
+        if( (result == null) || (result.length == 0) ) {
             if (!myORB.getORBData().isAppServerMode()) {
                 /** Issue 15931: the new wrapper mechanism is currently
                  * a lot slower than the old, and this is taking too
@@ -450,14 +450,14 @@ public final class ClientRequestInfoImpl
                  */
                 throw stdWrapper.invalidComponentId( id ) ;
             }
-	}
+        }
 
-	// Good citizen: In the interest of efficiency, we will assume
-	// interceptors will not modify the returned TaggedCompoent[], or
-	// the TaggedComponents inside of it.  Otherwise, we would need to
-	// clone the array and make a deep copy of its contents.
+        // Good citizen: In the interest of efficiency, we will assume
+        // interceptors will not modify the returned TaggedCompoent[], or
+        // the TaggedComponents inside of it.  Otherwise, we would need to
+        // clone the array and make a deep copy of its contents.
 
-	return result;
+        return result;
     }
     
     /**
@@ -465,9 +465,9 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public Policy get_request_policy (int type){
-	checkAccess( MID_GET_REQUEST_POLICY );
-	// _REVISIT_ Our ORB is not policy-based at this time.
-	throw wrapper.piOrbNotPolicyBased() ;
+        checkAccess( MID_GET_REQUEST_POLICY );
+        // _REVISIT_ Our ORB is not policy-based at this time.
+        throw wrapper.piOrbNotPolicyBased() ;
     }
     
     /**
@@ -480,16 +480,16 @@ public final class ClientRequestInfoImpl
     public void add_request_service_context (ServiceContext service_context, 
                                              boolean replace) {
 
-	checkAccess( MID_ADD_REQUEST_SERVICE_CONTEXT );
+        checkAccess( MID_ADD_REQUEST_SERVICE_CONTEXT );
 
-	if( cachedRequestServiceContexts == null ) {
-	    cachedRequestServiceContexts =
-		new HashMap<Integer,org.omg.IOP.ServiceContext>();
-	}
+        if( cachedRequestServiceContexts == null ) {
+            cachedRequestServiceContexts =
+                new HashMap<Integer,org.omg.IOP.ServiceContext>();
+        }
 
-	addServiceContext( cachedRequestServiceContexts,
-			   messageMediator.getRequestServiceContexts(),
-			   service_context, replace );
+        addServiceContext( cachedRequestServiceContexts,
+                           messageMediator.getRequestServiceContexts(),
+                           service_context, replace );
     }
     
     // NOTE: When adding a method, be sure to:
@@ -512,12 +512,12 @@ public final class ClientRequestInfoImpl
     public int request_id (){
         // access is currently valid for all states:
         //checkAccess( MID_REQUEST_ID );
-	/* 
-	 * NOTE: The requestId in client interceptors is the same as the
-	 * GIOP request id.  This works because both interceptors and
-	 * request ids are scoped by the ORB on the client side.
-	 */
-	return messageMediator.getRequestId();
+        /* 
+         * NOTE: The requestId in client interceptors is the same as the
+         * GIOP request id.  This works because both interceptors and
+         * request ids are scoped by the ORB on the client side.
+         */
+        return messageMediator.getRequestId();
     }
 
     /**
@@ -535,8 +535,8 @@ public final class ClientRequestInfoImpl
 
     @Override
     public String toString() {
-	return "ClientRequestInfoImpl[operation=" 
-	    + operation() + "]" ;
+        return "ClientRequestInfoImpl[operation=" 
+            + operation() + "]" ;
     }
 
     /**
@@ -544,24 +544,24 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public Parameter[] arguments (){
-	checkAccess( MID_ARGUMENTS );
+        checkAccess( MID_ARGUMENTS );
 
-	if( cachedArguments == null ) {
-	    if( request == null ) {
-		throw stdWrapper.piOperationNotSupported1() ;
-	    }
+        if( cachedArguments == null ) {
+            if( request == null ) {
+                throw stdWrapper.piOperationNotSupported1() ;
+            }
 
-	    // If it is DII request then get the arguments from the DII req
-	    // and convert that into parameters.
-	    cachedArguments = nvListToParameterArray( request.arguments() );
-	}
+            // If it is DII request then get the arguments from the DII req
+            // and convert that into parameters.
+            cachedArguments = nvListToParameterArray( request.arguments() );
+        }
 
-	// Good citizen: In the interest of efficiency, we assume
-	// interceptors will be "good citizens" in that they will not
-	// modify the contents of the Parameter[] array.  We also assume
-	// they will not change the values of the containing Anys.
+        // Good citizen: In the interest of efficiency, we assume
+        // interceptors will be "good citizens" in that they will not
+        // modify the contents of the Parameter[] array.  We also assume
+        // they will not change the values of the containing Anys.
 
-	return cachedArguments;
+        return cachedArguments;
     }
 
     /**
@@ -569,35 +569,35 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public TypeCode[] exceptions (){
-	checkAccess( MID_EXCEPTIONS );
+        checkAccess( MID_EXCEPTIONS );
 
-	if( cachedExceptions == null ) {
-	    if( request == null ) {
-	       throw stdWrapper.piOperationNotSupported2() ;
-	    }
+        if( cachedExceptions == null ) {
+            if( request == null ) {
+               throw stdWrapper.piOperationNotSupported2() ;
+            }
 
-	    // Get the list of exceptions from DII request data, If there are
-	    // no exceptions raised then this method will return null.
-	    ExceptionList excList = request.exceptions( );
-	    int count = excList.count();
-	    TypeCode[] excTCList = new TypeCode[count];
-	    try {
-		for( int i = 0; i < count; i++ ) {
-		    excTCList[i] = excList.item( i );
-		}
-	    } catch( Exception e ) {
-		throw wrapper.exceptionInExceptions( e ) ;
-	    }
+            // Get the list of exceptions from DII request data, If there are
+            // no exceptions raised then this method will return null.
+            ExceptionList excList = request.exceptions( );
+            int count = excList.count();
+            TypeCode[] excTCList = new TypeCode[count];
+            try {
+                for( int i = 0; i < count; i++ ) {
+                    excTCList[i] = excList.item( i );
+                }
+            } catch( Exception e ) {
+                throw wrapper.exceptionInExceptions( e ) ;
+            }
 
-	    cachedExceptions = excTCList;
-	}
+            cachedExceptions = excTCList;
+        }
 
-	// Good citizen: In the interest of efficiency, we assume
-	// interceptors will be "good citizens" in that they will not
-	// modify the contents of the TypeCode[] array.  We also assume
-	// they will not change the values of the containing TypeCodes.
+        // Good citizen: In the interest of efficiency, we assume
+        // interceptors will be "good citizens" in that they will not
+        // modify the contents of the TypeCode[] array.  We also assume
+        // they will not change the values of the containing TypeCodes.
 
-	return cachedExceptions;
+        return cachedExceptions;
     }
 
     /**
@@ -605,34 +605,34 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public String[] contexts (){
-	checkAccess( MID_CONTEXTS );
+        checkAccess( MID_CONTEXTS );
 
-	if( cachedContexts == null ) {
-	    if( request == null ) {
-		throw stdWrapper.piOperationNotSupported3() ;
-	    }
+        if( cachedContexts == null ) {
+            if( request == null ) {
+                throw stdWrapper.piOperationNotSupported3() ;
+            }
 
-	    // Get the list of contexts from DII request data, If there are
-	    // no contexts then this method will return null.
-	    ContextList ctxList = request.contexts( );
-	    int count = ctxList.count();
-	    String[] ctxListToReturn = new String[count];
-	    try {
-		for( int i = 0; i < count; i++ ) {
-		    ctxListToReturn[i] = ctxList.item( i );
-		}
-	    } catch( Exception e ) {
-		throw wrapper.exceptionInContexts( e ) ;
-	    }
+            // Get the list of contexts from DII request data, If there are
+            // no contexts then this method will return null.
+            ContextList ctxList = request.contexts( );
+            int count = ctxList.count();
+            String[] ctxListToReturn = new String[count];
+            try {
+                for( int i = 0; i < count; i++ ) {
+                    ctxListToReturn[i] = ctxList.item( i );
+                }
+            } catch( Exception e ) {
+                throw wrapper.exceptionInContexts( e ) ;
+            }
 
-	    cachedContexts = ctxListToReturn;
-	}
+            cachedContexts = ctxListToReturn;
+        }
 
-	// Good citizen: In the interest of efficiency, we assume
-	// interceptors will be "good citizens" in that they will not
-	// modify the contents of the String[] array.
+        // Good citizen: In the interest of efficiency, we assume
+        // interceptors will be "good citizens" in that they will not
+        // modify the contents of the String[] array.
 
-	return cachedContexts;
+        return cachedContexts;
     }
 
     /**
@@ -640,51 +640,51 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public String[] operation_context (){
-	checkAccess( MID_OPERATION_CONTEXT );
+        checkAccess( MID_OPERATION_CONTEXT );
 
-	if( cachedOperationContext == null ) {
-	    if( request == null ) {
-		throw stdWrapper.piOperationNotSupported4() ;
-	    }
+        if( cachedOperationContext == null ) {
+            if( request == null ) {
+                throw stdWrapper.piOperationNotSupported4() ;
+            }
 
-	    // Get the list of contexts from DII request data, If there are
-	    // no contexts then this method will return null.
-	    Context ctx = request.ctx( );
-	    // The first parameter in get_values is the start_scope which
-	    // if blank makes it as a global scope.
-	    // The second parameter is op_flags which is set to RESTRICT_SCOPE
-	    // As there is only one defined in the spec.
-	    // The Third param is the pattern which is '*' requiring it to
-	    // get all the contexts.
-	    NVList nvList = ctx.get_values( "", CTX_RESTRICT_SCOPE.value,"*" );
-	    String[] context = new String[(nvList.count() * 2) ];
-	    if( nvList.count() != 0 ) {
-		// The String[] array will contain Name and Value for each
-		// context and hence double the size in the array.
-		int index = 0;
-		for( int i = 0; i < nvList.count(); i++ ) {
-		    NamedValue nv;
-		    try {
-			nv = nvList.item( i );
-		    }
-		    catch (Exception e ) {
-			return (String[]) null;
-		    }
-		    context[index] = nv.name();
-		    index++;
-		    context[index] = nv.value().extract_string();
-		    index++;
-		}
-	    }
+            // Get the list of contexts from DII request data, If there are
+            // no contexts then this method will return null.
+            Context ctx = request.ctx( );
+            // The first parameter in get_values is the start_scope which
+            // if blank makes it as a global scope.
+            // The second parameter is op_flags which is set to RESTRICT_SCOPE
+            // As there is only one defined in the spec.
+            // The Third param is the pattern which is '*' requiring it to
+            // get all the contexts.
+            NVList nvList = ctx.get_values( "", CTX_RESTRICT_SCOPE.value,"*" );
+            String[] context = new String[(nvList.count() * 2) ];
+            if( nvList.count() != 0 ) {
+                // The String[] array will contain Name and Value for each
+                // context and hence double the size in the array.
+                int index = 0;
+                for( int i = 0; i < nvList.count(); i++ ) {
+                    NamedValue nv;
+                    try {
+                        nv = nvList.item( i );
+                    }
+                    catch (Exception e ) {
+                        return (String[]) null;
+                    }
+                    context[index] = nv.name();
+                    index++;
+                    context[index] = nv.value().extract_string();
+                    index++;
+                }
+            }
 
-	    cachedOperationContext = context;
-	}
+            cachedOperationContext = context;
+        }
 
-	// Good citizen: In the interest of efficiency, we assume
-	// interceptors will be "good citizens" in that they will not
-	// modify the contents of the String[] array.
+        // Good citizen: In the interest of efficiency, we assume
+        // interceptors will be "good citizens" in that they will not
+        // modify the contents of the String[] array.
 
-	return cachedOperationContext;
+        return cachedOperationContext;
     }
 
     /**
@@ -692,36 +692,36 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public Any result (){
-	checkAccess( MID_RESULT );
+        checkAccess( MID_RESULT );
 
-	if( cachedResult == null ) {
-	    if( request == null ) {
-		throw stdWrapper.piOperationNotSupported5() ;
-	    }
-	    // Get the result from the DII request data.
-	    NamedValue nvResult = request.result( );
+        if( cachedResult == null ) {
+            if( request == null ) {
+                throw stdWrapper.piOperationNotSupported5() ;
+            }
+            // Get the result from the DII request data.
+            NamedValue nvResult = request.result( );
 
-	    if( nvResult == null ) {
-		throw wrapper.piDiiResultIsNull() ;
-	    }
+            if( nvResult == null ) {
+                throw wrapper.piDiiResultIsNull() ;
+            }
 
-	    cachedResult = nvResult.value();
-	}
+            cachedResult = nvResult.value();
+        }
 
-	// Good citizen: In the interest of efficiency, we assume that
-	// interceptors will not modify the contents of the result Any.
-	// Otherwise, we would need to create a deep copy of the Any.
+        // Good citizen: In the interest of efficiency, we assume that
+        // interceptors will not modify the contents of the result Any.
+        // Otherwise, we would need to create a deep copy of the Any.
 
-	return cachedResult;
+        return cachedResult;
     }
 
     /**
      * See RequestInfoImpl for javadoc.
      */
     public boolean response_expected (){
-	// access is currently valid for all states:
-	//checkAccess( MID_RESPONSE_EXPECTED );
-	return ! messageMediator.isOneWay();
+        // access is currently valid for all states:
+        //checkAccess( MID_RESPONSE_EXPECTED );
+        return ! messageMediator.isOneWay();
     }
 
     /**
@@ -729,42 +729,42 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public Object forward_reference (){
-	checkAccess( MID_FORWARD_REFERENCE );
-	// Check to make sure we are in LOCATION_FORWARD
-	// state as per ptc/00-08-06, table 21-1
-	// footnote 2.
-	if( replyStatus != LOCATION_FORWARD.value ) {
-	    throw stdWrapper.invalidPiCall1() ;
-	}
+        checkAccess( MID_FORWARD_REFERENCE );
+        // Check to make sure we are in LOCATION_FORWARD
+        // state as per ptc/00-08-06, table 21-1
+        // footnote 2.
+        if( replyStatus != LOCATION_FORWARD.value ) {
+            throw stdWrapper.invalidPiCall1() ;
+        }
 
-	// Do not cache this value since if an interceptor raises
-	// forward request then the next interceptor in the
-	// list should see the new value.
-	IOR ior = getLocatedIOR();
-	return iorToObject(ior);
+        // Do not cache this value since if an interceptor raises
+        // forward request then the next interceptor in the
+        // list should see the new value.
+        IOR ior = getLocatedIOR();
+        return iorToObject(ior);
     }
 
     @TraceInterceptor
     private IOR getLocatedIOR() {
-	IOR ior;
-	ContactInfoList contactInfoList = messageMediator.getContactInfo().
+        IOR ior;
+        ContactInfoList contactInfoList = messageMediator.getContactInfo().
             getContactInfoList();
-	ior = contactInfoList.getEffectiveTargetIOR();
-	return ior;
+        ior = contactInfoList.getEffectiveTargetIOR();
+        return ior;
     }
 
     // Used to be protected. public for IIOPFailoverManagerImpl.
     @TraceInterceptor
     public void setLocatedIOR(IOR ior) {
-	ORB orb = messageMediator.getBroker();
+        ORB orb = messageMediator.getBroker();
 
-	ContactInfoListIterator iterator = (ContactInfoListIterator)
-	    ((InvocationInfo)orb.getInvocationInfo())
-	    .getContactInfoListIterator();
+        ContactInfoListIterator iterator = (ContactInfoListIterator)
+            ((InvocationInfo)orb.getInvocationInfo())
+            .getContactInfoListIterator();
 
-	// REVISIT - this most likely causes reportRedirect to happen twice.
-	// Once here and once inside the request dispatcher.
-	iterator.reportRedirect( messageMediator.getContactInfo(), ior);
+        // REVISIT - this most likely causes reportRedirect to happen twice.
+        // Once here and once inside the request dispatcher.
+        iterator.reportRedirect( messageMediator.getContactInfo(), ior);
     }
 
     /**
@@ -772,16 +772,16 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public org.omg.IOP.ServiceContext get_request_service_context( int id ) {
-	checkAccess( MID_GET_REQUEST_SERVICE_CONTEXT );
+        checkAccess( MID_GET_REQUEST_SERVICE_CONTEXT );
 
-	if( cachedRequestServiceContexts == null ) {
-	    cachedRequestServiceContexts =
-		new HashMap<Integer,org.omg.IOP.ServiceContext>();
-	}
+        if( cachedRequestServiceContexts == null ) {
+            cachedRequestServiceContexts =
+                new HashMap<Integer,org.omg.IOP.ServiceContext>();
+        }
 
-	return  getServiceContext(cachedRequestServiceContexts,
-				  messageMediator.getRequestServiceContexts(),
-				  id);
+        return  getServiceContext(cachedRequestServiceContexts,
+                                  messageMediator.getRequestServiceContexts(),
+                                  id);
     }
 
     /**
@@ -790,35 +790,35 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     public org.omg.IOP.ServiceContext get_reply_service_context( int id ) {
-	checkAccess( MID_GET_REPLY_SERVICE_CONTEXT );
+        checkAccess( MID_GET_REPLY_SERVICE_CONTEXT );
 
-	if( cachedReplyServiceContexts == null ) {
-	    cachedReplyServiceContexts =
-		new HashMap<Integer,org.omg.IOP.ServiceContext>();
-	}
+        if( cachedReplyServiceContexts == null ) {
+            cachedReplyServiceContexts =
+                new HashMap<Integer,org.omg.IOP.ServiceContext>();
+        }
 
-	// In the event this is called from a oneway, we will have no
-	// response object.
-	//
-	// In the event this is called after a IIOPConnection.purgeCalls,
-	// we will have a response object, but that object will
-	// not contain a header (which would hold the service context
-	// container).  See bug 4624102.
-	//
+        // In the event this is called from a oneway, we will have no
+        // response object.
+        //
+        // In the event this is called after a IIOPConnection.purgeCalls,
+        // we will have a response object, but that object will
+        // not contain a header (which would hold the service context
+        // container).  See bug 4624102.
+        //
 
-	// REVISIT: getReplyHeader should not be visible here.
-	if (messageMediator.getReplyHeader() != null) {
-	    ServiceContexts sctxs =
-		messageMediator.getReplyServiceContexts();
-	    if (sctxs != null) {
-		return getServiceContext(cachedReplyServiceContexts,
-					 sctxs, id);
-	    }
-	}
-	// See purge calls test.  The waiter is woken up by the
-	// call to purge calls - but there is no reply containing
-	// service contexts.
-	throw stdWrapper.invalidServiceContextId() ;
+        // REVISIT: getReplyHeader should not be visible here.
+        if (messageMediator.getReplyHeader() != null) {
+            ServiceContexts sctxs =
+                messageMediator.getReplyServiceContexts();
+            if (sctxs != null) {
+                return getServiceContext(cachedReplyServiceContexts,
+                                         sctxs, id);
+            }
+        }
+        // See purge calls test.  The waiter is woken up by the
+        // call to purge calls - but there is no reply containing
+        // service contexts.
+        throw stdWrapper.invalidServiceContextId() ;
     }
 
     //
@@ -827,10 +827,10 @@ public final class ClientRequestInfoImpl
     //
 
     @Override
-    public com.sun.corba.se.spi.legacy.connection.Connection connection()
+    public com.sun.corba.ee.spi.legacy.connection.Connection connection()
     {
-	return (com.sun.corba.se.spi.legacy.connection.Connection) 
-	    messageMediator.getConnection();
+        return (com.sun.corba.ee.spi.legacy.connection.Connection) 
+            messageMediator.getConnection();
     }
     
 
@@ -842,9 +842,9 @@ public final class ClientRequestInfoImpl
 
     protected void setInfo(MessageMediator messageMediator)
     {
-	this.messageMediator = messageMediator;
-	// REVISIT - so mediator can handle DII in subcontract.
-	this.messageMediator.setDIIInfo(request);
+        this.messageMediator = messageMediator;
+        // REVISIT - so mediator can handle DII in subcontract.
+        this.messageMediator.setDIIInfo(request);
     }
     
     /**
@@ -868,8 +868,8 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     void incrementEntryCount() {
-	this.entryCount++;
-	entryCount( this.entryCount ) ;
+        this.entryCount++;
+        entryCount( this.entryCount ) ;
     }
 
     @InfoMethod
@@ -880,8 +880,8 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     void decrementEntryCount() {
-	this.entryCount--;
-	entryCount( this.entryCount ) ;
+        this.entryCount--;
+        entryCount( this.entryCount ) ;
     }
     
     /**
@@ -889,7 +889,7 @@ public final class ClientRequestInfoImpl
      */
     @TraceInterceptor
     int getEntryCount() {
-	return this.entryCount;
+        return this.entryCount;
     }
     
     /**
@@ -899,26 +899,26 @@ public final class ClientRequestInfoImpl
     @TraceInterceptor
     @Override
     protected void setReplyStatus( short replyStatus ) {
-	super.setReplyStatus( replyStatus );
-	switch( replyStatus ) {
-	    case SUCCESSFUL.value:
-		endingPointCall = CALL_RECEIVE_REPLY;
-		break;
-	    case SYSTEM_EXCEPTION.value:
-	    case USER_EXCEPTION.value:
-		endingPointCall = CALL_RECEIVE_EXCEPTION;
-		break;
-	    case LOCATION_FORWARD.value:
-	    case TRANSPORT_RETRY.value:
-		endingPointCall = CALL_RECEIVE_OTHER;
-		break;
-	}
+        super.setReplyStatus( replyStatus );
+        switch( replyStatus ) {
+            case SUCCESSFUL.value:
+                endingPointCall = CALL_RECEIVE_REPLY;
+                break;
+            case SYSTEM_EXCEPTION.value:
+            case USER_EXCEPTION.value:
+                endingPointCall = CALL_RECEIVE_EXCEPTION;
+                break;
+            case LOCATION_FORWARD.value:
+            case TRANSPORT_RETRY.value:
+                endingPointCall = CALL_RECEIVE_OTHER;
+                break;
+        }
     }
 
     @TraceInterceptor
     @Override
     protected short getReplyStatus() {
-	return super.getReplyStatus() ;
+        return super.getReplyStatus() ;
     }
 
     /**
@@ -934,14 +934,14 @@ public final class ClientRequestInfoImpl
      * initiateClientPIRequest or not.
      */
     protected void setDIIInitiate( boolean diiInitiate ) {
-	this.diiInitiate = diiInitiate;
+        this.diiInitiate = diiInitiate;
     }
 
     /**
      * See comment for setDIIInitiate 
      */
     protected boolean isDIIInitiate() {
-	return this.diiInitiate;
+        return this.diiInitiate;
     }
 
     /**
@@ -951,11 +951,11 @@ public final class ClientRequestInfoImpl
      * end up in _releaseReply which will try to pop unless told not to.
      */
     protected void setPICurrentPushed( boolean piCurrentPushed ) {
-	this.piCurrentPushed = piCurrentPushed;
+        this.piCurrentPushed = piCurrentPushed;
     }
 
     protected boolean isPICurrentPushed() {
-	return this.piCurrentPushed;
+        return this.piCurrentPushed;
     }
 
     /**
@@ -965,13 +965,13 @@ public final class ClientRequestInfoImpl
     protected void setException( Exception exception ) {
         super.setException( exception );
 
-	// Clear cached values:
-	cachedReceivedException = null;
-	cachedReceivedExceptionId = null;
+        // Clear cached values:
+        cachedReceivedException = null;
+        cachedReceivedExceptionId = null;
     }
 
     protected boolean getIsOneWay() {
-	return ! response_expected();
+        return ! response_expected();
     }
 
     /**
@@ -1011,7 +1011,7 @@ public final class ClientRequestInfoImpl
         
         // Check the validCall table:
         if( !validCall[methodID][validCallIndex] ) {
-	    throw stdWrapper.invalidPiCall2() ;
+            throw stdWrapper.invalidPiCall2() ;
         }
     }
     

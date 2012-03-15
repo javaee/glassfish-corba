@@ -86,80 +86,80 @@ Adding and removing acceptors/connections to cause failover:
 Tests:
 
 Bootstrap:
-	Missing membership label
-	Therefore IORUpdate
+        Missing membership label
+        Therefore IORUpdate
 
 Normal operation:
         Send label
-	No IORUpdate
+        No IORUpdate
 
 IORUpdate only:
-	Setup: kill "instance"
-	Execute:
-		Invoke
-		IORUpdate
+        Setup: kill "instance"
+        Execute:
+                Invoke
+                IORUpdate
 
 Failover without update:
-	Setup: kill listener/connections.
-	Execute:
-		Invoke
-		Cannot connect to address
-		Therefore try next address
-		No IORUpdate since GIS not aware of "failure"
+        Setup: kill listener/connections.
+        Execute:
+                Invoke
+                Cannot connect to address
+                Therefore try next address
+                No IORUpdate since GIS not aware of "failure"
 
 Failover with update:
-	Setup: kill "instance"
-	Then setup/execute above: Failover with update.
-	IORUpdate
+        Setup: kill "instance"
+        Then setup/execute above: Failover with update.
+        IORUpdate
 
 Independent POAs:
-	Ensure no address tag or membership labels added to POAs.
-	Ensure no restarted by RFM.
+        Ensure no address tag or membership labels added to POAs.
+        Ensure no restarted by RFM.
 
 "Circular" failover success:
-	Setup: kill listener/connections and invoke to get in middle of list.
-	       kill listener/connections in remainder of list.
-	       restart listener/connections before middle of list.
+        Setup: kill listener/connections and invoke to get in middle of list.
+               kill listener/connections in remainder of list.
+               restart listener/connections before middle of list.
         Execute:
-		Invoke
-		Ensure .hasNext/.next "mod" to beginning of list
-		       on a single request
+                Invoke
+                Ensure .hasNext/.next "mod" to beginning of list
+                       on a single request
 
 "Circular" failover fail:
-	Same as above but do not restart.
-	Ensure failure returned to client when get back to 
-	middle starting	point in list.
+        Same as above but do not restart.
+        Ensure failure returned to client when get back to 
+        middle starting point in list.
 
 ------------------------------------------------------------------------------
 Server-side configuration:
 
 Server.setProperties:
-	Sets persistent server port.
-	Sets user-defined listen ports. W, X, Y, Z.
-	Registers ORBConfigurator for the ServerGroupManager.
-		 addORBInitializer
-			add_ior_interceptor
-			add_server_request_interceptor
-	Registers ORBConfigurator for test.
-		 register_initial_reference of fake GIS for test.
-		 register_initial_reference of real ReferenceFactoryManager
+        Sets persistent server port.
+        Sets user-defined listen ports. W, X, Y, Z.
+        Registers ORBConfigurator for the ServerGroupManager.
+                 addORBInitializer
+                        add_ior_interceptor
+                        add_server_request_interceptor
+        Registers ORBConfigurator for test.
+                 register_initial_reference of fake GIS for test.
+                 register_initial_reference of real ReferenceFactoryManager
 
 Server.main:
-	ORB.init executes configurators.
+        ORB.init executes configurators.
 
-	Create a ReferenceFactory for the test.
-	Create (using above RF) and bind reference for the test.
+        Create a ReferenceFactory for the test.
+        Create (using above RF) and bind reference for the test.
 
-	Create a "special" ReferenceFactory that does not add components.
-	Create (using special RF) and bind a reference for the test.
+        Create a "special" ReferenceFactory that does not add components.
+        Create (using special RF) and bind a reference for the test.
 
-	Create and bind an object managed by an independent POA.
-	(This object also controls fake GIS.)
+        Create and bind an object managed by an independent POA.
+        (This object also controls fake GIS.)
 
 ServerGroupManager.initialize
-	updateMembershipLabel - first time.
-	Get RFM and GIS from initial references
-	Register with GIS for change notifications.
-	
+        updateMembershipLabel - first time.
+        Get RFM and GIS from initial references
+        Register with GIS for change notifications.
+        
 
 // End of file.

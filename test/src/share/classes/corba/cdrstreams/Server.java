@@ -47,16 +47,16 @@ import org.omg.CORBA.*;
 import java.util.Properties;
 import org.omg.PortableServer.*;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
 public class Server
 {
     public static void main(String args[])
     {
         try {
-	    Properties props = new Properties( System.getProperties() ) ;
-	    props.setProperty( ORBConstants.DEBUG_PROPERTY, 
-		"subcontract,giop,transport" ) ;
+            Properties props = new Properties( System.getProperties() ) ;
+            props.setProperty( ORBConstants.DEBUG_PROPERTY, 
+                "subcontract,giop,transport" ) ;
             ORB orb = ORB.init(args, props );
       
             // Get rootPOA
@@ -64,11 +64,11 @@ public class Server
             rootPOA.the_POAManager().activate();
 
             GraphProcessorImpl impl = new GraphProcessorImpl();
-	    javax.rmi.CORBA.Tie tie = javax.rmi.CORBA.Util.getTie( impl ) ; 
+            javax.rmi.CORBA.Tie tie = javax.rmi.CORBA.Util.getTie( impl ) ; 
 
-	    byte[] id = rootPOA.activate_object( 
-						 (org.omg.PortableServer.Servant)tie ) ;
-	    org.omg.CORBA.Object obj = rootPOA.id_to_reference( id ) ;
+            byte[] id = rootPOA.activate_object( 
+                                                 (org.omg.PortableServer.Servant)tie ) ;
+            org.omg.CORBA.Object obj = rootPOA.id_to_reference( id ) ;
 
             // get the root naming context
             org.omg.CORBA.Object objRef = 

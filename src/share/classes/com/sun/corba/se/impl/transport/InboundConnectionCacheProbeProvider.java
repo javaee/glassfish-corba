@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 import org.glassfish.external.probe.provider.annotations.Probe ;
 import org.glassfish.external.probe.provider.annotations.ProbeProvider ;

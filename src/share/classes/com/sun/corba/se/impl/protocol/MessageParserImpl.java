@@ -38,22 +38,22 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.RequestId;
-import com.sun.corba.se.spi.transport.Connection;
-import com.sun.corba.se.spi.protocol.MessageParser;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.protocol.RequestId;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.protocol.MessageParser;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
-import com.sun.corba.se.spi.trace.Giop;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
+import com.sun.corba.ee.spi.trace.Giop;
+import com.sun.corba.ee.spi.trace.Transport;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 

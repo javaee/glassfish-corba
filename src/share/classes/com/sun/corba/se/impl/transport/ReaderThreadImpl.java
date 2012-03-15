@@ -37,16 +37,16 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
-import com.sun.corba.se.spi.transport.Connection;
-import com.sun.corba.se.spi.transport.ReaderThread;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.ReaderThread;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.threadpool.Work;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.threadpool.Work;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.trace.Transport;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Transport
@@ -60,9 +60,9 @@ public class ReaderThreadImpl implements ReaderThread, Work {
 
     public ReaderThreadImpl(ORB orb, Connection connection)
     {
-	this.orb = orb;
-	this.connection = connection;
-	keepRunning = true;
+        this.orb = orb;
+        this.connection = connection;
+        keepRunning = true;
     }
 
     ////////////////////////////////////////////////////
@@ -71,12 +71,12 @@ public class ReaderThreadImpl implements ReaderThread, Work {
     //
 
     public Connection getConnection() {
-	return connection;
+        return connection;
     }
 
     @Transport
     public synchronized void close() {
-	keepRunning = false;
+        keepRunning = false;
 
         // Note: do not close the connection here, as it may be 
         // re-used if we are simply closing the ReaderThread
@@ -134,11 +134,11 @@ public class ReaderThreadImpl implements ReaderThread, Work {
     }
 
     public void setEnqueueTime(long timeInMillis) {
-	enqueueTime = timeInMillis;
+        enqueueTime = timeInMillis;
     }
 
     public long getEnqueueTime() {
-	return enqueueTime;
+        return enqueueTime;
     }
 
     public String getName() { return "ReaderThread"; }

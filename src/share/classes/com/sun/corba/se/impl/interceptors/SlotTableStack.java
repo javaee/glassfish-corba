@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.interceptors;
+package com.sun.corba.ee.impl.interceptors;
 
-import com.sun.corba.se.spi.logging.InterceptorsSystemException;
+import com.sun.corba.ee.spi.logging.InterceptorsSystemException;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
 /**
  * SlotTableStack is the container of SlotTable instances for each thread
@@ -89,8 +89,8 @@ public class SlotTableStack
             // Add will cause the table to grow.
             tableContainer.add( currentIndex, table );
         } else if (currentIndex > tableContainer.size()) {
-	    throw wrapper.slotTableInvariant( currentIndex,
-		tableContainer.size() ) ;
+            throw wrapper.slotTableInvariant( currentIndex,
+                tableContainer.size() ) ;
         } else {
             // Set will override unused slots.
             tableContainer.set( currentIndex, table );
@@ -109,7 +109,7 @@ public class SlotTableStack
         if(currentIndex == 1) {
             // Do not pop the SlotTable, If there is only one.
             // This should not happen, But an extra check for safety.
-	    throw wrapper.cantPopOnlyPicurrent() ;
+            throw wrapper.cantPopOnlyPicurrent() ;
         }
         currentIndex--;
         SlotTable table = tableContainer.get( currentIndex );

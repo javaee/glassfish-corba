@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
 import org.glassfish.external.statistics.CountStatistic ;
 

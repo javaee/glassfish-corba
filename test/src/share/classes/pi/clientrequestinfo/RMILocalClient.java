@@ -42,9 +42,9 @@ package pi.clientrequestinfo;
 
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.corba.AnyImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import corba.framework.*;
 
@@ -76,73 +76,73 @@ public class RMILocalClient
     private java.lang.Object syncObject;
 
     public static void main(String args[]) {
-	final String[] arguments = args;
-	try {
-	    System.out.println( "===============================" );
-	    System.out.println( "Creating ORB for RMI Local test" );
-	    System.out.println( "===============================" );
+        final String[] arguments = args;
+        try {
+            System.out.println( "===============================" );
+            System.out.println( "Creating ORB for RMI Local test" );
+            System.out.println( "===============================" );
 
-	    final RMILocalClient client = new RMILocalClient();
+            final RMILocalClient client = new RMILocalClient();
 
-	    TestInitializer.out = System.out;
-	    client.out = System.out;
-	    client.err = System.err;
+            TestInitializer.out = System.out;
+            client.out = System.out;
+            client.err = System.err;
 
-	    // For this test, start both the client and the server using
-	    // the same ORB.
-	    System.out.println( "+ Creating ORB for client and server..." );
-	    client.createORB( args );
+            // For this test, start both the client and the server using
+            // the same ORB.
+            System.out.println( "+ Creating ORB for client and server..." );
+            client.createORB( args );
 
-	    // Inform JNDI provider of the ORB to use and create initial
-	    // naming context:
-	    System.out.println( "+ Creating initial naming context..." );
-	    Hashtable env = new Hashtable();
-	    env.put( "java.naming.corba.orb", client.orb );
-	    client.initialNamingContext = new InitialContext( env );
+            // Inform JNDI provider of the ORB to use and create initial
+            // naming context:
+            System.out.println( "+ Creating initial naming context..." );
+            Hashtable env = new Hashtable();
+            env.put( "java.naming.corba.orb", client.orb );
+            client.initialNamingContext = new InitialContext( env );
 
-	    System.out.println( "+ Starting Server..." );
-	    client.syncObject = new java.lang.Object();
-	    new Thread() {
-		public void run() {
-		    try {
-	                (new RMILocalServer()).run( 
-						client.orb, client.syncObject,
-						System.getProperties(),
-					        arguments, System.out, 
-						System.err, null );
-		    }
-		    catch( Exception e ) {
-			System.err.println( "SERVER CRASHED:" );
-	                e.printStackTrace( System.err );
-			System.exit( 1 );
-		    }
-		}
-	    }.start();
+            System.out.println( "+ Starting Server..." );
+            client.syncObject = new java.lang.Object();
+            new Thread() {
+                public void run() {
+                    try {
+                        (new RMILocalServer()).run( 
+                                                client.orb, client.syncObject,
+                                                System.getProperties(),
+                                                arguments, System.out, 
+                                                System.err, null );
+                    }
+                    catch( Exception e ) {
+                        System.err.println( "SERVER CRASHED:" );
+                        e.printStackTrace( System.err );
+                        System.exit( 1 );
+                    }
+                }
+            }.start();
 
-	    // Wait for server to start...
-	    synchronized( client.syncObject ) {
+            // Wait for server to start...
+            synchronized( client.syncObject ) {
                 try {
-	            client.syncObject.wait();
-		}
-		catch( InterruptedException e ) {
-		    // ignore.
-		}
-	    }
+                    client.syncObject.wait();
+                }
+                catch( InterruptedException e ) {
+                    // ignore.
+                }
+            }
 
-	    // Start client:
-	    System.out.println( "+ Starting Client..." );
-	    client.run( System.getProperties(),
-		                args, System.out, System.err, null );
-	    System.exit( 0 );
-	}
-	catch( Exception e ) {
-	    e.printStackTrace( System.err );
-	    System.exit( 1 );
-	}
+            // Start client:
+            System.out.println( "+ Starting Client..." );
+            client.run( System.getProperties(),
+                                args, System.out, System.err, null );
+            System.exit( 0 );
+        }
+        catch( Exception e ) {
+            e.printStackTrace( System.err );
+            System.exit( 1 );
+        }
     }
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
         try {
@@ -157,55 +157,55 @@ public class RMILocalClient
      * Clear invocation flags of helloRef and helloRefForward
      */
     protected void clearInvoked() 
-	throws Exception
+        throws Exception
     {
-	helloRef.clearInvoked();
-	helloRefForward.clearInvoked();
+        helloRef.clearInvoked();
+        helloRefForward.clearInvoked();
     }
 
     /**
      * Invoke the method with the given name on the object
      */
     protected void invokeMethod( String methodName ) 
-	throws Exception
+        throws Exception
     {
-	try {
-	    // Make an invocation:
-	    if( methodName.equals( "sayHello" ) ) {
-		helloRef.sayHello();
-	    }
-	    else if( methodName.equals( "saySystemException" ) ) {
-		helloRef.saySystemException();
-	    }
-	    else if( methodName.equals( "sayUserException" ) ) {
-		helloRef.sayUserException();
-	    }
-	    else if( methodName.equals( "sayOneway" ) ) {
-		helloRef.sayOneway();
-	    }
-	    else if( methodName.equals( "sayArguments" ) ) {
-		helloRef.sayArguments( "one", 2, true );
-	    }
-	}
-	catch( RemoteException e ) {
-	    throw (Exception)e.detail;
-	}
+        try {
+            // Make an invocation:
+            if( methodName.equals( "sayHello" ) ) {
+                helloRef.sayHello();
+            }
+            else if( methodName.equals( "saySystemException" ) ) {
+                helloRef.saySystemException();
+            }
+            else if( methodName.equals( "sayUserException" ) ) {
+                helloRef.sayUserException();
+            }
+            else if( methodName.equals( "sayOneway" ) ) {
+                helloRef.sayOneway();
+            }
+            else if( methodName.equals( "sayArguments" ) ) {
+                helloRef.sayArguments( "one", 2, true );
+            }
+        }
+        catch( RemoteException e ) {
+            throw (Exception)e.detail;
+        }
     }
 
     /**
      * Return true if the method was invoked
      */
     protected boolean wasInvoked() 
-	throws Exception 
+        throws Exception 
     {
-	return helloRef.wasInvoked();
+        return helloRef.wasInvoked();
     }
 
     /**
      * Return true if the method was forwarded
      */
     protected boolean didForward() 
-	throws Exception 
+        throws Exception 
     {
         return helloRefForward.wasInvoked();
     }
@@ -214,16 +214,16 @@ public class RMILocalClient
      * Perform ClientRequestInfo tests
      */
     protected void testClientRequestInfo () 
-	throws Exception 
+        throws Exception 
     {
-	super.testClientRequestInfo();
+        super.testClientRequestInfo();
     }
 
     /**
      * One-way test not applicable for RMI case.  Override it.
      */
     protected void testOneWay() throws Exception {
-	out.println( "+ OneWay test not applicable for RMI.  Skipping..." );
+        out.println( "+ OneWay test not applicable for RMI.  Skipping..." );
     }
 
     /**
@@ -231,23 +231,23 @@ public class RMILocalClient
      * from the last invocation
      */
     protected void resolveReferences() 
-	throws Exception 
+        throws Exception 
     {
         out.println( "    + resolving references..." );
         out.println( "      - disabling interceptors..." );
         SampleClientRequestInterceptor.enabled = false;
         // Resolve the hello object.
-	out.println( "      - Hello1" );
+        out.println( "      - Hello1" );
         helloRef = resolve( "Hello1" );
         // The initializer will store the location the interceptors should
         // use during a normal request:
-	TestInitializer.helloRef = (org.omg.CORBA.Object)helloRef;
-	out.println( "      - Hello1Forward" );
+        TestInitializer.helloRef = (org.omg.CORBA.Object)helloRef;
+        out.println( "      - Hello1Forward" );
         helloRefForward = resolve( "Hello1Forward" );
         // The initializer will store the location the interceptors should
         // use during a forward request:
         TestInitializer.helloRefForward = 
-	    (org.omg.CORBA.Object)helloRefForward;
+            (org.omg.CORBA.Object)helloRefForward;
         out.println( "      - enabling interceptors..." );
         SampleClientRequestInterceptor.enabled = true;
     }
@@ -256,12 +256,12 @@ public class RMILocalClient
      * Implementation borrowed from corba.socket.HelloClient.java test
      */
     private helloIF resolve(String name)
-	throws Exception
+        throws Exception
     {
         // Get the root naming context
         java.lang.Object obj = initialNamingContext.lookup( name );
-	helloIF helloRef = (helloIF)PortableRemoteObject.narrow(
-	    obj, helloIF.class );
+        helloIF helloRef = (helloIF)PortableRemoteObject.narrow(
+            obj, helloIF.class );
 
         return helloRef;
     }
@@ -272,12 +272,12 @@ public class RMILocalClient
     protected void runTestCase( String testName )
         throws Exception
     {
-	super.runTestCase( testName );
+        super.runTestCase( testName );
 
         out.println( "    + Resetting servants on server side" );
         out.println( "      - disabling interceptors..." );
         SampleClientRequestInterceptor.enabled = false;
-	helloRef.resetServant();
+        helloRef.resetServant();
         out.println( "      - enabling interceptors..." );
         SampleClientRequestInterceptor.enabled = true;
     }

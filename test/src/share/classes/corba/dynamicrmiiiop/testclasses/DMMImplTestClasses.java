@@ -46,21 +46,21 @@ public interface DMMImplTestClasses
 {
     public interface AllRemote
     {
-	AllRemote make( AllRemote arg ) throws RemoteException ;
+        AllRemote make( AllRemote arg ) throws RemoteException ;
 
-	AllRemote make( String arg ) throws RemoteException ;
+        AllRemote make( String arg ) throws RemoteException ;
     }
     
     public interface SomeRemote
     {
-	SomeRemote make( SomeRemote arg ) throws RemoteException ;
+        SomeRemote make( SomeRemote arg ) throws RemoteException ;
 
-	SomeRemote make( String arg ) ;
+        SomeRemote make( String arg ) ;
     }
     
     public interface NoRemote
     {
-	NoRemote make( NoRemote arg ) ;
+        NoRemote make( NoRemote arg ) ;
     }
 
     public interface NoMethods
@@ -74,9 +74,9 @@ public interface DMMImplTestClasses
 
     public interface IDLValue extends org.omg.CORBA.portable.ValueBase
     {
-	public abstract void foo ();
+        public abstract void foo ();
 
-	public abstract int bar ();
+        public abstract int bar ();
 
     } 
 
@@ -91,15 +91,15 @@ public interface DMMImplTestClasses
 
         public IDLStruct (int _arg1, int _arg2)
         {
-	    arg1 = _arg1;
-	    arg2 = _arg2;
+            arg1 = _arg1;
+            arg2 = _arg2;
         } 
     } 
 
     public interface IDLInterface extends org.omg.CORBA.Object, 
-	org.omg.CORBA.portable.IDLEntity 
+        org.omg.CORBA.portable.IDLEntity 
     {
-	String name ();
-	void name (String newName);
+        String name ();
+        void name (String newName);
     } 
 }

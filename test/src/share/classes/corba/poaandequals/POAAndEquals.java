@@ -57,8 +57,8 @@ public class POAAndEquals extends CORBATest
     }
 
     private ORB createORB() {
-	Properties props = new Properties();
-	props.put("org.omg.CORBA.ORBClass",
+        Properties props = new Properties();
+        props.put("org.omg.CORBA.ORBClass",
                   Options.getORBClass());
         String args[] = new String[] { "-ORBInitialPort",
                                        Options.getORBInitialPort() };

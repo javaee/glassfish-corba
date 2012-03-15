@@ -111,12 +111,12 @@ public class SetOverrideType implements org.omg.CORBA.portable.IDLEntity {
     public static SetOverrideType from_int(int i)
     {
         switch (i) {
-	case _SET_OVERRIDE:
-	    return SET_OVERRIDE;
-	case _ADD_OVERRIDE:
-	    return ADD_OVERRIDE;
-	default:
-	    throw new org.omg.CORBA.BAD_PARAM();
+        case _SET_OVERRIDE:
+            return SET_OVERRIDE;
+        case _ADD_OVERRIDE:
+            return ADD_OVERRIDE;
+        default:
+            throw new org.omg.CORBA.BAD_PARAM();
         }
     }
 

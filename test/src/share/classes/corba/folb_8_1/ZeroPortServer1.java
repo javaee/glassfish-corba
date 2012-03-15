@@ -66,17 +66,17 @@ public class ZeroPortServer1
 
     public static void main(String av[])
     {
-	try {
-	    Properties props = System.getProperties();
-	    Server.setProperties(props, socketPorts);
-	    orb = ORB.init(av, props);
+        try {
+            Properties props = System.getProperties();
+            Server.setProperties(props, socketPorts);
+            orb = ORB.init(av, props);
 
-	    POA poa = Common.createPOA("zeroPortPOA", true, orb);
-	    Common.createAndBind(serverName, orb, poa);
+            POA poa = Common.createPOA("zeroPortPOA", true, orb);
+            Common.createAndBind(serverName, orb, poa);
       
-	    System.out.println ("Server is ready.");
+            System.out.println ("Server is ready.");
 
-	    orb.run();
+            orb.run();
             
         } catch (Exception e) {
             System.out.println(baseMsg + e);

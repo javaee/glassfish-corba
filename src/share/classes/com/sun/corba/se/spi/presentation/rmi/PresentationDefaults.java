@@ -38,18 +38,18 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.presentation.rmi;
+package com.sun.corba.ee.spi.presentation.rmi;
 
 import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
-import com.sun.corba.se.impl.presentation.rmi.StubFactoryFactoryStaticImpl;
-import com.sun.corba.se.impl.presentation.rmi.StubFactoryStaticImpl;
-import com.sun.corba.se.impl.presentation.rmi.PresentationManagerImpl ;
+import com.sun.corba.ee.impl.presentation.rmi.StubFactoryFactoryStaticImpl;
+import com.sun.corba.ee.impl.presentation.rmi.StubFactoryStaticImpl;
+import com.sun.corba.ee.impl.presentation.rmi.PresentationManagerImpl ;
 
-import com.sun.corba.se.impl.presentation.rmi.codegen.StubFactoryFactoryCodegenImpl ;
+import com.sun.corba.ee.impl.presentation.rmi.codegen.StubFactoryFactoryCodegenImpl ;
 
 public abstract class PresentationDefaults
 {
@@ -59,83 +59,83 @@ public abstract class PresentationDefaults
     private PresentationDefaults() {}
 
     public synchronized static PresentationManager.StubFactoryFactory 
-	getDynamicStubFactoryFactory()
+        getDynamicStubFactoryFactory()
     {
-	if (dynamicImpl == null) {
+        if (dynamicImpl == null) {
             dynamicImpl =
                 new StubFactoryFactoryCodegenImpl();
         }
 
-	return dynamicImpl ;
+        return dynamicImpl ;
     }
 
     public synchronized static PresentationManager.StubFactoryFactory 
-	getStaticStubFactoryFactory()
+        getStaticStubFactoryFactory()
     {
-	if (staticImpl == null) {
+        if (staticImpl == null) {
             staticImpl =
                 new StubFactoryFactoryStaticImpl();
         }
 
-	return staticImpl ;
+        return staticImpl ;
     }
 
     public static PresentationManager.StubFactory makeStaticStubFactory( 
-	final Class stubClass )
+        final Class stubClass )
     {
-	return new StubFactoryStaticImpl( stubClass ) ;
+        return new StubFactoryStaticImpl( stubClass ) ;
     }
 
     private static InvocationInterceptor nullInvocationInterceptor = 
         new InvocationInterceptor() {
-	    public void preInvoke() {}
-	    public void postInvoke() {}
-	} ;
+            public void preInvoke() {}
+            public void postInvoke() {}
+        } ;
 
     public static InvocationInterceptor getNullInvocationInterceptor() 
     {
-	return nullInvocationInterceptor ;
+        return nullInvocationInterceptor ;
     }
     
     public static boolean inAppServer() {
-	final String thisClassRenamed = 
-	    "com.sun.corba.ee.spi.presentation.rmi.PresentationDefaults" ;
-	final boolean inAppServer = 
-	    PresentationDefaults.class.getName().equals( thisClassRenamed ) ;
-	return inAppServer ;
+        final String thisClassRenamed = 
+            "com.sun.corba.ee.spi.presentation.rmi.PresentationDefaults" ;
+        final boolean inAppServer = 
+            PresentationDefaults.class.getName().equals( thisClassRenamed ) ;
+        return inAppServer ;
     }
 
     private static boolean getBooleanPropertyValue( final String propName, 
-	final boolean def ) {
+        final boolean def ) {
 
-	final String defs = Boolean.toString( def ) ;
-	final String value = AccessController.doPrivileged(
-	    new PrivilegedAction<String>() {
-		public String run() {
-		    return System.getProperty( propName, defs ) ;
-		}
-	    }
-	) ;
+        final String defs = Boolean.toString( def ) ;
+        final String value = AccessController.doPrivileged(
+            new PrivilegedAction<String>() {
+                public String run() {
+                    return System.getProperty( propName, defs ) ;
+                }
+            }
+        ) ;
 
-	return Boolean.valueOf( value ) ;
+        return Boolean.valueOf( value ) ;
     }
 
     public static PresentationManager makeOrbPresentationManager() {
-	final boolean useDynamicStub = getBooleanPropertyValue( 
-	    ORBConstants.USE_DYNAMIC_STUB_PROPERTY, inAppServer() ) ;
+        final boolean useDynamicStub = getBooleanPropertyValue( 
+            ORBConstants.USE_DYNAMIC_STUB_PROPERTY, inAppServer() ) ;
 
-	final boolean debug = getBooleanPropertyValue( 
-	    ORBConstants.DEBUG_DYNAMIC_STUB, false ) ;
+        final boolean debug = getBooleanPropertyValue( 
+            ORBConstants.DEBUG_DYNAMIC_STUB, false ) ;
 
-	final PresentationManager result = new PresentationManagerImpl( useDynamicStub ) ;
-	result.setStubFactoryFactory( false, 
-	    PresentationDefaults.getStaticStubFactoryFactory() ) ;
-	result.setStubFactoryFactory( true, 
+        final PresentationManager result = new PresentationManagerImpl( useDynamicStub ) ;
+        result.setStubFactoryFactory( false, 
+            PresentationDefaults.getStaticStubFactoryFactory() ) ;
+        result.setStubFactoryFactory( true, 
             PresentationDefaults.getDynamicStubFactoryFactory() ) ;
-	if (debug) {
-	    result.enableDebug( System.out ) ;
+        if (debug) {
+            result.enableDebug( System.out ) ;
         }
 
-	return result ;
+        return result ;
     }
 }

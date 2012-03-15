@@ -62,12 +62,12 @@ public class LoggingServiceClientInterceptor
     private int outCallIndicatorSlotId;
 
     public LoggingServiceClientInterceptor(LoggingService loggingService,
-					   Current piCurrent,
-					   int outCallIndicatorSlotId)
+                                           Current piCurrent,
+                                           int outCallIndicatorSlotId)
     {
-	this.loggingService = loggingService;
-	this.piCurrent = piCurrent;
-	this.outCallIndicatorSlotId = outCallIndicatorSlotId;
+        this.loggingService = loggingService;
+        this.piCurrent = piCurrent;
+        this.outCallIndicatorSlotId = outCallIndicatorSlotId;
     }
 
     //
@@ -76,7 +76,7 @@ public class LoggingServiceClientInterceptor
 
     public String name() 
     {
-	return "LoggingServiceClientInterceptor";
+        return "LoggingServiceClientInterceptor";
     }
 
     public void destroy() 
@@ -89,27 +89,27 @@ public class LoggingServiceClientInterceptor
 
     public void send_request(ClientRequestInfo ri)
     {
-	log(ri, "send_request");
+        log(ri, "send_request");
     }
 
     public void send_poll(ClientRequestInfo ri)
     {
-	log(ri, "send_poll");
+        log(ri, "send_poll");
     }
 
     public void receive_reply(ClientRequestInfo ri)
     {
-	log(ri, "receive_reply");
+        log(ri, "receive_reply");
     }
 
     public void receive_exception(ClientRequestInfo ri)
     {
-	log(ri, "receive_exception");
+        log(ri, "receive_exception");
     }
 
     public void receive_other(ClientRequestInfo ri)
     {
-	log(ri, "receive_other");
+        log(ri, "receive_other");
     }
 
     //
@@ -118,31 +118,31 @@ public class LoggingServiceClientInterceptor
 
     public void log(ClientRequestInfo ri, String point)
     {
-	// IMPORTANT: Always set the TSC out call indicator in case
-	// other interceptors make outcalls for this request.
-	// Otherwise the outcall will not be set for the other interceptor's
-	// outcall resulting in infinite recursion.
+        // IMPORTANT: Always set the TSC out call indicator in case
+        // other interceptors make outcalls for this request.
+        // Otherwise the outcall will not be set for the other interceptor's
+        // outcall resulting in infinite recursion.
 
-	Any indicator = ORB.init().create_any();
-	indicator.insert_boolean(true);
-	try {
-	    piCurrent.set_slot(outCallIndicatorSlotId, indicator);
-	} catch (InvalidSlot e) { }
+        Any indicator = ORB.init().create_any();
+        indicator.insert_boolean(true);
+        try {
+            piCurrent.set_slot(outCallIndicatorSlotId, indicator);
+        } catch (InvalidSlot e) { }
 
-	try {
-	    indicator = ri.get_slot(outCallIndicatorSlotId);
+        try {
+            indicator = ri.get_slot(outCallIndicatorSlotId);
 
-	    // If the RSC out call slot is not set then log this invocation.
-	    // If it is set that indicates the interceptor is servicing the
-	    // invocation of loggingService itself.  In that case do
-	    // nothing (to avoid infinite recursion).
+            // If the RSC out call slot is not set then log this invocation.
+            // If it is set that indicates the interceptor is servicing the
+            // invocation of loggingService itself.  In that case do
+            // nothing (to avoid infinite recursion).
 
-	    if (indicator.type().kind().equals(TCKind.tk_null)) {
-		loggingService.log(ri.operation() + " " + point);
-	    }
-	} catch (InvalidSlot e) {
-	    System.out.println("Exception handling not shown.");	    
-	}
+            if (indicator.type().kind().equals(TCKind.tk_null)) {
+                loggingService.log(ri.operation() + " " + point);
+            }
+        } catch (InvalidSlot e) {
+            System.out.println("Exception handling not shown.");            
+        }
     }
 }
 

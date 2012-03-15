@@ -88,7 +88,7 @@ public final class FixedHolder implements Streamable {
      * @param input the <code>InputStream</code> to read from.
      */
     public void _read(InputStream input) {
-	value = input.read_fixed();
+        value = input.read_fixed();
     }
 
     /**
@@ -98,7 +98,7 @@ public final class FixedHolder implements Streamable {
      * @param output the <code>OutputStream</code> to write into.
      */
     public void _write(OutputStream output) {
-	output.write_fixed(value);
+        output.write_fixed(value);
     }
 
     
@@ -108,7 +108,7 @@ public final class FixedHolder implements Streamable {
      * @return the <code>TypeCode</code> object. 
      */
     public org.omg.CORBA.TypeCode _type() {
-	return ORB.init().get_primitive_tc(TCKind.tk_fixed);
+        return ORB.init().get_primitive_tc(TCKind.tk_fixed);
     }
 
 }

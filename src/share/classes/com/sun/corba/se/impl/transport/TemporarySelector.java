@@ -37,17 +37,17 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 import java.io.IOException;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.TemporarySelectorState;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.TemporarySelectorState;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 /**
  *
@@ -96,7 +96,7 @@ public class TemporarySelector {
      *       To avoid this potential scenario, the "no connection
      *       cache" plug-in disables the read optimization to always
      *       enter a blocking read.  
-     *       See com.sun.corba.se.impl.plugin.hwlb.NoConnectionCacheImpl.java
+     *       See com.sun.corba.ee.impl.plugin.hwlb.NoConnectionCacheImpl.java
      *       to see how the 'always enter blocking read' optimization is
      *       disabled.
      */
@@ -131,7 +131,7 @@ public class TemporarySelector {
      *       exists in the "no connection cache" plug-in.  To avoid this 
      *       scenario, the "no connection cache" plug-in disables the read
      *       optimization to always enter a blocking read.
-     *       See com.sun.corba.se.impl.plugin.hwlb.NoConnectionCacheImpl.java
+     *       See com.sun.corba.ee.impl.plugin.hwlb.NoConnectionCacheImpl.java
      *       to see how the 'always enter blocking read' optimization is
      *       disabled.
      */
@@ -148,6 +148,6 @@ public class TemporarySelector {
     }
 
     private void dprint(String theMsg) {
-	ORBUtility.dprint("TemporarySelector", theMsg);
+        ORBUtility.dprint("TemporarySelector", theMsg);
     }
 }

@@ -47,9 +47,9 @@ module corba
     module legacybootstrapserver
     {
         interface I
-	{
-  	    void dummy();
-	};
+        {
+            void dummy();
+        };
     };
 };
 

@@ -47,7 +47,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -62,42 +62,42 @@ import org.omg.CORBA.portable.UnknownException;
 import org.omg.IOP.ExceptionDetailMessage;
 import org.omg.IOP.TAG_CODE_SETS;
 
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.protocol.ClientRequestDispatcher;
-import com.sun.corba.se.spi.transport.OutboundConnectionCache;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.spi.protocol.ClientRequestDispatcher;
+import com.sun.corba.ee.spi.transport.OutboundConnectionCache;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
-import com.sun.corba.se.spi.ior.iiop.CodeSetsComponent;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orb.ORBVersion;
-import com.sun.corba.se.spi.protocol.MessageMediator;
-import com.sun.corba.se.spi.transport.ContactInfo ;
-import com.sun.corba.se.spi.transport.ContactInfoListIterator ;
-import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate;
+import com.sun.corba.ee.spi.ior.iiop.CodeSetsComponent;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORBVersion;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.transport.ContactInfo ;
+import com.sun.corba.ee.spi.transport.ContactInfoListIterator ;
+import com.sun.corba.ee.spi.transport.Connection;
 
-import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
-import com.sun.corba.se.spi.servicecontext.ServiceContext;
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.spi.servicecontext.UEInfoServiceContext;
-import com.sun.corba.se.spi.servicecontext.CodeSetServiceContext;
-import com.sun.corba.se.spi.servicecontext.SendingContextServiceContext;
-import com.sun.corba.se.spi.servicecontext.ORBVersionServiceContext;
-import com.sun.corba.se.spi.servicecontext.MaxStreamFormatVersionServiceContext;
-import com.sun.corba.se.spi.servicecontext.UnknownServiceContext;
-import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextDefaults;
+import com.sun.corba.ee.spi.servicecontext.ServiceContext;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.spi.servicecontext.UEInfoServiceContext;
+import com.sun.corba.ee.spi.servicecontext.CodeSetServiceContext;
+import com.sun.corba.ee.spi.servicecontext.SendingContextServiceContext;
+import com.sun.corba.ee.spi.servicecontext.ORBVersionServiceContext;
+import com.sun.corba.ee.spi.servicecontext.MaxStreamFormatVersionServiceContext;
+import com.sun.corba.ee.spi.servicecontext.UnknownServiceContext;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextsCache;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
-import com.sun.corba.se.impl.encoding.CodeSetConversion;
-import com.sun.corba.se.impl.encoding.EncapsInputStream;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.CodeSetComponentInfo;
+import com.sun.corba.ee.impl.encoding.CodeSetConversion;
+import com.sun.corba.ee.impl.encoding.EncapsInputStream;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
-import com.sun.corba.se.spi.trace.Subcontract;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage;
+import com.sun.corba.ee.spi.trace.Subcontract;
 import org.glassfish.pfl.tf.spi.TimingPointType;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
@@ -109,7 +109,7 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 @Subcontract
 public class ClientRequestDispatcherImpl
     implements
-	ClientRequestDispatcher
+        ClientRequestDispatcher
 {
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
@@ -195,7 +195,7 @@ public class ClientRequestDispatcherImpl
 
     @Subcontract
     public CDROutputObject beginRequest(Object self, String opName,
-	boolean isOneWay, ContactInfo contactInfo) {
+        boolean isOneWay, ContactInfo contactInfo) {
 
         final ContactInfo corbaContactInfo = contactInfo;
         final ORB orb = contactInfo.getBroker();
@@ -368,34 +368,34 @@ public class ClientRequestDispatcherImpl
 
     @Subcontract
     public CDRInputObject marshalingComplete(java.lang.Object self,
-					  CDROutputObject outputObject)
-	throws 
-	    ApplicationException, 
-	    org.omg.CORBA.portable.RemarshalException
+                                          CDROutputObject outputObject)
+        throws 
+            ApplicationException, 
+            org.omg.CORBA.portable.RemarshalException
     {
         MessageMediator messageMediator = outputObject.getMessageMediator();
         ORB orb = messageMediator.getBroker();
         operationAndId(messageMediator.getOperationName(), 
             messageMediator.getRequestId() );
 
-	try {
-	    exit_clientEncoding();
+        try {
+            exit_clientEncoding();
 
-	    enter_clientTransportAndWait();
+            enter_clientTransportAndWait();
 
-	    CDRInputObject inputObject = null ;
-	    try {
-		inputObject = marshalingComplete1(orb, messageMediator);
-	    } finally {
-		exit_clientTransportAndWait();
-	    }
+            CDRInputObject inputObject = null ;
+            try {
+                inputObject = marshalingComplete1(orb, messageMediator);
+            } finally {
+                exit_clientTransportAndWait();
+            }
 
-	    return processResponse(orb, messageMediator, inputObject);
-	} finally {
-	    // We must ALWAYS call enter_ClientDecoding, so that the
-	    // corresponding exit_clientDecoding gets called in endRequest().
-	    enter_clientDecoding() ;
-	}
+            return processResponse(orb, messageMediator, inputObject);
+        } finally {
+            // We must ALWAYS call enter_ClientDecoding, so that the
+            // corresponding exit_clientDecoding gets called in endRequest().
+            enter_clientDecoding() ;
+        }
     }
 
     @InfoMethod
@@ -410,56 +410,56 @@ public class ClientRequestDispatcherImpl
     @Subcontract
     public CDRInputObject marshalingComplete1(
             ORB orb, MessageMediator messageMediator)
-	throws
-	    ApplicationException, 
-	    org.omg.CORBA.portable.RemarshalException
+        throws
+            ApplicationException, 
+            org.omg.CORBA.portable.RemarshalException
     {
         operationAndId(messageMediator.getOperationName(),
             messageMediator.getRequestId() );
 
-	try {
-	    messageMediator.finishSendingRequest();
+        try {
+            messageMediator.finishSendingRequest();
 
             // TODO NEW CACHE: call release( conn, numResponse ) here
             // Get connection from MessageMediator
             // Get numResponse from messageMediator.isOneWay: 0 or 1 expected. 
 
-	    return messageMediator.waitForResponse();
-	} catch (RuntimeException e) {
+            return messageMediator.waitForResponse();
+        } catch (RuntimeException e) {
             reportException( e ) ;
 
-	    boolean retry  =
-		getContactInfoListIterator(orb)
-	            .reportException(messageMediator.getContactInfo(), e);
+            boolean retry  =
+                getContactInfoListIterator(orb)
+                    .reportException(messageMediator.getContactInfo(), e);
 
-	    // Bug 6382377: must not lose exception in PI
-	    // Must run interceptor end point before retrying.
-	    Exception newException = 
-		orb.getPIHandler().invokeClientPIEndingPoint(
-		    ReplyMessage.SYSTEM_EXCEPTION, e);
+            // Bug 6382377: must not lose exception in PI
+            // Must run interceptor end point before retrying.
+            Exception newException = 
+                orb.getPIHandler().invokeClientPIEndingPoint(
+                    ReplyMessage.SYSTEM_EXCEPTION, e);
 
-	    if (retry) {
-		if (newException == e) {
+            if (retry) {
+                if (newException == e) {
                     retryMessage( "Retry true; same exception" ) ;
-		    continueOrThrowSystemOrRemarshal(messageMediator,
-						     new RemarshalException());
-		} else {
+                    continueOrThrowSystemOrRemarshal(messageMediator,
+                                                     new RemarshalException());
+                } else {
                     retryMessage( "Retry true; new exception" ) ;
-		    continueOrThrowSystemOrRemarshal(messageMediator,
-						     newException);
-		}
-	    } else {
-		// NOTE: Interceptor ending point will run in releaseReply.
-		if (newException instanceof RuntimeException) {
-                    retryMessage( "Retry false; RuntimeException" ) ;
-		    throw (RuntimeException)newException ;
-		} else {
-                    retryMessage( "Retry false; other exception" ) ;
-		    throw e ;
+                    continueOrThrowSystemOrRemarshal(messageMediator,
+                                                     newException);
                 }
-	    } 
+            } else {
+                // NOTE: Interceptor ending point will run in releaseReply.
+                if (newException instanceof RuntimeException) {
+                    retryMessage( "Retry false; RuntimeException" ) ;
+                    throw (RuntimeException)newException ;
+                } else {
+                    retryMessage( "Retry false; other exception" ) ;
+                    throw e ;
+                }
+            } 
 
-	    return null; // for compiler
+            return null; // for compiler
         }
     }
 
@@ -475,236 +475,236 @@ public class ClientRequestDispatcherImpl
     @Subcontract
     protected CDRInputObject processResponse(ORB orb, 
         MessageMediator messageMediator, CDRInputObject inputObject)
-	throws ApplicationException, org.omg.CORBA.portable.RemarshalException {
+        throws ApplicationException, org.omg.CORBA.portable.RemarshalException {
 
         operationAndId(messageMediator.getOperationName(),
             messageMediator.getRequestId() );
 
-	enter_processResponse() ;
-	try {
-	    // We know for sure now that we've sent a message.
-	    // So OK to not send initial again.
-	    if (messageMediator.getConnection() != null) {
+        enter_processResponse() ;
+        try {
+            // We know for sure now that we've sent a message.
+            // So OK to not send initial again.
+            if (messageMediator.getConnection() != null) {
                 generalMessage( "Non-null connection" ) ;
-		messageMediator.getConnection().setPostInitialContexts();
-	    }
+                messageMediator.getConnection().setPostInitialContexts();
+            }
 
-	    // NOTE: not necessary to set MessageMediator for PI.
-	    // It already has it.
+            // NOTE: not necessary to set MessageMediator for PI.
+            // It already has it.
 
-	    // Process the response.
+            // Process the response.
 
-	    Exception exception = null;
+            Exception exception = null;
 
-	    if (messageMediator.isOneWay()) {
+            if (messageMediator.isOneWay()) {
                 generalMessage( "One way request" ) ;
-		getContactInfoListIterator(orb)
-		    .reportSuccess(messageMediator.getContactInfo());
-		// Invoke Portable Interceptors with receive_other
-		exception = orb.getPIHandler().invokeClientPIEndingPoint(
-		    ReplyMessage.NO_EXCEPTION, exception );
+                getContactInfoListIterator(orb)
+                    .reportSuccess(messageMediator.getContactInfo());
+                // Invoke Portable Interceptors with receive_other
+                exception = orb.getPIHandler().invokeClientPIEndingPoint(
+                    ReplyMessage.NO_EXCEPTION, exception );
                 reportException(exception);
-		continueOrThrowSystemOrRemarshal(messageMediator, exception);
-		return null;
-	    }
+                continueOrThrowSystemOrRemarshal(messageMediator, exception);
+                return null;
+            }
 
-	    consumeServiceContexts(orb, messageMediator);
+            consumeServiceContexts(orb, messageMediator);
 
-	    // Now that we have the service contexts processed and the
-	    // correct ORBVersion set, we must finish initializing the stream.
-	    // REVISIT - need interface for this operation.
-	    inputObject.performORBVersionSpecificInit();
+            // Now that we have the service contexts processed and the
+            // correct ORBVersion set, we must finish initializing the stream.
+            // REVISIT - need interface for this operation.
+            inputObject.performORBVersionSpecificInit();
 
-	    if (messageMediator.isSystemExceptionReply()) {
-		SystemException se = messageMediator.getSystemExceptionReply();
+            if (messageMediator.isSystemExceptionReply()) {
+                SystemException se = messageMediator.getSystemExceptionReply();
                 reportException( "received system exception", se);
 
-		boolean doRemarshal =
-		    getContactInfoListIterator(orb)
-			.reportException(messageMediator.getContactInfo(), se);
+                boolean doRemarshal =
+                    getContactInfoListIterator(orb)
+                        .reportException(messageMediator.getContactInfo(), se);
 
-		if (doRemarshal) {
+                if (doRemarshal) {
                     reportException( "Do remarshal", se);
-			
-		    // Invoke Portable Interceptors with receive_exception:
-		    exception = orb.getPIHandler().invokeClientPIEndingPoint(
-			ReplyMessage.SYSTEM_EXCEPTION, se );
+                        
+                    // Invoke Portable Interceptors with receive_exception:
+                    exception = orb.getPIHandler().invokeClientPIEndingPoint(
+                        ReplyMessage.SYSTEM_EXCEPTION, se );
 
-		    // If PI did not change the exception, throw a
-		    // Remarshal.
-		    if( se == exception ) {
+                    // If PI did not change the exception, throw a
+                    // Remarshal.
+                    if( se == exception ) {
                         generalMessage( "Do remarshal: same exception");
-			// exception = null is to maintain symmetry with
-			// GenericPOAClientSC.
-			exception = null;
-			continueOrThrowSystemOrRemarshal(messageMediator,
-							 new RemarshalException());
-			throw wrapper.statementNotReachable1() ;
-		    } else {
+                        // exception = null is to maintain symmetry with
+                        // GenericPOAClientSC.
+                        exception = null;
+                        continueOrThrowSystemOrRemarshal(messageMediator,
+                                                         new RemarshalException());
+                        throw wrapper.statementNotReachable1() ;
+                    } else {
                         reportException( "Do remarshal: new exception", exception );
-			//  Otherwise, throw the exception PI wants thrown.
-			continueOrThrowSystemOrRemarshal(messageMediator,
-							 exception);
-			throw wrapper.statementNotReachable2() ;
-		    }
-		}
+                        //  Otherwise, throw the exception PI wants thrown.
+                        continueOrThrowSystemOrRemarshal(messageMediator,
+                                                         exception);
+                        throw wrapper.statementNotReachable2() ;
+                    }
+                }
 
-		// No retry, so see if was unknown.
+                // No retry, so see if was unknown.
                 reportException( "NO remarshal", se);
 
-		ServiceContexts contexts = 
-		    messageMediator.getReplyServiceContexts();
-		if (contexts != null) {
-		    UEInfoServiceContext usc =
-			(UEInfoServiceContext)
-			contexts.get(UEInfoServiceContext.SERVICE_CONTEXT_ID);
+                ServiceContexts contexts = 
+                    messageMediator.getReplyServiceContexts();
+                if (contexts != null) {
+                    UEInfoServiceContext usc =
+                        (UEInfoServiceContext)
+                        contexts.get(UEInfoServiceContext.SERVICE_CONTEXT_ID);
 
-		    if (usc != null) {
-			Throwable unknown = usc.getUE() ;
-			UnknownException ue = new UnknownException(unknown);
+                    if (usc != null) {
+                        Throwable unknown = usc.getUE() ;
+                        UnknownException ue = new UnknownException(unknown);
 
                         reportException( "NO remarshal: UserException available",
                             unknown );
 
-			// Invoke Portable Interceptors with receive_exception:
-			exception = orb.getPIHandler().invokeClientPIEndingPoint(
-			    ReplyMessage.SYSTEM_EXCEPTION, ue );
+                        // Invoke Portable Interceptors with receive_exception:
+                        exception = orb.getPIHandler().invokeClientPIEndingPoint(
+                            ReplyMessage.SYSTEM_EXCEPTION, ue );
 
                         reportException( "NO remarshal: UserException available: PI exception ",
                             exception );
 
-			continueOrThrowSystemOrRemarshal(messageMediator, exception);
-			throw wrapper.statementNotReachable3() ;
-		    }
-		}
+                        continueOrThrowSystemOrRemarshal(messageMediator, exception);
+                        throw wrapper.statementNotReachable3() ;
+                    }
+                }
 
-		// It was not a comm failure nor unknown.
-		// This is the general case.
+                // It was not a comm failure nor unknown.
+                // This is the general case.
                 reportException( "general exception", se);
 
-		// Invoke Portable Interceptors with receive_exception:
-		exception = orb.getPIHandler().invokeClientPIEndingPoint(
-		    ReplyMessage.SYSTEM_EXCEPTION, se );
+                // Invoke Portable Interceptors with receive_exception:
+                exception = orb.getPIHandler().invokeClientPIEndingPoint(
+                    ReplyMessage.SYSTEM_EXCEPTION, se );
 
                 reportException( "general exception: PI exception", exception );
 
-		continueOrThrowSystemOrRemarshal(messageMediator, exception);
+                continueOrThrowSystemOrRemarshal(messageMediator, exception);
 
-		// Note: We should never need to execute this line, but
-		// we should assert in case exception is null somehow.
-		throw wrapper.statementNotReachable4() ;
-	    } else if (messageMediator.isUserExceptionReply()) {
-		getContactInfoListIterator(orb)
-		    .reportSuccess(messageMediator.getContactInfo());
+                // Note: We should never need to execute this line, but
+                // we should assert in case exception is null somehow.
+                throw wrapper.statementNotReachable4() ;
+            } else if (messageMediator.isUserExceptionReply()) {
+                getContactInfoListIterator(orb)
+                    .reportSuccess(messageMediator.getContactInfo());
 
-		String exceptionRepoId = peekUserExceptionId(inputObject);
+                String exceptionRepoId = peekUserExceptionId(inputObject);
                 receivedUserException(exceptionRepoId);
 
-		Exception newException = null;
+                Exception newException = null;
 
-		if (messageMediator.isDIIRequest()) {
-		    exception = messageMediator.unmarshalDIIUserException(
-				    exceptionRepoId, (InputStream)inputObject);
-		    newException = orb.getPIHandler().invokeClientPIEndingPoint(
-				       ReplyMessage.USER_EXCEPTION, exception );
-		    messageMediator.setDIIException(newException);
+                if (messageMediator.isDIIRequest()) {
+                    exception = messageMediator.unmarshalDIIUserException(
+                                    exceptionRepoId, (InputStream)inputObject);
+                    newException = orb.getPIHandler().invokeClientPIEndingPoint(
+                                       ReplyMessage.USER_EXCEPTION, exception );
+                    messageMediator.setDIIException(newException);
 
                     receivedUserExceptionDII(exception, newException);
-		} else {
-		    ApplicationException appException = new ApplicationException(
+                } else {
+                    ApplicationException appException = new ApplicationException(
                         exceptionRepoId, (org.omg.CORBA.portable.InputStream)inputObject);
 
-		    exception = appException;
+                    exception = appException;
 
-		    newException = orb.getPIHandler().invokeClientPIEndingPoint(
-				       ReplyMessage.USER_EXCEPTION, appException );
+                    newException = orb.getPIHandler().invokeClientPIEndingPoint(
+                                       ReplyMessage.USER_EXCEPTION, appException );
 
                     receivedUserExceptionNotDII(exception, newException);
-		}
+                }
 
-		if (newException != exception) {
-		    continueOrThrowSystemOrRemarshal(messageMediator,newException);
-		}
+                if (newException != exception) {
+                    continueOrThrowSystemOrRemarshal(messageMediator,newException);
+                }
 
-		if (newException instanceof ApplicationException) {
-		    throw (ApplicationException)newException;
-		}
-		// For DII: 
-		// This return will be ignored - already unmarshaled above.
-		return inputObject;
+                if (newException instanceof ApplicationException) {
+                    throw (ApplicationException)newException;
+                }
+                // For DII: 
+                // This return will be ignored - already unmarshaled above.
+                return inputObject;
 
-	    } else if (messageMediator.isLocationForwardReply()) {
+            } else if (messageMediator.isLocationForwardReply()) {
                 generalMessage( "received location forward");
-		
-		// NOTE: Expects iterator to update target IOR
-		getContactInfoListIterator(orb).reportRedirect(
-		    messageMediator.getContactInfo(),
+                
+                // NOTE: Expects iterator to update target IOR
+                getContactInfoListIterator(orb).reportRedirect(
+                    messageMediator.getContactInfo(),
                     messageMediator.getForwardedIOR());
 
-		// Invoke Portable Interceptors with receive_other:
-		Exception newException = orb.getPIHandler().invokeClientPIEndingPoint(
-		    ReplyMessage.LOCATION_FORWARD, null );
+                // Invoke Portable Interceptors with receive_other:
+                Exception newException = orb.getPIHandler().invokeClientPIEndingPoint(
+                    ReplyMessage.LOCATION_FORWARD, null );
 
-		if( !(newException instanceof RemarshalException) ) {
-		    exception = newException;
-		}
+                if( !(newException instanceof RemarshalException) ) {
+                    exception = newException;
+                }
 
-		// If PI did not change exception, throw Remarshal, else
-		// throw the exception PI wants thrown.
-		// KMC: GenericPOAClientSC did not check exception != null
-		if( exception != null ) {
-		    continueOrThrowSystemOrRemarshal(messageMediator, exception);
-		}
-		continueOrThrowSystemOrRemarshal(messageMediator,
-						 new RemarshalException());
-		throw wrapper.statementNotReachable5() ;
+                // If PI did not change exception, throw Remarshal, else
+                // throw the exception PI wants thrown.
+                // KMC: GenericPOAClientSC did not check exception != null
+                if( exception != null ) {
+                    continueOrThrowSystemOrRemarshal(messageMediator, exception);
+                }
+                continueOrThrowSystemOrRemarshal(messageMediator,
+                                                 new RemarshalException());
+                throw wrapper.statementNotReachable5() ;
 
-	    } else if (messageMediator.isDifferentAddrDispositionRequestedReply()){
+            } else if (messageMediator.isDifferentAddrDispositionRequestedReply()){
                 generalMessage( "received different addressing dispostion request");
 
-		// Set the desired target addressing disposition.
-		getContactInfoListIterator(orb).reportAddrDispositionRetry(
-		    messageMediator.getContactInfo(),
+                // Set the desired target addressing disposition.
+                getContactInfoListIterator(orb).reportAddrDispositionRetry(
+                    messageMediator.getContactInfo(),
                     messageMediator.getAddrDispositionReply());
 
-		// Invoke Portable Interceptors with receive_other:
-		Exception newException = orb.getPIHandler().invokeClientPIEndingPoint(
-		    ReplyMessage.NEEDS_ADDRESSING_MODE, null);
+                // Invoke Portable Interceptors with receive_other:
+                Exception newException = orb.getPIHandler().invokeClientPIEndingPoint(
+                    ReplyMessage.NEEDS_ADDRESSING_MODE, null);
 
-		// For consistency with corresponding code in GenericPOAClientSC:
-		if( !(newException instanceof RemarshalException) ) {
-		    exception = newException;
-		}
+                // For consistency with corresponding code in GenericPOAClientSC:
+                if( !(newException instanceof RemarshalException) ) {
+                    exception = newException;
+                }
 
-		// If PI did not change exception, throw Remarshal, else
-		// throw the exception PI wants thrown.
-		// KMC: GenericPOAClientSC did not include exception != null check
-		if( exception != null ) {
-		    continueOrThrowSystemOrRemarshal(messageMediator, exception);
-		}
-		continueOrThrowSystemOrRemarshal(messageMediator,
-						 new RemarshalException());
-		throw wrapper.statementNotReachable6() ;
-	    } else /* normal response */ {
+                // If PI did not change exception, throw Remarshal, else
+                // throw the exception PI wants thrown.
+                // KMC: GenericPOAClientSC did not include exception != null check
+                if( exception != null ) {
+                    continueOrThrowSystemOrRemarshal(messageMediator, exception);
+                }
+                continueOrThrowSystemOrRemarshal(messageMediator,
+                                                 new RemarshalException());
+                throw wrapper.statementNotReachable6() ;
+            } else /* normal response */ {
                 generalMessage( "received normal response");
 
-		getContactInfoListIterator(orb)
-		    .reportSuccess(messageMediator.getContactInfo());
+                getContactInfoListIterator(orb)
+                    .reportSuccess(messageMediator.getContactInfo());
 
-		messageMediator.handleDIIReply((InputStream)inputObject);
+                messageMediator.handleDIIReply((InputStream)inputObject);
 
-		// Invoke Portable Interceptors with receive_reply:
-		exception = orb.getPIHandler().invokeClientPIEndingPoint(
-		    ReplyMessage.NO_EXCEPTION, null );
+                // Invoke Portable Interceptors with receive_reply:
+                exception = orb.getPIHandler().invokeClientPIEndingPoint(
+                    ReplyMessage.NO_EXCEPTION, null );
 
-		// Remember: not thrown if exception is null.
-		continueOrThrowSystemOrRemarshal(messageMediator, exception);
+                // Remember: not thrown if exception is null.
+                continueOrThrowSystemOrRemarshal(messageMediator, exception);
 
-		return inputObject;
-	    }
+                return inputObject;
+            }
         } finally {
-	    exit_processResponse() ;
-	}
+            exit_processResponse() ;
+        }
     }
 
     // Filters the given exception into a SystemException or a
@@ -717,7 +717,7 @@ public class ClientRequestDispatcherImpl
     protected void continueOrThrowSystemOrRemarshal(
         MessageMediator messageMediator, Exception exception)
         throws 
-	    SystemException, RemarshalException
+            SystemException, RemarshalException
     {
         final ORB orb = messageMediator.getBroker();
 
@@ -739,181 +739,181 @@ public class ClientRequestDispatcherImpl
     }
 
     protected ContactInfoListIterator  getContactInfoListIterator(ORB orb) {
-	return (ContactInfoListIterator)
-	    ((InvocationInfo)orb.getInvocationInfo())
-	        .getContactInfoListIterator();
+        return (ContactInfoListIterator)
+            ((InvocationInfo)orb.getInvocationInfo())
+                .getContactInfoListIterator();
     }
 
     @Subcontract
     protected void registerWaiter(MessageMediator messageMediator) {
-	if (messageMediator.getConnection() != null) {
-	    messageMediator.getConnection().registerWaiter(messageMediator);
-	}
+        if (messageMediator.getConnection() != null) {
+            messageMediator.getConnection().registerWaiter(messageMediator);
+        }
     }
 
     @Subcontract
     protected void unregisterWaiter(ORB orb) {
-	MessageMediator messageMediator =
-	    orb.getInvocationInfo().getMessageMediator();
-	if (messageMediator!=null && messageMediator.getConnection() != null) {
-	    // REVISIT:
-	    // The messageMediator may be null if COMM_FAILURE before
-	    // it is created.
-	    messageMediator.getConnection().unregisterWaiter(messageMediator);
-	}
+        MessageMediator messageMediator =
+            orb.getInvocationInfo().getMessageMediator();
+        if (messageMediator!=null && messageMediator.getConnection() != null) {
+            // REVISIT:
+            // The messageMediator may be null if COMM_FAILURE before
+            // it is created.
+            messageMediator.getConnection().unregisterWaiter(messageMediator);
+        }
     }
 
     @Subcontract
     protected void addServiceContexts(MessageMediator messageMediator) {
-	ORB orb = messageMediator.getBroker();
-	Connection c = messageMediator.getConnection();
-	GIOPVersion giopVersion = messageMediator.getGIOPVersion();
+        ORB orb = messageMediator.getBroker();
+        Connection c = messageMediator.getConnection();
+        GIOPVersion giopVersion = messageMediator.getGIOPVersion();
 
-	ServiceContexts contexts = null;
+        ServiceContexts contexts = null;
 
-	// If Java serialization is used.
-	if (ORBUtility.getEncodingVersion() != ORBConstants.CDR_ENC_VERSION) {	  
-	    contexts = messageMediator.getRequestServiceContexts();
-	    ORBVersionServiceContext lsc =
-		ServiceContextDefaults.getORBVersionServiceContext() ;
-	    contexts.put(lsc);
-	    return;
-	}
+        // If Java serialization is used.
+        if (ORBUtility.getEncodingVersion() != ORBConstants.CDR_ENC_VERSION) {    
+            contexts = messageMediator.getRequestServiceContexts();
+            ORBVersionServiceContext lsc =
+                ServiceContextDefaults.getORBVersionServiceContext() ;
+            contexts.put(lsc);
+            return;
+        }
 
-	if (c != null && 	    
-	    giopVersion.equals(GIOPVersion.V1_2) && 
-	    c.getBroker().getORBData().alwaysSendCodeSetServiceContext()) {
-	    if (!c.isPostInitialContexts()) {	       
-	        contexts = (messageMediator.getBroker()).
-		                                getServiceContextsCache().get(
-						ServiceContextsCache.CASE.CLIENT_INITIAL);
-	    } else {
-	        contexts = messageMediator.getBroker()
+        if (c != null &&            
+            giopVersion.equals(GIOPVersion.V1_2) && 
+            c.getBroker().getORBData().alwaysSendCodeSetServiceContext()) {
+            if (!c.isPostInitialContexts()) {          
+                contexts = (messageMediator.getBroker()).
+                                                getServiceContextsCache().get(
+                                                ServiceContextsCache.CASE.CLIENT_INITIAL);
+            } else {
+                contexts = messageMediator.getBroker()
                     .getServiceContextsCache().get(
                         ServiceContextsCache.CASE.CLIENT_SUBSEQUENT);
-	    }
+            }
 
-	    addCodeSetServiceContext(c, contexts, giopVersion);
+            addCodeSetServiceContext(c, contexts, giopVersion);
 
-	    messageMediator.setRequestServiceContexts(contexts);
+            messageMediator.setRequestServiceContexts(contexts);
 
-	} else {
-	    contexts = messageMediator.getRequestServiceContexts();
-	
-	    addCodeSetServiceContext(c, contexts, giopVersion);
+        } else {
+            contexts = messageMediator.getRequestServiceContexts();
+        
+            addCodeSetServiceContext(c, contexts, giopVersion);
 
-	    // Add the RMI-IIOP max stream format version
-	    // service context to every request.  Once we have GIOP 1.3,
-	    // we could skip it since we now support version 2, but
-	    // probably safer to always send it.
-	    
-	    contexts.put( msfvc );
+            // Add the RMI-IIOP max stream format version
+            // service context to every request.  Once we have GIOP 1.3,
+            // we could skip it since we now support version 2, but
+            // probably safer to always send it.
+            
+            contexts.put( msfvc );
 
-	    // ORBVersion servicecontext needs to be sent
+            // ORBVersion servicecontext needs to be sent
 
-	    contexts.put( ovsc ) ;
+            contexts.put( ovsc ) ;
 
-	    // NOTE : We only want to send the runtime context the first time
-	    if ((c != null) && !c.isPostInitialContexts()) {
-	        // Do not do c.setPostInitialContexts() here.
-	        // If a client interceptor send_request does a ForwardRequest
-	        // which ends up using the same connection then the service
-	        // context would not be sent.
-	        SendingContextServiceContext scsc =
-		  ServiceContextDefaults.makeSendingContextServiceContext(
-						    orb.getFVDCodeBaseIOR() ) ; 
-		contexts.put( scsc ) ;
-	    }
-	}    
+            // NOTE : We only want to send the runtime context the first time
+            if ((c != null) && !c.isPostInitialContexts()) {
+                // Do not do c.setPostInitialContexts() here.
+                // If a client interceptor send_request does a ForwardRequest
+                // which ends up using the same connection then the service
+                // context would not be sent.
+                SendingContextServiceContext scsc =
+                  ServiceContextDefaults.makeSendingContextServiceContext(
+                                                    orb.getFVDCodeBaseIOR() ) ; 
+                contexts.put( scsc ) ;
+            }
+        }    
     }
 
     @Subcontract
     protected void consumeServiceContexts(ORB orb, 
-					MessageMediator messageMediator)
+                                        MessageMediator messageMediator)
     {
-	ServiceContexts ctxts = messageMediator.getReplyServiceContexts();
-	ServiceContext sc ;
+        ServiceContexts ctxts = messageMediator.getReplyServiceContexts();
+        ServiceContext sc ;
 
         if (ctxts == null) {
             return; // no service context available, return gracefully.
         }
 
-	sc = ctxts.get( SendingContextServiceContext.SERVICE_CONTEXT_ID ) ;
+        sc = ctxts.get( SendingContextServiceContext.SERVICE_CONTEXT_ID ) ;
 
-	if (sc != null) {
-	    SendingContextServiceContext scsc =
-		(SendingContextServiceContext)sc ;
-	    IOR ior = scsc.getIOR() ;
+        if (sc != null) {
+            SendingContextServiceContext scsc =
+                (SendingContextServiceContext)sc ;
+            IOR ior = scsc.getIOR() ;
 
-	    try {
-		// set the codebase returned by the server
-		if (messageMediator.getConnection() != null) {
-		    messageMediator.getConnection().setCodeBaseIOR(ior);
-		}
-	    } catch (ThreadDeath td) {
-		throw td ;
-	    } catch (Throwable t) {
-		throw wrapper.badStringifiedIor( t ) ;
-	    }
-	} 
+            try {
+                // set the codebase returned by the server
+                if (messageMediator.getConnection() != null) {
+                    messageMediator.getConnection().setCodeBaseIOR(ior);
+                }
+            } catch (ThreadDeath td) {
+                throw td ;
+            } catch (Throwable t) {
+                throw wrapper.badStringifiedIor( t ) ;
+            }
+        } 
 
-	// see if the version subcontract is present, if yes, then set
-	// the ORBversion
-	sc = ctxts.get( ORBVersionServiceContext.SERVICE_CONTEXT_ID ) ;
+        // see if the version subcontract is present, if yes, then set
+        // the ORBversion
+        sc = ctxts.get( ORBVersionServiceContext.SERVICE_CONTEXT_ID ) ;
 
-	if (sc != null) {
-	    ORBVersionServiceContext lsc =
-	       (ORBVersionServiceContext) sc;
+        if (sc != null) {
+            ORBVersionServiceContext lsc =
+               (ORBVersionServiceContext) sc;
 
-	    ORBVersion version = lsc.getVersion();
-	    orb.setORBVersion( version ) ;
-	}
+            ORBVersion version = lsc.getVersion();
+            orb.setORBVersion( version ) ;
+        }
 
-	getExceptionDetailMessage(messageMediator, wrapper);
+        getExceptionDetailMessage(messageMediator, wrapper);
     }
 
     @Subcontract
     protected void getExceptionDetailMessage(
         MessageMediator  messageMediator,
-	ORBUtilSystemException wrapper)
+        ORBUtilSystemException wrapper)
     {
-	ServiceContext sc = messageMediator.getReplyServiceContexts()
-	    .get(ExceptionDetailMessage.value);
-	if (sc == null) {
+        ServiceContext sc = messageMediator.getReplyServiceContexts()
+            .get(ExceptionDetailMessage.value);
+        if (sc == null) {
             return;
         }
 
-	if (! (sc instanceof UnknownServiceContext)) {
-	    throw wrapper.badExceptionDetailMessageServiceContextType();
-	}
-	byte[] data = ((UnknownServiceContext)sc).getData();
-	EncapsInputStream in = 
-	    new EncapsInputStream(messageMediator.getBroker(),
+        if (! (sc instanceof UnknownServiceContext)) {
+            throw wrapper.badExceptionDetailMessageServiceContextType();
+        }
+        byte[] data = ((UnknownServiceContext)sc).getData();
+        EncapsInputStream in = 
+            new EncapsInputStream(messageMediator.getBroker(),
                 data, data.length);
-	in.consumeEndian();
+        in.consumeEndian();
 
-	String msg =
-	      "----------BEGIN server-side stack trace----------\n"
-	    + in.read_wstring() + "\n"
-	    + "----------END server-side stack trace----------";
+        String msg =
+              "----------BEGIN server-side stack trace----------\n"
+            + in.read_wstring() + "\n"
+            + "----------END server-side stack trace----------";
 
-	messageMediator.setReplyExceptionDetailMessage(msg);
+        messageMediator.setReplyExceptionDetailMessage(msg);
     }
 
     @Subcontract
     public void endRequest(ORB orb, Object self, CDRInputObject inputObject)
     {
-	try {
-	    exit_clientDecoding();
+        try {
+            exit_clientDecoding();
 
-	    // Note: the inputObject may be null if an error occurs
-	    //       in request or before _invoke returns.
-	    // Note: self may be null also (e.g., compiler generates null in stub).
+            // Note: the inputObject may be null if an error occurs
+            //       in request or before _invoke returns.
+            // Note: self may be null also (e.g., compiler generates null in stub).
 
-	    MessageMediator messageMediator =
-		orb.getInvocationInfo().getMessageMediator();
-	    if (messageMediator != null) {
-		ORBUtility.popEncVersionFromThreadLocalState();
+            MessageMediator messageMediator =
+                orb.getInvocationInfo().getMessageMediator();
+            if (messageMediator != null) {
+                ORBUtility.popEncVersionFromThreadLocalState();
 
                 if (messageMediator.getConnection() != null) {
                     messageMediator.sendCancelRequestIfFinalFragmentNotSent();
@@ -934,46 +934,46 @@ public class ClientRequestDispatcherImpl
                 // TODO NEW CACHE: release( conn ) : conn is in MessageMediator
             }
 
-	    // XREVISIT NOTE - Assumes unregistering the waiter for
-	    // location forwards has already happened somewhere else.
-	    // The code below is only going to unregister the final successful
-	    // request. 
+            // XREVISIT NOTE - Assumes unregistering the waiter for
+            // location forwards has already happened somewhere else.
+            // The code below is only going to unregister the final successful
+            // request. 
 
-	    // NOTE: In the case of a recursive stack of endRequests in a
-	    // finally block (because of Remarshal) only the first call to
-	    // unregisterWaiter will remove the waiter.  The rest will be
-	    // noops.
-	    unregisterWaiter(orb);
+            // NOTE: In the case of a recursive stack of endRequests in a
+            // finally block (because of Remarshal) only the first call to
+            // unregisterWaiter will remove the waiter.  The rest will be
+            // noops.
+            unregisterWaiter(orb);
 
-	    // Invoke Portable Interceptors cleanup.  This is done to handle
-	    // exceptions during stream marshaling.  More generally, exceptions
-	    // that occur in the ORB after send_request (which includes
-	    // after returning from _request) before _invoke:
-	    orb.getPIHandler().cleanupClientPIRequest();
-	    
-	    // REVISIT: Early replies?
-	} catch (IOException ex) { 
+            // Invoke Portable Interceptors cleanup.  This is done to handle
+            // exceptions during stream marshaling.  More generally, exceptions
+            // that occur in the ORB after send_request (which includes
+            // after returning from _request) before _invoke:
+            orb.getPIHandler().cleanupClientPIRequest();
+            
+            // REVISIT: Early replies?
+        } catch (IOException ex) { 
             // See CDRInput/OutputObject.close() for more info.
             // This won't result in a Corba error if an IOException happens.
             reportException("ignoring IOException", ex );
-	} finally {
-	    exit_totalRequest() ;
-	}
+        } finally {
+            exit_totalRequest() ;
+        }
     }
 
     @Subcontract
     protected void performCodeSetNegotiation(MessageMediator messageMediator) {
-	Connection conn = messageMediator.getConnection();
+        Connection conn = messageMediator.getConnection();
         if (conn == null) {
             return;
         }
 
-	GIOPVersion giopVersion = messageMediator.getGIOPVersion();
+        GIOPVersion giopVersion = messageMediator.getGIOPVersion();
         if (giopVersion.equals(GIOPVersion.V1_0)) {
             return;
         }
 
-	IOR ior = (messageMediator.getContactInfo()).getEffectiveTargetIOR();
+        IOR ior = (messageMediator.getContactInfo()).getEffectiveTargetIOR();
 
         synchronized( conn ) {
             if (conn.getCodeSetContext() != null) {
@@ -1052,17 +1052,17 @@ public class ClientRequestDispatcherImpl
         }
 
         CodeSetServiceContext cssc = 
-	    ServiceContextDefaults.makeCodeSetServiceContext(codeSetCtx);
-	ctxs.put(cssc);
+            ServiceContextDefaults.makeCodeSetServiceContext(codeSetCtx);
+        ctxs.put(cssc);
     }    
 
     @Subcontract
     protected String peekUserExceptionId(CDRInputObject inputObject) {
-	CDRInputObject cdrInputObject = inputObject;
-	// REVISIT - need interface for mark/reset
+        CDRInputObject cdrInputObject = inputObject;
+        // REVISIT - need interface for mark/reset
         cdrInputObject.mark(Integer.MAX_VALUE);
         String result = cdrInputObject.read_string();
-	cdrInputObject.reset();
+        cdrInputObject.reset();
         return result;
     }                     
 }

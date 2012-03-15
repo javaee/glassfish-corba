@@ -48,63 +48,63 @@ import java.util.Properties;
 
 import org.omg.CORBA.ORB;
 
-import com.sun.corba.se.spi.legacy.connection.ORBSocketFactory;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.legacy.connection.ORBSocketFactory;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class Client
 {
     public static final String baseMsg = Client.class.getName();
     
     public static final String defaultFactoryClassName =
-	//REVISIT Common.DEFAULT_FACTORY_CLASS
-	"com.sun.corba.se.impl.legacy.connection.DefaultSocketFactory";
+        //REVISIT Common.DEFAULT_FACTORY_CLASS
+        "com.sun.corba.ee.impl.legacy.connection.DefaultSocketFactory";
 
     public static void main(String args[])
     {
         try {
             Properties props = new Properties();
 
-	    props.setProperty(Common.ORBClassKey, MyPIORB.class.getName());
+            props.setProperty(Common.ORBClassKey, MyPIORB.class.getName());
 
-	    props.setProperty(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
-			      ClientORBInitializer.class.getName(),
-			      "dummy");
+            props.setProperty(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
+                              ClientORBInitializer.class.getName(),
+                              "dummy");
 
-	    //
-	    // Case 1.
-	    //
+            //
+            // Case 1.
+            //
 
-	    System.out.println();
+            System.out.println();
             System.out.println("Case 1:  Default factory");
-	    System.out.println();
+            System.out.println();
 
             testFactory(args, 
                         props,
-			defaultFactoryClassName
-			);
+                        defaultFactoryClassName
+                        );
 
 
-	    //
-	    // Case 2.
-	    //
+            //
+            // Case 2.
+            //
 
-	    System.out.println();
+            System.out.println();
             System.out.println("Case 2:  Custom factory");
-	    System.out.println();
+            System.out.println();
 
             props.put(ORBConstants.LEGACY_SOCKET_FACTORY_CLASS_PROPERTY,
-		      Common.CUSTOM_FACTORY_CLASS);
+                      Common.CUSTOM_FACTORY_CLASS);
 
             testFactory(args, 
-			props,
-			Common.CUSTOM_FACTORY_CLASS);
+                        props,
+                        Common.CUSTOM_FACTORY_CLASS);
 
-	    // 
-	    // Success.
-	    //
+            // 
+            // Success.
+            //
 
-	    System.out.println();
-	    System.out.println(baseMsg + ".main: Test PASSED.");
+            System.out.println();
+            System.out.println(baseMsg + ".main: Test PASSED.");
 
         } catch (Exception e) {
             System.out.println(baseMsg + ".main: Test FAILED: " + e) ;
@@ -120,107 +120,107 @@ public class Client
     {
         ORB orb = ORB.init(args, props);
 
-	Common.upDownReset();
+        Common.upDownReset();
 
         resolveAndInvoke(orb, Common.serverName1);
 
-	// Invoke on another object in same server to observe
-	// already connected behavior.
+        // Invoke on another object in same server to observe
+        // already connected behavior.
         resolveAndInvoke(orb, Common.serverName2);
 
 
         // Make sure that the factory that was used matches the name given.
-	ORBSocketFactory socketFactory = 
-           ((com.sun.corba.se.spi.orb.ORB)orb).getORBData().getLegacySocketFactory();
-	if (socketFactory == null) {
-	    if (factoryName.equals(defaultFactoryClassName)) {
-		// OK - default does not use socket factory any longer.
-		;
-	    } else {
-		// Not the default - so expect a socket factory.
-		throw new Exception(baseMsg + "unexpected null socketFactory");
-	    }
-	} else {
-	    String orbSocketFactoryName = socketFactory.getClass().getName();
-	    if (! factoryName.equals(orbSocketFactoryName)) {
-		throw new Exception(baseMsg + ".testFactory: "
-				    + "Wrong socket factory class: "
-				    + orbSocketFactoryName
-				    + " should be "
-				    + factoryName);
-	    }
-	}
+        ORBSocketFactory socketFactory = 
+           ((com.sun.corba.ee.spi.orb.ORB)orb).getORBData().getLegacySocketFactory();
+        if (socketFactory == null) {
+            if (factoryName.equals(defaultFactoryClassName)) {
+                // OK - default does not use socket factory any longer.
+                ;
+            } else {
+                // Not the default - so expect a socket factory.
+                throw new Exception(baseMsg + "unexpected null socketFactory");
+            }
+        } else {
+            String orbSocketFactoryName = socketFactory.getClass().getName();
+            if (! factoryName.equals(orbSocketFactoryName)) {
+                throw new Exception(baseMsg + ".testFactory: "
+                                    + "Wrong socket factory class: "
+                                    + orbSocketFactoryName
+                                    + " should be "
+                                    + factoryName);
+            }
+        }
         orb.shutdown(false);
-	orb.destroy();
+        orb.destroy();
     }
 
     public static void resolveAndInvoke (ORB orb, String name)
-	throws
-	    Exception
+        throws
+            Exception
     {
         ExI exIRef;
 
-	System.out.println();
-	System.out.println("BEGIN: invoke on " + name);
+        System.out.println();
+        System.out.println("BEGIN: invoke on " + name);
 
         exIRef = ExIHelper.narrow(resolve("First", name, orb));
 
-	// The second resolve is to observe caching behavior.
+        // The second resolve is to observe caching behavior.
 
         exIRef = ExIHelper.narrow(resolve("Second", name, orb));
 
-	// The multiple invokes are to observe using various
-	// endpoints in the component data (and to observe caching behavior).
+        // The multiple invokes are to observe using various
+        // endpoints in the component data (and to observe caching behavior).
 
         invoke("First", exIRef);
-	invoke("Second", exIRef);
-	invoke("Third", exIRef);
-	invoke("Fourth", exIRef);
-	invoke("Fifth", exIRef);
+        invoke("Second", exIRef);
+        invoke("Third", exIRef);
+        invoke("Fourth", exIRef);
+        invoke("Fifth", exIRef);
 
-	System.out.println("END: invoke on " + name);
+        System.out.println("END: invoke on " + name);
     }
 
     public static org.omg.CORBA.Object resolve(String msg,
-					       String name, 
-					       ORB orb)
+                                               String name, 
+                                               ORB orb)
         throws Exception
     {
-	// List initial references.
+        // List initial references.
 
-	System.out.println();
-	System.out.println("BEGIN: " + msg + " list_initial_references.");
+        System.out.println();
+        System.out.println("BEGIN: " + msg + " list_initial_references.");
 
-	String services[] = orb.list_initial_services();
-	for (int i = 0; i < services.length; i++) {
-	    System.out.print(" " + services[i]);
-	}
-	System.out.println();
+        String services[] = orb.list_initial_services();
+        for (int i = 0; i < services.length; i++) {
+            System.out.print(" " + services[i]);
+        }
+        System.out.println();
 
-	System.out.println("END: " + msg + " list_initial_references.");
+        System.out.println("END: " + msg + " list_initial_references.");
 
 
-	// Resolve.
+        // Resolve.
 
-	System.out.println();
-	System.out.println("BEGIN: " + msg + " resolve.");
+        System.out.println();
+        System.out.println("BEGIN: " + msg + " resolve.");
 
         org.omg.CORBA.Object ref
-	    = ExIHelper.narrow(Common.getNameService(orb)
-			       .resolve(Common.makeNameComponent(name)));
+            = ExIHelper.narrow(Common.getNameService(orb)
+                               .resolve(Common.makeNameComponent(name)));
 
-	System.out.println("END: " + msg + " resolve.");
-	return ref;
+        System.out.println("END: " + msg + " resolve.");
+        return ref;
     }
 
     public static void invoke(String msg, ExI exIRef)
     {
-	System.out.println();
-	System.out.println("BEGIN: " + msg + " invocation.");
+        System.out.println();
+        System.out.println("BEGIN: " + msg + " invocation.");
 
         exIRef.sayHello();
 
-	System.out.println("END: " + msg + " invocation.");
+        System.out.println("END: " + msg + " invocation.");
     }
 }
 

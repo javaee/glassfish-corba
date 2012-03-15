@@ -79,13 +79,13 @@ public final class CompletionStatus implements org.omg.CORBA.portable.IDLEntity
  * The constant indicating that a method had not completed running
  * when a <code>SystemException</code> was thrown.
  */
-	_COMPLETED_NO = 1,
+        _COMPLETED_NO = 1,
 
 /**
  * The constant indicating that it is unknown whether a method had
  * completed running when a <code>SystemException</code> was thrown.
  */
-	_COMPLETED_MAYBE = 2;
+        _COMPLETED_MAYBE = 2;
 
 
 /**
@@ -131,16 +131,16 @@ public final class CompletionStatus implements org.omg.CORBA.portable.IDLEntity
  *            <code>int</code> constants defined in <code>CompletionStatus</code>
  */
     public static CompletionStatus from_int(int i)  {
-	switch (i) {
-	case _COMPLETED_YES:
-	    return COMPLETED_YES;
-	case _COMPLETED_NO:
-	    return COMPLETED_NO;
-	case _COMPLETED_MAYBE:
-	    return COMPLETED_MAYBE;
-	default:
-	    throw new org.omg.CORBA.BAD_PARAM();
-	}
+        switch (i) {
+        case _COMPLETED_YES:
+            return COMPLETED_YES;
+        case _COMPLETED_NO:
+            return COMPLETED_NO;
+        case _COMPLETED_MAYBE:
+            return COMPLETED_MAYBE;
+        default:
+            throw new org.omg.CORBA.BAD_PARAM();
+        }
     }
 
 
@@ -152,7 +152,7 @@ public final class CompletionStatus implements org.omg.CORBA.portable.IDLEntity
  *
  */
     private CompletionStatus(int _value) {
-	this._value = _value;
+        this._value = _value;
     }
 
     private int _value;

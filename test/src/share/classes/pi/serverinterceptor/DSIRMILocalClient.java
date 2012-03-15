@@ -42,9 +42,9 @@ package pi.serverinterceptor;
 
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.corba.AnyImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.IOP.*;
 import org.omg.IOP.CodecPackage.*;
@@ -62,19 +62,19 @@ import ServerRequestInterceptor.*;
 public class DSIRMILocalClient 
     extends DSIRMIClient
 {
-    public DSIRMILocalClient( com.sun.corba.se.spi.orb.ORB orb ) {
-	this.orb = orb;
+    public DSIRMILocalClient( com.sun.corba.ee.spi.orb.ORB orb ) {
+        this.orb = orb;
     }
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
-	out.println( "===============================================" );
-	out.println( "Instantiating Client ORB for DSI RMI Local test" );
-	out.println( "===============================================" );
+        out.println( "===============================================" );
+        out.println( "Instantiating Client ORB for DSI RMI Local test" );
+        out.println( "===============================================" );
 
-	super.run( environment, args, out, err, extra );
+        super.run( environment, args, out, err, extra );
     }
 
 }

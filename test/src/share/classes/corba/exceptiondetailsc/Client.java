@@ -88,226 +88,226 @@ public class Client
     public static void main(String[] av)
     {
         try {
-	    U.sop(main + " starting");
+            U.sop(main + " starting");
 
-	    if (! ColocatedClientServer.isColocated) {
-		U.sop(main + " : creating ORB.");
-		orb = ORB.init(av, null);
-		U.sop(main + " : creating InitialContext.");
-		initialContext = C.createInitialContext(orb);
-	    }
+            if (! ColocatedClientServer.isColocated) {
+                U.sop(main + " : creating ORB.");
+                orb = ORB.init(av, null);
+                U.sop(main + " : creating InitialContext.");
+                initialContext = C.createInitialContext(orb);
+            }
 
-	    U.lf();
-	    U.sop("+++++++++++++++++++++++++Looking up IDL references.");
-	    U.lf();
+            U.lf();
+            U.sop("+++++++++++++++++++++++++Looking up IDL references.");
+            U.lf();
 
-	    idlIConnect = idlIHelper.narrow(U.resolve(Server.idlIConnect,orb));
-	    idlIPOA     = idlIHelper.narrow(U.resolve(Server.idlIPOA,    orb));
+            idlIConnect = idlIHelper.narrow(U.resolve(Server.idlIConnect,orb));
+            idlIPOA     = idlIHelper.narrow(U.resolve(Server.idlIPOA,    orb));
 
-	    U.lf();
-	    U.sop("+++++++++++++++++++++++++Looking up RMI references.");
-	    U.lf();
-	    rmiiIConnect = (rmiiI)
-		U.lookupAndNarrow(Server.rmiiIConnect,
-				  rmiiI.class, initialContext);
-	    rmiiIPOA = (rmiiI)
-		U.lookupAndNarrow(Server.rmiiIPOA, rmiiI.class,initialContext);
+            U.lf();
+            U.sop("+++++++++++++++++++++++++Looking up RMI references.");
+            U.lf();
+            rmiiIConnect = (rmiiI)
+                U.lookupAndNarrow(Server.rmiiIConnect,
+                                  rmiiI.class, initialContext);
+            rmiiIPOA = (rmiiI)
+                U.lookupAndNarrow(Server.rmiiIPOA, rmiiI.class,initialContext);
 
-	    /* REVISIT: investigate hang
-	    rmiiIPOA = (rmiiI)
-		U.lookupAndNarrow(C.rmiiSL, rmiiI.class, initialContext);
-	    */
+            /* REVISIT: investigate hang
+            rmiiIPOA = (rmiiI)
+                U.lookupAndNarrow(C.rmiiSL, rmiiI.class, initialContext);
+            */
 
-	    U.lf();
-	    U.sop("+++++++++++++++++++++++++Making IDL/Connect calls.");
-	    U.lf();
-	    try {
-		idlIConnect.raise_system_exception(idlIConnectArg);
-	    } catch (Throwable t) {
-		processThrowable(IDLConnect, SYSTEM, t,
-				 new FREE_MEM(),
-				 "idlIServantConnect.raise_system_exception");
-	    }
-	    try {
-		idlIConnect.raise_user_exception(idlIConnectArg);
-	    } catch (Throwable t) {
-		processThrowable(IDLConnect, USER, t,
-				 new idlException());
-	    }
-	    try {
-		idlIConnect.raise_runtime_exception(idlIConnectArg);
-	    } catch (Throwable t) {
-		processThrowable(IDLConnect, RUNTIME, t,
-				 new UNKNOWN(),
-				 "idlIServantConnect.raise_runtime_exception");
-	    }
+            U.lf();
+            U.sop("+++++++++++++++++++++++++Making IDL/Connect calls.");
+            U.lf();
+            try {
+                idlIConnect.raise_system_exception(idlIConnectArg);
+            } catch (Throwable t) {
+                processThrowable(IDLConnect, SYSTEM, t,
+                                 new FREE_MEM(),
+                                 "idlIServantConnect.raise_system_exception");
+            }
+            try {
+                idlIConnect.raise_user_exception(idlIConnectArg);
+            } catch (Throwable t) {
+                processThrowable(IDLConnect, USER, t,
+                                 new idlException());
+            }
+            try {
+                idlIConnect.raise_runtime_exception(idlIConnectArg);
+            } catch (Throwable t) {
+                processThrowable(IDLConnect, RUNTIME, t,
+                                 new UNKNOWN(),
+                                 "idlIServantConnect.raise_runtime_exception");
+            }
 
-	    U.lf();
-	    U.sop("+++++++++++++++++++++++++Making IDL/POA calls.");
-	    U.lf();
-	    try {
-		idlIPOA.raise_system_exception(idlIPOAArg);
-	    } catch (Throwable t) {
-		processThrowable(IDLPOA, SYSTEM, t,
-				 new FREE_MEM(),
-				 "idlIServantPOA.raise_system_exception");
-	    }
-	    try {
-		idlIPOA.raise_user_exception(idlIPOAArg);
-	    } catch (Throwable t) {
-		processThrowable(IDLPOA, USER, t,
-				 new idlException());
-	    }
+            U.lf();
+            U.sop("+++++++++++++++++++++++++Making IDL/POA calls.");
+            U.lf();
+            try {
+                idlIPOA.raise_system_exception(idlIPOAArg);
+            } catch (Throwable t) {
+                processThrowable(IDLPOA, SYSTEM, t,
+                                 new FREE_MEM(),
+                                 "idlIServantPOA.raise_system_exception");
+            }
+            try {
+                idlIPOA.raise_user_exception(idlIPOAArg);
+            } catch (Throwable t) {
+                processThrowable(IDLPOA, USER, t,
+                                 new idlException());
+            }
 
-	    try {
-		idlIPOA.raise_runtime_exception(idlIPOAArg);
-	    } catch (Throwable t) {
-		processThrowable(IDLPOA, RUNTIME, t,
-				 new UNKNOWN(),
-				 "idlIServantPOA.raise_runtime_exception");
-	    }
+            try {
+                idlIPOA.raise_runtime_exception(idlIPOAArg);
+            } catch (Throwable t) {
+                processThrowable(IDLPOA, RUNTIME, t,
+                                 new UNKNOWN(),
+                                 "idlIServantPOA.raise_runtime_exception");
+            }
 
-	    U.lf();
-	    U.sop("+++++++++++++++++++++++++Making RMI-IIOP/Connect calls.");
-	    U.lf();
-	    try {
-		rmiiIConnect.raiseSystemException(rmiiIConnectArg);
-	    } catch (Throwable t) {
-		String message;
-		if (isColocated) {
-		    message = "FREE_MEM";
-		} else {
-		    message = "rmiiIServantConnect.raiseSystemException";
-		}
-		processThrowable(RMIIIOPConnect, SYSTEM, t,
-				 new RemoteException(), // wraps FREE_MEM
-				 message);
-	    }
-	    try {
-		rmiiIConnect.raiseUserException(rmiiIConnectArg);
-	    } catch (Throwable t) {
-		processThrowable(RMIIIOPConnect, USER, t,
-				 new rmiiException("dummy"),
-				 rmiiIConnectArg);
-	    }
-	    try {
-		rmiiIConnect.raiseRuntimeException(rmiiIConnectArg);
-	    } catch (Throwable t) {
-		processThrowable(RMIIIOPConnect, RUNTIME, t,
-				 new RuntimeException(),
-				 rmiiIConnectArg);
-	    }
+            U.lf();
+            U.sop("+++++++++++++++++++++++++Making RMI-IIOP/Connect calls.");
+            U.lf();
+            try {
+                rmiiIConnect.raiseSystemException(rmiiIConnectArg);
+            } catch (Throwable t) {
+                String message;
+                if (isColocated) {
+                    message = "FREE_MEM";
+                } else {
+                    message = "rmiiIServantConnect.raiseSystemException";
+                }
+                processThrowable(RMIIIOPConnect, SYSTEM, t,
+                                 new RemoteException(), // wraps FREE_MEM
+                                 message);
+            }
+            try {
+                rmiiIConnect.raiseUserException(rmiiIConnectArg);
+            } catch (Throwable t) {
+                processThrowable(RMIIIOPConnect, USER, t,
+                                 new rmiiException("dummy"),
+                                 rmiiIConnectArg);
+            }
+            try {
+                rmiiIConnect.raiseRuntimeException(rmiiIConnectArg);
+            } catch (Throwable t) {
+                processThrowable(RMIIIOPConnect, RUNTIME, t,
+                                 new RuntimeException(),
+                                 rmiiIConnectArg);
+            }
 
-	    U.lf();
-	    U.sop("+++++++++++++++++++++++++Making RMI-IIOP/POA calls.");
-	    U.lf();
-	    try {
-		rmiiIPOA.raiseSystemException(rmiiIPOAArg);
-	    } catch (Throwable t) {
-		String message;
-		if (isColocated) {
-		    message = "FREE_MEM";
-		} else {
-		    message = "rmiiIServantPOA.raiseSystemException";
-		}
-		processThrowable(RMIIIOPPOA, SYSTEM, t,
-				 new RemoteException(),
-				 message);
-	    }
-	    try {
-		rmiiIPOA.raiseUserException(rmiiIPOAArg);
-	    } catch (Throwable t) {
-		processThrowable(RMIIIOPPOA, USER, t,
-				 new rmiiException("dummy"),
+            U.lf();
+            U.sop("+++++++++++++++++++++++++Making RMI-IIOP/POA calls.");
+            U.lf();
+            try {
+                rmiiIPOA.raiseSystemException(rmiiIPOAArg);
+            } catch (Throwable t) {
+                String message;
+                if (isColocated) {
+                    message = "FREE_MEM";
+                } else {
+                    message = "rmiiIServantPOA.raiseSystemException";
+                }
+                processThrowable(RMIIIOPPOA, SYSTEM, t,
+                                 new RemoteException(),
+                                 message);
+            }
+            try {
+                rmiiIPOA.raiseUserException(rmiiIPOAArg);
+            } catch (Throwable t) {
+                processThrowable(RMIIIOPPOA, USER, t,
+                                 new rmiiException("dummy"),
 
-				 rmiiIPOAArg);
-	    }
+                                 rmiiIPOAArg);
+            }
 
-	    try {
-		rmiiIPOA.raiseRuntimeException(rmiiIPOAArg);
-	    } catch (Throwable t) {
-		processThrowable(RMIIIOPPOA, RUNTIME, t,
-				 new RuntimeException(),
-				 rmiiIPOAArg);
-	    }
+            try {
+                rmiiIPOA.raiseRuntimeException(rmiiIPOAArg);
+            } catch (Throwable t) {
+                processThrowable(RMIIIOPPOA, RUNTIME, t,
+                                 new RuntimeException(),
+                                 rmiiIPOAArg);
+            }
 
-	    if (numErrors == 0) {
-		U.lf();
-		U.sop("+++++++++++++++++++++++++PASSED");
-		U.lf();
-	    } else {
-		throw new RuntimeException("numError != 0");
-	    }
+            if (numErrors == 0) {
+                U.lf();
+                U.sop("+++++++++++++++++++++++++PASSED");
+                U.lf();
+            } else {
+                throw new RuntimeException("numError != 0");
+            }
 
-	    orb.shutdown(true);
+            orb.shutdown(true);
 
         } catch (Exception e) {
-	    U.lf();
+            U.lf();
             U.sopUnexpectedException(main + " : ", e);
-	    U.sop("+++++++++++++++++++++++++FAILED");
-	    U.lf();
-	    System.exit(1);
+            U.sop("+++++++++++++++++++++++++FAILED");
+            U.lf();
+            System.exit(1);
         }
-	U.lf();
-	U.sop(main + " ending successfully");
-	System.exit(Controller.SUCCESS);
+        U.lf();
+        U.sop(main + " ending successfully");
+        System.exit(Controller.SUCCESS);
     }
 
     public static void processThrowable(String servantType,
-					String exceptionCategory,
-					Throwable got,
-					Throwable expected)
+                                        String exceptionCategory,
+                                        Throwable got,
+                                        Throwable expected)
     {
-	processThrowable(servantType, exceptionCategory, got, expected, null);
+        processThrowable(servantType, exceptionCategory, got, expected, null);
     }
 
     public static void processThrowable(String servantType,
-					String exceptionCategory,
-					Throwable got,
-					Throwable expected,
-					String messageSubstring)
+                                        String exceptionCategory,
+                                        Throwable got,
+                                        Throwable expected,
+                                        String messageSubstring)
     {
-	boolean failType = false;
-	boolean failMessage = false;
+        boolean failType = false;
+        boolean failMessage = false;
 
-	U.lf();
-	U.sop("--------------------------------------------------");
-	U.sop(servantType + " " + exceptionCategory);
-	if (got.getClass().isInstance(expected)) {
-	    U.sop("Exception Type PASSED");
-	} else {
-	    U.sop("Exception Type FAIL");
-	    numErrors++;
-	    failType = true;
-	}
-	if (messageSubstring != null) {
-	    if (got.getMessage().indexOf(messageSubstring) != -1) {
-		U.sop("-----Exception Message PASSED-----");
-		U.sop("-----BEGIN passing stack trace:");
-		got.printStackTrace(System.out);
-		U.sop("-----END passing stack trace");
-	    } else {
-		U.sop("Exception Message FAIL");
-		numErrors++;
-		failMessage = true;
-	    }
-	}
-	if (failType) {
-	    U.sop("exception type expected: " + expected);
-	    U.sop("exception type received: " + got);
-	}
-	if (failMessage) {
-	    U.sop("exception message (substring) expected: " + messageSubstring);
-	    U.sop("exception message received: " + got.getMessage());
-	}
+        U.lf();
+        U.sop("--------------------------------------------------");
+        U.sop(servantType + " " + exceptionCategory);
+        if (got.getClass().isInstance(expected)) {
+            U.sop("Exception Type PASSED");
+        } else {
+            U.sop("Exception Type FAIL");
+            numErrors++;
+            failType = true;
+        }
+        if (messageSubstring != null) {
+            if (got.getMessage().indexOf(messageSubstring) != -1) {
+                U.sop("-----Exception Message PASSED-----");
+                U.sop("-----BEGIN passing stack trace:");
+                got.printStackTrace(System.out);
+                U.sop("-----END passing stack trace");
+            } else {
+                U.sop("Exception Message FAIL");
+                numErrors++;
+                failMessage = true;
+            }
+        }
+        if (failType) {
+            U.sop("exception type expected: " + expected);
+            U.sop("exception type received: " + got);
+        }
+        if (failMessage) {
+            U.sop("exception message (substring) expected: " + messageSubstring);
+            U.sop("exception message received: " + got.getMessage());
+        }
 
-	if (debug) {
-	    if (isColocated) {
-		U.sop("++++++++++++++++++++++++++++++++++++++++++++++++++");
-		got.printStackTrace(System.out);
-		U.sop("++++++++++++++++++++++++++++++++++++++++++++++++++");
-	    }
-	}
+        if (debug) {
+            if (isColocated) {
+                U.sop("++++++++++++++++++++++++++++++++++++++++++++++++++");
+                got.printStackTrace(System.out);
+                U.sop("++++++++++++++++++++++++++++++++++++++++++++++++++");
+            }
+        }
     }
 }
 

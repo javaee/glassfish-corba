@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.presentation.rmi ;
+package com.sun.corba.ee.spi.presentation.rmi ;
 
 import java.rmi.RemoteException ;
 

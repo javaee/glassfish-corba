@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.io;
+package com.sun.corba.ee.impl.io;
 
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
@@ -51,9 +51,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
-import com.sun.corba.se.impl.misc.ClassInfoCache ;
+import com.sun.corba.ee.impl.misc.ClassInfoCache ;
 
-import com.sun.corba.se.impl.misc.ORBUtility ;
+import com.sun.corba.ee.impl.misc.ORBUtility ;
 
 // This file contains some utility methods that
 // originally were in the OSC in the RMI-IIOP
@@ -77,18 +77,18 @@ class ObjectStreamClassCorbaExt {
      * 3. if 'cl' has no methods (including those of its ancestors), or,
      *    if all the methods (including those of its ancestors) throw an
      *    exception that is atleast java.rmi.RemoteException or one of
-     *	  java.rmi.RemoteException's super classes.
+     *    java.rmi.RemoteException's super classes.
      */
     static final boolean isAbstractInterface(Class cl) {
-	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
-	if (!cinfo.isInterface() || cinfo.isARemote(cl)) {
+        ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
+        if (!cinfo.isInterface() || cinfo.isARemote(cl)) {
             return false;
         }
 
         Method[] methods = cl.getMethods();
         for (int i = 0; i < methods.length; i++) {
             Class exceptions[] = methods[i].getExceptionTypes();
-	    boolean exceptionMatch = false;
+            boolean exceptionMatch = false;
             for (int j = 0; (j < exceptions.length) && !exceptionMatch; j++) {
                 if ((java.rmi.RemoteException.class == exceptions[j]) ||
                     (java.lang.Throwable.class == exceptions[j]) ||
@@ -97,12 +97,12 @@ class ObjectStreamClassCorbaExt {
                     exceptionMatch = true;
                 }
             }
-	    if (!exceptionMatch) {
-		return false;
-	    }
-	}
+            if (!exceptionMatch) {
+                return false;
+            }
+        }
 
-	return true;
+        return true;
     }
 
     // Common collisions (same length):
@@ -126,46 +126,46 @@ class ObjectStreamClassCorbaExt {
      *  fast as possible.
      */
     static final boolean isAny(String typeString) {
-	if (debugIsAny) {
-	    ORBUtility.dprint( 
-		ObjectStreamClassCorbaExt.class.getName(), 
-		"IsAny: typeString = " + typeString ) ;
-	}
+        if (debugIsAny) {
+            ORBUtility.dprint( 
+                ObjectStreamClassCorbaExt.class.getName(), 
+                "IsAny: typeString = " + typeString ) ;
+        }
 
-	int length = typeString.length() ;
+        int length = typeString.length() ;
 
-	if (length == objectLength) {
-	    // Note that java.lang.String occurs a lot, and has the
-	    // same length as java.lang.Object!
-	    if (typeString.charAt(length-2) == 't')
-		return objectString.equals( typeString ) ;
-	    else
-		return false ;
-	}
+        if (length == objectLength) {
+            // Note that java.lang.String occurs a lot, and has the
+            // same length as java.lang.Object!
+            if (typeString.charAt(length-2) == 't')
+                return objectString.equals( typeString ) ;
+            else
+                return false ;
+        }
 
-	if (length == serializableLength) {
-	    // java.math.BigInteger and java.math.BigDecimal have the same
-	    // length as java.io.Serializable
-	    if (typeString.charAt(length-2) == 'e')
-		return serializableString.equals( typeString ) ;
-	    else 
-		return false ;
-	}
+        if (length == serializableLength) {
+            // java.math.BigInteger and java.math.BigDecimal have the same
+            // length as java.io.Serializable
+            if (typeString.charAt(length-2) == 'e')
+                return serializableString.equals( typeString ) ;
+            else 
+                return false ;
+        }
 
-	if (length == externalizableLength)
-	    return externalizableString.equals( typeString ) ;
+        if (length == externalizableLength)
+            return externalizableString.equals( typeString ) ;
 
-	return false ;
+        return false ;
     }
 
     private static final Method[] getDeclaredMethods(final Class clz) {
         return AccessController.doPrivileged(
-	    new PrivilegedAction<Method[]>() {
-		public Method[] run() {
-		    return clz.getDeclaredMethods();
-		}
-	    }
-	);
+            new PrivilegedAction<Method[]>() {
+                public Method[] run() {
+                    return clz.getDeclaredMethods();
+                }
+            }
+        );
     }
 
 }

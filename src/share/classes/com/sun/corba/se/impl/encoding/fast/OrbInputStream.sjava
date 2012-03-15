@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA.DataInputStream ;
@@ -63,30 +63,30 @@ import org.omg.CORBA.portable.ValueInputStream ;
 //
 // Basic architecture:
 // Low-level:  
-//	This is the low-level API that handles primitive type encoding. Its
-//	implementation is fairly simple, but it must be very fast.  It also may 
-//	interact with buffering decisions, such as collect/grow/fragment.
-//	Methods:
-//	    read/write boolean char short int long float double
-//	    read/write array of boolean char short int long float double
-//	Interface: PrimitiveXXXStream
-//	Implementation for Fast, non-recursive encoding (needs a name/acronym
-//	    (Flat something, Flat Data Representation, also byte-coded
-//	     F BC DR ByCoFl or perhaps Exploded. Also self-describing.
-//	     DataRepresentation
-//	    PrimitveXXXStreamYYYImpl
+//      This is the low-level API that handles primitive type encoding. Its
+//      implementation is fairly simple, but it must be very fast.  It also may 
+//      interact with buffering decisions, such as collect/grow/fragment.
+//      Methods:
+//          read/write boolean char short int long float double
+//          read/write array of boolean char short int long float double
+//      Interface: PrimitiveXXXStream
+//      Implementation for Fast, non-recursive encoding (needs a name/acronym
+//          (Flat something, Flat Data Representation, also byte-coded
+//           F BC DR ByCoFl or perhaps Exploded. Also self-describing.
+//           DataRepresentation
+//          PrimitveXXXStreamYYYImpl
 // High-level: 
-//	This handles more complex data types primarily in terms of the low-level API,
-//	but may also include encoding-specific details (such as writing out a header
-//	for the start of an object).
-//	Methods:
-//	    read/write value (4 versions) abstract_interface Object TypeCode Any
+//      This handles more complex data types primarily in terms of the low-level API,
+//      but may also include encoding-specific details (such as writing out a header
+//      for the start of an object).
+//      Methods:
+//          read/write value (4 versions) abstract_interface Object TypeCode Any
 // Adapter: IdlXXXStreamAdapter is an abstract class that implements CORBA_2_3 XXXStream. 
-//	handle idl->java differences (ushort ulong ulonglong, 
-//	read_abstract_interface() simply calls read_abstract_interface( Class ) with a null,
-//	read_value() calls read_value( Class ) with a null).  We still need 4 versions
-//	of read_value.  Also proxies low-level ops to PrimitiveXXXStream, high-level to
-//	ComplexXXXStream.
+//      handle idl->java differences (ushort ulong ulonglong, 
+//      read_abstract_interface() simply calls read_abstract_interface( Class ) with a null,
+//      read_value() calls read_value( Class ) with a null).  We still need 4 versions
+//      of read_value.  Also proxies low-level ops to PrimitiveXXXStream, high-level to
+//      ComplexXXXStream.
 // Constructing a ComplexXXXStream requires a PrimitiveXXXStream.  All of these (complex,
 // primitive, and adapter) require factories.
 
@@ -103,38 +103,38 @@ public interface OrbInputStream extends InputStream
     public java.lang.Object read_abstract_interface(java.lang.Class clz) ;
 
     // from CORBA InputStream 
-    public boolean	read_boolean();
-    public char		read_char();
-    public char		read_wchar();
-    public byte		read_octet();
-    public short	read_short();
-    public short	read_ushort();
-    public int		read_long();
-    public int		read_ulong();
-    public long		read_longlong();
-    public long		read_ulonglong();
-    public float	read_float();
-    public double	read_double();
-    public String	read_string();
-    public String	read_wstring();
-    public void	read_boolean_array(boolean[] value, int offset, int length);
-    public void	read_char_array(char[] value, int offset, int length);
-    public void	read_wchar_array(char[] value, int offset, int length);
-    public void	read_octet_array(byte[] value, int offset, int length);
-    public void	read_short_array(short[] value, int offset, int length);
-    public void	read_ushort_array(short[] value, int offset, int length);
-    public void	read_long_array(int[] value, int offset, int length);
-    public void	read_ulong_array(int[] value, int offset, int length);
-    public void	read_longlong_array(long[] value, int offset, int length);
-    public void	read_ulonglong_array(long[] value, int offset, int length);
-    public void	read_float_array(float[] value, int offset, int length);
-    public void	read_double_array(double[] value, int offset, int length);
+    public boolean      read_boolean();
+    public char         read_char();
+    public char         read_wchar();
+    public byte         read_octet();
+    public short        read_short();
+    public short        read_ushort();
+    public int          read_long();
+    public int          read_ulong();
+    public long         read_longlong();
+    public long         read_ulonglong();
+    public float        read_float();
+    public double       read_double();
+    public String       read_string();
+    public String       read_wstring();
+    public void read_boolean_array(boolean[] value, int offset, int length);
+    public void read_char_array(char[] value, int offset, int length);
+    public void read_wchar_array(char[] value, int offset, int length);
+    public void read_octet_array(byte[] value, int offset, int length);
+    public void read_short_array(short[] value, int offset, int length);
+    public void read_ushort_array(short[] value, int offset, int length);
+    public void read_long_array(int[] value, int offset, int length);
+    public void read_ulong_array(int[] value, int offset, int length);
+    public void read_longlong_array(long[] value, int offset, int length);
+    public void read_ulonglong_array(long[] value, int offset, int length);
+    public void read_float_array(float[] value, int offset, int length);
+    public void read_double_array(double[] value, int offset, int length);
     public org.omg.CORBA.Object read_Object();
-    public TypeCode	read_TypeCode();
-    public Any		read_any();
+    public TypeCode     read_TypeCode();
+    public Any          read_any();
 
     // @Deprecated
-    public  org.omg.CORBA.Principal	read_Principal() ;
+    public  org.omg.CORBA.Principal     read_Principal() ;
     public int read() throws java.io.IOException ;
     public java.math.BigDecimal read_fixed() ;
     public org.omg.CORBA.Context read_Context() ;

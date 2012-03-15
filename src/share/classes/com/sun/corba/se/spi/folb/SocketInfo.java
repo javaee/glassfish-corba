@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.folb;
+package com.sun.corba.ee.spi.folb;
 
 import java.io.Serializable ;
 

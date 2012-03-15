@@ -47,16 +47,16 @@ public class PRO {
     private PRO() {}
 
     public static <T> T narrow( Object obj, Class<T> cls ) {
-	return cls.cast( PortableRemoteObject.narrow(
-	    obj, cls ) ) ;
+        return cls.cast( PortableRemoteObject.narrow(
+            obj, cls ) ) ;
     }
 
     public static <T> T toStub( Remote obj, Class<T> cls ) {
-	try {
-	    return cls.cast( PortableRemoteObject.toStub(
-		obj ) ) ;
-	} catch (Exception exc) {
-	    throw new RuntimeException( exc ) ;
-	}
+        try {
+            return cls.cast( PortableRemoteObject.toStub(
+                obj ) ) ;
+        } catch (Exception exc) {
+            throw new RuntimeException( exc ) ;
+        }
     }
 }

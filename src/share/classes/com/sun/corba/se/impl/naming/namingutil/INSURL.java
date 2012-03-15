@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.namingutil;
+package com.sun.corba.ee.impl.naming.namingutil;
 
 /**
  * INS URL is a generic interface for two different types of URL's specified 

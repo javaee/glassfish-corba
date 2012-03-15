@@ -558,7 +558,7 @@ can clone themselves), but just make sure that this is what you intended.
 not <code>c.removeAll(c)</code>. Calling  <code>c.removeAll(c)</code> to clear a collection
 is less clear, susceptible to errors from typos, less efficient and 
 for some collections, might throw a <code>ConcurrentModificationException</code>.
-	</p>
+        </p>
      
     
 <h3><a name="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED">DP: Classloaders should only be created inside doPrivileged block (DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED)</a></h3>
@@ -651,11 +651,11 @@ is symmetric and transitive. Without those properties, very unexpected behavoirs
 
   <p> This class defines a <code>compareTo(...)</code> method but inherits its
   <code>equals()</code> method from <code>java.lang.Object</code>.
-	Generally, the value of compareTo should return zero if and only if
-	equals returns true. If this is violated, weird and unpredictable
-	failures will occur in classes such as PriorityQueue.
-	In Java 5 the PriorityQueue.remove method uses the compareTo method,
-	while in Java 6 it uses the equals method.
+        Generally, the value of compareTo should return zero if and only if
+        equals returns true. If this is violated, weird and unpredictable
+        failures will occur in classes such as PriorityQueue.
+        In Java 5 the PriorityQueue.remove method uses the compareTo method,
+        while in Java 6 it uses the equals method.
 
 <p>From the JavaDoc for the compareTo method in the Comparable interface:
 <blockquote>
@@ -710,7 +710,7 @@ on objects referenced by X, because they may already be getting finalized in a s
   <p> This finalizer nulls out fields.  This is usually an error, as it does not aid garbage collection,
   and the object is going to be garbage collected anyway.  
 
-	
+        
 <h3><a name="FI_FINALIZER_ONLY_NULLS_FIELDS">FI: Finalizer only nulls fields (FI_FINALIZER_ONLY_NULLS_FIELDS)</a></h3>
 
 
@@ -718,7 +718,7 @@ on objects referenced by X, because they may already be getting finalized in a s
 the object be garbage collected, finalized, and then garbage collected again. You should just remove the finalize
 method.
 
-	
+        
 <h3><a name="FI_MISSING_SUPER_CALL">FI: Finalizer does not call superclass finalizer (FI_MISSING_SUPER_CALL)</a></h3>
 
 
@@ -749,12 +749,12 @@ method.
 
      
      <p> This call to a generic collection method passes an argument
-	while compile type Object where a specific type from
-	the generic type parameters is expected.
-	Thus, neither the standard Java type system nor static analysis
-	can provide useful information on whether the
-	object being passed as a parameter is of an appropriate type.
-	</p>
+        while compile type Object where a specific type from
+        the generic type parameters is expected.
+        Thus, neither the standard Java type system nor static analysis
+        can provide useful information on whether the
+        object being passed as a parameter is of an appropriate type.
+        </p>
      
     
 <h3><a name="HE_EQUALS_NO_HASHCODE">HE: Class defines equals() but not hashCode() (HE_EQUALS_NO_HASHCODE)</a></h3>
@@ -835,11 +835,11 @@ For example, in the following code, <code>foo</code> will be null.</p>
 
 <pre>
 public class CircularClassInitialization {
-	static class InnerClassSingleton extends CircularClassInitialization {
-		static InnerClassSingleton singleton = new InnerClassSingleton();
-	}
-	
-	static CircularClassInitialization foo = InnerClassSingleton.singleton;
+        static class InnerClassSingleton extends CircularClassInitialization {
+                static InnerClassSingleton singleton = new InnerClassSingleton();
+        }
+        
+        static CircularClassInitialization foo = InnerClassSingleton.singleton;
 }
 </pre>
 
@@ -889,22 +889,22 @@ that all fields are final.
     
 <h3><a name="NP_BOOLEAN_RETURN_NULL">NP: Method with Boolean return type returns explicit null (NP_BOOLEAN_RETURN_NULL)</a></h3>
 
-  	 
-  	 <p>
-	A method that returns either Boolean.TRUE, Boolean.FALSE or null is an accident waiting to happen.
-	This method can be invoked as though it returned a value of type boolean, and
-	the compiler will insert automatic unboxing of the Boolean value. If a null value is returned,
-	this will result in a NullPointerException.
-  	 </p>
-  	 
-  	 
+         
+         <p>
+        A method that returns either Boolean.TRUE, Boolean.FALSE or null is an accident waiting to happen.
+        This method can be invoked as though it returned a value of type boolean, and
+        the compiler will insert automatic unboxing of the Boolean value. If a null value is returned,
+        this will result in a NullPointerException.
+         </p>
+         
+         
 <h3><a name="NP_CLONE_COULD_RETURN_NULL">NP: Clone method may return null (NP_CLONE_COULD_RETURN_NULL)</a></h3>
 
       
       <p>
-	This clone method seems to return null in some circumstances, but clone is never
-	allowed to return a null value.  If you are convinced this path is unreachable, throw an AssertionError
-	instead.
+        This clone method seems to return null in some circumstances, but clone is never
+        allowed to return a null value.  If you are convinced this path is unreachable, throw an AssertionError
+        instead.
       </p>
       
    
@@ -923,9 +923,9 @@ that all fields are final.
 
       
       <p>
-	This toString method seems to return null in some circumstances. A liberal reading of the
-	spec could be interpreted as allowing this, but it is probably a bad idea and could cause
-	other code to break. Return the empty string or some other appropriate string rather than null.
+        This toString method seems to return null in some circumstances. A liberal reading of the
+        spec could be interpreted as allowing this, but it is probably a bad idea and could cause
+        other code to break. Return the empty string or some other appropriate string rather than null.
       </p>
       
    
@@ -1573,7 +1573,7 @@ and the next method is supposed to change the state of the iterator.
 itself (e.g., if <code>s.contains(s)</code> were true). This is unlikely to be true and would cause
 problems if it were true (such as the computation of the hash code resulting in infinite recursion).
 It is likely that the wrong value is being passed as a parameter.
-	</p>
+        </p>
      
     
 <h3><a name="DMI_INVOKING_HASHCODE_ON_ARRAY">DMI: Invocation of hashCode on an array (DMI_INVOKING_HASHCODE_ON_ARRAY)</a></h3>
@@ -1593,8 +1593,8 @@ use <code>java.util.Arrays.hashCode(a)</code>.
 
 
 <p> The Double.longBitsToDouble method is invoked, but a 32 bit int value is passed
-	as an argument. This almostly certainly is not intended and is unlikely 
-	to give the intended result.
+        as an argument. This almostly certainly is not intended and is unlikely 
+        to give the intended result.
 </p>
 
     
@@ -1603,7 +1603,7 @@ use <code>java.util.Arrays.hashCode(a)</code>.
      
      <p> This call doesn't make sense. For any collection <code>c</code>, calling <code>c.containsAll(c)</code> should
 always be true, and <code>c.retainAll(c)</code> should have no effect.
-	</p>
+        </p>
      
     
 <h3><a name="DMI_ANNOTATION_IS_NOT_VISIBLE_TO_REFLECTION">Dm: Can't use reflection to check for presence of annotation without runtime retention (DMI_ANNOTATION_IS_NOT_VISIBLE_TO_REFLECTION)</a></h3>
@@ -1617,16 +1617,16 @@ always be true, and <code>c.retainAll(c)</code> should have no effect.
 <h3><a name="DMI_FUTILE_ATTEMPT_TO_CHANGE_MAXPOOL_SIZE_OF_SCHEDULED_THREAD_POOL_EXECUTOR">Dm: Futile attempt to change max pool size of ScheduledThreadPoolExecutor (DMI_FUTILE_ATTEMPT_TO_CHANGE_MAXPOOL_SIZE_OF_SCHEDULED_THREAD_POOL_EXECUTOR)</a></h3>
 
       
-	<p>(<a href="http://java.sun.com/javase/6/docs/api/java/util/concurrent/ScheduledThreadPoolExecutor.html">Javadoc</a>)
+        <p>(<a href="http://java.sun.com/javase/6/docs/api/java/util/concurrent/ScheduledThreadPoolExecutor.html">Javadoc</a>)
 While ScheduledThreadPoolExecutor inherits from ThreadPoolExecutor, a few of the inherited tuning methods are not useful for it. In particular, because it acts as a fixed-sized pool using corePoolSize threads and an unbounded queue, adjustments to maximumPoolSize have no useful effect.
-	</p>
+        </p>
 
 
     
 <h3><a name="DMI_SCHEDULED_THREAD_POOL_EXECUTOR_WITH_ZERO_CORE_THREADS">Dm: Creation of ScheduledThreadPoolExecutor with zero core threads (DMI_SCHEDULED_THREAD_POOL_EXECUTOR_WITH_ZERO_CORE_THREADS)</a></h3>
 
       
-	<p>(<a href="http://java.sun.com/javase/6/docs/api/java/util/concurrent/ScheduledThreadPoolExecutor.html#ScheduledThreadPoolExecutor(int)">Javadoc</a>)
+        <p>(<a href="http://java.sun.com/javase/6/docs/api/java/util/concurrent/ScheduledThreadPoolExecutor.html#ScheduledThreadPoolExecutor(int)">Javadoc</a>)
 A ScheduledThreadPoolExecutor with zero core threads will never execute anything; changes to the max pool size are ignored.
 </p>
 
@@ -1635,7 +1635,7 @@ A ScheduledThreadPoolExecutor with zero core threads will never execute anything
 <h3><a name="DMI_VACUOUS_CALL_TO_EASYMOCK_METHOD">Dm: Useless/vacuous call to EasyMock method (DMI_VACUOUS_CALL_TO_EASYMOCK_METHOD)</a></h3>
 
       
-	<p>This call doesn't pass any objects to the EasyMock method, so the call doesn't do anything.
+        <p>This call doesn't pass any objects to the EasyMock method, so the call doesn't do anything.
 </p>
 
 
@@ -1836,15 +1836,15 @@ methods is not symmetric.
    
     <p>
     This code checks to see if a floating point value is equal to the special
-	Not A Number value (e.g., <code>if (x == Double.NaN)</code>). However,
-	because of the special semantics of <code>NaN</code>, no value
-	is equal to <code>Nan</code>, including <code>NaN</code>. Thus,
-	<code>x == Double.NaN</code> always evaluates to false.
+        Not A Number value (e.g., <code>if (x == Double.NaN)</code>). However,
+        because of the special semantics of <code>NaN</code>, no value
+        is equal to <code>Nan</code>, including <code>NaN</code>. Thus,
+        <code>x == Double.NaN</code> always evaluates to false.
 
-	To check to see if a value contained in <code>x</code>
-	is the special Not A Number value, use 
-	<code>Double.isNaN(x)</code> (or <code>Float.isNaN(x)</code> if
-	<code>x</code> is floating point precision).
+        To check to see if a value contained in <code>x</code>
+        is the special Not A Number value, use 
+        <code>Double.isNaN(x)</code> (or <code>Float.isNaN(x)</code> if
+        <code>x</code> is floating point precision).
     </p>
     
      
@@ -1863,7 +1863,7 @@ A runtime exception will occur when
 this statement is executed.
 </p>
 
- 	
+        
 <h3><a name="VA_FORMAT_STRING_BAD_CONVERSION">FS: The type of a supplied argument doesn't match format specifier (VA_FORMAT_STRING_BAD_CONVERSION)</a></h3>
 
 
@@ -1874,7 +1874,7 @@ For example, <code>String.format("%d", "1")</code> will generate an exception, s
 the String "1" is incompatible with the format specifier %d.
 </p>
 
- 	
+        
 <h3><a name="VA_FORMAT_STRING_EXPECTED_MESSAGE_FORMAT_SUPPLIED">FS: MessageFormat supplied where printf style format expected (VA_FORMAT_STRING_EXPECTED_MESSAGE_FORMAT_SUPPLIED)</a></h3>
 
 
@@ -1888,7 +1888,7 @@ and the format string will be returned exactly as provided without any formattin
 </p>
 </p>
 
- 	
+        
 <h3><a name="VA_FORMAT_STRING_EXTRA_ARGUMENTS_PASSED">FS: More arguments are passed than are actually used in the format string (VA_FORMAT_STRING_EXTRA_ARGUMENTS_PASSED)</a></h3>
 
 
@@ -1899,7 +1899,7 @@ This won't cause a runtime exception, but the code may be silently omitting
 information that was intended to be included in the formatted string.
 </p>
 
- 	
+        
 <h3><a name="VA_FORMAT_STRING_ILLEGAL">FS: Illegal format string (VA_FORMAT_STRING_ILLEGAL)</a></h3>
 
 
@@ -1909,7 +1909,7 @@ and a runtime exception will occur when
 this statement is executed.
 </p>
 
- 	
+        
 <h3><a name="VA_FORMAT_STRING_MISSING_ARGUMENT">FS: Format string references missing argument (VA_FORMAT_STRING_MISSING_ARGUMENT)</a></h3>
 
 
@@ -1919,7 +1919,7 @@ A runtime exception will occur when
 this statement is executed.
 </p>
 
- 	
+        
 <h3><a name="VA_FORMAT_STRING_NO_PREVIOUS_ARGUMENT">FS: No previous argument for format string (VA_FORMAT_STRING_NO_PREVIOUS_ARGUMENT)</a></h3>
 
 
@@ -1933,33 +1933,33 @@ For example,
 <p>would throw a MissingFormatArgumentException when executed.
 </p>
 
- 	
+        
 <h3><a name="GC_UNRELATED_TYPES">GC: No relationship between generic parameter and method argument (GC_UNRELATED_TYPES)</a></h3>
 
      
      <p> This call to a generic collection method contains an argument
      with an incompatible class from that of the collection's parameter
-	(i.e., the type of the argument is neither a supertype nor a subtype 
-		of the corresponding generic type argument).
+        (i.e., the type of the argument is neither a supertype nor a subtype 
+                of the corresponding generic type argument).
      Therefore, it is unlikely that the collection contains any objects 
-	that are equal to the method argument used here.
-	Most likely, the wrong value is being passed to the method.</p>
-	<p>In general, instances of two unrelated classes are not equal. 
-	For example, if the <code>Foo</code> and <code>Bar</code> classes
-	are not related by subtyping, then an instance of <code>Foo</code>
-		should not be equal to an instance of <code>Bar</code>.
-	Among other issues, doing so will likely result in an equals method
-	that is not symmetrical. For example, if you define the <code>Foo</code> class
-	so that a <code>Foo</code> can be equal to a <code>String</code>,
-	your equals method isn't symmetrical since a <code>String</code> can only be equal
-	to a <code>String</code>.
-	</p>
-	<p>In rare cases, people do define nonsymmetrical equals methods and still manage to make 
-	their code work. Although none of the APIs document or guarantee it, it is typically
-	the case that if you check if a <code>Collection&lt;String&gt;</code> contains
-	a <code>Foo</code>, the equals method of argument (e.g., the equals method of the 
-	<code>Foo</code> class) used to perform the equality checks.
-	</p>
+        that are equal to the method argument used here.
+        Most likely, the wrong value is being passed to the method.</p>
+        <p>In general, instances of two unrelated classes are not equal. 
+        For example, if the <code>Foo</code> and <code>Bar</code> classes
+        are not related by subtyping, then an instance of <code>Foo</code>
+                should not be equal to an instance of <code>Bar</code>.
+        Among other issues, doing so will likely result in an equals method
+        that is not symmetrical. For example, if you define the <code>Foo</code> class
+        so that a <code>Foo</code> can be equal to a <code>String</code>,
+        your equals method isn't symmetrical since a <code>String</code> can only be equal
+        to a <code>String</code>.
+        </p>
+        <p>In rare cases, people do define nonsymmetrical equals methods and still manage to make 
+        their code work. Although none of the APIs document or guarantee it, it is typically
+        the case that if you check if a <code>Collection&lt;String&gt;</code> contains
+        a <code>Foo</code>, the equals method of argument (e.g., the equals method of the 
+        <code>Foo</code> class) used to perform the equality checks.
+        </p>
      
     
 <h3><a name="HE_SIGNATURE_DECLARES_HASHING_OF_UNHASHABLE_CLASS">HE: Signature declares use of unhashable class in hashed construct (HE_SIGNATURE_DECLARES_HASHING_OF_UNHASHABLE_CLASS)</a></h3>
@@ -2183,9 +2183,9 @@ be an exception path, since the default case is often infeasible.</p>
 
       
       <p>
-	A parameter to this method has been identified as a value that should
-	always be checked to see whether or not it is null, but it is being dereferenced
-	without a preceding null check.
+        A parameter to this method has been identified as a value that should
+        always be checked to see whether or not it is null, but it is being dereferenced
+        without a preceding null check.
       </p>
       
    
@@ -2199,35 +2199,35 @@ something that should be closed.
     
 <h3><a name="NP_GUARANTEED_DEREF">NP: Null value is guaranteed to be dereferenced (NP_GUARANTEED_DEREF)</a></h3>
 
-		  
-			  <p>
-			  There is a statement or branch that if executed guarantees that
-			  a value is null at this point, and that 
-			  value that is guaranteed to be dereferenced
-			  (except on forward paths involving runtime exceptions).
-			  </p>
-		  
-	  
+                  
+                          <p>
+                          There is a statement or branch that if executed guarantees that
+                          a value is null at this point, and that 
+                          value that is guaranteed to be dereferenced
+                          (except on forward paths involving runtime exceptions).
+                          </p>
+                  
+          
 <h3><a name="NP_GUARANTEED_DEREF_ON_EXCEPTION_PATH">NP: Value is null and guaranteed to be dereferenced on exception path (NP_GUARANTEED_DEREF_ON_EXCEPTION_PATH)</a></h3>
 
-		  
-			  <p>
-			  There is a statement or branch on an exception path
-				that if executed guarantees that
-			  a value is null at this point, and that 
-			  value that is guaranteed to be dereferenced
-			  (except on forward paths involving runtime exceptions).
-			  </p>
-		  
-	  
+                  
+                          <p>
+                          There is a statement or branch on an exception path
+                                that if executed guarantees that
+                          a value is null at this point, and that 
+                          value that is guaranteed to be dereferenced
+                          (except on forward paths involving runtime exceptions).
+                          </p>
+                  
+          
 <h3><a name="NP_NONNULL_PARAM_VIOLATION">NP: Method call passes null to a nonnull parameter  (NP_NONNULL_PARAM_VIOLATION)</a></h3>
 
       
       <p>
       This method passes a null value as the parameter of a method which
-	must be nonnull. Either this parameter has been explicitly marked
-	as @Nonnull, or analysis has determined that this parameter is
-	always dereferenced.
+        must be nonnull. Either this parameter has been explicitly marked
+        as @Nonnull, or analysis has determined that this parameter is
+        always dereferenced.
       </p>
       
    
@@ -2279,9 +2279,9 @@ be an exception path, since the default case is often infeasible.</p>
       
       <p>
       This method call passes a null value for a nonnull method parameter.
-	Either the parameter is annotated as a parameter that should
-	always be nonnull, or analysis has shown that it will always be 
-	dereferenced.
+        Either the parameter is annotated as a parameter that should
+        always be nonnull, or analysis has shown that it will always be 
+        dereferenced.
       </p>
       
    
@@ -2291,9 +2291,9 @@ be an exception path, since the default case is often infeasible.</p>
       <p>
       A possibly-null value is passed at a call site where all known
       target methods require the parameter to be nonnull.
-	Either the parameter is annotated as a parameter that should
-	always be nonnull, or analysis has shown that it will always be 
-	dereferenced.
+        Either the parameter is annotated as a parameter that should
+        always be nonnull, or analysis has shown that it will always be 
+        dereferenced.
       </p>
       
    
@@ -2302,9 +2302,9 @@ be an exception path, since the default case is often infeasible.</p>
       
       <p>
       A possibly-null value is passed to a nonnull method parameter.
-	Either the parameter is annotated as a parameter that should
-	always be nonnull, or analysis has shown that it will always be 
-	dereferenced.
+        Either the parameter is annotated as a parameter that should
+        always be nonnull, or analysis has shown that it will always be 
+        dereferenced.
       </p>
       
    
@@ -2351,8 +2351,8 @@ which is probably what was intended.</p>
 
   <p> This regular method has the same name as the class it is defined in. It is likely that this was intended to be a constructor.
       If it was intended to be a constructor, remove the declaration of a void return value.
-	If you had accidently defined this method, realized the mistake, defined a proper constructor
-	but can't get rid of this method due to backwards compatibility, deprecate the method.
+        If you had accidently defined this method, realized the mistake, defined a proper constructor
+        but can't get rid of this method due to backwards compatibility, deprecate the method.
 </p>
 
     
@@ -2617,7 +2617,7 @@ a logic error.  Double check the computation.
 
 
   <p> A value stored in the previous switch case is overwritten here due to a switch fall through. It is likely that
-	you forgot to put a break or return at the end of the previous case.
+        you forgot to put a break or return at the end of the previous case.
 </p>
 
     
@@ -2625,8 +2625,8 @@ a logic error.  Double check the computation.
 
 
   <p> A value stored in the previous switch case is ignored here due to a switch fall through to a place where
-	an exception is thrown. It is likely that
-	you forgot to put a break or return at the end of the previous case.
+        an exception is thrown. It is likely that
+        you forgot to put a break or return at the end of the previous case.
 </p>
 
     
@@ -2734,8 +2734,8 @@ public @NonNegative Integer example(@Negative Integer value) {
       
       <p>
       A value that is annotated as possibility not being an instance of
-	the values denoted by the type qualifier, and the value is guaranteed to be used
-	in a way that requires values denoted by that type qualifier.
+        the values denoted by the type qualifier, and the value is guaranteed to be used
+        in a way that requires values denoted by that type qualifier.
       </p>
       
     
@@ -2744,8 +2744,8 @@ public @NonNegative Integer example(@Negative Integer value) {
       
       <p>
       A value that is annotated as possibility being an instance of
-	the values denoted by the type qualifier, and the value is guaranteed to be used
-	in a way that prohibits values denoted by that type qualifier.
+        the values denoted by the type qualifier, and the value is guaranteed to be used
+        in a way that prohibits values denoted by that type qualifier.
       </p>
       
     
@@ -2792,7 +2792,7 @@ in fact, override the method it is intended to.
 
 
   <p> This method is invoked in the constructor of of the superclass. At this point,
-	the fields of the class have not yet initialized.</p>
+        the fields of the class have not yet initialized.</p>
 <p>To make this more concrete, consider the following classes:</p>
 <pre>abstract class A {
   int hashCode;
@@ -2848,7 +2848,7 @@ of the array.
 Consider wrapping the array using <code>Arrays.asList(...)</code> before handling it off to a formatted.
 </p>
 
- 	
+        
 <h3><a name="UWF_NULL_FIELD">UwF: Field only ever set to null (UWF_NULL_FIELD)</a></h3>
 
 
@@ -2875,7 +2875,7 @@ This creates an array of length one to hold the primitive array and passes it to
     
 <h3><a name="LG_LOST_LOGGER_DUE_TO_WEAK_REFERENCE">LG: Potential lost logger changes due to weak reference in OpenJDK (LG_LOST_LOGGER_DUE_TO_WEAK_REFERENCE)</a></h3>
 
-		  
+                  
 <p>OpenJDK introduces a potential incompatibility.
  In particular, the java.util.logging.Logger behavior has
   changed. Instead of using strong references, it now uses weak references
@@ -2903,60 +2903,60 @@ after the call to initLogging, the logger configuration is lost
  Logger.getLogger("edu.umd.cs").info("Some message"); // this isn't logged to the file as expected
 }</pre></p>
 <p><em>Ulf Ochsenfahrt and Eric Fellheimer</em></p>
-		  
-	  
+                  
+          
 <h3><a name="OBL_UNSATISFIED_OBLIGATION">OBL: Method may fail to clean up stream or resource (OBL_UNSATISFIED_OBLIGATION)</a></h3>
 
-		  
-		  <p>
-		  This method may fail to clean up (close, dispose of) a stream,
-		  database object, or other
-		  resource requiring an explicit cleanup operation.
-		  </p>
-		  
-		  <p>
-		  In general, if a method opens a stream or other resource,
-		  the method should use a try/finally block to ensure that
-		  the stream or resource is cleaned up before the method
-		  returns.
-		  </p>
-		  
-		  <p>
-		  This bug pattern is essentially the same as the
-		  OS_OPEN_STREAM and ODR_OPEN_DATABASE_RESOURCE
-		  bug patterns, but is based on a different
-		  (and hopefully better) static analysis technique.
-		  We are interested is getting feedback about the
-		  usefulness of this bug pattern.
-		  To send feedback, either:
-		  </p>
-		  <ul>
-			<li>send email to findbugs@cs.umd.edu</li>
-			<li>file a bug report: <a href="http://findbugs.sourceforge.net/reportingBugs.html">http://findbugs.sourceforge.net/reportingBugs.html</a></li>
-		  </ul>
-		  
-		  <p>
-		  In particular,
-		  the false-positive suppression heuristics for this
-		  bug pattern have not been extensively tuned, so
-		  reports about false positives are helpful to us.
-		  </p>
-		  
-		  <p>
-		  See Weimer and Necula, <i>Finding and Preventing Run-Time Error Handling Mistakes</i>, for
-		  a description of the analysis technique.
-		  </p>
-		  
-	  
+                  
+                  <p>
+                  This method may fail to clean up (close, dispose of) a stream,
+                  database object, or other
+                  resource requiring an explicit cleanup operation.
+                  </p>
+                  
+                  <p>
+                  In general, if a method opens a stream or other resource,
+                  the method should use a try/finally block to ensure that
+                  the stream or resource is cleaned up before the method
+                  returns.
+                  </p>
+                  
+                  <p>
+                  This bug pattern is essentially the same as the
+                  OS_OPEN_STREAM and ODR_OPEN_DATABASE_RESOURCE
+                  bug patterns, but is based on a different
+                  (and hopefully better) static analysis technique.
+                  We are interested is getting feedback about the
+                  usefulness of this bug pattern.
+                  To send feedback, either:
+                  </p>
+                  <ul>
+                        <li>send email to findbugs@cs.umd.edu</li>
+                        <li>file a bug report: <a href="http://findbugs.sourceforge.net/reportingBugs.html">http://findbugs.sourceforge.net/reportingBugs.html</a></li>
+                  </ul>
+                  
+                  <p>
+                  In particular,
+                  the false-positive suppression heuristics for this
+                  bug pattern have not been extensively tuned, so
+                  reports about false positives are helpful to us.
+                  </p>
+                  
+                  <p>
+                  See Weimer and Necula, <i>Finding and Preventing Run-Time Error Handling Mistakes</i>, for
+                  a description of the analysis technique.
+                  </p>
+                  
+          
 <h3><a name="DM_CONVERT_CASE">Dm: Consider using Locale parameterized version of invoked method (DM_CONVERT_CASE)</a></h3>
 
 
   <p> A String is being converted to upper or lowercase, using the platform's default encoding. This may
       result in improper conversions when used with international characters. Use the </p>
       <ul>
-	<li>String.toUpperCase( Locale l )</li>
-	<li>String.toLowerCase( Locale l )</li>
-	</ul>
+        <li>String.toUpperCase( Locale l )</li>
+        <li>String.toLowerCase( Locale l )</li>
+        </ul>
       <p>versions instead.</p>
 
     
@@ -3393,16 +3393,16 @@ another field.</p>
     
 <h3><a name="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED">RV: Return value of putIfAbsent ignored, value passed to putIfAbsent reused (RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED)</a></h3>
 
-		  
-		The <code>putIfAbsent</code> method is typically used to ensure that a 
-		single value is associated with a given key (the first value for which put 
-		if absent succeeds).  
-		If you ignore the return value and retain a reference to the value passed in, 
-		you run the risk of retaining a value that is not the one that is associated with the key in the map.  
-		If it matters which one you use and you use the one that isn't stored in the map,
-		your program will behave incorrectly.
-		  
-	  
+                  
+                The <code>putIfAbsent</code> method is typically used to ensure that a 
+                single value is associated with a given key (the first value for which put 
+                if absent succeeds).  
+                If you ignore the return value and retain a reference to the value passed in, 
+                you run the risk of retaining a value that is not the one that is associated with the key in the map.  
+                If it matters which one you use and you use the one that isn't stored in the map,
+                your program will behave incorrectly.
+                  
+          
 <h3><a name="RU_INVOKE_RUN">Ru: Invokes run on a thread (did you mean to start it instead?) (RU_INVOKE_RUN)</a></h3>
 
 
@@ -3550,8 +3550,8 @@ for using a JSR-166 lock is:
 
   <p> This method contains a call to <code>java.lang.Object.wait()</code> which
   is not guarded by conditional control flow.&nbsp; The code should
-	verify that condition it intends to wait for is not already satisfied
-	before calling wait; any previous notifications will be ignored.
+        verify that condition it intends to wait for is not already satisfied
+        before calling wait; any previous notifications will be ignored.
   </p>
 
     
@@ -3626,7 +3626,7 @@ in Java 5.0).</p>
 
 
   <p>A primitive is boxed, and then immediately unboxed. This probably is due to a manual
-	boxing in a place where an unboxed value is required, thus forcing the compiler
+        boxing in a place where an unboxed value is required, thus forcing the compiler
 to immediately undo the work of the boxing.
 </p>
 
@@ -3776,12 +3776,12 @@ using <code>r.nextInt(n)</code>, rather than using <code>(int)(r.nextDouble() * 
 
       
       <p>
-	A large String constant is duplicated across multiple class files. 
-	This is likely because a final field is initialized to a String constant, and the Java language
-	mandates that all references to a final field from other classes be inlined into
+        A large String constant is duplicated across multiple class files. 
+        This is likely because a final field is initialized to a String constant, and the Java language
+        mandates that all references to a final field from other classes be inlined into
 that classfile. See <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6447475">JDK bug 6447475</a>
-	for a description of an occurrence of this bug in the JDK and how resolving it reduced
-	the size of the JDK by 1 megabyte.
+        for a description of an occurrence of this bug in the JDK and how resolving it reduced
+        the size of the JDK by 1 megabyte.
 </p>
       
    
@@ -3988,8 +3988,8 @@ Map.get(key) lookup.</p>
 <h3><a name="DMI_CONSTANT_DB_PASSWORD">Dm: Hardcoded constant database password (DMI_CONSTANT_DB_PASSWORD)</a></h3>
 
       
-	<p>This code creates a database connect using a hardcoded, constant password. Anyone with access to either the source code or the compiled code can 
-	easily learn the password.
+        <p>This code creates a database connect using a hardcoded, constant password. Anyone with access to either the source code or the compiled code can 
+        easily learn the password.
 </p>
 
 
@@ -3997,7 +3997,7 @@ Map.get(key) lookup.</p>
 <h3><a name="DMI_EMPTY_DB_PASSWORD">Dm: Empty database password (DMI_EMPTY_DB_PASSWORD)</a></h3>
 
       
-	<p>This code creates a database connect using a blank or empty password. This indicates that the database is not protected by a password. 
+        <p>This code creates a database connect using a blank or empty password. This indicates that the database is not protected by a password. 
 </p>
 
 
@@ -4005,7 +4005,7 @@ Map.get(key) lookup.</p>
 <h3><a name="HRS_REQUEST_PARAMETER_TO_COOKIE">HRS: HTTP cookie formed from untrusted input (HRS_REQUEST_PARAMETER_TO_COOKIE)</a></h3>
 
       
-	<p>This code constructs an HTTP Cookie using an untrusted HTTP parameter. If this cookie is added to an HTTP response, it will allow a HTTP response splitting
+        <p>This code constructs an HTTP Cookie using an untrusted HTTP parameter. If this cookie is added to an HTTP response, it will allow a HTTP response splitting
 vulnerability. See <a href="http://en.wikipedia.org/wiki/HTTP_response_splitting">http://en.wikipedia.org/wiki/HTTP_response_splitting</a>
 for more information.</p>
 <p>FindBugs looks only for the most blatant, obvious cases of HTTP response splitting.
@@ -4019,7 +4019,7 @@ consider using a commercial static analysis or pen-testing tool.
 <h3><a name="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER">HRS: HTTP Response splitting vulnerability (HRS_REQUEST_PARAMETER_TO_HTTP_HEADER)</a></h3>
 
             
-	<p>This code directly writes an HTTP parameter to an HTTP header, which allows for a HTTP response splitting
+        <p>This code directly writes an HTTP parameter to an HTTP header, which allows for a HTTP response splitting
 vulnerability. See <a href="http://en.wikipedia.org/wiki/HTTP_response_splitting">http://en.wikipedia.org/wiki/HTTP_response_splitting</a>
 for more information.</p>
 <p>FindBugs looks only for the most blatant, obvious cases of HTTP response splitting.
@@ -4052,7 +4052,7 @@ be used to make the prepared statement do something unexpected and undesirable.
 <h3><a name="XSS_REQUEST_PARAMETER_TO_JSP_WRITER">XSS: JSP reflected cross site scripting vulnerability (XSS_REQUEST_PARAMETER_TO_JSP_WRITER)</a></h3>
 
 
-	<p>This code directly writes an HTTP parameter to JSP output, which allows for a cross site scripting
+        <p>This code directly writes an HTTP parameter to JSP output, which allows for a cross site scripting
 vulnerability. See <a href="http://en.wikipedia.org/wiki/Cross-site_scripting">http://en.wikipedia.org/wiki/Cross-site_scripting</a>
 for more information.</p>
 <p>FindBugs looks only for the most blatant, obvious cases of cross site scripting.
@@ -4065,7 +4065,7 @@ consider using a commercial static analysis or pen-testing tool.
 <h3><a name="XSS_REQUEST_PARAMETER_TO_SEND_ERROR">XSS: Servlet reflected cross site scripting vulnerability (XSS_REQUEST_PARAMETER_TO_SEND_ERROR)</a></h3>
 
 
-	<p>This code directly writes an HTTP parameter to a Server error page (using HttpServletResponse.sendError). Echoing this untrusted input allows
+        <p>This code directly writes an HTTP parameter to a Server error page (using HttpServletResponse.sendError). Echoing this untrusted input allows
 for a reflected cross site scripting
 vulnerability. See <a href="http://en.wikipedia.org/wiki/Cross-site_scripting">http://en.wikipedia.org/wiki/Cross-site_scripting</a>
 for more information.</p>
@@ -4080,7 +4080,7 @@ consider using a commercial static analysis or pen-testing tool.
 <h3><a name="XSS_REQUEST_PARAMETER_TO_SERVLET_WRITER">XSS: Servlet reflected cross site scripting vulnerability (XSS_REQUEST_PARAMETER_TO_SERVLET_WRITER)</a></h3>
 
 
-	<p>This code directly writes an HTTP parameter to Servlet output, which allows for a reflected cross site scripting
+        <p>This code directly writes an HTTP parameter to Servlet output, which allows for a reflected cross site scripting
 vulnerability. See <a href="http://en.wikipedia.org/wiki/Cross-site_scripting">http://en.wikipedia.org/wiki/Cross-site_scripting</a>
 for more information.</p>
 <p>FindBugs looks only for the most blatant, obvious cases of cross site scripting.
@@ -4165,7 +4165,7 @@ a signed and unsigned right shift (depending upon the size of the shift).
       
       <p>
       This method uses the same code to implement two branches of a conditional branch.
-	Check to ensure that this isn't a coding mistake.
+        Check to ensure that this isn't a coding mistake.
       </p>
       
    
@@ -4174,8 +4174,8 @@ a signed and unsigned right shift (depending upon the size of the shift).
       
       <p>
       This method uses the same code to implement two clauses of a switch statement.
-	This could be a case of duplicate code, but it might also indicate
-	a coding mistake.
+        This could be a case of duplicate code, but it might also indicate
+        a coding mistake.
       </p>
       
    
@@ -4294,7 +4294,7 @@ exception; instead, it will print true for any nonnull value, and false for null
 This feature of format strings is strange, and may not be what you intended.
 </p>
 
- 	
+        
 <h3><a name="IA_AMBIGUOUS_INVOCATION_OF_INHERITED_OR_OUTER_METHOD">IA: Ambiguous invocation of either an inherited or outer method (IA_AMBIGUOUS_INVOCATION_OF_INHERITED_OR_OUTER_METHOD)</a></h3>
 
 
@@ -4349,20 +4349,20 @@ This code performs integer multiply and then converts the result to a long,
 as in:
 <code>
 <pre> 
-	long convertDaysToMilliseconds(int days) { return 1000*3600*24*days; } 
+        long convertDaysToMilliseconds(int days) { return 1000*3600*24*days; } 
 </pre></code>
 If the multiplication is done using long arithmetic, you can avoid
 the possibility that the result will overflow. For example, you
 could fix the above code to:
 <code>
 <pre> 
-	long convertDaysToMilliseconds(int days) { return 1000L*3600*24*days; } 
+        long convertDaysToMilliseconds(int days) { return 1000L*3600*24*days; } 
 </pre></code>
 or 
 <code>
 <pre> 
-	static final long MILLISECONDS_PER_DAY = 24L*3600*1000;
-	long convertDaysToMilliseconds(int days) { return days * MILLISECONDS_PER_DAY; } 
+        static final long MILLISECONDS_PER_DAY = 24L*3600*1000;
+        long convertDaysToMilliseconds(int days) { return days * MILLISECONDS_PER_DAY; } 
 </pre></code>
 </p>
 
@@ -4730,8 +4730,8 @@ it may indicate a misunderstanding of how serialization works.
       
       <p>
       A value is used in a way that requires it to be always be a value denoted by a type qualifier, but
-	there is an explicit annotation stating that it is not known where the value is required to have that type qualifier.
-	Either the usage or the annotation is incorrect.
+        there is an explicit annotation stating that it is not known where the value is required to have that type qualifier.
+        Either the usage or the annotation is incorrect.
       </p>
       
     
@@ -4740,8 +4740,8 @@ it may indicate a misunderstanding of how serialization works.
       
       <p>
       A value is used in a way that requires it to be never be a value denoted by a type qualifier, but
-	there is an explicit annotation stating that it is not known where the value is prohibited from having that type qualifier.
-	Either the usage or the annotation is incorrect.
+        there is an explicit annotation stating that it is not known where the value is prohibited from having that type qualifier.
+        Either the usage or the annotation is incorrect.
       </p>
       
     
@@ -4755,8 +4755,8 @@ this is caused by having an empty statement
 block for an <code>if</code> statement:</p>
 <pre>
     if (argv.length == 0) {
-	// TODO: handle this case
-	}
+        // TODO: handle this case
+        }
 </pre>
 
     

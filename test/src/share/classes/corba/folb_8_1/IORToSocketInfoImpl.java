@@ -50,134 +50,134 @@ import java.util.List;
 
 import org.omg.CORBA.Any;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.TaggedComponent;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.se.spi.transport.IORToSocketInfo;
-import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.TaggedComponent;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPAddress ;
+import com.sun.corba.ee.spi.transport.IORToSocketInfo;
+import com.sun.corba.ee.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 public class IORToSocketInfoImpl
     implements IORToSocketInfo
 {
     public List getSocketInfo(IOR ior, List previous)
     {
-	boolean debug = ior.getORB().transportDebugFlag;
+        boolean debug = ior.getORB().transportDebugFlag;
 
-	if (debug) {
-	    dprint(".getSocketInfo->: " + previous);
-	}
+        if (debug) {
+            dprint(".getSocketInfo->: " + previous);
+        }
 
-	if (! previous.isEmpty()) {
-	    if (debug) {
-		dprint(".getSocketInfo<-: returning previous: " + previous);
-	    }
-	    return previous;
-	}
+        if (! previous.isEmpty()) {
+            if (debug) {
+                dprint(".getSocketInfo<-: returning previous: " + previous);
+            }
+            return previous;
+        }
 
-	SocketInfo socketInfo;
-	List result = new ArrayList();
+        SocketInfo socketInfo;
+        List result = new ArrayList();
 
-	//
-	// Find and add address from profile.
-	//
+        //
+        // Find and add address from profile.
+        //
 
-	IIOPProfileTemplate iiopProfileTemplate = (IIOPProfileTemplate)
-	    ior.getProfile().getTaggedProfileTemplate() ;
-	IIOPAddress primary = iiopProfileTemplate.getPrimaryAddress() ;
-	String hostname = primary.getHost().toLowerCase();
-	int    port     = primary.getPort();
-	socketInfo = createSocketInfo("Primary", 
-				      SocketInfo.IIOP_CLEAR_TEXT,
-				      hostname, port);
-	result.add(socketInfo);
+        IIOPProfileTemplate iiopProfileTemplate = (IIOPProfileTemplate)
+            ior.getProfile().getTaggedProfileTemplate() ;
+        IIOPAddress primary = iiopProfileTemplate.getPrimaryAddress() ;
+        String hostname = primary.getHost().toLowerCase();
+        int    port     = primary.getPort();
+        socketInfo = createSocketInfo("Primary", 
+                                      SocketInfo.IIOP_CLEAR_TEXT,
+                                      hostname, port);
+        result.add(socketInfo);
 
-	//
-	// Find and add alternate iiop addresses.
-	//
+        //
+        // Find and add alternate iiop addresses.
+        //
 
-	Iterator iterator;
-	/* DO NOT DO THIS FOR THE TEST
-	iterator = iiopProfileTemplate.iteratorById(
+        Iterator iterator;
+        /* DO NOT DO THIS FOR THE TEST
+        iterator = iiopProfileTemplate.iteratorById(
             TAG_ALTERNATE_IIOP_ADDRESS.value);
 
-	while (iterator.hasNext()) {
-	    AlternateIIOPAddressComponent alternate =
-		(AlternateIIOPAddressComponent) iterator.next();
-	    hostname   = alternate.getAddress().getHost().toLowerCase();
-	    port       = alternate.getAddress().getPort();
-	    socketInfo = createSocketInfo("Alternate", 
-					  SocketInfo.IIOP_CLEAR_TEXT,
-					  hostname, port);
-	    result.add(socketInfo);
-	}
-	*/
+        while (iterator.hasNext()) {
+            AlternateIIOPAddressComponent alternate =
+                (AlternateIIOPAddressComponent) iterator.next();
+            hostname   = alternate.getAddress().getHost().toLowerCase();
+            port       = alternate.getAddress().getPort();
+            socketInfo = createSocketInfo("Alternate", 
+                                          SocketInfo.IIOP_CLEAR_TEXT,
+                                          hostname, port);
+            result.add(socketInfo);
+        }
+        */
 
-	//
-	// Find and add custom tagged addresses.
-	//
+        //
+        // Find and add custom tagged addresses.
+        //
 
-	iterator = iiopProfileTemplate.iteratorById(
+        iterator = iiopProfileTemplate.iteratorById(
             TAG_TAGGED_CUSTOM_SOCKET_INFO.value);
 
-	while (iterator.hasNext()) {
-	    Object o = iterator.next();
-	    if (! Common.timing) {
-		System.out.println(o);
-	    }
-	    byte[] data = ((TaggedComponent)o).getIOPComponent( ior.getORB() ).
-		component_data ;
-	    Any any = null;
-	    try {
-		any = Common.getCodec(ior.getORB()).decode(data);
-	    } catch (Exception e) {
-		System.out.println("Unexpected: " + e);
-		System.exit(1);
-	    }
-	    TaggedCustomSocketInfo taggedSocketInfo = 
-		TaggedCustomSocketInfoHelper.extract(any);
-	    socketInfo = createSocketInfo("custom",
-					  taggedSocketInfo.type,
-					  taggedSocketInfo.host,
-					  taggedSocketInfo.port);
-	    result.add(socketInfo);
-	}
+        while (iterator.hasNext()) {
+            Object o = iterator.next();
+            if (! Common.timing) {
+                System.out.println(o);
+            }
+            byte[] data = ((TaggedComponent)o).getIOPComponent( ior.getORB() ).
+                component_data ;
+            Any any = null;
+            try {
+                any = Common.getCodec(ior.getORB()).decode(data);
+            } catch (Exception e) {
+                System.out.println("Unexpected: " + e);
+                System.exit(1);
+            }
+            TaggedCustomSocketInfo taggedSocketInfo = 
+                TaggedCustomSocketInfoHelper.extract(any);
+            socketInfo = createSocketInfo("custom",
+                                          taggedSocketInfo.type,
+                                          taggedSocketInfo.host,
+                                          taggedSocketInfo.port);
+            result.add(socketInfo);
+        }
 
-	// This should be sorted in the order you want requests tried
-	// if failover occurs.
+        // This should be sorted in the order you want requests tried
+        // if failover occurs.
 
-	if (debug) {
-	    dprint(".getSocketInfo<-: returning: " + result);
-	}
-	return result;
+        if (debug) {
+            dprint(".getSocketInfo<-: returning: " + result);
+        }
+        return result;
     }
 
     private SocketInfo createSocketInfo(String testMessage,
-					final String type,
-					final String hostname, final int port)
+                                        final String type,
+                                        final String hostname, final int port)
     {
-	if (! Common.timing) {
-	    System.out.println(testMessage + " " + type 
-			       + " " + hostname + " " + port);
-	}
-	return new SocketInfo() {
-	    public String getType() { return type; }
-	    public String getHost() { return hostname; }
-	    public int    getPort() { return port; }
+        if (! Common.timing) {
+            System.out.println(testMessage + " " + type 
+                               + " " + hostname + " " + port);
+        }
+        return new SocketInfo() {
+            public String getType() { return type; }
+            public String getHost() { return hostname; }
+            public int    getPort() { return port; }
             @Override
-	    public String toString()
-	    {
-		return "SocketInfo[" + type + " " + hostname + " " + port +"]";
-	    }
+            public String toString()
+            {
+                return "SocketInfo[" + type + " " + hostname + " " + port +"]";
+            }
        };
     }
 
     private void dprint(String msg)
     {
-	ORBUtility.dprint("IORToSocketInfoImpl", msg);
-    }	
+        ORBUtility.dprint("IORToSocketInfoImpl", msg);
+    }   
 }
 
 // End of file.

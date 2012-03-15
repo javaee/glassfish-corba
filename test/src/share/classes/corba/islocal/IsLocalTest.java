@@ -49,14 +49,14 @@ import corba.framework.CORBATest;
 
 public class IsLocalTest extends CORBATest {
     public static final String thisPackage =
-	IsLocalTest.class.getPackage().getName();
+        IsLocalTest.class.getPackage().getName();
 
     protected void doTest()
-	throws
-	    Throwable
+        throws
+            Throwable
     {
-	Controller orbd   = createORBD();
-	orbd.start();
+        Controller orbd   = createORBD();
+        orbd.start();
 
         doTestType("Server", "Server",
                    "Client", "Client");
@@ -72,21 +72,21 @@ public class IsLocalTest extends CORBATest {
     }
 
     protected void doTestType(String serverMainClass, String serverTestName,
-			      String clientMainClass, String clientTestName)
-	throws
-	    Throwable
+                              String clientMainClass, String clientTestName)
+        throws
+            Throwable
     {
-	Controller server = createServer(thisPackage + "." + serverMainClass,
-					 serverTestName);
-	server.start();
+        Controller server = createServer(thisPackage + "." + serverMainClass,
+                                         serverTestName);
+        server.start();
 
-	Controller client = createClient(thisPackage + "." + clientMainClass,
-					 clientTestName);
-	client.start();
-	client.waitFor();
-	client.stop();
+        Controller client = createClient(thisPackage + "." + clientMainClass,
+                                         clientTestName);
+        client.start();
+        client.waitFor();
+        client.stop();
 
-	server.stop();
+        server.stop();
     }
 }
 

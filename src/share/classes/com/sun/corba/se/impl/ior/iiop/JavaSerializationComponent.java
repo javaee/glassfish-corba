@@ -37,15 +37,15 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.ior.iiop;
+package com.sun.corba.ee.impl.ior.iiop;
 
 import org.omg.CORBA_2_3.portable.OutputStream;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.ior.TaggedComponentBase;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.ior.TaggedComponentBase;
 
 /**
  * Tagged component that contains a value that indicates the Java 
@@ -63,12 +63,12 @@ public class JavaSerializationComponent extends TaggedComponentBase {
     private static JavaSerializationComponent singleton;
 
     static {
-	singleton = new JavaSerializationComponent(
-					       ORBConstants.JAVA_ENC_VERSION);
+        singleton = new JavaSerializationComponent(
+                                               ORBConstants.JAVA_ENC_VERSION);
     }
 
     public static JavaSerializationComponent singleton() {
-	return singleton;
+        return singleton;
     }
 
     public JavaSerializationComponent(byte version) {
@@ -76,7 +76,7 @@ public class JavaSerializationComponent extends TaggedComponentBase {
     }
 
     public byte javaSerializationVersion() {
-	return this.version;
+        return this.version;
     }
 
     public void writeContents(OutputStream os) {
@@ -84,18 +84,18 @@ public class JavaSerializationComponent extends TaggedComponentBase {
     }
     
     public int getId() {
-	return ORBConstants.TAG_JAVA_SERIALIZATION_ID;
+        return ORBConstants.TAG_JAVA_SERIALIZATION_ID;
     }
 
     public boolean equals(Object obj) {
-	if (!(obj instanceof JavaSerializationComponent)) {
-	    return false;
-	}
-	JavaSerializationComponent other = (JavaSerializationComponent) obj;
-	return this.version == other.version;
+        if (!(obj instanceof JavaSerializationComponent)) {
+            return false;
+        }
+        JavaSerializationComponent other = (JavaSerializationComponent) obj;
+        return this.version == other.version;
     }
 
     public int hashCode() {
-	return this.version;
+        return this.version;
     }
 }

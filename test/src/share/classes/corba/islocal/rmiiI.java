@@ -49,11 +49,11 @@ import java.rmi.RemoteException;
 
 public interface rmiiI
     extends 
-	Remote 
+        Remote 
 { 
     String m(String x)
-	throws
-	    RemoteException; 
+        throws
+            RemoteException; 
 }
 
 // End of file.

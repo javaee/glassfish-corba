@@ -49,7 +49,7 @@
 package corba.rogueclient;
 
 import java.util.Properties;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
@@ -57,42 +57,42 @@ import corba.framework.Options;
 public class RogueClientTest extends CORBATest {
 
     public static final String thisPackage =
-	RogueClientTest.class.getPackage().getName();
+        RogueClientTest.class.getPackage().getName();
 
     private final static int CLIENT_TIMEOUT = 250000;
 
     protected void doTest() throws Throwable
     {
-	Controller orbd = createORBD();
-	orbd.start();
+        Controller orbd = createORBD();
+        orbd.start();
 //        Properties serverProps = Options.getServerProperties();
 //        serverProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
-	Controller server = createServer(thisPackage + ".Server","Server");
-	server.start();
+        Controller server = createServer(thisPackage + ".Server","Server");
+        server.start();
 
 //        Properties rogueClientProps = Options.getClientProperties();
 //        rogueClientProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
-	Controller rogueClient = createClient(thisPackage + ".RogueClient","RogueClient");
+        Controller rogueClient = createClient(thisPackage + ".RogueClient","RogueClient");
 
         // put some tougher than defaults settings on well behaved client
-	// so command line property for read timeouts gets executed
+        // so command line property for read timeouts gets executed
         Properties clientProps = Options.getClientProperties();
         clientProps.setProperty(ORBConstants.TRANSPORT_TCP_TIMEOUTS_PROPERTY,
                                 "150:2500:25");
-	Controller client = createClient(thisPackage + ".Client","Client");
+        Controller client = createClient(thisPackage + ".Client","Client");
 
 
-	client.start();
+        client.start();
 
-	rogueClient.start();
+        rogueClient.start();
 
-	client.waitFor(CLIENT_TIMEOUT);
-	rogueClient.waitFor(CLIENT_TIMEOUT);
+        client.waitFor(CLIENT_TIMEOUT);
+        rogueClient.waitFor(CLIENT_TIMEOUT);
 
-	client.stop();
-	rogueClient.stop();
-	server.stop();
-	orbd.stop();
+        client.stop();
+        rogueClient.stop();
+        server.stop();
+        orbd.stop();
     }
 }
 

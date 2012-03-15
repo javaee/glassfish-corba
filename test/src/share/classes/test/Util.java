@@ -65,8 +65,8 @@ import javax.naming.NamingException;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import sun.rmi.rmic.Main;
-import com.sun.corba.se.impl.util.JDKBridge;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.util.JDKBridge;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import java.net.InetAddress;
 
 public class Util {
@@ -75,8 +75,8 @@ public class Util {
 
     static public void trace( String msg )
     {
-	if (debug)
-	    System.out.println( msg ) ;
+        if (debug)
+            System.out.println( msg ) ;
     }
 
     public static final String HANDSHAKE = "Ready.";
@@ -85,7 +85,7 @@ public class Util {
      * Create an ORB.
      */
     public static ORB createORB ( String nameServerHost,
-				  int nameServerPort, String orbDebugFlags ) {
+                                  int nameServerPort, String orbDebugFlags ) {
         // Setup the name server arguments...
         String[] nameServerArgs;
 
@@ -100,18 +100,18 @@ public class Util {
         nameServerArgs[0] = "-ORBInitialPort";
         nameServerArgs[1] = Integer.toString(nameServerPort);
 
-	// Setup the ORB properties...
+        // Setup the ORB properties...
 
-	Properties props = System.getProperties();
+        Properties props = System.getProperties();
 
-	props.put("org.omg.CORBA.ORBClass", "com.sun.corba.se.impl.orb.ORBImpl");
-        props.put("org.omg.CORBA.ORBSingletonClass", "com.sun.corba.se.impl.orb.ORBSingleton");
+        props.put("org.omg.CORBA.ORBClass", "com.sun.corba.ee.impl.orb.ORBImpl");
+        props.put("org.omg.CORBA.ORBSingletonClass", "com.sun.corba.ee.impl.orb.ORBSingleton");
 
-	if (orbDebugFlags != null)
-	    props.put( ORBConstants.DEBUG_PROPERTY, orbDebugFlags ) ;
+        if (orbDebugFlags != null)
+            props.put( ORBConstants.DEBUG_PROPERTY, orbDebugFlags ) ;
 
-	// Create and return the ORB...
-	return ORB.init(nameServerArgs, props);
+        // Create and return the ORB...
+        return ORB.init(nameServerArgs, props);
     }
 
     /*
@@ -119,12 +119,12 @@ public class Util {
      * Name server must be started prior to this call.
      */
     public static Context startORBAndGetNameContext (String nameServerHost,
-						     int nameServerPort, String orbDebugFlags ) throws Exception  {
+                                                     int nameServerPort, String orbDebugFlags ) throws Exception  {
         // Create the ORB...
-	ORB orb = createORB( nameServerHost, nameServerPort, orbDebugFlags );
+        ORB orb = createORB( nameServerHost, nameServerPort, orbDebugFlags );
 
-	// Return the initial context...
-	return getInitialContext(true,nameServerHost,nameServerPort,orb);
+        // Return the initial context...
+        return getInitialContext(true,nameServerHost,nameServerPort,orb);
     }
 
     /*
@@ -135,10 +135,10 @@ public class Util {
                                                 String nameServerHost,
                                                 int nameServerPort,
                                                 ORB orb)
-	throws Exception {
+        throws Exception {
         Context result = null;
 
-	// Create a hashtable with the correct properties...
+        // Create a hashtable with the correct properties...
 
         Hashtable env = new Hashtable();
 
@@ -157,11 +157,11 @@ public class Util {
 
             serverUrl += ":" + Integer.toString(nameServerPort);
 
-	    env.put("java.naming.factory.initial","com.sun.jndi.rmi.registry.RegistryContextFactory");
-	    env.put("java.naming.provider.url",serverUrl);
+            env.put("java.naming.factory.initial","com.sun.jndi.rmi.registry.RegistryContextFactory");
+            env.put("java.naming.provider.url",serverUrl);
         }
 
-    	// Now get and return our context...
+        // Now get and return our context...
 
         return new InitialContext(env);
     }
@@ -172,11 +172,11 @@ public class Util {
      * Name server must be started prior to this call.
      */
     public static Object startORBAndLookup (
-					    String servantName, String nameServerHost, int nameServerPort,
-					    String orbDebugFlags ) throws Exception {
+                                            String servantName, String nameServerHost, int nameServerPort,
+                                            String orbDebugFlags ) throws Exception {
         // Start the ORB and get a name context...
         Context context = startORBAndGetNameContext( nameServerHost,
-						     nameServerPort, orbDebugFlags );
+                                                     nameServerPort, orbDebugFlags );
 
         // Now do the lookup and return it...
 
@@ -242,9 +242,9 @@ public class Util {
             if (args[4].equalsIgnoreCase("-iiop")) {
             } else if (args[4].equalsIgnoreCase("-jrmp")) {
                 iiop = false;
-		// Dynamic RMI-IIOP prevents the use of JRMP, so 
-		// make sure it is disabled.
-		System.setProperty( "com.sun.corba.se.ORBUseDynamicStub", "false" ) ;
+                // Dynamic RMI-IIOP prevents the use of JRMP, so 
+                // make sure it is disabled.
+                System.setProperty( "com.sun.corba.ee.ORBUseDynamicStub", "false" ) ;
             } else {
                 error = true;
             }
@@ -261,7 +261,7 @@ public class Util {
                 if (host.equals("-nullHost")) host = null;
 
                 if (startSingleServant( args[0], args[1], host,
-					Integer.parseInt(args[3]), iiop, null ) == false) {
+                                        Integer.parseInt(args[3]), iiop, null ) == false) {
                     System.exit(1);
                 }
             }
@@ -283,31 +283,31 @@ public class Util {
      * Name server must be started prior to this call.
      */
     public static boolean startSingleServant(  
-					     String servantClassName, String servantName, String nameServerHost, 
-					     int nameServerPort, boolean iiop, String orbDebugFlags ) {
-    	boolean result = true;
-	trace( "Util.startSingleServant called." ) ;
+                                             String servantClassName, String servantName, String nameServerHost, 
+                                             int nameServerPort, boolean iiop, String orbDebugFlags ) {
+        boolean result = true;
+        trace( "Util.startSingleServant called." ) ;
 
-    	try {
+        try {
 
             Class servantClass = Class.forName(servantClassName);
             Remote servant = (Remote) servantClass.newInstance();
             result = startSingleServant( servant, servantName, nameServerHost,
-					 nameServerPort, iiop, orbDebugFlags );
+                                         nameServerPort, iiop, orbDebugFlags );
 
         } catch (Throwable e) {
 
-    	    e.printStackTrace(System.out);
-    	    System.out.println();
-    	    System.out.flush();
-    	    result = false;
+            e.printStackTrace(System.out);
+            System.out.println();
+            System.out.flush();
+            result = false;
 
-    	    if (e instanceof ThreadDeath) {
-    	        throw new ThreadDeath();
-    	    }
+            if (e instanceof ThreadDeath) {
+                throw new ThreadDeath();
+            }
         } finally {
-	    trace( "Util.startSingleServant exiting." ) ;
-	}
+            trace( "Util.startSingleServant exiting." ) ;
+        }
 
         return result;
     }
@@ -323,26 +323,26 @@ public class Util {
      * Name server must be started prior to this call.
      */
     public static boolean startSingleServant(  Remote servant, String servantName, 
-	String nameServerHost, int nameServerPort, boolean iiop, String orbDebugFlags ) {
+        String nameServerHost, int nameServerPort, boolean iiop, String orbDebugFlags ) {
 
-    	boolean result = true;
-	
-	trace( "Util.startSingleServant called" ) ;
+        boolean result = true;
+        
+        trace( "Util.startSingleServant called" ) ;
 
-    	try {
-    	    ORB orb = null;
+        try {
+            ORB orb = null;
 
-    	    if (iiop) {
-		orb = createORB( null, nameServerPort, orbDebugFlags );
-	    }
+            if (iiop) {
+                orb = createORB( null, nameServerPort, orbDebugFlags );
+            }
 
-    	    if (!(servant instanceof PortableRemoteObject)) {
-    	        PortableRemoteObject.exportObject(servant);
-    	    }
+            if (!(servant instanceof PortableRemoteObject)) {
+                PortableRemoteObject.exportObject(servant);
+            }
 
-    	    singleServantContext = getInitialContext(iiop,nameServerHost,nameServerPort,orb);
+            singleServantContext = getInitialContext(iiop,nameServerHost,nameServerPort,orb);
 
-    	    singleServantContext.rebind(servantName, servant);
+            singleServantContext.rebind(servantName, servant);
 
             Object stub = singleServantContext.lookup(servantName);
 
@@ -353,19 +353,19 @@ public class Util {
             }
 
             System.out.flush();
-    	} catch (Throwable e) {
-    	    e.printStackTrace(System.out);
-    	    System.out.println();
-    	    System.out.flush();
-    	    result = false;
+        } catch (Throwable e) {
+            e.printStackTrace(System.out);
+            System.out.println();
+            System.out.flush();
+            result = false;
 
-	    trace( "Util.startSingleServant exiting" ) ;
-    	    if (e instanceof ThreadDeath) {
-    	        throw new ThreadDeath();
-    	    }
-    	}
+            trace( "Util.startSingleServant exiting" ) ;
+            if (e instanceof ThreadDeath) {
+                throw new ThreadDeath();
+            }
+        }
 
-    	return result;
+        return result;
     }
 
     // List of properties that must be inherited by any process
@@ -383,13 +383,13 @@ public class Util {
         "org.omg.CORBA.ORBSingletonClass",
 
         // Security related
-        "com.sun.corba.se.ORBBase",
+        "com.sun.corba.ee.ORBBase",
         "java.security.policy",
         "java.security.debug",
         "java.security.manager",
 
         // Test setup
-	"corba.test.orb.classpath",
+        "corba.test.orb.classpath",
         "corba.test.controller.name",
         "http.server.port",
         "name.server.port",
@@ -397,12 +397,12 @@ public class Util {
         "java.compiler",
         "java.rmi.server.codebase",
         "http.server.root.directory",
-        "com.sun.corba.se.JavaIDLHome",
+        "com.sun.corba.ee.JavaIDLHome",
 
         // For testing tools
-	"emma.coverage.out.file",
-	"emma.coverage.out.merge",
-	"emma.rt.control",
+        "emma.coverage.out.file",
+        "emma.coverage.out.merge",
+        "emma.rt.control",
         "junit.report.dir",
         "net.sourceforge.cobertura.datafile", 
 
@@ -413,97 +413,97 @@ public class Util {
         ORBConstants.GIOP_BUFFER_SIZE,
         ORBConstants.GIOP_11_BUFFMGR,
         ORBConstants.GIOP_12_BUFFMGR,
-	ORBConstants.USE_DYNAMIC_STUB_PROPERTY,
-	ORBConstants.ENABLE_JAVA_SERIALIZATION_PROPERTY,
-	ORBConstants.USE_CODEGEN_REFLECTIVE_COPYOBJECT,
-	ORBConstants.INIT_DEBUG_PROPERTY,
-	ORBConstants.DEBUG_DYNAMIC_STUB,
+        ORBConstants.USE_DYNAMIC_STUB_PROPERTY,
+        ORBConstants.ENABLE_JAVA_SERIALIZATION_PROPERTY,
+        ORBConstants.USE_CODEGEN_REFLECTIVE_COPYOBJECT,
+        ORBConstants.INIT_DEBUG_PROPERTY,
+        ORBConstants.DEBUG_DYNAMIC_STUB,
         ORBConstants.INITIAL_PORT_PROPERTY,
         ORBConstants.ORBD_PORT_PROPERTY
     };
 
     public static void inheritProperties( Vector command )
     {
-	for (int j = 0; j < PROCESS_PROPERTIES.length; j++) {
-	    String key = PROCESS_PROPERTIES[j];
-	    String value = System.getProperty(key);
-	    if (value != null) {
-		command.insertElementAt("-D" + key + "=" + value, 1 );   
-	    }
-	}
+        for (int j = 0; j < PROCESS_PROPERTIES.length; j++) {
+            String key = PROCESS_PROPERTIES[j];
+            String value = System.getProperty(key);
+            if (value != null) {
+                command.insertElementAt("-D" + key + "=" + value, 1 );   
+            }
+        }
     }
 
     public static Process startProcess( Vector command,
-	String handShake ) throws IOException {
-	return startProcess( command, handShake, Test.forkDebugLevel ) ;
+        String handShake ) throws IOException {
+        return startProcess( command, handShake, Test.forkDebugLevel ) ;
     }
 
     public static Process startProcess( Vector command, 
-	String handShake, int debugLevel ) throws IOException 
+        String handShake, int debugLevel ) throws IOException 
     {
-	inheritProperties( command ) ;
+        inheritProperties( command ) ;
 
-	if (debugLevel >= Test.ATTACH) {
-	    command.insertElementAt( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y", 1 ) ;
-	    command.insertElementAt( "-Xnoagent", 1 ) ;
-	    command.insertElementAt( "-Xdebug", 1 ) ;
+        if (debugLevel >= Test.ATTACH) {
+            command.insertElementAt( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y", 1 ) ;
+            command.insertElementAt( "-Xnoagent", 1 ) ;
+            command.insertElementAt( "-Xdebug", 1 ) ;
         }
 
         String[] arg = new String[command.size()];
         command.copyInto(arg);
 
-      	if (debugLevel >= Test.DISPLAY) {
-	    StringBuffer buff = new StringBuffer() ;
-	    buff.append( "startProcess: about to exec:" ) ;
-	    for (int ctr=0; ctr<command.size(); ctr++ ) {
-		buff.append( " " ) ;
-		buff.append( (String)command.elementAt(ctr) ) ;
-	    }
-	    trace( buff.toString() ) ;
-	    trace( "handShake = \"" + handShake + "\"" ) ;	
-	}
+        if (debugLevel >= Test.DISPLAY) {
+            StringBuffer buff = new StringBuffer() ;
+            buff.append( "startProcess: about to exec:" ) ;
+            for (int ctr=0; ctr<command.size(); ctr++ ) {
+                buff.append( " " ) ;
+                buff.append( (String)command.elementAt(ctr) ) ;
+            }
+            trace( buff.toString() ) ;
+            trace( "handShake = \"" + handShake + "\"" ) ;      
+        }
 
-	return startProcess(arg,handShake,debugLevel);
+        return startProcess(arg,handShake,debugLevel);
     }
 
     private static void displayCommand( String[] command ) 
     {
-	System.out.println( 
-	    "-----------------------------------------------------------------" ) ;
-	System.out.println( "Current working directory: " +
-	    System.getProperty( "user.dir" ) ) ;
-	System.out.println( "Command to exec:" ) ;
-	for (String str : command)
-	    System.out.println( "\t" + str ) ;
-	System.out.println( 
-	    "-----------------------------------------------------------------" ) ;
+        System.out.println( 
+            "-----------------------------------------------------------------" ) ;
+        System.out.println( "Current working directory: " +
+            System.getProperty( "user.dir" ) ) ;
+        System.out.println( "Command to exec:" ) ;
+        for (String str : command)
+            System.out.println( "\t" + str ) ;
+        System.out.println( 
+            "-----------------------------------------------------------------" ) ;
     }
 
     private static Process startProcess( String[] command, 
-	String handShake, int debugLevel ) throws IOException 
+        String handShake, int debugLevel ) throws IOException 
     {
         Process theProcess = null;
-	if (debugLevel >= Test.DISPLAY)
-	    displayCommand( command ) ;
+        if (debugLevel >= Test.DISPLAY)
+            displayCommand( command ) ;
 
-	theProcess = Runtime.getRuntime().exec(command);
+        theProcess = Runtime.getRuntime().exec(command);
 
-	ProcessMonitor monitor ;
+        ProcessMonitor monitor ;
 
-	if (debugLevel >= Test.DISPLAY)
-	    monitor = new ProcessMonitor( theProcess, 
-		System.out, System.err, handShake);
-	else
-	    monitor = new ProcessMonitor(theProcess, 
-		StreamReader.NULL_OUTPUT_STREAM, StreamReader.NULL_OUTPUT_STREAM, handShake);
+        if (debugLevel >= Test.DISPLAY)
+            monitor = new ProcessMonitor( theProcess, 
+                System.out, System.err, handShake);
+        else
+            monitor = new ProcessMonitor(theProcess, 
+                StreamReader.NULL_OUTPUT_STREAM, StreamReader.NULL_OUTPUT_STREAM, handShake);
 
         monitor.start();
 
         try {
             monitor.waitForHandshake(120000);
         } catch (Exception e) {
-	    theProcess.destroy();
-	    theProcess = null;
+            theProcess.destroy();
+            theProcess = null;
             try {
                 monitor.finishWriting();
             } catch (InterruptedException iex) {
@@ -511,12 +511,12 @@ public class Util {
                 iex.printStackTrace( );
             }
 
-	    Error err = new Error(e.getMessage());
-	    err.initCause( e ) ;
-	    throw err ;
-	}
+            Error err = new Error(e.getMessage());
+            err.initCause( e ) ;
+            throw err ;
+        }
 
-	return theProcess;
+        return theProcess;
     }
 
     /**
@@ -573,60 +573,60 @@ public class Util {
      * @throws Exception if compile fails.
      */
     private static void rmicInternal (String generatorArg,
-				      String[] additionalArgs,
-				      String[] classes,
-				      OutputStream out)
-	throws Exception {
+                                      String[] additionalArgs,
+                                      String[] classes,
+                                      OutputStream out)
+        throws Exception {
 
         try {
-	    trace( "Util.rmicInternal called" ) ;
-	    trace( "\tgeneratorArg = " + generatorArg ) ;
-	    trace( "\tadditionalArgs = " + Test.display(additionalArgs)) ;
-	    trace( "\tclasses = " + Test.display(classes)) ;
+            trace( "Util.rmicInternal called" ) ;
+            trace( "\tgeneratorArg = " + generatorArg ) ;
+            trace( "\tadditionalArgs = " + Test.display(additionalArgs)) ;
+            trace( "\tclasses = " + Test.display(classes)) ;
 
-	    if (classes != null && classes.length > 0) {
-		int commandCount = classes.length+2;
-		if (debug) 
-		    commandCount++;
-		if (generatorArg != null) 
-		    commandCount++;
-		if (additionalArgs != null) 
-		    commandCount+=additionalArgs.length;
-		String[] args = new String[commandCount];
-		int index = 0;
-		if (generatorArg != null) 
-		    args[index++] = generatorArg;
-    	        if (additionalArgs != null) {
-    	            int count = additionalArgs.length;
+            if (classes != null && classes.length > 0) {
+                int commandCount = classes.length+2;
+                if (debug) 
+                    commandCount++;
+                if (generatorArg != null) 
+                    commandCount++;
+                if (additionalArgs != null) 
+                    commandCount+=additionalArgs.length;
+                String[] args = new String[commandCount];
+                int index = 0;
+                if (generatorArg != null) 
+                    args[index++] = generatorArg;
+                if (additionalArgs != null) {
+                    int count = additionalArgs.length;
                     System.arraycopy(additionalArgs,0,args,index,count);
                     index += count;
-    	        }
+                }
 
-		args[index++] = "-classpath";
-		args[index++] = System.getProperty("java.class.path");
-		if (debug)
-		    args[index++] = "-verbose" ;
-	    
-		int count = classes.length;
+                args[index++] = "-classpath";
+                args[index++] = System.getProperty("java.class.path");
+                if (debug)
+                    args[index++] = "-verbose" ;
+            
+                int count = classes.length;
                 System.arraycopy(classes,0,args,index,count);
 
-		// Test.checkSunTools() ;
-            	Main compiler = new Main(out, "rmic");
-            	if (!compiler.compile(args)) {
-            	    throw new Exception ("compile failed");
-            	}
-    	    }
+                // Test.checkSunTools() ;
+                Main compiler = new Main(out, "rmic");
+                if (!compiler.compile(args)) {
+                    throw new Exception ("compile failed");
+                }
+            }
 
-    	} catch (Throwable e) {
-    	    if (e instanceof ThreadDeath) {
-    	        throw (ThreadDeath) e;
-    	    }
-    	    Exception exc = new Exception(e.toString());
-	    exc.initCause( e ) ;
-	    throw exc ;
-    	} finally {
-	    trace( "Util.rmicInternal exiting" ) ;
-	}
+        } catch (Throwable e) {
+            if (e instanceof ThreadDeath) {
+                throw (ThreadDeath) e;
+            }
+            Exception exc = new Exception(e.toString());
+            exc.initCause( e ) ;
+            throw exc ;
+        } finally {
+            trace( "Util.rmicInternal exiting" ) ;
+        }
     }
 
     /**
@@ -637,27 +637,27 @@ public class Util {
      * @throws Exception if compile fails.
      */
     private static void rmicExternal (String generatorArg,
-				      String[] additionalArgs,
-				      String[] classes,
-				      OutputStream out)
-	throws Exception {
+                                      String[] additionalArgs,
+                                      String[] classes,
+                                      OutputStream out)
+        throws Exception {
 
-	trace( "Util.rmicExternal called" ) ;
-	trace( "\tgeneratorArg = " + generatorArg ) ;
-	trace( "\tadditionalArgs = " + Test.display(additionalArgs)) ;
-	trace( "\tclasses = " + Test.display(classes)) ;
+        trace( "Util.rmicExternal called" ) ;
+        trace( "\tgeneratorArg = " + generatorArg ) ;
+        trace( "\tadditionalArgs = " + Test.display(additionalArgs)) ;
+        trace( "\tclasses = " + Test.display(classes)) ;
 
         if (classes != null && classes.length > 0) {
             Vector temp = new Vector(10);
             temp.addElement(System.getProperty("java.home") + "/bin/java");    // _REVISIT_ Should be rmic!
-	    String classPath = System.getProperty( "java.class.path" ) ;
-	    temp.addElement("-classpath");
-	    temp.addElement(classPath);
-	    temp.addElement("sun.rmi.rmic.Main");
-	    temp.addElement("-classpath");
-	    temp.addElement(classPath);
-	    if (debug)
-		temp.addElement( "-verbose" ) ;
+            String classPath = System.getProperty( "java.class.path" ) ;
+            temp.addElement("-classpath");
+            temp.addElement(classPath);
+            temp.addElement("sun.rmi.rmic.Main");
+            temp.addElement("-classpath");
+            temp.addElement(classPath);
+            if (debug)
+                temp.addElement( "-verbose" ) ;
             if (generatorArg != null) {
                 temp.addElement(generatorArg);
             }
@@ -679,16 +679,16 @@ public class Util {
                 if (result != 0) {
                     throw new Exception("compile failed: " + result);
                 }
-	    } catch (Throwable e) {
-		if (e instanceof ThreadDeath) {
-		    throw (ThreadDeath) e;
-		}
-		Exception exc = new Exception(e.toString());
-		exc.initCause( e ) ;
-		throw exc ;
-	    } finally {
-		trace( "Util.rmicExternal exiting" ) ;
-	    }
+            } catch (Throwable e) {
+                if (e instanceof ThreadDeath) {
+                    throw (ThreadDeath) e;
+                }
+                Exception exc = new Exception(e.toString());
+                exc.initCause( e ) ;
+                throw exc ;
+            } finally {
+                trace( "Util.rmicExternal exiting" ) ;
+            }
         }
     }
 
@@ -702,23 +702,23 @@ public class Util {
         Vector temp = new Vector(15);
 
         temp.addElement(System.getProperty("java.home") + "/bin/java" );
-        temp.addElement("-Dorg.omg.CORBA.ORBClass=com.sun.corba.se.impl.orb.ORBImpl");
-        temp.addElement("-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.se.impl.orb.ORBSingleton");
+        temp.addElement("-Dorg.omg.CORBA.ORBClass=com.sun.corba.ee.impl.orb.ORBImpl");
+        temp.addElement("-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.ee.impl.orb.ORBSingleton");
 
-	// add the Util delegates property; this is required so that
-	// appropriate delegates are picked up when running with the
-	// serialization code that has 5 bug fixes to handle
-	// interoperability and the correct RepID generation
+        // add the Util delegates property; this is required so that
+        // appropriate delegates are picked up when running with the
+        // serialization code that has 5 bug fixes to handle
+        // interoperability and the correct RepID generation
 
-        temp.addElement("-Djavax.rmi.CORBA.UtilClass=com.sun.corba.se.impl.javax.rmi.CORBA.Util");
-	temp.addElement("-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl");
-	temp.addElement("-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject");
+        temp.addElement("-Djavax.rmi.CORBA.UtilClass=com.sun.corba.ee.impl.javax.rmi.CORBA.Util");
+        temp.addElement("-Djavax.rmi.CORBA.StubClass=com.sun.corba.ee.impl.javax.rmi.CORBA.StubDelegateImpl");
+        temp.addElement("-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.ee.impl.javax.rmi.PortableRemoteObject");
         String codebase = System.getProperty("java.rmi.server.codebase");
         if (codebase != null) {
             temp.addElement("-Djava.rmi.server.codebase=" + codebase);
         }
 
-	boolean is12VM = true;
+        boolean is12VM = true;
         if (is12VM) {
             String policy = System.getProperty("java.security.policy");
             if (policy != null) {
@@ -756,11 +756,11 @@ public class Util {
         if (policy != null)
             cmd.addElement("-Djava.security.policy=" + policy);
 
-        cmd.add("-Dorg.omg.CORBA.ORBClass=com.sun.corba.se.impl.orb.ORBImpl");
-        cmd.add("-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.se.impl.orb.ORBSingleton");
-	cmd.add("-Djavax.rmi.CORBA.UtilClass=com.sun.corba.se.impl.javax.rmi.CORBA.Util");
-	cmd.add("-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl");
-	cmd.add("-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject");
+        cmd.add("-Dorg.omg.CORBA.ORBClass=com.sun.corba.ee.impl.orb.ORBImpl");
+        cmd.add("-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.ee.impl.orb.ORBSingleton");
+        cmd.add("-Djavax.rmi.CORBA.UtilClass=com.sun.corba.ee.impl.javax.rmi.CORBA.Util");
+        cmd.add("-Djavax.rmi.CORBA.StubClass=com.sun.corba.ee.impl.javax.rmi.CORBA.StubDelegateImpl");
+        cmd.add("-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.ee.impl.javax.rmi.PortableRemoteObject");
 
         cmd.add("-classpath");
         cmd.add(System.getProperty("java.class.path"));
@@ -774,21 +774,21 @@ public class Util {
 
         // Fill out the command...
 
-	Vector cmd = new Vector() ;
+        Vector cmd = new Vector() ;
         cmd.add( System.getProperty("java.home") + "/bin/java" );
 
-        cmd.add(  "-Dorg.omg.CORBA.ORBClass=com.sun.corba.se.impl.orb.ORBImpl" );
-        cmd.add(  "-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.se.impl.orb.ORBSingleton" );
-	cmd.add(  "-Djavax.rmi.CORBA.UtilClass=com.sun.corba.se.impl.javax.rmi.CORBA.Util" );
-	cmd.add(  "-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl" );
-	cmd.add(  "-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject" );
+        cmd.add(  "-Dorg.omg.CORBA.ORBClass=com.sun.corba.ee.impl.orb.ORBImpl" );
+        cmd.add(  "-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.ee.impl.orb.ORBSingleton" );
+        cmd.add(  "-Djavax.rmi.CORBA.UtilClass=com.sun.corba.ee.impl.javax.rmi.CORBA.Util" );
+        cmd.add(  "-Djavax.rmi.CORBA.StubClass=com.sun.corba.ee.impl.javax.rmi.CORBA.StubDelegateImpl" );
+        cmd.add(  "-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.ee.impl.javax.rmi.PortableRemoteObject" );
 
-	// Add properties
-	int index;
-	for (index = 0; index < properties.size(); index++) 
-	    cmd.add(  (String)properties.elementAt(index) );
+        // Add properties
+        int index;
+        for (index = 0; index < properties.size(); index++) 
+            cmd.add(  (String)properties.elementAt(index) );
 
-	// Add classpath and server class
+        // Add classpath and server class
         cmd.add(  "-classpath" );
         cmd.add(  System.getProperty("java.class.path") );
         cmd.add(  serverClass );
@@ -800,29 +800,29 @@ public class Util {
 
     // This version of startServer allows added paths to be appended to the classpath
     public static Process startServer (String serverClass, Vector properties, 
-				       String classpath) 
-	throws IOException {
+                                       String classpath) 
+        throws IOException {
 
         // Fill out the command... 
 
-	Vector cmd = new Vector() ;
+        Vector cmd = new Vector() ;
         cmd.add(  System.getProperty("java.home") + "/bin/java" );
-        cmd.add(  "-Dorg.omg.CORBA.ORBClass=com.sun.corba.se.impl.orb.ORBImpl" );
-        cmd.add(  "-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.se.impl.orb.ORBSingleton" );
-	cmd.add(  "-Djavax.rmi.CORBA.UtilClass=com.sun.corba.se.impl.javax.rmi.CORBA.Util" );
-	cmd.add(  "-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl" );
-	cmd.add(  "-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject" );
+        cmd.add(  "-Dorg.omg.CORBA.ORBClass=com.sun.corba.ee.impl.orb.ORBImpl" );
+        cmd.add(  "-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.ee.impl.orb.ORBSingleton" );
+        cmd.add(  "-Djavax.rmi.CORBA.UtilClass=com.sun.corba.ee.impl.javax.rmi.CORBA.Util" );
+        cmd.add(  "-Djavax.rmi.CORBA.StubClass=com.sun.corba.ee.impl.javax.rmi.CORBA.StubDelegateImpl" );
+        cmd.add(  "-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.ee.impl.javax.rmi.PortableRemoteObject" );
 
-	// Add properties
-	int index;
-	for (index = 0; index < properties.size(); index++) 
-	    cmd.add(  (String)properties.elementAt(index) );
+        // Add properties
+        int index;
+        for (index = 0; index < properties.size(); index++) 
+            cmd.add(  (String)properties.elementAt(index) );
 
-	// Add classpath and server class
+        // Add classpath and server class
         cmd.add(  "-classpath" );
         cmd.add(  System.getProperty("java.class.path")+File.pathSeparator+classpath );
-	cmd.add(  serverClass );
-		
+        cmd.add(  serverClass );
+                
         // Start her up...
         return startProcess(cmd,Util.HANDSHAKE,Test.forkDebugLevel);
     }
@@ -833,11 +833,11 @@ public class Util {
 
     public static Process startNameServer(String port, boolean iiop) throws IOException {
 
-	try {
-	    Thread.sleep( 3*1000 ) ; // sleep for 3 seconds
-	} catch (InterruptedException exc) {
-	    // ignore this: very rare case
-	}
+        try {
+            Thread.sleep( 3*1000 ) ; // sleep for 3 seconds
+        } catch (InterruptedException exc) {
+            // ignore this: very rare case
+        }
 
         String handshake = null;
         Vector args = new Vector();
@@ -845,11 +845,11 @@ public class Util {
         // Fill out the command...
 
         args.addElement(System.getProperty("java.home") + "/bin/java" );
-        args.addElement("-Dorg.omg.CORBA.ORBClass=com.sun.corba.se.impl.orb.ORBImpl");
-        args.addElement("-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.se.impl.orb.ORBSingleton");
-	args.addElement("-Djavax.rmi.CORBA.UtilClass=com.sun.corba.se.impl.javax.rmi.CORBA.Util");
-	args.addElement("-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl");
-	args.addElement("-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject");
+        args.addElement("-Dorg.omg.CORBA.ORBClass=com.sun.corba.ee.impl.orb.ORBImpl");
+        args.addElement("-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.ee.impl.orb.ORBSingleton");
+        args.addElement("-Djavax.rmi.CORBA.UtilClass=com.sun.corba.ee.impl.javax.rmi.CORBA.Util");
+        args.addElement("-Djavax.rmi.CORBA.StubClass=com.sun.corba.ee.impl.javax.rmi.CORBA.StubDelegateImpl");
+        args.addElement("-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.ee.impl.javax.rmi.PortableRemoteObject");
         args.addElement("-classpath");
         args.addElement(System.getProperty("java.class.path"));
 
@@ -861,7 +861,7 @@ public class Util {
 
         if (iiop) {
 
-            args.addElement("com.sun.corba.se.impl.naming.cosnaming.TransientNameServer");
+            args.addElement("com.sun.corba.ee.impl.naming.cosnaming.TransientNameServer");
             args.addElement("-ORBInitialPort");
             args.addElement(port);
             handshake = "Initial Naming Context:";
@@ -874,8 +874,8 @@ public class Util {
         }
 
         // Start her up...
-	Test.dprint( "name server being started with command " + args ) ;
-	Test.dprint( "Expecting handshake: " + handshake ) ;
+        Test.dprint( "name server being started with command " + args ) ;
+        Test.dprint( "Expecting handshake: " + handshake ) ;
 
         return startProcess(args,handshake,Test.forkDebugLevel);
     }
@@ -907,29 +907,29 @@ public class Util {
                                      OutputStream err) {
 
         try {
-	    if (Test.forkDebugLevel >= Test.DISPLAY)
-		displayCommand( command ) ;
+            if (Test.forkDebugLevel >= Test.DISPLAY)
+                displayCommand( command ) ;
 
             Process theProcess  = Runtime.getRuntime().exec(command);
 
             ProcessMonitor monitor = new ProcessMonitor(theProcess,out,err);
             monitor.start();
-	    int result = waitForCompletion(theProcess,2000);
+            int result = waitForCompletion(theProcess,2000);
             monitor.finishWriting();
             return result;
 
         } catch (Throwable error) {
             Error exc = new Error(error.getMessage());
-	    exc.initCause( error ) ;
-	    throw exc ;
+            exc.initCause( error ) ;
+            throw exc ;
         }
     }
 
 
     public static int waitForCompletion( Process theProcess ,int sleepTime)
-	throws java.lang.InterruptedException
+        throws java.lang.InterruptedException
     {
-	int result = -1;
+        int result = -1;
 
         try {
             theProcess.waitFor();

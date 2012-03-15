@@ -62,16 +62,16 @@ import sun.tools.java.CompilerError;
 import sun.rmi.rmic.IndentingWriter;
 import java.util.HashSet;
 import java.util.Arrays;
-import com.sun.corba.se.impl.util.Utility;
-import com.sun.corba.se.impl.util.PackagePrefixChecker;
+import com.sun.corba.ee.impl.util.Utility;
+import com.sun.corba.ee.impl.util.PackagePrefixChecker;
 import sun.rmi.rmic.Main;
 
 /**
  * An IIOP stub/tie generator for rmic.
  *
- * @version	1.0, 2/23/98
- * @author	Bryan Atsatt
- * @author	Anil Vijendran
+ * @version     1.0, 2/23/98
+ * @author      Bryan Atsatt
+ * @author      Anil Vijendran
  * @version     2.0 fall 99
  * @author      M. Mortazavi
  */
@@ -97,7 +97,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
     protected boolean castArray = false;
     protected Hashtable transactionalObjects = new Hashtable() ;
     protected boolean POATie = false ;
-	
+        
     /**
      * Default constructor for Main to use.
      */
@@ -121,7 +121,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      * constructed instance.
      */
     protected boolean requireNewInstance() {
-    	return false;
+        return false;
     }
     
     /**
@@ -129,12 +129,12 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param stack The context stack.
      */
     protected boolean parseNonConforming(ContextStack stack) {
-	    
-	// We let the environment setting decide so that
-	// another generator (e.g. IDLGenerator) can change
-	// it and we will just go with the flow...
-	    
-	return stack.getEnv().getParseNonConforming();   
+            
+        // We let the environment setting decide so that
+        // another generator (e.g. IDLGenerator) can change
+        // it and we will just go with the flow...
+            
+        return stack.getEnv().getParseNonConforming();   
     }
 
     /**
@@ -149,26 +149,26 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
 
         // Do we have an interface? 
         
-	if (cdef.isInterface()) {
-		    
-	    // Yes, so first try Abstract...
-		    
-	    result = AbstractType.forAbstract(cdef,stack,true);
-			
-	    if (result == null) {
-			    
-		// Then try Remote...
-			    
-		result = RemoteType.forRemote(cdef,stack,false);
-	    }
-	} else {
-		    
-	    // Not an interface, so try Implementation...
-		    
-	    result = ImplementationType.forImplementation(cdef,stack,false);
-	}
+        if (cdef.isInterface()) {
+                    
+            // Yes, so first try Abstract...
+                    
+            result = AbstractType.forAbstract(cdef,stack,true);
+                        
+            if (result == null) {
+                            
+                // Then try Remote...
+                            
+                result = RemoteType.forRemote(cdef,stack,false);
+            }
+        } else {
+                    
+            // Not an interface, so try Implementation...
+                    
+            result = ImplementationType.forImplementation(cdef,stack,false);
+        }
 
-	return result;
+        return result;
     }
 
     /**
@@ -179,80 +179,80 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      * @return true if no errors, false otherwise.
      */
     public boolean parseArgs(String argv[], Main main) {
-	Object marker = new Object() ;
-		
-	// Reset any cached options...
-		
+        Object marker = new Object() ;
+                
+        // Reset any cached options...
+                
         reverseIDs = false;
         localStubs = true;
         useHash = true;
         stubBaseClass = DEFAULT_STUB_CLASS;
         //       tieBaseClass = DEFAULT_TIE_CLASS;
-	transactionalObjects = new Hashtable() ;
+        transactionalObjects = new Hashtable() ;
 
-	// Parse options...
-		
-	boolean result = super.parseArgs(argv,main);
-	if (result) {
-	    for (int i = 0; i < argv.length; i++) {
-		if (argv[i] != null) {
-		    String arg = argv[i].toLowerCase();
-		    if (arg.equals("-iiop")) {
-			argv[i] = null;
+        // Parse options...
+                
+        boolean result = super.parseArgs(argv,main);
+        if (result) {
+            for (int i = 0; i < argv.length; i++) {
+                if (argv[i] != null) {
+                    String arg = argv[i].toLowerCase();
+                    if (arg.equals("-iiop")) {
+                        argv[i] = null;
                     } else if (arg.equals("-xreverseids")) {
                         reverseIDs = true;
-			argv[i] = null;
+                        argv[i] = null;
                     } else if (arg.equals("-nolocalstubs")) {
                         localStubs = false;
-			argv[i] = null;
+                        argv[i] = null;
                     } else if (arg.equals("-xnohash")) {
                         useHash = false;
-            	        argv[i] = null;
+                        argv[i] = null;
                     } else if (argv[i].equals("-standardPackage")) {
                         standardPackage = true;
                         argv[i] = null;
                     } else if (arg.equals("-xstubbase")) {
-			argv[i] = null;
-            	        if (++i < argv.length && argv[i] != null && !argv[i].startsWith("-")) {
+                        argv[i] = null;
+                        if (++i < argv.length && argv[i] != null && !argv[i].startsWith("-")) {
                             stubBaseClass = argv[i];
-			    argv[i] = null;
+                            argv[i] = null;
                         } else {
-			    main.error("rmic.option.requires.argument", "-Xstubbase");
-			    result = false;
-			}
+                            main.error("rmic.option.requires.argument", "-Xstubbase");
+                            result = false;
+                        }
                     } else if (arg.equals("-xtiebase")) {
-			argv[i] = null;
-            	        if (++i < argv.length && argv[i] != null && !argv[i].startsWith("-")) {
+                        argv[i] = null;
+                        if (++i < argv.length && argv[i] != null && !argv[i].startsWith("-")) {
                             tieBaseClass = argv[i];
-			    argv[i] = null;
-			} else {
-			    main.error("rmic.option.requires.argument", "-Xtiebase");
-			    result = false;
-			}
-		    } else if (arg.equals("-transactional" )) {
-			// Scan for the next non-flag argument.
-			// Assume that it is a class name and add it
-			// to the list of transactional classes.
-			for ( int ctr=i+1; ctr<argv.length; ctr++ ) {
-			    if (argv[ctr].charAt(1) != '-') {
-				transactionalObjects.put( argv[ctr], marker ) ;
-				break ;
-			    }
-			}
-			argv[i] = null;
-		    } else if (arg.equals( "-poa" )) {
-			POATie = true ;
-			argv[i] = null;
-		    }
-		}
-	    }
-	}
+                            argv[i] = null;
+                        } else {
+                            main.error("rmic.option.requires.argument", "-Xtiebase");
+                            result = false;
+                        }
+                    } else if (arg.equals("-transactional" )) {
+                        // Scan for the next non-flag argument.
+                        // Assume that it is a class name and add it
+                        // to the list of transactional classes.
+                        for ( int ctr=i+1; ctr<argv.length; ctr++ ) {
+                            if (argv[ctr].charAt(1) != '-') {
+                                transactionalObjects.put( argv[ctr], marker ) ;
+                                break ;
+                            }
+                        }
+                        argv[i] = null;
+                    } else if (arg.equals( "-poa" )) {
+                        POATie = true ;
+                        argv[i] = null;
+                    }
+                }
+            }
+        }
         if(POATie){
             tieBaseClass = DEFAULT_POA_TIE_CLASS;
         } else {
             tieBaseClass = DEFAULT_TIE_CLASS;
         }
-	return result;
+        return result;
     }
 
     /**
@@ -264,7 +264,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      *  Intended to be passed to topType.collectMatching(filter,alreadyChecked).
      */
     protected OutputType[] getOutputTypesFor(CompoundType topType,
-					     HashSet alreadyChecked) {
+                                             HashSet alreadyChecked) {
 
         // We want to generate stubs for all remote and implementation types,
         // so collect them up.
@@ -300,7 +300,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
                 // want to create a stub for it...
                 
                 int remoteInterfaceCount = 0;
-		InterfaceType[] interfaces = ((CompoundType)type).getInterfaces();
+                InterfaceType[] interfaces = ((CompoundType)type).getInterfaces();
                 for (int j = 0; j < interfaces.length; j++) {
                     if (interfaces[j].isType(TYPE_REMOTE) && 
                         !interfaces[j].isType(TYPE_ABSTRACT)) {
@@ -320,9 +320,9 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
 
             if (type instanceof AbstractType) {
              
-		// Do not create a stub for this type...
+                // Do not create a stub for this type...
  
-		createStub = false;  // d11141
+                createStub = false;  // d11141
             }
                           
             if (createStub) {
@@ -335,8 +335,8 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
 
         // Copy list into array..
         
-	OutputType[] outputTypes = new OutputType[list.size()];
-	list.copyInto(outputTypes);
+        OutputType[] outputTypes = new OutputType[list.size()];
+        list.copyInto(outputTypes);
         return outputTypes;
     }
 
@@ -348,7 +348,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      * @param outputType One of the items returned by getOutputTypesFor(...)
      */
     protected String getFileNameExtensionFor(OutputType outputType) {
-	return SOURCE_FILE_EXTENSION;
+        return SOURCE_FILE_EXTENSION;
     }
 
     /**
@@ -358,121 +358,121 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      *  Intended to be passed to Type.collectMatching(filter,alreadyChecked).
      * @param writer The output stream.
      */
-    protected void writeOutputFor(	OutputType outputType,
-					HashSet alreadyChecked,
-					IndentingWriter writer) throws IOException {
+    protected void writeOutputFor(      OutputType outputType,
+                                        HashSet alreadyChecked,
+                                        IndentingWriter writer) throws IOException {
 
-	String fileName = outputType.getName();
-	CompoundType theType = (CompoundType) outputType.getType();
+        String fileName = outputType.getName();
+        CompoundType theType = (CompoundType) outputType.getType();
 
-	// Are we doing a Stub or Tie?
+        // Are we doing a Stub or Tie?
 
-	if (fileName.endsWith(Utility.RMI_STUB_SUFFIX)) {
-	            
-	    // Stub.
-	        
-	    writeStub(outputType,writer);
-	        
-	} else {
-	        
-	    // Tie
-	        
-	    writeTie(outputType,writer);
-	}
+        if (fileName.endsWith(Utility.RMI_STUB_SUFFIX)) {
+                    
+            // Stub.
+                
+            writeStub(outputType,writer);
+                
+        } else {
+                
+            // Tie
+                
+            writeTie(outputType,writer);
+        }
     }
                                             
     /**
      * Write a stub for the specified type.
      */
     protected void writeStub(OutputType outputType,
-			     IndentingWriter p) throws IOException {
+                             IndentingWriter p) throws IOException {
 
         CompoundType theType = (CompoundType) outputType.getType();
-	RemoteType[] remoteInterfaces = getDirectRemoteInterfaces(theType);
+        RemoteType[] remoteInterfaces = getDirectRemoteInterfaces(theType);
         
-	// Write comment.
+        // Write comment.
 
-	p.pln("// Stub class generated by rmic, do not edit.");
-	p.pln("// Contents subject to change without notice.");
-	p.pln();
+        p.pln("// Stub class generated by rmic, do not edit.");
+        p.pln("// Contents subject to change without notice.");
+        p.pln();
 
         // Set our standard classes...
         
         setStandardClassesInUse(theType,true);
-		
-	// Add classes for this type...
-		
-	addClassesInUse(theType,remoteInterfaces);
+                
+        // Add classes for this type...
+                
+        addClassesInUse(theType,remoteInterfaces);
 
         // START OF IASRI 6307510
         imports.remove(theType.getName().toString());
         importCount--;
         // END OF IASRI 6307510
 
-	// Write package and import statements...
-		
-	writePackageAndImports(p);
+        // Write package and import statements...
+                
+        writePackageAndImports(p);
 
-	// Declare the stub class; implement all remote interfaces.
+        // Declare the stub class; implement all remote interfaces.
 
-	p.p("public class " + currentClass);
-	p.p(" extends " + getName(stubBaseClass));
-	p.p(" implements ");
-	if (remoteInterfaces.length > 0) {
-	    for(int i = 0; i < remoteInterfaces.length; i++) {
-		if (i > 0) {
-		    p.pln(",");
-		}
-		String objName = testUtil(getName(remoteInterfaces[i]), theType);
-		p.p(objName);
-	    }
-	}
-		
+        p.p("public class " + currentClass);
+        p.p(" extends " + getName(stubBaseClass));
+        p.p(" implements ");
+        if (remoteInterfaces.length > 0) {
+            for(int i = 0; i < remoteInterfaces.length; i++) {
+                if (i > 0) {
+                    p.pln(",");
+                }
+                String objName = testUtil(getName(remoteInterfaces[i]), theType);
+                p.p(objName);
+            }
+        }
+                
         // Add java.rmi.Remote if this type does not implement it.
         // This allows stubs for Abstract interfaces to be treated
         // uniformly...
 
-	if (!implementsRemote(theType)) {
-	    p.pln(",");
-	    p.p(getName("java.rmi.Remote"));
+        if (!implementsRemote(theType)) {
+            p.pln(",");
+            p.p(getName("java.rmi.Remote"));
         }
         
-	p.plnI(" {");
-	p.pln();
+        p.plnI(" {");
+        p.pln();
         
         // Write the ids...
         
-	writeIds( p, theType, false );
-	p.pln();
+        writeIds( p, theType, false );
+        p.pln();
  
-	// Write the _ids() method...
-		
-	p.plnI("public String[] _ids() { ");
-	p.pln("return _type_ids;");
-	p.pOln("}");
-		
+        // Write the _ids() method...
+                
+        p.plnI("public String[] _ids() { ");
+        p.pln("return _type_ids;");
+        p.pOln("}");
+                
         // Get all the methods and write each stub method...
         
-	CompoundType.Method[] remoteMethods = theType.getMethods();
+        CompoundType.Method[] remoteMethods = theType.getMethods();
         int methodCount = remoteMethods.length;
         if (methodCount > 0) {
             boolean writeHeader = true;
-	    for(int i = 0; i < methodCount; i++) {
-		if (!remoteMethods[i].isConstructor()) {
-		    if (writeHeader) {
-			writeHeader = false;
-		    }
-		    p.pln();
-		    writeStubMethod(p, remoteMethods[i], theType);
+            for(int i = 0; i < methodCount; i++) {
+                if (!remoteMethods[i].isConstructor()) {
+                    if (writeHeader) {
+                        writeHeader = false;
+                    }
+                    p.pln();
+                    writeStubMethod(p, remoteMethods[i], theType);
                 }
-	    }
+            }
         }
 
         // Write the cast array hack...
         
         writeCastArray(p);
-		
-	p.pOln("}");		// end stub class
+                
+        p.pOln("}");            // end stub class
     }
     
     void addClassInUse(String qualifiedName) {
@@ -597,7 +597,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
 
                 }
 
-	    } else if (importName != null) { 
+            } else if (importName != null) { 
                                 
                 // It is in some package for which we normally
                 // would import, but we have a previous import
@@ -606,24 +606,24 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
                     
                 nameToUse = qualifiedName;
 
-		/*
-		  // Is the currentPackage the default package?
+                /*
+                  // Is the currentPackage the default package?
                 
-		  if (currentPackage == null) {
+                  if (currentPackage == null) {
                 
-		  // Yes, so undo the import so that all
-		  // uses for this name will be qualified...
+                  // Yes, so undo the import so that all
+                  // uses for this name will be qualified...
                     
-		  String old = (String)imports.remove(unqualifiedName);
-		  classesInUse.put(old,old);
-		  importCount--;
+                  String old = (String)imports.remove(unqualifiedName);
+                  classesInUse.put(old,old);
+                  importCount--;
                 
-		  // Note that this name is in use but should
-		  // not be imported...
+                  // Note that this name is in use but should
+                  // not be imported...
                     
-		  imports.put(nameToUse,NO_IMPORT);                
-		  }
-		*/
+                  imports.put(nameToUse,NO_IMPORT);                
+                  }
+                */
             } else if (qualifiedName.equals("org.omg.CORBA.Object")) { 
                 
                 // Always qualify this quy to avoid confusion...
@@ -681,7 +681,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
     }
     
     void setStandardClassesInUse(CompoundType type,
-				 boolean stub) throws IOException {
+                                 boolean stub) throws IOException {
         
         // Reset our state...
         
@@ -773,7 +773,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         // If this is a stub, add all interfaces...
         
         if (interfaces != null) {
-	    addClassInUse(interfaces);
+            addClassInUse(interfaces);
         }
     }
     
@@ -781,13 +781,13 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
 
         // Write package declaration...
         
-	if (currentPackage != null) {
-	    p.pln("package " + 
+        if (currentPackage != null) {
+            p.pln("package " + 
                    Util.correctPackageName(
                         currentPackage, false, standardPackage)
                    + ";");
-	    p.pln();                             
-	}
+            p.pln();                             
+        }
        
         // Get imports into an array and sort them...
         
@@ -831,7 +831,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         // If theType is not remote, look at all the interfaces
         // until we find one that is...
         
-	if (!result) {
+        if (!result) {
             InterfaceType[] interfaces = theType.getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
                 result = implementsRemote(interfaces[i]);
@@ -850,38 +850,38 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         
         // Wtite the method declaration and opening brace...
         
-	String methodName = method.getName();
-	String methodIDLName = method.getIDLName();
+        String methodName = method.getName();
+        String methodIDLName = method.getIDLName();
 
-	Type paramTypes[] = method.getArguments();
-	String paramNames[] = method.getArgumentNames();
-	Type returnType = method.getReturnType();
-	ValueType[] exceptions = getStubExceptions(method,false);
+        Type paramTypes[] = method.getArguments();
+        String paramNames[] = method.getArgumentNames();
+        Type returnType = method.getReturnType();
+        ValueType[] exceptions = getStubExceptions(method,false);
         
         addNamesInUse(method);
         addNameInUse("_type_ids");
 
-	String objName = testUtil(getName(returnType), returnType);
-	p.p("public " + objName + " " + methodName + "(");
-	for(int i = 0; i < paramTypes.length; i++) {
-	    if (i > 0)
-		p.p(", ");
-	    p.p(getName(paramTypes[i]) + " " + paramNames[i]);
-	}
+        String objName = testUtil(getName(returnType), returnType);
+        p.p("public " + objName + " " + methodName + "(");
+        for(int i = 0; i < paramTypes.length; i++) {
+            if (i > 0)
+                p.p(", ");
+            p.p(getName(paramTypes[i]) + " " + paramNames[i]);
+        }
 
-	p.p(")");
-	if (exceptions.length > 0) {
-	    p.p(" throws ");
-	    for(int i = 0; i < exceptions.length; i++) {
-		if (i > 0) {
-		    p.p(", ");
-		}
-		// Added for Bug 4818753
-		p.p(getExceptionName(exceptions[i]));
-	    }
-	}
+        p.p(")");
+        if (exceptions.length > 0) {
+            p.p(" throws ");
+            for(int i = 0; i < exceptions.length; i++) {
+                if (i > 0) {
+                    p.p(", ");
+                }
+                // Added for Bug 4818753
+                p.p(getExceptionName(exceptions[i]));
+            }
+        }
 
-	p.plnI(" {");
+        p.plnI(" {");
         
         // Now create the method body...
         
@@ -893,18 +893,18 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
  
         // Close out the method...
         
-	p.pOln("}");
+        p.pOln("}");
     }
 
 
     void writeLocalStubMethodBody (IndentingWriter p,
-				   CompoundType.Method method,
-				   CompoundType theType) throws IOException {
+                                   CompoundType.Method method,
+                                   CompoundType theType) throws IOException {
     
-	String objName;
-	String paramNames[] = method.getArgumentNames();
-	Type returnType = method.getReturnType();
-	ValueType[] exceptions = getStubExceptions(method,false);
+        String objName;
+        String paramNames[] = method.getArgumentNames();
+        Type returnType = method.getReturnType();
+        ValueType[] exceptions = getStubExceptions(method,false);
         String methodName = method.getName();
         String methodIDLName = method.getIDLName();
         
@@ -920,14 +920,14 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         }
         p.p(methodName+"(");
         for (int i = 0; i < paramNames.length; i++) {
-	    if (i > 0)
-		p.p(", ");
-	    p.p(paramNames[i]);
+            if (i > 0)
+                p.p(", ");
+            p.p(paramNames[i]);
         }
         p.pln(");");
-	if (returnType.isType(TYPE_VOID)) {
-	    p.pln( "return ;" ) ;
-	}
+        if (returnType.isType(TYPE_VOID)) {
+            p.pln( "return ;" ) ;
+        }
 
         p.pOln("}");
         p.plnI("try {");
@@ -944,19 +944,19 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         if (!returnType.isType(TYPE_VOID)) {
             if (copyReturn) {
                 resultName = getVariableName("result");
-		objName = testUtil(getName(returnType), returnType);
-		p.p(objName+" "+resultName + " = ");
+                objName = testUtil(getName(returnType), returnType);
+                p.p(objName+" "+resultName + " = ");
             } else {
                 p.p("return ");
             }
         }
-	objName = testUtil(getName(theType), theType);
-	p.p("(("+objName+")"+so+".servant)."+methodName+"(");
+        objName = testUtil(getName(theType), theType);
+        p.p("(("+objName+")"+so+".servant)."+methodName+"(");
         
         for (int i = 0; i < argNames.length; i++) {
-	    if (i > 0)
-		p.p(", ");
-	    p.p(argNames[i]);
+            if (i > 0)
+                p.p(", ");
+            p.p(argNames[i]);
         }
         
         if (copyReturn) {
@@ -972,35 +972,35 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         p.pOlnI("} catch (Throwable "+e1+") {");
           
         p.pln("Throwable "+e2+" = (Throwable)Util.copyObject("+e1+",_orb());");
-	for(int i = 0; i < exceptions.length; i++) {
-	    if (exceptions[i].getIdentifier() != idRemoteException &&
-		exceptions[i].isType(TYPE_VALUE)) {
-		// Added for Bug 4818753
-		p.plnI("if ("+e2+" instanceof "+getExceptionName(exceptions[i])+") {");
-		p.pln("throw ("+getExceptionName(exceptions[i])+")"+e2+";");
-		p.pOln("}");
-	    }
-	}
+        for(int i = 0; i < exceptions.length; i++) {
+            if (exceptions[i].getIdentifier() != idRemoteException &&
+                exceptions[i].isType(TYPE_VALUE)) {
+                // Added for Bug 4818753
+                p.plnI("if ("+e2+" instanceof "+getExceptionName(exceptions[i])+") {");
+                p.pln("throw ("+getExceptionName(exceptions[i])+")"+e2+";");
+                p.pOln("}");
+            }
+        }
         
         p.pln("throw Util.wrapException("+e2+");");
-	p.pOlnI("} finally {");
-	p.pln("_servant_postinvoke("+so+");");
-	p.pOln("}");
-	p.pOln("}");    
+        p.pOlnI("} finally {");
+        p.pln("_servant_postinvoke("+so+");");
+        p.pOln("}");
+        p.pOln("}");    
     }
 
 
     void writeNonLocalStubMethodBody (  IndentingWriter p,
-					CompoundType.Method method,
-					CompoundType theType) throws IOException {
+                                        CompoundType.Method method,
+                                        CompoundType theType) throws IOException {
                                 
-	String methodName = method.getName();
-	String methodIDLName = method.getIDLName();
+        String methodName = method.getName();
+        String methodIDLName = method.getIDLName();
 
-	Type paramTypes[] = method.getArguments();
-	String paramNames[] = method.getArgumentNames();
-	Type returnType = method.getReturnType();
-	ValueType[] exceptions = getStubExceptions(method,true);
+        Type paramTypes[] = method.getArguments();
+        String paramNames[] = method.getArgumentNames();
+        Type returnType = method.getReturnType();
+        ValueType[] exceptions = getStubExceptions(method,true);
     
         String in = getVariableName("in");
         String out = getVariableName("out");
@@ -1012,8 +1012,8 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         boolean needNewReadStreamClass = false;
         for (int i = 0; i < exceptions.length; i++) {
             if (exceptions[i].getIdentifier() != idRemoteException &&
-		exceptions[i].isType(TYPE_VALUE) &&
-		needNewReadStreamClass(exceptions[i])) {
+                exceptions[i].isType(TYPE_VALUE) &&
+                needNewReadStreamClass(exceptions[i])) {
                 needNewReadStreamClass = true;
                 break;
             }
@@ -1043,147 +1043,147 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
 
         // Now write the method, inserting casts where needed...
         
-	p.plnI("try {");
-	if (needNewReadStreamClass) {
-	    p.pln(idExtInputStream + " "+in+" = null;");
-	} else {
-	    p.pln(idInputStream + " "+in+" = null;");
-	}
-	p.plnI("try {");
+        p.plnI("try {");
+        if (needNewReadStreamClass) {
+            p.pln(idExtInputStream + " "+in+" = null;");
+        } else {
+            p.pln(idInputStream + " "+in+" = null;");
+        }
+        p.plnI("try {");
 
-	String argStream = "null";
+        String argStream = "null";
         
         if (needNewWriteStreamClass) {
-	    p.plnI(idExtOutputStream + " "+out+" = ");
-	    p.pln("(" + idExtOutputStream + ")");
-	    p.pln("_request(\"" + methodIDLName + "\", true);");
-	    p.pO();
+            p.plnI(idExtOutputStream + " "+out+" = ");
+            p.pln("(" + idExtOutputStream + ")");
+            p.pln("_request(\"" + methodIDLName + "\", true);");
+            p.pO();
         } else {
-	    p.pln("OutputStream "+out+" = _request(\"" + methodIDLName + "\", true);");
+            p.pln("OutputStream "+out+" = _request(\"" + methodIDLName + "\", true);");
         }
         
-	if (paramTypes.length > 0) {
-	    writeMarshalArguments(p, out, paramTypes, paramNames);
-	    p.pln();
-	}
-	argStream = out;
+        if (paramTypes.length > 0) {
+            writeMarshalArguments(p, out, paramTypes, paramNames);
+            p.pln();
+        }
+        argStream = out;
 
-	if (returnType.isType(TYPE_VOID)) {
-	    p.pln("_invoke(" + argStream + ");" );
-	} else {
-	    if (needNewReadStreamClass) {
-		p.plnI(in+" = (" + idExtInputStream + ")_invoke(" + argStream + ");");
-		p.pO();
-	    } else {
-		p.pln(in+" = _invoke(" + argStream + ");");
-	    }
-	    p.p("return ");
-	    writeUnmarshalArgument(p, in, returnType, null);
-	    p.pln();
-	}
+        if (returnType.isType(TYPE_VOID)) {
+            p.pln("_invoke(" + argStream + ");" );
+        } else {
+            if (needNewReadStreamClass) {
+                p.plnI(in+" = (" + idExtInputStream + ")_invoke(" + argStream + ");");
+                p.pO();
+            } else {
+                p.pln(in+" = _invoke(" + argStream + ");");
+            }
+            p.p("return ");
+            writeUnmarshalArgument(p, in, returnType, null);
+            p.pln();
+        }
         
         // Handle ApplicationException...
         
-	p.pOlnI("} catch ("+getName(idApplicationException)+" "+ex+") {");
-	if (needNewReadStreamClass) {
-	    p.pln(in + " = (" + idExtInputStream + ") "+ex+".getInputStream();");
+        p.pOlnI("} catch ("+getName(idApplicationException)+" "+ex+") {");
+        if (needNewReadStreamClass) {
+            p.pln(in + " = (" + idExtInputStream + ") "+ex+".getInputStream();");
         } else {
-	    p.pln(in + " = "+ex+".getInputStream();");
+            p.pln(in + " = "+ex+".getInputStream();");
         }
 
         boolean idRead = false;
         boolean idAllocated = false;
-	for(int i = 0; i < exceptions.length; i++) {
-	    if (exceptions[i].getIdentifier() != idRemoteException) {
-	
-		// Is this our special-case IDLEntity exception?
-	            
-		if (exceptions[i].isIDLEntityException() && !exceptions[i].isCORBAUserException()) {
-				    
-		    // Yes.
-				    
-		    if (!idAllocated && !idRead) {
-			p.pln("String $_id = "+ex+".getId();");
-			idAllocated = true;
-		    }
-				    
-		    String helperName = IDLNames.replace(exceptions[i].getQualifiedIDLName(false),"::",".");
-		    helperName += "Helper";
-		    p.plnI("if ($_id.equals("+helperName+".id())) {");
-		    p.pln("throw "+helperName+".read("+in+");");
-				    
-		} else {
-				    
-		    // No.
-				    
-		    if (!idAllocated && !idRead) {
-	p.pln("String $_id = "+in+".read_string();");
-			idAllocated = true;
-			idRead = true;
-		    } else if (idAllocated && !idRead) {
-			p.pln("$_id = "+in+".read_string();");
-			idRead = true;
-		    }
-		    p.plnI("if ($_id.equals(\""+getExceptionRepositoryID(exceptions[i])+"\")) {");
-		    // Added for Bug 4818753
-		    p.pln("throw ("+getExceptionName(exceptions[i])+") "+in+".read_value(" + getExceptionName(exceptions[i]) + ".class);");
-		}
-		p.pOln("}");
-	    }
-	}
-	if (!idAllocated && !idRead) {
-	    p.pln("String $_id = "+in+".read_string();");
-	    idAllocated = true;
-	    idRead = true;
-	} else if (idAllocated && !idRead) {
-	    p.pln("$_id = "+in+".read_string();");
-	    idRead = true;
-	}
-	p.pln("throw new UnexpectedException($_id);");
+        for(int i = 0; i < exceptions.length; i++) {
+            if (exceptions[i].getIdentifier() != idRemoteException) {
+        
+                // Is this our special-case IDLEntity exception?
+                    
+                if (exceptions[i].isIDLEntityException() && !exceptions[i].isCORBAUserException()) {
+                                    
+                    // Yes.
+                                    
+                    if (!idAllocated && !idRead) {
+                        p.pln("String $_id = "+ex+".getId();");
+                        idAllocated = true;
+                    }
+                                    
+                    String helperName = IDLNames.replace(exceptions[i].getQualifiedIDLName(false),"::",".");
+                    helperName += "Helper";
+                    p.plnI("if ($_id.equals("+helperName+".id())) {");
+                    p.pln("throw "+helperName+".read("+in+");");
+                                    
+                } else {
+                                    
+                    // No.
+                                    
+                    if (!idAllocated && !idRead) {
+        p.pln("String $_id = "+in+".read_string();");
+                        idAllocated = true;
+                        idRead = true;
+                    } else if (idAllocated && !idRead) {
+                        p.pln("$_id = "+in+".read_string();");
+                        idRead = true;
+                    }
+                    p.plnI("if ($_id.equals(\""+getExceptionRepositoryID(exceptions[i])+"\")) {");
+                    // Added for Bug 4818753
+                    p.pln("throw ("+getExceptionName(exceptions[i])+") "+in+".read_value(" + getExceptionName(exceptions[i]) + ".class);");
+                }
+                p.pOln("}");
+            }
+        }
+        if (!idAllocated && !idRead) {
+            p.pln("String $_id = "+in+".read_string();");
+            idAllocated = true;
+            idRead = true;
+        } else if (idAllocated && !idRead) {
+            p.pln("$_id = "+in+".read_string();");
+            idRead = true;
+        }
+        p.pln("throw new UnexpectedException($_id);");
         
         // Handle RemarshalException...
         
-	p.pOlnI("} catch ("+getName(idRemarshalException)+" "+ex+") {");
-	if (!returnType.isType(TYPE_VOID)) {
-	    p.p("return ");
-	}
-	p.p(methodName + "(");
-	for(int i = 0; i < paramTypes.length; i++) {
-	    if (i > 0) {
-		p.p(",");
-	    }
-	    p.p(paramNames[i]);
-	}
-	p.pln(");");
-		
-	// Ensure that we release the reply...
-		
-	p.pOlnI("} finally {");
-	p.pln("_releaseReply("+in+");");
-		
-	p.pOln("}"); 
+        p.pOlnI("} catch ("+getName(idRemarshalException)+" "+ex+") {");
+        if (!returnType.isType(TYPE_VOID)) {
+            p.p("return ");
+        }
+        p.p(methodName + "(");
+        for(int i = 0; i < paramTypes.length; i++) {
+            if (i > 0) {
+                p.p(",");
+            }
+            p.p(paramNames[i]);
+        }
+        p.pln(");");
+                
+        // Ensure that we release the reply...
+                
+        p.pOlnI("} finally {");
+        p.pln("_releaseReply("+in+");");
+                
+        p.pOln("}"); 
         
         // Handle SystemException...
         
-	p.pOlnI("} catch (SystemException "+ex+") {");
-	p.pln("throw Util.mapSystemException("+ex+");");		
-	p.pOln("}");
+        p.pOlnI("} catch (SystemException "+ex+") {");
+        p.pln("throw Util.mapSystemException("+ex+");");                
+        p.pOln("}");
 
         // returnResult(p,returnType);
     }
 
     void allocateResult (IndentingWriter p,
                          Type returnType) throws IOException {
-	if (!returnType.isType(TYPE_VOID)) {
-	    String objName = testUtil(getName(returnType), returnType);
-	    p.p(objName + " result = ");
-    	}
+        if (!returnType.isType(TYPE_VOID)) {
+            String objName = testUtil(getName(returnType), returnType);
+            p.p(objName + " result = ");
+        }
     }
 
     int getTypeCode(Type type) {
-	    
-	int typeCode = type.getTypeCode();
-	    
+            
+        int typeCode = type.getTypeCode();
+            
         // Handle late-breaking special case for
         // abstract IDL entities...
         
@@ -1201,73 +1201,73 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      * type "type" to the java.io.ObjectOutput stream named "stream".
      */
     void writeMarshalArgument(IndentingWriter p,
-			      String streamName,
-			      Type type, String name) throws IOException {
+                              String streamName,
+                              Type type, String name) throws IOException {
 
-	int typeCode = getTypeCode(type);
+        int typeCode = getTypeCode(type);
 
-	switch (typeCode) {
-	case TYPE_BOOLEAN:
-	    p.p(streamName + ".write_boolean(" + name + ");");
-	    break;
-	case TYPE_BYTE:
-	    p.p(streamName + ".write_octet(" + name + ");");
-	    break;
-	case TYPE_CHAR:
-	    p.p(streamName + ".write_wchar(" + name + ");");
-	    break;
-	case TYPE_SHORT:
-	    p.p(streamName + ".write_short(" + name + ");");
-	    break;
-	case TYPE_INT:
-	    p.p(streamName + ".write_long(" + name + ");");
-	    break;
-	case TYPE_LONG:
-	    p.p(streamName + ".write_longlong(" + name + ");");
-	    break;
-	case TYPE_FLOAT:
-	    p.p(streamName + ".write_float(" + name + ");");
-	    break;
-	case TYPE_DOUBLE:
-	    p.p(streamName + ".write_double(" + name + ");");
-	    break;
-	case TYPE_STRING:
-	    p.p(streamName + ".write_value(" + name + "," + getName(type) + ".class);");
-	    break;
-	case TYPE_ANY:
-	    p.p("Util.writeAny("+ streamName + "," + name + ");");
-	    break;
-	case TYPE_CORBA_OBJECT:
-	    p.p(streamName + ".write_Object(" + name + ");");
-	    break;
-	case TYPE_REMOTE:
-	    p.p("Util.writeRemoteObject("+ streamName + "," + name + ");");
-	    break;
-	case TYPE_ABSTRACT:
-	    p.p("Util.writeAbstractObject("+ streamName + "," + name + ");");
-	    break;
-	case TYPE_NC_INTERFACE:
-	    p.p(streamName + ".write_value((Serializable)" + name + "," + getName(type) + ".class);");
-	    break;
-	case TYPE_VALUE:
-	    p.p(streamName + ".write_value(" + name + "," + getName(type) + ".class);");
-	    break;
-	case TYPE_IMPLEMENTATION:
-	    p.p(streamName + ".write_value((Serializable)" + name + "," + getName(type) + ".class);");
-	    break;
-	case TYPE_NC_CLASS:
-	    p.p(streamName + ".write_value((Serializable)" + name + "," + getName(type) + ".class);");
-	    break;
-	case TYPE_ARRAY:
-	    castArray = true;
-	    p.p(streamName + ".write_value(cast_array(" + name + ")," + getName(type) + ".class);");
-	    break;
-	case TYPE_JAVA_RMI_REMOTE:
-	    p.p("Util.writeRemoteObject("+ streamName + "," + name + ");");
-	    break;
-	default:
-	    throw new Error("unexpected type code: " + typeCode);
-	}
+        switch (typeCode) {
+        case TYPE_BOOLEAN:
+            p.p(streamName + ".write_boolean(" + name + ");");
+            break;
+        case TYPE_BYTE:
+            p.p(streamName + ".write_octet(" + name + ");");
+            break;
+        case TYPE_CHAR:
+            p.p(streamName + ".write_wchar(" + name + ");");
+            break;
+        case TYPE_SHORT:
+            p.p(streamName + ".write_short(" + name + ");");
+            break;
+        case TYPE_INT:
+            p.p(streamName + ".write_long(" + name + ");");
+            break;
+        case TYPE_LONG:
+            p.p(streamName + ".write_longlong(" + name + ");");
+            break;
+        case TYPE_FLOAT:
+            p.p(streamName + ".write_float(" + name + ");");
+            break;
+        case TYPE_DOUBLE:
+            p.p(streamName + ".write_double(" + name + ");");
+            break;
+        case TYPE_STRING:
+            p.p(streamName + ".write_value(" + name + "," + getName(type) + ".class);");
+            break;
+        case TYPE_ANY:
+            p.p("Util.writeAny("+ streamName + "," + name + ");");
+            break;
+        case TYPE_CORBA_OBJECT:
+            p.p(streamName + ".write_Object(" + name + ");");
+            break;
+        case TYPE_REMOTE:
+            p.p("Util.writeRemoteObject("+ streamName + "," + name + ");");
+            break;
+        case TYPE_ABSTRACT:
+            p.p("Util.writeAbstractObject("+ streamName + "," + name + ");");
+            break;
+        case TYPE_NC_INTERFACE:
+            p.p(streamName + ".write_value((Serializable)" + name + "," + getName(type) + ".class);");
+            break;
+        case TYPE_VALUE:
+            p.p(streamName + ".write_value(" + name + "," + getName(type) + ".class);");
+            break;
+        case TYPE_IMPLEMENTATION:
+            p.p(streamName + ".write_value((Serializable)" + name + "," + getName(type) + ".class);");
+            break;
+        case TYPE_NC_CLASS:
+            p.p(streamName + ".write_value((Serializable)" + name + "," + getName(type) + ".class);");
+            break;
+        case TYPE_ARRAY:
+            castArray = true;
+            p.p(streamName + ".write_value(cast_array(" + name + ")," + getName(type) + ".class);");
+            break;
+        case TYPE_JAVA_RMI_REMOTE:
+            p.p("Util.writeRemoteObject("+ streamName + "," + name + ");");
+            break;
+        default:
+            throw new Error("unexpected type code: " + typeCode);
+        }
     }
 
     /**
@@ -1277,88 +1277,88 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      * discarded).
      */
     void writeUnmarshalArgument(IndentingWriter p,
-				String streamName,
-				Type type,
-				String name) throws IOException {
+                                String streamName,
+                                Type type,
+                                String name) throws IOException {
 
         int typeCode = getTypeCode(type);
-	    
-	if (name != null) {
-	    p.p(name + " = ");
+            
+        if (name != null) {
+            p.p(name + " = ");
         }
         
-	switch (typeCode) {
-	case TYPE_BOOLEAN:
-	    p.p(streamName + ".read_boolean();");
-	    break;
-	case TYPE_BYTE:
-	    p.p(streamName + ".read_octet();");
-	    break;
-	case TYPE_CHAR:
-	    p.p(streamName + ".read_wchar();");
-	    break;
-	case TYPE_SHORT:
-	    p.p(streamName + ".read_short();");
-	    break;
-	case TYPE_INT:
-	    p.p(streamName + ".read_long();");
-	    break;
-	case TYPE_LONG:
-	    p.p(streamName + ".read_longlong();");
-	    break;
-	case TYPE_FLOAT:
-	    p.p(streamName + ".read_float();");
-	    break;
-	case TYPE_DOUBLE:
-	    p.p(streamName + ".read_double();");
-	    break;
-	case TYPE_STRING:
-	    p.p("(String) " + streamName + ".read_value(" + getName(type) + ".class);");
-	    break;
-	case TYPE_ANY:
-	    if (type.getIdentifier() != idJavaLangObject) {
-		p.p("(" + getName(type) + ") ");
-	    }
-	    p.p("Util.readAny(" + streamName + ");");
-	    break;
-	case TYPE_CORBA_OBJECT:
-	    if (type.getIdentifier() == idCorbaObject) {
-		p.p("(" + getName(type) + ") " + streamName + ".read_Object();");
-	    } else {
-		p.p("(" + getName(type) + ") " + streamName + ".read_Object(" + getStubName(type) + ".class);");
-	    }
-	    break;
-	case TYPE_REMOTE:
-	    String objName = testUtil(getName(type), type);
-	    p.p("(" + objName + ") " +
-		"PortableRemoteObject.narrow(" + streamName + ".read_Object(), " + objName + ".class);");
-	    break;
-	case TYPE_ABSTRACT:
-	    p.p("(" + getName(type) + ") " + streamName + ".read_abstract_interface();");
-	    break;
-	case TYPE_NC_INTERFACE:
-	    p.p("(" + getName(type) + ") " + streamName + ".read_value(" + getName(type) + ".class);");
-	    break;
-	case TYPE_VALUE:
-	    p.p("(" + getName(type) + ") " + streamName + ".read_value(" + getName(type) + ".class);");
-	    break;
-	case TYPE_IMPLEMENTATION:
-	    p.p("(" + getName(type) + ") " + streamName + ".read_value(" + getName(type) + ".class);");
-	    break;
-	case TYPE_NC_CLASS:
-	    p.p("(" + getName(type) + ") " + streamName + ".read_value(" + getName(type) + ".class);");
-	    break;
-	case TYPE_ARRAY:
-	    p.p("(" + getName(type) + ") " + streamName + ".read_value(" + getName(type) + ".class);");
-	    break;
-	case TYPE_JAVA_RMI_REMOTE:
- 	    p.p("(" + getName(type) + ") " +
- 		"PortableRemoteObject.narrow(" + streamName + ".read_Object(), " + getName(type) + ".class);");
-            //	    p.p("(" + getName(type) + ") " + streamName + ".read_Object(" + getStubName(type) + ".class);");
-	    break;
-	default:
-	    throw new Error("unexpected type code: " + typeCode);
-	}
+        switch (typeCode) {
+        case TYPE_BOOLEAN:
+            p.p(streamName + ".read_boolean();");
+            break;
+        case TYPE_BYTE:
+            p.p(streamName + ".read_octet();");
+            break;
+        case TYPE_CHAR:
+            p.p(streamName + ".read_wchar();");
+            break;
+        case TYPE_SHORT:
+            p.p(streamName + ".read_short();");
+            break;
+        case TYPE_INT:
+            p.p(streamName + ".read_long();");
+            break;
+        case TYPE_LONG:
+            p.p(streamName + ".read_longlong();");
+            break;
+        case TYPE_FLOAT:
+            p.p(streamName + ".read_float();");
+            break;
+        case TYPE_DOUBLE:
+            p.p(streamName + ".read_double();");
+            break;
+        case TYPE_STRING:
+            p.p("(String) " + streamName + ".read_value(" + getName(type) + ".class);");
+            break;
+        case TYPE_ANY:
+            if (type.getIdentifier() != idJavaLangObject) {
+                p.p("(" + getName(type) + ") ");
+            }
+            p.p("Util.readAny(" + streamName + ");");
+            break;
+        case TYPE_CORBA_OBJECT:
+            if (type.getIdentifier() == idCorbaObject) {
+                p.p("(" + getName(type) + ") " + streamName + ".read_Object();");
+            } else {
+                p.p("(" + getName(type) + ") " + streamName + ".read_Object(" + getStubName(type) + ".class);");
+            }
+            break;
+        case TYPE_REMOTE:
+            String objName = testUtil(getName(type), type);
+            p.p("(" + objName + ") " +
+                "PortableRemoteObject.narrow(" + streamName + ".read_Object(), " + objName + ".class);");
+            break;
+        case TYPE_ABSTRACT:
+            p.p("(" + getName(type) + ") " + streamName + ".read_abstract_interface();");
+            break;
+        case TYPE_NC_INTERFACE:
+            p.p("(" + getName(type) + ") " + streamName + ".read_value(" + getName(type) + ".class);");
+            break;
+        case TYPE_VALUE:
+            p.p("(" + getName(type) + ") " + streamName + ".read_value(" + getName(type) + ".class);");
+            break;
+        case TYPE_IMPLEMENTATION:
+            p.p("(" + getName(type) + ") " + streamName + ".read_value(" + getName(type) + ".class);");
+            break;
+        case TYPE_NC_CLASS:
+            p.p("(" + getName(type) + ") " + streamName + ".read_value(" + getName(type) + ".class);");
+            break;
+        case TYPE_ARRAY:
+            p.p("(" + getName(type) + ") " + streamName + ".read_value(" + getName(type) + ".class);");
+            break;
+        case TYPE_JAVA_RMI_REMOTE:
+            p.p("(" + getName(type) + ") " +
+                "PortableRemoteObject.narrow(" + streamName + ".read_Object(), " + getName(type) + ".class);");
+            //      p.p("(" + getName(type) + ") " + streamName + ".read_Object(" + getStubName(type) + ".class);");
+            break;
+        default:
+            throw new Error("unexpected type code: " + typeCode);
+        }
     }
 
     /**
@@ -1597,8 +1597,8 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         }
     }
     void writeIds(IndentingWriter p, CompoundType theType, boolean isTie
-		  ) throws IOException {
-	p.plnI("private static final String[] _type_ids = {");
+                  ) throws IOException {
+        p.plnI("private static final String[] _type_ids = {");
     
         String[] ids = getAllRemoteRepIDs(theType);
 
@@ -1612,17 +1612,17 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
            // Must be an implementation which only implements Remote...
            p.pln("\"\"");
         }
-	String qname = theType.getQualifiedName() ;
-	boolean isTransactional = isTie && transactionalObjects.containsKey( qname ) ;
-	// Add TransactionalObject if needed.
-	if (isTransactional) {
+        String qname = theType.getQualifiedName() ;
+        boolean isTransactional = isTie && transactionalObjects.containsKey( qname ) ;
+        // Add TransactionalObject if needed.
+        if (isTransactional) {
             // Have already written an id.
             p.pln( ", " ) ;
-	    p.pln( "\"IDL:omg.org/CosTransactions/TransactionalObject:1.0\"" ) ;
-	} else if (ids.length > 0) {
-	    p.pln();
+            p.pln( "\"IDL:omg.org/CosTransactions/TransactionalObject:1.0\"" ) ;
+        } else if (ids.length > 0) {
+            p.pln();
         }            
-	p.pOln("};");
+        p.pOln("};");
     }
 
 
@@ -1630,88 +1630,88 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      * Write the Tie for the remote class to a stream.
      */
     protected void writeTie(OutputType outputType,
-			    IndentingWriter p) throws IOException 
+                            IndentingWriter p) throws IOException 
     {
         CompoundType theType = (CompoundType) outputType.getType();
         RemoteType[] remoteInterfaces = null;
-		
-	// Write comment...
-	p.pln("// Tie class generated by rmic, do not edit.");
-	p.pln("// Contents subject to change without notice.");
-	p.pln();
+                
+        // Write comment...
+        p.pln("// Tie class generated by rmic, do not edit.");
+        p.pln("// Contents subject to change without notice.");
+        p.pln();
 
         // Set our standard classes...
         setStandardClassesInUse(theType,false);
-		
-	// Add classes for this type...
-	addClassesInUse(theType,remoteInterfaces);
-		
+                
+        // Add classes for this type...
+        addClassesInUse(theType,remoteInterfaces);
+                
         // START OF IASRI 6307510
         imports.remove(theType.getName().toString());
         importCount--;
         // END OF IASRI 6307510
 
-	// Write package and import statements...
-	writePackageAndImports(p);
+        // Write package and import statements...
+        writePackageAndImports(p);
 
-	// Declare the tie class.
-	p.p("public class " + currentClass + " extends " + 
-	    getName(tieBaseClass) + " implements Tie");
+        // Declare the tie class.
+        p.p("public class " + currentClass + " extends " + 
+            getName(tieBaseClass) + " implements Tie");
 
         // Add java.rmi.Remote if this type does not implement it.
         // This allows stubs for Abstract interfaces to be treated
         // uniformly...
-	if (!implementsRemote(theType)) {
-	    p.pln(",");
-	    p.p(getName("java.rmi.Remote"));
+        if (!implementsRemote(theType)) {
+            p.pln(",");
+            p.p(getName("java.rmi.Remote"));
         }
 
-	p.plnI(" {");
+        p.plnI(" {");
 
-	// Write data members...
-	p.pln();
-	p.pln("private " + getName(theType) + " target = null;");
-	p.pln();
+        // Write data members...
+        p.pln();
+        p.pln("private " + getName(theType) + " target = null;");
+        p.pln();
         
         // Write the ids...
-	writeIds( p, theType, true ) ;
-	
-	// Write setTarget method...
-	p.pln();
-	p.plnI("public void setTarget(Remote target) {");
-	p.pln("this.target = (" + getName(theType) + ") target;");
-	p.pOln("}");
-		
-	// Write getTarget method...
-	p.pln();
-	p.plnI("public Remote getTarget() {");
-	p.pln("return target;");
-	p.pOln("}");
+        writeIds( p, theType, true ) ;
+        
+        // Write setTarget method...
+        p.pln();
+        p.plnI("public void setTarget(Remote target) {");
+        p.pln("this.target = (" + getName(theType) + ") target;");
+        p.pOln("}");
+                
+        // Write getTarget method...
+        p.pln();
+        p.plnI("public Remote getTarget() {");
+        p.pln("return target;");
+        p.pOln("}");
 
-	// Write thisObject method...
-	p.pln();
+        // Write thisObject method...
+        p.pln();
         write_tie_thisObject_method(p,idCorbaObject);
 
-	// Write deactivate method...
-	p.pln();
+        // Write deactivate method...
+        p.pln();
         write_tie_deactivate_method(p);
 
-	// Write get orb method...
-	p.pln();
-	p.plnI("public ORB orb() {");
-	p.pln("return _orb();");
-	p.pOln("}");
+        // Write get orb method...
+        p.pln();
+        p.plnI("public ORB orb() {");
+        p.pln("return _orb();");
+        p.pOln("}");
 
-	// Write set orb method...
-	p.pln();
+        // Write set orb method...
+        p.pln();
         write_tie_orb_method(p);
 
-	// Write the _ids() method...
-	p.pln();
+        // Write the _ids() method...
+        p.pln();
         write_tie__ids_method(p);
 
         // Get all the methods...
-	CompoundType.Method[] remoteMethods = theType.getMethods();
+        CompoundType.Method[] remoteMethods = theType.getMethods();
         
         // Register all the argument names used, plus our
         // data member names...
@@ -1721,89 +1721,89 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         addNameInUse("_type_ids");
         
         // Write the _invoke method...
-	p.pln();
-	
-	String in = getVariableName("in");
-	String _in = getVariableName("_in");
-	String ex = getVariableName("ex");
-	String method = getVariableName("method");
-	String reply = getVariableName("reply");
-	
-	p.plnI("public OutputStream  _invoke(String "+method+", InputStream "+_in+", " +
-	       "ResponseHandler "+reply+") throws SystemException {");
+        p.pln();
+        
+        String in = getVariableName("in");
+        String _in = getVariableName("_in");
+        String ex = getVariableName("ex");
+        String method = getVariableName("method");
+        String reply = getVariableName("reply");
+        
+        p.plnI("public OutputStream  _invoke(String "+method+", InputStream "+_in+", " +
+               "ResponseHandler "+reply+") throws SystemException {");
 
-	if (remoteMethods.length > 0) {
-	    p.plnI("try {");
-	    p.plnI(idExtInputStream + " "+in+" = ");
-	    p.pln("(" + idExtInputStream + ") "+_in+";");
-	    p.pO();
-		    
-	    // See if we should use a hash table style
-	    // comparison...
+        if (remoteMethods.length > 0) {
+            p.plnI("try {");
+            p.plnI(idExtInputStream + " "+in+" = ");
+            p.pln("(" + idExtInputStream + ") "+_in+";");
+            p.pO();
+                    
+            // See if we should use a hash table style
+            // comparison...
 
             StaticStringsHash hash = getStringsHash(remoteMethods);
             
-	    if (hash != null) {
+            if (hash != null) {
                 p.plnI("switch ("+method+"."+hash.method+") {");
                 for (int i = 0; i < hash.buckets.length; i++) {
                     p.plnI("case "+hash.keys[i]+": ");
                     for (int j = 0; j < hash.buckets[i].length; j++) {
-			CompoundType.Method current = remoteMethods[hash.buckets[i][j]];
-			if (j > 0) {
-			    p.pO("} else ");
-			}
-			p.plnI("if ("+method+".equals(\""+ current.getIDLName() +"\")) {");
-			writeTieMethod(p, theType,current);
+                        CompoundType.Method current = remoteMethods[hash.buckets[i][j]];
+                        if (j > 0) {
+                            p.pO("} else ");
+                        }
+                        p.plnI("if ("+method+".equals(\""+ current.getIDLName() +"\")) {");
+                        writeTieMethod(p, theType,current);
                     }
                     p.pOln("}");
                     p.pO();
                 }
-	    } else {
-		for(int i = 0; i < remoteMethods.length; i++) {
-		CompoundType.Method current = remoteMethods[i];
-		if (i > 0) {
-		    p.pO("} else ");
-		}
-	        
-		p.plnI("if ("+method+".equals(\""+ current.getIDLName() +"\")) {");
-		writeTieMethod(p, theType, current);
-	    }
-	    }
-		    
-	    if (hash != null) {
-		p.pI();
-		//        p.plnI("default:");
-	    } else {
-		//   p.pOlnI("} else {");
-	    }
-	    //		    p.pln("throw new "+getName(idBadMethodException)+"();");
-		    
-	    if (hash != null) {
+            } else {
+                for(int i = 0; i < remoteMethods.length; i++) {
+                CompoundType.Method current = remoteMethods[i];
+                if (i > 0) {
+                    p.pO("} else ");
+                }
+                
+                p.plnI("if ("+method+".equals(\""+ current.getIDLName() +"\")) {");
+                writeTieMethod(p, theType, current);
+            }
+            }
+                    
+            if (hash != null) {
+                p.pI();
+                //        p.plnI("default:");
+            } else {
+                //   p.pOlnI("} else {");
+            }
+            //              p.pln("throw new "+getName(idBadMethodException)+"();");
+                    
+            if (hash != null) {
                 p.pO();
             }
-	    p.pOln("}");
-	    p.pln("throw new "+getName(idBadMethodException)+"();");
+            p.pOln("}");
+            p.pln("throw new "+getName(idBadMethodException)+"();");
 
-	    p.pOlnI("} catch ("+getName(idSystemException)+" "+ex+") {");
-	    p.pln("throw "+ex+";");
-		    
-	    p.pOlnI("} catch ("+getName(idJavaLangThrowable)+" "+ex+") {");
-	    p.pln("throw new " + getName(idPortableUnknownException) + "("+ex+");");
-	    p.pOln("}");
-	} else {
-	    // No methods...
-		    
-	    p.pln("throw new " + getName(idBadMethodException) + "();");
-	}
-		
-	p.pOln("}");		// end invoke
+            p.pOlnI("} catch ("+getName(idSystemException)+" "+ex+") {");
+            p.pln("throw "+ex+";");
+                    
+            p.pOlnI("} catch ("+getName(idJavaLangThrowable)+" "+ex+") {");
+            p.pln("throw new " + getName(idPortableUnknownException) + "("+ex+");");
+            p.pOln("}");
+        } else {
+            // No methods...
+                    
+            p.pln("throw new " + getName(idBadMethodException) + "();");
+        }
+                
+        p.pOln("}");            // end invoke
 
         // Write the cast array hack...
         
         writeCastArray(p);
 
-	// End tie class...
-	p.pOln("}");
+        // End tie class...
+        p.pOln("}");
     }
     public void catchWrongPolicy(IndentingWriter p) throws IOException {
         p.pln("");
@@ -1869,7 +1869,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         throws IOException
     {
         if(POATie){
-	p.plnI("public void orb(ORB orb) {");
+        p.plnI("public void orb(ORB orb) {");
         /*
         p.pln("try{");
         p.pln("orb.connect(_poa().servant_to_reference(this));");
@@ -1886,11 +1886,11 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         p.pln("    throw new org.omg.CORBA.BAD_PARAM");
         p.pln("        (\"POA Servant requires an instance of org.omg.CORBA_2_3.ORB\");");
         p.pln("}");        
-	p.pOln("}");
+        p.pOln("}");
         } else {
-	p.plnI("public void orb(ORB orb) {");
-	p.pln("orb.connect(this);");
-	p.pOln("}");
+        p.plnI("public void orb(ORB orb) {");
+        p.pln("orb.connect(this);");
+        p.pOln("}");
         }
     }
 
@@ -1902,9 +1902,9 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         p.pln("return _type_ids;");
         p.pOln("}");
         } else {
-	p.plnI("public String[] _ids() { ");
-	p.pln("return _type_ids;");
-	p.pOln("}");
+        p.plnI("public String[] _ids() { ");
+        p.pln("return _type_ids;");
+        p.pOln("}");
         }
     }
 
@@ -1934,31 +1934,31 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
     }
    
     static boolean needNewWriteStreamClass(Type type) {
-	switch (type.getTypeCode()) {
-	case TYPE_VOID:
-	case TYPE_BOOLEAN:
-	case TYPE_BYTE:
-	case TYPE_CHAR:
-	case TYPE_SHORT:
-	case TYPE_INT:
-	case TYPE_LONG:
-	case TYPE_FLOAT:
-	case TYPE_DOUBLE:           return false;
-    		
-	case TYPE_STRING:           return true;
-	case TYPE_ANY:              return false;            
-	case TYPE_CORBA_OBJECT:     return false;
-	case TYPE_REMOTE:           return false;  
-	case TYPE_ABSTRACT:         return false;
-	case TYPE_NC_INTERFACE:     return true;
-	case TYPE_VALUE:            return true;
-	case TYPE_IMPLEMENTATION:   return true;
-	case TYPE_NC_CLASS:         return true;
-	case TYPE_ARRAY:            return true;
-	case TYPE_JAVA_RMI_REMOTE:  return false;
-    		
-	default: throw new Error("unexpected type code: " + type.getTypeCode());
-	}
+        switch (type.getTypeCode()) {
+        case TYPE_VOID:
+        case TYPE_BOOLEAN:
+        case TYPE_BYTE:
+        case TYPE_CHAR:
+        case TYPE_SHORT:
+        case TYPE_INT:
+        case TYPE_LONG:
+        case TYPE_FLOAT:
+        case TYPE_DOUBLE:           return false;
+                
+        case TYPE_STRING:           return true;
+        case TYPE_ANY:              return false;            
+        case TYPE_CORBA_OBJECT:     return false;
+        case TYPE_REMOTE:           return false;  
+        case TYPE_ABSTRACT:         return false;
+        case TYPE_NC_INTERFACE:     return true;
+        case TYPE_VALUE:            return true;
+        case TYPE_IMPLEMENTATION:   return true;
+        case TYPE_NC_CLASS:         return true;
+        case TYPE_ARRAY:            return true;
+        case TYPE_JAVA_RMI_REMOTE:  return false;
+                
+        default: throw new Error("unexpected type code: " + type.getTypeCode());
+        }
     }
     
     /*
@@ -1967,7 +1967,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      * use to refer to either the copy or the original.
      */
     String[] writeCopyArguments(CompoundType.Method method,
-				IndentingWriter p) throws IOException {
+                                IndentingWriter p) throws IOException {
         
         Type[] args = method.getArguments();
         String[] origNames = method.getArgumentNames();
@@ -1990,7 +1990,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
         boolean[] copyArg = new boolean[args.length];
         int copyCount = 0;
         int firstCopiedArg = 0; // Only used in single copy case.  It is only the first arg that
-				// needs copying IF copyCount == 1.
+                                // needs copying IF copyCount == 1.
         
         for (int i = 0; i < args.length; i++) {
             if (mustCopy(args[i])) {
@@ -2043,12 +2043,12 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
                 // For each of the types which was copied, create
                 // a local temporary for it, updating the result
                 // array with the new local parameter name...
-		int copyIndex = 0 ;
+                int copyIndex = 0 ;
                 for (int i = 0; i < args.length; i++) {
                     if (copyArg[i]) {
                         result[i] = getVariableName(result[i]+"Copy");
                         p.pln( getName(args[i]) + " " + result[i] + " = (" + getName(args[i]) + ") " + 
-			       arrayName + "[" + copyIndex++ +"];");
+                               arrayName + "[" + copyIndex++ +"];");
                     }
                 }
             } else {
@@ -2056,8 +2056,8 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
                 // with the new local parameter name...
                 result[firstCopiedArg] = getVariableName(result[firstCopiedArg]+"Copy");
                 p.pln( getName(args[firstCopiedArg]) + " " + result[firstCopiedArg] + " = (" + 
-		       getName(args[firstCopiedArg]) + ") Util.copyObject(" +
-		       origNames[firstCopiedArg] + ",_orb());");
+                       getName(args[firstCopiedArg]) + ") Util.copyObject(" +
+                       origNames[firstCopiedArg] + ",_orb());");
             }
         }
         
@@ -2091,7 +2091,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
     }
   
     void addNamesInUse(CompoundType.Method method) {
-	String paramNames[] = method.getArgumentNames();
+        String paramNames[] = method.getArgumentNames();
         for (int i = 0; i < paramNames.length; i++) {
             addNameInUse(paramNames[i]);   
         }
@@ -2102,38 +2102,38 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
     }
     
     static boolean mustCopy(Type type) {
-	switch (type.getTypeCode()) {
-	case TYPE_VOID:
-	case TYPE_BOOLEAN:
-	case TYPE_BYTE:
-	case TYPE_CHAR:
-	case TYPE_SHORT:
-	case TYPE_INT:
-	case TYPE_LONG:
-	case TYPE_FLOAT:
-	case TYPE_DOUBLE:
-	case TYPE_STRING:           return false;
-    		
-	case TYPE_ANY:              return true;
-    		
-	case TYPE_CORBA_OBJECT:     return false;
-    		
-	case TYPE_REMOTE:    		
-	case TYPE_ABSTRACT:
-	case TYPE_NC_INTERFACE:
-	case TYPE_VALUE:
-	case TYPE_IMPLEMENTATION:
-	case TYPE_NC_CLASS:
-	case TYPE_ARRAY:            
-	case TYPE_JAVA_RMI_REMOTE:  return true;
-    		
-	default: throw new Error("unexpected type code: " + type.getTypeCode());
-	}
+        switch (type.getTypeCode()) {
+        case TYPE_VOID:
+        case TYPE_BOOLEAN:
+        case TYPE_BYTE:
+        case TYPE_CHAR:
+        case TYPE_SHORT:
+        case TYPE_INT:
+        case TYPE_LONG:
+        case TYPE_FLOAT:
+        case TYPE_DOUBLE:
+        case TYPE_STRING:           return false;
+                
+        case TYPE_ANY:              return true;
+                
+        case TYPE_CORBA_OBJECT:     return false;
+                
+        case TYPE_REMOTE:               
+        case TYPE_ABSTRACT:
+        case TYPE_NC_INTERFACE:
+        case TYPE_VALUE:
+        case TYPE_IMPLEMENTATION:
+        case TYPE_NC_CLASS:
+        case TYPE_ARRAY:            
+        case TYPE_JAVA_RMI_REMOTE:  return true;
+                
+        default: throw new Error("unexpected type code: " + type.getTypeCode());
+        }
     }
 
     ValueType[] getStubExceptions (CompoundType.Method method, boolean sort) {
 
-	ValueType[] list = method.getFilteredStubExceptions(method.getExceptions());
+        ValueType[] list = method.getFilteredStubExceptions(method.getExceptions());
 
         // Sort the list so that all org.omg.CORBA.UserException
         // subtypes are at the beginning of the list.  This ensures
@@ -2142,7 +2142,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
 
         if (sort) {
             Arrays.sort(list,new UserExceptionComparator());
-	    }
+            }
            
         return list; 
                 }
@@ -2152,95 +2152,95 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
     }
  
     void writeTieMethod(IndentingWriter p, CompoundType type,
-			CompoundType.Method method) throws IOException {
-	String methodName = method.getName();
-	Type paramTypes[] = method.getArguments();
-	String paramNames[] = method.getArgumentNames();
-	Type returnType = method.getReturnType();
-	ValueType[] exceptions = getTieExceptions(method);
+                        CompoundType.Method method) throws IOException {
+        String methodName = method.getName();
+        Type paramTypes[] = method.getArguments();
+        String paramNames[] = method.getArgumentNames();
+        Type returnType = method.getReturnType();
+        ValueType[] exceptions = getTieExceptions(method);
         String in = getVariableName("in");
         String ex = getVariableName("ex");
         String out = getVariableName("out");
         String reply = getVariableName("reply");
         
-    	for (int i = 0; i < paramTypes.length; i++) {
-	    p.p(getName(paramTypes[i])+" "+paramNames[i]+" = ");
-	    writeUnmarshalArgument(p, in, paramTypes[i], null);
-	    p.pln();
-    	}
-				
-	boolean handleExceptions = exceptions != null;
-	boolean doReturn = !returnType.isType(TYPE_VOID);
-		
-	if (handleExceptions && doReturn) {
-	    String objName = testUtil(getName(returnType), returnType);
-	    p.pln(objName+" result;");
-	}
+        for (int i = 0; i < paramTypes.length; i++) {
+            p.p(getName(paramTypes[i])+" "+paramNames[i]+" = ");
+            writeUnmarshalArgument(p, in, paramTypes[i], null);
+            p.pln();
+        }
+                                
+        boolean handleExceptions = exceptions != null;
+        boolean doReturn = !returnType.isType(TYPE_VOID);
+                
+        if (handleExceptions && doReturn) {
+            String objName = testUtil(getName(returnType), returnType);
+            p.pln(objName+" result;");
+        }
 
-	if (handleExceptions)
-	    p.plnI("try {");
+        if (handleExceptions)
+            p.plnI("try {");
 
-	if (doReturn) {
-	    if (handleExceptions) {
-		p.p("result = ");
-	    } else {
-		p.p(getName(returnType)+" result = ");
-	    }
-	}
+        if (doReturn) {
+            if (handleExceptions) {
+                p.p("result = ");
+            } else {
+                p.p(getName(returnType)+" result = ");
+            }
+        }
 
-	p.p("target."+methodName+"(");
-	for(int i = 0; i < paramNames.length; i++) {
-	    if (i > 0)
-		p.p(", ");
-	    p.p(paramNames[i]);
-	}
-	p.pln(");");
+        p.p("target."+methodName+"(");
+        for(int i = 0; i < paramNames.length; i++) {
+            if (i > 0)
+                p.p(", ");
+            p.p(paramNames[i]);
+        }
+        p.pln(");");
 
-	if (handleExceptions) {
-	    for(int i = 0; i < exceptions.length; i++) {
-		p.pOlnI("} catch ("+getName(exceptions[i])+" "+ex+") {");
-			    
-		// Is this our IDLEntity Exception special case?
-			    
-		if (exceptions[i].isIDLEntityException() && !exceptions[i].isCORBAUserException()) {
-			    
-			        // Yes...
-			        
-		    String helperName = IDLNames.replace(exceptions[i].getQualifiedIDLName(false),"::",".");
-		    helperName += "Helper";
-		    p.pln(idOutputStream+" "+out +" = "+reply+".createExceptionReply();");
-		    p.pln(helperName+".write("+out+","+ex+");");
-			        
-		} else {
-			        
-			        // No...
-			        
-		    p.pln("String id = \"" + getExceptionRepositoryID(exceptions[i]) + "\";");
-		p.plnI(idExtOutputStream + " "+out+" = ");
-		p.pln("(" + idExtOutputStream + ") "+reply+".createExceptionReply();");
-		p.pOln(out+".write_string(id);");
-		    p.pln(out+".write_value("+ex+"," + getName(exceptions[i]) + ".class);");
+        if (handleExceptions) {
+            for(int i = 0; i < exceptions.length; i++) {
+                p.pOlnI("} catch ("+getName(exceptions[i])+" "+ex+") {");
+                            
+                // Is this our IDLEntity Exception special case?
+                            
+                if (exceptions[i].isIDLEntityException() && !exceptions[i].isCORBAUserException()) {
+                            
+                                // Yes...
+                                
+                    String helperName = IDLNames.replace(exceptions[i].getQualifiedIDLName(false),"::",".");
+                    helperName += "Helper";
+                    p.pln(idOutputStream+" "+out +" = "+reply+".createExceptionReply();");
+                    p.pln(helperName+".write("+out+","+ex+");");
+                                
+                } else {
+                                
+                                // No...
+                                
+                    p.pln("String id = \"" + getExceptionRepositoryID(exceptions[i]) + "\";");
+                p.plnI(idExtOutputStream + " "+out+" = ");
+                p.pln("(" + idExtOutputStream + ") "+reply+".createExceptionReply();");
+                p.pOln(out+".write_string(id);");
+                    p.pln(out+".write_value("+ex+"," + getName(exceptions[i]) + ".class);");
                 }
                 
-		p.pln("return "+out+";");
-	    }
-	    p.pOln("}");
-	}
+                p.pln("return "+out+";");
+            }
+            p.pOln("}");
+        }
 
         if (needNewWriteStreamClass(returnType)) {
-	    p.plnI(idExtOutputStream + " "+out+" = ");
-	    p.pln("(" + idExtOutputStream + ") "+reply+".createReply();");
-	    p.pO();
-	} else {
-	    p.pln("OutputStream "+out+" = "+reply+".createReply();");
-	}
+            p.plnI(idExtOutputStream + " "+out+" = ");
+            p.pln("(" + idExtOutputStream + ") "+reply+".createReply();");
+            p.pO();
+        } else {
+            p.pln("OutputStream "+out+" = "+reply+".createReply();");
+        }
 
-	if (doReturn) {
-	    writeMarshalArgument(p, out, returnType, "result");
-	    p.pln();
-	}
+        if (doReturn) {
+            writeMarshalArgument(p, out, returnType, "result");
+            p.pln();
+        }
 
-	p.pln("return "+out+";");
+        p.pln("return "+out+";");
     }
 
 
@@ -2250,20 +2250,20 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      * array", to the java.io.ObjectOutput stream named "stream".
      */
     void writeMarshalArguments(IndentingWriter p,
-			       String streamName,
-			       Type[] types, String[] names)
-	throws IOException
+                               String streamName,
+                               Type[] types, String[] names)
+        throws IOException
     {
-    	if (types.length != names.length) {
-    	    throw new Error("paramter type and name arrays different sizes");
-    	}
+        if (types.length != names.length) {
+            throw new Error("paramter type and name arrays different sizes");
+        }
 
-    	for (int i = 0; i < types.length; i++) {
-    	    writeMarshalArgument(p, streamName, types[i], names[i]);
-    	    if (i != types.length -1) {
-    	        p.pln();
-    	    }
-    	}
+        for (int i = 0; i < types.length; i++) {
+            writeMarshalArgument(p, streamName, types[i], names[i]);
+            if (i != types.length -1) {
+                p.pln();
+            }
+        }
     }
 
     /**
@@ -2272,12 +2272,12 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      * unqualifiedName "Util".
      */
     String testUtil(String objectName, Type ttype) {
-	if (objectName.equals("Util")) {
-		String correctedName = (String)ttype.getPackageName() + "." + objectName;
-		return correctedName;
-	} else {
-		return objectName;
-	}
+        if (objectName.equals("Util")) {
+                String correctedName = (String)ttype.getPackageName() + "." + objectName;
+                return correctedName;
+        } else {
+                return objectName;
+        }
     }
 }
 

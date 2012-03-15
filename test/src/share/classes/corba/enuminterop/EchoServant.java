@@ -47,11 +47,11 @@ import javax.rmi.PortableRemoteObject;
 public class EchoServant extends PortableRemoteObject implements Echo
 {
     public EchoServant() throws RemoteException {
-	super() ;
+        super() ;
     }
 
     public Object echoObject( String arg ) throws RemoteException {
-	return getDay( arg ) ;
+        return getDay( arg ) ;
     }
 
     public Day echoDay( String arg ) throws RemoteException {

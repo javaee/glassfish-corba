@@ -40,11 +40,11 @@
                 </execution>
               </executions>
            </plugin>
-	
+        
         </plugins>
   </build>
   <properties>
-  	<sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
+        <sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
   </properties>
   <dependencies>
 <!--

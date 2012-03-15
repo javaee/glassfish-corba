@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.interceptors;
+package com.sun.corba.ee.impl.interceptors;
 
 import org.omg.PortableInterceptor.Interceptor;
 import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
@@ -49,7 +49,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.lang.reflect.Array;
 
-import com.sun.corba.se.spi.logging.InterceptorsSystemException ;
+import com.sun.corba.ee.spi.logging.InterceptorsSystemException ;
 
 /** 
  * Provides a repository of registered Portable Interceptors, organized
@@ -67,11 +67,11 @@ public class InterceptorList {
     // and update NUM_INTERCEPTOR_TYPES and classTypes accordingly.
     // NUM_INTERCEPTOR_TYPES represents the number of interceptor 
     // types, so we know how many lists to maintain.
-    static final int INTERCEPTOR_TYPE_CLIENT 		= 0;
-    static final int INTERCEPTOR_TYPE_SERVER 		= 1;
-    static final int INTERCEPTOR_TYPE_IOR    		= 2;
+    static final int INTERCEPTOR_TYPE_CLIENT            = 0;
+    static final int INTERCEPTOR_TYPE_SERVER            = 1;
+    static final int INTERCEPTOR_TYPE_IOR               = 2;
     
-    static final int NUM_INTERCEPTOR_TYPES    		= 3;
+    static final int NUM_INTERCEPTOR_TYPES              = 3;
     
     // Array of class types for interceptors.  This is used to create the
     // appropriate array type for each interceptor type.  These must 
@@ -114,42 +114,42 @@ public class InterceptorList {
      *     name already exists for the given type.
      */
     void register_interceptor( Interceptor interceptor, int type ) 
-	throws DuplicateName
+        throws DuplicateName
     {
         // If locked, deny any further addition of interceptors.
         if( locked ) {
-	    throw wrapper.interceptorListLocked() ;
+            throw wrapper.interceptorListLocked() ;
         }
         
-	// Cache interceptor name:
-	String interceptorName = interceptor.name();
-	boolean anonymous = interceptorName.equals( "" );
-	boolean foundDuplicate = false;
-	Interceptor[] interceptorList = interceptors[type];
+        // Cache interceptor name:
+        String interceptorName = interceptor.name();
+        boolean anonymous = interceptorName.equals( "" );
+        boolean foundDuplicate = false;
+        Interceptor[] interceptorList = interceptors[type];
 
-	// If this is not an anonymous interceptor, 
-	// search for an interceptor of the same name in this category:
-	if( !anonymous ) {
-	    int size = interceptorList.length;
+        // If this is not an anonymous interceptor, 
+        // search for an interceptor of the same name in this category:
+        if( !anonymous ) {
+            int size = interceptorList.length;
 
-	    // An O(n) search will suffice because register_interceptor is not
-	    // likely to be called often.
-	    for( int i = 0; i < size; i++ ) {
-		Interceptor in = (Interceptor)interceptorList[i];
-		if( in.name().equals( interceptorName ) ) {
-		    foundDuplicate = true;
-		    break;
-		}
-	    }
-	}
+            // An O(n) search will suffice because register_interceptor is not
+            // likely to be called often.
+            for( int i = 0; i < size; i++ ) {
+                Interceptor in = (Interceptor)interceptorList[i];
+                if( in.name().equals( interceptorName ) ) {
+                    foundDuplicate = true;
+                    break;
+                }
+            }
+        }
 
-	if( !foundDuplicate ) {
+        if( !foundDuplicate ) {
             growInterceptorArray( type );
             interceptors[type][interceptors[type].length-1] = interceptor;
-	}
-	else {
-	    throw new DuplicateName( interceptorName );
-	}
+        }
+        else {
+            throw new DuplicateName( interceptorName );
+        }
     }
 
     /**
@@ -174,7 +174,7 @@ public class InterceptorList {
      * or false if not.
      */
     boolean hasInterceptorsOfType( int type ) {
-	return interceptors[type].length > 0;
+        return interceptors[type].length > 0;
     }
     
     /**
@@ -213,65 +213,65 @@ public class InterceptorList {
      * method.
      */
     void destroyAll() {
-	int numTypes = interceptors.length;
+        int numTypes = interceptors.length;
 
-	for( int i = 0; i < numTypes; i++ ) {
-	    int numInterceptors = interceptors[i].length;
-	    for( int j = 0; j < numInterceptors; j++ ) {
-		interceptors[i][j].destroy();
-	    }
-	}
+        for( int i = 0; i < numTypes; i++ ) {
+            int numInterceptors = interceptors[i].length;
+            for( int j = 0; j < numInterceptors; j++ ) {
+                interceptors[i][j].destroy();
+            }
+        }
     }
 
     /**
      * Sort interceptors.
      */
     void sortInterceptors() {
-	List<Interceptor> sorted = null;
-	List<Interceptor> unsorted = null;
+        List<Interceptor> sorted = null;
+        List<Interceptor> unsorted = null;
 
-	int numTypes = interceptors.length;
+        int numTypes = interceptors.length;
 
-	for( int i = 0; i < numTypes; i++ ) {
-	    int numInterceptors = interceptors[i].length;
-	    if (numInterceptors > 0) {
-		// Get fresh sorting bins for each non empty type.
-		sorted = new ArrayList<Interceptor>(); // not synchronized like we want.
-		unsorted = new ArrayList<Interceptor>();
-	    }
-	    for( int j = 0; j < numInterceptors; j++ ) {
-		Interceptor interceptor = interceptors[i][j];
-		if (interceptor instanceof Comparable) {
-		    sorted.add(interceptor);
-		} else {
-		    unsorted.add(interceptor);
-		}
-	    }
-	    if (numInterceptors > 0 && sorted.size() > 0) {
-		// Let the RuntimeExceptions thrown by sort
-		// (i.e., ClassCastException and UnsupportedOperationException)
-		// flow back to the user.
-		// Note that this will cause an unchecked conversion warning
-		// because Interceptor is not Comparable.  We rely on dynamic
-		// typing here: if an Interceptor is in the sorted list,
-		// it IS comparable by construction.  I don't think there
-		// is any way to capture this in a Java type.
-		Collections.sort(List.class.cast( sorted ));
-		Iterator<Interceptor> sortedIterator = sorted.iterator();
-		Iterator<Interceptor> unsortedIterator = unsorted.iterator();
-		for( int j = 0; j < numInterceptors; j++ ) {
-		    if (sortedIterator.hasNext()) {
-			interceptors[i][j] =
-			    sortedIterator.next();
-		    } else if (unsortedIterator.hasNext()) {
-			interceptors[i][j] =
-			    unsortedIterator.next();
-		    } else {
-			throw wrapper.sortSizeMismatch() ;
-		    }
-		}
-	    }
-	}
+        for( int i = 0; i < numTypes; i++ ) {
+            int numInterceptors = interceptors[i].length;
+            if (numInterceptors > 0) {
+                // Get fresh sorting bins for each non empty type.
+                sorted = new ArrayList<Interceptor>(); // not synchronized like we want.
+                unsorted = new ArrayList<Interceptor>();
+            }
+            for( int j = 0; j < numInterceptors; j++ ) {
+                Interceptor interceptor = interceptors[i][j];
+                if (interceptor instanceof Comparable) {
+                    sorted.add(interceptor);
+                } else {
+                    unsorted.add(interceptor);
+                }
+            }
+            if (numInterceptors > 0 && sorted.size() > 0) {
+                // Let the RuntimeExceptions thrown by sort
+                // (i.e., ClassCastException and UnsupportedOperationException)
+                // flow back to the user.
+                // Note that this will cause an unchecked conversion warning
+                // because Interceptor is not Comparable.  We rely on dynamic
+                // typing here: if an Interceptor is in the sorted list,
+                // it IS comparable by construction.  I don't think there
+                // is any way to capture this in a Java type.
+                Collections.sort(List.class.cast( sorted ));
+                Iterator<Interceptor> sortedIterator = sorted.iterator();
+                Iterator<Interceptor> unsortedIterator = unsorted.iterator();
+                for( int j = 0; j < numInterceptors; j++ ) {
+                    if (sortedIterator.hasNext()) {
+                        interceptors[i][j] =
+                            sortedIterator.next();
+                    } else if (unsortedIterator.hasNext()) {
+                        interceptors[i][j] =
+                            unsortedIterator.next();
+                    } else {
+                        throw wrapper.sortSizeMismatch() ;
+                    }
+                }
+            }
+        }
     }
 }
 

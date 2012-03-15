@@ -58,7 +58,7 @@ public final class BadKind extends org.omg.CORBA.UserException {
      * Constructs a <code>BadKind</code> exception with no reason message.
      */
     public BadKind() {
-	super();
+        super();
     }
 
     /**
@@ -67,6 +67,6 @@ public final class BadKind extends org.omg.CORBA.UserException {
      * @param reason the String containing a reason message
      */
     public BadKind(String reason) {
-	super(reason);
+        super(reason);
     }
 }

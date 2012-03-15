@@ -44,7 +44,7 @@ import java.rmi.RemoteException ;
 import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 import org.omg.PortableServer.POA ;
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
+import com.sun.corba.ee.spi.oa.ObjectAdapter ;
 import javax.rmi.PortableRemoteObject ;
 
 public class ORTEchoImpl extends PortableRemoteObject implements ORTEcho
@@ -53,19 +53,19 @@ public class ORTEchoImpl extends PortableRemoteObject implements ORTEcho
 
     public ORTEchoImpl( POA poa ) throws java.rmi.RemoteException
     {
-	this.poa = poa ;
+        this.poa = poa ;
     }
 
     public ObjectReferenceTemplate getORT() throws RemoteException 
     {
-	ObjectAdapter oa = (ObjectAdapter)poa ;
-	return oa.getAdapterTemplate() ;
+        ObjectAdapter oa = (ObjectAdapter)poa ;
+        return oa.getAdapterTemplate() ;
     }
 
     public ObjectReferenceFactory getORF() throws RemoteException 
     {
-	ObjectAdapter oa = (ObjectAdapter)poa ;
-	return oa.getCurrentFactory() ;
+        ObjectAdapter oa = (ObjectAdapter)poa ;
+        return oa.getCurrentFactory() ;
     }
 } 
 

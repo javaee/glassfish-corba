@@ -37,16 +37,16 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.ior.iiop;
+package com.sun.corba.ee.impl.ior.iiop;
 
 import org.omg.CORBA_2_3.portable.OutputStream;
 
-import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
+import com.sun.corba.ee.spi.folb.ClusterInstanceInfo;
 
-import com.sun.corba.se.spi.ior.TaggedComponentBase;
-import com.sun.corba.se.spi.ior.iiop.ClusterInstanceInfoComponent;
+import com.sun.corba.ee.spi.ior.TaggedComponentBase;
+import com.sun.corba.ee.spi.ior.iiop.ClusterInstanceInfoComponent;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class ClusterInstanceInfoComponentImpl extends TaggedComponentBase 
     implements ClusterInstanceInfoComponent {
@@ -56,25 +56,25 @@ public class ClusterInstanceInfoComponentImpl extends TaggedComponentBase
     @Override
     public boolean equals(Object obj)
     {
-	if (!(obj instanceof ClusterInstanceInfoComponentImpl)) {
+        if (!(obj instanceof ClusterInstanceInfoComponentImpl)) {
             return false;
         }
 
-	ClusterInstanceInfoComponentImpl other = 
-	    (ClusterInstanceInfoComponentImpl)obj ;
+        ClusterInstanceInfoComponentImpl other = 
+            (ClusterInstanceInfoComponentImpl)obj ;
 
-	return clusterInstanceInfoValue.equals( 
+        return clusterInstanceInfoValue.equals( 
             other.clusterInstanceInfoValue ) ;
     }
 
     @Override
     public int hashCode() {
-	return clusterInstanceInfoValue.hashCode() ;
+        return clusterInstanceInfoValue.hashCode() ;
     }
 
     @Override
     public String toString() {
-	return "ClusterInstanceInfoComponentImpl[clusterInstanceInfoValue=" 
+        return "ClusterInstanceInfoComponentImpl[clusterInstanceInfoValue=" 
             + clusterInstanceInfoValue + "]" ;
     }
 
@@ -85,7 +85,7 @@ public class ClusterInstanceInfoComponentImpl extends TaggedComponentBase
 
     public ClusterInstanceInfo getClusterInstanceInfo()
     {
-	return clusterInstanceInfoValue;
+        return clusterInstanceInfoValue;
     }
 
     public void writeContents(OutputStream os) {
@@ -93,7 +93,7 @@ public class ClusterInstanceInfoComponentImpl extends TaggedComponentBase
     }
     
     public int getId() {
-	return ORBConstants.FOLB_MEMBER_ADDRESSES_TAGGED_COMPONENT_ID ;
+        return ORBConstants.FOLB_MEMBER_ADDRESSES_TAGGED_COMPONENT_ID ;
     }
 }
 

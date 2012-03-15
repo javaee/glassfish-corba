@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi ;
+package com.sun.corba.ee.impl.presentation.rmi ;
 
 import java.io.ObjectInputStream ;
 import java.io.ObjectOutputStream ;
@@ -54,11 +54,11 @@ import org.omg.CORBA.portable.OutputStream ;
 
 import org.omg.CORBA.ORB ;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
-import com.sun.corba.se.spi.presentation.rmi.DynamicStub ;
-import com.sun.corba.se.impl.ior.StubIORImpl ;
-import com.sun.corba.se.impl.util.RepositoryId ;
-import com.sun.corba.se.impl.util.JDKBridge ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.ee.spi.presentation.rmi.DynamicStub ;
+import com.sun.corba.ee.impl.ior.StubIORImpl ;
+import com.sun.corba.ee.impl.util.RepositoryId ;
+import com.sun.corba.ee.impl.util.JDKBridge ;
 
 public class DynamicStubImpl extends ObjectImpl 
     implements DynamicStub, Serializable
@@ -71,95 +71,95 @@ public class DynamicStubImpl extends ObjectImpl
 
     public void setSelf( DynamicStub self ) 
     {
-	this.self = self ;
+        this.self = self ;
     }
 
     public DynamicStub getSelf()
     {
-	return self ;
+        return self ;
     }
 
     public DynamicStubImpl( String[] typeIds ) 
     {
-	this.typeIds = typeIds ;
-	ior = null ;
+        this.typeIds = typeIds ;
+        ior = null ;
     }
 
     public void setDelegate( Delegate delegate ) 
     {
-	_set_delegate( delegate ) ;
+        _set_delegate( delegate ) ;
     }
 
     public Delegate getDelegate() 
     {
-	return _get_delegate() ;
+        return _get_delegate() ;
     }
 
     public ORB getORB()
     {
-	return _orb() ;
+        return _orb() ;
     }
 
     public String[] _ids() 
     {
-	return typeIds.clone() ;
+        return typeIds.clone() ;
     }
 
     public String[] getTypeIds() 
     {
-	return _ids() ;
+        return _ids() ;
     }
 
     public void connect( ORB orb ) throws RemoteException 
     {
-	ior = StubConnectImpl.connect( ior, self, this, orb ) ;
+        ior = StubConnectImpl.connect( ior, self, this, orb ) ;
     }
 
     public boolean isLocal()
     {
-	return _is_local() ;
+        return _is_local() ;
     }
 
     public OutputStream request( String operation, 
-	boolean responseExpected ) 
+        boolean responseExpected ) 
     {
-	return _request( operation, responseExpected ) ; 
+        return _request( operation, responseExpected ) ; 
     }
     
     private void readObject( ObjectInputStream stream ) throws 
-	IOException, ClassNotFoundException
+        IOException, ClassNotFoundException
     {
-	ior = new StubIORImpl() ;
-	ior.doRead( stream ) ;
+        ior = new StubIORImpl() ;
+        ior.doRead( stream ) ;
     }
 
     private void writeObject( ObjectOutputStream stream ) throws
-	IOException
+        IOException
     {
-	if (ior == null) {
+        if (ior == null) {
             ior = new StubIORImpl(this);
         }
-	ior.doWrite( stream ) ;
+        ior.doWrite( stream ) ;
     }
 
     public Object readResolve()
     {
-	String repositoryId = ior.getRepositoryId() ;
-	String cname = RepositoryId.cache.getId( repositoryId ).getClassName() ; 
+        String repositoryId = ior.getRepositoryId() ;
+        String cname = RepositoryId.cache.getId( repositoryId ).getClassName() ; 
 
-	Class<?> cls = null ;
+        Class<?> cls = null ;
 
-	try {
-	    cls = JDKBridge.loadClass( cname, null, null ) ;
-	} catch (ClassNotFoundException exc) {
+        try {
+            cls = JDKBridge.loadClass( cname, null, null ) ;
+        } catch (ClassNotFoundException exc) {
             Exceptions.self.readResolveClassNotFound( exc, cname ) ;
-	}
+        }
 
-	PresentationManager pm = 
-	    com.sun.corba.se.spi.orb.ORB.getPresentationManager() ;
-	PresentationManager.ClassData classData = pm.getClassData( cls ) ;
-	InvocationHandlerFactoryImpl ihfactory = 
-	    (InvocationHandlerFactoryImpl)classData.getInvocationHandlerFactory() ;
-	return ihfactory.getInvocationHandler( this ) ;
+        PresentationManager pm = 
+            com.sun.corba.ee.spi.orb.ORB.getPresentationManager() ;
+        PresentationManager.ClassData classData = pm.getClassData( cls ) ;
+        InvocationHandlerFactoryImpl ihfactory = 
+            (InvocationHandlerFactoryImpl)classData.getInvocationHandlerFactory() ;
+        return ihfactory.getInvocationHandler( this ) ;
     }
 }

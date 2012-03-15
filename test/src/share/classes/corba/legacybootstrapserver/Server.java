@@ -57,50 +57,50 @@ public class Server
     public static void main(String[] av)
     {
         try {
-	    System.out.println(main + " starting");
-	    System.out.println(main + " " + getBootstrapFilePathAndName());
+            System.out.println(main + " starting");
+            System.out.println(main + " " + getBootstrapFilePathAndName());
 
-	    // Initialize the file.
-	    Properties props = new Properties();
-	    ORB orb = ORB.init((String[])null, (Properties) null);
-	    org.omg.CORBA.Object o = new IServantConnect();
-	    orb.connect(o);
-	    props.put(Client.initialEntryName, orb.object_to_string(o));
-	    Client.writeProperties(props, getBootstrapFilePathAndName());
+            // Initialize the file.
+            Properties props = new Properties();
+            ORB orb = ORB.init((String[])null, (Properties) null);
+            org.omg.CORBA.Object o = new IServantConnect();
+            orb.connect(o);
+            props.put(Client.initialEntryName, orb.object_to_string(o));
+            Client.writeProperties(props, getBootstrapFilePathAndName());
 
-	    // Set up args.
-	    String[] args = { "-InitialServicesFile", 
-			      getBootstrapFilePathAndName(),
-			      "-ORBInitialPort",
-			      Client.getORBInitialPort() };
+            // Set up args.
+            String[] args = { "-InitialServicesFile", 
+                              getBootstrapFilePathAndName(),
+                              "-ORBInitialPort",
+                              Client.getORBInitialPort() };
 
-	    ServerThread serverThread = new ServerThread(args);
-	    serverThread.start();
+            ServerThread serverThread = new ServerThread(args);
+            serverThread.start();
 
-	    // Wait 5 seconds before sending handshake.
-	    Thread.sleep(5000);
+            // Wait 5 seconds before sending handshake.
+            Thread.sleep(5000);
 
-	    System.out.println(Options.defServerHandshake);
+            System.out.println(Options.defServerHandshake);
 
-	    Object wait = new Object();
-	    synchronized (wait) {
-		wait.wait();
-	    }
+            Object wait = new Object();
+            synchronized (wait) {
+                wait.wait();
+            }
         } catch (Exception e) {
-	    System.out.println(main + ": unexpected exception: " + e);
-	    e.printStackTrace(System.out);
-	    System.exit(1);
+            System.out.println(main + ": unexpected exception: " + e);
+            e.printStackTrace(System.out);
+            System.exit(1);
         }
-	System.exit(Controller.SUCCESS);
+        System.exit(Controller.SUCCESS);
     }
 
     public static String getBootstrapFilePathAndName()
     {
-	return
-	    //Options.getOutputDirectory()
-	    System.getProperty("output.dir")
-	    + System.getProperty("file.separator")
-	    + Client.bootstrapFilename;
+        return
+            //Options.getOutputDirectory()
+            System.getProperty("output.dir")
+            + System.getProperty("file.separator")
+            + Client.bootstrapFilename;
     }
 }
 
@@ -109,25 +109,25 @@ class ServerThread extends Thread
     String[] av;
     ServerThread (String[] av)
     {
-	this.av = av;
+        this.av = av;
     }
 
     public void run ()
     {
-	try {
-	    // Start server.
-	    com.sun.corba.se.internal.CosNaming.BootstrapServer.main(av);
-	} catch (Throwable t) {
-	    System.out.println("BootstrapServer.main Throwable:");
-	    t.printStackTrace(System.out);
-	    System.exit(1);
-	}
+        try {
+            // Start server.
+            com.sun.corba.ee.internal.CosNaming.BootstrapServer.main(av);
+        } catch (Throwable t) {
+            System.out.println("BootstrapServer.main Throwable:");
+            t.printStackTrace(System.out);
+            System.exit(1);
+        }
     }
 }
 
 class IServantConnect
     extends
-	_IImplBase
+        _IImplBase
 {
     public void dummy(){}
 }

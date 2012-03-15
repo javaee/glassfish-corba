@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.orb ;
+package com.sun.corba.ee.impl.orb ;
 
 import java.net.InetAddress ;
 
@@ -51,20 +51,20 @@ public class NormalDataCollector extends DataCollectorBase {
     private String[] args ;
 
     public NormalDataCollector( String[] args, Properties props, 
-	String localHostName, String configurationHostName ) 
+        String localHostName, String configurationHostName ) 
     {
-	super( props, localHostName, configurationHostName ) ;
-	this.args = args ;
+        super( props, localHostName, configurationHostName ) ;
+        this.args = args ;
     }
 
     public boolean isApplet() 
     {
-	return false ;
+        return false ;
     }
 
     protected void collect()
     {
-	checkPropertyDefaults() ;
+        checkPropertyDefaults() ;
 
         findPropertiesFromFile() ;
         findPropertiesFromSystem() ;

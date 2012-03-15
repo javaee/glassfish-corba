@@ -39,7 +39,7 @@
  */
 
 
-package com.sun.corba.se.spi.ior;
+package com.sun.corba.ee.spi.ior;
 
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;

@@ -54,10 +54,10 @@ import java.rmi.RemoteException;
  */
 public interface EchoTest extends Remote {
     public String echo(String x)
-	throws RemoteException;
+        throws RemoteException;
 
     public void neverReturns()
-	throws RemoteException;
+        throws RemoteException;
 }
 
 // End of file.

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)PortableContext.java	1.8 99/06/07 */
+/* @(#)PortableContext.java     1.8 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -65,7 +65,7 @@ import java.io.BufferedReader;
 import sun.rmi.registry.RegistryImpl;
 import java.rmi.registry.Registry;
 import java.rmi.RMISecurityManager;
-import com.sun.corba.se.impl.util.Utility;
+import com.sun.corba.ee.impl.util.Utility;
 import javax.rmi.CORBA.Tie;
 import javax.rmi.CORBA.Util;
 
@@ -124,8 +124,8 @@ import javax.rmi.CORBA.Util;
  * It's not as convenient, but does solve both problems.
  * </td></tr>
  * </table>
- * @version	1.0, 6/23/98
- * @author	Bryan Atsatt
+ * @version     1.0, 6/23/98
+ * @author      Bryan Atsatt
  */
 public class PortableContext {
 
@@ -310,10 +310,10 @@ public class PortableContext {
 
                 if (!haveJRMP) {
 
-            	    // Wait forever...
+                    // Wait forever...
 
-            	    Object sync = new Object();
-            	    synchronized (sync) { sync.wait(); }
+                    Object sync = new Object();
+                    synchronized (sync) { sync.wait(); }
                 }
             } else {
                 usage();
@@ -336,12 +336,12 @@ public class PortableContext {
      * @see #startServant(java.lang.String, java.lang.String, java.lang.String, boolean)
      */
     public static Servant startServant(String servantSpec,
-				       boolean startNameServer)
-	throws  ClassNotFoundException,
-		InstantiationException,
-		IllegalAccessException,
-		RemoteException,
-		NamingException {
+                                       boolean startNameServer)
+        throws  ClassNotFoundException,
+                InstantiationException,
+                IllegalAccessException,
+                RemoteException,
+                NamingException {
         return startServant(servantSpec,null,null,startNameServer);
     }
 
@@ -363,11 +363,11 @@ public class PortableContext {
                                         String defaultHost,
                                         String defaultPort,
                                         boolean startNameServer)
-	throws  ClassNotFoundException,
-		InstantiationException,
-		IllegalAccessException,
-		RemoteException,
-		NamingException {
+        throws  ClassNotFoundException,
+                InstantiationException,
+                IllegalAccessException,
+                RemoteException,
+                NamingException {
 
 
         int runtime = -1;
@@ -436,14 +436,14 @@ public class PortableContext {
             runtime = IIOP_RUNTIME;
         }
 
-	// Make sure we have a valid port number for the name service...
+        // Make sure we have a valid port number for the name service...
 
-	if (port == null) {
+        if (port == null) {
 
-	    // Use default port...
+            // Use default port...
 
-	    port = runtime == IIOP_RUNTIME ? "900" : Integer.toString(java.rmi.registry.Registry.REGISTRY_PORT);
-	}
+            port = runtime == IIOP_RUNTIME ? "900" : Integer.toString(java.rmi.registry.Registry.REGISTRY_PORT);
+        }
 
         // Get a context...
 
@@ -495,9 +495,9 @@ public class PortableContext {
     }
 
     protected PortableContext (String nameServerHost,
-			       String nameServerPort,
-			       int runtime,
-			       boolean startNameServer) throws NamingException {
+                               String nameServerPort,
+                               int runtime,
+                               boolean startNameServer) throws NamingException {
 
         this.runtime = runtime;
         this.startNameServer = startNameServer;
@@ -576,14 +576,14 @@ public class PortableContext {
         if (host != null && host.length() == 0) host = null;
         if (port != null && port.length() == 0) port = null;
 
-	// Make sure we have a valid port number for the name service...
+        // Make sure we have a valid port number for the name service...
 
-	if (port == null) {
+        if (port == null) {
 
-	    // Use default port...
+            // Use default port...
 
-	    port = runtime == IIOP_RUNTIME ? "900" : Integer.toString(java.rmi.registry.Registry.REGISTRY_PORT);
-	}
+            port = runtime == IIOP_RUNTIME ? "900" : Integer.toString(java.rmi.registry.Registry.REGISTRY_PORT);
+        }
 
         // Get a context...
 
@@ -637,7 +637,7 @@ public class PortableContext {
 
         args.addElement("java");
         args.addElement("-classpath");
-	args.addElement(System.getProperty("java.class.path"));
+        args.addElement(System.getProperty("java.class.path"));
 
         if (is12VM) {
             String policy = System.getProperty("java.security.policy");
@@ -648,7 +648,7 @@ public class PortableContext {
 
         if (runtime == IIOP_RUNTIME) {
 
-            args.addElement("com.sun.corba.se.impl.naming.cosnaming.TransientNameServer");
+            args.addElement("com.sun.corba.ee.impl.naming.cosnaming.TransientNameServer");
             args.addElement("-ORBInitialPort");
             args.addElement(port);
             handshake = "Initial Naming Context:";
@@ -676,11 +676,11 @@ public class PortableContext {
     private Servant startServant(   String servantClass,
                                     String servantName,
                                     Remote servant)
-	throws  ClassNotFoundException,
-		InstantiationException,
-		IllegalAccessException,
-		RemoteException,
-		NamingException {
+        throws  ClassNotFoundException,
+                InstantiationException,
+                IllegalAccessException,
+                RemoteException,
+                NamingException {
         Servant result = new Servant(servantClass,servantName,servant);
 
         // Export it if we need to...
@@ -704,21 +704,21 @@ public class PortableContext {
 
         Hashtable nameEnv = new Hashtable();
 
-	// First, make sure we have a valid port number for
-	// the name service...
+        // First, make sure we have a valid port number for
+        // the name service...
 
-	if (nameServerPort == 0) {
+        if (nameServerPort == 0) {
 
-	    // Use default port...
+            // Use default port...
 
-	    nameServerPort = runtime == IIOP_RUNTIME ? 900 : java.rmi.registry.Registry.REGISTRY_PORT;
-	}
+            nameServerPort = runtime == IIOP_RUNTIME ? 900 : java.rmi.registry.Registry.REGISTRY_PORT;
+        }
 
-	// Are we doing IIOP?
+        // Are we doing IIOP?
 
         String[] nameServerArgs = null;
 
-	if (runtime == IIOP_RUNTIME) {
+        if (runtime == IIOP_RUNTIME) {
 
             // Yes, so create the ORB. First, setup the
             // name server arguments...
@@ -738,7 +738,7 @@ public class PortableContext {
 
             // Now create the orb...
 
-    	    orb = initORB(nameServerArgs);
+            orb = initORB(nameServerArgs);
 
             // Now setup the name server environment...
 
@@ -757,19 +757,19 @@ public class PortableContext {
 
             serverUrl += ":" + Integer.toString(nameServerPort);
 
-	    nameEnv.put("java.naming.factory.initial","com.sun.jndi.rmi.registry.RegistryContextFactory");
-	    nameEnv.put("java.naming.provider.url",serverUrl);
+            nameEnv.put("java.naming.factory.initial","com.sun.jndi.rmi.registry.RegistryContextFactory");
+            nameEnv.put("java.naming.provider.url",serverUrl);
 
         } else {
             throw new Error("Unknown runtime: " + runtime);
         }
 
-    	// Now get our name context.
+        // Now get our name context.
 
         boolean gotContext = false;
         boolean retry = false;
 
-	try {
+        try {
             nameContext = new InitialContext(nameEnv);
             gotContext = true;
 
@@ -783,38 +783,38 @@ public class PortableContext {
                 } catch (javax.naming.NameNotFoundException e) {
                 }
             }
-	} catch (Throwable e) {
+        } catch (Throwable e) {
 
-	    if (e instanceof ThreadDeath) throw (ThreadDeath)e;
+            if (e instanceof ThreadDeath) throw (ThreadDeath)e;
 
-    	    String server = runtime == IIOP_RUNTIME ? "TransientNameServer" : "RMIRegistry";
+            String server = runtime == IIOP_RUNTIME ? "TransientNameServer" : "RMIRegistry";
 
-	    if (startNameServer && nameServerHost == null) {
+            if (startNameServer && nameServerHost == null) {
 
-    	        System.out.println("Starting " + server + "...");
+                System.out.println("Starting " + server + "...");
 
-    	        try {
-    	            startNameServer(Integer.toString(nameServerPort),runtime);
-    	        } catch (Exception e1) {
-    	            throw new NamingException("Could not start name server: " + e1.toString());
-    	        }
+                try {
+                    startNameServer(Integer.toString(nameServerPort),runtime);
+                } catch (Exception e1) {
+                    throw new NamingException("Could not start name server: " + e1.toString());
+                }
 
-    	        if (orb != null) {
+                if (orb != null) {
 
-    	            // We have to recreate the orb at this point, because it's
-    	            // connection to the name service is bad...
+                    // We have to recreate the orb at this point, because it's
+                    // connection to the name service is bad...
 
                     orb.shutdown(false);
-    	            orb = initORB(nameServerArgs);
+                    orb = initORB(nameServerArgs);
                     nameEnv.put("java.naming.corba.orb", orb);
                 }
 
                 nameContext = new InitialContext(nameEnv);
 
-	    } else {
-    	        throw new NamingException("Could not connect to " + server + ".");
-    	    }
-	}
+            } else {
+                throw new NamingException("Could not connect to " + server + ".");
+            }
+        }
 
         // Finally, create our key...
 
@@ -823,27 +823,27 @@ public class PortableContext {
 
     private ORB initORB (String[] nameServerArgs) {
 
-	// Setup the ORB properties...
+        // Setup the ORB properties...
 
-	Properties props = null;
+        Properties props = null;
 
-	try {
-	    props = System.getProperties();
-	} catch (SecurityException e) {
-	    props = new Properties();
-	}
+        try {
+            props = System.getProperties();
+        } catch (SecurityException e) {
+            props = new Properties();
+        }
 
         if (props.getProperty("org.omg.CORBA.ORBClass") == null) {
-    	    props.put("org.omg.CORBA.ORBClass","com.sun.corba.se.impl.orb.ORBImpl");
-    	}
+            props.put("org.omg.CORBA.ORBClass","com.sun.corba.ee.impl.orb.ORBImpl");
+        }
 
         if (props.getProperty("org.omg.CORBA.ORBSingletonClass") == null) {
-    	    props.put("org.omg.CORBA.ORBSingletonClass","com.sun.corba.se.impl.orb.ORBSingleton");
-    	}
+            props.put("org.omg.CORBA.ORBSingletonClass","com.sun.corba.ee.impl.orb.ORBSingleton");
+        }
 
-	// Create and return the ORB...
+        // Create and return the ORB...
 
-	return ORB.init(nameServerArgs, props);
+        return ORB.init(nameServerArgs, props);
     }
 
     protected static String createContextKey(int runtime, String host, String port) {
@@ -944,34 +944,34 @@ class RMIRegistry {
      * The port number can be specified on the command line.
      */
     public static void main(String args[]) {
-    	// Create and install the security manager
-    	System.setSecurityManager(new RMISecurityManager());
+        // Create and install the security manager
+        System.setSecurityManager(new RMISecurityManager());
 
-    	try {
-    	    int port = Registry.REGISTRY_PORT;
-    	    if (args.length >= 1) {
-		port = Integer.parseInt(args[0]);
-    	    }
-    	    Registry registry = new RegistryImpl(port);
-    	    System.out.println("Ready.");
+        try {
+            int port = Registry.REGISTRY_PORT;
+            if (args.length >= 1) {
+                port = Integer.parseInt(args[0]);
+            }
+            Registry registry = new RegistryImpl(port);
+            System.out.println("Ready.");
 
-    	    // prevent registry from exiting
-    	    while (true) {
-    		try {
-    		    // The following timeout is used because a bug in the
-    		    // native C code for Thread.sleep() cause it to return
-    		    // immediately for any higher value.
-    		    Thread.sleep(Integer.MAX_VALUE - 1);
-    		} catch (InterruptedException e) {
-    		}
-    	    }
-    	} catch (NumberFormatException e) {
-    	    System.out.println("Port is not a number.");
-    	} catch (Exception e) {
-    	    System.out.println("RegistryImpl.main: an exception occurred: " +
-    			       e.getMessage());
-    	    e.printStackTrace();
-    	}
-    	System.exit(1);
+            // prevent registry from exiting
+            while (true) {
+                try {
+                    // The following timeout is used because a bug in the
+                    // native C code for Thread.sleep() cause it to return
+                    // immediately for any higher value.
+                    Thread.sleep(Integer.MAX_VALUE - 1);
+                } catch (InterruptedException e) {
+                }
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Port is not a number.");
+        } catch (Exception e) {
+            System.out.println("RegistryImpl.main: an exception occurred: " +
+                               e.getMessage());
+            e.printStackTrace();
+        }
+        System.exit(1);
     }
 }

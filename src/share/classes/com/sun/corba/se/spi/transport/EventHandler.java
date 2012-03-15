@@ -37,12 +37,12 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 
-import com.sun.corba.se.spi.threadpool.Work;
+import com.sun.corba.ee.spi.threadpool.Work;
 
 /**
  * @author Harold Carr

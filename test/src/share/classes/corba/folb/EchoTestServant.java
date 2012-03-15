@@ -49,9 +49,9 @@ import java.util.List;
 import java.rmi.RemoteException;
 import javax.rmi.PortableRemoteObject;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 public class EchoTestServant
     extends PortableRemoteObject
@@ -62,41 +62,41 @@ public class EchoTestServant
     private ORB orb;
 
     public EchoTestServant(ORB orb)
-	throws RemoteException
+        throws RemoteException
     {
-	this.orb = orb;
+        this.orb = orb;
     }
 
     public String echo(String x)
-	throws RemoteException
+        throws RemoteException
     {
-	String result = "TestServant echoes: " + x;
-	dprint(".echo: " + result);
+        String result = "TestServant echoes: " + x;
+        dprint(".echo: " + result);
         return result;
     }
 
     public void neverReturns()
-	throws RemoteException
+        throws RemoteException
     {
-	try {
-	    dprint(".neverReturns");
-	    Object o = new Object();
-	    try { 
-		synchronized (o) {
-		    o.wait(); 
-		} 
-	    } catch (InterruptedException e) {
-		;
-	    }
-	} catch (Exception e) {
-	    dprint(".neverReturns: !!! Unexpected Exception");
-	    e.printStackTrace(System.out);
-	}
+        try {
+            dprint(".neverReturns");
+            Object o = new Object();
+            try { 
+                synchronized (o) {
+                    o.wait(); 
+                } 
+            } catch (InterruptedException e) {
+                ;
+            }
+        } catch (Exception e) {
+            dprint(".neverReturns: !!! Unexpected Exception");
+            e.printStackTrace(System.out);
+        }
     }
 
     private void dprint(String msg)
     {
-	ORBUtility.dprint("Server", msg);
+        ORBUtility.dprint("Server", msg);
     }
 }
 

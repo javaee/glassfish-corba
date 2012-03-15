@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ClassUtils.java	1.3 99/06/07 */
+/* @(#)ClassUtils.java  1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -80,7 +80,7 @@ public class ClassUtils {
             
         return result;
     }
-	
+        
     /**
      * Return the directory which contains a given class (either .java or .class).
      * @param className Fully qualified class name.
@@ -102,14 +102,14 @@ public class ClassUtils {
                     String packageName = className.substring(0,i);
                     ClassFile cls = path.getDirectory(packageName.replace('.',File.separatorChar));
                     if (cls != null && ! cls.isZipped()) {
-			result = new File(cls.getPath());
+                        result = new File(cls.getPath());
                     }
                 }
             }
         }
         return result;
     }
-	
+        
     private static boolean directoryInPath(String dirPath, String path) {
         if (!dirPath.endsWith(File.separator)) {
             dirPath = dirPath + File.separator;
@@ -133,20 +133,20 @@ public class ClassUtils {
             }
         }
       
-	return false;
+        return false;
     }
-	
+        
     private static File packageDirectory (String className, ClassPath path, String fileExt) {
         
         ClassFile cls = path.getFile(className.replace('.',File.separatorChar) + fileExt);
 
         if (cls != null && ! cls.isZipped()) {
-    	    File file = new File(cls.getPath());
-    	    File dir = new File(file.getParent());
-    	    return dir;
+            File file = new File(cls.getPath());
+            File dir = new File(file.getParent());
+            return dir;
         }
 
-	return null;
+        return null;
     }
 }
 

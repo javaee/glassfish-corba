@@ -47,7 +47,7 @@ import java.util.Properties ;
 
 class HelloServant extends HelloPOA {
     public String sayHello() {
-	return "Hello";
+        return "Hello";
     }
 }
 
@@ -63,8 +63,8 @@ public class Server {
                 // delay = Integer.parseInt(args[0]);
             // } catch (Exception e) { }
             
-	    Properties props = new Properties() ;
-	    props.setProperty( "com.sun.corba.se.ORBDebug", "poa" ) ;
+            Properties props = new Properties() ;
+            props.setProperty( "com.sun.corba.ee.ORBDebug", "poa" ) ;
             ORB orb = ORB.init(args, props);
 
             POA rootPOA = POAHelper.narrow(
@@ -78,13 +78,13 @@ public class Server {
             POA childPOA = rootPOA.create_POA("Child", null, policy);
             childPOA.set_servant_manager(new MyServantActivator());
             System.out.println("Set servant manager");
-	
+        
             String str = "ABCRef";
-	    org.omg.CORBA.Object obj = childPOA.create_reference_with_id(
-		str.getBytes(), "IDL:test/Hello:1.0");
+            org.omg.CORBA.Object obj = childPOA.create_reference_with_id(
+                str.getBytes(), "IDL:test/Hello:1.0");
             childPOA.the_POAManager().activate();
 
-	    Hello ref = HelloHelper.narrow(obj);
+            Hello ref = HelloHelper.narrow(obj);
             NamingContext namingContext = NamingContextHelper.narrow(
             orb.resolve_initial_references("NameService"));
             NameComponent[] name = { new NameComponent("Hello", "") };

@@ -40,7 +40,7 @@
 
 package pi.clientrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.CORBA.*;
 
@@ -60,28 +60,28 @@ public class InvokeVisitAllForward
     }
 
     public void invoke() throws Exception {
-	super.invoke();
+        super.invoke();
 
-	SampleClientRequestInterceptor.invokeOnForwardedObject = true;
+        SampleClientRequestInterceptor.invokeOnForwardedObject = true;
 
-	// Invoke send_request then receive_reply
-	invokeMethod( "sayHello" );
+        // Invoke send_request then receive_reply
+        invokeMethod( "sayHello" );
 
-	// Invoke send_request then receive_exception:
-	try {
-	    invokeMethod( "saySystemException" );
-	}
-	catch( UNKNOWN e ) {
-	    // We expect this, but no other exception.
-	}
-
-	// Invoke send_request then receive_other:
-	SampleClientRequestInterceptor.exceptionRedirectToOther = true;
-	try {
-	    invokeMethod( "saySystemException" );
+        // Invoke send_request then receive_exception:
+        try {
+            invokeMethod( "saySystemException" );
         }
-	catch( UNKNOWN e ) {
-	    // We expect this, but no other exception.
-	}
+        catch( UNKNOWN e ) {
+            // We expect this, but no other exception.
+        }
+
+        // Invoke send_request then receive_other:
+        SampleClientRequestInterceptor.exceptionRedirectToOther = true;
+        try {
+            invokeMethod( "saySystemException" );
+        }
+        catch( UNKNOWN e ) {
+            // We expect this, but no other exception.
+        }
     }
 }

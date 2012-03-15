@@ -38,24 +38,24 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA_2_3.portable.InputStream;
 
-import com.sun.corba.se.spi.ior.IORFactories;
+import com.sun.corba.ee.spi.ior.IORFactories;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextDefaults;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 /**
  * This implements the GIOP 1.0 Reply header.
@@ -84,7 +84,7 @@ public final class ReplyMessage_1_0 extends Message_1_0
     // Constructors
 
     ReplyMessage_1_0(ORB orb) {
-	this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
+        this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
         this.orb = orb;
     }
 
@@ -117,7 +117,7 @@ public final class ReplyMessage_1_0 extends Message_1_0
     }
 
     public SystemException getSystemException(String message) {
-	return MessageBase.getSystemException(
+        return MessageBase.getSystemException(
             exClassName, minorCode, completionStatus, message, wrapper);
     }
 
@@ -126,7 +126,7 @@ public final class ReplyMessage_1_0 extends Message_1_0
     }
 
     public void setIOR( IOR ior ) {
-	this.ior = ior;
+        this.ior = ior;
     }
 
     // IO methods
@@ -134,7 +134,7 @@ public final class ReplyMessage_1_0 extends Message_1_0
     public void read(org.omg.CORBA.portable.InputStream istream) {
         super.read(istream);
         this.service_contexts = ServiceContextDefaults.makeServiceContexts(
-	    (org.omg.CORBA_2_3.portable.InputStream) istream);
+            (org.omg.CORBA_2_3.portable.InputStream) istream);
         this.request_id = istream.read_ulong();
         this.reply_status = istream.read_long();
         isValidReplyStatus(this.reply_status); // raises exception on error
@@ -159,14 +159,14 @@ public final class ReplyMessage_1_0 extends Message_1_0
                 this.completionStatus = CompletionStatus.COMPLETED_MAYBE;
                 break;
             default:
-		throw wrapper.badCompletionStatusInReply( status );
+                throw wrapper.badCompletionStatusInReply( status );
             }
 
         } else if (this.reply_status == USER_EXCEPTION) {
             // do nothing. The client stub will read the exception from body.
         } else if (this.reply_status == LOCATION_FORWARD) {
             CDRInputObject cdr = (CDRInputObject) istream;
-	    this.ior = IORFactories.makeIOR( orb, (InputStream)cdr ) ;
+            this.ior = IORFactories.makeIOR( orb, (InputStream)cdr ) ;
         }
     }
 
@@ -174,9 +174,9 @@ public final class ReplyMessage_1_0 extends Message_1_0
     // IOR may be written afterwards into the reply mesg body.
     public void write(org.omg.CORBA.portable.OutputStream ostream) {
         super.write(ostream);
-	service_contexts.write(
-	    (org.omg.CORBA_2_3.portable.OutputStream) ostream,
-	    GIOPVersion.V1_0);
+        service_contexts.write(
+            (org.omg.CORBA_2_3.portable.OutputStream) ostream,
+            GIOPVersion.V1_0);
         ostream.write_ulong(this.request_id);
         ostream.write_long(this.reply_status);
     }
@@ -191,7 +191,7 @@ public final class ReplyMessage_1_0 extends Message_1_0
         case LOCATION_FORWARD :
             break;
         default :
-	    throw wrapper.illegalReplyStatus();
+            throw wrapper.illegalReplyStatus();
         }
     }
 

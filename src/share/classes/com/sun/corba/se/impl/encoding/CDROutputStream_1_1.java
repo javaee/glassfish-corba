@@ -37,9 +37,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
 public class CDROutputStream_1_1 extends CDROutputStream_1_0
 {
@@ -112,7 +112,7 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
 
     @Override
     public int get_offset() {
-	return bbwi.position() + fragmentOffset;
+        return bbwi.position() + fragmentOffset;
     }
 
     @Override
@@ -132,7 +132,7 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
         converter.convert(x);
 
         if (converter.getNumBytes() != 2)
-	    throw wrapper.badGiop11Ctb();
+            throw wrapper.badGiop11Ctb();
 
         alignAndReserve(converter.getAlignment(),
                         converter.getNumBytes());
@@ -146,13 +146,13 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
     public void write_wstring(String value)
     {
         if (value == null) {
-	    throw wrapper.nullParam();
+            throw wrapper.nullParam();
         }
 
         // The length is the number of code points (which are 2 bytes each)
         // including the 2 byte null.  See CORBA formal 99-10-07 15.3.2.7.
 
-    	int len = value.length() + 1;
+        int len = value.length() + 1;
 
         write_long(len);
 

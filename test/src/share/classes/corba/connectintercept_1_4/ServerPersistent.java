@@ -48,8 +48,8 @@ public class ServerPersistent
 {
     public static void main(String av[])
     {
-	String[] args = { Common.Persistent };
-	ServerCommon.main(args);
+        String[] args = { Common.Persistent };
+        ServerCommon.main(args);
     }
 }
 

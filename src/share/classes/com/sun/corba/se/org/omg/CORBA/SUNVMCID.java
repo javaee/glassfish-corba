@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.org.omg.CORBA ;
+package com.sun.corba.ee.org.omg.CORBA ;
 
 /**
  * The vendor minor code ID reserved for Sun by the OMG.

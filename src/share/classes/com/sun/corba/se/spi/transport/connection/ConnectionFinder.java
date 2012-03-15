@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport.connection;
+package com.sun.corba.ee.spi.transport.connection;
 
 import java.util.Collection ;
 
@@ -53,6 +53,6 @@ public interface ConnectionFinder<C extends Connection> {
      * exists.  May create a new connection and return it.
      */
     C find( ContactInfo<C> cinfo, Collection<C> idleConnections, 
-	Collection<C> busyConnections ) throws IOException ;
+        Collection<C> busyConnections ) throws IOException ;
 }
 

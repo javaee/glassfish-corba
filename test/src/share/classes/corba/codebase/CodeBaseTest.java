@@ -43,7 +43,7 @@ import test.Test;
 import corba.framework.*;
 import java.util.*;
 import java.io.*;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
 public class CodeBaseTest extends CORBATest
 {
@@ -192,7 +192,7 @@ public class CodeBaseTest extends CORBATest
             executionStrategy = new ExternalExec();
 
         Properties props = Options.getServerProperties() ;
-	int emmaPort = EmmaControl.setCoverageProperties( props ) ;
+        int emmaPort = EmmaControl.setCoverageProperties( props ) ;
 
         String args[] = new String[] { 
                              "-port",
@@ -206,7 +206,7 @@ public class CodeBaseTest extends CORBATest
 
         Hashtable extra = new Hashtable(1);
 
-	// Make sure that starting the web server controller waits until the web server is ready
+        // Make sure that starting the web server controller waits until the web server is ready
         extra.put(ExternalExec.HANDSHAKE_KEY, "Ready.");
 
         exec.initialize("corba.codebase.WebServer",
@@ -217,7 +217,7 @@ public class CodeBaseTest extends CORBATest
                         Options.getReportDirectory() + "webserver.out.txt",
                         Options.getReportDirectory() + "webserver.err.txt",
                         extra,
-			emmaPort ) ;
+                        emmaPort ) ;
 
         controllers.add(exec);
 

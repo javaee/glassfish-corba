@@ -63,14 +63,14 @@ public class policy2Client {
             System.out.println( "ORB Initializing" );
             Properties props = new Properties();
             props.put( "org.omg.corba.ORBClass", System.getProperty("org.omg.CORBA.ORBClass"));
-            props.setProperty( "com.sun.corba.se.ORBid", "sunorb1");
-            System.out.println("com.sun.corba.se.ORBid " + props.getProperty("com.sun.corba.se.ORBid"));
+            props.setProperty( "com.sun.corba.ee.ORBid", "sunorb1");
+            System.out.println("com.sun.corba.ee.ORBid " + props.getProperty("com.sun.corba.ee.ORBid"));
             ORB orb1 = ORB.init( args, props );
 
             props = new Properties();
             props.put( "org.omg.corba.ORBClass", System.getProperty("org.omg.CORBA.ORBClass"));
-            props.setProperty( "com.sun.corba.se.ORBid", "sunorb2");
-            System.out.println("com.sun.corba.se.ORBid " + props.getProperty("com.sun.corba.se.ORBid"));
+            props.setProperty( "com.sun.corba.ee.ORBid", "sunorb2");
+            System.out.println("com.sun.corba.ee.ORBid " + props.getProperty("com.sun.corba.ee.ORBid"));
             ORB orb2 = ORB.init( args, props );
 
             lookupAndInvoke(orb1, "Object1");

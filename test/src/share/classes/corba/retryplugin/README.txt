@@ -49,7 +49,7 @@ server to the client to indicate test phase changes (i.e., rejecting
 on/off; always rejecting/retry timeout; shutdown) rather than Thread.sleep.
 
 ------------------------------------------------------------------------------
-	***** IMPORTANT NOTICE *****
+        ***** IMPORTANT NOTICE *****
 
 Should only use RetryClientRequestInterceptor if the client *ONLY* talks
 to stateless beans.

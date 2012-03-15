@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.oa;
+package com.sun.corba.ee.spi.oa;
 
 /** This exception is thrown when an operation on an ObjectAdapter
  * fails because the ObjectAdapter was destroyed during the operation.

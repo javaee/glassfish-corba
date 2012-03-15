@@ -42,7 +42,7 @@ package corba.rmipoacounter;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class RMIPOACounterTest extends CORBATest
 {

@@ -65,18 +65,18 @@ public abstract class ClientCommon
     private CodecFactory codecFactory;
 
     public void run( Properties environment, String args[], PrintStream out,
-	             PrintStream err, Hashtable extra) 
+                     PrintStream err, Hashtable extra) 
         throws Exception
     {
-	out.println( "Client" );
-	out.println( "======" );
+        out.println( "Client" );
+        out.println( "======" );
 
-	this.out = out;
-	this.err = err;
-	ClientTestInitializer.out = this.out;
+        this.out = out;
+        this.err = err;
+        ClientTestInitializer.out = this.out;
 
-	this.orb = createORB( args );
-	ClientTestInitializer.orb = this.orb;
+        this.orb = createORB( args );
+        ClientTestInitializer.orb = this.orb;
 
         try {
             // Test ORBInitializer
@@ -181,7 +181,7 @@ public abstract class ClientCommon
      * Test that destroy is called on all interceptors.
      */
     private void testDestroy() 
-	throws Exception
+        throws Exception
     {
         helper.start( "testDestroy" ) ;
 
@@ -221,14 +221,14 @@ public abstract class ClientCommon
      * Checks that a single interceptor passed the destroy test
      */
     private void checkDestroyCount( String name, int expected, int actual ) 
-	throws Exception
+        throws Exception
     {
-	out.println( "* " + name + " interceptor: Expected " + expected + 
-	    " destroys.  Received " + actual + "." );
-	if( expected != actual ) {
-	    throw new RuntimeException( 
-		"Incorrect number of destroys called." );
-	}
+        out.println( "* " + name + " interceptor: Expected " + expected + 
+            " destroys.  Received " + actual + "." );
+        if( expected != actual ) {
+            throw new RuntimeException( 
+                "Incorrect number of destroys called." );
+        }
     }
 
     abstract protected ORB createORB( String[] args );

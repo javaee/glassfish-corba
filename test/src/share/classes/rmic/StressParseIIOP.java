@@ -62,14 +62,14 @@ import java.io.IOException;
  * StressParseIIOP walks all classes in a classpath and has CompoundType.makeType()
  * parse them. The output is sent to standard out.
  *
- * @author	Bryan Atsatt
+ * @author      Bryan Atsatt
  */
 public class StressParseIIOP {
 
     private static final int MAX_FILES = 400;
-    private static final String kPathArg 	        = "-classpath";
-    private static final String kBatchSizeArg 	    = "-batchsize";
-    private static final String kSoloArg 	        = "-solo";
+    private static final String kPathArg                = "-classpath";
+    private static final String kBatchSizeArg       = "-batchsize";
+    private static final String kSoloArg                = "-solo";
     private String classPath;
     private int batchSize;
     private boolean solo;
@@ -81,35 +81,35 @@ public class StressParseIIOP {
      */
     public StressParseIIOP (String classPath, int batchSize, boolean solo) {
 
-	this.classPath = classPath;
-	this.batchSize = batchSize;
-	this.solo = solo;
-	totalCount = 0;
+        this.classPath = classPath;
+        this.batchSize = batchSize;
+        this.solo = solo;
+        totalCount = 0;
     }
 
     public int parse () {
 
-	int result = 0;
-		
-	// Collect all classes...
+        int result = 0;
+                
+        // Collect all classes...
 
         Vector allClasses = ClassEnumerator.getClasses(classPath,true);
         System.out.println("Processing " + allClasses.size() + " classes:\n");
         
-	// Split the list if needed...
+        // Split the list if needed...
 
-	Vector[] classes = split(allClasses,batchSize);
+        Vector[] classes = split(allClasses,batchSize);
 
-	// Parse them...
+        // Parse them...
 
-	for (int i = 0; i < classes.length; i++) {
-	    int exitValue = parse(classes[i]);
-	    if (exitValue != 0) {
-		result = exitValue;
-	    }
-	}
-		
-	return result;
+        for (int i = 0; i < classes.length; i++) {
+            int exitValue = parse(classes[i]);
+            if (exitValue != 0) {
+                result = exitValue;
+            }
+        }
+                
+        return result;
     }
 
     protected static Vector[] split (Vector all, int maxSize) {
@@ -185,72 +185,72 @@ public class StressParseIIOP {
      */
     public static void main(String args[]) {
 
-	// Init arguments...
+        // Init arguments...
 
-	String classPath = null;
-	int batchSize = MAX_FILES;
-	boolean solo = false;
+        String classPath = null;
+        int batchSize = MAX_FILES;
+        boolean solo = false;
 
-	// Get arguments...
+        // Get arguments...
 
-	if (args == null) {
-	    usage();
-	} else {
-	    for (int i = 0; i < args.length; i++) {
+        if (args == null) {
+            usage();
+        } else {
+            for (int i = 0; i < args.length; i++) {
 
-		String arg = args[i].toLowerCase();
+                String arg = args[i].toLowerCase();
 
-		if (arg.equals(kPathArg)) classPath = args[++i];
-		else if (arg.equals(kBatchSizeArg)) batchSize = Integer.parseInt(args[++i]);
-		else if (arg.equals(kSoloArg)) solo = true;
-		else usage();
-	    }
-	}
+                if (arg.equals(kPathArg)) classPath = args[++i];
+                else if (arg.equals(kBatchSizeArg)) batchSize = Integer.parseInt(args[++i]);
+                else if (arg.equals(kSoloArg)) solo = true;
+                else usage();
+            }
+        }
 
-	// Init classPath if needed...
+        // Init classPath if needed...
 
-	if (classPath == null) {
-	    classPath = ClassEnumerator.getFullClassPath();
-	}
-	// Construct our object...
+        if (classPath == null) {
+            classPath = ClassEnumerator.getFullClassPath();
+        }
+        // Construct our object...
 
-	StressParseIIOP parser = new StressParseIIOP(classPath,batchSize,solo);
+        StressParseIIOP parser = new StressParseIIOP(classPath,batchSize,solo);
 
-	// Tell it to do it's thing...
+        // Tell it to do it's thing...
 
         int result = 0;
         
-	try {
-	    long startTime = System.currentTimeMillis();
-	    result = parser.parse();
-	    long duration = System.currentTimeMillis() - startTime;
-			
-	    if (result == 0) {
-		System.out.println("PASS. Completed in " + duration + " ms.");
-	    } else {
-		System.out.println("FAIL. Completed in " + duration + " ms.");
-	    }
-	} catch (InternalError e) {
-	    result = 1;
-	    System.err.println("Error! " + e.getMessage());
-	} catch (Exception e) {
-	    result = 1;
-	    System.err.println("Error! Caught " + e.getMessage());
-	    e.printStackTrace(System.err);
-	}
-	
-	System.exit(result);
+        try {
+            long startTime = System.currentTimeMillis();
+            result = parser.parse();
+            long duration = System.currentTimeMillis() - startTime;
+                        
+            if (result == 0) {
+                System.out.println("PASS. Completed in " + duration + " ms.");
+            } else {
+                System.out.println("FAIL. Completed in " + duration + " ms.");
+            }
+        } catch (InternalError e) {
+            result = 1;
+            System.err.println("Error! " + e.getMessage());
+        } catch (Exception e) {
+            result = 1;
+            System.err.println("Error! Caught " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
+        
+        System.exit(result);
     }
 
     /**
      * Print usage.
      */
     public static void usage () {
-	PrintStream out = System.out;
+        PrintStream out = System.out;
 
-	out.println();
-	out.println("Usage: java rmic.StressParseIIOP [-classpath <path>]");
-	out.println();
+        out.println();
+        out.println("Usage: java rmic.StressParseIIOP [-classpath <path>]");
+        out.println();
     }
 
     /**
@@ -265,11 +265,11 @@ public class StressParseIIOP {
 
         try {
 
-	    Runtime runtime     = Runtime.getRuntime();
+            Runtime runtime     = Runtime.getRuntime();
             Process theProcess  = runtime.exec(command);
             ProcessMonitor monitor = new ProcessMonitor(theProcess,System.out,System.err,0);
             monitor.start();
-	    int result = waitForCompletion(theProcess,2000);
+            int result = waitForCompletion(theProcess,2000);
             monitor.stop();
             return result;
         } catch (Throwable error) {
@@ -280,9 +280,9 @@ public class StressParseIIOP {
 
 
     private static int waitForCompletion( Process theProcess, int sleepTime)
-	throws java.lang.InterruptedException
+        throws java.lang.InterruptedException
     {
-	int result = -1;
+        int result = -1;
 
         try {
             theProcess.waitFor();
@@ -306,8 +306,8 @@ public class StressParseIIOP {
  * ProcessMonitor provides a thread which will consume output from a
  * java.lang.Process and write it to the specified local streams.
  *
- * @version	1.0, 6/11/98
- * @author	Bryan Atsatt
+ * @version     1.0, 6/11/98
+ * @author      Bryan Atsatt
  */
 class ProcessMonitor extends Thread {
     Process process;
@@ -362,7 +362,7 @@ class ProcessMonitor extends Thread {
         BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-	String eolTest = "";
+        String eolTest = "";
 
         try {
             while ((eolTest = in.readLine()) != null) {
@@ -372,7 +372,7 @@ class ProcessMonitor extends Thread {
                     localOut.println(eolTest);
                 }
 
-	    }
+            }
         } catch (IOException e) {}
 
         try {

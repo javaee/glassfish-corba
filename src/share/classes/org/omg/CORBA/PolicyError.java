@@ -61,7 +61,7 @@ public final class PolicyError extends org.omg.CORBA.UserException {
      * with no reason code and an empty reason detail message.
      */
     public PolicyError() {
-	super();
+        super();
     }
 
     /**
@@ -70,8 +70,8 @@ public final class PolicyError extends org.omg.CORBA.UserException {
      * @param __reason the reason code.
      */
     public PolicyError(short __reason) {
-	super();
-	reason = __reason;
+        super();
+        reason = __reason;
     }
 
     /**
@@ -81,7 +81,7 @@ public final class PolicyError extends org.omg.CORBA.UserException {
      * @param __reason the reason code.
      */
     public PolicyError(String reason_string, short __reason) {
-	super(reason_string);
-	reason = __reason;
+        super(reason_string);
+        reason = __reason;
     }
 }

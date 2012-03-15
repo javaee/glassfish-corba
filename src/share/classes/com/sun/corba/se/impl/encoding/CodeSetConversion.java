@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -53,9 +53,9 @@ import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.charset.UnmappableCharacterException;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.logging.OMGSystemException;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
 
 /**
  * Collection of classes, interfaces, and factory methods for
@@ -147,7 +147,7 @@ public class CodeSetConversion
         // The same array may be used internally over multiple
         // calls.
         public abstract char[] getChars(byte[] bytes, int offset, int length);
-	public abstract char[] getChars(ByteBuffer buff, int offset, int length);
+        public abstract char[] getChars(ByteBuffer buff, int offset, int length);
 
     }
 
@@ -201,12 +201,12 @@ public class CodeSetConversion
 
                 // This can only happen if one of our Entries has
                 // an invalid name.
-		throw wrapper.invalidCtbConverterName(icne,codeset.getName());
+                throw wrapper.invalidCtbConverterName(icne,codeset.getName());
             } catch(UnsupportedCharsetException ucne) {
 
                 // This can only happen if one of our Entries has
                 // an unsupported name.
-		throw wrapper.invalidCtbConverterName(ucne,codeset.getName());
+                throw wrapper.invalidCtbConverterName(ucne,codeset.getName());
             }
 
             this.codeset = codeset;
@@ -240,46 +240,46 @@ public class CodeSetConversion
             
             buffer = cacheEncoder.get(strToConvert);
             if (buffer != null) {
-		numBytes = buffer.limit();
-		//We need to set the buffer position to zero; becoz a
-		//previous read would have set the buffer position to its limit
-		buffer.position(0);
+                numBytes = buffer.limit();
+                //We need to set the buffer position to zero; becoz a
+                //previous read would have set the buffer position to its limit
+                buffer.position(0);
             }
             else {
                 strToConvert.getChars(0, numChars, chars, 0);
-		convertCharArray();
-		cacheEncoder.put(strToConvert, buffer);
+                convertCharArray();
+                cacheEncoder.put(strToConvert, buffer);
             }
 
-	    //ToDo: if encoding debug is turned on call the below method
-	    //validateCodesetCache(buffer, strToConvert);
+            //ToDo: if encoding debug is turned on call the below method
+            //validateCodesetCache(buffer, strToConvert);
         }
-	
-	void validateCodesetCache(ByteBuffer bb, String strToConvert) {
-		try {
+        
+        void validateCodesetCache(ByteBuffer bb, String strToConvert) {
+                try {
                     Charset tmpCharset = Charset.forName(codeset.getName());
-		    CharsetDecoder result = tmpCharset.newDecoder();
-		    buffer.position(0);
-		    int pos=0;
-		    CharBuffer charBuf = result.decode(buffer);
-		    if (!strToConvert.equals(charBuf.toString()) ) {
+                    CharsetDecoder result = tmpCharset.newDecoder();
+                    buffer.position(0);
+                    int pos=0;
+                    CharBuffer charBuf = result.decode(buffer);
+                    if (!strToConvert.equals(charBuf.toString()) ) {
                         System.out.println(" buff position =" +pos + 
-			"newPos ="+ buffer.position() +
-			" orgString ="+ strToConvert + 
-			" retString =" + charBuf.toString() );
+                        "newPos ="+ buffer.position() +
+                        " orgString ="+ strToConvert + 
+                        " retString =" + charBuf.toString() );
 
-			ORBUtility.dprint("CodeSetConversion",
+                        ORBUtility.dprint("CodeSetConversion",
                             "CharBuff pos =" +
                             charBuf.position() + " limit=" +
                             charBuf.limit() + " buff limit = " +
                             buffer.limit() + "numByte =" +
                             numBytes + " numChar " + numChars );
-		    }
-   	   	} catch (Exception ex) { 
+                    }
+                } catch (Exception ex) { 
                     ORBUtility.dprint("CodeSetConversion",
                         "Exception in CodeSet cache");
                     ex.printStackTrace();
-		}
+                }
         }
         
         public final int getNumBytes() {
@@ -329,17 +329,17 @@ public class CodeSetConversion
 
             } catch (IllegalStateException ise) {
                 // an encoding operation is already in progress
-		throw wrapper.ctbConverterFailure( ise ) ;
+                throw wrapper.ctbConverterFailure( ise ) ;
             } catch (MalformedInputException mie) {
                 // There were illegal Unicode char pairs
-		throw wrapper.badUnicodePair( mie ) ;
+                throw wrapper.badUnicodePair( mie ) ;
             } catch (UnmappableCharacterException uce) {
                 // A character doesn't map to the desired code set
                 // CORBA formal 00-11-03.
-		throw omgWrapper.charNotInCodeset( uce ) ;
+                throw omgWrapper.charNotInCodeset( uce ) ;
             } catch (CharacterCodingException cce) {
                 // If this happens, then some other encoding error occured
-		throw wrapper.ctbConverterFailure( cce ) ;
+                throw wrapper.ctbConverterFailure( cce ) ;
             }
         }
     }
@@ -402,45 +402,45 @@ public class CodeSetConversion
         }
 
         public char[] getChars(ByteBuffer buff, int offset, int numBytes) {
-	    try {
-		buff.limit(numBytes);
-		char [] myCache = cacheDecoder.get(buff);
+            try {
+                buff.limit(numBytes);
+                char [] myCache = cacheDecoder.get(buff);
 
-		if (myCache == null)  {
-		    byte[] byteArray = new byte[numBytes];
-		    buff.get(byteArray);
-		    buff.position(0);
-		    CharBuffer charBuf = btc.decode(buff);
-		    ByteBuffer bbb = ByteBuffer.wrap(byteArray);
+                if (myCache == null)  {
+                    byte[] byteArray = new byte[numBytes];
+                    buff.get(byteArray);
+                    buff.position(0);
+                    CharBuffer charBuf = btc.decode(buff);
+                    ByteBuffer bbb = ByteBuffer.wrap(byteArray);
 
-		    // CharBuffer returned by the decoder will set its limit
-		    // to byte immediately after the last written byte.
-		    resultingNumChars = charBuf.limit();
+                    // CharBuffer returned by the decoder will set its limit
+                    // to byte immediately after the last written byte.
+                    resultingNumChars = charBuf.limit();
                     buffer = new char[resultingNumChars];
-	            charBuf.get(buffer, 0, resultingNumChars).position(0);
-        	    cacheDecoder.put(bbb, buffer);
-	       }
-	       else {
-	           buffer = myCache;
-	           resultingNumChars = myCache.length;
-	       }
-	       return buffer;
+                    charBuf.get(buffer, 0, resultingNumChars).position(0);
+                    cacheDecoder.put(bbb, buffer);
+               }
+               else {
+                   buffer = myCache;
+                   resultingNumChars = myCache.length;
+               }
+               return buffer;
 
-	    } catch (IllegalStateException ile) {
-		// There were a decoding operation already in progress
-		throw wrapper.btcConverterFailure( ile ) ;
-	    } catch (MalformedInputException mie) {
-		// There were illegal Unicode char pairs
-		throw wrapper.badUnicodePair( mie ) ;
-	    } catch (UnmappableCharacterException uce) {
-		// A character doesn't map to the desired code set.
-		// CORBA formal 00-11-03.
-	        throw omgWrapper.charNotInCodeset( uce ) ;
-	    } catch (CharacterCodingException cce) {
-		// If this happens, then a character decoding error occured.
-		throw wrapper.btcConverterFailure( cce ) ;
+            } catch (IllegalStateException ile) {
+                // There were a decoding operation already in progress
+                throw wrapper.btcConverterFailure( ile ) ;
+            } catch (MalformedInputException mie) {
+                // There were illegal Unicode char pairs
+                throw wrapper.badUnicodePair( mie ) ;
+            } catch (UnmappableCharacterException uce) {
+                // A character doesn't map to the desired code set.
+                // CORBA formal 00-11-03.
+                throw omgWrapper.charNotInCodeset( uce ) ;
+            } catch (CharacterCodingException cce) {
+                // If this happens, then a character decoding error occured.
+                throw wrapper.btcConverterFailure( cce ) ;
             }
-	}
+        }
 
         public char[] getChars(byte[] bytes, int offset, int numBytes) {
 
@@ -480,17 +480,17 @@ public class CodeSetConversion
 
             } catch (IllegalStateException ile) {
                 // There were a decoding operation already in progress
-		throw wrapper.btcConverterFailure( ile ) ;
+                throw wrapper.btcConverterFailure( ile ) ;
             } catch (MalformedInputException mie) {
                 // There were illegal Unicode char pairs
-		throw wrapper.badUnicodePair( mie ) ;
+                throw wrapper.badUnicodePair( mie ) ;
             } catch (UnmappableCharacterException uce) {
                 // A character doesn't map to the desired code set.
                 // CORBA formal 00-11-03.
-		throw omgWrapper.charNotInCodeset( uce ) ;
+                throw omgWrapper.charNotInCodeset( uce ) ;
             } catch (CharacterCodingException cce) {
                 // If this happens, then a character decoding error occured.
-		throw wrapper.btcConverterFailure( cce ) ;
+                throw wrapper.btcConverterFailure( cce ) ;
             }
         }
 
@@ -514,7 +514,7 @@ public class CodeSetConversion
             } catch(IllegalCharsetNameException icne) {
                 // This can only happen if one of our charset entries has
                 // an illegal name.
-		throw wrapper.invalidBtcConverterName( icne, javaCodeSetName ) ;
+                throw wrapper.invalidBtcConverterName( icne, javaCodeSetName ) ;
             }
 
             return result;
@@ -546,29 +546,29 @@ public class CodeSetConversion
         }
 
         @Override
-	public char[] getChars(ByteBuffer bytes, int offset, int numBytes) {
+        public char[] getChars(ByteBuffer bytes, int offset, int numBytes) {
             //bytes.position(offset);
             byte [] marker = { bytes.get(), bytes.get() };
             bytes.position(0);
 
             if (hasUTF16ByteOrderMarker(marker, 0, numBytes)) {
-		if (!converterUsesBOM)
+                if (!converterUsesBOM)
                     switchToConverter(OSFCodeSetRegistry.UTF_16);
 
-		converterUsesBOM = true;
-		return super.getChars(bytes, offset, numBytes);
+                converterUsesBOM = true;
+                return super.getChars(bytes, offset, numBytes);
             } else {
-		if (converterUsesBOM) {
+                if (converterUsesBOM) {
                     if (defaultToLittleEndian)
-			switchToConverter(OSFCodeSetRegistry.UTF_16LE);
+                        switchToConverter(OSFCodeSetRegistry.UTF_16LE);
                     else
-                    	switchToConverter(OSFCodeSetRegistry.UTF_16BE);
+                        switchToConverter(OSFCodeSetRegistry.UTF_16BE);
 
                     converterUsesBOM = false;
-		}
-		return super.getChars(bytes, offset, numBytes);
+                }
+                return super.getChars(bytes, offset, numBytes);
             }
-	}
+        }
 
         @Override
         public char[] getChars(byte[] bytes, int offset, int numBytes) {
@@ -683,16 +683,16 @@ public class CodeSetConversion
 
         CTBConverter converter = null; 
 
-	Map<OSFCodeSetRegistry.Entry, CTBConverter> m =  cacheCTBC.get();
-	converter = (JavaCTBConverter) m.get(codeset);
-	if (converter == null ) {
-	    converter = new JavaCTBConverter(codeset, alignment);
-	    m.put(codeset, converter);
-	}
-	else if(converter.getAlignment() != alignment) {
-	    ((JavaCTBConverter) converter).setAlignment(alignment);
-	}
-	return converter;
+        Map<OSFCodeSetRegistry.Entry, CTBConverter> m =  cacheCTBC.get();
+        converter = (JavaCTBConverter) m.get(codeset);
+        if (converter == null ) {
+            converter = new JavaCTBConverter(codeset, alignment);
+            m.put(codeset, converter);
+        }
+        else if(converter.getAlignment() != alignment) {
+            ((JavaCTBConverter) converter).setAlignment(alignment);
+        }
+        return converter;
     }
 
     /**
@@ -714,14 +714,14 @@ public class CodeSetConversion
             return new UTF16BTCConverter(defaultToLittleEndian);
         } else {
 
-	    BTCConverter converter = null;
-	    Map<OSFCodeSetRegistry.Entry, BTCConverter> m  = cacheBTCC.get();
-	    converter = (JavaBTCConverter) m.get(codeset);
-	    if (converter == null) {
-	        converter = new JavaBTCConverter(codeset);
-	        m.put(codeset, converter);
+            BTCConverter converter = null;
+            Map<OSFCodeSetRegistry.Entry, BTCConverter> m  = cacheBTCC.get();
+            converter = (JavaBTCConverter) m.get(codeset);
+            if (converter == null) {
+                converter = new JavaBTCConverter(codeset);
+                m.put(codeset, converter);
             }
-	    return converter;
+            return converter;
         }
     }
 
@@ -827,14 +827,14 @@ public class CodeSetConversion
 
     // initialize-on-demand holder
     private static class CodeSetConversionHolder {
-	static final CodeSetConversion csc = new CodeSetConversion() ;
+        static final CodeSetConversion csc = new CodeSetConversion() ;
     }
 
     /**
      * CodeSetConversion is a singleton, and this is the access point.
      */
     public static CodeSetConversion impl() {
-	return CodeSetConversionHolder.csc ;
+        return CodeSetConversionHolder.csc ;
     }
 
     // Number used internally to indicate the fallback code
@@ -847,21 +847,21 @@ public class CodeSetConversion
 
     // CodeSet converters are cached once created and are shared with multiple
     //  worker threads as shared objects. Each converter's 
-    //	btc/ctb	object has cached string<-->byte[] cache on a per thread basis.
+    //  btc/ctb object has cached string<-->byte[] cache on a per thread basis.
     //  Everytime a string is encoded/decoded it's result will be stored in 
     //  the weak HashMap of the respective converters.
     private ThreadLocal <HashMap<OSFCodeSetRegistry.Entry, BTCConverter>> 
-	cacheBTCC = new ThreadLocal() {
+        cacheBTCC = new ThreadLocal() {
         @Override
-	public HashMap<OSFCodeSetRegistry.Entry, BTCConverter> initialValue() {
+        public HashMap<OSFCodeSetRegistry.Entry, BTCConverter> initialValue() {
             return new HashMap<OSFCodeSetRegistry.Entry, BTCConverter>() ;
-	}
+        }
     };
     private ThreadLocal <HashMap<OSFCodeSetRegistry.Entry, CTBConverter>> 
-	cacheCTBC = new ThreadLocal() {
+        cacheCTBC = new ThreadLocal() {
         @Override
-	public HashMap<OSFCodeSetRegistry.Entry, CTBConverter> initialValue() {
+        public HashMap<OSFCodeSetRegistry.Entry, CTBConverter> initialValue() {
             return new HashMap<OSFCodeSetRegistry.Entry, CTBConverter>() ;
-	}
+        }
     };
 }

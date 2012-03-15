@@ -38,15 +38,15 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.servicecontext;
+package com.sun.corba.ee.impl.servicecontext;
 
 import java.io.Serializable ;
 import org.omg.CORBA_2_3.portable.InputStream;
 import org.omg.CORBA_2_3.portable.OutputStream;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.servicecontext.ServiceContextBase ;
-import com.sun.corba.se.spi.servicecontext.UEInfoServiceContext ;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextBase ;
+import com.sun.corba.ee.spi.servicecontext.UEInfoServiceContext ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 public class UEInfoServiceContextImpl extends ServiceContextBase
     implements UEInfoServiceContext
@@ -58,28 +58,28 @@ public class UEInfoServiceContextImpl extends ServiceContextBase
 
     public UEInfoServiceContextImpl( Throwable ex )
     {
-	unknown = ex ;
+        unknown = ex ;
     }
 
     public UEInfoServiceContextImpl(InputStream is, GIOPVersion gv)
     {
-	super(is) ;
+        super(is) ;
 
-	try { 
-	    unknown = (Throwable) in.read_value() ;
-	} catch (Exception e) {
-	    unknown = wrapper.couldNotReadInfo( e ) ;
-	}
+        try { 
+            unknown = (Throwable) in.read_value() ;
+        } catch (Exception e) {
+            unknown = wrapper.couldNotReadInfo( e ) ;
+        }
     }
 
     public int getId() 
     { 
-	return SERVICE_CONTEXT_ID ; 
+        return SERVICE_CONTEXT_ID ; 
     }
 
     public void writeData( OutputStream os ) 
     {
-	os.write_value( (Serializable)unknown ) ;
+        os.write_value( (Serializable)unknown ) ;
     }
 
     public Throwable getUE() { return unknown ; } 
@@ -87,7 +87,7 @@ public class UEInfoServiceContextImpl extends ServiceContextBase
     @Override
     public String toString()
     {
-	return "UEInfoServiceContextImpl[ unknown=" + unknown.toString() + " ]" ;
+        return "UEInfoServiceContextImpl[ unknown=" + unknown.toString() + " ]" ;
     }
 }
 

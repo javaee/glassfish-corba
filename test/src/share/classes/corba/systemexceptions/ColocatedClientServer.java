@@ -69,43 +69,43 @@ public class ColocatedClientServer
 
     public static void main (String[] av)
     {
-	isColocated = true; // Used by Client and Server.
+        isColocated = true; // Used by Client and Server.
 
-	try {
-	    // Share an ORB between a client and server.
-	    // So ClientDelegate.isLocal currently succeeds.
+        try {
+            // Share an ORB between a client and server.
+            // So ClientDelegate.isLocal currently succeeds.
 
-	    Properties props = new Properties();
-	    props.setProperty("com.sun.corba.se.ORBAllowLocalOptimization",
-			      "true");
-	    orb = ORB.init(av, props);
-	    U.sop(main + " : creating ORB.");
-	    Server.orb = (com.sun.corba.se.spi.orb.ORB) orb;
-	    Client.orb = orb;
-	    
-	    // Share a naming context between client and server
-	    // so Util.isLocal is true.
+            Properties props = new Properties();
+            props.setProperty("com.sun.corba.ee.ORBAllowLocalOptimization",
+                              "true");
+            orb = ORB.init(av, props);
+            U.sop(main + " : creating ORB.");
+            Server.orb = (com.sun.corba.ee.spi.orb.ORB) orb;
+            Client.orb = orb;
+            
+            // Share a naming context between client and server
+            // so Util.isLocal is true.
 
-	    // Use the same ORB which has interceptor properties set.
-	    U.sop(main + " : creating InitialContext.");
-	    initialContext = C.createInitialContext(orb);
-	    Server.initialContext = initialContext;
-	    Client.initialContext = initialContext;
-	    
-	    ServerThread ServerThread = new ServerThread(av);
-	    ServerThread.start();
-	    synchronized (signal) {
-		try {
-		    signal.wait();
-		} catch (InterruptedException e) {
-		    ;
-		}
-	    }
-	    Client.main(av);
-	} catch (Exception e) {
-	    U.sopUnexpectedException(main, e);
-	    System.exit(1);
-	}
+            // Use the same ORB which has interceptor properties set.
+            U.sop(main + " : creating InitialContext.");
+            initialContext = C.createInitialContext(orb);
+            Server.initialContext = initialContext;
+            Client.initialContext = initialContext;
+            
+            ServerThread ServerThread = new ServerThread(av);
+            ServerThread.start();
+            synchronized (signal) {
+                try {
+                    signal.wait();
+                } catch (InterruptedException e) {
+                    ;
+                }
+            }
+            Client.main(av);
+        } catch (Exception e) {
+            U.sopUnexpectedException(main, e);
+            System.exit(1);
+        }
     }
 }
 
@@ -114,11 +114,11 @@ class ServerThread extends Thread
     String[] args;
     ServerThread (String[] args)
     {
-	this.args = args;
+        this.args = args;
     }
     public void run ()
     {
-	Server.main(args);
+        Server.main(args);
     }
 }
 

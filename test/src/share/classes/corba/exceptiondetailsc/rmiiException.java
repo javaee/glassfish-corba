@@ -46,11 +46,11 @@ package corba.exceptiondetailsc;
 
 public class rmiiException
     extends
-	Exception
+        Exception
 {
     public rmiiException(String x)
     {
-	super(x);
+        super(x);
     }
 }
 

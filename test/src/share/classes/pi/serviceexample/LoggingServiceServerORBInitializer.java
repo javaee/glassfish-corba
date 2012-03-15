@@ -60,35 +60,35 @@ public class LoggingServiceServerORBInitializer
 
     public void post_init(ORBInitInfo info)
     {
-	try {
+        try {
 
-	    // Create and register the logging service interceptor.
-	    // Give that interceptor references to the NameService and
-	    // PICurrent to avoid further lookups (i.e., optimization).
-	    // More importantly, allocate and give the interceptor
-	    // a slot id which is will use to tell itself not to
-	    // log calls that the interceptor makes to the logging process.
+            // Create and register the logging service interceptor.
+            // Give that interceptor references to the NameService and
+            // PICurrent to avoid further lookups (i.e., optimization).
+            // More importantly, allocate and give the interceptor
+            // a slot id which is will use to tell itself not to
+            // log calls that the interceptor makes to the logging process.
 
-	    NamingContext nameService = 
-		NamingContextHelper.narrow(
+            NamingContext nameService = 
+                NamingContextHelper.narrow(
                     info.resolve_initial_references("NameService"));
 
-	    Current piCurrent =
-		CurrentHelper.narrow(
-	            info.resolve_initial_references("PICurrent"));
+            Current piCurrent =
+                CurrentHelper.narrow(
+                    info.resolve_initial_references("PICurrent"));
 
-	    int outCallIndicatorSlotId = info.allocate_slot_id();
+            int outCallIndicatorSlotId = info.allocate_slot_id();
 
-	    LoggingServiceServerInterceptor interceptor =
-		new LoggingServiceServerInterceptor(nameService,
-						    piCurrent,
-						    outCallIndicatorSlotId);
+            LoggingServiceServerInterceptor interceptor =
+                new LoggingServiceServerInterceptor(nameService,
+                                                    piCurrent,
+                                                    outCallIndicatorSlotId);
 
-	    info.add_client_request_interceptor(interceptor);
-	    info.add_server_request_interceptor(interceptor);
-	} catch (Throwable t) {
-	    System.out.println("Exception handling not shown.");
-	}
+            info.add_client_request_interceptor(interceptor);
+            info.add_server_request_interceptor(interceptor);
+        } catch (Throwable t) {
+            System.out.println("Exception handling not shown.");
+        }
     }
 }
  

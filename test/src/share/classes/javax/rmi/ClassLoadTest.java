@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ClassLoadTest.java	1.7 99/06/07 */
+/* @(#)ClassLoadTest.java       1.7 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -52,7 +52,7 @@ package javax.rmi;
 import test.Test;
 import test.WebServer;
 import java.io.File;
-import com.sun.corba.se.impl.util.JDKBridge;
+import com.sun.corba.ee.impl.util.JDKBridge;
 import javax.rmi.CORBA.Util;
 import java.rmi.server.RMIClassLoader;
 import org.glassfish.pfl.test.JUnitReportHelper;
@@ -237,7 +237,7 @@ public class ClassLoadTest extends Test {
         } catch (ClassNotFoundException e) {
             if (shouldFail == FAIL_NOT_FOUND ||
                 (shouldFail == FAIL_NOT_FOUND12_OR_ILLEGAL_ARG11 &&
-	         is12VM)) {
+                 is12VM)) {
                 helper.pass() ;
                 return null;
             }
@@ -248,7 +248,7 @@ public class ClassLoadTest extends Test {
         } catch (IllegalArgumentException e) {
             if (shouldFail == FAIL_ILLEGAL_ARG ||
                 (shouldFail == FAIL_NOT_FOUND12_OR_ILLEGAL_ARG11 &&
-		 isPre12VM)) {
+                 isPre12VM)) {
                 helper.pass() ;
                 return null;
             }
@@ -356,7 +356,7 @@ public class ClassLoadTest extends Test {
                         length = slash;   
                     }
                     String portStr = remoteCodebase.substring(colon+1,length);
-		    port = Integer.parseInt(portStr);
+                    port = Integer.parseInt(portStr);
                 }
             }
 

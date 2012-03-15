@@ -38,12 +38,12 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.protocol;
+package com.sun.corba.ee.spi.protocol;
 
 
-import com.sun.corba.se.spi.ior.ObjectKey;
+import com.sun.corba.ee.spi.ior.ObjectKey;
 
-import com.sun.corba.se.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.IOR ;
 
 /**
  * Server delegate adds behavior on the server-side -- specifically

@@ -47,9 +47,9 @@ module corba
     module purgecalls
     {
         interface ServerSide
-	{
+        {
             void neverReturns ( );
-	};
+        };
     };
 };
 

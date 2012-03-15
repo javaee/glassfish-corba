@@ -49,33 +49,33 @@ import java.rmi.RemoteException;
 
 public interface rmiiI
     extends 
-	Remote 
+        Remote 
 { 
     String sayHello ()
-	throws
-	    RemoteException; 
+        throws
+            RemoteException; 
 
     int    sendBytes (byte[] x) 
-	throws
-	    RemoteException;
+        throws
+            RemoteException;
 
     Object sendOneObject (Object x)
-	throws
-	    RemoteException,
-	    rmiiMyException;
+        throws
+            RemoteException,
+            rmiiMyException;
 
     Object sendTwoObjects (Object x, Object y)
-	throws
-	    RemoteException;
+        throws
+            RemoteException;
 
     String makeColocatedCallFromServant ()
-	throws
-	    RemoteException;
+        throws
+            RemoteException;
 
     String colocatedCallFromServant (String a)
-	throws
-	    RemoteException,
-	    Exception;
+        throws
+            RemoteException,
+            Exception;
 
     String throwThreadDeathInServant (String a)
         throws
@@ -83,8 +83,8 @@ public interface rmiiI
             ThreadDeath;
 
     Object returnObjectFromServer (boolean isSerializable)
-	throws
-	    RemoteException;
+        throws
+            RemoteException;
 }
 
 // End of file.

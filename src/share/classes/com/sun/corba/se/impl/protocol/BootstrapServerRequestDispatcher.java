@@ -37,22 +37,22 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.protocol ;
+package com.sun.corba.ee.impl.protocol ;
 
 import java.util.Iterator ;
 
 import org.omg.CORBA.SystemException ;
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.ior.ObjectKey ;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
-import com.sun.corba.se.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.ObjectKey ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.protocol.ServerRequestDispatcher ;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
 
-import com.sun.corba.se.impl.encoding.MarshalInputStream ;
-import com.sun.corba.se.impl.encoding.MarshalOutputStream ;
+import com.sun.corba.ee.impl.encoding.MarshalInputStream ;
+import com.sun.corba.ee.impl.encoding.MarshalOutputStream ;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 /**
  * Class BootstrapServerRequestDispatcher handles the requests coming to the
@@ -79,7 +79,7 @@ public class BootstrapServerRequestDispatcher
 
     public BootstrapServerRequestDispatcher(ORB orb )
     {
-	this.orb = orb;
+        this.orb = orb;
     }
     
     /**
@@ -88,56 +88,56 @@ public class BootstrapServerRequestDispatcher
      */
     public void dispatch(MessageMediator messageMediator)
     {
-	MessageMediator request = (MessageMediator) messageMediator;
-	MessageMediator response = null;
+        MessageMediator request = (MessageMediator) messageMediator;
+        MessageMediator response = null;
 
-	try {
-	    MarshalInputStream is = (MarshalInputStream) 
-		request.getInputObject();
-	    String method = request.getOperationName();
-	    response = request.getProtocolHandler().createResponse(request, null);
-	    MarshalOutputStream os = (MarshalOutputStream) 
-		response.getOutputObject();
+        try {
+            MarshalInputStream is = (MarshalInputStream) 
+                request.getInputObject();
+            String method = request.getOperationName();
+            response = request.getProtocolHandler().createResponse(request, null);
+            MarshalOutputStream os = (MarshalOutputStream) 
+                response.getOutputObject();
 
             if (method.equals("get")) {
                 // Get the name of the requested service
                 String serviceKey = is.read_string();
 
                 // Look it up
-		org.omg.CORBA.Object serviceObject = 
-		    orb.getLocalResolver().resolve( serviceKey ) ;
+                org.omg.CORBA.Object serviceObject = 
+                    orb.getLocalResolver().resolve( serviceKey ) ;
 
                 // Write reply value
                 os.write_Object(serviceObject);
             } else if (method.equals("list")) {
-		java.util.Set keys = orb.getLocalResolver().list() ;
-		os.write_long( keys.size() ) ;
-		Iterator iter = keys.iterator() ;
-		while (iter.hasNext()) {
-		    String obj = (String)iter.next() ;
-		    os.write_string( obj ) ;
-		}
-	    } else {
-		throw wrapper.illegalBootstrapOperation( method ) ;
+                java.util.Set keys = orb.getLocalResolver().list() ;
+                os.write_long( keys.size() ) ;
+                Iterator iter = keys.iterator() ;
+                while (iter.hasNext()) {
+                    String obj = (String)iter.next() ;
+                    os.write_string( obj ) ;
+                }
+            } else {
+                throw wrapper.illegalBootstrapOperation( method ) ;
             }
 
-	} catch (org.omg.CORBA.SystemException ex) {
+        } catch (org.omg.CORBA.SystemException ex) {
             // Marshal the exception thrown
-	    response = request.getProtocolHandler().createSystemExceptionResponse(
-		request, ex, null);
-	} catch (java.lang.RuntimeException ex) {
+            response = request.getProtocolHandler().createSystemExceptionResponse(
+                request, ex, null);
+        } catch (java.lang.RuntimeException ex) {
             // Unknown exception
-	    SystemException sysex = wrapper.bootstrapRuntimeException( ex ) ;
-	    response = request.getProtocolHandler().createSystemExceptionResponse(
+            SystemException sysex = wrapper.bootstrapRuntimeException( ex ) ;
+            response = request.getProtocolHandler().createSystemExceptionResponse(
                  request, sysex, null ) ;
-	} catch (java.lang.Exception ex) {
+        } catch (java.lang.Exception ex) {
             // Unknown exception
-	    SystemException sysex = wrapper.bootstrapException( ex ) ;
-	    response = request.getProtocolHandler().createSystemExceptionResponse(
+            SystemException sysex = wrapper.bootstrapException( ex ) ;
+            response = request.getProtocolHandler().createSystemExceptionResponse(
                  request, sysex, null ) ;
-	}
+        }
 
-	return;
+        return;
     }
 
     /**
@@ -146,13 +146,13 @@ public class BootstrapServerRequestDispatcher
      * thrown if the object key is not the initial object key.
      */
     public IOR locate( ObjectKey objectKey) {
-	return null;
+        return null;
     }
 
     /**
      * Not implemented
      */
     public int getId() {
-	throw wrapper.genericNoImpl() ;
+        throw wrapper.genericNoImpl() ;
     }
 }

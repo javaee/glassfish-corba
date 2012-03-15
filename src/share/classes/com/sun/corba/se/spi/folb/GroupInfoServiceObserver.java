@@ -42,7 +42,7 @@
 // Last Modified : 2005 Aug 08 (Mon) 17:59:49 by Harold Carr.
 //
 
-package com.sun.corba.se.spi.folb;
+package com.sun.corba.ee.spi.folb;
 
 /**
  * @author Harold Carr

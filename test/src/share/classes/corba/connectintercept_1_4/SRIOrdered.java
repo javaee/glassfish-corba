@@ -51,7 +51,7 @@ public class SRIOrdered
     extends
         org.omg.CORBA.LocalObject
     implements
-	org.omg.PortableInterceptor.ServerRequestInterceptor,
+        org.omg.PortableInterceptor.ServerRequestInterceptor,
         Comparable
 {
     public static final String baseMsg = SRIOrdered.class.getName();
@@ -59,60 +59,60 @@ public class SRIOrdered
     public int order;
     public SRIOrdered(String name, int order)
     {
-	this.name = name;
-	this.order = order;
+        this.name = name;
+        this.order = order;
     }
     public int compareTo(Object o)
     {
-	int otherOrder = ((SRIOrdered)o).order;
-	if (order < otherOrder) {
-	    return -1;
-	} else if (order == otherOrder) {
-	    return 0;
-	}
-	return 1;
+        int otherOrder = ((SRIOrdered)o).order;
+        if (order < otherOrder) {
+            return -1;
+        } else if (order == otherOrder) {
+            return 0;
+        }
+        return 1;
     }
     public String name() { return name; }
 
     public void destroy() 
     {
-	try {
-	    Common.up(order);
-	} catch (INTERNAL e) {
-	    // INTERNAL will get swallowed by ORB.
-	    // Convert it to something else so server will exit incorrectly
-	    // so error can be detected.
-	    throw new RuntimeException(baseMsg + ": Wrong order in destroy.");
-	}
+        try {
+            Common.up(order);
+        } catch (INTERNAL e) {
+            // INTERNAL will get swallowed by ORB.
+            // Convert it to something else so server will exit incorrectly
+            // so error can be detected.
+            throw new RuntimeException(baseMsg + ": Wrong order in destroy.");
+        }
     }
 
     public void receive_request_service_contexts(ServerRequestInfo sri)
     {
-	Common.up(order);
+        Common.up(order);
     }
 
     public void receive_request(ServerRequestInfo sri)
     {
-	// Note: Do NOT put Common.up here because all 3 ordered
-	// interceptors run in RRSC so when we get here current will
-	// be 3 but the first ordered interceptor will have value 1
-	// and fail.
-	// Bottom line: only count up in one point.
+        // Note: Do NOT put Common.up here because all 3 ordered
+        // interceptors run in RRSC so when we get here current will
+        // be 3 but the first ordered interceptor will have value 1
+        // and fail.
+        // Bottom line: only count up in one point.
     }
 
     public void send_reply(ServerRequestInfo sri)
     {
-	Common.down(order);
+        Common.down(order);
     }
 
     public void send_exception(ServerRequestInfo sri)
     {
-	Common.down(order);
+        Common.down(order);
     }
 
     public void send_other(ServerRequestInfo sri)
     {
-	Common.down(order);
+        Common.down(order);
     }
 }
 

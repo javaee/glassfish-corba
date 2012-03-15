@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 /**
  * Defines the contract between the BufferManager and
@@ -60,7 +60,7 @@ public abstract class BufferManagerWrite
 
     BufferManagerWrite( ORB orb ) 
     {
-	this.orb = orb ;
+        this.orb = orb ;
     }
 
     /**

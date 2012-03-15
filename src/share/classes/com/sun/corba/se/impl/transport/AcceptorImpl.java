@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -51,12 +51,12 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 
-import com.sun.corba.se.spi.transport.Selector;
+import com.sun.corba.ee.spi.transport.Selector;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.trace.Transport;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
@@ -69,65 +69,65 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
     private Class<?> lastExceptionClassSeen = null ;
 
     public AcceptorImpl(ORB orb, int port,
-				       String name, String type)
+                                       String name, String type)
     {
         super( orb, port, name, type ) ;
     }
 
     @Transport
     public synchronized boolean initialize() {
-	if (initialized) {
-	    return false;
-	}
-	InetSocketAddress inetSocketAddress = null;
-	String host = "all interfaces";
-	try {
-	    if (orb.getORBData().getListenOnAllInterfaces()) {
-		inetSocketAddress = new InetSocketAddress(port);
-	    } else {
-		host = orb.getORBData().getORBServerHost();
-		inetSocketAddress = new InetSocketAddress(host, port);
-	    }
-	    serverSocket = orb.getORBData().getSocketFactory()
-		.createServerSocket(type, inetSocketAddress);
-	    internalInitialize();
-	    if (orb.getORBData().showInfoMessages()) {
-		wrapper.infoCreateListenerSucceeded(host, Integer.toString(port));
-	    }
-	} catch (Throwable t) {
-	    throw wrapper.createListenerFailed(t, host, port);
-	}
-	initialized = true;
-	return true;
+        if (initialized) {
+            return false;
+        }
+        InetSocketAddress inetSocketAddress = null;
+        String host = "all interfaces";
+        try {
+            if (orb.getORBData().getListenOnAllInterfaces()) {
+                inetSocketAddress = new InetSocketAddress(port);
+            } else {
+                host = orb.getORBData().getORBServerHost();
+                inetSocketAddress = new InetSocketAddress(host, port);
+            }
+            serverSocket = orb.getORBData().getSocketFactory()
+                .createServerSocket(type, inetSocketAddress);
+            internalInitialize();
+            if (orb.getORBData().showInfoMessages()) {
+                wrapper.infoCreateListenerSucceeded(host, Integer.toString(port));
+            }
+        } catch (Throwable t) {
+            throw wrapper.createListenerFailed(t, host, port);
+        }
+        initialized = true;
+        return true;
     }
 
     protected void internalInitialize()
-	throws Exception
+        throws Exception
     {
-	// Determine the listening port (for the IOR).
-	// This is important when using emphemeral ports (i.e.,
-	// when the port value to the constructor is 0).
+        // Determine the listening port (for the IOR).
+        // This is important when using emphemeral ports (i.e.,
+        // when the port value to the constructor is 0).
 
-	port = serverSocket.getLocalPort();
+        port = serverSocket.getLocalPort();
 
-	// Register with transport (also sets up monitoring).
+        // Register with transport (also sets up monitoring).
 
-	orb.getCorbaTransportManager().getInboundConnectionCache(this);
+        orb.getCorbaTransportManager().getInboundConnectionCache(this);
 
-	// Finish configuation.
+        // Finish configuation.
 
-	serverSocketChannel = serverSocket.getChannel();
+        serverSocketChannel = serverSocket.getChannel();
 
-	if (serverSocketChannel != null) {
-	    setUseSelectThreadToWait(
-	        orb.getORBData().acceptorSocketUseSelectThreadToWait());
-	    serverSocketChannel.configureBlocking(
-	        ! orb.getORBData().acceptorSocketUseSelectThreadToWait());
-	} else {
-	    // Configure to use listener and reader threads.
-	    setUseSelectThreadToWait(false);
-	}
-	setUseWorkerThreadForEvent(
+        if (serverSocketChannel != null) {
+            setUseSelectThreadToWait(
+                orb.getORBData().acceptorSocketUseSelectThreadToWait());
+            serverSocketChannel.configureBlocking(
+                ! orb.getORBData().acceptorSocketUseSelectThreadToWait());
+        } else {
+            // Configure to use listener and reader threads.
+            setUseSelectThreadToWait(false);
+        }
+        setUseWorkerThreadForEvent(
             orb.getORBData().acceptorSocketUseWorkerThreadForEvent());
 
     }
@@ -140,47 +140,47 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
     @Transport
     public Socket getAcceptedSocket() {
-	SocketChannel socketChannel = null;
-	Socket socket = null;
+        SocketChannel socketChannel = null;
+        Socket socket = null;
 
-	try {
-	    if (serverSocketChannel == null) {
-		socket = serverSocket.accept();
+        try {
+            if (serverSocketChannel == null) {
+                socket = serverSocket.accept();
                 usingServerSocket( serverSocket ) ;
-	    } else {
-		socketChannel = serverSocketChannel.accept();
-		socket = socketChannel.socket();
+            } else {
+                socketChannel = serverSocketChannel.accept();
+                socket = socketChannel.socket();
                 usingServerSocketChannel(serverSocketChannel);
-	    }
+            }
 
-	    orb.getORBData().getSocketFactory()
-		.setAcceptedSocketOptions(this, serverSocket, socket);
+            orb.getORBData().getSocketFactory()
+                .setAcceptedSocketOptions(this, serverSocket, socket);
 
-	    // Clear the last exception after a successful accept, in case
-	    // we get sporadic bursts of related failures.
-	    lastExceptionClassSeen = null ;
-	} catch (IOException e) {
-	    // Log the exception at WARNING level, unless the same exception
-	    // occurs repeatedly.  In that case, only log the first exception
-	    // as a warning.  Log all exceptions with the same class after the
-	    // first of that class at FINE level.  We want to avoid flooding the
-	    // log when the same error occurs repeatedly (e.g. we are using an
-	    // SSLSocketChannel and there is a certificate problem that causes
-	    // ALL accepts to fail).
-	    if (e.getClass() == lastExceptionClassSeen) {
-		wrapper.ioexceptionInAcceptFine(e);
-	    } else {
-		lastExceptionClassSeen = e.getClass() ;
-		wrapper.ioexceptionInAccept(e);
-	    }
+            // Clear the last exception after a successful accept, in case
+            // we get sporadic bursts of related failures.
+            lastExceptionClassSeen = null ;
+        } catch (IOException e) {
+            // Log the exception at WARNING level, unless the same exception
+            // occurs repeatedly.  In that case, only log the first exception
+            // as a warning.  Log all exceptions with the same class after the
+            // first of that class at FINE level.  We want to avoid flooding the
+            // log when the same error occurs repeatedly (e.g. we are using an
+            // SSLSocketChannel and there is a certificate problem that causes
+            // ALL accepts to fail).
+            if (e.getClass() == lastExceptionClassSeen) {
+                wrapper.ioexceptionInAcceptFine(e);
+            } else {
+                lastExceptionClassSeen = e.getClass() ;
+                wrapper.ioexceptionInAccept(e);
+            }
 
-	    orb.getTransportManager().getSelector(0).unregisterForEvent(this);
-	    // REVISIT - need to close - recreate - then register new one.
-	    orb.getTransportManager().getSelector(0).registerForEvent(this);
-	    // NOTE: if register cycling we do not want to shut down ORB
-	    // since local beans will still work.  Instead one will see
-	    // a growing log file to alert admin of problem.
-	}
+            orb.getTransportManager().getSelector(0).unregisterForEvent(this);
+            // REVISIT - need to close - recreate - then register new one.
+            orb.getTransportManager().getSelector(0).registerForEvent(this);
+            // NOTE: if register cycling we do not want to shut down ORB
+            // since local beans will still work.  Instead one will see
+            // a growing log file to alert admin of problem.
+        }
 
         return socket ;
     }
@@ -190,26 +190,26 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
     @Transport
     public void close () {
-	try {
-	    Selector selector = orb.getTransportManager().getSelector(0);
-	    selector.unregisterForEvent(this);
-	    if (serverSocketChannel != null) {
-		serverSocketChannel.close();
-	    }
-	    if (serverSocket != null) {
-		serverSocket.close();
-	    }
-	} catch (IOException e) {
+        try {
+            Selector selector = orb.getTransportManager().getSelector(0);
+            selector.unregisterForEvent(this);
+            if (serverSocketChannel != null) {
+                serverSocketChannel.close();
+            }
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
+        } catch (IOException e) {
             closeException(e);
-	} finally {
-	}
+        } finally {
+        }
     }
 
     // EventHandler methods
     //
 
     public SelectableChannel getChannel() {
-	return serverSocketChannel;
+        return serverSocketChannel;
     }
 
     ////////////////////////////////////////////////////
@@ -223,48 +223,48 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
     @Transport
     public void doWork() {
-	try {
-	    if (selectionKey.isAcceptable()) {
+        try {
+            if (selectionKey.isAcceptable()) {
                 AccessController.doPrivileged(
-		    new PrivilegedAction<Object>() {
-			public java.lang.Object run() {
+                    new PrivilegedAction<Object>() {
+                        public java.lang.Object run() {
                             accept() ;
-			    return null;
-			}
-		    }
-		);
-	    } else {
+                            return null;
+                        }
+                    }
+                );
+            } else {
                 selectionKeyNotAcceptable() ;
-	    }
-	} catch (SecurityException se) {
+            }
+        } catch (SecurityException se) {
             securityException( se ) ;
-	    String permissionStr = ORBUtility.getClassSecurityInfo(getClass());
+            String permissionStr = ORBUtility.getClassSecurityInfo(getClass());
             wrapper.securityExceptionInAccept(se, permissionStr);
-	} catch (Exception ex) {
+        } catch (Exception ex) {
             otherException( ex ) ;
             wrapper.exceptionInAccept(ex, ex.toString() );
-	} catch (Throwable t) {
+        } catch (Throwable t) {
             otherException( t ) ;
-	} finally {
+        } finally {
 
             // IMPORTANT: To avoid bug (4953599), we force the
-	    // Thread that does the NIO select to also do the
-	    // enable/disable of Ops using SelectionKey.interestOps().
-	    // Otherwise, the SelectionKey.interestOps() may block
-	    // indefinitely.
-	    // NOTE: If "acceptorSocketUseWorkerThreadForEvent" is
-	    // set to to false in ParserTable.java, then this method,
-	    // doWork(), will get executed by the same thread 
-	    // (SelectorThread) that does the NIO select. 
-	    // If "acceptorSocketUseWorkerThreadForEvent" is set
-	    // to true, a WorkerThread will execute this method,
-	    // doWork(). Hence, the registering of the enabling of
-	    // the SelectionKey's interestOps is done here instead
-	    // of calling SelectionKey.interestOps(<interest op>).
+            // Thread that does the NIO select to also do the
+            // enable/disable of Ops using SelectionKey.interestOps().
+            // Otherwise, the SelectionKey.interestOps() may block
+            // indefinitely.
+            // NOTE: If "acceptorSocketUseWorkerThreadForEvent" is
+            // set to to false in ParserTable.java, then this method,
+            // doWork(), will get executed by the same thread 
+            // (SelectorThread) that does the NIO select. 
+            // If "acceptorSocketUseWorkerThreadForEvent" is set
+            // to true, a WorkerThread will execute this method,
+            // doWork(). Hence, the registering of the enabling of
+            // the SelectionKey's interestOps is done here instead
+            // of calling SelectionKey.interestOps(<interest op>).
 
             Selector selector = orb.getTransportManager().getSelector(0);
             selector.registerInterestOps(this);
-	}
+        }
     }
 
     ////////////////////////////////////////////////////
@@ -274,7 +274,7 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
     public ServerSocket getServerSocket()
     {
-	return serverSocket;
+        return serverSocket;
     }
 
     @InfoMethod

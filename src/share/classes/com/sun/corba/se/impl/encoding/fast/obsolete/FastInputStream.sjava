@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 import java.util.List ;
 import java.util.ArrayList ;
@@ -49,9 +49,9 @@ import java.util.Iterator ;
 import java.nio.ByteBuffer ;
 import java.nio.BufferUnderflowException ;
 
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
+import com.sun.corba.ee.spi.orbutil.generic.Pair ;
 
-import static com.sun.corba.se.impl.encoding.fast.Codes.* ;
+import static com.sun.corba.ee.impl.encoding.fast.Codes.* ;
 
 /** A prototype of an OutputStream design to be very fast, and used
  * from generated code.  This stream avoids most lookups, except for 
@@ -69,261 +69,261 @@ public class FastInputStream {
     private static final int DATA_SIZE = 4096 ;
 
     private void error( String msg ) {
-	throw new IllegalStateException( msg ) ;
+        throw new IllegalStateException( msg ) ;
     }
 
     private void allocate() {
-	if (iter.hasNext()) {
-	    current = iter.next() ;
-	} else {
-	    error( "Tried to read past end of stream" ) ;
-	}
+        if (iter.hasNext()) {
+            current = iter.next() ;
+        } else {
+            error( "Tried to read past end of stream" ) ;
+        }
     }
 
     public FastInputStream( List<ByteBuffer> data ) {
-	this.data = data ;
-	this.iter = data.iterator() ;
-	allocate() ;
+        this.data = data ;
+        this.iter = data.iterator() ;
+        allocate() ;
 
-	indirections = new ArrayList<Object>( 100 ) ;
+        indirections = new ArrayList<Object>( 100 ) ;
     }
 
     public void close() {
-	data = null ;
-	current = null ;
-	indirections = null ;
+        data = null ;
+        current = null ;
+        indirections = null ;
     }
 
     private String code( byte b ) {
-	Codes[] codes = Codes.class.getEnumConstants() ;
-	if ((b>=0) && (b<codes.length))
-	    return codes[b].toString() ;
-	else 
-	    return "invalid Code(" + b + ")" ;
+        Codes[] codes = Codes.class.getEnumConstants() ;
+        if ((b>=0) && (b<codes.length))
+            return codes[b].toString() ;
+        else 
+            return "invalid Code(" + b + ")" ;
     }
 
     private Codes getCode() {
-	byte b = getByte() ;
-	Codes[] codes = Codes.class.getEnumConstants() ;
-	if ((b>=0) && (b<codes.length))
-	    return codes[b] ;
-	else 
-	    error( "Invalid code " + b ) ;
+        byte b = getByte() ;
+        Codes[] codes = Codes.class.getEnumConstants() ;
+        if ((b>=0) && (b<codes.length))
+            return codes[b] ;
+        else 
+            error( "Invalid code " + b ) ;
 
-	return null ;
+        return null ;
     }
 
     private void expect( Codes code ) {
-	byte b = getByte() ;
-	if (code.ordinal() != b)
-	    error( "Error in reading stream: expected " + code
-		+ " but read " + code(b) ) ;
+        byte b = getByte() ;
+        if (code.ordinal() != b)
+            error( "Error in reading stream: expected " + code
+                + " but read " + code(b) ) ;
     }
 
     private boolean getBoolean() {
-	byte b ;
-	try {
-	    b = current.get() ;
-	} catch (BufferUnderflowException exc) {
-	    allocate() ;
-	    b = current.get() ;
-	}
+        byte b ;
+        try {
+            b = current.get() ;
+        } catch (BufferUnderflowException exc) {
+            allocate() ;
+            b = current.get() ;
+        }
 
-	if (b==0)
-	    return false ;
-	else if (b==1)
-	    return true ;
-	else
-	    error( "Invalid boolean in stream: value was " + b ) ;
+        if (b==0)
+            return false ;
+        else if (b==1)
+            return true ;
+        else
+            error( "Invalid boolean in stream: value was " + b ) ;
 
-	return false ;
+        return false ;
     }
 
     private byte getByte() {
-	byte b ;
-	try {
-	    return current.get() ;
-	} catch (BufferUnderflowException exc) {
-	    allocate() ;
-	    return current.get() ;
-	}
+        byte b ;
+        try {
+            return current.get() ;
+        } catch (BufferUnderflowException exc) {
+            allocate() ;
+            return current.get() ;
+        }
     }
 
     private short getShort() {
-	short b ;
-	try {
-	    return current.getShort() ;
-	} catch (BufferUnderflowException exc) {
-	    allocate() ;
-	    return current.getShort() ;
-	}
+        short b ;
+        try {
+            return current.getShort() ;
+        } catch (BufferUnderflowException exc) {
+            allocate() ;
+            return current.getShort() ;
+        }
     }
 
     private char getChar() {
-	char b ;
-	try {
-	    return current.getChar() ;
-	} catch (BufferUnderflowException exc) {
-	    allocate() ;
-	    return current.getChar() ;
-	}
+        char b ;
+        try {
+            return current.getChar() ;
+        } catch (BufferUnderflowException exc) {
+            allocate() ;
+            return current.getChar() ;
+        }
     }
 
     private int getInt() {
-	int b ;
-	try {
-	    return current.getInt() ;
-	} catch (BufferUnderflowException exc) {
-	    allocate() ;
-	    return current.getInt() ;
-	}
+        int b ;
+        try {
+            return current.getInt() ;
+        } catch (BufferUnderflowException exc) {
+            allocate() ;
+            return current.getInt() ;
+        }
     }
 
     private long getLong() {
-	long b ;
-	try {
-	    return current.getLong() ;
-	} catch (BufferUnderflowException exc) {
-	    allocate() ;
-	    return current.getLong() ;
-	}
+        long b ;
+        try {
+            return current.getLong() ;
+        } catch (BufferUnderflowException exc) {
+            allocate() ;
+            return current.getLong() ;
+        }
     }
 
     private float getFloat() {
-	float b ;
-	try {
-	    return current.getFloat() ;
-	} catch (BufferUnderflowException exc) {
-	    allocate() ;
-	    return current.getFloat() ;
-	}
+        float b ;
+        try {
+            return current.getFloat() ;
+        } catch (BufferUnderflowException exc) {
+            allocate() ;
+            return current.getFloat() ;
+        }
     }
 
     private double getDouble() {
-	double b ;
-	try {
-	    return current.getDouble() ;
-	} catch (BufferUnderflowException exc) {
-	    allocate() ;
-	    return current.getDouble() ;
-	}
+        double b ;
+        try {
+            return current.getDouble() ;
+        } catch (BufferUnderflowException exc) {
+            allocate() ;
+            return current.getDouble() ;
+        }
     }
 
     public boolean readBoolean() {
-	expect( BOOL ) ;
-	return getBoolean() ;
+        expect( BOOL ) ;
+        return getBoolean() ;
     }
 
     public char readChar() {
-	expect( CHAR ) ;
-	return getChar() ;
+        expect( CHAR ) ;
+        return getChar() ;
     }
 
     public byte readByte() {
-	expect( BYTE ) ;
-	return getByte() ;
+        expect( BYTE ) ;
+        return getByte() ;
     }
 
     public short readShort() {
-	expect( SHORT ) ;
-	return getShort() ;
+        expect( SHORT ) ;
+        return getShort() ;
     }
 
     public int readInt() {
-	expect( INT ) ;
-	return getInt() ;
+        expect( INT ) ;
+        return getInt() ;
     }
 
     public long readLong() {
-	expect( LONG ) ;
-	return getLong() ;
+        expect( LONG ) ;
+        return getLong() ;
     }
 
     public float readFloat() {
-	expect( FLOAT ) ;
-	return getFloat() ;
+        expect( FLOAT ) ;
+        return getFloat() ;
     }
 
     public double readDouble() {
-	expect( DOUBLE ) ;
-	return getDouble() ;
+        expect( DOUBLE ) ;
+        return getDouble() ;
     }
 
     private <T> T handleIndirection( Class<T> cls ) {
-	int indir = -getInt() ;
-	if ((indir > 0) && (indir < indirections.size())) {
-	    Object val = indirections.get(indir) ;
-	    if (val == null) {
-		error( "Indirection to a NULL value" ) ;
-	    } else if (cls.isInstance( val )) {
-		return cls.cast( val ) ;
-	    } else {
-		error( "Indirection to value " + val 
-		    + " of incompatible type. Expected type " + cls.getName() ) ;
-	    }
-	} else {
-	    error( "Indirection value " + indir + " is out of range" ) ;
-	}
+        int indir = -getInt() ;
+        if ((indir > 0) && (indir < indirections.size())) {
+            Object val = indirections.get(indir) ;
+            if (val == null) {
+                error( "Indirection to a NULL value" ) ;
+            } else if (cls.isInstance( val )) {
+                return cls.cast( val ) ;
+            } else {
+                error( "Indirection to value " + val 
+                    + " of incompatible type. Expected type " + cls.getName() ) ;
+            }
+        } else {
+            error( "Indirection value " + indir + " is out of range" ) ;
+        }
 
-	return null ;
+        return null ;
     }
 
     public boolean[] readBooleanArray() {
-	Codes code = getCode() ;
-	if (code == REF) {
-	    int indir = -getInt() ;
-	    if ((indir > 0) && (indir < indirections.size())) {
-		Object val = indirections.get(indir) ;
-		if (val == null) {
-		    error( "Indirection to a NULL value" ) ;
-		} else if (val instanceof boolean[]) {
-		    return (boolean[])val ;
-		} else {
-		    error( "Indirection to non-String value " + val ) ;
-		}
-	    } else {
-		error( "Indirection value " + indir + " is out of range" ) ;
-	    }
-	} else if (code == BOOL_ARR) {
-	    int indir1 = -getInt() ;
-	    int len = getInt() ;
-	    boolean[] result = new boolean[len] ;
-	    for (int ctr=0; ctr<len; ctr++)
-		result[ctr] = getBoolean() ;	
-	    indirections.set( indir1, result ) ;
-	    return result ;
-	} else
-	    error( "Expected INDIR or ARRAY BOOL, but read " + code ) ;
+        Codes code = getCode() ;
+        if (code == REF) {
+            int indir = -getInt() ;
+            if ((indir > 0) && (indir < indirections.size())) {
+                Object val = indirections.get(indir) ;
+                if (val == null) {
+                    error( "Indirection to a NULL value" ) ;
+                } else if (val instanceof boolean[]) {
+                    return (boolean[])val ;
+                } else {
+                    error( "Indirection to non-String value " + val ) ;
+                }
+            } else {
+                error( "Indirection value " + indir + " is out of range" ) ;
+            }
+        } else if (code == BOOL_ARR) {
+            int indir1 = -getInt() ;
+            int len = getInt() ;
+            boolean[] result = new boolean[len] ;
+            for (int ctr=0; ctr<len; ctr++)
+                result[ctr] = getBoolean() ;    
+            indirections.set( indir1, result ) ;
+            return result ;
+        } else
+            error( "Expected INDIR or ARRAY BOOL, but read " + code ) ;
 
-	return null ;
+        return null ;
     }
 
     public char[] readCharArray() {
-	return null ;
+        return null ;
     }
 
     public byte[] readByteArray() {
-	return null ;
+        return null ;
     }
 
     public short[] readShortArray() {
-	return null ;
+        return null ;
     }
 
     public int[] readIntArray() {
-	return null ;
+        return null ;
     }
 
     public long[] readLongArray() {
-	return null ;
+        return null ;
     }
 
     public float[] readFloatArray() {
-	return null ;
+        return null ;
     }
 
     public double[] readDoubleArray() {
-	return null ;
+        return null ;
     }
 
     public void readNull() {
@@ -339,7 +339,7 @@ public class FastInputStream {
      * </ol>
      */
     public Object startReference() {
-	return null ;
+        return null ;
     }
 
     /** Skip the end marker at the end of a reference, or throw an error.
@@ -353,7 +353,7 @@ public class FastInputStream {
      * startReference/endReference.
      */
     public Pair<Object,Integer> startReferenceArray( String className, int size ) {
-	return null ;
+        return null ;
     }
 
     // XXX We do not have support for multi-dimensional arrays in this prototype.

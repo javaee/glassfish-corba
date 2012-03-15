@@ -77,11 +77,11 @@ public class helloDIIClientStub {
       Any result = orb.create_any();
       result.insert_string( "dummy" );
       NamedValue resultVal = orb.create_named_value( "result", result, 
-	  org.omg.CORBA.ARG_OUT.value );
+          org.omg.CORBA.ARG_OUT.value );
 
       // Invoke method:
       Request thisReq = object._create_request( null, "sayHello", 
-	  argList, resultVal );
+          argList, resultVal );
       thisReq.invoke();
 
       // Return result:
@@ -97,11 +97,11 @@ public class helloDIIClientStub {
       Any result = orb.create_any();
       result.insert_string( "dummy" );
       NamedValue resultVal = orb.create_named_value( "result", result, 
-	  org.omg.CORBA.ARG_OUT.value );
+          org.omg.CORBA.ARG_OUT.value );
 
       // Invoke method:
       Request thisReq = object._create_request( null, "saySystemException", 
-	  argList, resultVal );
+          argList, resultVal );
       thisReq.invoke();
 
       // Return result:
@@ -117,7 +117,7 @@ public class helloDIIClientStub {
 
       // Invoke method as a oneway:
       Request thisReq = object._create_request( null, "sayOneway", 
-	  argList, null );
+          argList, null );
       thisReq.send_oneway();
   }
 
@@ -133,11 +133,11 @@ public class helloDIIClientStub {
       Any result = orb.create_any();
       result.insert_boolean( true );
       NamedValue resultVal = orb.create_named_value( "result", result, 
-	  org.omg.CORBA.ARG_OUT.value );
+          org.omg.CORBA.ARG_OUT.value );
 
       // Invoke method:
       Request thisReq = object._create_request( null, "_is_a", 
-	  argList, resultVal );
+          argList, resultVal );
       thisReq.invoke();
 
       // Return result:
@@ -153,11 +153,11 @@ public class helloDIIClientStub {
       Any result = orb.create_any();
       result.insert_boolean( false );
       NamedValue resultVal = orb.create_named_value( "result", result, 
-	  org.omg.CORBA.ARG_OUT.value );
+          org.omg.CORBA.ARG_OUT.value );
 
       // Invoke method:
       Request thisReq = object._create_request( null, "_non_existent", 
-	  argList, resultVal );
+          argList, resultVal );
       thisReq.invoke();
 
       // Return result:
@@ -173,17 +173,17 @@ public class helloDIIClientStub {
       Any result = orb.create_any();
       result.insert_Object( (org.omg.CORBA.Object)null );
       NamedValue resultVal = orb.create_named_value( "result", result, 
-	  org.omg.CORBA.ARG_OUT.value );
+          org.omg.CORBA.ARG_OUT.value );
 
       // Invoke method:
       Request thisReq = object._create_request( null, "_get_interface_def", 
-	  argList, resultVal );
+          argList, resultVal );
 
       try {
           thisReq.invoke();
       }
       catch( BAD_OPERATION e ) {
-	  // expected, since we do not implement _get_interface_def in our ORB.
+          // expected, since we do not implement _get_interface_def in our ORB.
       }
 
       // Return result:
@@ -199,7 +199,7 @@ public class helloDIIClientStub {
 
       // Invoke method:
       Request thisReq = object._create_request( null, "clearInvoked", 
-	  argList, null );
+          argList, null );
       thisReq.invoke();
   }
 
@@ -211,11 +211,11 @@ public class helloDIIClientStub {
       Any result = orb.create_any();
       result.insert_boolean( false );
       NamedValue resultVal = orb.create_named_value( "result", result, 
-	  org.omg.CORBA.ARG_OUT.value );
+          org.omg.CORBA.ARG_OUT.value );
 
       // Invoke method:
       Request thisReq = object._create_request( null, "wasInvoked", 
-	  argList, resultVal );
+          argList, resultVal );
       thisReq.invoke();
 
       // Return result:
@@ -231,7 +231,7 @@ public class helloDIIClientStub {
 
       // Invoke method:
       Request thisReq = object._create_request( null, "resetServant", 
-	  argList, null );
+          argList, null );
       thisReq.invoke();
   }
 

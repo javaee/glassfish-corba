@@ -45,10 +45,10 @@ import org.omg.CORBA.ORB;
 
 public class HelloImpl extends HelloPOA {
 
-	public String sayHello() {
-		System.out.println("Hello : inside sayHello()");
-		return "Hello";
-	}
+        public String sayHello() {
+                System.out.println("Hello : inside sayHello()");
+                return "Hello";
+        }
 
 }
 
@@ -56,16 +56,16 @@ public class HelloImpl extends HelloPOA {
 
 class CloseImpl extends ClosePOA {
 
-	private ORB orb=null;
+        private ORB orb=null;
 
-	public CloseImpl(ORB orb) {
-		this.orb = orb;
-	}
+        public CloseImpl(ORB orb) {
+                this.orb = orb;
+        }
 
-   	public void shutdown() {
-		System.out.println("PoaOperation : shutDown called");
-		orb.shutdown(false);
-	}
+        public void shutdown() {
+                System.out.println("PoaOperation : shutDown called");
+                orb.shutdown(false);
+        }
 
 }
 

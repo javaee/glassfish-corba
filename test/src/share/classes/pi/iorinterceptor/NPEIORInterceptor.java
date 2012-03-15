@@ -74,23 +74,23 @@ public class NPEIORInterceptor
     public static boolean establishComponentsCalled = false;
 
     public NPEIORInterceptor( String name, PrintStream out ) {
-	this.name = name;
-	this.out = out;
-	out.println( "    - NPEIORInterceptor " + name + " created." );
-	registered = true;
+        this.name = name;
+        this.out = out;
+        out.println( "    - NPEIORInterceptor " + name + " created." );
+        registered = true;
     }
 
     public String name() {
-	return name;
+        return name;
     }
 
     public void destroy() {
     }
 
     public void establish_components (IORInfo info) {
-	out.println( "    - NPEIORInterceptor: establish_components called." );
-	establishComponentsCalled = true;
-	throw new NullPointerException();
+        out.println( "    - NPEIORInterceptor: establish_components called." );
+        establishComponentsCalled = true;
+        throw new NullPointerException();
     }
 
     public void components_established( IORInfo info )
@@ -98,7 +98,7 @@ public class NPEIORInterceptor
     }
 
     public void adapter_state_changed( ObjectReferenceTemplate[] templates, 
-	short state )
+        short state )
     {
     }
 

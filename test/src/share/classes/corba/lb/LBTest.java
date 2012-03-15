@@ -47,13 +47,13 @@ import corba.framework.Options ;
 import corba.framework.Controller ;
 
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
-import com.sun.corba.se.impl.plugin.hwlb.VirtualAddressAgentImpl ;
-import com.sun.corba.se.impl.plugin.hwlb.NoConnectionCacheImpl ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
+import com.sun.corba.ee.impl.plugin.hwlb.VirtualAddressAgentImpl ;
+import com.sun.corba.ee.impl.plugin.hwlb.NoConnectionCacheImpl ;
 
 public class LBTest
     extends
-	CORBATest
+        CORBATest
 {
     private static final String LB_HOST = "localhost" ;
     private static final int LB_PORT = 57340 ;
@@ -63,80 +63,80 @@ public class LBTest
     private static final int SHARED_SERVER_ID = 2727 ;
 
     protected void doTest()
-	throws Exception
+        throws Exception
     {
-	String thisPackage = this.getClass().getPackage().getName() ;
-	String pluginPackage = "com.sun.corba.se.impl.plugin.hwlb" ;
+        String thisPackage = this.getClass().getPackage().getName() ;
+        String pluginPackage = "com.sun.corba.ee.impl.plugin.hwlb" ;
 
-	// Set up shared client and server properties.  This causes the client
-	// ORBs to be initialized without connection caching, and the server
-	// ORBs to use ORT to set the server port to Sx_PORT, while creating
-	// IORs that contains the LB_PORT.
-	Properties serverProps = Options.getServerProperties() ; 
-	serverProps.setProperty( ORBConstants.ORB_SERVER_ID_PROPERTY, 
-	    Integer.toString(SHARED_SERVER_ID)) ;
-	serverProps.setProperty( ORBConstants.USER_CONFIGURATOR_PREFIX 
-	    + pluginPackage + "." + "VirtualAddressAgentImpl",
-	    "dummy" ) ;
-	serverProps.setProperty( VirtualAddressAgentImpl.VAA_HOST_PROPERTY, 
-	    LB_HOST ) ;
-	serverProps.setProperty( VirtualAddressAgentImpl.VAA_PORT_PROPERTY, 
-	    Integer.toString(LB_PORT) ) ;
+        // Set up shared client and server properties.  This causes the client
+        // ORBs to be initialized without connection caching, and the server
+        // ORBs to use ORT to set the server port to Sx_PORT, while creating
+        // IORs that contains the LB_PORT.
+        Properties serverProps = Options.getServerProperties() ; 
+        serverProps.setProperty( ORBConstants.ORB_SERVER_ID_PROPERTY, 
+            Integer.toString(SHARED_SERVER_ID)) ;
+        serverProps.setProperty( ORBConstants.USER_CONFIGURATOR_PREFIX 
+            + pluginPackage + "." + "VirtualAddressAgentImpl",
+            "dummy" ) ;
+        serverProps.setProperty( VirtualAddressAgentImpl.VAA_HOST_PROPERTY, 
+            LB_HOST ) ;
+        serverProps.setProperty( VirtualAddressAgentImpl.VAA_PORT_PROPERTY, 
+            Integer.toString(LB_PORT) ) ;
 
-	Properties clientProps = Options.getClientProperties() ; 
-	clientProps.setProperty( ORBConstants.USER_CONFIGURATOR_PREFIX 
-		+ pluginPackage + "." + "NoConnectionCacheImpl",
-		"dummy" ) ;
+        Properties clientProps = Options.getClientProperties() ; 
+        clientProps.setProperty( ORBConstants.USER_CONFIGURATOR_PREFIX 
+                + pluginPackage + "." + "NoConnectionCacheImpl",
+                "dummy" ) ;
         
-	Controller orbd = createORBD();
-	orbd.start();
+        Controller orbd = createORBD();
+        orbd.start();
 
-	Controller lb;
-	Controller server1;
-	Controller server2;
-	Controller client;
+        Controller lb;
+        Controller server1;
+        Controller server2;
+        Controller client;
 
-	String lbArgs = "-listen " + LB_PORT + " -pool " + S1_PORT + " " + S2_PORT ;
-	Options.addServerArgs( lbArgs ) ;
+        String lbArgs = "-listen " + LB_PORT + " -pool " + S1_PORT + " " + S2_PORT ;
+        Options.addServerArgs( lbArgs ) ;
 
-	lb = createServer(thisPackage+"."+"LB", "LB" ) ;
+        lb = createServer(thisPackage+"."+"LB", "LB" ) ;
 
-	serverProps.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY, 
-	    Integer.toString(S1_PORT)) ;
-	server1 = createServer(thisPackage+"."+"Server", "Server1.1");
+        serverProps.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY, 
+            Integer.toString(S1_PORT)) ;
+        server1 = createServer(thisPackage+"."+"Server", "Server1.1");
 
-	serverProps.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY, 
-	    Integer.toString(S2_PORT)) ;
-	server2 = createServer(thisPackage+"."+"Server", "Server2");
-	
-	client = createClient(thisPackage+"."+"Client", "Client");
+        serverProps.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY, 
+            Integer.toString(S2_PORT)) ;
+        server2 = createServer(thisPackage+"."+"Server", "Server2");
+        
+        client = createClient(thisPackage+"."+"Client", "Client");
 
-	lb.start() ;
-	Thread.sleep( 1000 ) ;
+        lb.start() ;
+        Thread.sleep( 1000 ) ;
 
-	server1.start();
-	server2.start();
+        server1.start();
+        server2.start();
 
-	Thread.sleep( 1000 ) ;
+        Thread.sleep( 1000 ) ;
 
-	client.start();
+        client.start();
 
-	// Wait for client to get started before stopping server1.
-	Thread.sleep( 4000 ) ;
-	server1.stop();
+        // Wait for client to get started before stopping server1.
+        Thread.sleep( 4000 ) ;
+        server1.stop();
 
-	Thread.sleep( 1000 ) ;
-	serverProps.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY, 
-	    Integer.toString(S1_PORT)) ;
-	server1 = createServer(thisPackage+"."+"Server", "Server1.2");
-	server1.start() ;
+        Thread.sleep( 1000 ) ;
+        serverProps.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY, 
+            Integer.toString(S1_PORT)) ;
+        server1 = createServer(thisPackage+"."+"Server", "Server1.2");
+        server1.start() ;
 
-	client.waitFor(1000 * 60 * 2);
+        client.waitFor(1000 * 60 * 2);
 
-	client.stop();
-	lb.stop() ;
-	server1.stop();
-	server2.stop();
-	orbd.stop();
+        client.stop();
+        lb.stop() ;
+        server1.stop();
+        server2.stop();
+        orbd.stop();
     }
 }

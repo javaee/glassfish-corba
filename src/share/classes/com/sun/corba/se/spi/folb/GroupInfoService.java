@@ -42,11 +42,11 @@
 // Last Modified : 2005 Aug 08 (Mon) 17:53:01 by Harold Carr.
 //
 
-package com.sun.corba.se.spi.folb;
+package com.sun.corba.ee.spi.folb;
 
 import java.util.List;
 
-import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
+import com.sun.corba.ee.spi.folb.GroupInfoServiceObserver;
 
 /**
  * @author Harold Carr

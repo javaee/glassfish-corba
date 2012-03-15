@@ -56,7 +56,7 @@ public final class InvalidValue
      * Constructs an <code>InvalidValue</code> object.
      */
     public InvalidValue() {
-	super();
+        super();
     }
 
     /**
@@ -65,6 +65,6 @@ public final class InvalidValue
      * regarding the exception.
      */
     public InvalidValue(String reason) {
-	super(reason);
+        super(reason);
     }
 }

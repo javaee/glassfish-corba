@@ -76,12 +76,12 @@ public class InternalExec extends ControllerAdapter
 
     public void stop()
     {
-	// Can't be stopped
+        // Can't be stopped
     }
 
     public void kill()
     {
-	// Can't be killed
+        // Can't be killed
     }
 
     public int waitFor() throws Exception
@@ -96,7 +96,7 @@ public class InternalExec extends ControllerAdapter
 
     public int exitValue() throws IllegalThreadStateException
     {
-	// Just in case a subclass wants to change finished
+        // Just in case a subclass wants to change finished
         if (!finished())
             throw new IllegalThreadStateException("not finished");
 

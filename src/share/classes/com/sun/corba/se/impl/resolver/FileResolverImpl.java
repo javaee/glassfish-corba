@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.resolver ;
+package com.sun.corba.ee.impl.resolver ;
 
-import com.sun.corba.se.spi.resolver.Resolver ;
+import com.sun.corba.ee.spi.resolver.Resolver ;
 
 import java.util.Enumeration;
 import java.util.Properties;
@@ -50,9 +50,9 @@ import java.util.HashSet;
 import java.io.File;
 import java.io.FileInputStream;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.misc.CorbaResourceUtil ;
+import com.sun.corba.ee.impl.misc.CorbaResourceUtil ;
 
 public class FileResolverImpl implements Resolver
 {
@@ -63,34 +63,34 @@ public class FileResolverImpl implements Resolver
 
     public FileResolverImpl( ORB orb, File file )
     {
-	this.orb = orb ;
-	this.file = file ;
-	savedProps = new Properties() ;
+        this.orb = orb ;
+        this.file = file ;
+        savedProps = new Properties() ;
     }
 
     public org.omg.CORBA.Object resolve( String name ) 
     {
-	check() ;
-	String stringifiedObject = savedProps.getProperty( name ) ;
-	if (stringifiedObject == null) {
-	    return null;
-	}
-	return orb.string_to_object( stringifiedObject ) ;
+        check() ;
+        String stringifiedObject = savedProps.getProperty( name ) ;
+        if (stringifiedObject == null) {
+            return null;
+        }
+        return orb.string_to_object( stringifiedObject ) ;
     }
 
     public Set<String> list()
     {
-	check() ;
+        check() ;
 
-	Set result = new HashSet() ;
+        Set result = new HashSet() ;
 
-	// Obtain all the keys from the property object
-	Enumeration theKeys = savedProps.propertyNames();
-	while (theKeys.hasMoreElements()) {
-	    result.add( theKeys.nextElement() ) ;
-	}
+        // Obtain all the keys from the property object
+        Enumeration theKeys = savedProps.propertyNames();
+        while (theKeys.hasMoreElements()) {
+            result.add( theKeys.nextElement() ) ;
+        }
 
-	return result ;
+        return result ;
     }
 
     /**
@@ -99,26 +99,26 @@ public class FileResolverImpl implements Resolver
     */
     private void check() 
     {
-	if (file == null) {
-	    return;
+        if (file == null) {
+            return;
         }
 
-	long lastMod = file.lastModified();
-	if (lastMod > fileModified) {
-	    try {
-		FileInputStream fileIS = new FileInputStream(file);
-		savedProps.clear();
-		savedProps.load(fileIS);
-		fileIS.close();
-		fileModified = lastMod;
-	    } catch (java.io.FileNotFoundException e) {
-		System.err.println( CorbaResourceUtil.getText(
-		    "bootstrap.filenotfound", file.getAbsolutePath()));
-	    } catch (java.io.IOException e) {
-		System.err.println( CorbaResourceUtil.getText(
-		    "bootstrap.exception",
-		    file.getAbsolutePath(), e.toString()));
-	    }
-	}
+        long lastMod = file.lastModified();
+        if (lastMod > fileModified) {
+            try {
+                FileInputStream fileIS = new FileInputStream(file);
+                savedProps.clear();
+                savedProps.load(fileIS);
+                fileIS.close();
+                fileModified = lastMod;
+            } catch (java.io.FileNotFoundException e) {
+                System.err.println( CorbaResourceUtil.getText(
+                    "bootstrap.filenotfound", file.getAbsolutePath()));
+            } catch (java.io.IOException e) {
+                System.err.println( CorbaResourceUtil.getText(
+                    "bootstrap.exception",
+                    file.getAbsolutePath(), e.toString()));
+            }
+        }
     }
 }

@@ -52,7 +52,7 @@ public class ClientORBInitializer
     extends
         org.omg.CORBA.LocalObject
     implements
-	ORBInitializer
+        ORBInitializer
 {
     public static final String baseMsg = ClientORBInitializer.class.getName();
 
@@ -60,26 +60,26 @@ public class ClientORBInitializer
 
     public void post_init(ORBInitInfo orbInitInfo)
     {
-	try {
-	    // These are intentionally random to test ordering.
+        try {
+            // These are intentionally random to test ordering.
 
-	    orbInitInfo.add_client_request_interceptor(
+            orbInitInfo.add_client_request_interceptor(
                 new CRIOrdered("Three", 3));
 
-	    orbInitInfo.add_client_request_interceptor(
+            orbInitInfo.add_client_request_interceptor(
                 new CRIOrdered("One", 1));
 
-	    orbInitInfo.add_client_request_interceptor(
+            orbInitInfo.add_client_request_interceptor(
                 new CRI());
 
-	    orbInitInfo.add_client_request_interceptor(
+            orbInitInfo.add_client_request_interceptor(
                 new CRIOrdered("Two", 2));
 
-	    System.out.println(baseMsg + ".post_init: add_* completed.");
-	} catch (DuplicateName ex) {
-	    System.out.println(baseMsg + ".post_init: " + ex);
-	    System.exit(-1);
-	}
+            System.out.println(baseMsg + ".post_init: add_* completed.");
+        } catch (DuplicateName ex) {
+            System.out.println(baseMsg + ".post_init: " + ex);
+            System.exit(-1);
+        }
     }
 }
 

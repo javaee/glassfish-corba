@@ -87,7 +87,7 @@ import sun.reflect.ReflectionFactory ;
 public final class Bridge
 {
     private static final Permission getBridgePermission = 
-	new BridgePermission( "getBridge" ) ;
+        new BridgePermission( "getBridge" ) ;
     private static Bridge bridge = null ;
 
     // latestUserDefinedLoader() is a private static method
@@ -100,60 +100,60 @@ public final class Bridge
 
     private Method getLatestUserDefinedLoaderMethod() {
         return AccessController.doPrivileged(
-	    new PrivilegedAction<Method>() {
+            new PrivilegedAction<Method>() {
             @SuppressWarnings("unchecked")
-		public Method run() {
-		    Method result = null;
+                public Method run() {
+                    Method result = null;
 
-		    try {
-			Class io = ObjectInputStream.class;
-			result = io.getDeclaredMethod( 
-			    "latestUserDefinedLoader");
-			result.setAccessible(true);
-		    } catch (NoSuchMethodException nsme) {
-			throw new Error("java.io.ObjectInputStream" +
+                    try {
+                        Class io = ObjectInputStream.class;
+                        result = io.getDeclaredMethod( 
+                            "latestUserDefinedLoader");
+                        result.setAccessible(true);
+                    } catch (NoSuchMethodException nsme) {
+                        throw new Error("java.io.ObjectInputStream" +
                         " latestUserDefinedLoader " + nsme, nsme) ;
-		    }
+                    }
 
-		    return result;
-		} 
-	    }
-	);
+                    return result;
+                } 
+            }
+        );
     }
 
     private Unsafe getUnsafe() {
-	Field fld = AccessController.doPrivileged( 
-	    new PrivilegedAction<Field>() {
-		public Field run() {
-		    try {
-			Class unsafeClass = sun.misc.Unsafe.class ;
-			Field fld = unsafeClass.getDeclaredField( "theUnsafe" ) ;
-			fld.setAccessible( true ) ;
-			return fld ;
-		    } catch (NoSuchFieldException exc) {
-			throw new Error("Could not access Unsafe", exc) ;
-		    }
-		}
-	    } 
-	) ;
+        Field fld = AccessController.doPrivileged( 
+            new PrivilegedAction<Field>() {
+                public Field run() {
+                    try {
+                        Class unsafeClass = sun.misc.Unsafe.class ;
+                        Field fld = unsafeClass.getDeclaredField( "theUnsafe" ) ;
+                        fld.setAccessible( true ) ;
+                        return fld ;
+                    } catch (NoSuchFieldException exc) {
+                        throw new Error("Could not access Unsafe", exc) ;
+                    }
+                }
+            } 
+        ) ;
 
-	Unsafe theUnsafe = null;
+        Unsafe theUnsafe = null;
 
-	try {
-	    theUnsafe = Unsafe.class.cast( fld.get( null ) ) ;
-	} catch (Throwable t) {
-	    throw new Error("Could not access Unsafe", t) ;
-	}
+        try {
+            theUnsafe = Unsafe.class.cast( fld.get( null ) ) ;
+        } catch (Throwable t) {
+            throw new Error("Could not access Unsafe", t) ;
+        }
 
-	return theUnsafe ;
+        return theUnsafe ;
     }
 
 
     @SuppressWarnings("unchecked")
     private Bridge() {
-	latestUserDefinedLoaderMethod = getLatestUserDefinedLoaderMethod();
-	unsafe = getUnsafe() ;
-	reflectionFactory = AccessController.doPrivileged(
+        latestUserDefinedLoaderMethod = getLatestUserDefinedLoaderMethod();
+        unsafe = getUnsafe() ;
+        reflectionFactory = AccessController.doPrivileged(
 
         // This generates a warning because GetReflectionFactoryAction
         // does not have the correct type: I can't fix that.
@@ -176,16 +176,16 @@ public final class Bridge
      */
     public static synchronized Bridge get()
     {
-	SecurityManager sman = System.getSecurityManager() ;
-	if (sman != null) {
+        SecurityManager sman = System.getSecurityManager() ;
+        if (sman != null) {
             sman.checkPermission(getBridgePermission);
         }
 
-	if (bridge == null) {
-	    bridge = new Bridge() ;
-	}
+        if (bridge == null) {
+            bridge = new Bridge() ;
+        }
 
-	return bridge ;
+        return bridge ;
     }
 
     /** Obtain the latest user defined ClassLoader from the call stack.
@@ -197,10 +197,10 @@ public final class Bridge
             // Invoke the ObjectInputStream.latestUserDefinedLoader method
             return (ClassLoader)latestUserDefinedLoaderMethod.invoke(null);
         } catch (InvocationTargetException ite) {
-	    throw new Error("sun.corba.Bridge.latestUserDefinedLoader: " + ite,
+            throw new Error("sun.corba.Bridge.latestUserDefinedLoader: " + ite,
                 ite) ;
         } catch (IllegalAccessException iae) {
-	    throw new Error("sun.corba.Bridge.latestUserDefinedLoader: " + iae,
+            throw new Error("sun.corba.Bridge.latestUserDefinedLoader: " + iae,
                 iae) ;
         }
     }
@@ -222,7 +222,7 @@ public final class Bridge
      */
     public final int getInt(Object o, long offset)
     {
-	return unsafe.getInt( o, offset ) ;
+        return unsafe.getInt( o, offset ) ;
     }
 
     /**
@@ -245,7 +245,7 @@ public final class Bridge
      */
     public final void putInt(Object o, long offset, int x)
     {
-	unsafe.putInt( o, offset, x ) ;
+        unsafe.putInt( o, offset, x ) ;
     }
 
     /**
@@ -253,7 +253,7 @@ public final class Bridge
      */
     public final Object getObject(Object o, long offset)
     {
-	return unsafe.getObject( o, offset ) ;
+        return unsafe.getObject( o, offset ) ;
     }
 
     /**
@@ -261,78 +261,78 @@ public final class Bridge
      */
     public final void putObject(Object o, long offset, Object x)
     {
-	unsafe.putObject( o, offset, x ) ;
+        unsafe.putObject( o, offset, x ) ;
     }
 
     /** @see #getInt(Object, long) */
     public final boolean getBoolean(Object o, long offset)
     {
-	return unsafe.getBoolean( o, offset ) ;
+        return unsafe.getBoolean( o, offset ) ;
     }
     /** @see #putInt(Object, long, int) */
     public final void    putBoolean(Object o, long offset, boolean x)
     {
-	unsafe.putBoolean( o, offset, x ) ;
+        unsafe.putBoolean( o, offset, x ) ;
     }
     /** @see #getInt(Object, long) */
     public final byte    getByte(Object o, long offset)
     {
-	return unsafe.getByte( o, offset ) ;
+        return unsafe.getByte( o, offset ) ;
     }
     /** @see #putInt(Object, long, int) */
     public final void    putByte(Object o, long offset, byte x)
     {
-	unsafe.putByte( o, offset, x ) ;
+        unsafe.putByte( o, offset, x ) ;
     }
     /** @see #getInt(Object, long) */
     public final short   getShort(Object o, long offset)
     {
-	return unsafe.getShort( o, offset ) ;
+        return unsafe.getShort( o, offset ) ;
     }
     /** @see #putInt(Object, long, int) */
     public final void    putShort(Object o, long offset, short x)
     {
-	unsafe.putShort( o, offset, x ) ;
+        unsafe.putShort( o, offset, x ) ;
     }
     /** @see #getInt(Object, long) */
     public final char    getChar(Object o, long offset)
     {
-	return unsafe.getChar( o, offset ) ;
+        return unsafe.getChar( o, offset ) ;
     }
     /** @see #putInt(Object, long, int) */
     public final void    putChar(Object o, long offset, char x)
     {
-	unsafe.putChar( o, offset, x ) ;
+        unsafe.putChar( o, offset, x ) ;
     }
     /** @see #getInt(Object, long) */
     public final long    getLong(Object o, long offset)
     {
-	return unsafe.getLong( o, offset ) ;
+        return unsafe.getLong( o, offset ) ;
     }
     /** @see #putInt(Object, long, int) */
     public final void    putLong(Object o, long offset, long x)
     {
-	unsafe.putLong( o, offset, x ) ;
+        unsafe.putLong( o, offset, x ) ;
     }
     /** @see #getInt(Object, long) */
     public final float   getFloat(Object o, long offset)
     {
-	return unsafe.getFloat( o, offset ) ;
+        return unsafe.getFloat( o, offset ) ;
     }
     /** @see #putInt(Object, long, int) */
     public final void    putFloat(Object o, long offset, float x)
     {
-	unsafe.putFloat( o, offset, x ) ;
+        unsafe.putFloat( o, offset, x ) ;
     }
     /** @see #getInt(Object, long) */
     public final double  getDouble(Object o, long offset)
     {
-	return unsafe.getDouble( o, offset ) ;
+        return unsafe.getDouble( o, offset ) ;
     }
     /** @see #putInt(Object, long, int) */
     public final void    putDouble(Object o, long offset, double x)
     {
-	unsafe.putDouble( o, offset, x ) ;
+        unsafe.putDouble( o, offset, x ) ;
     }
 
     /**
@@ -346,7 +346,7 @@ public final class Bridge
      */
     public final long objectFieldOffset(Field f) 
     {
-	return unsafe.objectFieldOffset( f ) ;
+        return unsafe.objectFieldOffset( f ) ;
     }
 
     /** Throw the exception. 
@@ -354,7 +354,7 @@ public final class Bridge
      */
     public final void throwException(Throwable ee)
     {
-	unsafe.throwException( ee ) ;
+        unsafe.throwException( ee ) ;
     }
 
     /** Obtain a constructor for Class cl using constructor cons which
@@ -366,8 +366,8 @@ public final class Bridge
      */
     @SuppressWarnings("unchecked")
     public final <T> Constructor<T> newConstructorForSerialization( Class<T> cl,
-	Constructor<?> cons )
+        Constructor<?> cons )
     {
-	return reflectionFactory.newConstructorForSerialization( cl, cons ) ;
+        return reflectionFactory.newConstructorForSerialization( cl, cons ) ;
     }
 }

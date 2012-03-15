@@ -79,7 +79,7 @@ public final class ServiceDetail implements org.omg.CORBA.portable.IDLEntity
      * @param service_detail a <code>byte</code> array describing the ORB service
      */
     public ServiceDetail(int service_detail_type, byte[] service_detail) {
-	this.service_detail_type = service_detail_type;
-	this.service_detail = service_detail;
+        this.service_detail_type = service_detail_type;
+        this.service_detail = service_detail;
     }
 }

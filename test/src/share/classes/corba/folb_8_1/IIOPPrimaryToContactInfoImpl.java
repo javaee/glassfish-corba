@@ -57,13 +57,13 @@ import java.util.logging.Level;
 //import com.sun.logging.LogDomains;
 
 // These are "ee" in the AS version:
-import com.sun.corba.se.spi.transport.ContactInfo;
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.ContactInfoList;
-import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
-import com.sun.corba.se.spi.transport.SocketInfo;
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.ContactInfoList;
+import com.sun.corba.ee.spi.transport.IIOPPrimaryToContactInfo;
+import com.sun.corba.ee.spi.transport.SocketInfo;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 /**
  * This is the "sticky manager" - based on the 7.1 EE concept.
@@ -95,226 +95,226 @@ public class IIOPPrimaryToContactInfoImpl
 
     public IIOPPrimaryToContactInfoImpl()
     {
-	map = new HashMap();
-	debugChecked = false;
-	debug = false;
+        map = new HashMap();
+        debugChecked = false;
+        debug = false;
     }
 
     public synchronized void reset(ContactInfo primary)
     {
-	try {
-	    if (debug) {
-		dprint(".reset: " + getKey(primary));
-	    }
-	    map.remove(getKey(primary));
-	} catch (Throwable t) {
+        try {
+            if (debug) {
+                dprint(".reset: " + getKey(primary));
+            }
+            map.remove(getKey(primary));
+        } catch (Throwable t) {
             _logger.log(Level.WARNING,
-			"Problem in " + baseMsg + ".reset",
-			t);
-	    RuntimeException rte =
-		new RuntimeException(baseMsg + ".reset error");
-	    rte.initCause(t);
-	    throw rte;
-	}
+                        "Problem in " + baseMsg + ".reset",
+                        t);
+            RuntimeException rte =
+                new RuntimeException(baseMsg + ".reset error");
+            rte.initCause(t);
+            throw rte;
+        }
     }
 
     public synchronized boolean hasNext(ContactInfo primary,
-					ContactInfo previous,
-					List contactInfos)
+                                        ContactInfo previous,
+                                        List contactInfos)
     {
-	try {
-	    if (! debugChecked) {
-		debugChecked = true;
-		debug = ((ORB)primary.getBroker()).transportDebugFlag 
-		        || _logger.isLoggable(Level.FINE);
-	    }
+        try {
+            if (! debugChecked) {
+                debugChecked = true;
+                debug = ((ORB)primary.getBroker()).transportDebugFlag 
+                        || _logger.isLoggable(Level.FINE);
+            }
 
-	    if (debug) {
-		dprint(".hasNext->: " 
-		       + formatKeyPreviousList(getKey(primary),
-					       previous,
-					       contactInfos));
-	    }
-	    boolean result;
-	    if (previous == null) {
-		result = true;
-	    } else {
-		int previousIndex = contactInfos.indexOf(previous);
-		int contactInfosSize = contactInfos.size();
-		if (debug) {
-		    dprint(".hasNext: " 
-			   + previousIndex + " " + contactInfosSize);
-		}
-		if (previousIndex < 0) {
-		    // This SHOULD not happen.
-		    // It would only happen if the previous is NOT
-		    // found in the current list of contactInfos.
-		    RuntimeException rte = new RuntimeException(
+            if (debug) {
+                dprint(".hasNext->: " 
+                       + formatKeyPreviousList(getKey(primary),
+                                               previous,
+                                               contactInfos));
+            }
+            boolean result;
+            if (previous == null) {
+                result = true;
+            } else {
+                int previousIndex = contactInfos.indexOf(previous);
+                int contactInfosSize = contactInfos.size();
+                if (debug) {
+                    dprint(".hasNext: " 
+                           + previousIndex + " " + contactInfosSize);
+                }
+                if (previousIndex < 0) {
+                    // This SHOULD not happen.
+                    // It would only happen if the previous is NOT
+                    // found in the current list of contactInfos.
+                    RuntimeException rte = new RuntimeException(
 
 
-			"Problem in " + baseMsg + ".hasNext: previousIndex: "
-			+ previousIndex);
+                        "Problem in " + baseMsg + ".hasNext: previousIndex: "
+                        + previousIndex);
 
-		    _logger.log(Level.SEVERE, 
-			"Problem in " + baseMsg + ".hasNext: previousIndex: "
-			+ previousIndex, rte);
-		    throw rte;
-		} else {
-		    // Since this is a retry, ensure that there is a following
-		    // ContactInfo for .next
-		    result = (contactInfosSize - 1) > previousIndex;
-		}
-	    }
-	    if (debug) {
-		dprint(".hasNext<-: " + result);
-	    }
-	    return result;
-	} catch (Throwable t) {
+                    _logger.log(Level.SEVERE, 
+                        "Problem in " + baseMsg + ".hasNext: previousIndex: "
+                        + previousIndex, rte);
+                    throw rte;
+                } else {
+                    // Since this is a retry, ensure that there is a following
+                    // ContactInfo for .next
+                    result = (contactInfosSize - 1) > previousIndex;
+                }
+            }
+            if (debug) {
+                dprint(".hasNext<-: " + result);
+            }
+            return result;
+        } catch (Throwable t) {
             _logger.log(Level.WARNING, 
-			"Problem in " + baseMsg + ".hasNext",
-			t);
-	    RuntimeException rte =
-		new RuntimeException(baseMsg + ".hasNext error");
-	    rte.initCause(t);
-	    throw rte;
-	}
+                        "Problem in " + baseMsg + ".hasNext",
+                        t);
+            RuntimeException rte =
+                new RuntimeException(baseMsg + ".hasNext error");
+            rte.initCause(t);
+            throw rte;
+        }
     }
 
     public synchronized ContactInfo next(ContactInfo primary,
-					 ContactInfo previous,
-					 List contactInfos)
+                                         ContactInfo previous,
+                                         List contactInfos)
     {
-	try {
-	    String debugMsg = null;
+        try {
+            String debugMsg = null;
 
-	    if (debug) {
-		debugMsg = "";
-		dprint(".next->: " 
-		       + formatKeyPreviousList(getKey(primary),
-					       previous,
-					       contactInfos));
-		dprint(".next: map: " + formatMap(map));
-	    }
+            if (debug) {
+                debugMsg = "";
+                dprint(".next->: " 
+                       + formatKeyPreviousList(getKey(primary),
+                                               previous,
+                                               contactInfos));
+                dprint(".next: map: " + formatMap(map));
+            }
 
-	    Object result = null;
+            Object result = null;
 
-	    if (previous == null) {
-		// This is NOT a retry.
-		result = map.get(getKey(primary));
-		if (result == null) {
-		    if (debug) {
-			debugMsg = ".next<-: initialize map: ";
-		    }
-		    // NOTE: do not map primary to primary.
-		    // In case of local transport we NEVER use primary.
-		    result = contactInfos.get(0);
-		    map.put(getKey(primary), result);
-		} else {
-		    if (debug) {
-			dprint(".next: primary mapped to: " + result);
-		    }
-		    int position = contactInfos.indexOf(result);
-		    if (position == -1) {
-			// It is possible that communication to the key
-			// took place on SharedCDR, then a corbaloc to 
-			// same location uses a SocketOrChannelContactInfo
-			// and vice versa.
-			if (debug) {
-			    dprint(".next: cannot find mapped entry in current list.  Removing mapped entry and trying .next again.");
-			}
-			reset(primary);
-			return next(primary, previous, contactInfos);
-		    }
-		    // NOTE: This step is critical.  You do NOT want to
-		    // return contact info from the map.  You want to find
-		    // it, as a SocketInfo, in the current list, and then
-		    // return that ContactInfo.  Otherwise you will potentially
-		    // return a ContactInfo pointing to an incorrect IOR.
-		    result = contactInfos.get(position);
-		    if (debug) {
-			debugMsg = ".next<-: mapped: ";
-		    }
-		}
-	    } else {
-		// This is a retry.
-		// If previous is last element then .next is not called
-		// because hasNext will return false.
-		result = contactInfos.get(contactInfos.indexOf(previous) + 1);
-		map.put(getKey(primary), result);
+            if (previous == null) {
+                // This is NOT a retry.
+                result = map.get(getKey(primary));
+                if (result == null) {
+                    if (debug) {
+                        debugMsg = ".next<-: initialize map: ";
+                    }
+                    // NOTE: do not map primary to primary.
+                    // In case of local transport we NEVER use primary.
+                    result = contactInfos.get(0);
+                    map.put(getKey(primary), result);
+                } else {
+                    if (debug) {
+                        dprint(".next: primary mapped to: " + result);
+                    }
+                    int position = contactInfos.indexOf(result);
+                    if (position == -1) {
+                        // It is possible that communication to the key
+                        // took place on SharedCDR, then a corbaloc to 
+                        // same location uses a SocketOrChannelContactInfo
+                        // and vice versa.
+                        if (debug) {
+                            dprint(".next: cannot find mapped entry in current list.  Removing mapped entry and trying .next again.");
+                        }
+                        reset(primary);
+                        return next(primary, previous, contactInfos);
+                    }
+                    // NOTE: This step is critical.  You do NOT want to
+                    // return contact info from the map.  You want to find
+                    // it, as a SocketInfo, in the current list, and then
+                    // return that ContactInfo.  Otherwise you will potentially
+                    // return a ContactInfo pointing to an incorrect IOR.
+                    result = contactInfos.get(position);
+                    if (debug) {
+                        debugMsg = ".next<-: mapped: ";
+                    }
+                }
+            } else {
+                // This is a retry.
+                // If previous is last element then .next is not called
+                // because hasNext will return false.
+                result = contactInfos.get(contactInfos.indexOf(previous) + 1);
+                map.put(getKey(primary), result);
 
-		_logger.log(Level.INFO, "IIOP failover to: " + result);
+                _logger.log(Level.INFO, "IIOP failover to: " + result);
 
-		if (debug) {
-		    debugMsg = ".next<-: update map: " 
-			+ " " + contactInfos.indexOf(previous)
-			+ " " + contactInfos.size() + " ";
-		}
-	    }
-	    if (debug) {
-		dprint(debugMsg + result);
-	    }
-	    return (ContactInfo) result;
-	} catch (Throwable t) {
+                if (debug) {
+                    debugMsg = ".next<-: update map: " 
+                        + " " + contactInfos.indexOf(previous)
+                        + " " + contactInfos.size() + " ";
+                }
+            }
+            if (debug) {
+                dprint(debugMsg + result);
+            }
+            return (ContactInfo) result;
+        } catch (Throwable t) {
             _logger.log(Level.WARNING,
-			"Problem in " + baseMsg + ".next",
-			t);
-	    RuntimeException rte =
-		new RuntimeException(baseMsg + ".next error");
-	    rte.initCause(t);
-	    throw rte;
-	}
+                        "Problem in " + baseMsg + ".next",
+                        t);
+            RuntimeException rte =
+                new RuntimeException(baseMsg + ".next error");
+            rte.initCause(t);
+            throw rte;
+        }
     }
 
     private Object getKey(ContactInfo contactInfo)
     {
-	if (((SocketInfo)contactInfo).getPort() == 0) {
-	    // When CSIv2 is used the primary will have a zero port.
-	    // Therefore type/host/port will NOT be unique.
-	    // So use the entire IOR for the key in that case.
-	    return ((ContactInfoList)contactInfo.getContactInfoList())
-		.getEffectiveTargetIOR();
-	} else {
-	    return contactInfo;
-	}
+        if (((SocketInfo)contactInfo).getPort() == 0) {
+            // When CSIv2 is used the primary will have a zero port.
+            // Therefore type/host/port will NOT be unique.
+            // So use the entire IOR for the key in that case.
+            return ((ContactInfoList)contactInfo.getContactInfoList())
+                .getEffectiveTargetIOR();
+        } else {
+            return contactInfo;
+        }
     }
 
     private String formatKeyPreviousList(Object key,
-					 ContactInfo previous, List list)
+                                         ContactInfo previous, List list)
     {
-	String result =
-	      "\n  key     : " + key
-	    + "\n  previous: " + previous
-	    + "\n  list:";
-	Iterator i = list.iterator();
-	int count = 1;
-	while (i.hasNext()) {
-	    result += "\n    " + count++ + "  " + i.next();
-	}
-	return result;
+        String result =
+              "\n  key     : " + key
+            + "\n  previous: " + previous
+            + "\n  list:";
+        Iterator i = list.iterator();
+        int count = 1;
+        while (i.hasNext()) {
+            result += "\n    " + count++ + "  " + i.next();
+        }
+        return result;
     }
 
     private String formatMap(Map map)
     {
-	String result = "";
-	synchronized (map) {
-	    Iterator i = map.entrySet().iterator();
-	    if (! i.hasNext()) {
-		return "empty";
-	    }
-	    while (i.hasNext()) {
-		Map.Entry entry = (Map.Entry) i.next();
-		result += 
-		      "\n    key  : " + entry.getKey()
-		    + "\n    value: " + entry.getValue()
-		    + "\n";
-	    }
-	}
-	return result;
+        String result = "";
+        synchronized (map) {
+            Iterator i = map.entrySet().iterator();
+            if (! i.hasNext()) {
+                return "empty";
+            }
+            while (i.hasNext()) {
+                Map.Entry entry = (Map.Entry) i.next();
+                result += 
+                      "\n    key  : " + entry.getKey()
+                    + "\n    value: " + entry.getValue()
+                    + "\n";
+            }
+        }
+        return result;
     }
 
     private void dprint(String msg)
     {
-	_logger.log(Level.FINE, msg);
+        _logger.log(Level.FINE, msg);
     }
 }
 
@@ -323,20 +323,20 @@ class MyLogger
 {
     void log(Level level, String msg)
     {
-	log(level, msg, null);
+        log(level, msg, null);
     }
 
     void log(Level level, String msg, Throwable t)
     {
-	ORBUtility.dprint("IIOPPrimaryToContactInfoImpl.MyLogger.log", msg);
-	if (t != null) {
-	    t.printStackTrace(System.out);
-	}
+        ORBUtility.dprint("IIOPPrimaryToContactInfoImpl.MyLogger.log", msg);
+        if (t != null) {
+            t.printStackTrace(System.out);
+        }
     }
 
     boolean isLoggable(Level level)
     {
-	return false;
+        return false;
     }
 }
 

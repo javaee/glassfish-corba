@@ -40,8 +40,8 @@
 
 package pi.serverrequestinfo;
 
-import com.sun.corba.se.impl.misc.*;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.misc.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.IOP.*;
 import ServerRequestInfo.*;
@@ -68,7 +68,7 @@ public class ExceptionStrategy
         throws ForwardRequest
     {
         super.receive_request_service_contexts( interceptor, ri );
-       	 
+         
         try { 
             count++;
 
@@ -113,7 +113,7 @@ public class ExceptionStrategy
         super.send_exception( interceptor, ri );
 
         try {
-	    testException( "send_exception", ri );
+            testException( "send_exception", ri );
         }
         catch( Exception ex ) {
             failException( "send_exception", ex );
@@ -127,7 +127,7 @@ public class ExceptionStrategy
         super.send_other( interceptor, ri );
 
         try {
-	    testException( "send_other", ri );
+            testException( "send_other", ri );
         }
         catch( Exception ex ) {
             failException( "send_other", ex );
@@ -135,9 +135,9 @@ public class ExceptionStrategy
     }
 
     private void testException( String methodName, 
-		                ServerRequestInfo ri ) 
+                                ServerRequestInfo ri ) 
     {
-	String header = methodName + "(): ";
+        String header = methodName + "(): ";
         if( methodName.equals( "send_exception" ) ) {
             if( count == 2 ) {
                 // Called for System Exception:
@@ -157,22 +157,22 @@ public class ExceptionStrategy
             else if( count == 3 ) {
                 // Called for User Exception:
                 // Test send_exception:
-		// _REVISIT_ Currently, we do not have access to the 
-		// user exception in the Java Language mappings.  When this
-		// is fixed, uncomment this test.
-		/*
+                // _REVISIT_ Currently, we do not have access to the 
+                // user exception in the Java Language mappings.  When this
+                // is fixed, uncomment this test.
+                /*
                 Any sendingException = ri.sending_exception();
 
-		try {
-		    log( header + "Got any with type = " + 
-	                sendingException.type().name() );
-	        }
-		catch( org.omg.CORBA.TypeCodePackage.BadKind e ) {
-		    log( "" + e );
-		}
+                try {
+                    log( header + "Got any with type = " + 
+                        sendingException.type().name() );
+                }
+                catch( org.omg.CORBA.TypeCodePackage.BadKind e ) {
+                    log( "" + e );
+                }
 
-		SystemException sex = 
-		    ORBUtility.extractSystemException( sendingException );
+                SystemException sex = 
+                    ORBUtility.extractSystemException( sendingException );
                 log( "SystemException: " + sex );
                 log( "SystemException: " + sex.getMessage() );
 
@@ -186,7 +186,7 @@ public class ExceptionStrategy
                 else {
                     log( header + "sending_exception() is valid." );
                 }
-		*/
+                */
             }
             else {
                 fail( header + "sending_exception should not be " +

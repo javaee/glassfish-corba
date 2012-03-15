@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
 import org.omg.CORBA.TRANSIENT ;
 import org.omg.CORBA.SystemException ;
@@ -46,26 +46,26 @@ import org.omg.CORBA.SystemException ;
 import org.omg.CORBA.portable.ServantObject;
 
 
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher;
-import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
-import com.sun.corba.se.spi.protocol.ForwardException ;
+import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcher;
+import com.sun.corba.ee.spi.protocol.RequestDispatcherRegistry;
+import com.sun.corba.ee.spi.protocol.ForwardException ;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.ior.IOR ;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.ior.IOR ;
 
-import com.sun.corba.se.spi.oa.ObjectAdapterFactory;
-import com.sun.corba.se.spi.oa.OADestroyed ;
+import com.sun.corba.ee.spi.oa.ObjectAdapterFactory;
+import com.sun.corba.ee.spi.oa.OADestroyed ;
 
-import com.sun.corba.se.spi.ior.ObjectAdapterId;
-import com.sun.corba.se.spi.ior.TaggedProfile;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
-import com.sun.corba.se.spi.ior.ObjectId; 
+import com.sun.corba.ee.spi.ior.ObjectAdapterId;
+import com.sun.corba.ee.spi.ior.TaggedProfile;
+import com.sun.corba.ee.spi.ior.ObjectKeyTemplate;
+import com.sun.corba.ee.spi.ior.ObjectId; 
 
-import com.sun.corba.se.spi.logging.POASystemException;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.POASystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
-import com.sun.corba.se.spi.trace.IsLocal;
-import com.sun.corba.se.spi.trace.Subcontract;
+import com.sun.corba.ee.spi.trace.IsLocal;
+import com.sun.corba.ee.spi.trace.Subcontract;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Subcontract
@@ -81,8 +81,8 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     // Should this be unified?  How can we better handle this retry/backoff
     // implementation with a single implementation?
     private static final int INITIAL_BACKOFF = 1 ;  // initially start off very small
-						    // because 1 millisecond is a long time for a local call.
-						   
+                                                    // because 1 millisecond is a long time for a local call.
+                                                   
     private static final int MAX_BACKOFF   = 1000 ;   // Never sleep longer than this
     private static final int MAX_WAIT_TIME = 10 * 1000 ; // Total time to wait for a local request.
 
@@ -106,30 +106,30 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
 
     protected LocalClientRequestDispatcherBase(ORB orb, int scid, IOR ior)
     {
-	this.orb = orb ;
+        this.orb = orb ;
 
-	TaggedProfile prof = ior.getProfile() ;
-	servantIsLocal = orb.getORBData().isLocalOptimizationAllowed() && 
-	    prof.isLocal();
+        TaggedProfile prof = ior.getProfile() ;
+        servantIsLocal = orb.getORBData().isLocalOptimizationAllowed() && 
+            prof.isLocal();
 
-	ObjectKeyTemplate oktemp = prof.getObjectKeyTemplate() ;
-	this.scid = oktemp.getSubcontractId() ;
-	RequestDispatcherRegistry sreg = orb.getRequestDispatcherRegistry() ;
-	oaf = sreg.getObjectAdapterFactory( scid ) ;
-	oaid = oktemp.getObjectAdapterId() ;
-	ObjectId oid = prof.getObjectId() ;
-	objectId = oid.getId() ;
+        ObjectKeyTemplate oktemp = prof.getObjectKeyTemplate() ;
+        this.scid = oktemp.getSubcontractId() ;
+        RequestDispatcherRegistry sreg = orb.getRequestDispatcherRegistry() ;
+        oaf = sreg.getObjectAdapterFactory( scid ) ;
+        oaid = oktemp.getObjectAdapterId() ;
+        ObjectId oid = prof.getObjectId() ;
+        objectId = oid.getId() ;
     }
 
     public byte[] getObjectId() 
     {
-	return objectId ;
+        return objectId ;
     }
 
     @IsLocal
     public boolean is_local(org.omg.CORBA.Object self)
     {
-	return false;
+        return false;
     }
 
     /*
@@ -140,23 +140,23 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     * If useLocalInvocation returns false, servant_preinvoke is not called.
     * If useLocalInvocation returns true,
     * call servant_preinvoke
-    *	If servant_preinvoke returns null,
-    *	    goto A
+    *   If servant_preinvoke returns null,
+    *       goto A
     *   else
-    *	    (local invocation proceeds normally)
-    *	    servant_postinvoke is called
+    *       (local invocation proceeds normally)
+    *       servant_postinvoke is called
     *
     */
     @IsLocal
     public boolean useLocalInvocation( org.omg.CORBA.Object self ) 
     {
-	if (isNextCallValid.get() == Boolean.TRUE) {
+        if (isNextCallValid.get() == Boolean.TRUE) {
             return servantIsLocal;
         } else {
             isNextCallValid.set(Boolean.TRUE);
         }
 
-	return false ;    
+        return false ;    
     }
 
     @InfoMethod
@@ -168,43 +168,43 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     */
     @IsLocal
     protected boolean checkForCompatibleServant( ServantObject so, 
-	Class expectedType )
+        Class expectedType )
     {
-	if (so == null) {
+        if (so == null) {
             return false;
         }
 
-	// Normally, this test will never fail.  However, if the servant
-	// and the stub were loaded in different class loaders, this test
-	// will fail.
-	if (!expectedType.isInstance( so.servant )) {
+        // Normally, this test will never fail.  However, if the servant
+        // and the stub were loaded in different class loaders, this test
+        // will fail.
+        if (!expectedType.isInstance( so.servant )) {
             servantNotCompatible() ;
-	    isNextCallValid.set( Boolean.FALSE ) ;
+            isNextCallValid.set( Boolean.FALSE ) ;
 
-	    // When servant_preinvoke returns null, the stub will
-	    // recursively re-invoke itself.  Thus, the next call made from 
-	    // the stub is another useLocalInvocation call.
-	    return false ;
-	}
+            // When servant_preinvoke returns null, the stub will
+            // recursively re-invoke itself.  Thus, the next call made from 
+            // the stub is another useLocalInvocation call.
+            return false ;
+        }
 
-	return true ;
+        return true ;
     }
 
     // The actual servant_preinvoke implementation, which must be 
     // overridden.  This method may throw exceptions 
     // which are handled by servant_preinvoke.
     protected ServantObject internalPreinvoke( 
-	org.omg.CORBA.Object self, String operation, 
-	Class expectedType ) throws OADestroyed 
+        org.omg.CORBA.Object self, String operation, 
+        Class expectedType ) throws OADestroyed 
     {
-	return null ;
+        return null ;
     }
 
     // This method is called when OADestroyed is caught.  This allows
     // subclasses to provide cleanup code if necessary.
     protected void cleanupAfterOADestroyed() 
     {
-	// Default is NO-OP
+        // Default is NO-OP
     }
 
     @InfoMethod
@@ -221,7 +221,7 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     // logic that is common to all POA based servant_preinvoke implementations.
     @Subcontract
     public ServantObject servant_preinvoke( org.omg.CORBA.Object self,
-	String operation, Class expectedType ) {
+        String operation, Class expectedType ) {
 
         long startTime = -1 ;
         long backoff = INITIAL_BACKOFF ;

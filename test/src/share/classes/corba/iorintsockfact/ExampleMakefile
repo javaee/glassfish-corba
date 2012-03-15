@@ -61,20 +61,20 @@ IDLJ_FLAGS=-fall -td $(CLASSPATH) -verbose
 ORBD=${JAVA_HOME}/bin/orbd -ORBInitialPort ${ORB_INITIAL_PORT}
 
 b:
-	$(IDLJ) $(IDLJ_FLAGS) iorintsockfact.idl
-	$(JAVAC) -g $(CLASSPATH)/$(PKGDIR)/*.java
-	$(JAVAC) -g -classpath $(CLASSPATH) *.java -d $(CLASSPATH)
+        $(IDLJ) $(IDLJ_FLAGS) iorintsockfact.idl
+        $(JAVAC) -g $(CLASSPATH)/$(PKGDIR)/*.java
+        $(JAVAC) -g -classpath $(CLASSPATH) *.java -d $(CLASSPATH)
 
 o:
-	$(ORBD)
+        $(ORBD)
 
 s:
-	$(JAVA) -classpath $(CLASSPATH) $(PACKAGE).Server \
-		-ORBInitialPort ${ORB_INITIAL_PORT}
+        $(JAVA) -classpath $(CLASSPATH) $(PACKAGE).Server \
+                -ORBInitialPort ${ORB_INITIAL_PORT}
 
 c:
-	$(JAVA) -classpath $(CLASSPATH) $(PACKAGE).Client \
-		-ORBInitialPort ${ORB_INITIAL_PORT}
+        $(JAVA) -classpath $(CLASSPATH) $(PACKAGE).Client \
+                -ORBInitialPort ${ORB_INITIAL_PORT}
 
 clean: 
-	rm -rf .classes/*
+        rm -rf .classes/*

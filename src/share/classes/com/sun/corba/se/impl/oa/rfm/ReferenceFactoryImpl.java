@@ -38,12 +38,12 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.oa.rfm;
+package com.sun.corba.ee.impl.oa.rfm;
 
 import org.omg.CORBA.LocalObject ;
 
-import com.sun.corba.se.spi.oa.rfm.ReferenceFactory ;
-import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
+import com.sun.corba.ee.spi.oa.rfm.ReferenceFactory ;
+import com.sun.corba.ee.spi.oa.rfm.ReferenceFactoryManager ;
 
 public class ReferenceFactoryImpl extends LocalObject implements ReferenceFactory
 {
@@ -52,26 +52,26 @@ public class ReferenceFactoryImpl extends LocalObject implements ReferenceFactor
     private String repositoryId ;
 
     public ReferenceFactoryImpl( ReferenceFactoryManagerImpl manager, 
-	String name, String repositoryId ) {
-	this.manager = manager ;
-	this.name = name ;
-	this.repositoryId = repositoryId ;
+        String name, String repositoryId ) {
+        this.manager = manager ;
+        this.name = name ;
+        this.repositoryId = repositoryId ;
     }
 
     public org.omg.CORBA.Object createReference( byte[] key ) {
-	return manager.createReference( name, key, repositoryId ) ;
+        return manager.createReference( name, key, repositoryId ) ;
     }
 
     public void destroy() {
-	manager.destroy( name ) ;
+        manager.destroy( name ) ;
     }
 
     public String toString()
     {
-	return "ReferenceFactoryImpl["
-	    + name
-	    + ", "
-	    + repositoryId
-	    + "]";
+        return "ReferenceFactoryImpl["
+            + name
+            + ", "
+            + repositoryId
+            + "]";
     }
 }

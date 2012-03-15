@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.oa.rfm ;
+package com.sun.corba.ee.spi.oa.rfm ;
 
 import java.util.Map ;
 import java.util.List ;
@@ -61,7 +61,7 @@ import org.omg.PortableServer.ServantLocator ;
  * from an ORB by calling resolve_initial_references( "ReferenceFactoryManager" ).
  * The ORB will have an instance of this available if it is started with the
  * property ORBConstants.USER_CONFIGURATOR_PREFIX +
- * "com.sun.corba.se.impl.oa.rfm.ReferenceManagerConfigurator" set to a value
+ * "com.sun.corba.ee.impl.oa.rfm.ReferenceManagerConfigurator" set to a value
  * (usually we use "1" as the value, but that does not matter).
  * This will cause the configurator to set up the ORB so that the 
  * ReferenceFactoryManager is available, so long as the configurator class
@@ -125,7 +125,7 @@ public interface ReferenceFactoryManager extends org.omg.CORBA.Object,
      * @param policies are the policies to be used to create the underlying POA.
      */
     public ReferenceFactory create( String name, String repositoryId, List<Policy> policies,
-	ServantLocator manager ) ;
+        ServantLocator manager ) ;
 
     /** Get the ReferenceFactory name from a String[] adapterName, if
      * adapterName is the name of a ReferenceFactory.  If not, return null.

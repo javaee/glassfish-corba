@@ -38,17 +38,17 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
 import java.util.Collection;
 
-import com.sun.corba.se.spi.ior.IORTemplate;
-import com.sun.corba.se.spi.ior.ObjectAdapterId;
+import com.sun.corba.ee.spi.ior.IORTemplate;
+import com.sun.corba.ee.spi.ior.ObjectAdapterId;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message ;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message ;
 //
 // REVISIT - impl/poa specific:
-import com.sun.corba.se.impl.oa.poa.Policies;
+import com.sun.corba.ee.impl.oa.poa.Policies;
 
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.ManagedAttribute ;
@@ -74,21 +74,21 @@ public interface TransportManager {
     public void close();
 
     public static final String SOCKET_OR_CHANNEL_CONNECTION_CACHE =
-	"SocketOrChannelConnectionCache";
+        "SocketOrChannelConnectionCache";
 
     @ManagedAttribute
     @Description( "List of all Acceptors in this ORB" ) 
     public Collection<Acceptor> getAcceptors() ;
 
     public Collection<Acceptor> getAcceptors(String objectAdapterManagerId,
-				   ObjectAdapterId objectAdapterId);
+                                   ObjectAdapterId objectAdapterId);
 
     // REVISIT - POA specific policies
     public void addToIORTemplate(IORTemplate iorTemplate, 
-				 Policies policies,
-				 String codebase,
-				 String objectAdapterManagerId,
-				 ObjectAdapterId objectAdapterId);
+                                 Policies policies,
+                                 String codebase,
+                                 String objectAdapterManagerId,
+                                 ObjectAdapterId objectAdapterId);
 
     // Methods for GIOP debugging support
 

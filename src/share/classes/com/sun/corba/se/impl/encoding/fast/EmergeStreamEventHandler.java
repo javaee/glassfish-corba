@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 public interface EmergeStreamEventHandler {
     /** Primitive event representing a null value.
@@ -81,81 +81,81 @@ public interface EmergeStreamEventHandler {
     public void doubleEvent( double value ) ;
 
     public void boolArrEvent(
-	LabelManager.Label selfLabel,
-	long offset,
-	long length,
-	boolean[] value ) ;
+        LabelManager.Label selfLabel,
+        long offset,
+        long length,
+        boolean[] value ) ;
 
     public void charArrEvent( 
-	LabelManager.Label selfLabel,
-	long offset,
-	long length,
-	char[] value ) ;
+        LabelManager.Label selfLabel,
+        long offset,
+        long length,
+        char[] value ) ;
 
     public void byteArrEvent( 
-	LabelManager.Label selfLabel,
-	long offset,
-	long length,
-	byte[] value ) ;
+        LabelManager.Label selfLabel,
+        long offset,
+        long length,
+        byte[] value ) ;
 
     public void shortArrEvent( 
-	LabelManager.Label selfLabel,
-	long offset,
-	long length,
-	short[] value ) ;
+        LabelManager.Label selfLabel,
+        long offset,
+        long length,
+        short[] value ) ;
 
     public void intArrEvent( 
-	LabelManager.Label selfLabel,
-	long offset,
-	long length,
-	int[] value ) ;
+        LabelManager.Label selfLabel,
+        long offset,
+        long length,
+        int[] value ) ;
 
     public void longArrEvent( 
-	LabelManager.Label selfLabel,
-	long offset,
-	long length,
-	long[] value ) ;
+        LabelManager.Label selfLabel,
+        long offset,
+        long length,
+        long[] value ) ;
 
     public void floatArrEvent( 
-	LabelManager.Label selfLabel,
-	long offset,
-	long length,
-	float[] value ) ;
+        LabelManager.Label selfLabel,
+        long offset,
+        long length,
+        float[] value ) ;
 
     public void doubleArrEvent( 
-	LabelManager.Label selfLabel,
-	long offset,
-	long length,
-	double[] value ) ;
+        LabelManager.Label selfLabel,
+        long offset,
+        long length,
+        double[] value ) ;
 
     public void refArrEvent( 
-	LabelManager.Label selfLabel,
-	LabelManager.Label typeLabel,
-	long offset,
-	long length,
-	LabelManager.Label[] value ) ;
+        LabelManager.Label selfLabel,
+        LabelManager.Label typeLabel,
+        long offset,
+        long length,
+        LabelManager.Label[] value ) ;
 
     /** A refEvent is followed by numParts simplePartEvents.
      */
     public void refEvent(
-	LabelManager.Label selfLabel,
-	long numParts ) ;
+        LabelManager.Label selfLabel,
+        long numParts ) ;
 
     /** A simplePartEvent is followed by length primitiveEvents.
      */
     public void simplePartEvent(
-	LabelManager.Label typeLabel,
-	long offset,
-	long length ) ;
+        LabelManager.Label typeLabel,
+        long offset,
+        long length ) ;
 
     /** A customPartEvent is followed by length primitiveEvents (as
      * in the simplePartEvent), then a tupleEvent (start),
      * a sequence of primitiveEvents, and a tupleEvent (finish).
      */
     public void customPartEvent(
-	LabelManager.Label typeLabel,
-	long offset,
-	long length ) ;
+        LabelManager.Label typeLabel,
+        long offset,
+        long length ) ;
 
     /** Represents the beginning of a tuple sequence.
      */
@@ -176,30 +176,30 @@ public interface EmergeStreamEventHandler {
     /** A label request message.
      */
     public void labelMessageRequestEvent(
-	LabelManager.Label label ) ;
+        LabelManager.Label label ) ;
 
     /** A successful reply to a label request message.
      * Followed by a refData event.
      */
     public void labelMessageReplyGoodEvent(
-	LabelManager.Label label ) ;
+        LabelManager.Label label ) ;
 
     /** A reply with error to a label request message.
      */
     public void labelMessageReplyBadEvent(
-	LabelManager.Label label,
-	long reasonCodeCategory,
-	long reasonCodeMinorCode ) ;
+        LabelManager.Label label,
+        long reasonCodeCategory,
+        long reasonCodeMinorCode ) ;
 
     public void closeSessionMessageEvent(
-	long sessionId ) ;
+        long sessionId ) ;
 
     public void rejectRequestMessageEvent(
-	long reasonCodeCategory,
-	long reasonCodeMinorCode ) ;
+        long reasonCodeCategory,
+        long reasonCodeMinorCode ) ;
 
     public void fiberListMessageEvent(
-	long[] fibers ) ;
+        long[] fibers ) ;
 
     /** Represents a data message transferring some number
      * of arguments.  Sequence:
@@ -212,16 +212,16 @@ public interface EmergeStreamEventHandler {
      * <LI>MessageEvent (end)
      */
     public void messageStartEvent(
-	long requestId,
-	long sessionId,
-	long fiberId,
-	long numArgs ) ;
+        long requestId,
+        long sessionId,
+        long fiberId,
+        long numArgs ) ;
 
     public void messageEndEvent(
-	long requestId,
-	long sessionId,
-	long fiberId,
-	long numArgs ) ;
+        long requestId,
+        long sessionId,
+        long fiberId,
+        long numArgs ) ;
 }
 
 

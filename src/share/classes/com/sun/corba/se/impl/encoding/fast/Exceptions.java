@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding.fast;
+package com.sun.corba.ee.impl.encoding.fast;
 
-import com.sun.corba.se.spi.logex.stdcorba.StandardLogger;
+import com.sun.corba.ee.spi.logex.stdcorba.StandardLogger;
 import java.io.InvalidClassException;
 import java.lang.reflect.Field;
 import org.glassfish.pfl.basic.logex.Chain;

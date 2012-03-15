@@ -62,7 +62,7 @@ public final class INVALID_TRANSACTION extends SystemException {
      * of 0 and a completion state of COMPLETED_NO.
      */
     public INVALID_TRANSACTION() {
-	this("");
+        this("");
     }
 
     /**

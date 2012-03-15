@@ -38,15 +38,15 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextDefaults;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ObjectKeyCacheEntry;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 /**
  * This implements the GIOP 1.1 Request header.
@@ -78,7 +78,7 @@ public final class RequestMessage_1_1 extends Message_1_1
 
     RequestMessage_1_1(ORB orb) {
         this.orb = orb;
-	this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
+        this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
     }
 
     @SuppressWarnings({"deprecation"})
@@ -122,11 +122,11 @@ public final class RequestMessage_1_1 extends Message_1_1
 
     public ObjectKeyCacheEntry getObjectKeyCacheEntry() {
         if (this.entry == null) {
-	    // this will raise a MARSHAL exception upon errors.
-	    this.entry = orb.extractObjectKeyCacheEntry(object_key);
+            // this will raise a MARSHAL exception upon errors.
+            this.entry = orb.extractObjectKeyCacheEntry(object_key);
         }
 
-	return this.entry;
+        return this.entry;
     }
 
     public String getOperation() {
@@ -145,7 +145,7 @@ public final class RequestMessage_1_1 extends Message_1_1
         super.read(istream);
         this.service_contexts 
             = ServiceContextDefaults.makeServiceContexts(
-		(org.omg.CORBA_2_3.portable.InputStream) istream);
+                (org.omg.CORBA_2_3.portable.InputStream) istream);
         this.request_id = istream.read_ulong();
         this.response_expected = istream.read_boolean();
         this.reserved = new byte[3];
@@ -162,14 +162,14 @@ public final class RequestMessage_1_1 extends Message_1_1
     public void write(org.omg.CORBA.portable.OutputStream ostream) 
     {
         super.write(ostream);
-	service_contexts.write(
-	    (org.omg.CORBA_2_3.portable.OutputStream) ostream,
-	    GIOPVersion.V1_1);
+        service_contexts.write(
+            (org.omg.CORBA_2_3.portable.OutputStream) ostream,
+            GIOPVersion.V1_1);
         ostream.write_ulong(this.request_id);
         ostream.write_boolean(this.response_expected);
         nullCheck(this.reserved);
         if (this.reserved.length != (3)) {
-	    throw wrapper.badReservedLength( );
+            throw wrapper.badReservedLength( );
         }
         for (int _i0 = 0;_i0 < (3); ++_i0) {
             ostream.write_octet(this.reserved[_i0]);

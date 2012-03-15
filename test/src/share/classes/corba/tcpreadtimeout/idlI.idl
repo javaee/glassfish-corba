@@ -42,11 +42,11 @@ module corba
     module tcpreadtimeout
     {
         interface idlI
-	{
-	    string o(in string x);
+        {
+            string o(in string x);
 
-	    string return_after_client_gives_up(in string x);
-	};
+            string return_after_client_gives_up(in string x);
+        };
     };
 };
 
@@ -56,11 +56,11 @@ module corba
     module tcpreadtimeout
     {
         interface idlI
-	{
-	    string o(in string x);
+        {
+            string o(in string x);
 
-	    string return_after_client_gives_up(in string x);
-	};
+            string return_after_client_gives_up(in string x);
+        };
     };
 };
 

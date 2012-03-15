@@ -40,7 +40,7 @@
 
 package pi.serverrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.CORBA.*;
 
@@ -151,7 +151,7 @@ public class ForwardReferenceStrategy
 
     public void send_exception (
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
-	throws ForwardRequest
+        throws ForwardRequest
     {
         super.send_exception( interceptor, ri );
 
@@ -174,7 +174,7 @@ public class ForwardReferenceStrategy
 
     public void send_other (
         SampleServerRequestInterceptor interceptor, ServerRequestInfo ri)
-	throws ForwardRequest
+        throws ForwardRequest
     {
         super.send_other( interceptor, ri );
 

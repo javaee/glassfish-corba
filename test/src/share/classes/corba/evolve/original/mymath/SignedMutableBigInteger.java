@@ -39,7 +39,7 @@
  */
 
 /*
- * @(#)SignedMutableBigInteger.java	1.10 05/11/17
+ * @(#)SignedMutableBigInteger.java     1.10 05/11/17
  */
 
 package mymath;

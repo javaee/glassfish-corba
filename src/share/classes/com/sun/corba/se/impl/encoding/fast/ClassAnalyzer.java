@@ -38,14 +38,14 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 import java.lang.reflect.InvocationTargetException ;
 import java.io.ObjectInputStream ;
 import java.io.ObjectOutputStream ;
 import java.io.IOException ;
 
-import com.sun.corba.se.impl.io.ObjectStreamField ;
+import com.sun.corba.ee.impl.io.ObjectStreamField ;
 
 /** Analyze a class to determine its structure for serialization.
  * The results of this class are INDEPENDENT of the serialization algorithm.
@@ -70,8 +70,8 @@ public interface ClassAnalyzer<T> {
     /**
      * The name of the class described by this descriptor.
      *
-     * @return	a <code>String</code> representing the fully qualified name of
-     * 		the class
+     * @return  a <code>String</code> representing the fully qualified name of
+     *          the class
      */
     public String getName() ;
 
@@ -79,8 +79,8 @@ public interface ClassAnalyzer<T> {
      * The name of the class described by this descriptor as a char[] 
      * instead of a String.
      *
-     * @return	a <code>String</code> representing the fully qualified name of
-     * 		the class
+     * @return  a <code>String</code> representing the fully qualified name of
+     *          the class
      */
     public char[] getNameAsCharArray() ;
 
@@ -88,7 +88,7 @@ public interface ClassAnalyzer<T> {
      * Return the class in the local VM that this version is mapped to.  Null
      * is returned if there is no corresponding local class.
      *
-     * @return	the <code>Class</code> instance that this descriptor represents
+     * @return  the <code>Class</code> instance that this descriptor represents
      */
     public Class<T> forClass() ;
     
@@ -158,7 +158,7 @@ public interface ClassAnalyzer<T> {
      * non-serializable or does not define writeObject.
      */
     public void invokeWriteObject(Object obj, ObjectOutputStream out)
-	throws IOException, UnsupportedOperationException ;
+        throws IOException, UnsupportedOperationException ;
 
     /**
      * Returns true if represented class is serializable (but not
@@ -174,8 +174,8 @@ public interface ClassAnalyzer<T> {
      * non-serializable or does not define readObject.
      */
     void invokeReadObject(Object obj, ObjectInputStream in)
-	throws ClassNotFoundException, IOException, 
-	       UnsupportedOperationException ;
+        throws ClassNotFoundException, IOException, 
+               UnsupportedOperationException ;
 
     /**
      * Returns true if represented class is serializable (but not
@@ -191,7 +191,7 @@ public interface ClassAnalyzer<T> {
      * non-serializable or does not define readObjectNoData.
      */
     public void invokeReadObjectNoData(Object obj)
-	throws IOException, UnsupportedOperationException ;
+        throws IOException, UnsupportedOperationException ;
 
     /**
      * Returns true if represented class is serializable or externalizable and
@@ -206,7 +206,7 @@ public interface ClassAnalyzer<T> {
      * non-serializable or does not define writeReplace.
      */
     public Object invokeWriteReplace(Object obj)
-	throws IOException, UnsupportedOperationException ;
+        throws IOException, UnsupportedOperationException ;
 
     /**
      * Returns true if represented class is serializable or externalizable and
@@ -221,6 +221,6 @@ public interface ClassAnalyzer<T> {
      * non-serializable or does not define readResolve.
      */
     Object invokeReadResolve(Object obj)
-	throws IOException, UnsupportedOperationException ;
+        throws IOException, UnsupportedOperationException ;
 }
 

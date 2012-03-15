@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.misc;
+package com.sun.corba.ee.impl.misc;
 
 import org.omg.CORBA.ORB;
 import java.io.Serializable;

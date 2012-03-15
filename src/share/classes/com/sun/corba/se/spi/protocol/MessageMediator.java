@@ -38,36 +38,36 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.protocol;
+package com.sun.corba.ee.spi.protocol;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.Connection;
 import java.nio.ByteBuffer;
 
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.portable.ResponseHandler;
 import org.omg.CORBA_2_3.portable.InputStream;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.orb.ObjectKeyCacheEntry;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.spi.transport.ContactInfo;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.LocateReplyMessage;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.LocateReplyOrReplyMessage;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateReplyMessage;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateReplyOrReplyMessage;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.RequestMessage;
 
 /**
  * @author Harold Carr
  */
 public abstract interface MessageMediator
     extends
-	ResponseHandler
+        ResponseHandler
 {
     public void setReplyHeader(LocateReplyOrReplyMessage header);
     public LocateReplyMessage getLocateReplyHeader();
@@ -101,7 +101,7 @@ public abstract interface MessageMediator
     public void setDIIInfo(org.omg.CORBA.Request request);
     public boolean isDIIRequest();
     public Exception unmarshalDIIUserException(String repoId,
-					       InputStream inputStream);
+                                               InputStream inputStream);
     public void setDIIException(Exception exception);
     public void handleDIIReply(InputStream inputStream);
 

@@ -56,14 +56,14 @@ public class ClientRequestInfoTest
     Controller orbd;
 
     public static String[] rmicClasses = {
-	"pi.clientrequestinfo.helloRMIIIOP"
+        "pi.clientrequestinfo.helloRMIIIOP"
     };
 
     protected void doTest() 
         throws Throwable 
     {
         startORBD();
-	System.out.println();
+        System.out.println();
         System.out.println( "      \t\t\t\tLocal\t\tRemote" );
 
         beginTest( "[POA]\t\t\t" );
@@ -101,158 +101,158 @@ public class ClientRequestInfoTest
     private void testPOALocal() 
         throws Throwable
     {
-	Controller client;
+        Controller client;
 
-	try {
-	    // Start only a client - the client will create the server.
-	    client = createClient( 
-		"pi.clientrequestinfo.POALocalClient",
-	        "poalocal" );
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, null );
-	    client.stop();
-	}
-	finally {
-	}
+        try {
+            // Start only a client - the client will create the server.
+            client = createClient( 
+                "pi.clientrequestinfo.POALocalClient",
+                "poalocal" );
+            client.start();
+            client.waitFor();
+            printEndTest( client, null );
+            client.stop();
+        }
+        finally {
+        }
     }
 
     private void testPOARemote()
-	throws Throwable
+        throws Throwable
     {
-	Controller client, server;
+        Controller client, server;
 
-	try {
-	    server = createServer( "pi.clientrequestinfo.POAServer",
-					      "poa-server" );
-	    server.start();
-	    client = createClient( "pi.clientrequestinfo.POAClient",
-					      "poa-client" );
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
-	    server.stop();
-	}
-	finally {
-	}
+        try {
+            server = createServer( "pi.clientrequestinfo.POAServer",
+                                              "poa-server" );
+            server.start();
+            client = createClient( "pi.clientrequestinfo.POAClient",
+                                              "poa-client" );
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testPOADIILocal() 
-	throws Throwable
+        throws Throwable
     {
-	Controller client;
+        Controller client;
 
-	try {
-	    // Start only a client - the client will create the server.
-	    client = createClient( "pi.clientrequestinfo.DIIPOALocalClient",
-					      "diipoalocal" );
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, null );
-	    client.stop();
-	}
-	finally {
-	}
+        try {
+            // Start only a client - the client will create the server.
+            client = createClient( "pi.clientrequestinfo.DIIPOALocalClient",
+                                              "diipoalocal" );
+            client.start();
+            client.waitFor();
+            printEndTest( client, null );
+            client.stop();
+        }
+        finally {
+        }
     }
 
     private void testPOADIIRemote()
-	throws Throwable
+        throws Throwable
     {
-	Controller client, server;
+        Controller client, server;
 
-	try {
-	    server = createServer( "pi.clientrequestinfo.POAServer",
-					      "dii-poa-server" );
-	    server.start();
-	    client = createClient( "pi.clientrequestinfo.DIIPOAClient",
-					      "dii-poa-client" );
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
-	    server.stop();
-	}
-	finally {
-	}
+        try {
+            server = createServer( "pi.clientrequestinfo.POAServer",
+                                              "dii-poa-server" );
+            server.start();
+            client = createClient( "pi.clientrequestinfo.DIIPOAClient",
+                                              "dii-poa-client" );
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testRMILocal()
-	throws Throwable
+        throws Throwable
     {
-	Controller client;
+        Controller client;
 
-	try {
-	    // Start only a client - the client will create the server.
-	    client = createClient( "pi.clientrequestinfo.RMILocalClient",
-				   "rmilocal" );
+        try {
+            // Start only a client - the client will create the server.
+            client = createClient( "pi.clientrequestinfo.RMILocalClient",
+                                   "rmilocal" );
             client.start();
-	    client.waitFor();
-	    printEndTest( client, null );
-	    client.stop();
-	}
-	finally {
-	}
+            client.waitFor();
+            printEndTest( client, null );
+            client.stop();
+        }
+        finally {
+        }
     }
 
     private void testRMIRemote()
-	throws Throwable
+        throws Throwable
     {
-	Controller client, server;
+        Controller client, server;
 
-	try {
-	    server = createServer( "pi.clientrequestinfo.RMIServer",
-				   "rmi-server" );
-	    server.start();
-	    client = createClient( "pi.clientrequestinfo.RMIClient",
-				   "rmi-client" );
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
-	    server.stop();
-	}
-	finally {
-	}
+        try {
+            server = createServer( "pi.clientrequestinfo.RMIServer",
+                                   "rmi-server" );
+            server.start();
+            client = createClient( "pi.clientrequestinfo.RMIClient",
+                                   "rmi-client" );
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testClientDelegateDIILocal()
-	throws Throwable
+        throws Throwable
     {
-	Controller client;
+        Controller client;
 
-	try {
-	    // Start only a client - the client will create the server.
-	    client = createClient( "pi.clientrequestinfo.DIIRMILocalClient",
-				   "diirmilocal" );
+        try {
+            // Start only a client - the client will create the server.
+            client = createClient( "pi.clientrequestinfo.DIIRMILocalClient",
+                                   "diirmilocal" );
             client.start();
-	    client.waitFor();
-	    printEndTest( client, null );
-	    client.stop();
-	}
-	finally {
-	}
+            client.waitFor();
+            printEndTest( client, null );
+            client.stop();
+        }
+        finally {
+        }
     }
 
     private void testClientDelegateDIIRemote()
-	throws Throwable
+        throws Throwable
     {
-	Controller client, server;
+        Controller client, server;
 
-	try {
-	    server = createServer( "pi.clientrequestinfo.OldRMIServer",
-				   "dii-rmi-server" );
-	    server.start();
-	    client = createClient( "pi.clientrequestinfo.DIIPOAClient",
-				   "dii-rmi-client" );
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
-	    server.stop();
-	}
-	finally {
-	}
+        try {
+            server = createServer( "pi.clientrequestinfo.OldRMIServer",
+                                   "dii-rmi-server" );
+            server.start();
+            client = createClient( "pi.clientrequestinfo.DIIPOAClient",
+                                   "dii-rmi-client" );
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void beginTest( String name )
@@ -283,29 +283,29 @@ public class ClientRequestInfoTest
 
 
     private void printEndTest( Controller client, Controller server ) 
-	throws Throwable
+        throws Throwable
     {
-	if( (server != null) && server.finished() ) {
-	    System.out.print( "FAILED, Server crashed" );
-	    failed = true;
-	}
-	else if( client.exitValue() != Controller.SUCCESS ) {
-	    System.out.print( "FAILED, Client exit value = " + 
-		client.exitValue() );
-	    failed = true;
-	}
-	else {
-	    System.out.print( "PASSED" );
-	}
+        if( (server != null) && server.finished() ) {
+            System.out.print( "FAILED, Server crashed" );
+            failed = true;
+        }
+        else if( client.exitValue() != Controller.SUCCESS ) {
+            System.out.print( "FAILED, Client exit value = " + 
+                client.exitValue() );
+            failed = true;
+        }
+        else {
+            System.out.print( "PASSED" );
+        }
     }
 
     // Pause a little to allow all processes to fully terminate.
     private void pause() {
-	try {
-	    Thread.sleep( 2000 );
-	}
-	catch( InterruptedException e ) {
-	    // ignore.
-	}
+        try {
+            Thread.sleep( 2000 );
+        }
+        catch( InterruptedException e ) {
+            // ignore.
+        }
     }
 }

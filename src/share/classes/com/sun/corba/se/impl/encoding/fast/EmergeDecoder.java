@@ -37,11 +37,11 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 import java.io.PrintStream ;
 
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.Reader ;
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.Reader ;
 import org.glassfish.pfl.basic.algorithm.Printer;
 
 /** This class provides a means of decoding the data in an emerge stream, 
@@ -390,7 +390,7 @@ public class EmergeDecoder {
     }
 
     public EmergeDecoder( PrintStream ps, Reader reader ) {
-	EmergeStreamParser parser = new EmergeStreamParser( reader ) ;
-	parser.parse( makeHandler( ps ) ) ;
+        EmergeStreamParser parser = new EmergeStreamParser( reader ) ;
+        parser.parse( makeHandler( ps ) ) ;
     }
 }

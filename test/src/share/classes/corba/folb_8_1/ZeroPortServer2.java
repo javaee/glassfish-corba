@@ -48,9 +48,9 @@ public class ZeroPortServer2
 {
     public static void main(String[] av)
     {
-	ZeroPortServer1.serverName = Common.zero2;
-	ZeroPortServer1.socketPorts = Common.zero2Ports;
-	ZeroPortServer1.main(av);
+        ZeroPortServer1.serverName = Common.zero2;
+        ZeroPortServer1.socketPorts = Common.zero2Ports;
+        ZeroPortServer1.main(av);
     }
 }
 

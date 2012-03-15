@@ -44,10 +44,10 @@ import java.net.Socket;
 import java.util.Properties;
 import java.rmi.RemoteException ;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.transport.Acceptor;
-import com.sun.corba.se.spi.transport.TransportDefault;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.transport.Acceptor;
+import com.sun.corba.ee.spi.transport.TransportDefault;
 import org.glassfish.pfl.basic.func.UnaryVoidFunction;
 
 import org.testng.Assert ;
@@ -88,16 +88,16 @@ public class NewAcceptorClient extends Framework {
     }
 
     private Echo makeServant( String name ) {
-	try {
-	    return new EchoImpl( name ) ;
-	} catch (RemoteException rex) {
-	    Assert.fail( "Unexpected remote exception " + rex ) ;
-	    return null ; // never reached
-	}
+        try {
+            return new EchoImpl( name ) ;
+        } catch (RemoteException rex) {
+            Assert.fail( "Unexpected remote exception " + rex ) ;
+            return null ; // never reached
+        }
     }
 
     private void msg( String msg ) {
-	System.out.println( "NewAcceptorClient: " + msg ) ;
+        System.out.println( "NewAcceptorClient: " + msg ) ;
     }
 
     private static final int ITERATIONS = 10 ;
@@ -119,7 +119,7 @@ public class NewAcceptorClient extends Framework {
     }
 
     public static void main( String[] args ) {
-	Class[] classes = { NewAcceptorClient.class } ;
-	Framework.run( "gen/corba/simpledynamic/test-output", classes ) ;
+        Class[] classes = { NewAcceptorClient.class } ;
+        Framework.run( "gen/corba/simpledynamic/test-output", classes ) ;
     }
 }

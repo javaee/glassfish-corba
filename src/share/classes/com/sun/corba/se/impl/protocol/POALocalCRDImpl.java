@@ -38,44 +38,44 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
 import org.omg.CORBA.portable.ServantObject;
 
-import com.sun.corba.se.spi.oa.ObjectAdapter;
-import com.sun.corba.se.spi.oa.OAInvocationInfo ;
-import com.sun.corba.se.spi.oa.OADestroyed;
+import com.sun.corba.ee.spi.oa.ObjectAdapter;
+import com.sun.corba.ee.spi.oa.OAInvocationInfo ;
+import com.sun.corba.ee.spi.oa.OADestroyed;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.trace.Subcontract;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.trace.Subcontract;
 
 @Subcontract
 public class POALocalCRDImpl extends LocalClientRequestDispatcherBase {
 
     public POALocalCRDImpl( ORB orb, int scid, IOR ior) {
-	super( orb, scid, ior );
+        super( orb, scid, ior );
     }
 
     @Subcontract
     private OAInvocationInfo servantEnter( ObjectAdapter oa ) throws OADestroyed {
-	oa.enter() ;
+        oa.enter() ;
 
-	OAInvocationInfo info = oa.makeInvocationInfo( objectId ) ;
-	orb.pushInvocationInfo( info ) ;
+        OAInvocationInfo info = oa.makeInvocationInfo( objectId ) ;
+        orb.pushInvocationInfo( info ) ;
 
-	return info ;
+        return info ;
     }
 
     @Subcontract
     private void servantExit( ObjectAdapter oa ) {
-	try {
-	    oa.returnServant();
-	} finally {
-	    oa.exit() ;
-	    orb.popInvocationInfo() ; 
-	}
+        try {
+            oa.returnServant();
+        } finally {
+            oa.exit() ;
+            orb.popInvocationInfo() ; 
+        }
     }
 
     // Look up the servant for this request and return it in a 
@@ -90,7 +90,7 @@ public class POALocalCRDImpl extends LocalClientRequestDispatcherBase {
     public ServantObject internalPreinvoke( org.omg.CORBA.Object self,
         String operation, Class expectedType) throws OADestroyed {
 
-	ObjectAdapter oa = null ;
+        ObjectAdapter oa = null ;
 
         oa = oaf.find( oaid ) ;
 
@@ -122,7 +122,7 @@ public class POALocalCRDImpl extends LocalClientRequestDispatcherBase {
                                    ServantObject servantobj) 
     {
         ObjectAdapter oa = orb.peekInvocationInfo().oa() ; 
-	servantExit( oa ) ;	
+        servantExit( oa ) ;     
     }
 }
 

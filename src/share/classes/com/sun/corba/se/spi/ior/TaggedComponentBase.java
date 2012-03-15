@@ -38,13 +38,13 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior;
+package com.sun.corba.ee.spi.ior;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
 
-import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
+import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 
 /** Base class to use for implementing TaggedComponents.  It implements
@@ -55,12 +55,12 @@ public abstract class TaggedComponentBase extends IdentifiableBase
     implements TaggedComponent 
 {
     public org.omg.IOP.TaggedComponent getIOPComponent( 
-	org.omg.CORBA.ORB orb )
+        org.omg.CORBA.ORB orb )
     {
-	EncapsOutputStream os = new EncapsOutputStream( (ORB)orb ) ;
-	os.write_ulong( getId() ) ; // Fix for 6158378
-	write( os ) ;
-	InputStream is = (InputStream)(os.create_input_stream() ) ;
-	return org.omg.IOP.TaggedComponentHelper.read( is ) ;
+        EncapsOutputStream os = new EncapsOutputStream( (ORB)orb ) ;
+        os.write_ulong( getId() ) ; // Fix for 6158378
+        write( os ) ;
+        InputStream is = (InputStream)(os.create_input_stream() ) ;
+        return org.omg.IOP.TaggedComponentHelper.read( is ) ;
     }
 }

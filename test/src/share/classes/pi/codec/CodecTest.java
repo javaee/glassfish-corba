@@ -50,7 +50,7 @@ import java.util.*;
 public class CodecTest extends CORBATest
 {
     protected void doTest() 
-	throws Throwable
+        throws Throwable
     {
         Controller orbd = createORBD();
 

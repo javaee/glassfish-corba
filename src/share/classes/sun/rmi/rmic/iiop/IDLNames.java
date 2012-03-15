@@ -55,38 +55,38 @@ import sun.tools.java.Identifier;
 import sun.tools.java.CompilerError;
 import sun.tools.java.ClassDefinition;
 import sun.tools.java.ClassNotFound;
-import com.sun.corba.se.impl.util.RepositoryId;
+import com.sun.corba.ee.impl.util.RepositoryId;
 
 /**
  * IDLNames provides static utility methods to perform the IDL
  * name mappings specified in Chapter 5 of the Java Language
  * to IDL specification.
  *
- * @version	1.0, 3/19/98
- * @author	Bryan Atsatt
+ * @version     1.0, 3/19/98
+ * @author      Bryan Atsatt
  */
 public class IDLNames implements sun.rmi.rmic.iiop.Constants {
-	
+        
     /**
      * Used to convert ascii to hex.
      */
-    public static final byte ASCII_HEX[] =	{
-	(byte)'0',
-	(byte)'1',
-	(byte)'2',
-	(byte)'3',
-	(byte)'4',
-	(byte)'5',
-	(byte)'6',
-	(byte)'7',
-	(byte)'8',
-	(byte)'9',
-	(byte)'A',
-	(byte)'B',
-	(byte)'C',
-	(byte)'D',
-	(byte)'E',
-	(byte)'F',
+    public static final byte ASCII_HEX[] =      {
+        (byte)'0',
+        (byte)'1',
+        (byte)'2',
+        (byte)'3',
+        (byte)'4',
+        (byte)'5',
+        (byte)'6',
+        (byte)'7',
+        (byte)'8',
+        (byte)'9',
+        (byte)'A',
+        (byte)'B',
+        (byte)'C',
+        (byte)'D',
+        (byte)'E',
+        (byte)'F',
     };
     
     //_____________________________________________________________________
@@ -113,32 +113,32 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
         String result = (String) env.namesCache.get(name);
 
         if (result == null) {
-        	
-	    // 28.3.2.7 Case sensitive member names.
-        	
-	    // Note:    This must be done before any of
-	    //          the other conversions!
+                
+            // 28.3.2.7 Case sensitive member names.
+                
+            // Note:    This must be done before any of
+            //          the other conversions!
         
-	    result = nameContext.get(name);
+            result = nameContext.get(name);
             
-	    // 28.3.2.3 Leading underscores...
-        	
-	    result = convertLeadingUnderscores(result);
+            // 28.3.2.3 Leading underscores...
+                
+            result = convertLeadingUnderscores(result);
   
-	    // 28.3.2.2 IDL keywords (NOTE: must be done
-	    // after leading underscore conversion because
-	    // the mangling for IDL keywords creates a
-	    // leading underscore!)...
-        	
+            // 28.3.2.2 IDL keywords (NOTE: must be done
+            // after leading underscore conversion because
+            // the mangling for IDL keywords creates a
+            // leading underscore!)...
+                
             result = convertIDLKeywords(result);
-        	
-	    // 28.3.2.4 Illegal IDL identifier characters...
-        	
-	    result = convertToISOLatin1(result);
-        	
-	    // Add to namesCache...
-        	
-	    env.namesCache.put(name,result);
+                
+            // 28.3.2.4 Illegal IDL identifier characters...
+                
+            result = convertToISOLatin1(result);
+                
+            // Add to namesCache...
+                
+            env.namesCache.put(name,result);
         }
         
         return result;
@@ -180,23 +180,23 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
                 // Convert the character into the IDL escape syntax...
                
                 buffer.append("U");
-		buffer.append((char)ASCII_HEX[(c & 0xF000) >>> 12]);
-		buffer.append((char)ASCII_HEX[(c & 0x0F00) >>> 8]);
-		buffer.append((char)ASCII_HEX[(c & 0x00F0) >>> 4]);
-		buffer.append((char)ASCII_HEX[(c & 0x000F)]);
-        		
+                buffer.append((char)ASCII_HEX[(c & 0xF000) >>> 12]);
+                buffer.append((char)ASCII_HEX[(c & 0x0F00) >>> 8]);
+                buffer.append((char)ASCII_HEX[(c & 0x00F0) >>> 4]);
+                buffer.append((char)ASCII_HEX[(c & 0x000F)]);
+                        
             } else {
                 if (buffer != null) {
                     buffer.append(c);
                 }
             }
-    	}
-    	
-    	if (buffer != null) {
-    	    result = buffer.toString();
-    	}
+        }
+        
+        if (buffer != null) {
+            result = buffer.toString();
+        }
  
-    	return result;
+        return result;
     }
     
     /**
@@ -205,16 +205,16 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
      * Section 28.3.2.5
      */
     public static String convertIDLKeywords (String name) {
-    	
-    	for (int i = 0; i < IDL_KEYWORDS.length; i++) {
-    	    if (name.equalsIgnoreCase(IDL_KEYWORDS[i])) {
-    	        return "_" + name;
-    	    }
-    	}
-    	
-    	return name;
+        
+        for (int i = 0; i < IDL_KEYWORDS.length; i++) {
+            if (name.equalsIgnoreCase(IDL_KEYWORDS[i])) {
+                return "_" + name;
+            }
+        }
+        
+        return name;
     }
-	
+        
     /**
      * Convert names which have leading underscores
      * <p>
@@ -222,11 +222,11 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
      */
     public static String convertLeadingUnderscores (String name) {
         
-    	if (name.startsWith("_")) {
-    	    return "J" + name;       
-    	}
-    	
-    	return name;
+        if (name.startsWith("_")) {
+            return "J" + name;       
+        }
+        
+        return name;
     }
     
     /**
@@ -239,46 +239,46 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
     public static String getClassOrInterfaceName (Identifier id,
                                                   BatchEnvironment env) throws Exception {
         
-    	// Get the type and package name...
-    	
-    	String typeName = id.getName().toString();
-    	String packageName = null;
+        // Get the type and package name...
+        
+        String typeName = id.getName().toString();
+        String packageName = null;
 
-    	if (id.isQualified()) {
-	    packageName = id.getQualifier().toString();
-    	}
-    	
+        if (id.isQualified()) {
+            packageName = id.getQualifier().toString();
+        }
+        
         // Check namesCache...
         
         String result = (String) env.namesCache.get(typeName);
 
         if (result == null) {
-        	
-	    // 28.3.2.5 Inner classes...
+                
+            // 28.3.2.5 Inner classes...
 
-	    result = replace(typeName,". ","__");
+            result = replace(typeName,". ","__");
  
-	    // 28.3.2.4 Illegal identifier characters...
-        	
-	    result = convertToISOLatin1(result);
-        	
-	    // 28.3.2.7 Case sensitive class or interface names...
-        	
-	    NameContext context = NameContext.forName(packageName,false,env);
-	    context.assertPut(result);
-        	
-	    // Run it through the name checks...
-        	
-	    result = getTypeOrModuleName(result);
-        	
-	    // Add it to the namesCache...
-        	
-	    env.namesCache.put(typeName,result);
+            // 28.3.2.4 Illegal identifier characters...
+                
+            result = convertToISOLatin1(result);
+                
+            // 28.3.2.7 Case sensitive class or interface names...
+                
+            NameContext context = NameContext.forName(packageName,false,env);
+            context.assertPut(result);
+                
+            // Run it through the name checks...
+                
+            result = getTypeOrModuleName(result);
+                
+            // Add it to the namesCache...
+                
+            env.namesCache.put(typeName,result);
         }
         
         return result;
     }
-    	
+        
     /**
      * Convert an Exception name.
      * <p>
@@ -286,21 +286,21 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
      */
     public static String getExceptionName (String idlName) {
  
-    	String result = idlName;
+        String result = idlName;
 // d.11315 Incorrectly mangled exception names
-	if (idlName.endsWith(EXCEPTION_SUFFIX)) {
+        if (idlName.endsWith(EXCEPTION_SUFFIX)) {
 
-	    // Remove "Exception" and append "Ex". Strip leading underscore
-	    // in case the idlName is exactly "_Exception"...
+            // Remove "Exception" and append "Ex". Strip leading underscore
+            // in case the idlName is exactly "_Exception"...
 
-	    result = stripLeadingUnderscore(idlName.substring(0,idlName.lastIndexOf(EXCEPTION_SUFFIX)) + EX_SUFFIX);
-    	} else {
+            result = stripLeadingUnderscore(idlName.substring(0,idlName.lastIndexOf(EXCEPTION_SUFFIX)) + EX_SUFFIX);
+        } else {
             result = idlName + EX_SUFFIX;
         }
         
         return result;
     }
-	
+        
     /**
      * Convert a qualified Identifier into an array of IDL names.
      * <p>
@@ -308,39 +308,39 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
      * Throws exception if fails 28.3.2.7.
      */
     public static String[] getModuleNames (Identifier theID, 
-					   boolean boxIt,
-					   BatchEnvironment env) throws Exception {
-		
-	String[] result = null;
-		
-	if (theID.isQualified()) {
-		    
-	    // Extract the qualifier...
-		    
-	    Identifier id = theID.getQualifier();
-		    		    
-	    // 28.3.2.7 Case sensitive module names.
-        	
-	    env.modulesContext.assertPut(id.toString());
-		    
-	    // Count them...
-    		
-	    int count = 1;
-	    Identifier current = id;
-	    while (current.isQualified()) {
-		current = current.getQualifier();
-		count++;
-	    }
-    		
-	    result = new String[count];
-	    int index = count-1;
-	    current = id;
-    		
-	    // Now walk them and fill our array (backwards)...
-    		
-	    for (int i = 0; i < count; i++) {
-    		    
-		String item = current.getName().toString();
+                                           boolean boxIt,
+                                           BatchEnvironment env) throws Exception {
+                
+        String[] result = null;
+                
+        if (theID.isQualified()) {
+                    
+            // Extract the qualifier...
+                    
+            Identifier id = theID.getQualifier();
+                                    
+            // 28.3.2.7 Case sensitive module names.
+                
+            env.modulesContext.assertPut(id.toString());
+                    
+            // Count them...
+                
+            int count = 1;
+            Identifier current = id;
+            while (current.isQualified()) {
+                current = current.getQualifier();
+                count++;
+            }
+                
+            result = new String[count];
+            int index = count-1;
+            current = id;
+                
+            // Now walk them and fill our array (backwards)...
+                
+            for (int i = 0; i < count; i++) {
+                    
+                String item = current.getName().toString();
  
                 // Check namesCache...
                 
@@ -348,36 +348,36 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
 
                 if (cachedItem == null) {
          
-		    // 28.3.2.4 Illegal identifier characters...
-                	
-		    cachedItem = convertToISOLatin1(item);
-                	
-		    // Run it through the name checks...
-                	
-		    cachedItem = getTypeOrModuleName(cachedItem);
-                	
-		    // Add it to the namesCache...
-                	
-		    env.namesCache.put(item,cachedItem);
+                    // 28.3.2.4 Illegal identifier characters...
+                        
+                    cachedItem = convertToISOLatin1(item);
+                        
+                    // Run it through the name checks...
+                        
+                    cachedItem = getTypeOrModuleName(cachedItem);
+                        
+                    // Add it to the namesCache...
+                        
+                    env.namesCache.put(item,cachedItem);
                 }
 
-		result[index--] = cachedItem;
-		current = current.getQualifier();
-	    }
+                result[index--] = cachedItem;
+                current = current.getQualifier();
+            }
         }
  
-		
-	// If it is supposed to be "boxed", prepend
-	// IDL_BOXEDIDL_MODULE...
-		
-	if (boxIt) {		    
-	    if (result == null) {
-		result = IDL_BOXEDIDL_MODULE;
-	    } else {
-	    String[] boxed = new String[result.length+IDL_BOXEDIDL_MODULE.length];
-	    System.arraycopy(IDL_BOXEDIDL_MODULE,0,boxed,0,IDL_BOXEDIDL_MODULE.length);
-	    System.arraycopy(result,0,boxed,IDL_BOXEDIDL_MODULE.length,result.length);
-	    result = boxed;
+                
+        // If it is supposed to be "boxed", prepend
+        // IDL_BOXEDIDL_MODULE...
+                
+        if (boxIt) {                
+            if (result == null) {
+                result = IDL_BOXEDIDL_MODULE;
+            } else {
+            String[] boxed = new String[result.length+IDL_BOXEDIDL_MODULE.length];
+            System.arraycopy(IDL_BOXEDIDL_MODULE,0,boxed,0,IDL_BOXEDIDL_MODULE.length);
+            System.arraycopy(result,0,boxed,IDL_BOXEDIDL_MODULE.length,result.length);
+            result = boxed;
         }
         }
         
@@ -391,22 +391,22 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
      */
     public static String getArrayName (Type theType, int arrayDimension) {
 
-	StringBuffer idlName = new StringBuffer(64);
+        StringBuffer idlName = new StringBuffer(64);
 
-	// Prefix with seq<n>_...
-		
-	idlName.append(IDL_SEQUENCE);
+        // Prefix with seq<n>_...
+                
+        idlName.append(IDL_SEQUENCE);
         idlName.append(Integer.toString(arrayDimension));
         idlName.append("_");
-		
-	// Add the type name. We need to map any spaces in the
-	// name to "_"...
-				
-	idlName.append(replace(stripLeadingUnderscore(theType.getIDLName())," ","_"));
-		
-	// And we're done...
-		
-	return idlName.toString();
+                
+        // Add the type name. We need to map any spaces in the
+        // name to "_"...
+                                
+        idlName.append(replace(stripLeadingUnderscore(theType.getIDLName())," ","_"));
+                
+        // And we're done...
+                
+        return idlName.toString();
     }
  
     /**
@@ -415,7 +415,7 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
     public static String[] getArrayModuleNames (Type theType) {
 
         String[] moduleName;
-        String[] typeModule = theType.getIDLModuleNames();   	    			
+        String[] typeModule = theType.getIDLModuleNames();                              
         int typeModuleLength = typeModule.length;
         
         // Does the type have a module?
@@ -427,18 +427,18 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
             moduleName = IDL_SEQUENCE_MODULE;
         } else {
            
-	    // Yes, so gotta concatenate...
+            // Yes, so gotta concatenate...
            
-	    moduleName = new String[typeModuleLength + IDL_SEQUENCE_MODULE.length];
-	    System.arraycopy(IDL_SEQUENCE_MODULE,0,moduleName,0,IDL_SEQUENCE_MODULE.length);
-	    System.arraycopy(typeModule,0,moduleName,IDL_SEQUENCE_MODULE.length,typeModuleLength);
+            moduleName = new String[typeModuleLength + IDL_SEQUENCE_MODULE.length];
+            System.arraycopy(IDL_SEQUENCE_MODULE,0,moduleName,0,IDL_SEQUENCE_MODULE.length);
+            System.arraycopy(typeModule,0,moduleName,IDL_SEQUENCE_MODULE.length,typeModuleLength);
         }
-		
-	return moduleName;
+                
+        return moduleName;
     }
     
     private static int getInitialAttributeKind (CompoundType.Method method,
-						BatchEnvironment env) throws ClassNotFound {
+                                                BatchEnvironment env) throws ClassNotFound {
     
         int result = ATTRIBUTE_NONE;
         
@@ -455,8 +455,8 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
             
             if (exceptions.length > 0) {
                 for (int i = 0; i < exceptions.length; i++) {
-            	    if (exceptions[i].isCheckedException() && 
-            	        !exceptions[i].isRemoteExceptionOrSubclass()) {
+                    if (exceptions[i].isCheckedException() && 
+                        !exceptions[i].isRemoteExceptionOrSubclass()) {
                         validExceptions = false;
                         break;
                     }
@@ -506,8 +506,8 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
     }
 
     private static void setAttributeKinds (CompoundType.Method[] methods,
-					   int[] kinds,
-					   String[] names) {
+                                           int[] kinds,
+                                           String[] names) {
         
         int count = methods.length;
         
@@ -673,66 +673,66 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
      */
     public static void setMethodNames (CompoundType container,
                                        CompoundType.Method[] allMethods,
-				       BatchEnvironment env) 
-	throws Exception {
-	    
-	// This method implements the following name mangling sequence:
-	//
-	//   1. If methods belong to a Remote interface, identify
-	//      those which qualify as an attribute under 28.3.4.3.
-	//      Those that do are referred to as 'attributes' below;
-	//      those that do not are referred to as 'methods'.
-	//
-	//   2. Apply the 28.3.4.3 manglings, except "__", to all 
-	//      attribute names.
-	//
-	//   3. Apply all 28.3 manglings, except 28.3.2.7, to all names.
-	//
-	//   4. Apply 28.3.2.7 manglings to all method names.
-	//
-	//   5. Compare each attribute name to each method name. For 
-	//      any which compare equal, append "__" to the attribute
-	//      name.
-	//
-	//   6. Compare each name (attribute and method) to all others.
-	//      If any compare equal, throw an Exception with the
-	//      conflicting name as the message.
-	    
-	int count = allMethods.length;
-	    
-	if (count == 0) return;
-	    
-	// Make an array of all the method names...
-	   
-	String[] names = new String[count];
+                                       BatchEnvironment env) 
+        throws Exception {
+            
+        // This method implements the following name mangling sequence:
+        //
+        //   1. If methods belong to a Remote interface, identify
+        //      those which qualify as an attribute under 28.3.4.3.
+        //      Those that do are referred to as 'attributes' below;
+        //      those that do not are referred to as 'methods'.
+        //
+        //   2. Apply the 28.3.4.3 manglings, except "__", to all 
+        //      attribute names.
+        //
+        //   3. Apply all 28.3 manglings, except 28.3.2.7, to all names.
+        //
+        //   4. Apply 28.3.2.7 manglings to all method names.
+        //
+        //   5. Compare each attribute name to each method name. For 
+        //      any which compare equal, append "__" to the attribute
+        //      name.
+        //
+        //   6. Compare each name (attribute and method) to all others.
+        //      If any compare equal, throw an Exception with the
+        //      conflicting name as the message.
+            
+        int count = allMethods.length;
+            
+        if (count == 0) return;
+            
+        // Make an array of all the method names...
+           
+        String[] names = new String[count];
         for (int i = 0; i < count; i++) {
-	    names[i] = allMethods[i].getName();
-	}
-	    
-	// Are we dealing with a RemoteType, AbstractType, or ValueType?
-	    
-	CompoundType enclosing = allMethods[0].getEnclosing();
- 	if (enclosing.isType(TYPE_REMOTE) ||
- 	    enclosing.isType(TYPE_ABSTRACT) || 
- 	    enclosing.isType(TYPE_VALUE)) {
-	    
-	    // Yes, so we must do the 28.3.4.3 attribute mapping. First, get
-	    // the initial attribute kind of each method...
-	        
-	    int[] kinds = new int[count];
-	        
+            names[i] = allMethods[i].getName();
+        }
+            
+        // Are we dealing with a RemoteType, AbstractType, or ValueType?
+            
+        CompoundType enclosing = allMethods[0].getEnclosing();
+        if (enclosing.isType(TYPE_REMOTE) ||
+            enclosing.isType(TYPE_ABSTRACT) || 
+            enclosing.isType(TYPE_VALUE)) {
+            
+            // Yes, so we must do the 28.3.4.3 attribute mapping. First, get
+            // the initial attribute kind of each method...
+                
+            int[] kinds = new int[count];
+                
             for (int i = 0; i < count; i++) {
                 kinds[i] = getInitialAttributeKind(allMethods[i],env);
             }
-	        
-	    // Now set the attribute kind for each method and do the
-	    // 28.3.4.3 name mangling...
-	        
-	    setAttributeKinds(allMethods,kinds,names);
-	}
-	    
-	// Make and populate a new context from our names array...
-	    
+                
+            // Now set the attribute kind for each method and do the
+            // 28.3.4.3 name mangling...
+                
+            setAttributeKinds(allMethods,kinds,names);
+        }
+            
+        // Make and populate a new context from our names array...
+            
         NameContext context = new NameContext(true);
          
         for (int i = 0; i < count; i++) {
@@ -757,37 +757,37 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
         
         boolean overloaded[] = new boolean[count];
         for (int i = 0; i < count; i++) {
-	    overloaded[i] = (!allMethods[i].isAttribute() &&
-			     !allMethods[i].isConstructor() &&
-			 doesMethodCollide(names[i],allMethods[i],allMethods,names,true));
-	}
+            overloaded[i] = (!allMethods[i].isAttribute() &&
+                             !allMethods[i].isConstructor() &&
+                         doesMethodCollide(names[i],allMethods[i],allMethods,names,true));
+        }
         convertOverloadedMethods(allMethods,names,overloaded);
         
         // Now do the same mangling for constructor name collisions...
         
         for (int i = 0; i < count; i++) {
-	    overloaded[i] = (!allMethods[i].isAttribute() &&
-			     allMethods[i].isConstructor() &&
-			     doesConstructorCollide(names[i],allMethods[i],allMethods,names,true));
-	}
+            overloaded[i] = (!allMethods[i].isAttribute() &&
+                             allMethods[i].isConstructor() &&
+                             doesConstructorCollide(names[i],allMethods[i],allMethods,names,true));
+        }
         convertOverloadedMethods(allMethods,names,overloaded);
             
         // Now do the 28.3.4.3 mangling for attribute name collisions...
-   	        
+                
         for (int i = 0; i < count; i++) {
-       	    			    		
+                                                
                 CompoundType.Method method = allMethods[i];
-   	    		
-       	    // If this is an attribute name, does it collide with a method?
-   	    			
-	    if (method.isAttribute() &&
-		doesMethodCollide(names[i],method,allMethods,names,true)) {
-   	    			
-		// Yes, so add double underscore...
-   	    			
-		    names[i] += "__";
-		}
-       	    }
+                        
+            // If this is an attribute name, does it collide with a method?
+                                
+            if (method.isAttribute() &&
+                doesMethodCollide(names[i],method,allMethods,names,true)) {
+                                
+                // Yes, so add double underscore...
+                                
+                    names[i] += "__";
+                }
+            }
         
         // Do the same mangling for any constructors which collide with
         // methods...
@@ -797,14 +797,14 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
             CompoundType.Method method = allMethods[i];
             
                 // Is this a constructor which collides with a method?
-   	        
+                
                 if (method.isConstructor() && 
-		    doesConstructorCollide(names[i],method,allMethods,names,false)) {
-       	    		
-		// Yes, so add double underscore...
-   	    			
-		names[i] += "__";
-       	    }
+                    doesConstructorCollide(names[i],method,allMethods,names,false)) {
+                        
+                // Yes, so add double underscore...
+                                
+                names[i] += "__";
+            }
         }    
         }
 
@@ -813,11 +813,11 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
         String containerName = container.getIDLName();
         for (int i = 0; i < count; i++) {
             if (names[i].equalsIgnoreCase(containerName)) {
-		// Do not add underscore to attributes.
-		// Otherwise getFoo will turn into _get_foo_.
-		if (! allMethods[i].isAttribute()) {
-		    names[i] += "_";
-		}
+                // Do not add underscore to attributes.
+                // Otherwise getFoo will turn into _get_foo_.
+                if (! allMethods[i].isAttribute()) {
+                    names[i] += "_";
+                }
             }
         }
 
@@ -826,14 +826,14 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
 
         for (int i = 0; i < count; i++) {
 
-       	    // Does it collide with any other name?
-   	        
-	    if (doesMethodCollide(names[i],allMethods[i],allMethods,names,false)) {
+            // Does it collide with any other name?
+                
+            if (doesMethodCollide(names[i],allMethods[i],allMethods,names,false)) {
 
-		// Yes, so bail...
-    		
-		throw new Exception(allMethods[i].toString());
-       	    }
+                // Yes, so bail...
+                
+                throw new Exception(allMethods[i].toString());
+            }
         }    
                         
         // Ok. We have unique names. Create the appropriate 'wire' name
@@ -857,7 +857,7 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
 
     private static String stripLeadingUnderscore (String name) {
         if (name != null && name.length() > 1 
-	    && name.charAt(0) == '_')
+            && name.charAt(0) == '_')
         {
             return name.substring(1);
         }
@@ -867,7 +867,7 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
     
     private static String stripTrailingUnderscore (String name) {
         if (name != null && name.length() > 1 && 
-	    name.charAt(name.length() - 1) == '_') 
+            name.charAt(name.length() - 1) == '_') 
         {
             return name.substring(0, name.length() - 1);
         }
@@ -876,77 +876,77 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
     
     
     private static void convertOverloadedMethods(CompoundType.Method[] allMethods,
-						 String[] names,
-						 boolean[] overloaded) {
+                                                 String[] names,
+                                                 boolean[] overloaded) {
                                                 
         for (int i = 0; i < names.length; i++) {
             
-       	    // Do we need to mangle it?
-   	        
-	    if (overloaded[i]) {
-       	    			    		
-		// Yes, so add arguments...
-   	    		
+            // Do we need to mangle it?
+                
+            if (overloaded[i]) {
+                                                
+                // Yes, so add arguments...
+                        
                 CompoundType.Method method = allMethods[i];
-		Type[] args = method.getArguments();
-   	    		
-		for (int k = 0; k < args.length; k++) {
-   	    			
-   	    			// Add the separator...
-   	    			
-		    names[i] += "__";
-   	    			
-   	    			// Get the fully qualified IDL name, without the "::"
-   	    			// prefix...
-   	    			
-                    String argIDLName = args[k].getQualifiedIDLName(false);   	    			
-   	    			
-   	    			// Replace any occurances of "::_" with "_" to
-   	    			// undo any IDL keyword mangling and do next step
-   	    			// at the same time...
-   	    			
-		    argIDLName = replace(argIDLName,"::_","_");
-   	    			
-   	    			// Replace any occurances of "::" with "_"...
-   	    			
-		    argIDLName = replace(argIDLName,"::","_");
-   	    			
-   	    			// Replace any occurances of " " with "_"...
-   	    			
-		    argIDLName = replace(argIDLName," ","_");
+                Type[] args = method.getArguments();
+                        
+                for (int k = 0; k < args.length; k++) {
+                                
+                                // Add the separator...
+                                
+                    names[i] += "__";
+                                
+                                // Get the fully qualified IDL name, without the "::"
+                                // prefix...
+                                
+                    String argIDLName = args[k].getQualifiedIDLName(false);                             
+                                
+                                // Replace any occurances of "::_" with "_" to
+                                // undo any IDL keyword mangling and do next step
+                                // at the same time...
+                                
+                    argIDLName = replace(argIDLName,"::_","_");
+                                
+                                // Replace any occurances of "::" with "_"...
+                                
+                    argIDLName = replace(argIDLName,"::","_");
+                                
+                                // Replace any occurances of " " with "_"...
+                                
+                    argIDLName = replace(argIDLName," ","_");
  
-   	    			// Add the argument type name...
-   	    			
-		    names[i] += argIDLName;
-		}
-   	    		
-		if (args.length == 0) {
-		    names[i] += "__";
-		}
-   	    		
-		// Remove any IDL keyword mangling...
+                                // Add the argument type name...
+                                
+                    names[i] += argIDLName;
+                }
+                        
+                if (args.length == 0) {
+                    names[i] += "__";
+                }
+                        
+                // Remove any IDL keyword mangling...
 
-		names[i] = stripLeadingUnderscore(names[i]);
-       	    }
+                names[i] = stripLeadingUnderscore(names[i]);
+            }
         }
     }
     
     private static boolean doesMethodCollide (String name,
-					      CompoundType.Method method,
-					      CompoundType.Method[] allMethods,
-					      String[] allNames,
-					      boolean ignoreAttributes) {
+                                              CompoundType.Method method,
+                                              CompoundType.Method[] allMethods,
+                                              String[] allNames,
+                                              boolean ignoreAttributes) {
         
         // Scan all methods looking for a match...
         
-	for (int i = 0; i < allMethods.length; i++) {
-   	        
-	    CompoundType.Method target = allMethods[i];
-   	        
-	    if (method != target &&	                            // Not same instance
-		!target.isConstructor() &&                      // Not a constructor
-		(!ignoreAttributes || !target.isAttribute()) && // Correct kind
-		name.equals(allNames[i])) {	                    // Same names
+        for (int i = 0; i < allMethods.length; i++) {
+                
+            CompoundType.Method target = allMethods[i];
+                
+            if (method != target &&                                 // Not same instance
+                !target.isConstructor() &&                      // Not a constructor
+                (!ignoreAttributes || !target.isAttribute()) && // Correct kind
+                name.equals(allNames[i])) {                         // Same names
                 
                 // Are we looking at a get/set pair?
                 
@@ -975,20 +975,20 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
     }
     
     private static boolean doesConstructorCollide (String name,
-						   CompoundType.Method method,
-						   CompoundType.Method[] allMethods,
-						   String[] allNames,
-						   boolean compareConstructors) {
+                                                   CompoundType.Method method,
+                                                   CompoundType.Method[] allMethods,
+                                                   String[] allNames,
+                                                   boolean compareConstructors) {
     
         // Scan all methods looking for a match...
         
-	for (int i = 0; i < allMethods.length; i++) {
-   	        
-	    CompoundType.Method target = allMethods[i];
-   	        
-	    if (method != target &&	                                // Not same instance
-		(target.isConstructor() == compareConstructors) &&  // Correct kind
-		name.equals(allNames[i])) {	                        // Same names
+        for (int i = 0; i < allMethods.length; i++) {
+                
+            CompoundType.Method target = allMethods[i];
+                
+            if (method != target &&                                     // Not same instance
+                (target.isConstructor() == compareConstructors) &&  // Correct kind
+                name.equals(allNames[i])) {                             // Same names
                                 
                 // We have a collision...
                
@@ -1008,12 +1008,12 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
      */
     public static void setMemberNames (CompoundType container,
                                        CompoundType.Member[] allMembers,
-				       CompoundType.Method[] allMethods,
-				       BatchEnvironment env) 
-	throws Exception {
-	
-	// Make and populate a new context...
-	    
+                                       CompoundType.Method[] allMethods,
+                                       BatchEnvironment env) 
+        throws Exception {
+        
+        // Make and populate a new context...
+            
         NameContext context = new NameContext(true);
          
         for (int i = 0; i < allMembers.length; i++) {
@@ -1028,19 +1028,19 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
             String idlName = getMemberOrMethodName(context,member.getName(),env);            
             member.setIDLName(idlName);   
         }
-	
+        
         // First see if we have a collision with the container name (28.3.2.9).
 
         String containerName = container.getIDLName();
         for (int i = 0; i < allMembers.length; i++) {
             String name = allMembers[i].getIDLName();
             if (name.equalsIgnoreCase(containerName)) {
-		// REVISIT - How is this different than line 788
+                // REVISIT - How is this different than line 788
                 allMembers[i].setIDLName(name+"_");
             }
         }
 
-	// Check for collisions between member names...
+        // Check for collisions between member names...
  
         for (int i = 0; i < allMembers.length; i++) {
             String name = allMembers[i].getIDLName();
@@ -1048,8 +1048,8 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
                 if (i != j && allMembers[j].getIDLName().equals(name)) {
                 
                     // Collision...
-    		
-		    throw new Exception(name);
+                
+                    throw new Exception(name);
                 }
             }
         }
@@ -1086,55 +1086,55 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
      * Section 28.3.10.2   (see SpecialClassType)
      */
     public static String getTypeName(int typeCode, boolean isConstant) {
-     	
-	String idlName = null;
-    	
-    	switch (typeCode) {
-	case TYPE_VOID:		    idlName = IDL_VOID; break;
-	case TYPE_BOOLEAN:	    idlName = IDL_BOOLEAN; break;
-	case TYPE_BYTE:		    idlName = IDL_BYTE; break;
-	case TYPE_CHAR:		    idlName = IDL_CHAR; break;
-	case TYPE_SHORT:	    idlName = IDL_SHORT; break;
-	case TYPE_INT:		    idlName = IDL_INT; break;
-	case TYPE_LONG:		    idlName = IDL_LONG; break;
-	case TYPE_FLOAT:	    idlName = IDL_FLOAT; break;
-	case TYPE_DOUBLE:	    idlName = IDL_DOUBLE; break;
-	case TYPE_ANY:			idlName = IDL_ANY; break;
-	case TYPE_CORBA_OBJECT:	idlName = IDL_CORBA_OBJECT; break;
-	case TYPE_STRING:
-	    {
-		if (isConstant) {
-		    idlName = IDL_CONSTANT_STRING;
-		} else {
-		    idlName = IDL_STRING;
-		}
-        	    
-		break;
-	    }
-	}
-		
-	return idlName;
+        
+        String idlName = null;
+        
+        switch (typeCode) {
+        case TYPE_VOID:             idlName = IDL_VOID; break;
+        case TYPE_BOOLEAN:          idlName = IDL_BOOLEAN; break;
+        case TYPE_BYTE:             idlName = IDL_BYTE; break;
+        case TYPE_CHAR:             idlName = IDL_CHAR; break;
+        case TYPE_SHORT:            idlName = IDL_SHORT; break;
+        case TYPE_INT:              idlName = IDL_INT; break;
+        case TYPE_LONG:             idlName = IDL_LONG; break;
+        case TYPE_FLOAT:            idlName = IDL_FLOAT; break;
+        case TYPE_DOUBLE:           idlName = IDL_DOUBLE; break;
+        case TYPE_ANY:                  idlName = IDL_ANY; break;
+        case TYPE_CORBA_OBJECT: idlName = IDL_CORBA_OBJECT; break;
+        case TYPE_STRING:
+            {
+                if (isConstant) {
+                    idlName = IDL_CONSTANT_STRING;
+                } else {
+                    idlName = IDL_STRING;
+                }
+                    
+                break;
+            }
+        }
+                
+        return idlName;
     }
 
     /**
      * Create a qualified name.
      */
     public static String getQualifiedName (String[] idlModuleNames, String idlName) {
-        String result = null;		
-	if (idlModuleNames != null && idlModuleNames.length > 0) {
-	    for (int i = 0; i < idlModuleNames.length;i++) {
-		if (i == 0) {
-		    result = idlModuleNames[0];
-		} else {
-		    result += IDL_NAME_SEPARATOR;
-		    result += idlModuleNames[i];
-		}
-	    }
-	    result += IDL_NAME_SEPARATOR;
-	    result += idlName;
-	} else {
-	    result = idlName;
-	}
+        String result = null;           
+        if (idlModuleNames != null && idlModuleNames.length > 0) {
+            for (int i = 0; i < idlModuleNames.length;i++) {
+                if (i == 0) {
+                    result = idlModuleNames[0];
+                } else {
+                    result += IDL_NAME_SEPARATOR;
+                    result += idlModuleNames[i];
+                }
+            }
+            result += IDL_NAME_SEPARATOR;
+            result += idlName;
+        } else {
+            result = idlName;
+        }
         return result;
     }
 
@@ -1146,38 +1146,38 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
      * @return 
      */
     public static String replace (String source, String match, String replace) {
-    	
-    	int index = source.indexOf(match,0);
-    	
-    	if (index >=0) {
-    	    
-    	    // We have at least one match, so gotta do the
-    	    // work...
-    	    
-	    StringBuffer result = new StringBuffer(source.length() + 16);
-	    int matchLength = match.length();
-	    int startIndex = 0;
-        	
-	    while (index >= 0) {
-		result.append(source.substring(startIndex,index));
-		result.append(replace);
-		startIndex = index + matchLength;
-		index = source.indexOf(match,startIndex);
-	    }
-        	
-	    // Grab the last piece, if any...
-        	
-	    if (startIndex < source.length()) {
-		result.append(source.substring(startIndex));
+        
+        int index = source.indexOf(match,0);
+        
+        if (index >=0) {
+            
+            // We have at least one match, so gotta do the
+            // work...
+            
+            StringBuffer result = new StringBuffer(source.length() + 16);
+            int matchLength = match.length();
+            int startIndex = 0;
+                
+            while (index >= 0) {
+                result.append(source.substring(startIndex,index));
+                result.append(replace);
+                startIndex = index + matchLength;
+                index = source.indexOf(match,startIndex);
+            }
+                
+            // Grab the last piece, if any...
+                
+            if (startIndex < source.length()) {
+                result.append(source.substring(startIndex));
             }
             
-	    return result.toString();
-        	
-    	} else {
-    	
-    	    // No matches, just return the source...
-    	    
-    	    return source;
+            return result.toString();
+                
+        } else {
+        
+            // No matches, just return the source...
+            
+            return source;
         }
     }
 
@@ -1186,8 +1186,8 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
      */
     public static String getIDLRepositoryID (String idlName) {
         return  IDL_REPOSITORY_ID_PREFIX + 
-	    replace(idlName,"::", "/") + 
-	    IDL_REPOSITORY_ID_VERSION;
+            replace(idlName,"::", "/") + 
+            IDL_REPOSITORY_ID_VERSION;
     }
 
     //_____________________________________________________________________
@@ -1203,15 +1203,15 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
      */
     private static String getTypeOrModuleName (String name) {
 
-    	// 28.3.2.3 Leading underscores...
-    	
-    	String result = convertLeadingUnderscores(name);
+        // 28.3.2.3 Leading underscores...
+        
+        String result = convertLeadingUnderscores(name);
 
-    	// 28.3.2.2 IDL keywords (NOTE: must be done
-    	// after leading underscore conversion because
-    	// the mangling for IDL keywords creates a
-    	// leading underscore!)...
-    	
+        // 28.3.2.2 IDL keywords (NOTE: must be done
+        // after leading underscore conversion because
+        // the mangling for IDL keywords creates a
+        // leading underscore!)...
+        
         return convertIDLKeywords(result);
     }
 }

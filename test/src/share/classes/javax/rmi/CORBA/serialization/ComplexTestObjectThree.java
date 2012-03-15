@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ComplexTestObjectThree.java	1.4 99/06/07 */
+/* @(#)ComplexTestObjectThree.java      1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -78,18 +78,18 @@ public class ComplexTestObjectThree implements Serializable
     public boolean equals(Object o)
     {
         try
-	    {
-		ComplexTestObjectThree ctbo = (ComplexTestObjectThree)o;
-		return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) &&
-			(ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && (ctbo.fDouble == fDouble)
-			&& (ctbo.fOne.equals(fOne)) 
-			&& (ctbo.fTwo.equals(fTwo))
-			);
-	    }
+            {
+                ComplexTestObjectThree ctbo = (ComplexTestObjectThree)o;
+                return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) &&
+                        (ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && (ctbo.fDouble == fDouble)
+                        && (ctbo.fOne.equals(fOne)) 
+                        && (ctbo.fTwo.equals(fTwo))
+                        );
+            }
         catch(Exception e)
-	    {
-		return false;
-	    }
+            {
+                return false;
+            }
     }
 
     public String toString()

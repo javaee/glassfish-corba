@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.corba;
+package com.sun.corba.ee.impl.corba;
 
 import org.omg.CORBA.Environment;
 import org.omg.CORBA.UserException;
@@ -62,17 +62,17 @@ public class EnvironmentImpl extends Environment {
   
     public Exception exception() 
     {
-	return _exc;
+        return _exc;
     }
 
     public void exception(Exception exc)
     {
-	_exc = exc;
+        _exc = exc;
     }
 
     public void clear()
     {
-	_exc = null;
+        _exc = null;
     }
 
 }

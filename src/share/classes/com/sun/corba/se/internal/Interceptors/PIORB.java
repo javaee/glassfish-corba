@@ -37,9 +37,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.internal.Interceptors;
+package com.sun.corba.ee.internal.Interceptors;
 
-import com.sun.corba.se.internal.POA.POAORB;
+import com.sun.corba.ee.internal.POA.POAORB;
              
 /** 
  * Deprecated class for backward compatibility.
@@ -48,7 +48,7 @@ public class PIORB
     extends POAORB
 {
     public PIORB() {
-	super();
+        super();
     }
 }
 

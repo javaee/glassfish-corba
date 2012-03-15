@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.servicecontext;
+package com.sun.corba.ee.impl.servicecontext;
 
 import java.util.Map ;
 import java.util.HashMap ;
@@ -50,20 +50,20 @@ import org.omg.CORBA_2_3.portable.InputStream ;
 
 import com.sun.org.omg.SendingContext.CodeBase;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults ;
-import com.sun.corba.se.spi.servicecontext.ServiceContext ;
-import com.sun.corba.se.spi.servicecontext.ServiceContexts ;
-import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry ;
-import com.sun.corba.se.spi.servicecontext.UEInfoServiceContext ;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextDefaults ;
+import com.sun.corba.ee.spi.servicecontext.ServiceContext ;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts ;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextFactoryRegistry ;
+import com.sun.corba.ee.spi.servicecontext.UEInfoServiceContext ;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.EncapsInputStream ;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.trace.TraceServiceContext;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.EncapsInputStream ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.trace.TraceServiceContext;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @TraceServiceContext
@@ -96,20 +96,20 @@ public class ServiceContextsImpl implements ServiceContexts
     private GIOPVersion giopVersion;
 
     private String getValidSCIds() {
-	StringBuilder sb = new StringBuilder() ;
-	sb.append( "(" ) ;
-	boolean first = true ;
-	for (int id : scMap.keySet()) {
-	    if (first) {
+        StringBuilder sb = new StringBuilder() ;
+        sb.append( "(" ) ;
+        boolean first = true ;
+        for (int id : scMap.keySet()) {
+            if (first) {
                 first = false;
             } else {
                 sb.append(",");
             }
 
-	    sb.append( id ) ;
-	}
-	sb.append( ")" ) ;
-	return sb.toString() ;
+            sb.append( id ) ;
+        }
+        sb.append( ")" ) ;
+        return sb.toString() ;
     }
 
     @InfoMethod
@@ -148,7 +148,7 @@ public class ServiceContextsImpl implements ServiceContexts
     }
 
     public ServiceContextsImpl( ORB orb ) {
-	this.orb = orb ;
+        this.orb = orb ;
 
         scMap = new HashMap<Integer,Object>();
 
@@ -156,14 +156,14 @@ public class ServiceContextsImpl implements ServiceContexts
         // be specified in ServiceContext.  
         // See REVISIT below concerning giopVersion.
         giopVersion = orb.getORBData().getGIOPVersion();
-	codeBase = null ;
+        codeBase = null ;
     }
 
     /** 
      * Read the Service contexts from the input stream.
      */
     public ServiceContextsImpl(InputStream s) {
-	this( (ORB)(s.orb()) ) ;
+        this( (ORB)(s.orb()) ) ;
 
         // We need to store this so that we can have access
         // to the CodeBase for unmarshaling possible
@@ -291,7 +291,7 @@ public class ServiceContextsImpl implements ServiceContexts
      */
     @TraceServiceContext
     private void writeMapEntry(OutputStream os, int id, Object scObj, 
-	GIOPVersion gv) {
+        GIOPVersion gv) {
         if (scObj instanceof byte[]) {
             // If it's still in byte[] form, we don't need to
             // unmarshal it here, just copy the bytes into
@@ -358,7 +358,7 @@ public class ServiceContextsImpl implements ServiceContexts
     }
 
     private ServiceContextsImpl(  ServiceContextsImpl scimpl ) {
-	this( scimpl.orb ) ;
+        this( scimpl.orb ) ;
 
         this.codeBase = scimpl.codeBase ;
         this.giopVersion = scimpl.giopVersion ;

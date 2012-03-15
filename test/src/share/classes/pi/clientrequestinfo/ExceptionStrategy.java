@@ -40,8 +40,8 @@
 
 package pi.clientrequestinfo;
 
-import com.sun.corba.se.impl.misc.*;
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.misc.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.IOP.*;
 import ClientRequestInfo.*;
@@ -72,15 +72,15 @@ public class ExceptionStrategy
     boolean diiMode;
 
     public ExceptionStrategy() {
-	this( false );
+        this( false );
     }
 
     public ExceptionStrategy( boolean diiMode ) {
-	this.diiMode = diiMode;
+        this.diiMode = diiMode;
     }
 
     public void send_request (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
         throws ForwardRequest
     {
         super.send_request( interceptor, ri );
@@ -96,16 +96,16 @@ public class ExceptionStrategy
     }
 
     public void send_poll (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
     {
-	super.send_poll( interceptor, ri );
-	// never executed in our orb.
+        super.send_poll( interceptor, ri );
+        // never executed in our orb.
     }
 
     public void receive_reply (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
     {
-	super.receive_reply( interceptor, ri );
+        super.receive_reply( interceptor, ri );
 
         try {
             testException( "receive_reply", ri );
@@ -117,13 +117,13 @@ public class ExceptionStrategy
 
 
     public void receive_exception (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
-	throws ForwardRequest
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
+        throws ForwardRequest
     {
-	super.receive_exception( interceptor, ri );
+        super.receive_exception( interceptor, ri );
 
         try {
-	    testException( "receive_exception", ri );
+            testException( "receive_exception", ri );
         }
         catch( Exception ex ) {
             failException( "receive_exception", ex );
@@ -131,13 +131,13 @@ public class ExceptionStrategy
     }
 
     public void receive_other (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
         throws ForwardRequest
     {
-	super.receive_other( interceptor, ri );
+        super.receive_other( interceptor, ri );
 
         try {
-	    testException( "receive_other", ri );
+            testException( "receive_other", ri );
         }
         catch( Exception ex ) {
             failException( "receive_other", ex );
@@ -145,9 +145,9 @@ public class ExceptionStrategy
     }
 
     private void testException( String methodName, 
-		                ClientRequestInfo ri ) 
+                                ClientRequestInfo ri ) 
     {
-	String header = methodName + "(): ";
+        String header = methodName + "(): ";
         if( methodName.equals( "receive_exception" ) ) {
             if( count == 2 ) {
                 // Called for System Exception:
@@ -175,36 +175,36 @@ public class ExceptionStrategy
                 }
             }
             else if( count == 3 ) {
-		// Skip this test in DII mode:
-		if( diiMode ) {
-		    log( header + "skipping UserException test for DII" );    
-		}
-		else {
-		    // Called for User Exception:
-		    // Test received_exception:
-		    Any receivedException = ri.received_exception();
+                // Skip this test in DII mode:
+                if( diiMode ) {
+                    log( header + "skipping UserException test for DII" );    
+                }
+                else {
+                    // Called for User Exception:
+                    // Test received_exception:
+                    Any receivedException = ri.received_exception();
 
-		    ExampleException exception = 
-			ExampleExceptionHelper.extract( receivedException );
-		    if( !exception.reason.equals( "valid" ) ) {
-			fail( header + 
-			      "received_exception() did not return valid " +
-			      "ExampleException" );
-		    }
-		    else {
-			log( header + "received_exception() is valid." );
-		    }
+                    ExampleException exception = 
+                        ExampleExceptionHelper.extract( receivedException );
+                    if( !exception.reason.equals( "valid" ) ) {
+                        fail( header + 
+                              "received_exception() did not return valid " +
+                              "ExampleException" );
+                    }
+                    else {
+                        log( header + "received_exception() is valid." );
+                    }
 
-		    // Test received_exception_id:
-		    String exceptionId = ri.received_exception_id();
+                    // Test received_exception_id:
+                    String exceptionId = ri.received_exception_id();
 
-		    log( header + "exceptionId for UserException is: " + 
-			exceptionId );
-		    
-		    if( exceptionId.indexOf( "ExampleException" ) == -1 ) {
-			fail( header + "exceptionId incorrect!" );
-		    }
-		}
+                    log( header + "exceptionId for UserException is: " + 
+                        exceptionId );
+                    
+                    if( exceptionId.indexOf( "ExampleException" ) == -1 ) {
+                        fail( header + "exceptionId incorrect!" );
+                    }
+                }
             }
             else {
                 fail( header + "receive_exception should not be " +

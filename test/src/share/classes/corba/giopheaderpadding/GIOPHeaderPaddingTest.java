@@ -49,15 +49,15 @@ import corba.framework.CORBATest;
 
 import java.util.Properties;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.orb.ORB;
 
 import corba.framework.*;
 
 public class GIOPHeaderPaddingTest extends CORBATest {
 
     public static final String thisPackage =
-	GIOPHeaderPaddingTest.class.getPackage().getName();
+        GIOPHeaderPaddingTest.class.getPackage().getName();
 
     protected void doTest() throws Throwable {
         if (test.Test.useJavaSerialization()) {
@@ -95,20 +95,20 @@ public class GIOPHeaderPaddingTest extends CORBATest {
     }
 
     protected void doTestType(String serverMainClass, String serverTestName,
-			      String clientMainClass, String clientTestName)
-	throws Throwable {
+                              String clientMainClass, String clientTestName)
+        throws Throwable {
 
-	Controller server = createServer(thisPackage + "." + serverMainClass,
-					 serverTestName);
-	server.start();
+        Controller server = createServer(thisPackage + "." + serverMainClass,
+                                         serverTestName);
+        server.start();
 
-	Controller client = createClient(thisPackage + "." + clientMainClass,
-					 clientTestName);
-	client.start();
-	client.waitFor();
-	client.stop();
+        Controller client = createClient(thisPackage + "." + clientMainClass,
+                                         clientTestName);
+        client.start();
+        client.waitFor();
+        client.stop();
 
-	server.stop();
+        server.stop();
     }
 }
 

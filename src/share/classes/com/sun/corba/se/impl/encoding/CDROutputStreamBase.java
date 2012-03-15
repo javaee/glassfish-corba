@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -47,8 +47,8 @@ import java.nio.ByteBuffer;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.orb.ORB;
 
 /**
  * Describes CDROutputObject delegates and provides some
@@ -135,12 +135,12 @@ abstract class CDROutputStreamBase extends java.io.OutputStream
 //     public abstract void flush() throws IOException;
 //     public abstract void close() throws IOException;
 
-    // com.sun.corba.se.impl.encoding.MarshalOutputStream
+    // com.sun.corba.ee.impl.encoding.MarshalOutputStream
     public abstract void start_block();
     public abstract void end_block();
     public abstract void putEndian();
     public abstract void writeTo(java.io.OutputStream s)
-	throws IOException;
+        throws IOException;
     public abstract byte[] toByteArray();
 
     // org.omg.CORBA.DataOutputStream

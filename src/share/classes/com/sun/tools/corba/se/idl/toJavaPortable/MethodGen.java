@@ -48,7 +48,7 @@
  * US Government Users Restricted Rights - Use, duplication or
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  *
- * @(#)MethodGen.java	1.9 99/08/18
+ * @(#)MethodGen.java   1.9 99/08/18
  */
 
 package com.sun.tools.corba.se.idl.toJavaPortable;
@@ -433,7 +433,7 @@ public class MethodGen implements com.sun.tools.corba.se.idl.MethodGen
     if (m.contexts ().size () > 0)
     {
       if (!firstTime)
-	stream.print (", ");
+        stream.print (", ");
       stream.print ("$context");
     }
 
@@ -517,18 +517,18 @@ public class MethodGen implements com.sun.tools.corba.se.idl.MethodGen
       SymtabEntry parmType = Util.typeOf (parm.type ());
       if (parmType instanceof StringEntry)
         if ((parm.passType () == ParameterEntry.In) || 
-	    (parm.passType () == ParameterEntry.Inout))
+            (parm.passType () == ParameterEntry.Inout))
         {
           StringEntry string = (StringEntry)parmType;
           if (string.maxSize () != null)
           {
             stream.print (THREE_INDENT + "if (" + parm.name ());
-	    if (parm.passType () == ParameterEntry.Inout)
-	      stream.print (".value"); // get from holder
+            if (parm.passType () == ParameterEntry.Inout)
+              stream.print (".value"); // get from holder
             stream.print (" == null || " + parm.name ());
-	    if (parm.passType () == ParameterEntry.Inout)
-	      stream.print (".value"); // get from holder
-	    stream.println (".length () > (" + 
+            if (parm.passType () == ParameterEntry.Inout)
+              stream.print (".value"); // get from holder
+            stream.println (".length () > (" + 
                 Util.parseExpression (string.maxSize ()) + "))");
             stream.println (THREE_INDENT + 
                 "throw new org.omg.CORBA.BAD_PARAM (0," +
@@ -609,14 +609,14 @@ public class MethodGen implements com.sun.tools.corba.se.idl.MethodGen
       SymtabEntry parmType = Util.typeOf (parm.type ());
       if (parmType instanceof StringEntry)
         if ((parm.passType () == ParameterEntry.Out) || 
-	    (parm.passType () == ParameterEntry.Inout))
+            (parm.passType () == ParameterEntry.Inout))
         {
           StringEntry string = (StringEntry)parmType;
           if (string.maxSize () != null)
           {
             stream.print (FOUR_INDENT + "if (" + parm.name () + 
                 ".value.length ()");
-	    stream.println ("         > (" + 
+            stream.println ("         > (" + 
                 Util.parseExpression (string.maxSize ()) + "))");
             stream.println (FIVE_INDENT + "throw new org.omg.CORBA.MARSHAL(0,"+
                 "org.omg.CORBA.CompletionStatus.COMPLETED_NO);");
@@ -628,9 +628,9 @@ public class MethodGen implements com.sun.tools.corba.se.idl.MethodGen
       StringEntry string = (StringEntry)mtype;
       if (string.maxSize () != null)
       {
-	stream.println(FOUR_INDENT + "if ($result.length () > (" + 
+        stream.println(FOUR_INDENT + "if ($result.length () > (" + 
             Util.parseExpression (string.maxSize ()) + "))");
-	stream.println (FIVE_INDENT + "throw new org.omg.CORBA.MARSHAL (0," +
+        stream.println (FIVE_INDENT + "throw new org.omg.CORBA.MARSHAL (0," +
             " org.omg.CORBA.CompletionStatus.COMPLETED_NO);");
       }
     }
@@ -696,9 +696,9 @@ public class MethodGen implements com.sun.tools.corba.se.idl.MethodGen
       // Step 2.  Add the context parameter if necessary. <d59297>
       if (m.contexts ().size () > 0)
       {
-	if (!firstTime)
-	  stream.print (", ");
-	stream.print ("$context");
+        if (!firstTime)
+          stream.print (", ");
+        stream.print ("$context");
       }
     }
     stream.println (TWO_INDENT + ");");
@@ -818,9 +818,9 @@ public class MethodGen implements com.sun.tools.corba.se.idl.MethodGen
         // Step 2.  Add the context parameter if necessary. <d59297>
         if (m.contexts ().size () > 0)
         {
-	  if (!firstTime)
-	    stream.print (", ");
-	  stream.print ("$context");
+          if (!firstTime)
+            stream.print (", ");
+          stream.print ("$context");
         }
     }
     stream.println (");");
@@ -1044,7 +1044,7 @@ public class MethodGen implements com.sun.tools.corba.se.idl.MethodGen
       // if write value to the boxed holder indicated by the name ending with ".value"
       if (mType instanceof PrimitiveEntry && name.endsWith (".value"))
         stream.println (Util.helperName (type, true) + ".write (" + oStream + ", "  // <d61056>
-	+ " new " + Util.javaQualifiedName (type) + " (" + name + "));"); //<d60929>
+        + " new " + Util.javaQualifiedName (type) + " (" + name + "));"); //<d60929>
       else
         stream.println (Util.helperName (type, true) + ".write (" + oStream + ", " + name + ");"); //<d60929> // <d61056>
     }

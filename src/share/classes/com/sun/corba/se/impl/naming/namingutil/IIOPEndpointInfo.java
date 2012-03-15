@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.namingutil;
+package com.sun.corba.ee.impl.naming.namingutil;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 /** 
  *  EndpointInfo is used internally by CorbaLoc object to store the
@@ -64,50 +64,50 @@ public class IIOPEndpointInfo
     }
 
     IIOPEndpointInfo( ) {
-	// Default IIOP Version 
-	major = ORBConstants.DEFAULT_INS_GIOP_MAJOR_VERSION;
-	minor = ORBConstants.DEFAULT_INS_GIOP_MINOR_VERSION;
-	// Default host is localhost
-	host = ORBConstants.DEFAULT_INS_HOST;
-	// Default INS Port
-	port = ORBConstants.DEFAULT_INS_PORT;
+        // Default IIOP Version 
+        major = ORBConstants.DEFAULT_INS_GIOP_MAJOR_VERSION;
+        minor = ORBConstants.DEFAULT_INS_GIOP_MINOR_VERSION;
+        // Default host is localhost
+        host = ORBConstants.DEFAULT_INS_HOST;
+        // Default INS Port
+        port = ORBConstants.DEFAULT_INS_PORT;
     }
 
     public void setHost( String theHost ) {
-	host = theHost;
+        host = theHost;
     }
 
     public String getHost( ) {
-	return host;
+        return host;
     }
 
     public void setPort( int thePort ) {
-	port = thePort;
+        port = thePort;
     }
 
     public int getPort( ) {
-	return port;
+        return port;
     }
 
     public void setVersion( int theMajor, int theMinor ) {
-	major = theMajor;
-	minor = theMinor;
+        major = theMajor;
+        minor = theMinor;
     }
 
     public int getMajor( ) {
-	return major;
+        return major;
     }
 
     public int getMinor( ) {
-	return minor;
+        return minor;
     }
 
     /** Internal Debug Method.
      */
     public void dump( ) {
-	System.out.println( " Major -> " + major + " Minor -> " + minor );
-	System.out.println( "host -> " + host );
-	System.out.println( "port -> " + port );
+        System.out.println( " Major -> " + major + " Minor -> " + minor );
+        System.out.println( "host -> " + host );
+        System.out.println( "port -> " + port );
     }
 }
 

@@ -73,14 +73,14 @@ public class GameViewServer extends GameViewImpl implements RemoteGameView
 
     public GameViewServer(Game game, Player player) throws RemoteException
     {
-	super (game, player);
-	PortableRemoteObject.exportObject (this);
+        super (game, player);
+        PortableRemoteObject.exportObject (this);
     }
 
     public void quit () throws RemoteException
     {
-	super.quit ();
-	PortableRemoteObject.unexportObject (this);
+        super.quit ();
+        PortableRemoteObject.unexportObject (this);
     }
 
 }

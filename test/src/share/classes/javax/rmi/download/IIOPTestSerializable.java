@@ -57,14 +57,14 @@ public class IIOPTestSerializable implements Serializable
 
     public void setRef(Servant t)
     {
-	//System.out.println("setRef "+t);
-	ref = t;
+        //System.out.println("setRef "+t);
+        ref = t;
     }
 
     public Servant getRef()
     {
-	//System.out.println("getRef "+ref);
-	return ref;
+        //System.out.println("getRef "+ref);
+        return ref;
     }
 
 }

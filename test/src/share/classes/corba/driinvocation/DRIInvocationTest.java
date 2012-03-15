@@ -39,7 +39,7 @@
  */
 package corba.driinvocation;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import corba.framework.CORBATest;
 import corba.framework.Controller;
 import corba.framework.InternalExec;

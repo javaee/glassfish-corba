@@ -48,7 +48,7 @@ import corba.hcks.U;
 
 class ServerSideServant
     extends
-	ServerSidePOA
+        ServerSidePOA
 {
     public static final String baseMsg = ServerSideServant.class.getName();
 
@@ -56,12 +56,12 @@ class ServerSideServant
 
     public void neverReturns ( )
     {
-	U.sop(baseMsg + ".neverReturns");
-	try {
-	    Thread.sleep(Integer.MAX_VALUE);
-	} catch (InterruptedException e) {
-	    U.sop(e);
-	}
+        U.sop(baseMsg + ".neverReturns");
+        try {
+            Thread.sleep(Integer.MAX_VALUE);
+        } catch (InterruptedException e) {
+            U.sop(e);
+        }
     }
 }
 

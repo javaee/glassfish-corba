@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +54,7 @@ import org.omg.CORBA.Any ;
 
 import org.omg.CORBA_2_3.portable.InputStream;
 
-import com.sun.corba.se.impl.corba.TypeCodeImpl;
+import com.sun.corba.ee.impl.corba.TypeCodeImpl;
 
 public class WrapperInputStream extends org.omg.CORBA_2_3.portable.InputStream implements TypeCodeReader
 {
@@ -71,7 +71,7 @@ public class WrapperInputStream extends org.omg.CORBA_2_3.portable.InputStream i
     public int read() throws IOException { return stream.read(); }
     public int read(byte b[]) throws IOException { return stream.read(b); }
     public int read(byte b[], int off, int len) throws IOException {
-	return stream.read(b, off, len);
+        return stream.read(b, off, len);
     }
     public long skip(long n) throws IOException { return stream.skip(n); }
     public int available() throws IOException { return stream.available(); }
@@ -97,40 +97,40 @@ public class WrapperInputStream extends org.omg.CORBA_2_3.portable.InputStream i
     public String read_wstring() { return stream.read_wstring(); }
 
     public void read_boolean_array(boolean[] value, int offset, int length) {
-	stream.read_boolean_array(value, offset, length);
+        stream.read_boolean_array(value, offset, length);
     }
     public void read_char_array(char[] value, int offset, int length) {
-	stream.read_char_array(value, offset, length);
+        stream.read_char_array(value, offset, length);
     }
     public void read_wchar_array(char[] value, int offset, int length) {
-	stream.read_wchar_array(value, offset, length);
+        stream.read_wchar_array(value, offset, length);
     }
     public void read_octet_array(byte[] value, int offset, int length) {
-	stream.read_octet_array(value, offset, length);
+        stream.read_octet_array(value, offset, length);
     }
     public void read_short_array(short[] value, int offset, int length) {
-	stream.read_short_array(value, offset, length);
+        stream.read_short_array(value, offset, length);
     }
     public void read_ushort_array(short[] value, int offset, int length) {
-	stream.read_ushort_array(value, offset, length);
+        stream.read_ushort_array(value, offset, length);
     }
     public void read_long_array(int[] value, int offset, int length) {
-	stream.read_long_array(value, offset, length);
+        stream.read_long_array(value, offset, length);
     }
     public void read_ulong_array(int[] value, int offset, int length) {
-	stream.read_ulong_array(value, offset, length);
+        stream.read_ulong_array(value, offset, length);
     }
     public void read_longlong_array(long[] value, int offset, int length) {
-	stream.read_longlong_array(value, offset, length);
+        stream.read_longlong_array(value, offset, length);
     }
     public void read_ulonglong_array(long[] value, int offset, int length) {
-	stream.read_ulonglong_array(value, offset, length);
+        stream.read_ulonglong_array(value, offset, length);
     }
     public void read_float_array(float[] value, int offset, int length) {
-	stream.read_float_array(value, offset, length);
+        stream.read_float_array(value, offset, length);
     }
     public void read_double_array(double[] value, int offset, int length) {
-	stream.read_double_array(value, offset, length);
+        stream.read_double_array(value, offset, length);
     }
 
     public org.omg.CORBA.Object read_Object() { return stream.read_Object(); }
@@ -150,15 +150,15 @@ public class WrapperInputStream extends org.omg.CORBA_2_3.portable.InputStream i
             typeMap = new HashMap<Integer,TypeCodeImpl>(16);
         }
         //if (TypeCodeImpl.debug) System.out.println(this + " adding tc " 
-	//  + tc + " at position " + position);
+        //  + tc + " at position " + position);
         typeMap.put(position, tc);
     }
 
     public TypeCodeImpl getTypeCodeAtPosition(int position) {
         if (typeMap == null)
-	    return null;
-	//if (TypeCodeImpl.debug) System.out.println("Getting tc " 
-	//    + typeMap.get(position) + " at position " + position);
+            return null;
+        //if (TypeCodeImpl.debug) System.out.println("Getting tc " 
+        //    + typeMap.get(position) + " at position " + position);
         return typeMap.get(position);
     }
 

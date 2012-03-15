@@ -65,15 +65,15 @@ public final class OperationDescription implements org.omg.CORBA.portable.IDLEnt
 
     public OperationDescription (String _name, String _id, String _defined_in, String _version, org.omg.CORBA.TypeCode _result, com.sun.org.omg.CORBA.OperationMode _mode, String[] _contexts, com.sun.org.omg.CORBA.ParameterDescription[] _parameters, com.sun.org.omg.CORBA.ExceptionDescription[] _exceptions)
     {
-	name = _name;
-	id = _id;
-	defined_in = _defined_in;
-	version = _version;
-	result = _result;
-	mode = _mode;
-	contexts = _contexts;
-	parameters = _parameters;
-	exceptions = _exceptions;
+        name = _name;
+        id = _id;
+        defined_in = _defined_in;
+        version = _version;
+        result = _result;
+        mode = _mode;
+        contexts = _contexts;
+        parameters = _parameters;
+        exceptions = _exceptions;
     } // ctor
 
 } // class OperationDescription

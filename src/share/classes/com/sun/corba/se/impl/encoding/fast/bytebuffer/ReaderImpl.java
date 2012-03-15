@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast.bytebuffer ;
+package com.sun.corba.ee.impl.encoding.fast.bytebuffer ;
 
 import java.nio.ByteOrder ;
 import java.nio.ByteBuffer ;
@@ -110,10 +110,10 @@ public class ReaderImpl implements Reader {
      * @throws TimeoutException when a read operation times out waiting for more data.
      */
     public ReaderImpl( long timeout ) {
-	buffers = new LinkedBlockingQueue<BufferWrapper>() ;
+        buffers = new LinkedBlockingQueue<BufferWrapper>() ;
         queueSize = 0 ;
-	current = null ;
-	closed = false ;
+        current = null ;
+        closed = false ;
         if (timeout < 0)
             throw new IllegalArgumentException( "Timeout must not be negative." ) ;
         this.timeout = timeout ;
@@ -138,14 +138,14 @@ public class ReaderImpl implements Reader {
     public synchronized void receiveData( BufferWrapper bb ) {
         bb.reset() ;
         bb.buffer().order( byteOrder ) ;
-	buffers.offer( bb ) ;
+        buffers.offer( bb ) ;
         queueSize += bb.remaining() ;
     }
 
     /** Cause all subsequent method calls on this object to throw IllegalStateException.
      */
     public synchronized void close() {
-	closed = true ; 
+        closed = true ; 
 
         current.dispose() ;
         current = null ;
@@ -153,7 +153,7 @@ public class ReaderImpl implements Reader {
         for (BufferWrapper bw : buffers) {
             bw.dispose() ;
         }
-	buffers = null ;
+        buffers = null ;
         queueSize = 0 ;
     }
 

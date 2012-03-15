@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.threadpool;
+package com.sun.corba.ee.spi.threadpool;
 
 public interface WorkQueue 
 { 

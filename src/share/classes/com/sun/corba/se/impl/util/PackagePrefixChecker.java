@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.util;
+package com.sun.corba.ee.impl.util;
 
 import java.io.File;
 
@@ -55,10 +55,10 @@ public final class PackagePrefixChecker
 
     public static String correctPackageName (String p)
     {
-	if (isOffendingPackage(p))
-	    return PACKAGE_PREFIX+p;
-	else 
-	    return p;
+        if (isOffendingPackage(p))
+            return PACKAGE_PREFIX+p;
+        else 
+            return p;
     }
 
     public static boolean isOffendingPackage(String p)
@@ -79,8 +79,8 @@ public final class PackagePrefixChecker
     public static String withoutPackagePrefix(String p)
     {
         if (hasBeenPrefixed(p)) 
-	    return p.substring(PACKAGE_PREFIX_LENGTH) ;
+            return p.substring(PACKAGE_PREFIX_LENGTH) ;
         else 
-	    return p;
+            return p;
     }
 }

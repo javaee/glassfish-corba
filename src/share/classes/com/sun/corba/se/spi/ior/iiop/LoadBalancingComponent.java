@@ -37,9 +37,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.ior.iiop;
+package com.sun.corba.ee.spi.ior.iiop;
 
-import com.sun.corba.se.spi.ior.TaggedComponent;
+import com.sun.corba.ee.spi.ior.TaggedComponent;
 
 public interface LoadBalancingComponent extends TaggedComponent
 {

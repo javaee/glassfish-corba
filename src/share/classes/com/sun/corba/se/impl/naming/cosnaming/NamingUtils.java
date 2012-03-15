@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.cosnaming;
+package com.sun.corba.ee.impl.naming.cosnaming;
 
 import java.io.*;
 import org.omg.CosNaming.NameComponent;
@@ -59,8 +59,8 @@ public class NamingUtils {
      * @param msg the debug message to print.
      */ 
     public static void dprint(String msg) {
-	if (debug && debugStream != null)
-	    debugStream.println(msg);
+        if (debug && debugStream != null)
+            debugStream.println(msg);
     }
 
     /**
@@ -68,10 +68,10 @@ public class NamingUtils {
      * @param msg the error message to print.
      */ 
     public static void errprint(String msg) {
-	if (errStream != null)
-	    errStream.println(msg);
-	else
-	    System.err.println(msg);
+        if (errStream != null)
+            errStream.println(msg);
+        else
+            System.err.println(msg);
     }
 
     /**
@@ -79,10 +79,10 @@ public class NamingUtils {
      * @param e any Java exception.
      */
     public static void printException(java.lang.Exception e) {
-	if (errStream != null)
-	    e.printStackTrace(errStream);
-	else
-	    e.printStackTrace();
+        if (errStream != null)
+            e.printStackTrace(errStream);
+        else
+            e.printStackTrace();
     }
 
     /**
@@ -91,16 +91,16 @@ public class NamingUtils {
      * @exception IOException thrown if the file cannot be opened for output.
      */ 
     public static void makeDebugStream(File logFile)
-	throws java.io.IOException {
-	// Create an outputstream for debugging
-	java.io.OutputStream logOStream =
-	    new java.io.FileOutputStream(logFile);
-	java.io.DataOutputStream logDStream =
-	    new java.io.DataOutputStream(logOStream);
-	debugStream = new java.io.PrintStream(logDStream);
+        throws java.io.IOException {
+        // Create an outputstream for debugging
+        java.io.OutputStream logOStream =
+            new java.io.FileOutputStream(logFile);
+        java.io.DataOutputStream logDStream =
+            new java.io.DataOutputStream(logOStream);
+        debugStream = new java.io.PrintStream(logDStream);
       
-	// Emit first message
-	debugStream.println("Debug Stream Enabled.");
+        // Emit first message
+        debugStream.println("Debug Stream Enabled.");
     }
   
     /**
@@ -109,16 +109,16 @@ public class NamingUtils {
      * @exception IOException thrown if the file cannot be opened for output.
      */ 
     public static void makeErrStream(File errFile)
-	throws java.io.IOException {
-	if (debug) {
-	    // Create an outputstream for errors
-	    java.io.OutputStream errOStream =
-		new java.io.FileOutputStream(errFile);
-	    java.io.DataOutputStream errDStream =
-		new java.io.DataOutputStream(errOStream);
-	    errStream = new java.io.PrintStream(errDStream);
-	    dprint("Error stream setup completed.");
-	}
+        throws java.io.IOException {
+        if (debug) {
+            // Create an outputstream for errors
+            java.io.OutputStream errOStream =
+                new java.io.FileOutputStream(errFile);
+            java.io.DataOutputStream errDStream =
+                new java.io.DataOutputStream(errOStream);
+            errStream = new java.io.PrintStream(errDStream);
+            dprint("Error stream setup completed.");
+        }
     }  
 
 

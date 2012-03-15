@@ -39,7 +39,7 @@
  */
 package pi.serverinterceptor;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import corba.framework.*;
 import java.util.*;
 
@@ -63,8 +63,8 @@ public class ServerInterceptorTest
     protected void doTest() 
         throws Throwable 
     {
-	startORBD();
-	System.out.println();
+        startORBD();
+        System.out.println();
         System.out.println( "      \t\t\t\tLocal\t\tRemote" );
 
         beginTest( "[POA]\t\t\t" );
@@ -90,7 +90,7 @@ public class ServerInterceptorTest
         endTest( "\t\t" );
         testServerRequestDispatcherDSIRemote();
         endTest( "\n" );
-	stopORBD();
+        stopORBD();
 
         System.out.println();
         System.out.print( "      Final Result: " );
@@ -100,185 +100,185 @@ public class ServerInterceptorTest
     }
 
     private void testPOALocal()
-	throws Throwable
+        throws Throwable
     {
-	Controller server;
+        Controller server;
 
-	try {
+        try {
 
             Properties clientProps = Options.getClientProperties();
 
             clientProps.setProperty(ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
                                     Options.getUnusedPort().toString());
 
-	    // Start only a server - the server will create the client in this 
-	    // test.  Create it as a client so no handshake is tested for.
-	    server = createClient( "pi.serverinterceptor.POALocalServer",
-				   "poalocal" );
+            // Start only a server - the server will create the client in this 
+            // test.  Create it as a client so no handshake is tested for.
+            server = createClient( "pi.serverinterceptor.POALocalServer",
+                                   "poalocal" );
 
-	    server.start();
+            server.start();
 
             clientProps.remove(ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY);
 
-	    server.waitFor();
-	    printEndTest( server, null );
-	    server.stop();
-	}
-	finally {
-	}
+            server.waitFor();
+            printEndTest( server, null );
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testPOARemote()
-	throws Throwable
+        throws Throwable
     {
-	Controller client, server;
+        Controller client, server;
 
-	try {
+        try {
 
             Properties serverProps = Options.getServerProperties();
 
             serverProps.setProperty(ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
                                     Options.getUnusedPort().toString());
 
-	    server = createServer( "pi.serverinterceptor.POARemoteServer", 
-				   "poa-server" );
-	    server.start();
+            server = createServer( "pi.serverinterceptor.POARemoteServer", 
+                                   "poa-server" );
+            server.start();
 
             serverProps.remove(ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY);
 
-	    client = createClient( "pi.serverinterceptor.POARemoteClient",
-				   "poa-client" );
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
-	    server.stop();
-	}
-	finally {
-	}
+            client = createClient( "pi.serverinterceptor.POARemoteClient",
+                                   "poa-client" );
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testPOADSILocal()
-	throws Throwable
+        throws Throwable
     {
         Controller server;
 
-	try {
+        try {
 
-	    // Start only a server - the server will create the client in this 
-	    // test.  Create it as a client so no handshake is tested for.
-	    server = createClient( "pi.serverinterceptor.DSIPOALocalServer",
-				   "dsipoalocal" );
-	    server.start();
-	    server.waitFor();
-	    printEndTest( server, null );
-	    server.stop();
-	}
-	finally {
-	}
+            // Start only a server - the server will create the client in this 
+            // test.  Create it as a client so no handshake is tested for.
+            server = createClient( "pi.serverinterceptor.DSIPOALocalServer",
+                                   "dsipoalocal" );
+            server.start();
+            server.waitFor();
+            printEndTest( server, null );
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testPOADSIRemote()
-	throws Throwable 
+        throws Throwable 
     {
-	Controller client, server;
+        Controller client, server;
 
-	try {
-	    server = createServer( "pi.serverinterceptor.DSIPOARemoteServer", 
-				   "dsi-poa-server" );
-	    server.start();
-	    client = createClient( "pi.serverinterceptor.POARemoteClient",
-				   "dsi-poa-client" );
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
-	    server.stop();
-	}
-	finally {
-	}
+        try {
+            server = createServer( "pi.serverinterceptor.DSIPOARemoteServer", 
+                                   "dsi-poa-server" );
+            server.start();
+            client = createClient( "pi.serverinterceptor.POARemoteClient",
+                                   "dsi-poa-client" );
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testRMILocal()
-	throws Throwable
+        throws Throwable
     {
-	Controller server;
+        Controller server;
 
-	try {
-	    // Start only a server - the server will create the client in this 
-	    // test.  Create it as a client so no handshake is tested for.
-	    server = createClient( "pi.serverinterceptor.RMILocalServer",
-				   "rmilocal" );
-	    server.start();
-	    server.waitFor();
-	    printEndTest( server, null );
-	    server.stop();
-	}
-	finally {
-	}
+        try {
+            // Start only a server - the server will create the client in this 
+            // test.  Create it as a client so no handshake is tested for.
+            server = createClient( "pi.serverinterceptor.RMILocalServer",
+                                   "rmilocal" );
+            server.start();
+            server.waitFor();
+            printEndTest( server, null );
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testRMIRemote() 
-	throws Throwable
+        throws Throwable
     {
-	Controller client, server;
+        Controller client, server;
 
-	try {
-	    server = createServer( "pi.serverinterceptor.RMIRemoteServer",
-				   "rmi-server" );
-	    server.start();
-	    client = createClient( "pi.serverinterceptor.RMIRemoteClient",
-				   "rmi-client" );
+        try {
+            server = createServer( "pi.serverinterceptor.RMIRemoteServer",
+                                   "rmi-server" );
+            server.start();
+            client = createClient( "pi.serverinterceptor.RMIRemoteClient",
+                                   "rmi-client" );
 
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
-	    server.stop();
-	}
-	finally {
-	}
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testServerRequestDispatcherDSILocal()
-	throws Throwable
+        throws Throwable
     {
-	Controller server;
+        Controller server;
 
-	try {
-	    // Start only a server - the server will create the client in this 
-	    // test.  Create it as a client so no handshake is tested for.
-	    server = createClient( "pi.serverinterceptor.DSIRMILocalServer",
-				   "dsirmilocal" );
-	    server.start();
-	    server.waitFor();
-	    printEndTest( server, null );
-	    server.stop();
-	}
-	finally {
-	}
+        try {
+            // Start only a server - the server will create the client in this 
+            // test.  Create it as a client so no handshake is tested for.
+            server = createClient( "pi.serverinterceptor.DSIRMILocalServer",
+                                   "dsirmilocal" );
+            server.start();
+            server.waitFor();
+            printEndTest( server, null );
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testServerRequestDispatcherDSIRemote()
-	throws Throwable
+        throws Throwable
     {
-	Controller client, server;
+        Controller client, server;
 
-	try {
-	    server = createServer( "pi.serverinterceptor.DSIRMIRemoteServer",
-				   "dsi-rmi-server" );
-	    server.start();
-	    client = createClient( "pi.serverinterceptor.DSIRMIRemoteClient",
-				   "dsi-rmi-client" );
+        try {
+            server = createServer( "pi.serverinterceptor.DSIRMIRemoteServer",
+                                   "dsi-rmi-server" );
+            server.start();
+            client = createClient( "pi.serverinterceptor.DSIRMIRemoteClient",
+                                   "dsi-rmi-client" );
 
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
-	    server.stop();
-	}
-	finally {
-	}
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void beginTest( String name )
@@ -294,24 +294,24 @@ public class ServerInterceptorTest
     }
 
     private void printBeginTest( String name ) {
-	System.out.print( "      " + name );
+        System.out.print( "      " + name );
     }
 
     private void printEndTest( Controller client, Controller server ) {
-	if( (server != null) && server.finished() ) {
-	    System.out.print( "FAILED, Server crashed" );
-	    failed = true;
-	}
-	else if( (client != null) && 
-		 (client.exitValue() != Controller.SUCCESS) ) 
-	{
-	    System.out.print( "FAILED, Client exit value = " +
-		client.exitValue() );
+        if( (server != null) && server.finished() ) {
+            System.out.print( "FAILED, Server crashed" );
             failed = true;
-	}
-	else {
-	    System.out.print( "PASSED" );
-	}
+        }
+        else if( (client != null) && 
+                 (client.exitValue() != Controller.SUCCESS) ) 
+        {
+            System.out.print( "FAILED, Client exit value = " +
+                client.exitValue() );
+            failed = true;
+        }
+        else {
+            System.out.print( "PASSED" );
+        }
     }
 
     private void startORBD()

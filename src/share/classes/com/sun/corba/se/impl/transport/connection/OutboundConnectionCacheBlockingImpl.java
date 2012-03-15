@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport.connection;
+package com.sun.corba.ee.impl.transport.connection;
 
 import java.io.IOException ;
 
@@ -47,13 +47,13 @@ import java.util.HashMap ;
 
 import java.util.concurrent.locks.ReentrantLock ;
 
-import com.sun.corba.se.spi.transport.connection.Connection ;
-import com.sun.corba.se.spi.transport.connection.ConnectionFinder ;
-import com.sun.corba.se.spi.transport.connection.ContactInfo ;
-import com.sun.corba.se.spi.transport.connection.OutboundConnectionCache ;
+import com.sun.corba.ee.spi.transport.connection.Connection ;
+import com.sun.corba.ee.spi.transport.connection.ConnectionFinder ;
+import com.sun.corba.ee.spi.transport.connection.ContactInfo ;
+import com.sun.corba.ee.spi.transport.connection.OutboundConnectionCache ;
 
-import com.sun.corba.se.spi.transport.concurrent.ConcurrentQueueFactory;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.spi.transport.concurrent.ConcurrentQueueFactory;
+import com.sun.corba.ee.spi.trace.Transport;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,9 +73,9 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
 
     // Configuration data
     // XXX we may want this data to be dynamically re-configurable
-    private final int maxParallelConnections ;	// Maximum number of 
-						// connections we will open 
-						// to the same endpoint
+    private final int maxParallelConnections ;  // Maximum number of 
+                                                // connections we will open 
+                                                // to the same endpoint
 
     @ManagedAttribute
     public int maxParallelConnections() { return maxParallelConnections ; }
@@ -95,24 +95,24 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
     }
 
     protected String thisClassName() {
-	return "OutboundConnectionCacheBlockingImpl" ;
+        return "OutboundConnectionCacheBlockingImpl" ;
     }
 
     public OutboundConnectionCacheBlockingImpl( final String cacheType, 
-	final int highWaterMark, final int numberToReclaim, 
-	final int maxParallelConnections, final long ttl ) {
+        final int highWaterMark, final int numberToReclaim, 
+        final int maxParallelConnections, final long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, ttl ) ;
+        super( cacheType, highWaterMark, numberToReclaim, ttl ) ;
 
-	if (maxParallelConnections < 1) 
-	    throw new IllegalArgumentException( 
-		"maxParallelConnections must be > 0" ) ;
+        if (maxParallelConnections < 1) 
+            throw new IllegalArgumentException( 
+                "maxParallelConnections must be > 0" ) ;
 
-	this.maxParallelConnections = maxParallelConnections ;
+        this.maxParallelConnections = maxParallelConnections ;
 
-	this.entryMap = 
+        this.entryMap = 
             new HashMap<ContactInfo<C>,OutboundCacheEntry<C>>() ;
-	this.connectionMap = new HashMap<C,OutboundConnectionState<C>>() ;
+        this.connectionMap = new HashMap<C,OutboundConnectionState<C>>() ;
         this.reclaimableConnections = 
             ConcurrentQueueFactory.<C>makeConcurrentQueue( ttl ) ;
     }
@@ -156,11 +156,11 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
 
     @Transport
     public C get( final ContactInfo<C> cinfo,
-	final ConnectionFinder<C> finder ) throws IOException {
+        final ConnectionFinder<C> finder ) throws IOException {
         lock.lock() ;
         C result = null ;
 
-	try {
+        try {
             while (true) {
                 final OutboundCacheEntry<C> entry = getEntry( cinfo ) ;
 
@@ -218,18 +218,18 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
                     break ;
                 }
             }
-	} finally {
+        } finally {
             display( "totalIdle", totalIdle ) ;
             display( "totalBusy", totalBusy ) ;
             lock.unlock() ;
-	}
+        }
 
         return result ;
     }
 
     @Transport
     private OutboundCacheEntry<C> getEntry( final ContactInfo<C> cinfo 
-	) throws IOException {
+        ) throws IOException {
 
         OutboundCacheEntry<C> result = null ;
         // This is the only place a OutboundCacheEntry is constructed.
@@ -249,8 +249,8 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
     // no connection currently exists.
     @Transport
     private C tryNewConnection( final OutboundCacheEntry<C> entry, 
-	final ContactInfo<C> cinfo ) throws IOException {
-	
+        final ContactInfo<C> cinfo ) throws IOException {
+        
         C conn = null ;
         if (internalCanCreateNewConnection(entry)) {
             // If this throws an exception just let it
@@ -271,60 +271,60 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
 
     @Transport
     private OutboundConnectionState<C> getConnectionState( 
-	ContactInfo<C> cinfo, OutboundCacheEntry<C> entry, C conn ) {
+        ContactInfo<C> cinfo, OutboundCacheEntry<C> entry, C conn ) {
         lock.lock() ;
-	
-	try {
-	    OutboundConnectionState<C> cs = connectionMap.get( conn ) ;
-	    if (cs == null) {
-		cs = new OutboundConnectionState<C>( cinfo, entry, conn ) ;
+        
+        try {
+            OutboundConnectionState<C> cs = connectionMap.get( conn ) ;
+            if (cs == null) {
+                cs = new OutboundConnectionState<C>( cinfo, entry, conn ) ;
                 display( "creating new OutboundConnectionState ", cs ) ;
-		connectionMap.put( conn, cs ) ;
-	    } else {
+                connectionMap.put( conn, cs ) ;
+            } else {
                 display( "found OutboundConnectionState ", cs ) ;
-	    }
+            }
 
-	    return cs ;
-	} finally {
+            return cs ;
+        } finally {
             lock.unlock() ;
-	}
+        }
     }
 
     @Transport
     public void release( final C conn, 
-	final int numResponsesExpected ) {
+        final int numResponsesExpected ) {
         lock.lock() ;
         OutboundConnectionState<C> cs = null ;
 
-	try {
+        try {
             cs = connectionMap.get( conn ) ;
-	    if (cs == null) {
+            if (cs == null) {
                 msg( "connection was already closed" ) ;
-		return ; 
-	    } else {
+                return ; 
+            } else {
                 int numResp = cs.release( numResponsesExpected ) ;
                 display( "numResponsesExpected", numResponsesExpected ) ;
 
-		if (!cs.isBusy()) {
-		    boolean connectionClosed = false ;
-		    if (numResp == 0) {
-			connectionClosed = reclaimOrClose( cs, conn ) ;
-		    }
+                if (!cs.isBusy()) {
+                    boolean connectionClosed = false ;
+                    if (numResp == 0) {
+                        connectionClosed = reclaimOrClose( cs, conn ) ;
+                    }
 
-		    decrementTotalBusy() ;
+                    decrementTotalBusy() ;
 
-		    if (!connectionClosed) {
+                    if (!connectionClosed) {
                         msg( "idle connection queued" ) ;
-			totalIdle++ ;
-		    }
-		}
-	    }
-	} finally {
+                        totalIdle++ ;
+                    }
+                }
+            }
+        } finally {
             display( "cs", cs ) ;
             display( "totalIdle", totalIdle ) ;
             display( "totalBusy", totalBusy ) ;
             lock.unlock() ;
-	}
+        }
     }
 
     /** Decrement the number of expected responses.  When a connection is idle 
@@ -333,19 +333,19 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
     @Transport
     public void responseReceived( final C conn ) {
         lock.lock() ;
-	try {
-	    final OutboundConnectionState<C> cs = connectionMap.get( conn ) ;
-	    if (cs == null) {
+        try {
+            final OutboundConnectionState<C> cs = connectionMap.get( conn ) ;
+            if (cs == null) {
                 msg( "response received on closed connection" ) ;
-		return ;
-	    }
+                return ;
+            }
 
             if (cs.responseReceived()) {
-		reclaimOrClose( cs, conn ) ;
+                reclaimOrClose( cs, conn ) ;
             }
-	} finally {
+        } finally {
             lock.unlock() ;
-	}
+        }
     }
     
     // If overflow, close conn and return true,
@@ -376,29 +376,29 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
     @Transport
     public void close( final C conn ) {
         lock.lock() ;
-	try {
-	    final OutboundConnectionState<C> cs = connectionMap.remove( conn ) ;
-	    if (cs == null) {
+        try {
+            final OutboundConnectionState<C> cs = connectionMap.remove( conn ) ;
+            if (cs == null) {
                 msg( "connection was already closed" ) ;
-		return ;
-	    }
+                return ;
+            }
             display( "cs", cs ) ;
 
             if (cs.isBusy()) {
                 msg( "connection removed from busy connections" ) ;
-		decrementTotalBusy() ;
+                decrementTotalBusy() ;
             } else if (cs.isIdle()) {
                 msg( "connection removed from idle connections" ) ;
-		decrementTotalIdle() ;
+                decrementTotalIdle() ;
             }
             try {
                 cs.close();
             } catch (IOException ex) {
                 // ignore this
             }
-	} finally {
+        } finally {
             lock.unlock() ;
-	}
+        }
     }
 
     @Transport

@@ -50,28 +50,28 @@ public class FactoryForRetainAndUseActiveMapOnly implements POAFactory
 {
 
     public POA createPOA(POA parent)
-	throws AdapterAlreadyExists, InvalidPolicy
+        throws AdapterAlreadyExists, InvalidPolicy
     {
-	Policy[] policies = new Policy[2];
+        Policy[] policies = new Policy[2];
 
         System.out.println("createPOA1");
 
-	policies[0] =
-	    parent.create_servant_retention_policy(
+        policies[0] =
+            parent.create_servant_retention_policy(
                 ServantRetentionPolicyValue.RETAIN);
 
         System.out.println("createPOA2");
 
-	policies[1] =
-	    parent.create_request_processing_policy(
+        policies[1] =
+            parent.create_request_processing_policy(
                 RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY);
 
 
         System.out.println("createPOA3");
-	
-	POA x = parent.create_POA("RetainAndUseActiveMap",
-				 null,
-				 policies);
+        
+        POA x = parent.create_POA("RetainAndUseActiveMap",
+                                 null,
+                                 policies);
 
         System.out.println("createPOA4");
 
@@ -79,6 +79,6 @@ public class FactoryForRetainAndUseActiveMapOnly implements POAFactory
     }
 
     public String getObjectFactoryName() {
-	return "corba.poapolicies.BasicObjectFactoryImpl";
+        return "corba.poapolicies.BasicObjectFactoryImpl";
     }
 }

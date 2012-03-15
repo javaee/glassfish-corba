@@ -38,14 +38,14 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.interceptors;
+package com.sun.corba.ee.impl.interceptors;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 import org.omg.PortableInterceptor.Current;
 import org.omg.PortableInterceptor.InvalidSlot;
 import org.omg.CORBA.Any;
 
-import com.sun.corba.se.spi.logging.OMGSystemException ;
+import com.sun.corba.ee.spi.logging.OMGSystemException ;
 
 /**
  * PICurrent is the implementation of Current as specified in the Portable
@@ -85,8 +85,8 @@ public class PICurrent extends org.omg.CORBA.LocalObject
      * initialization.
      */
     PICurrent( ORB myORB ) {
-	this.myORB = myORB;
-	this.orbInitializing = true;
+        this.myORB = myORB;
+        this.orbInitializing = true;
         slotCounter = 0;
     }
 
@@ -138,12 +138,12 @@ public class PICurrent extends org.omg.CORBA.LocalObject
      */
     public void set_slot( int id, Any data ) throws InvalidSlot 
     {
-	if( orbInitializing ) {
-	    // As per ptc/00-08-06 if the ORB is still initializing, disallow
-	    // calls to get_slot and set_slot.  If an attempt is made to call,
-	    // throw a BAD_INV_ORDER.
-	    throw wrapper.invalidPiCall3() ;
-	}
+        if( orbInitializing ) {
+            // As per ptc/00-08-06 if the ORB is still initializing, disallow
+            // calls to get_slot and set_slot.  If an attempt is made to call,
+            // throw a BAD_INV_ORDER.
+            throw wrapper.invalidPiCall3() ;
+        }
 
         getSlotTable().set_slot( id, data );
     }
@@ -154,12 +154,12 @@ public class PICurrent extends org.omg.CORBA.LocalObject
      */
     public Any get_slot( int id ) throws InvalidSlot 
     {
-	if( orbInitializing ) {
-	    // As per ptc/00-08-06 if the ORB is still initializing, disallow
-	    // calls to get_slot and set_slot.  If an attempt is made to call,
-	    // throw a BAD_INV_ORDER.
-	    throw wrapper.invalidPiCall4() ;
-	}
+        if( orbInitializing ) {
+            // As per ptc/00-08-06 if the ORB is still initializing, disallow
+            // calls to get_slot and set_slot.  If an attempt is made to call,
+            // throw a BAD_INV_ORDER.
+            throw wrapper.invalidPiCall4() ;
+        }
 
         return getSlotTable().get_slot( id );
     }
@@ -177,7 +177,7 @@ public class PICurrent extends org.omg.CORBA.LocalObject
      * initializing.
      */
     void setORBInitializing( boolean init ) {
-	this.orbInitializing = init;
+        this.orbInitializing = init;
     }
 }
 

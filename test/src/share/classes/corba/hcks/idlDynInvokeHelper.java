@@ -48,7 +48,7 @@ import org.omg.CORBA.*;
 import org.omg.CORBA.portable.UnknownException;
 import org.omg.PortableServer.*;
 import java.util.Properties;
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 class idlDynInvokeHelper 
 {
@@ -62,113 +62,113 @@ class idlDynInvokeHelper
         try {
             if (r.op_name().equals(C.syncOK) ) {
 
-		// syncOK
-		
-		NVList nvlist = orb.create_list(0);
+                // syncOK
+                
+                NVList nvlist = orb.create_list(0);
 
-		Any a1 = orb.create_any();
-		a1.type(ORB.init().get_primitive_tc(TCKind.tk_string));
-		nvlist.add_value("arg1", a1, ARG_IN.value);
+                Any a1 = orb.create_any();
+                a1.type(ORB.init().get_primitive_tc(TCKind.tk_string));
+                nvlist.add_value("arg1", a1, ARG_IN.value);
 
-		// get values
-		r.arguments(nvlist);
-		String arg1 = a1.extract_string();
+                // get values
+                r.arguments(nvlist);
+                String arg1 = a1.extract_string();
 
-		U.sop(r.op_name() + "(" + arg1 + ")");
+                U.sop(r.op_name() + "(" + arg1 + ")");
 
-		Any __result = orb.create_any();
-		__result.insert_string(U.DSI(arg1));
-		r.set_result(__result);
+                Any __result = orb.create_any();
+                __result.insert_string(U.DSI(arg1));
+                r.set_result(__result);
 
             } else if (r.op_name().equals(C.asyncOK) ) {
 
-		// asyncOK
+                // asyncOK
 
-		NVList nvlist = orb.create_list(0);
+                NVList nvlist = orb.create_list(0);
 
-		Any a1 = orb.create_any();
-		a1.type(idlJStringHelper.type());
-		nvlist.add_value("arg1", a1, ARG_IN.value);
+                Any a1 = orb.create_any();
+                a1.type(idlJStringHelper.type());
+                nvlist.add_value("arg1", a1, ARG_IN.value);
 
-		r.arguments(nvlist);
+                r.arguments(nvlist);
 
-		byte[] data = idlJStringHelper.extract(a1);
-		U.sop(new String(data, C.UTF8));
-		
-		Any __return = orb.create_any();
-		__return.type(orb.get_primitive_tc(TCKind.tk_void));
-		r.set_result(__return);
+                byte[] data = idlJStringHelper.extract(a1);
+                U.sop(new String(data, C.UTF8));
+                
+                Any __return = orb.create_any();
+                __return.type(orb.get_primitive_tc(TCKind.tk_void));
+                r.set_result(__return);
 
-	    } else if (r.op_name().equals(C.throwUserException) ) {
+            } else if (r.op_name().equals(C.throwUserException) ) {
 
-		// throwUserException
+                // throwUserException
 
-		idlExampleException ex = null;
-		try {
-		    C.throwUserException(U.from_a_idlDynamic_servant);
-		    throw new INTERNAL(U.SHOULD_NOT_SEE_THIS);
-		} catch (idlExampleException e) {
-		    ex = e;
-		}
+                idlExampleException ex = null;
+                try {
+                    C.throwUserException(U.from_a_idlDynamic_servant);
+                    throw new INTERNAL(U.SHOULD_NOT_SEE_THIS);
+                } catch (idlExampleException e) {
+                    ex = e;
+                }
 
-		Any any = orb.create_any();
-		idlExampleExceptionHelper.insert(any, ex);
-		r.set_exception(any);
-		return;
+                Any any = orb.create_any();
+                idlExampleExceptionHelper.insert(any, ex);
+                r.set_exception(any);
+                return;
 
-	    } else if (r.op_name().equals(C.throwSystemException) ) {
+            } else if (r.op_name().equals(C.throwSystemException) ) {
 
-		// throwSystemException
+                // throwSystemException
 
-		SystemException ex = null;
-		try {
-		    C.throwSystemException(U.from_a_idlDynamic_servant);
-		    throw new INTERNAL(U.SHOULD_NOT_SEE_THIS);
-		} catch (SystemException e) {
-		    ex = e;
-		}
+                SystemException ex = null;
+                try {
+                    C.throwSystemException(U.from_a_idlDynamic_servant);
+                    throw new INTERNAL(U.SHOULD_NOT_SEE_THIS);
+                } catch (SystemException e) {
+                    ex = e;
+                }
 
-		if (throwSystemException) {
-		    throwSystemException = false;
-		    throw ex;
-		} else {
-		    throwSystemException = true;
-		    Any any = orb.create_any();
-		    ORBUtility.insertSystemException(ex, any);
-		    r.set_exception(any);
-		    return;
-		}
-	    } else if (r.op_name().equals(C.throwUnknownException)) {
+                if (throwSystemException) {
+                    throwSystemException = false;
+                    throw ex;
+                } else {
+                    throwSystemException = true;
+                    Any any = orb.create_any();
+                    ORBUtility.insertSystemException(ex, any);
+                    r.set_exception(any);
+                    return;
+                }
+            } else if (r.op_name().equals(C.throwUnknownException)) {
 
-		// throwUnknownException
+                // throwUnknownException
 
-		UnknownException ex = null;
-		try {
-		    C.throwUnknownException(U.from_a_idlDynamic_servant);
-		    throw new INTERNAL(U.SHOULD_NOT_SEE_THIS);
-		} catch (UnknownException e) {
-		    ex = e;
-		}
-			
-		Any any = orb.create_any();
-		ORBUtility.insertSystemException(ex, any);
-		r.set_exception(any);
-		return;
+                UnknownException ex = null;
+                try {
+                    C.throwUnknownException(U.from_a_idlDynamic_servant);
+                    throw new INTERNAL(U.SHOULD_NOT_SEE_THIS);
+                } catch (UnknownException e) {
+                    ex = e;
+                }
+                        
+                Any any = orb.create_any();
+                ORBUtility.insertSystemException(ex, any);
+                r.set_exception(any);
+                return;
 
 
-	    } else if (r.op_name().equals(C.throwUNKNOWN)) {
+            } else if (r.op_name().equals(C.throwUNKNOWN)) {
 
-		C.throwUNKNOWN(U.from_a_idlDynamic_servant);
+                C.throwUNKNOWN(U.from_a_idlDynamic_servant);
 
-	    }
+            }
 
         } catch (SystemException ex) {
-	    // REVISIT - probably time to remove this catch clause.
+            // REVISIT - probably time to remove this catch clause.
             U.sop("DynamicServant.invoke SystemException: " + ex);
-	    throw ex;
+            throw ex;
         } catch (Exception ex) {
             U.sop("DynamicServant.invoke Exception: " + ex);
-	    ex.printStackTrace(System.err);
+            ex.printStackTrace(System.err);
         }
     }
 }

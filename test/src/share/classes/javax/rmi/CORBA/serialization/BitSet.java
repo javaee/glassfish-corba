@@ -112,8 +112,8 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
         /* Traverse the bitset until a used unit is found */
         int i;
         for (i = unitsInUse-1; i >= 0; i--)
-	    if(bits[i] != 0)
-		break; //this unit is in use!
+            if(bits[i] != 0)
+                break; //this unit is in use!
 
         unitsInUse = i+1; //the new logical size
     }
@@ -122,7 +122,7 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      * Creates a new bit set. All bits are initially <code>false</code>.
      */
     public BitSet() {
-	this(BITS_PER_UNIT);
+        this(BITS_PER_UNIT);
     }
 
     /**
@@ -135,25 +135,25 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      *               is negative.
      */
     public BitSet(int nbits) {
-	/* nbits can't be negative; size 0 is OK */
-	if (nbits < 0)
-	    throw new NegativeArraySizeException(Integer.toString(nbits));
+        /* nbits can't be negative; size 0 is OK */
+        if (nbits < 0)
+            throw new NegativeArraySizeException(Integer.toString(nbits));
 
-	bits = new long[(unitIndex(nbits-1) + 1)];
+        bits = new long[(unitIndex(nbits-1) + 1)];
     }
 
     /**
      * Ensures that the BitSet can hold enough units.
-     * @param	unitsRequired the minimum acceptable number of units.
+     * @param   unitsRequired the minimum acceptable number of units.
      */
     private void ensureCapacity(int unitsRequired) {
-	if (bits.length < unitsRequired) {
-	    /* Allocate larger of doubled size or required size */
-	    int request = Math.max(2 * bits.length, unitsRequired);
-	    long newBits[] = new long[request];
-	    System.arraycopy(bits, 0, newBits, 0, unitsInUse);
-	    bits = newBits;
-	}
+        if (bits.length < unitsRequired) {
+            /* Allocate larger of doubled size or required size */
+            int request = Math.max(2 * bits.length, unitsRequired);
+            long newBits[] = new long[request];
+            System.arraycopy(bits, 0, newBits, 0, unitsInUse);
+            bits = newBits;
+        }
     }
 
     /**
@@ -168,8 +168,8 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
             return 0;
 
         int highestBit = (unitsInUse - 1) * 64;
-	long highestUnit = bits[unitsInUse - 1];
-	do {
+        long highestUnit = bits[unitsInUse - 1];
+        do {
             highestUnit = highestUnit >>> 1;
             highestBit++;
         } while(highestUnit > 0);
@@ -184,8 +184,8 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      * @since     JDK1.0
      */
     public void set(int bitIndex) {
-	if (bitIndex < 0)
-	    throw new IndexOutOfBoundsException(Integer.toString(bitIndex));
+        if (bitIndex < 0)
+            throw new IndexOutOfBoundsException(Integer.toString(bitIndex));
 
         int unitIndex = unitIndex(bitIndex);
         int unitsRequired = unitIndex+1;
@@ -207,13 +207,13 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      * @since     JDK1.0
      */
     public void clear(int bitIndex) {
-	if (bitIndex < 0)
-	    throw new IndexOutOfBoundsException(Integer.toString(bitIndex));
-	int unitIndex = unitIndex(bitIndex);
-	if (unitIndex >= unitsInUse)
-	    return;
+        if (bitIndex < 0)
+            throw new IndexOutOfBoundsException(Integer.toString(bitIndex));
+        int unitIndex = unitIndex(bitIndex);
+        if (unitIndex >= unitsInUse)
+            return;
 
-	bits[unitIndex] &= ~bit(bitIndex);
+        bits[unitIndex] &= ~bit(bitIndex);
         if (unitIndex == unitsInUse-1)
             recalculateUnitsInUse();
     }
@@ -229,9 +229,9 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
     public void andNot(BitSet set) {
         int unitsInCommon = Math.min(unitsInUse, set.unitsInUse);
 
-	// perform logical (a & !b) on bits in common
+        // perform logical (a & !b) on bits in common
         for (int i=0; i<unitsInCommon; i++) {
-	    bits[i] &= ~set.bits[i];
+            bits[i] &= ~set.bits[i];
         }
 
         recalculateUnitsInUse();
@@ -248,15 +248,15 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      * @exception IndexOutOfBoundsException if the specified index is negative.
      */
     public boolean get(int bitIndex) {
-	if (bitIndex < 0)
-	    throw new IndexOutOfBoundsException(Integer.toString(bitIndex));
+        if (bitIndex < 0)
+            throw new IndexOutOfBoundsException(Integer.toString(bitIndex));
 
-	boolean result = false;
-	int unitIndex = unitIndex(bitIndex);
-	if (unitIndex < unitsInUse)
-	    result = ((bits[unitIndex] & bit(bitIndex)) != 0);
+        boolean result = false;
+        int unitIndex = unitIndex(bitIndex);
+        if (unitIndex < unitsInUse)
+            result = ((bits[unitIndex] & bit(bitIndex)) != 0);
 
-	return result;
+        return result;
     }
 
     /**
@@ -269,19 +269,19 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      * @param   set   a bit set. 
      */
     public void and(BitSet set) {
-	if (this == set)
-	    return;
+        if (this == set)
+            return;
 
-	// perform logical AND on bits in common
-	int oldUnitsInUse = unitsInUse;
+        // perform logical AND on bits in common
+        int oldUnitsInUse = unitsInUse;
         int i;
-	unitsInUse = Math.min(unitsInUse,set.unitsInUse);
-	for(i=0; i<unitsInUse; i++)
-	    bits[i] &= set.bits[i];
+        unitsInUse = Math.min(unitsInUse,set.unitsInUse);
+        for(i=0; i<unitsInUse; i++)
+            bits[i] &= set.bits[i];
 
-	// clear out units no longer used
-	for( ; i < oldUnitsInUse; i++)
-	    bits[i] = 0;
+        // clear out units no longer used
+        for( ; i < oldUnitsInUse; i++)
+            bits[i] = 0;
     }
 
     /**
@@ -294,20 +294,20 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      * @param   set   a bit set.
      */
     public void or(BitSet set) {
-	if (this == set)
-	    return;
+        if (this == set)
+            return;
 
-	ensureCapacity(set.unitsInUse);
+        ensureCapacity(set.unitsInUse);
 
-	// perform logical OR on bits in common
-	int unitsInCommon = Math.min(unitsInUse, set.unitsInUse);
+        // perform logical OR on bits in common
+        int unitsInCommon = Math.min(unitsInUse, set.unitsInUse);
         int i;
-	for(i=0; i<unitsInCommon; i++)
-	    bits[i] |= set.bits[i];
+        for(i=0; i<unitsInCommon; i++)
+            bits[i] |= set.bits[i];
 
-	// copy any remaining bits
-	for(; i<set.unitsInUse; i++)
-	    bits[i] = set.bits[i];
+        // copy any remaining bits
+        for(; i<set.unitsInUse; i++)
+            bits[i] = set.bits[i];
 
         if (unitsInUse < set.unitsInUse)
             unitsInUse = set.unitsInUse;
@@ -340,12 +340,12 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
             unitsInUse = newUnitsInUse;
         }
 
-	// perform logical XOR on bits in common
+        // perform logical XOR on bits in common
         int i;
         for (i=0; i<unitsInCommon; i++)
-	    bits[i] ^= set.bits[i];
+            bits[i] ^= set.bits[i];
 
-	// copy any remaining bits
+        // copy any remaining bits
         for ( ; i<set.unitsInUse; i++)
             bits[i] = set.bits[i];
 
@@ -379,11 +379,11 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      * @return  a hash code value for this bit set.
      */
     public int hashCode() {
-	long h = 1234;
-	for (int i = bits.length; --i >= 0; )
+        long h = 1234;
+        for (int i = bits.length; --i >= 0; )
             h ^= bits[i] * (i + 1);
 
-	return (int)((h >> 32) ^ h);
+        return (int)((h >> 32) ^ h);
     }
     
     /**
@@ -394,7 +394,7 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      * @return  the number of bits currently in this bit set.
      */
     public int size() {
-	return bits.length << ADDRESS_BITS_PER_UNIT;
+        return bits.length << ADDRESS_BITS_PER_UNIT;
     }
 
     /**
@@ -413,30 +413,30 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      * @see     java.util.BitSet#size()
      */
     public boolean equals(Object obj) {
-	if (obj == null || !(obj instanceof BitSet))
-	    return false;
-	if (this == obj)
-	    return true;
+        if (obj == null || !(obj instanceof BitSet))
+            return false;
+        if (this == obj)
+            return true;
 
-	BitSet set = (BitSet) obj;
-	int minUnitsInUse = Math.min(unitsInUse, set.unitsInUse);
+        BitSet set = (BitSet) obj;
+        int minUnitsInUse = Math.min(unitsInUse, set.unitsInUse);
 
-	// Check units in use by both BitSets
-	for (int i = 0; i < minUnitsInUse; i++)
-	    if (bits[i] != set.bits[i])
-		return false;
+        // Check units in use by both BitSets
+        for (int i = 0; i < minUnitsInUse; i++)
+            if (bits[i] != set.bits[i])
+                return false;
 
-	// Check any units in use by only one BitSet (must be 0 in other)
-	if (unitsInUse > minUnitsInUse) {
-	    for (int i = minUnitsInUse; i<unitsInUse; i++)
-		if (bits[i] != 0)
-		    return false;
-	} else {
-	    for (int i = minUnitsInUse; i<set.unitsInUse; i++)
-		if (set.bits[i] != 0)
-		    return false;
-	}
-	return true;
+        // Check any units in use by only one BitSet (must be 0 in other)
+        if (unitsInUse > minUnitsInUse) {
+            for (int i = minUnitsInUse; i<unitsInUse; i++)
+                if (bits[i] != 0)
+                    return false;
+        } else {
+            for (int i = minUnitsInUse; i<set.unitsInUse; i++)
+                if (set.bits[i] != 0)
+                    return false;
+        }
+        return true;
     }
 
     /**
@@ -451,20 +451,20 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      * @see     java.util.BitSet#size()
      */
     public Object clone() {
-	BitSet result = null;
-	try {
-	    result = (BitSet) super.clone();
-	} catch (CloneNotSupportedException e) {
-	    throw new InternalError();
-	}
-	result.bits = new long[bits.length];
-	System.arraycopy(bits, 0, result.bits, 0, unitsInUse);
-	return result;
+        BitSet result = null;
+        try {
+            result = (BitSet) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError();
+        }
+        result.bits = new long[bits.length];
+        System.arraycopy(bits, 0, result.bits, 0, unitsInUse);
+        return result;
     }
 
     private void writeObjectX(java.io.ObjectOutputStream out)
-	throws IOException {
-	out.defaultWriteObject();
+        throws IOException {
+        out.defaultWriteObject();
     }
     /**
      * This override of readObject makes sure unitsInUse is set properly
@@ -506,20 +506,20 @@ public class BitSet implements java.lang.Cloneable, java.io.Serializable {
      * @return  a string representation of this bit set.
      */
     public String toString() {
-	int numBits = unitsInUse << ADDRESS_BITS_PER_UNIT;
-	StringBuffer buffer = new StringBuffer(8*numBits + 2);
-	String separator = "";
-	buffer.append('{');
+        int numBits = unitsInUse << ADDRESS_BITS_PER_UNIT;
+        StringBuffer buffer = new StringBuffer(8*numBits + 2);
+        String separator = "";
+        buffer.append('{');
 
-	for (int i = 0 ; i < numBits; i++) {
-	    if (get(i)) {
-		buffer.append(separator);
-		separator = ", ";
-	        buffer.append(i);
-	    }
+        for (int i = 0 ; i < numBits; i++) {
+            if (get(i)) {
+                buffer.append(separator);
+                separator = ", ";
+                buffer.append(i);
+            }
         }
 
-	buffer.append('}');
-	return buffer.toString();
+        buffer.append('}');
+        return buffer.toString();
     }
 }

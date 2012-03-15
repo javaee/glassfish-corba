@@ -40,7 +40,7 @@
 package corba.shutdown;
 
 import HelloApp.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.ee.impl.orbutil.ORBConstants;
 
 import org.omg.CosNaming.*;
 import org.omg.CosNaming.NamingContextPackage.*;
@@ -48,8 +48,8 @@ import org.omg.CORBA.*;
 import java.util.Properties ;
 import org.omg.PortableServer.*;
 
-import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
-import com.sun.corba.se.spi.oa.rfm.ReferenceFactory ;
+import com.sun.corba.ee.spi.oa.rfm.ReferenceFactoryManager ;
+import com.sun.corba.ee.spi.oa.rfm.ReferenceFactory ;
 
 /**
  * Servant implementation
@@ -67,7 +67,7 @@ public class Server
     public static void main(String args[])
     {
         try {
-      	    Properties props = new Properties(System.getProperties());
+            Properties props = new Properties(System.getProperties());
             props.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
                 Integer.toString( argData.port() + instance ) ) ;
             props.setProperty( ORBConstants.ORB_ID_PROPERTY,
@@ -78,28 +78,28 @@ public class Server
                 "1" ) ;
             ORB orb = ORB.init(args, props);
         
-	// Get the RFM and naming service
-	ReferenceFactoryManager rfm = null ;
+        // Get the RFM and naming service
+        ReferenceFactoryManager rfm = null ;
 
-	try {
-	    rfm = ReferenceFactoryManager.class.cast( 
-		serverORB.resolve_initial_references( "ReferenceFactoryManager" )) ;
-	    rfm.activate() ;
-	    serverNamingRoot = NamingContextExtHelper.narrow(
-		serverORB.resolve_initial_references( "NameService" )) ;
-	} catch (Exception exc) {
-	    fatal( "Exception in getting initial references: " + exc, exc ) ;
-	}
+        try {
+            rfm = ReferenceFactoryManager.class.cast( 
+                serverORB.resolve_initial_references( "ReferenceFactoryManager" )) ;
+            rfm.activate() ;
+            serverNamingRoot = NamingContextExtHelper.narrow(
+                serverORB.resolve_initial_references( "NameService" )) ;
+        } catch (Exception exc) {
+            fatal( "Exception in getting initial references: " + exc, exc ) ;
+        }
 
-	TestServantLocator locator = new TestServantLocator( serverORB ) ;
-	PresentationManager pm = ORB.getPresentationManager() ;
+        TestServantLocator locator = new TestServantLocator( serverORB ) ;
+        PresentationManager pm = ORB.getPresentationManager() ;
 
-	String repositoryId ;
-	try {
-	    repositoryId = pm.getRepositoryId( new TestImpl() ) ;
-	} catch (Exception exc) {
-	    throw new RuntimeException( exc ) ;
-	}
+        String repositoryId ;
+        try {
+            repositoryId = pm.getRepositoryId( new TestImpl() ) ;
+        } catch (Exception exc) {
+            throw new RuntimeException( exc ) ;
+        }
       
             // Get rootPOA
             POA rootPOA = (POA)orb.resolve_initial_references("RootPOA");

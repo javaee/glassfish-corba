@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.ior ;
+package com.sun.corba.ee.impl.ior ;
 
 import org.omg.CORBA.portable.InputStream ;
 import org.omg.CORBA.portable.OutputStream ;
@@ -50,11 +50,11 @@ import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 import org.omg.PortableInterceptor.ObjectReferenceFactoryHelper ;
 
 
-import com.sun.corba.se.spi.ior.IORFactory;
-import com.sun.corba.se.spi.ior.IORTemplateList;
-import com.sun.corba.se.spi.ior.IORFactories;
+import com.sun.corba.ee.spi.ior.IORFactory;
+import com.sun.corba.ee.spi.ior.IORTemplateList;
+import com.sun.corba.ee.spi.ior.IORFactories;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 /** This is an implementation of the ObjectReferenceFactory abstract value 
 * type defined by the portable interceptors IDL.  
@@ -73,32 +73,32 @@ public class ObjectReferenceFactoryImpl extends ObjectReferenceProducerBase
 
     public ObjectReferenceFactoryImpl( InputStream is )
     {
-	super( (ORB)(is.orb()) ) ;
-	_read( is ) ;
+        super( (ORB)(is.orb()) ) ;
+        _read( is ) ;
     }
 
     public ObjectReferenceFactoryImpl( ORB orb, IORTemplateList iortemps ) 
     {
-	super( orb ) ;
-	iorTemplates = iortemps ;
+        super( orb ) ;
+        iorTemplates = iortemps ;
     }
 
     @Override
     public boolean equals( Object obj )
     {
-	if (!(obj instanceof ObjectReferenceFactoryImpl))
-	    return false ;
+        if (!(obj instanceof ObjectReferenceFactoryImpl))
+            return false ;
 
-	ObjectReferenceFactoryImpl other = (ObjectReferenceFactoryImpl)obj ;
+        ObjectReferenceFactoryImpl other = (ObjectReferenceFactoryImpl)obj ;
 
-	return (iorTemplates != null) && 
-	    iorTemplates.equals( other.iorTemplates ) ;
+        return (iorTemplates != null) && 
+            iorTemplates.equals( other.iorTemplates ) ;
     }
 
     @Override
     public int hashCode()
     {
-	return iorTemplates.hashCode() ;
+        return iorTemplates.hashCode() ;
     }
 
     // Note that this repository ID must reflect the implementation
@@ -107,16 +107,16 @@ public class ObjectReferenceFactoryImpl extends ObjectReferenceProducerBase
     // class.  This allows for multiple independent implementations 
     // of the abstract valuetype, should that become necessary.
     public static final String repositoryId = 
-	"IDL:com/sun/corba/se/impl/ior/ObjectReferenceFactoryImpl:1.0" ;
+        "IDL:com/sun/corba/ee/impl/ior/ObjectReferenceFactoryImpl:1.0" ;
 
     public String[] _truncatable_ids() 
     {
-	return new String[] { repositoryId } ;
+        return new String[] { repositoryId } ;
     }
 
     public TypeCode _type() 
     {
-	return ObjectReferenceFactoryHelper.type() ;
+        return ObjectReferenceFactoryHelper.type() ;
     }
 
     /** Read the data into a (presumably) empty ObjectReferenceFactoryImpl.  
@@ -124,29 +124,29 @@ public class ObjectReferenceFactoryImpl extends ObjectReferenceProducerBase
     */
     public void _read( InputStream is ) 
     {
-	org.omg.CORBA_2_3.portable.InputStream istr = 
-	    (org.omg.CORBA_2_3.portable.InputStream)is ;
+        org.omg.CORBA_2_3.portable.InputStream istr = 
+            (org.omg.CORBA_2_3.portable.InputStream)is ;
 
-	iorTemplates = IORFactories.makeIORTemplateList( istr ) ;
+        iorTemplates = IORFactories.makeIORTemplateList( istr ) ;
     }
 
     /** Write the state to the OutputStream.  
      */
     public void _write( OutputStream os ) 
     {
-	org.omg.CORBA_2_3.portable.OutputStream ostr = 
-	    (org.omg.CORBA_2_3.portable.OutputStream)os ;
+        org.omg.CORBA_2_3.portable.OutputStream ostr = 
+            (org.omg.CORBA_2_3.portable.OutputStream)os ;
 
-	iorTemplates.write( ostr ) ;
+        iorTemplates.write( ostr ) ;
     }
 
     public IORFactory getIORFactory()
     {
-	return iorTemplates ;
+        return iorTemplates ;
     }
 
     public IORTemplateList getIORTemplateList() 
     {
-	return iorTemplates ;
+        return iorTemplates ;
     }
 }

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)ClassB.java	1.4 99/06/07 */
+/* @(#)ClassB.java      1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -54,16 +54,16 @@ public class ClassB extends ClassA{
     private static final long serialVersionUID = 123556789L;
 
     private int a2;
-	
+        
     public ClassB(){
-	a2 = 73;
+        a2 = 73;
     }
-	
+        
     public long getTotal(){
-	return  super.getTotal() + a2;
+        return  super.getTotal() + a2;
     }
 
     public long getOriginalTotal(){
-	return super.getOriginalTotal() + 73;
+        return super.getOriginalTotal() + 73;
     }
 }

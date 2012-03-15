@@ -72,46 +72,46 @@ public class RDebugExec extends ExternalExec
 
     protected String[] getDebugVMArgs()
     {
-	String[] result = { "-Xdebug", "-Xnoagent", 
-	    "-Xrunjdwp:transport=dt_socket,server=y,suspend=y" } ;
+        String[] result = { "-Xdebug", "-Xnoagent", 
+            "-Xrunjdwp:transport=dt_socket,server=y,suspend=y" } ;
 
-	return result ;
+        return result ;
     } ;
 
     // Don't timeout while debugging
     protected long getMaximumTimeout()
     {
-	return 0 ;
+        return 0 ;
     }
 
     public int waitFor(long timeout) throws Exception
     {
-	// We don't want to set a timeout while debugging
-	return waitFor() ;
+        // We don't want to set a timeout while debugging
+        return waitFor() ;
     }
 
     public void start() throws Exception
     {
-	System.out.println( "Starting process " + processName + " in remote debug mode" ) ;
-	super.start() ;
-	Object waiter = new Object() ;
-	synchronized (waiter) {
-	    waiter.wait( 5000 ) ;
-	}
+        System.out.println( "Starting process " + processName + " in remote debug mode" ) ;
+        super.start() ;
+        Object waiter = new Object() ;
+        synchronized (waiter) {
+            waiter.wait( 5000 ) ;
+        }
     }
 
     public void stop()
     {
-	// we don't want to stop; just tell the user and let them
-	// tell us when to stop
-	
+        // we don't want to stop; just tell the user and let them
+        // tell us when to stop
+        
         printDebugBreak();
 
         System.out.println("The framework wants to stop the "
                            + processName + " process");
         
-	waitForEnter("Press enter to terminate the process");
+        waitForEnter("Press enter to terminate the process");
 
-	kill();
+        kill();
     }
 }

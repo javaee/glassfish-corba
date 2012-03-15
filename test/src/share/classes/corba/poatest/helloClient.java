@@ -54,13 +54,13 @@ public class helloClient
 
     public static void main(String args[])
     {
-	try{
-	    // create and initialize the ORB
-	    ORB orb = ORB.init(args, System.getProperties());
+        try{
+            // create and initialize the ORB
+            ORB orb = ORB.init(args, System.getProperties());
 
             // get the root naming context
         org.omg.CORBA.Object objRef = 
-		orb.resolve_initial_references("NameService");
+                orb.resolve_initial_references("NameService");
         NamingContext ncRef = NamingContextHelper.narrow(objRef);
  
         // resolve the Object Reference in Naming
@@ -69,7 +69,7 @@ public class helloClient
         helloRef = helloHelper.narrow(ncRef.resolve(path));
 
         System.out.println("Obtained a handle on server object: " + helloRef);
-	helloRef.sayHello();
+        helloRef.sayHello();
         System.out.println("OK! Returned from oneway call !!");
 
         // call shutdown
@@ -78,11 +78,11 @@ public class helloClient
         System.out.println("OK! Returned from shutdown!!");
 
 
-	} catch (Exception e) {
-	    System.out.println("ERROR : " + e) ;
-	    e.printStackTrace(System.out);
-	    System.exit(1);
-	}
+        } catch (Exception e) {
+            System.out.println("ERROR : " + e) ;
+            e.printStackTrace(System.out);
+            System.exit(1);
+        }
     }
 
 }

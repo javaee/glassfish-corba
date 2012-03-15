@@ -87,7 +87,7 @@ public final class ValueBaseHolder implements Streamable {
      *                <code>ValueBaseHolder</code> object
      */
     public ValueBaseHolder(java.io.Serializable initial) {
-	value = initial;
+        value = initial;
     }
 
     /**
@@ -97,7 +97,7 @@ public final class ValueBaseHolder implements Streamable {
      * @param input the InputStream containing CDR formatted data from the wire
      */
     public void _read(InputStream input) {
-	value = ((org.omg.CORBA_2_3.portable.InputStream)input).read_value();
+        value = ((org.omg.CORBA_2_3.portable.InputStream)input).read_value();
     }
 
     /**
@@ -106,7 +106,7 @@ public final class ValueBaseHolder implements Streamable {
      * @param output the OutputStream which will contain the CDR formatted data
      */
     public void _write(OutputStream output) {
-	((org.omg.CORBA_2_3.portable.OutputStream)output).write_value(value);
+        ((org.omg.CORBA_2_3.portable.OutputStream)output).write_value(value);
     }
 
     /**
@@ -116,7 +116,7 @@ public final class ValueBaseHolder implements Streamable {
      * @return    the TypeCode of the value held in the holder
      */
     public org.omg.CORBA.TypeCode _type() {
-	return ORB.init().get_primitive_tc(TCKind.tk_value);
+        return ORB.init().get_primitive_tc(TCKind.tk_value);
     }
 
 }

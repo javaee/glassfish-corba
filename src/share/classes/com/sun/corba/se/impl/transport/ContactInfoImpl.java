@@ -38,18 +38,18 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
-import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.Connection;
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.ContactInfoList;
-import com.sun.corba.se.spi.transport.TransportManager;
-import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.ContactInfoList;
+import com.sun.corba.ee.spi.transport.TransportManager;
+import com.sun.corba.ee.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.impl.transport.ContactInfoBase;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.transport.ContactInfoBase;
 
 /**
  * @author Harold Carr
@@ -75,61 +75,61 @@ public class ContactInfoImpl
 
     protected ContactInfoImpl(
         ORB orb,
-	ContactInfoList contactInfoList)
+        ContactInfoList contactInfoList)
     {
-	this.orb = orb;
-	this.contactInfoList = contactInfoList;
+        this.orb = orb;
+        this.contactInfoList = contactInfoList;
     }
 
     public ContactInfoImpl(
         ORB orb,
-	ContactInfoList contactInfoList,
-	String socketType,
-	String hostname,
-	int port)
+        ContactInfoList contactInfoList,
+        String socketType,
+        String hostname,
+        int port)
     {
-	this(orb, contactInfoList);
-	this.socketType = socketType;
-	this.hostname = hostname;
-	this.port     = port;
+        this(orb, contactInfoList);
+        this.socketType = socketType;
+        this.hostname = hostname;
+        this.port     = port;
     }
 
     // XREVISIT
     public ContactInfoImpl(
         ORB orb,
-	ContactInfoList contactInfoList,
-	IOR effectiveTargetIOR,
-	short addressingDisposition,
-	String socketType,
-	String hostname,
-	int port)
+        ContactInfoList contactInfoList,
+        IOR effectiveTargetIOR,
+        short addressingDisposition,
+        String socketType,
+        String hostname,
+        int port)
     {
-	this(orb, contactInfoList, socketType, hostname, port);
-	this.effectiveTargetIOR = effectiveTargetIOR;
-	this.addressingDisposition = addressingDisposition;
+        this(orb, contactInfoList, socketType, hostname, port);
+        this.effectiveTargetIOR = effectiveTargetIOR;
+        this.addressingDisposition = addressingDisposition;
     }
 
     public boolean isConnectionBased()
     {
-	return true;
+        return true;
     }
 
     public boolean shouldCacheConnection()
     {
-	return true;
+        return true;
     }
 
     public String getConnectionCacheType()
     {
-	return TransportManager.SOCKET_OR_CHANNEL_CONNECTION_CACHE;
+        return TransportManager.SOCKET_OR_CHANNEL_CONNECTION_CACHE;
     }
 
     public Connection createConnection()
     {
-	Connection connection =
-	    new ConnectionImpl(orb, this,
-					      socketType, hostname, port);
-	return connection;
+        Connection connection =
+            new ConnectionImpl(orb, this,
+                                              socketType, hostname, port);
+        return connection;
     }
 
     ////////////////////////////////////////////////////
@@ -139,22 +139,22 @@ public class ContactInfoImpl
 
     public String getMonitoringName()
     {
-	return "SocketConnections";
+        return "SocketConnections";
     }
 
     public String getType()
     {
-	return socketType;
+        return socketType;
     }
 
     public String getHost()
     {
-	return hostname;
+        return hostname;
     }
 
     public int getPort()
     {
-	return port;
+        return port;
     }
 
     ////////////////////////////////////////////////////
@@ -169,11 +169,11 @@ public class ContactInfoImpl
     @Override
     public int hashCode() 
     {
-	if (! isHashCodeCached) {
-	    cachedHashCode = socketType.hashCode() ^ hostname.hashCode() ^ port;
-	    isHashCodeCached = true;
-	}
-	return cachedHashCode;
+        if (! isHashCodeCached) {
+            cachedHashCode = socketType.hashCode() ^ hostname.hashCode() ^ port;
+            isHashCodeCached = true;
+        }
+        return cachedHashCode;
     }
 
     // NOTE: equals should only check type/host/port, otherwise
@@ -183,39 +183,39 @@ public class ContactInfoImpl
     @Override
     public boolean equals(Object obj) 
     {
-	if (obj == null) {
-	    return false;
-	} else if (!(obj instanceof ContactInfoImpl)) {
-	    return false;
-	}
+        if (obj == null) {
+            return false;
+        } else if (!(obj instanceof ContactInfoImpl)) {
+            return false;
+        }
 
-	ContactInfoImpl other =
-	    (ContactInfoImpl) obj;
+        ContactInfoImpl other =
+            (ContactInfoImpl) obj;
 
         if (port != other.port) {
             return false;
-	}
+        }
         if (!hostname.equals(other.hostname)) {
             return false;
         }
-	if (socketType == null) {
-	    if (other.socketType != null) {
-		return false;
-	    }
-	} else if (!socketType.equals(other.socketType)) {
-	    return false;
-	}
+        if (socketType == null) {
+            if (other.socketType != null) {
+                return false;
+            }
+        } else if (!socketType.equals(other.socketType)) {
+            return false;
+        }
         return true;
     }
 
     public String toString()
     {
-	return
-	    "SocketOrChannelContactInfoImpl[" 
-	    + socketType + " "
-	    + hostname + " "
-	    + port
-	    + "]";
+        return
+            "SocketOrChannelContactInfoImpl[" 
+            + socketType + " "
+            + hostname + " "
+            + port
+            + "]";
     }
 
     ////////////////////////////////////////////////////
@@ -225,7 +225,7 @@ public class ContactInfoImpl
 
     protected void dprint(String msg) 
     {
-	ORBUtility.dprint("SocketOrChannelContactInfoImpl", msg);
+        ORBUtility.dprint("SocketOrChannelContactInfoImpl", msg);
     }
 }
 

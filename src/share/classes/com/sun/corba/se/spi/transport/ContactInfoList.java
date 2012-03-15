@@ -38,13 +38,13 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
 import java.util.Iterator ;
 
-import com.sun.corba.se.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.IOR ;
 
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
+import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcher ;
 
 
 /**

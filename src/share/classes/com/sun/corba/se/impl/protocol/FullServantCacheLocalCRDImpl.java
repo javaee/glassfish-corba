@@ -38,14 +38,14 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
 import org.omg.CORBA.portable.ServantObject ;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.oa.OAInvocationInfo ;
-import com.sun.corba.se.spi.oa.OADestroyed;
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.trace.Subcontract;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.oa.OAInvocationInfo ;
+import com.sun.corba.ee.spi.oa.OADestroyed;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.trace.Subcontract;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Subcontract
@@ -53,13 +53,13 @@ public class FullServantCacheLocalCRDImpl extends ServantCacheLocalCRDBase
 {
     public FullServantCacheLocalCRDImpl( ORB orb, int scid, IOR ior ) 
     {
-	super( orb, scid, ior ) ;
+        super( orb, scid, ior ) ;
     }
 
     @Subcontract
     @Override
     public ServantObject internalPreinvoke( org.omg.CORBA.Object self,
-	String operation, Class expectedType ) throws OADestroyed {
+        String operation, Class expectedType ) throws OADestroyed {
 
         OAInvocationInfo cachedInfo = getCachedInfo() ;
         if (!checkForCompatibleServant( cachedInfo, expectedType )) {
@@ -78,16 +78,16 @@ public class FullServantCacheLocalCRDImpl extends ServantCacheLocalCRDBase
     @Subcontract
     public void servant_postinvoke(org.omg.CORBA.Object self,
         ServantObject servantobj) {
-	try {
-	    OAInvocationInfo cachedInfo = getCachedInfo() ;
-	    cachedInfo.oa().exit() ;
-	} catch (OADestroyed oades) {
+        try {
+            OAInvocationInfo cachedInfo = getCachedInfo() ;
+            cachedInfo.oa().exit() ;
+        } catch (OADestroyed oades) {
             caughtOADestroyed() ;
-	    // ignore this: if I can't get the OA, I don't
-	    // need to call exit on it.
-	} finally {
-	    orb.popInvocationInfo() ;
-	}
+            // ignore this: if I can't get the OA, I don't
+            // need to call exit on it.
+        } finally {
+            orb.popInvocationInfo() ;
+        }
     }
 
     @InfoMethod

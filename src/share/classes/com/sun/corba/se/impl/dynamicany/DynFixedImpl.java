@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package com.sun.corba.ee.impl.dynamicany;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
@@ -46,7 +46,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynFixed;
@@ -77,7 +77,7 @@ public class DynFixedImpl extends DynAnyBasicImpl implements DynFixed
     //
 /*
     public int component_count() {
-	return 0;
+        return 0;
     }
 */
     //
@@ -86,9 +86,9 @@ public class DynFixedImpl extends DynAnyBasicImpl implements DynFixed
 
     public String get_value () {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
-	return any.extract_fixed().toString();
+        return any.extract_fixed().toString();
     }
 
     // Initializes the value of the DynFixed.
@@ -113,7 +113,7 @@ public class DynFixedImpl extends DynAnyBasicImpl implements DynFixed
                org.omg.DynamicAny.DynAnyPackage.InvalidValue
     {
         if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+            throw wrapper.dynAnyDestroyed() ;
         }
         int digits = 0;
         boolean preservedPrecision = true;
@@ -170,9 +170,9 @@ public class DynFixedImpl extends DynAnyBasicImpl implements DynFixed
             currentDigits = integerPart.length() + currentScale;
         }
 
-	int integerPartLength = (integerPart == null) ? 0 
-	    : integerPart.length() ;	
-	
+        int integerPartLength = (integerPart == null) ? 0 
+            : integerPart.length() ;    
+        
         // Let's see if we have to drop some precision
         if (currentDigits > digits) {
             preservedPrecision = false;

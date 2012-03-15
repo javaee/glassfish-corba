@@ -47,16 +47,16 @@ public class EchoImpl implements Echo
 {
     public void throwsSystemException() throws RemoteException 
     {
-	throw new BAD_PARAM() ;
+        throw new BAD_PARAM() ;
     }
 
     public void throwsUnknownException() throws RemoteException 
     {
-	throw new IllegalArgumentException() ;
+        throw new IllegalArgumentException() ;
     }
 
     public int twice( int arg ) throws RemoteException 
     {
-	return 2*arg ;
+        return 2*arg ;
     }
 }

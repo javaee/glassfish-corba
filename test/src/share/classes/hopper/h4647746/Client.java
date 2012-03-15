@@ -78,10 +78,10 @@ public class Client
 
     public static void main(String args[])
     {
-	System.out.println( "Starting POA Applet initialization test" ) ;
+        System.out.println( "Starting POA Applet initialization test" ) ;
         try{
-	    Properties props = System.getProperties() ;
-	    new Client( props, args, System.out, System.err ) ;
+            Properties props = System.getProperties() ;
+            new Client( props, args, System.out, System.err ) ;
         } catch (Exception e) {
             System.out.println("ERROR : " + e) ;
             e.printStackTrace(System.out);
@@ -90,13 +90,13 @@ public class Client
     }
 
     public Client( Properties props, String args[], PrintStream out,
-	PrintStream err )
+        PrintStream err )
     {
-	this.orb = ORB.init( args, props ) ;
-	this.out = System.out ;
-	this.err = System.err ;
+        this.orb = ORB.init( args, props ) ;
+        this.out = System.out ;
+        this.err = System.err ;
 
-	runTests() ;
+        runTests() ;
     }
 
 // *************************************************
@@ -105,12 +105,12 @@ public class Client
 
     private void error( String msg )
     {
-	throw new RuntimeException( msg ) ;
+        throw new RuntimeException( msg ) ;
     }
     
     private void info( String msg )
     {
-	out.println( msg ) ;
+        out.println( msg ) ;
     }
 
  // *************************************************
@@ -119,78 +119,78 @@ public class Client
 
     private void runTests()
     {
-	java.applet.Applet applet = new java.applet.Applet() ;
-	java.applet.AppletStub dummy = new java.applet.AppletStub() {
-	    public void appletResize( int width, int height ) 
-	    {
-	    }
+        java.applet.Applet applet = new java.applet.Applet() ;
+        java.applet.AppletStub dummy = new java.applet.AppletStub() {
+            public void appletResize( int width, int height ) 
+            {
+            }
 
-	    public java.applet.AppletContext getAppletContext() 
-	    {
-		return null ;
-	    }
+            public java.applet.AppletContext getAppletContext() 
+            {
+                return null ;
+            }
 
-	    public java.net.URL getCodeBase()
-	    { 
-		return null ;
-	    }
+            public java.net.URL getCodeBase()
+            { 
+                return null ;
+            }
 
-	    public java.net.URL getDocumentBase()
-	    {
-		return null ;
-	    }
+            public java.net.URL getDocumentBase()
+            {
+                return null ;
+            }
 
-	    public String getParameter( String name )
-	    {
-		return null ;
-	    }
+            public String getParameter( String name )
+            {
+                return null ;
+            }
 
-	    public boolean isActive()
-	    {
-		return false ;
-	    }
-	} ;
-	applet.setStub( dummy ) ;
+            public boolean isActive()
+            {
+                return false ;
+            }
+        } ;
+        applet.setStub( dummy ) ;
 
-	ORB orb = ORB.init( applet, null ) ;	
-	POA rpoa = null ;
-	try {
-	    rpoa = (POA)(orb.resolve_initial_references( "RootPOA" )) ;
-	} catch (InvalidName err) {
-	    error( err.toString() ) ;
-	}
+        ORB orb = ORB.init( applet, null ) ;    
+        POA rpoa = null ;
+        try {
+            rpoa = (POA)(orb.resolve_initial_references( "RootPOA" )) ;
+        } catch (InvalidName err) {
+            error( err.toString() ) ;
+        }
 
-	Policy[] policies = { rpoa.create_request_processing_policy(
-	    RequestProcessingPolicyValue.USE_DEFAULT_SERVANT ) } ;
+        Policy[] policies = { rpoa.create_request_processing_policy(
+            RequestProcessingPolicyValue.USE_DEFAULT_SERVANT ) } ;
 
-	POA cpoa = null ;
+        POA cpoa = null ;
 
-	try {
-	    cpoa = rpoa.create_POA( "Child", rpoa.the_POAManager(), 
-		policies ) ;    
-	} catch (InvalidPolicy err) {
-	    error( err.toString() ) ;
-	} catch (AdapterAlreadyExists err) {
-	    error( err.toString() ) ;
-	}
+        try {
+            cpoa = rpoa.create_POA( "Child", rpoa.the_POAManager(), 
+                policies ) ;    
+        } catch (InvalidPolicy err) {
+            error( err.toString() ) ;
+        } catch (AdapterAlreadyExists err) {
+            error( err.toString() ) ;
+        }
 
-	Servant servant = new Servant() {
-	    public String[] _all_interfaces( POA poa, byte[] objectId )
-	    {
-		return null ;
-	    }
-	} ;
+        Servant servant = new Servant() {
+            public String[] _all_interfaces( POA poa, byte[] objectId )
+            {
+                return null ;
+            }
+        } ;
 
-	// This should set the delegate on servant
-	try {
-	    cpoa.set_servant( servant ) ;
-	} catch (WrongPolicy err) {
-	    error( err.toString() ) ;
-	}
+        // This should set the delegate on servant
+        try {
+            cpoa.set_servant( servant ) ;
+        } catch (WrongPolicy err) {
+            error( err.toString() ) ;
+        }
 
-	// Without the fix for bug 4647746, this fails because 
-	// the delegate was not initialized in ORB.init in Applet
-	// mode.
-	Delegate delegate = servant._get_delegate() ;
+        // Without the fix for bug 4647746, this fails because 
+        // the delegate was not initialized in ORB.init in Applet
+        // mode.
+        Delegate delegate = servant._get_delegate() ;
     }
 }

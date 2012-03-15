@@ -78,19 +78,19 @@ public class ComplexTestObjectFour implements Externalizable
     public boolean equals(Object o)
     {
         try
-	    {
-		ComplexTestObjectFour ctbo = (ComplexTestObjectFour)o;
-		return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) && 
-			(ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && 
-			(ctbo.fDouble == fDouble)
-			&& (ctbo.fOne.equals(fOne)) 
-			&& (ctbo.fTwo.equals(fTwo))
-			);
-	    }
+            {
+                ComplexTestObjectFour ctbo = (ComplexTestObjectFour)o;
+                return ((ctbo.fString.equals(fString)) && (ctbo.fInt == fInt) && 
+                        (ctbo.fLong == fLong) && (ctbo.fFloat == fFloat) && 
+                        (ctbo.fDouble == fDouble)
+                        && (ctbo.fOne.equals(fOne)) 
+                        && (ctbo.fTwo.equals(fTwo))
+                        );
+            }
         catch(Exception e)
-	    {
-		return false;
-	    }
+            {
+                return false;
+            }
     }
 
     public String toString()
@@ -99,8 +99,8 @@ public class ComplexTestObjectFour implements Externalizable
     }
 
     public void writeExternal(ObjectOutput out)
-    	throws IOException {
-    	out.writeInt(fInt);
+        throws IOException {
+        out.writeInt(fInt);
         out.writeLong(fLong);
         out.writeFloat(fFloat);
         out.writeDouble(fDouble);
@@ -110,8 +110,8 @@ public class ComplexTestObjectFour implements Externalizable
     }
 
     public void readExternal(ObjectInput in)
-    	throws IOException, ClassNotFoundException {
-    	fInt = in.readInt();
+        throws IOException, ClassNotFoundException {
+        fInt = in.readInt();
         fLong = in.readLong();
         fFloat = in.readFloat();
         fDouble = in.readDouble();

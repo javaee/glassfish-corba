@@ -49,18 +49,18 @@ public class JavaCompiler extends Compiler
 {
     private boolean newVM() 
     {
-	String version = System.getProperty( "java.version" ) ;
-	StringTokenizer st = new StringTokenizer( version, "." ) ;
+        String version = System.getProperty( "java.version" ) ;
+        StringTokenizer st = new StringTokenizer( version, "." ) ;
 
-	// Assume that version is major.minor.patch format.
-	// We can ignore the patch, which need not be a string
-	// (e.g. 1.3.1_01 is a valid version).
-	int major = Integer.parseInt( st.nextToken() ) ;
-	int minor = Integer.parseInt( st.nextToken() ) ;
+        // Assume that version is major.minor.patch format.
+        // We can ignore the patch, which need not be a string
+        // (e.g. 1.3.1_01 is a valid version).
+        int major = Integer.parseInt( st.nextToken() ) ;
+        int minor = Integer.parseInt( st.nextToken() ) ;
 
-	// If we ever have a 2.x.y version, it would be new.
-	// For now, 1.4 and greater are new VMs.
-	return (major > 1) || (minor > 3) ;
+        // If we ever have a 2.x.y version, it would be new.
+        // For now, 1.4 and greater are new VMs.
+        return (major > 1) || (minor > 3) ;
     }
 
     /**
@@ -68,9 +68,9 @@ public class JavaCompiler extends Compiler
      */
     public String compilerClassName()
     {
-	// Break this up to avoid rename conflicts on sun tools java.
-	return (newVM() ? "com.sun." : "sun.") 
-	    + "tools.javac.Main" ;
+        // Break this up to avoid rename conflicts on sun tools java.
+        return (newVM() ? "com.sun." : "sun.") 
+            + "tools.javac.Main" ;
     }
 
     /**
@@ -102,8 +102,8 @@ public class JavaCompiler extends Compiler
         args.add(outputDirectory);
         // args.add("-bootclasspath");
         // args.add(Options.getClasspath());
-	args.add( "-Xbootclasspath/p:" + 
-	    System.getProperty( "corba.test.orb.classpath" ) ) ;
+        args.add( "-Xbootclasspath/p:" + 
+            System.getProperty( "corba.test.orb.classpath" ) ) ;
 
         if (arguments != null)
             args.addAll(arguments);

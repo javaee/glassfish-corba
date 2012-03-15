@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.oa.poa ;
+package com.sun.corba.ee.impl.oa.poa ;
 
 import org.omg.PortableServer.Servant ;
 
@@ -48,7 +48,7 @@ import org.omg.PortableServer.POAPackage.ServantAlreadyActive ;
 import org.omg.PortableServer.POAPackage.ObjectNotActive ;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 
-import com.sun.corba.se.spi.trace.Poa;
+import com.sun.corba.ee.spi.trace.Poa;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Poa
@@ -57,10 +57,10 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
     
     POAPolicyMediatorBase_R( Policies policies, POAImpl poa ) 
     {
-	super( policies, poa ) ;
+        super( policies, poa ) ;
 
-	// assert policies.retainServants() && policies.useActiveObjectMapOnly()
-	if (!policies.retainServants()) {
+        // assert policies.retainServants() && policies.useActiveObjectMapOnly()
+        if (!policies.retainServants()) {
             throw wrapper.policyMediatorBadPolicyInFactory();
         }
 
@@ -69,80 +69,80 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
     
     public void returnServant() 
     {
-	// NO-OP
+        // NO-OP
     }
 
     public void clearAOM() 
     {
-	activeObjectMap.clear() ;
-	activeObjectMap = null ;
+        activeObjectMap.clear() ;
+        activeObjectMap = null ;
     }
 
     protected Servant internalKeyToServant( ActiveObjectMap.Key key )
     {
-	AOMEntry entry = activeObjectMap.get(key);
-	if (entry == null) {
+        AOMEntry entry = activeObjectMap.get(key);
+        if (entry == null) {
             return null;
         }
 
-	return activeObjectMap.getServant( entry ) ;
+        return activeObjectMap.getServant( entry ) ;
     }
 
     protected Servant internalIdToServant( byte[] id )
     {
-	ActiveObjectMap.Key key = new ActiveObjectMap.Key( id ) ;
-	return internalKeyToServant( key ) ;
+        ActiveObjectMap.Key key = new ActiveObjectMap.Key( id ) ;
+        return internalKeyToServant( key ) ;
     }
 
     @Poa
     protected void activateServant( ActiveObjectMap.Key key, AOMEntry entry, Servant servant )
     {
-	setDelegate(servant, key.id() );
+        setDelegate(servant, key.id() );
 
-	activeObjectMap.putServant( servant, entry ) ;
+        activeObjectMap.putServant( servant, entry ) ;
 
-	POAManagerImpl pm = (POAManagerImpl)poa.the_POAManager() ;
-	POAFactory factory = pm.getFactory() ;
-	factory.registerPOAForServant(poa, servant);
+        POAManagerImpl pm = (POAManagerImpl)poa.the_POAManager() ;
+        POAFactory factory = pm.getFactory() ;
+        factory.registerPOAForServant(poa, servant);
     }
 
     @Poa
     public final void activateObject(byte[] id, Servant servant) 
-	throws WrongPolicy, ServantAlreadyActive, ObjectAlreadyActive
+        throws WrongPolicy, ServantAlreadyActive, ObjectAlreadyActive
     {
-	if (isUnique && activeObjectMap.contains(servant)) {
+        if (isUnique && activeObjectMap.contains(servant)) {
             throw new ServantAlreadyActive();
         }
-	ActiveObjectMap.Key key = new ActiveObjectMap.Key( id ) ;
+        ActiveObjectMap.Key key = new ActiveObjectMap.Key( id ) ;
 
-	AOMEntry entry = activeObjectMap.get( key ) ;
+        AOMEntry entry = activeObjectMap.get( key ) ;
 
-	// Check for an ObjectAlreadyActive error
-	entry.activateObject() ;
+        // Check for an ObjectAlreadyActive error
+        entry.activateObject() ;
 
-	activateServant( key, entry, servant ) ;
+        activateServant( key, entry, servant ) ;
     }
     
     @Poa
     public Servant deactivateObject( byte[] id ) 
-	throws ObjectNotActive, WrongPolicy 
+        throws ObjectNotActive, WrongPolicy 
     {
-	ActiveObjectMap.Key key = new ActiveObjectMap.Key( id ) ;
-	return deactivateObject( key ) ;
+        ActiveObjectMap.Key key = new ActiveObjectMap.Key( id ) ;
+        return deactivateObject( key ) ;
     }
     
     @Poa
     protected void deactivateHelper( ActiveObjectMap.Key key, AOMEntry entry, 
-	Servant s ) throws ObjectNotActive, WrongPolicy
+        Servant s ) throws ObjectNotActive, WrongPolicy
     {
-	// Default does nothing, but the USE_SERVANT_MANAGER case
-	// must handle etherealization
+        // Default does nothing, but the USE_SERVANT_MANAGER case
+        // must handle etherealization
 
-	activeObjectMap.remove(key);
+        activeObjectMap.remove(key);
 
-	POAManagerImpl pm = (POAManagerImpl)poa.the_POAManager() ;
-	POAFactory factory = pm.getFactory() ;
-	factory.unregisterPOAForServant(poa, s);
+        POAManagerImpl pm = (POAManagerImpl)poa.the_POAManager() ;
+        POAFactory factory = pm.getFactory() ;
+        factory.unregisterPOAForServant(poa, s);
     }
 
     @InfoMethod
@@ -150,42 +150,42 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
 
     @Poa
     public Servant deactivateObject( ActiveObjectMap.Key key ) 
-	throws ObjectNotActive, WrongPolicy {
+        throws ObjectNotActive, WrongPolicy {
 
-	AOMEntry entry = activeObjectMap.get(key);
-	if (entry == null) {
+        AOMEntry entry = activeObjectMap.get(key);
+        if (entry == null) {
             throw new ObjectNotActive();
         }
 
-	Servant s = activeObjectMap.getServant( entry ) ;
-	if (s == null) {
+        Servant s = activeObjectMap.getServant( entry ) ;
+        if (s == null) {
             throw new ObjectNotActive();
         }
 
-	deactivatingObject( s, poa ) ;
+        deactivatingObject( s, poa ) ;
 
-	deactivateHelper( key, entry, s ) ;
+        deactivateHelper( key, entry, s ) ;
 
-	return s ;
+        return s ;
     }
 
     @Poa
     public byte[] servantToId( Servant servant ) throws ServantNotActive, WrongPolicy
-    {	
-	if (!isUnique && !isImplicit) {
+    {   
+        if (!isUnique && !isImplicit) {
             throw new WrongPolicy();
         }
 
-	if (isUnique) {
-	    ActiveObjectMap.Key key = activeObjectMap.getKey(servant);
-	    if (key != null) {
+        if (isUnique) {
+            ActiveObjectMap.Key key = activeObjectMap.getKey(servant);
+            if (key != null) {
                 return key.id();
             }
-	} 
+        } 
 
-	// assert !isUnique || (servant not in activateObjectMap)
-	
-	if (isImplicit) {
+        // assert !isUnique || (servant not in activateObjectMap)
+        
+        if (isImplicit) {
             try {
                 byte[] id = newSystemId();
                 activateObject(id, servant);
@@ -199,7 +199,7 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
             }
         }
 
-	throw new ServantNotActive();
+        throw new ServantNotActive();
     }
 }
 

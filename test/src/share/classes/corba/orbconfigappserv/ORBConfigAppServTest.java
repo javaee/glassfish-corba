@@ -50,12 +50,12 @@ import corba.framework.*;
 public class ORBConfigAppServTest extends CORBATest
 {
     public static final String thisPackage =
-	ORBConfigAppServTest.class.getPackage().getName();
+        ORBConfigAppServTest.class.getPackage().getName();
 
     protected void doTest() throws Throwable
     {
         Controller client =
-	    createClient(thisPackage + ".ORBManager", "ORBManager");
+            createClient(thisPackage + ".ORBManager", "ORBManager");
         client.start();
         client.waitFor(120000);
         client.stop();

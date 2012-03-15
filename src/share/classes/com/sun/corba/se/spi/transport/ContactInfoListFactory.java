@@ -37,11 +37,11 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.transport ;
+package com.sun.corba.ee.spi.transport ;
 
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.orb.ORB;
 
 /** Interface used to create a ContactInfoList from an IOR, as required
  * for supporting CORBA semantics using the DCS framework.  This is a 

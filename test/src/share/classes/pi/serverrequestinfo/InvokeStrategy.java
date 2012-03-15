@@ -40,7 +40,7 @@
 
 package pi.serverrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 
 /**
@@ -53,20 +53,20 @@ abstract public class InvokeStrategy {
      * Invokes the method with the given name
      */
     protected void invokeMethod( String name ) throws Exception {
-	ServerCommon.server.invokeMethod( name );
+        ServerCommon.server.invokeMethod( name );
     }
 
     public void invoke() throws Exception {
-	// Reset the request interceptor to prepare for test:
-	SampleServerRequestInterceptor.enabled = true;
+        // Reset the request interceptor to prepare for test:
+        SampleServerRequestInterceptor.enabled = true;
         SampleServerRequestInterceptor.receiveRequestServiceContextsEnabled = 
-	    true;
+            true;
         SampleServerRequestInterceptor.receiveRequestEnabled = true;
         SampleServerRequestInterceptor.sendReplyEnabled = true;
         SampleServerRequestInterceptor.sendExceptionEnabled = true;
         SampleServerRequestInterceptor.sendOtherEnabled = true;
 
-	// Reset flags
+        // Reset flags
         SampleServerRequestInterceptor.exceptionRedirectToOther = false;
         SampleServerRequestInterceptor.invokeOnForwardedObject = false;
     }

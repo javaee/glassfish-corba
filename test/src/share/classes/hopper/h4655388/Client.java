@@ -78,10 +78,10 @@ public class Client
 
     public static void main(String args[])
     {
-	System.out.println( "Starting POA hierarchy test" ) ;
+        System.out.println( "Starting POA hierarchy test" ) ;
         try{
-	    Properties props = System.getProperties() ;
-	    new Client( props, args, System.out, System.err ) ;
+            Properties props = System.getProperties() ;
+            new Client( props, args, System.out, System.err ) ;
         } catch (Exception e) {
             System.out.println("ERROR : " + e) ;
             e.printStackTrace(System.out);
@@ -90,13 +90,13 @@ public class Client
     }
 
     public Client( Properties props, String args[], PrintStream out,
-	PrintStream err )
+        PrintStream err )
     {
-	this.orb = ORB.init( args, props ) ;
-	this.out = System.out ;
-	this.err = System.err ;
+        this.orb = ORB.init( args, props ) ;
+        this.out = System.out ;
+        this.err = System.err ;
 
-	runTests() ;
+        runTests() ;
     }
 
 // *************************************************
@@ -105,12 +105,12 @@ public class Client
 
     private void error( String msg )
     {
-	throw new RuntimeException( msg ) ;
+        throw new RuntimeException( msg ) ;
     }
     
     private void info( String msg )
     {
-	out.println( msg ) ;
+        out.println( msg ) ;
     }
 
  // *************************************************
@@ -119,54 +119,54 @@ public class Client
 
     private void runTests()
     {
-	String[] args = null ;
-	ORB orb = ORB.init( args, null ) ;	
-	POA rpoa = null ;
-	try {
-	    rpoa = (POA)(orb.resolve_initial_references( "RootPOA" )) ;
-	} catch (InvalidName err) {
-	    error( err.toString() ) ;
-	}
+        String[] args = null ;
+        ORB orb = ORB.init( args, null ) ;      
+        POA rpoa = null ;
+        try {
+            rpoa = (POA)(orb.resolve_initial_references( "RootPOA" )) ;
+        } catch (InvalidName err) {
+            error( err.toString() ) ;
+        }
 
-	Policy[] policies = { rpoa.create_request_processing_policy(
-	    RequestProcessingPolicyValue.USE_DEFAULT_SERVANT ) } ;
+        Policy[] policies = { rpoa.create_request_processing_policy(
+            RequestProcessingPolicyValue.USE_DEFAULT_SERVANT ) } ;
 
-	POA cpoa = null ;
+        POA cpoa = null ;
 
-	try {
-	    cpoa = rpoa.create_POA( "Child1", rpoa.the_POAManager(), 
-		policies ) ;    
-	} catch (InvalidPolicy err) {
-	    error( err.toString() ) ;
-	} catch (AdapterAlreadyExists err) {
-	    error( err.toString() ) ;
-	}
+        try {
+            cpoa = rpoa.create_POA( "Child1", rpoa.the_POAManager(), 
+                policies ) ;    
+        } catch (InvalidPolicy err) {
+            error( err.toString() ) ;
+        } catch (AdapterAlreadyExists err) {
+            error( err.toString() ) ;
+        }
 
-	try {
-	    cpoa = rpoa.create_POA( "Child2", rpoa.the_POAManager(), 
-		policies ) ;    
-	} catch (InvalidPolicy err) {
-	    error( err.toString() ) ;
-	} catch (AdapterAlreadyExists err) {
-	    error( err.toString() ) ;
-	}
+        try {
+            cpoa = rpoa.create_POA( "Child2", rpoa.the_POAManager(), 
+                policies ) ;    
+        } catch (InvalidPolicy err) {
+            error( err.toString() ) ;
+        } catch (AdapterAlreadyExists err) {
+            error( err.toString() ) ;
+        }
 
-	// Without the fix for bug 4655388, this call fails with a 
-	// ClassCastException.
-	POA[] children = rpoa.the_children() ;
+        // Without the fix for bug 4655388, this call fails with a 
+        // ClassCastException.
+        POA[] children = rpoa.the_children() ;
 
-	if (children.length != 2)
-	    error( "Should have exactly 2 children" ) ;
+        if (children.length != 2)
+            error( "Should have exactly 2 children" ) ;
 
-	if (!children[0].the_name().equals( "Child1" ))
-	    if (!children[0].the_name().equals( "Child2" ))
-		error( "children[0] is incorrect" ) ;
+        if (!children[0].the_name().equals( "Child1" ))
+            if (!children[0].the_name().equals( "Child2" ))
+                error( "children[0] is incorrect" ) ;
 
-	if (!children[1].the_name().equals( "Child1" ))
-	    if (!children[1].the_name().equals( "Child2" ))
-		error( "children[1] is incorrect" ) ;
+        if (!children[1].the_name().equals( "Child1" ))
+            if (!children[1].the_name().equals( "Child2" ))
+                error( "children[1] is incorrect" ) ;
 
-	if (children[0].the_name().equals( children[1].the_name() ))
-	    error( "Both children have the same name" ) ;
+        if (children[0].the_name().equals( children[1].the_name() ))
+            error( "Both children have the same name" ) ;
     }
 }

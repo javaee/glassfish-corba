@@ -85,11 +85,11 @@ public class FileOutputDecorator implements Controller
                            String outFileName,
                            String errFileName,
                            Hashtable extra,
-			   int emmaPort ) throws Exception
+                           int emmaPort ) throws Exception
     {
         OutputStream outstr = CORBAUtil.openFile(outFileName);
         OutputStream errstr = CORBAUtil.openFile(errFileName);
-	this.emmaPort = emmaPort ;
+        this.emmaPort = emmaPort ;
 
         delegate.initialize(className,
                             processName,
@@ -110,8 +110,8 @@ public class FileOutputDecorator implements Controller
                            OutputStream err,
                            Hashtable extra) throws Exception
     {
-	// There is no reason to call this (it defeats the
-	// purpose of this class), but must be present.
+        // There is no reason to call this (it defeats the
+        // purpose of this class), but must be present.
         delegate.initialize(className,
                             processName,
                             environment,
@@ -130,14 +130,14 @@ public class FileOutputDecorator implements Controller
     public void stop()
     {
         try {
-	    EmmaControl.writeCoverageData( emmaPort, Options.getEmmaFile() ) ;
+            EmmaControl.writeCoverageData( emmaPort, Options.getEmmaFile() ) ;
 
-	    try {
-		Thread.sleep( 500 ) ; // give emma time to write out the file
-				      // (This may not be required)
-	    } catch (InterruptedException exc) {
-		// ignore this
-	    }
+            try {
+                Thread.sleep( 500 ) ; // give emma time to write out the file
+                                      // (This may not be required)
+            } catch (InterruptedException exc) {
+                // ignore this
+            }
 
             delegate.stop();
         } finally {

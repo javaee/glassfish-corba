@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.presentation.rmi ;
+package com.sun.corba.ee.spi.presentation.rmi ;
 
 /** Represents an interceptor that is invoked around a 
  * RMI-IIOP method invocation when dynamic RMI-IIOP is used.

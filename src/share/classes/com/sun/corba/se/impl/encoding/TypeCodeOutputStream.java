@@ -38,14 +38,14 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 
 import org.omg.CORBA_2_3.portable.OutputStream;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.misc.ORBUtility;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,7 +70,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
     {
         TypeCodeInputStream tcis 
             = new TypeCodeInputStream((ORB)orb(), getByteBuffer(), getIndex(), 
-		isLittleEndian(), getGIOPVersion());
+                isLittleEndian(), getGIOPVersion());
         return tcis;
     }
 
@@ -109,7 +109,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
 
     public int getPositionForID(String id) {
         if (typeMap == null)
-	    throw wrapper.refTypeIndirType() ;
+            throw wrapper.refTypeIndirType() ;
         return
             typeMap.get(id) ;
     }
@@ -128,16 +128,16 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
         // Then write the rest of the byte array.
 
         s.write_long(firstLong);
-	byte[] buf = ORBUtility.getByteBufferArray(getByteBuffer());
-	s.write_octet_array(buf, 4, getIndex() - 4);
+        byte[] buf = ORBUtility.getByteBufferArray(getByteBuffer());
+        s.write_octet_array(buf, 4, getIndex() - 4);
     }
 
     public TypeCodeOutputStream createEncapsulation(org.omg.CORBA.ORB _orb) {
-	TypeCodeOutputStream encap = new TypeCodeOutputStream((ORB)_orb,
+        TypeCodeOutputStream encap = new TypeCodeOutputStream((ORB)_orb,
             isLittleEndian());
-	encap.setEnclosingOutputStream(this);
+        encap.setEnclosingOutputStream(this);
         encap.makeEncapsulation();
-	return encap;
+        return encap;
     }
 
     protected void makeEncapsulation() {
@@ -162,7 +162,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
     @Override
     public int getRealIndex(int index) {
         int topPos = getTopLevelPosition();
-	return topPos;
+        return topPos;
     }
 
     public byte[] getTypeCodeBuffer() {
@@ -182,10 +182,10 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
 
     public void printTypeMap() {
         System.out.println("typeMap = {");
-	for (String id : typeMap.keySet()) {
+        for (String id : typeMap.keySet()) {
             System.out.println("  key = " + id + ", value = "
                 + typeMap.get(id));
-	}
+        }
         System.out.println("}");
     }
 }

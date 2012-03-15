@@ -38,21 +38,21 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.ior;
+package com.sun.corba.ee.impl.ior;
 
 import org.omg.CORBA_2_3.portable.OutputStream ;
 
-import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
+import com.sun.corba.ee.spi.protocol.ServerRequestDispatcher ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.ior.ObjectId ;
-import com.sun.corba.se.spi.ior.ObjectKey ;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
+import com.sun.corba.ee.spi.ior.ObjectId ;
+import com.sun.corba.ee.spi.ior.ObjectKey ;
+import com.sun.corba.ee.spi.ior.ObjectKeyTemplate ;
 
-import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
+import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
 
-import com.sun.corba.se.spi.logging.IORSystemException;
+import com.sun.corba.ee.spi.logging.IORSystemException;
 
 /**
  * @author  Ken Cavanaugh
@@ -67,69 +67,69 @@ public class ObjectKeyImpl implements ObjectKey
     private byte[] array;
     
     public ObjectKeyImpl( ObjectKeyTemplate oktemp, ObjectId id) {
-	this.oktemp = oktemp ;
-	this.id = id ;
+        this.oktemp = oktemp ;
+        this.id = id ;
     }
 
     @Override
     public boolean equals( Object obj )
     {
-	if (obj == null) {
+        if (obj == null) {
             return false;
         }
 
-	if (!(obj instanceof ObjectKeyImpl)) {
+        if (!(obj instanceof ObjectKeyImpl)) {
             return false;
         }
 
-	ObjectKeyImpl other = (ObjectKeyImpl)obj ;
+        ObjectKeyImpl other = (ObjectKeyImpl)obj ;
 
-	return oktemp.equals( other.oktemp ) &&
-	    id.equals( other.id ) ;
+        return oktemp.equals( other.oktemp ) &&
+            id.equals( other.id ) ;
     }
 
     @Override
     public int hashCode()
     {
-	return oktemp.hashCode() ^ id.hashCode() ;
+        return oktemp.hashCode() ^ id.hashCode() ;
     }
 
     public ObjectKeyTemplate getTemplate() 
     {
-	return oktemp ;
+        return oktemp ;
     }
 
     public ObjectId getId()
     {
-	return id ;
+        return id ;
     }
 
     public void write( OutputStream os ) 
     {
-	oktemp.write( id, os ) ;
+        oktemp.write( id, os ) ;
     }
 
     public synchronized byte[] getBytes(org.omg.CORBA.ORB orb) 
     {
-        if (array == null) {	    
-	    EncapsOutputStream os = new EncapsOutputStream((ORB)orb);
-	    try {
-	        write(os);
-		array = os.toByteArray();
-	    } finally {
-	        try {
-		    os.close();
-		} catch (java.io.IOException e) {
-		    wrapper.ioexceptionDuringStreamClose(e);    
-		}
-	    }
-	}
+        if (array == null) {        
+            EncapsOutputStream os = new EncapsOutputStream((ORB)orb);
+            try {
+                write(os);
+                array = os.toByteArray();
+            } finally {
+                try {
+                    os.close();
+                } catch (java.io.IOException e) {
+                    wrapper.ioexceptionDuringStreamClose(e);    
+                }
+            }
+        }
 
-	return array.clone() ;
+        return array.clone() ;
     }
 
     public ServerRequestDispatcher getServerRequestDispatcher()
     {
-	return oktemp.getServerRequestDispatcher( id ) ;
+        return oktemp.getServerRequestDispatcher( id ) ;
     }
 }

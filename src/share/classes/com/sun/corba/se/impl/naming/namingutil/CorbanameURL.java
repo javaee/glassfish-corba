@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.namingutil;
+package com.sun.corba.ee.impl.naming.namingutil;
 
 /** 
  *  The corbaname: URL definitions from the -ORBInitDef and -ORBDefaultInitDef's
@@ -67,7 +67,7 @@ public class CorbanameURL extends INSURLBase
         int delimiterIndex = url.indexOf( '#' );
         String corbalocString = null;
         if( delimiterIndex != -1 ) {
-	    corbalocString = "corbaloc:" + url.substring( 0, delimiterIndex ) ;
+            corbalocString = "corbaloc:" + url.substring( 0, delimiterIndex ) ;
         } else {
             corbalocString = "corbaloc:" + url ;
         }
@@ -83,11 +83,11 @@ public class CorbanameURL extends INSURLBase
             // the String is null then the Root Naming context is passed
             // back
             if((delimiterIndex > -1) &&
-	       (delimiterIndex < (aURL.length() - 1)))
+               (delimiterIndex < (aURL.length() - 1)))
             {
-		int start = delimiterIndex + 1 ;
-		String result = url.substring(start) ;
-		theStringifiedName = result ;
+                int start = delimiterIndex + 1 ;
+                String result = url.substring(start) ;
+                theStringifiedName = result ;
             } 
         } catch( Exception e ) {
             badAddress( e, aURL );

@@ -47,34 +47,34 @@ package mantis.m4764130;
 import java.util.Properties;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.*;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class Client 
 {
     public static void main(String[] args)
     {
-	try {
+        try {
 
             Properties props = new Properties();
-	    props.put(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX
-		      + Interceptor.class.getName(),
-		      "dummy");
-	    ORB orb = ORB.init(args, props);
+            props.put(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX
+                      + Interceptor.class.getName(),
+                      "dummy");
+            ORB orb = ORB.init(args, props);
 
-	    NamingContext namingContext = 
-		NamingContextHelper.narrow(orb.resolve_initial_references(
- 	            "NameService"));
-	    NameComponent nc = new NameComponent("Server", "");
-	    NameComponent path[] = { nc };
-	    Hello hello = HelloHelper.narrow(namingContext.resolve( path ));
+            NamingContext namingContext = 
+                NamingContextHelper.narrow(orb.resolve_initial_references(
+                    "NameService"));
+            NameComponent nc = new NameComponent("Server", "");
+            NameComponent path[] = { nc };
+            Hello hello = HelloHelper.narrow(namingContext.resolve( path ));
 
             hello.hello("1234");
 
-	} catch (Exception ex) {
-	    System.out.println("Client ERROR : " + ex);
-	    ex.printStackTrace();
+        } catch (Exception ex) {
+            System.out.println("Client ERROR : " + ex);
+            ex.printStackTrace();
             System.exit(1);
-	}
+        }
     }
 }
 

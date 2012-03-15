@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 import java.util.concurrent.Callable ;
 import java.util.concurrent.Future ;
@@ -60,60 +60,60 @@ public class LookupTableSimpleConcurrentImpl<K,V> implements LookupTable<K,V> {
      * table.
      */
     public LookupTableSimpleConcurrentImpl( UnaryFunction<K,V> factory, 
-	Class<V> token ) {
+        Class<V> token ) {
 
-	this.factory = factory ;
-	this.token = token ;
+        this.factory = factory ;
+        this.token = token ;
     }
 
     public V lookup(final Holder<Boolean> firstTime, final K key) {
-	// There are several possible results:
-	// 1. obj is null
-	// 2. obj is an instance of the token.
-	// 3. obj is a FutureTask<V>.
-	Object obj = map.get( key ) ;
-	if (firstTime != null)
-	    firstTime.content( true ) ;
+        // There are several possible results:
+        // 1. obj is null
+        // 2. obj is an instance of the token.
+        // 3. obj is a FutureTask<V>.
+        Object obj = map.get( key ) ;
+        if (firstTime != null)
+            firstTime.content( true ) ;
 
-	if (obj == null) {
-	    Future<V> ft = new FutureTask<V>( 
-		new Callable<V>() {
-		    public V call() {
-			if (firstTime != null) 
-			    firstTime.content( true ) ;
+        if (obj == null) {
+            Future<V> ft = new FutureTask<V>( 
+                new Callable<V>() {
+                    public V call() {
+                        if (firstTime != null) 
+                            firstTime.content( true ) ;
 
-			return factory.evaluate( key ) ;
-		    }
-		} 
-	    ) ;
+                        return factory.evaluate( key ) ;
+                    }
+                } 
+            ) ;
 
-	    obj = map.putIfAbsent( key, ft ) ;
+            obj = map.putIfAbsent( key, ft ) ;
 
-	    // Now obj is either a Future<V>, or a V
-	    // if another thread got here first.
-	} 
-	
-	if (token.isInstance( obj )) {
-	    return token.cast( obj ) ;
-	} else {
-	    // assert FutureTask.isInstance( obj )
+            // Now obj is either a Future<V>, or a V
+            // if another thread got here first.
+        } 
+        
+        if (token.isInstance( obj )) {
+            return token.cast( obj ) ;
+        } else {
+            // assert FutureTask.isInstance( obj )
 
-	    Future<V> ft = (Future<V>)obj ;
-	    
-	    //
-	    // block if necessary until result is ready.
-	    V result = null ;
-	    try {
-		result = ft.get() ;
-	    } catch (Exception exc) {
-		// XXX what should we do here? InterruptedException, ExecutionException
-	    }
+            Future<V> ft = (Future<V>)obj ;
+            
+            //
+            // block if necessary until result is ready.
+            V result = null ;
+            try {
+                result = ft.get() ;
+            } catch (Exception exc) {
+                // XXX what should we do here? InterruptedException, ExecutionException
+            }
 
-	    // make sure that the table contains the result, not the future
-	    map.replace( key, ft, result ) ;
+            // make sure that the table contains the result, not the future
+            map.replace( key, ft, result ) ;
 
-	    return result ;
-	}
+            return result ;
+        }
     }
 }
 

@@ -49,41 +49,41 @@ import corba.framework.CORBATest;
 
 public class ConnectionsTest
     extends
-	CORBATest
+        CORBATest
 {
     public static final String thisPackage =
-	ConnectionsTest.class.getPackage().getName();
+        ConnectionsTest.class.getPackage().getName();
 
     protected void doTest()
-	throws
-	    Throwable
+        throws
+            Throwable
     {
-	Controller orbd   = createORBD();
-	orbd.start();
+        Controller orbd   = createORBD();
+        orbd.start();
 
-	Controller server1 = createServer(thisPackage + "." + "Server1",
-					 "Server1");
-	Controller server2 = createServer(thisPackage + "." + "Server2",
-					 "Server2");
-	Controller client1 = createClient(thisPackage + "." + "Client1",
-					 "Client1");
-	Controller client2 = createClient(thisPackage + "." + "Client2",
-					 "Client2");
+        Controller server1 = createServer(thisPackage + "." + "Server1",
+                                         "Server1");
+        Controller server2 = createServer(thisPackage + "." + "Server2",
+                                         "Server2");
+        Controller client1 = createClient(thisPackage + "." + "Client1",
+                                         "Client1");
+        Controller client2 = createClient(thisPackage + "." + "Client2",
+                                         "Client2");
 
-	server1.start();
-	server2.start();
+        server1.start();
+        server2.start();
 
-	client1.start();
-	client2.start();
+        client1.start();
+        client2.start();
 
-	client1.waitFor(300000);
-	client2.waitFor(300000);
+        client1.waitFor(300000);
+        client2.waitFor(300000);
 
-	client1.stop();
-	client2.stop();
-	server1.stop();
-	server2.stop();
-	orbd.stop();
+        client1.stop();
+        client2.stop();
+        server1.stop();
+        server2.stop();
+        orbd.stop();
     }
 }
 

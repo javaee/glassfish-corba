@@ -115,68 +115,68 @@ public class BatchEnvironment extends sun.rmi.rmic.BatchEnvironment implements C
      * stream for messages and Main.
      */
     public BatchEnvironment(OutputStream out, ClassPath path, Main main) {
-    	
-    	super(out,path,main);
+        
+        super(out,path,main);
 
         // Make sure we have our definitions...
 
-    	try {
-	    defRemote =
-		getClassDeclaration(idRemote).getClassDefinition(this);
-    	    defError =
-    	        getClassDeclaration(idJavaLangError).getClassDefinition(this);
-    	    defException =
-    	        getClassDeclaration(idJavaLangException).getClassDefinition(this);
-    	    defRemoteException =
-    	        getClassDeclaration(idRemoteException).getClassDefinition(this);
-    	    defCorbaObject =
-    	        getClassDeclaration(idCorbaObject).getClassDefinition(this);
-    	    defSerializable =
-    	        getClassDeclaration(idJavaIoSerializable).getClassDefinition(this);
-    	    defRuntimeException =
-    	        getClassDeclaration(idJavaLangRuntimeException).getClassDefinition(this);    
-    	    defExternalizable =
-    	        getClassDeclaration(idJavaIoExternalizable).getClassDefinition(this);    
-    	    defThrowable=
-    	        getClassDeclaration(idJavaLangThrowable).getClassDefinition(this);    
-    	    defIDLEntity=
-    	        getClassDeclaration(idIDLEntity).getClassDefinition(this);    
-    	    defValueBase=
-    	        getClassDeclaration(idValueBase).getClassDefinition(this);    
-    	    typeRemoteException = defRemoteException.getClassDeclaration().getType();
-    	    typeException = defException.getClassDeclaration().getType();
+        try {
+            defRemote =
+                getClassDeclaration(idRemote).getClassDefinition(this);
+            defError =
+                getClassDeclaration(idJavaLangError).getClassDefinition(this);
+            defException =
+                getClassDeclaration(idJavaLangException).getClassDefinition(this);
+            defRemoteException =
+                getClassDeclaration(idRemoteException).getClassDefinition(this);
+            defCorbaObject =
+                getClassDeclaration(idCorbaObject).getClassDefinition(this);
+            defSerializable =
+                getClassDeclaration(idJavaIoSerializable).getClassDefinition(this);
+            defRuntimeException =
+                getClassDeclaration(idJavaLangRuntimeException).getClassDefinition(this);    
+            defExternalizable =
+                getClassDeclaration(idJavaIoExternalizable).getClassDefinition(this);    
+            defThrowable=
+                getClassDeclaration(idJavaLangThrowable).getClassDefinition(this);    
+            defIDLEntity=
+                getClassDeclaration(idIDLEntity).getClassDefinition(this);    
+            defValueBase=
+                getClassDeclaration(idValueBase).getClassDefinition(this);    
+            typeRemoteException = defRemoteException.getClassDeclaration().getType();
+            typeException = defException.getClassDeclaration().getType();
             typeIOException = getClassDeclaration(idJavaIoIOException).getType();
             typeThrowable = getClassDeclaration(idJavaLangThrowable).getType();
 
             classPathLoader = new ClassPathLoader(path);
-    	    
-    	} catch (ClassNotFound e) {
-    	    error(0, "rmic.class.not.found", e.name);
-    	    throw new Error();
-    	}
+            
+        } catch (ClassNotFound e) {
+            error(0, "rmic.class.not.found", e.name);
+            throw new Error();
+        }
     }
 
     /**
      * Return whether or not to parse non-conforming types.
      */
     public boolean getParseNonConforming () {
-	return parseNonConforming;
+        return parseNonConforming;
     }
     
     /**
      * Set whether or not to parse non-conforming types.
      */
     public void setParseNonConforming (boolean parseEm) {
-	    
-	// If we are transitioning from not parsing to
-	// parsing, we need to throw out any previously
-	// parsed types...
-	    
-	if (parseEm && !parseNonConforming) {
-	    reset();    
-	}
-	    
-	parseNonConforming = parseEm;
+            
+        // If we are transitioning from not parsing to
+        // parsing, we need to throw out any previously
+        // parsed types...
+            
+        if (parseEm && !parseNonConforming) {
+            reset();    
+        }
+            
+        parseNonConforming = parseEm;
     }
     
     void setStandardPackage(boolean standardPackage) {
@@ -225,15 +225,15 @@ public class BatchEnvironment extends sun.rmi.rmic.BatchEnvironment implements C
 
         // Now remove all table entries...
 
-	allTypes.clear();
-	invalidTypes.clear();
+        allTypes.clear();
+        invalidTypes.clear();
         alreadyChecked.clear();
         namesCache.clear();
         modulesContext.clear();
         
         // Clean up remaining...
         loader = null;
-	parseNonConforming = false;
+        parseNonConforming = false;
 
         // REVISIT - can't clean up classPathLoader here
     }
@@ -243,15 +243,15 @@ public class BatchEnvironment extends sun.rmi.rmic.BatchEnvironment implements C
      */
     public void shutdown() {
         if (alreadyChecked != null) {
-	    //System.out.println();
-	    //System.out.println("allTypes.size() = "+ allTypes.size());
-	    //System.out.println("    InstanceCount before reset = "+Type.instanceCount);
+            //System.out.println();
+            //System.out.println("allTypes.size() = "+ allTypes.size());
+            //System.out.println("    InstanceCount before reset = "+Type.instanceCount);
             reset();
-	    //System.out.println("    InstanceCount AFTER reset = "+Type.instanceCount);
+            //System.out.println("    InstanceCount AFTER reset = "+Type.instanceCount);
 
             alreadyChecked = null;
-	    allTypes = null;
-	    invalidTypes = null;
+            allTypes = null;
+            invalidTypes = null;
             nameContexts = null;
             namesCache = null;
             modulesContext = null;

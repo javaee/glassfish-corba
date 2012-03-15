@@ -68,7 +68,7 @@ import java.security.PrivilegedAction;
 import java.util.Properties;
 import java.rmi.server.RMIClassLoader;
 
-import com.sun.corba.se.org.omg.CORBA.GetPropertyAction;
+import com.sun.corba.ee.org.omg.CORBA.GetPropertyAction;
 
 /**
  * Provides utility methods that can be used by stubs and ties to
@@ -80,11 +80,11 @@ public class Util {
     private static javax.rmi.CORBA.UtilDelegate utilDelegate = null;
     private static final String UtilClassKey = "javax.rmi.CORBA.UtilClass";
     private static final String defaultUtilImplName = 
-	"com.sun.corba.se.impl.javax.rmi.CORBA.Util";
+        "com.sun.corba.ee.impl.javax.rmi.CORBA.Util";
 
     static {
-	utilDelegate = (javax.rmi.CORBA.UtilDelegate)
-	    createDelegateIfSpecified(UtilClassKey, defaultUtilImplName);
+        utilDelegate = (javax.rmi.CORBA.UtilDelegate)
+            createDelegateIfSpecified(UtilClassKey, defaultUtilImplName);
     }
 
     private Util(){}
@@ -95,11 +95,11 @@ public class Util {
      * @return the mapped exception.
      */
     public static RemoteException mapSystemException(SystemException ex) {
-	
-	if (utilDelegate != null) {
-	    return utilDelegate.mapSystemException(ex);
-	}
-	return null;
+        
+        if (utilDelegate != null) {
+            return utilDelegate.mapSystemException(ex);
+        }
+        return null;
     }
 
     /**
@@ -109,9 +109,9 @@ public class Util {
      */
     public static void writeAny(OutputStream out, Object obj) {
 
-	if (utilDelegate != null) {
-	    utilDelegate.writeAny(out, obj);
-	}
+        if (utilDelegate != null) {
+            utilDelegate.writeAny(out, obj);
+        }
     }
 
     /**
@@ -121,10 +121,10 @@ public class Util {
      */
     public static Object readAny(InputStream in) {
 
-	if (utilDelegate != null) {
-	    return utilDelegate.readAny(in);
-	}
-	return null;
+        if (utilDelegate != null) {
+            return utilDelegate.readAny(in);
+        }
+        return null;
     }
 
     /**
@@ -140,9 +140,9 @@ public class Util {
     public static void writeRemoteObject(OutputStream out,
                                          java.lang.Object obj) {
                                                 
-	if (utilDelegate != null) {
-	    utilDelegate.writeRemoteObject(out, obj);
-	}
+        if (utilDelegate != null) {
+            utilDelegate.writeRemoteObject(out, obj);
+        }
 
     }
     
@@ -160,9 +160,9 @@ an exported
     public static void writeAbstractObject(OutputStream out,
                                            java.lang.Object obj) {
                                                 
-	if (utilDelegate != null) {
-	    utilDelegate.writeAbstractObject(out, obj);
-	}
+        if (utilDelegate != null) {
+            utilDelegate.writeAbstractObject(out, obj);
+        }
     }
     
     /**
@@ -174,9 +174,9 @@ an exported
     public static void registerTarget(javax.rmi.CORBA.Tie tie,
                                       java.rmi.Remote target) {
         
-	if (utilDelegate != null) {
-	    utilDelegate.registerTarget(tie, target);
-	}
+        if (utilDelegate != null) {
+            utilDelegate.registerTarget(tie, target);
+        }
 
     }
     
@@ -190,9 +190,9 @@ Tie#deactivate}
         throws java.rmi.NoSuchObjectException 
     {
 
-	if (utilDelegate != null) {
-	    utilDelegate.unexportObject(target);
-	}
+        if (utilDelegate != null) {
+            utilDelegate.unexportObject(target);
+        }
 
     }
     
@@ -202,10 +202,10 @@ Tie#deactivate}
      */
     public static Tie getTie (Remote target) {
 
-	if (utilDelegate != null) {
-	    return utilDelegate.getTie(target);
-	}
-	return null;
+        if (utilDelegate != null) {
+            return utilDelegate.getTie(target);
+        }
+        return null;
     }
 
 
@@ -215,10 +215,10 @@ Tie#deactivate}
      * @return a class which implements the ValueHandler interface.
      */
     public static ValueHandler createValueHandler() {
-	if (utilDelegate != null) {
-	    return utilDelegate.createValueHandler();
-	}
-	return null;
+        if (utilDelegate != null) {
+            return utilDelegate.createValueHandler();
+        }
+        return null;
     }
 
     /**
@@ -227,10 +227,10 @@ Tie#deactivate}
      * @return a space-separated list of URLs, or null.
      */
     public static String getCodebase(java.lang.Class clz) {
-	if (utilDelegate != null) {
-	    return utilDelegate.getCodebase(clz);
-	}
-	return null;
+        if (utilDelegate != null) {
+            return utilDelegate.getCodebase(clz);
+        }
+        return null;
     }
 
     /**
@@ -262,11 +262,11 @@ Tie#deactivate}
     public static Class loadClass(String className,
                                   String remoteCodebase,
                                   ClassLoader loader)
-	throws ClassNotFoundException {
-	if (utilDelegate != null) {
-	    return utilDelegate.loadClass(className,remoteCodebase,loader);
-	}  
-	return null ;
+        throws ClassNotFoundException {
+        if (utilDelegate != null) {
+            return utilDelegate.loadClass(className,remoteCodebase,loader);
+        }  
+        return null ;
     }
 
 
@@ -292,11 +292,11 @@ Tie#deactivate}
      */
     public static boolean isLocal(Stub stub) throws RemoteException {
 
-	if (utilDelegate != null) {
-	    return utilDelegate.isLocal(stub);
-	}
+        if (utilDelegate != null) {
+            return utilDelegate.isLocal(stub);
+        }
 
-	return false;
+        return false;
     }
     
     /**
@@ -307,9 +307,9 @@ Tie#deactivate}
      */
     public static RemoteException wrapException(Throwable orig) {
 
-	if (utilDelegate != null) {
-	    return utilDelegate.wrapException(orig);
-	}
+        if (utilDelegate != null) {
+            return utilDelegate.wrapException(orig);
+        }
 
         return null;
     }
@@ -324,12 +324,12 @@ Tie#deactivate}
      * @exception RemoteException if any object could not be copied or connected.
      */
     public static Object[] copyObjects (Object[] obj, ORB orb)
-	throws RemoteException {
+        throws RemoteException {
     
-	if (utilDelegate != null) {
-	    return utilDelegate.copyObjects(obj, orb);
-	}
-	
+        if (utilDelegate != null) {
+            return utilDelegate.copyObjects(obj, orb);
+        }
+        
         return null;
     }
 
@@ -342,12 +342,12 @@ Tie#deactivate}
      * @exception RemoteException if the object could not be copied or connected.
      */
     public static Object copyObject (Object obj, ORB orb)
-	throws RemoteException {
+        throws RemoteException {
 
-	if (utilDelegate != null) {
-	    return utilDelegate.copyObject(obj, orb);
-	}
-	return null;
+        if (utilDelegate != null) {
+            return utilDelegate.copyObject(obj, orb);
+        }
+        return null;
     }
 
     // Same code as in PortableRemoteObject. Can not be shared because they
@@ -355,7 +355,7 @@ Tie#deactivate}
     // security reasons. If you know a better solution how to share this code
     // then remove it from PortableRemoteObject. Also in Stub.java
     private static Object createDelegateIfSpecified(String classKey, 
-	String defaultClassName) 
+        String defaultClassName) 
     {
         String className = (String)
             AccessController.doPrivileged(new GetPropertyAction(classKey));
@@ -366,39 +366,39 @@ Tie#deactivate}
             }
         }
 
-	if (className == null) {
-	    className = defaultClassName;
-	}
+        if (className == null) {
+            className = defaultClassName;
+        }
 
         try {
             return loadDelegateClass(className).newInstance();
         } catch (ClassNotFoundException ex) {
-	    INITIALIZE exc = new INITIALIZE( "Cannot instantiate " + className);
-	    exc.initCause( ex ) ;
-	    throw exc ;
+            INITIALIZE exc = new INITIALIZE( "Cannot instantiate " + className);
+            exc.initCause( ex ) ;
+            throw exc ;
         } catch (Exception ex) {
-	    INITIALIZE exc = new INITIALIZE( "Error while instantiating" + className);
-	    exc.initCause( ex ) ;
-	    throw exc ;
+            INITIALIZE exc = new INITIALIZE( "Error while instantiating" + className);
+            exc.initCause( ex ) ;
+            throw exc ;
         }
     }
 
     private static Class loadDelegateClass( String className )  throws ClassNotFoundException
     {
-	try {
-	    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-	    return Class.forName(className, false, loader);
-	} catch (ClassNotFoundException e) {
-	    // ignore, then try RMIClassLoader
-	}
+        try {
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            return Class.forName(className, false, loader);
+        } catch (ClassNotFoundException e) {
+            // ignore, then try RMIClassLoader
+        }
 
-	try {
-	    return RMIClassLoader.loadClass(className);
-	} catch (MalformedURLException e) {
-	    String msg = "Could not load " + className + ": " + e.toString();
-	    ClassNotFoundException exc = new ClassNotFoundException( msg ) ; 
-	    throw exc ;
-	}
+        try {
+            return RMIClassLoader.loadClass(className);
+        } catch (MalformedURLException e) {
+            String msg = "Could not load " + className + ": " + e.toString();
+            ClassNotFoundException exc = new ClassNotFoundException( msg ) ; 
+            throw exc ;
+        }
     }
     /**
      * Load the orb.properties file.
@@ -406,7 +406,7 @@ Tie#deactivate}
     private static Properties getORBPropertiesFile () 
     {
         return (Properties) AccessController.doPrivileged(
-	    new GetORBPropertiesFileAction());
+            new GetORBPropertiesFileAction());
     }
 
 }

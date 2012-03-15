@@ -40,7 +40,7 @@
 
 package pi.clientrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 
 /**
@@ -60,16 +60,16 @@ abstract public class InterceptorStrategy {
      * Logs the given message as test output.
      */
     protected void log( String message ) {
-	ClientCommon.client.out.println( "    + " + message );
+        ClientCommon.client.out.println( "    + " + message );
     }
 
     /**
      * Reports the given message as a test failure for the given reason.
      */
     protected void fail( String reason ) {
-	ClientCommon.client.out.println( "    + ERROR: " + reason );
-	failReason = reason;
-	failed = true;
+        ClientCommon.client.out.println( "    + ERROR: " + reason );
+        failReason = reason;
+        failed = true;
     }
     
     /**
@@ -86,29 +86,29 @@ abstract public class InterceptorStrategy {
     }
 
     public void send_request (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
         throws ForwardRequest
     {
     }
 
     public void send_poll (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
     {
     }
 
     public void receive_reply (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
     {
     }
 
     public void receive_exception (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
-	throws ForwardRequest
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
+        throws ForwardRequest
     {
     }
 
     public void receive_other (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri) 
         throws ForwardRequest
     {
     }

@@ -63,15 +63,15 @@ public class SampleIORInterceptor
     static int destroyCount = 0;
 
     public SampleIORInterceptor( String name ) {
-	this.name = name;
+        this.name = name;
     }
 
     public String name() {
-	return name;
+        return name;
     }
 
     public void destroy() {
-	destroyCount++;
+        destroyCount++;
     }
 
     public void establish_components (IORInfo info) {
@@ -82,7 +82,7 @@ public class SampleIORInterceptor
     }
 
     public void adapter_state_changed( ObjectReferenceTemplate[] templates, 
-	short state )
+        short state )
     {
     }
 

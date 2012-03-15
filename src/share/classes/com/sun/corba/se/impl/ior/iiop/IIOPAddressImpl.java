@@ -38,13 +38,13 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.ior.iiop;
+package com.sun.corba.ee.impl.ior.iiop;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.logging.IORSystemException ;
+import com.sun.corba.ee.spi.logging.IORSystemException ;
 
 /**
  * @author Ken Cavanaugh
@@ -59,28 +59,28 @@ public final class IIOPAddressImpl extends IIOPAddressBase
     
     public IIOPAddressImpl( String host, int port ) 
     {
-	if ((port < 0) || (port > 65535)) {
+        if ((port < 0) || (port > 65535)) {
             throw wrapper.badIiopAddressPort(port);
         }
 
-	this.host = host ;
-	this.port = port ;
+        this.host = host ;
+        this.port = port ;
     }
 
     public IIOPAddressImpl( InputStream is )
     {
-	host = is.read_string() ;
-	short thePort = is.read_short() ;
-	port = shortToInt( thePort ) ;
+        host = is.read_string() ;
+        short thePort = is.read_short() ;
+        port = shortToInt( thePort ) ;
     }
 
     public String getHost()
     {
-	return host ;
+        return host ;
     }
 
     public int getPort()
     {
-	return port ;
+        return port ;
     }
 }

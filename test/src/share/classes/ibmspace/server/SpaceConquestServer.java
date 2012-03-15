@@ -87,118 +87,118 @@ public class SpaceConquestServer extends PortableRemoteObject implements SpaceCo
 
     public SpaceConquestServer (int numPlayers) throws RemoteException
     {
-	fGame = new Game (numPlayers);
-	fViews = new Vector ();
-	fRequiredPlayers = numPlayers;
+        fGame = new Game (numPlayers);
+        fViews = new Vector ();
+        fRequiredPlayers = numPlayers;
     }
 
     public SpaceConquestServer () throws RemoteException
     {
-	fGame = new Game (1);
-	fViews = new Vector ();
-	fRequiredPlayers = 1;
+        fGame = new Game (1);
+        fViews = new Vector ();
+        fRequiredPlayers = 1;
     }
 
     private synchronized void waitForAllPlayers ()
     {
-	try
-	    {
-		if ( fNumberOfPlayers < fRequiredPlayers ) {
-		    wait ();
-		} else {
-		    notifyAll ();
-		}
-	    }
-	catch (InterruptedException e)
-	    {
-	    }
+        try
+            {
+                if ( fNumberOfPlayers < fRequiredPlayers ) {
+                    wait ();
+                } else {
+                    notifyAll ();
+                }
+            }
+        catch (InterruptedException e)
+            {
+            }
     }
 
     public synchronized GameView  joinGame (String playerName) throws RemoteException
     {
-	if ( fGame.isGameStarted() ) {
-	    // Probably should throw an exception here
-	    // This is to prevent players from joining after the required
-	    // number of players have joined and the game has started.
-	    System.out.println (playerName + " tried to join started game");
-	    return null;
-	}
+        if ( fGame.isGameStarted() ) {
+            // Probably should throw an exception here
+            // This is to prevent players from joining after the required
+            // number of players have joined and the game has started.
+            System.out.println (playerName + " tried to join started game");
+            return null;
+        }
 
-	fGame.logCall ();
-	double idealTemp = PlanetImpl.RandomTemp ();
-	double idealGravity = PlanetImpl.RandomGravity ();
-	Player player = new Player (playerName, idealTemp, idealGravity);
-	fGame.addPlayer (player);
-	fNumberOfPlayers++;
+        fGame.logCall ();
+        double idealTemp = PlanetImpl.RandomTemp ();
+        double idealGravity = PlanetImpl.RandomGravity ();
+        Player player = new Player (playerName, idealTemp, idealGravity);
+        fGame.addPlayer (player);
+        fNumberOfPlayers++;
 
-	GameView view;
+        GameView view;
 
-	if ( fRequiredPlayers == 1 ) {
-	    view = new GameViewImpl (fGame, player);
-	} else {
-	    view = new GameViewServer (fGame, player);
-	}
+        if ( fRequiredPlayers == 1 ) {
+            view = new GameViewImpl (fGame, player);
+        } else {
+            view = new GameViewServer (fGame, player);
+        }
 
-	fViews.addElement (view);
-	waitForAllPlayers ();
-	return view;
+        fViews.addElement (view);
+        waitForAllPlayers ();
+        return view;
     }
 
     public void quitGame (GameView gameView) throws RemoteException
     {
-	gameView.quit ();
-	fNumberOfPlayers--;
-	if ( fNumberOfPlayers == 0 ) PortableRemoteObject.unexportObject (this);
+        gameView.quit ();
+        fNumberOfPlayers--;
+        if ( fNumberOfPlayers == 0 ) PortableRemoteObject.unexportObject (this);
     }
 
     public synchronized Planet[] getGalaxyMap () throws RemoteException
     {
-	Planet[] planets = fGame.createGalaxyMap ();
-	return planets;
+        Planet[] planets = fGame.createGalaxyMap ();
+        return planets;
     }
 
     public synchronized int getNumberOfPlanets () throws RemoteException
     {
-	Planet[] planets = getGalaxyMap ();
-	return Array.getLength (planets);
+        Planet[] planets = getGalaxyMap ();
+        return Array.getLength (planets);
     }
 
     public synchronized Planet getPlanet (int index) throws RemoteException
     {
-	Planet[] planets = getGalaxyMap ();
-	return planets[index];
+        Planet[] planets = getGalaxyMap ();
+        return planets[index];
     }
 
     private static InitialContext context ;
 
     public static void main (String[] args)
     {
-	int numPlayers = 1;
+        int numPlayers = 1;
 
-	if ( Array.getLength (args) != 0 ) {
-	    numPlayers = (Integer.valueOf (args[0])).intValue();
-	}
+        if ( Array.getLength (args) != 0 ) {
+            numPlayers = (Integer.valueOf (args[0])).intValue();
+        }
 
-	try
-	    {
-		if ( System.getSecurityManager() == null ) {
-		    System.setSecurityManager (new RMISecurityManager());
-		}
+        try
+            {
+                if ( System.getSecurityManager() == null ) {
+                    System.setSecurityManager (new RMISecurityManager());
+                }
 
-		SpaceConquestServer obj = new SpaceConquestServer (numPlayers);
+                SpaceConquestServer obj = new SpaceConquestServer (numPlayers);
 
-		// Pass system properties with -D option of java command, e.g.
-		// -Djava.naming.factory.initial=com.sun.jndi.cosnaming.CNCtxFactory
+                // Pass system properties with -D option of java command, e.g.
+                // -Djava.naming.factory.initial=com.sun.jndi.cosnaming.CNCtxFactory
 
-		context = new InitialContext ();
-		context.rebind ("SpaceConquest", obj);
-		System.out.println ("SpaceConquest server bound in registry");
-	    }
-	catch (Exception e)
-	    {
-		System.out.println ("SpaceConquest Server Exception: " + e.getMessage());
-		e.printStackTrace ();
-	    }
+                context = new InitialContext ();
+                context.rebind ("SpaceConquest", obj);
+                System.out.println ("SpaceConquest server bound in registry");
+            }
+        catch (Exception e)
+            {
+                System.out.println ("SpaceConquest Server Exception: " + e.getMessage());
+                e.printStackTrace ();
+            }
     }
 
 

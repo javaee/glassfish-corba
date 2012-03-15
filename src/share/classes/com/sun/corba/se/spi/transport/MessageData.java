@@ -37,10 +37,10 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message ;
-import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message ;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
 
 public interface MessageData {
     /** An array of GIOP messages.  The messages will

@@ -378,10 +378,10 @@ public abstract class FileLocator extends Object {
 
             ze = zf.getEntry (zeName);
             if (ze == null) {
-	    	zf.close(); // D55355, D56419
-		zf = null;
+                zf.close(); // D55355, D56419
+                zf = null;
                 return null;
-	    }
+            }
             InputStream istream = zf.getInputStream(ze);
             if (buffered)
                 istream = new BufferedInputStream(istream);

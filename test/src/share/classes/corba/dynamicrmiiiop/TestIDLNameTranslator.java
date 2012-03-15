@@ -54,9 +54,9 @@ import java.math.BigInteger;
 
 import corba.dynamicrmiiiop.testclasses.*;
 
-import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
-import com.sun.corba.se.impl.presentation.rmi.IDLNameTranslatorImpl ;
-import com.sun.corba.se.impl.presentation.rmi.IDLTypesUtil ;
+import com.sun.corba.ee.spi.presentation.rmi.IDLNameTranslator ;
+import com.sun.corba.ee.impl.presentation.rmi.IDLNameTranslatorImpl ;
+import com.sun.corba.ee.impl.presentation.rmi.IDLTypesUtil ;
 
 public class TestIDLNameTranslator extends TestCase {
 
@@ -74,17 +74,17 @@ public class TestIDLNameTranslator extends TestCase {
         InvalidRemotes.InvalidRemote3.class, 
         InvalidRemotes.InvalidRemote4.class,
         InvalidRemotes.InvalidRemote5.class, 
-	// InvalidRemote6 has a method that declares an unchecked exception.
-	// Although bad practice, this is not an error.
+        // InvalidRemote6 has a method that declares an unchecked exception.
+        // Although bad practice, this is not an error.
         // InvalidRemotes.InvalidRemote6.class,
         // InvalidRemotes.InvalidRemote7.class, 
         // InvalidRemotes.InvalidRemote8.class,
         InvalidRemotes.InvalidRemote9.class, 
         InvalidRemotes.InvalidRemote10.class,
         InvalidRemotes.InvalidRemote11.class, 
-	// The following test for interfaces that inherit the 
-	// same method from multiple super-interfaces.  This is supposed
-	// to be illegal, but rmic allows it, so we will also allow it here.
+        // The following test for interfaces that inherit the 
+        // same method from multiple super-interfaces.  This is supposed
+        // to be illegal, but rmic allows it, so we will also allow it here.
         //InvalidRemotes.InvalidRemote12.class,
         //InvalidRemotes.InvalidRemote13.class, 
         //InvalidRemotes.InvalidRemote14.class,
@@ -101,12 +101,12 @@ public class TestIDLNameTranslator extends TestCase {
 
     public void testMultipleInterfaces()
     {
-	doIDLNameTranslationTest( IDLMultipleInterfaceTest.class,
-	    new Class[] { 
-		IDLMultipleInterfaceTest.first.class,
-		IDLMultipleInterfaceTest.second.class
-	    }
-	) ;
+        doIDLNameTranslationTest( IDLMultipleInterfaceTest.class,
+            new Class[] { 
+                IDLMultipleInterfaceTest.first.class,
+                IDLMultipleInterfaceTest.second.class
+            }
+        ) ;
     }
 
     public void testIDLProperties() 
@@ -175,7 +175,7 @@ public class TestIDLNameTranslator extends TestCase {
          for(int i = 0; i < nonRemoteInterfaces.length; i++) {
             Class nonRemote = nonRemoteInterfaces[i];
             String msg = "Unexpected success for class " + nonRemote.getName() +
-		" at index " + i ;
+                " at index " + i ;
 
             try {
                 IDLNameTranslator translator = 
@@ -213,43 +213,43 @@ public class TestIDLNameTranslator extends TestCase {
             Assert.fail(e.getMessage());
         }
 
-	return expectedIdlNames ;
+        return expectedIdlNames ;
     }
 
     private void doIDLNameTranslationTest(Class testClass, 
-	Class[] testInterfaces)
+        Class[] testInterfaces)
     {
-	String[] expectedIdlNames = getExpectedIdlNames( testClass ) ; 
+        String[] expectedIdlNames = getExpectedIdlNames( testClass ) ; 
         IDLNameTranslator nameTranslator = 
             IDLNameTranslatorImpl.get(testInterfaces);
         Method[] sortedMethods = getSortedMethods( testInterfaces );
 
         doIDLNameTranslationTest(expectedIdlNames, nameTranslator,
-	    sortedMethods );
+            sortedMethods );
     }
 
     private void doIDLNameTranslationTest(Class testClass, 
-	Class testInterface)
+        Class testInterface)
     {
-	String[] expectedIdlNames = getExpectedIdlNames( testClass ) ; 
-	doIDLNameTranslationTest( expectedIdlNames, testInterface ) ;
+        String[] expectedIdlNames = getExpectedIdlNames( testClass ) ; 
+        doIDLNameTranslationTest( expectedIdlNames, testInterface ) ;
     }
 
     private void doIDLNameTranslationTest(String[] expectedIdlNames, 
-	Class testInterface)
+        Class testInterface)
     {
         IDLNameTranslator nameTranslator = 
             IDLNameTranslatorImpl.get(testInterface);
         Method[] sortedMethods = getSortedMethods(
-	    new Class[] { testInterface } );
+            new Class[] { testInterface } );
       
         doIDLNameTranslationTest(expectedIdlNames, nameTranslator,
-	    sortedMethods );
+            sortedMethods );
     }
 
     private void doIDLNameTranslationTest(
-	String[] expectedIdlNames, IDLNameTranslator nameTranslator,
-	Method[] sortedMethods )
+        String[] expectedIdlNames, IDLNameTranslator nameTranslator,
+        Method[] sortedMethods )
     {
         for(int i = 0; i < sortedMethods.length; i++) {
             Method m = (Method) sortedMethods[i];
@@ -268,12 +268,12 @@ public class TestIDLNameTranslator extends TestCase {
     {
         IDLNameTranslatorImpl nameTranslator = 
             (IDLNameTranslatorImpl)IDLNameTranslatorImpl.get(
-		java.rmi.Remote.class);
+                java.rmi.Remote.class);
 
         for( int i = Character.MIN_VALUE; i <= Character.MAX_VALUE; i++ ) {
             char c = (char) i;
             String unicode = IDLNameTranslatorImpl.charToUnicodeRepresentation(
-		c);
+                c);
             String msg = i + ":" + Character.toString(c) + ":" + unicode;
 
             // Make sure result is 5 characters long : 1 character for
@@ -293,14 +293,14 @@ public class TestIDLNameTranslator extends TestCase {
     {
         SortedSet sortedMethods = new TreeSet(new MethodComparator());
 
-	for(int classCtr = 0; classCtr < classes.length; classCtr++ ) {
-	    Method[] methods = classes[classCtr].getMethods();
+        for(int classCtr = 0; classCtr < classes.length; classCtr++ ) {
+            Method[] methods = classes[classCtr].getMethods();
 
-	    for(int methodCtr = 0; methodCtr < methods.length; methodCtr++) {
-		Method next = methods[methodCtr];
-		sortedMethods.add(next);
-	    }
-	}
+            for(int methodCtr = 0; methodCtr < methods.length; methodCtr++) {
+                Method next = methods[methodCtr];
+                sortedMethods.add(next);
+            }
+        }
 
         Method[] sortedMethodArray = new Method[sortedMethods.size()];
         

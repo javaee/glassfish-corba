@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.copyobject ;
+package com.sun.corba.ee.impl.copyobject ;
 
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
 
@@ -46,12 +46,12 @@ import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
 public class ReferenceObjectCopierImpl implements ObjectCopier
 {
     public Object copy( Object obj, boolean debug ) {
-	return obj ;
+        return obj ;
     }
 
     public Object copy( Object obj )
     {
-	return obj ;
+        return obj ;
     }
 }
 

@@ -57,7 +57,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import javax.naming.NamingException;
 import java.util.HashSet;
-import com.sun.corba.se.impl.util.Utility;
+import com.sun.corba.ee.impl.util.Utility;
 import java.io.File;
 
 /*
@@ -174,48 +174,48 @@ public abstract class RemoteTest extends Test {
                                     boolean iiop,
                                     boolean external) throws Exception 
     {
-	try {
-	    dprint( "RemoteTest.generateStubs called" ) ;
-	    dprint( "\tclasses = " + Test.display(classes)) ;
-	    dprint( "\tadditionalRMICArgs = " + Test.display(additionalRMICArgs)) ;
-	    dprint( "\tonlyOnce = " + onlyOnce ) ;
-	    dprint( "\tiiop = " + iiop ) ;
-	    dprint( "\texternal = " + external ) ;
+        try {
+            dprint( "RemoteTest.generateStubs called" ) ;
+            dprint( "\tclasses = " + Test.display(classes)) ;
+            dprint( "\tadditionalRMICArgs = " + Test.display(additionalRMICArgs)) ;
+            dprint( "\tonlyOnce = " + onlyOnce ) ;
+            dprint( "\tiiop = " + iiop ) ;
+            dprint( "\texternal = " + external ) ;
 
-	    Vector list = new Vector(classes.length);
-	    for (int i = 0; i < classes.length; i++) {
-		String theClass = classes[i];
-		// Do we need to compile this class?
-		if (!stubs.contains(theClass) || !onlyOnce) {
-		    dprint( "RemoteTest.generateStubs: adding to list " + theClass ) ;
-		    list.addElement(theClass);
-		}
-	    }
+            Vector list = new Vector(classes.length);
+            for (int i = 0; i < classes.length; i++) {
+                String theClass = classes[i];
+                // Do we need to compile this class?
+                if (!stubs.contains(theClass) || !onlyOnce) {
+                    dprint( "RemoteTest.generateStubs: adding to list " + theClass ) ;
+                    list.addElement(theClass);
+                }
+            }
 
-	    int classCount = list.size();
-	    if (classCount > 0) {
-		String[] compileEm = new String[classCount];
-		list.copyInto(compileEm);
+            int classCount = list.size();
+            if (classCount > 0) {
+                String[] compileEm = new String[classCount];
+                list.copyInto(compileEm);
 
-		String genArg = null;
-		if (iiop) {
-		    genArg = "-iiop";
-		} else {
-		    genArg = "-vcompat";
-		}
+                String genArg = null;
+                if (iiop) {
+                    genArg = "-iiop";
+                } else {
+                    genArg = "-vcompat";
+                }
 
-		// Util.rmic(null,null,null,external); // _REVSISIT_ Remove! Bug in 1.2b4.1
-		Util.rmic(genArg,additionalRMICArgs,compileEm,external);
+                // Util.rmic(null,null,null,external); // _REVSISIT_ Remove! Bug in 1.2b4.1
+                Util.rmic(genArg,additionalRMICArgs,compileEm,external);
 
-		if (onlyOnce) {
-		    for (int i = 0; i < classCount; i++) {
-			stubs.add(compileEm[i]);
-		    }
-		}
-	    }
-	} finally {
-	    dprint( "RemoteTest.generateStubs exiting" ) ;
-	}
+                if (onlyOnce) {
+                    for (int i = 0; i < classCount; i++) {
+                        stubs.add(compileEm[i]);
+                    }
+                }
+            }
+        } finally {
+            dprint( "RemoteTest.generateStubs exiting" ) ;
+        }
     }
 
 
@@ -249,17 +249,17 @@ public abstract class RemoteTest extends Test {
             if (portString != null) {
                 port = Integer.parseInt(portString);
             }
-	    String orbDebugFlags = (String)flags.get( ORB_DEBUG ) ;
+            String orbDebugFlags = (String)flags.get( ORB_DEBUG ) ;
             result = ServantContext.getContext(host,port,true,iiop,orbDebugFlags);
         }
 
-	dprint( "getServantContext returns " + result ) ;
+        dprint( "getServantContext returns " + result ) ;
         return result;
     }
 
     public void setup () {
         try {
-	    dprint( "RemoteTest.setup called" ) ;
+            dprint( "RemoteTest.setup called" ) ;
             iiop = !getArgs().containsKey(JRMP_FLAG);
 
             if (!getArgs().containsKey(SKIP_RMIC_FLAG)) {
@@ -282,14 +282,14 @@ public abstract class RemoteTest extends Test {
                     if (dir != null) {
                         File root = new File(dir);
                         for (int i = 0; i < tieClasses.length; i++) {
-			    dprint( "RemoteTest.setup: tieClass = " + tieClasses[i] ) ;
+                            dprint( "RemoteTest.setup: tieClass = " + tieClasses[i] ) ;
                             String tieClass = Utility.tieName(tieClasses[i]);
                             tieClass = tieClass.replace('.',File.separatorChar);
                             tieClass += ".class";
                             File file = new File(root,tieClass);
-			    dprint( "RemoteTest.setup: file = " + file ) ;
+                            dprint( "RemoteTest.setup: file = " + file ) ;
                             if (file.exists()) {
-				dprint( "RemoteTest.setup: deleting file" ) ;
+                                dprint( "RemoteTest.setup: deleting file" ) ;
                                 file.delete();
                             }
                         }
@@ -311,19 +311,19 @@ public abstract class RemoteTest extends Test {
             e.printStackTrace(new PrintStream(out));
             throw new Error(out.toString());
         } finally {
-	    dprint( "RemoteTest.setup exiting" ) ;
-	}
+            dprint( "RemoteTest.setup exiting" ) ;
+        }
     }
 
     public void run () {
-	dprint( "run called" ) ;
+        dprint( "run called" ) ;
         ServantContext theContext = null;
 
         try {
             // Do the test...
             theContext = getServantContext();
 
-	    dprint( "doTest called" ) ;
+            dprint( "doTest called" ) ;
             doTest(theContext);
         } catch (ThreadDeath death) {
             throw death;

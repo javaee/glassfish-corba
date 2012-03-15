@@ -101,20 +101,20 @@ public class InnerTest extends Test implements Constants {
       Abstract interface      Abstract interface      AA
     */
     private static final String[] CASES = { 
-	"RR","RI","RV","RS","RA",
-	"IR","II","IV","IS","IA",
-	"VR","VI","VV","VS","VA",//"SR",
-	"SI","SV","SS","SA",
-	"AR","AI","AV","AS","AA",
+        "RR","RI","RV","RS","RA",
+        "IR","II","IV","IS","IA",
+        "VR","VI","VV","VS","VA",//"SR",
+        "SI","SV","SS","SA",
+        "AR","AI","AV","AS","AA",
     };
     private int typeCode(char c) {
         switch (c) {
-	case 'R': return TYPE_REMOTE;
-	case 'I': return TYPE_NC_INTERFACE;
-	case 'V': return TYPE_VALUE;
-	case 'S': return TYPE_IMPLEMENTATION;
-	case 'A': return TYPE_ABSTRACT;
-	default: throw new Error("Unkown type.");
+        case 'R': return TYPE_REMOTE;
+        case 'I': return TYPE_NC_INTERFACE;
+        case 'V': return TYPE_VALUE;
+        case 'S': return TYPE_IMPLEMENTATION;
+        case 'A': return TYPE_ABSTRACT;
+        default: throw new Error("Unkown type.");
         }
     }
     

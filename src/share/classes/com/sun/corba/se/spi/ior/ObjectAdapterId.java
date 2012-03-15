@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior ;
+package com.sun.corba.ee.spi.ior ;
 
 import java.util.Iterator ;
 

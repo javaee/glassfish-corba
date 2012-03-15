@@ -37,24 +37,24 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 
-import com.sun.corba.se.spi.transport.Acceptor;
-import com.sun.corba.se.spi.transport.ListenerThread;
+import com.sun.corba.ee.spi.transport.Acceptor;
+import com.sun.corba.ee.spi.transport.ListenerThread;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.threadpool.Work;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.threadpool.Work;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.trace.Transport;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Transport
 public class ListenerThreadImpl
     implements
-	ListenerThread,
-	Work
+        ListenerThread,
+        Work
 {
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
@@ -66,9 +66,9 @@ public class ListenerThreadImpl
 
     public ListenerThreadImpl(ORB orb, Acceptor acceptor)
     {
-	this.orb = orb;
-	this.acceptor = acceptor;
-	keepRunning = true;
+        this.orb = orb;
+        this.acceptor = acceptor;
+        keepRunning = true;
     }
 
     ////////////////////////////////////////////////////
@@ -78,13 +78,13 @@ public class ListenerThreadImpl
 
     public Acceptor getAcceptor()
     {
-	return acceptor;
+        return acceptor;
     }
 
     @Transport
     public synchronized void close()
     {
-	keepRunning = false;
+        keepRunning = false;
         acceptor.close() ;
     }
 
@@ -133,12 +133,12 @@ public class ListenerThreadImpl
 
     public void setEnqueueTime(long timeInMillis) 
     {
-	enqueueTime = timeInMillis;
+        enqueueTime = timeInMillis;
     }
 
     public long getEnqueueTime() 
     {
-	return enqueueTime;
+        return enqueueTime;
     }
 
     public String getName() { return "ListenerThread"; }

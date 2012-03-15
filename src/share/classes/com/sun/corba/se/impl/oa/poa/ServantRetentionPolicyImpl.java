@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.oa.poa;
+package com.sun.corba.ee.impl.oa.poa;
 
 import org.omg.CORBA.Policy;
 import org.omg.PortableServer.SERVANT_RETENTION_POLICY_ID;
@@ -51,24 +51,24 @@ final class ServantRetentionPolicyImpl
     private static final long serialVersionUID = 469062222833983100L;
 
     public ServantRetentionPolicyImpl(ServantRetentionPolicyValue value) {
-	this.value = value;
+        this.value = value;
     }
 
     public ServantRetentionPolicyValue value() {
-	return value;
+        return value;
     }
 
     public int policy_type()
     {
-	return SERVANT_RETENTION_POLICY_ID.value ;
+        return SERVANT_RETENTION_POLICY_ID.value ;
     }
 
     public Policy copy() {
-	return new ServantRetentionPolicyImpl(value);
+        return new ServantRetentionPolicyImpl(value);
     }
 
     public void destroy() {
-	value = null;
+        value = null;
     }
 
     private ServantRetentionPolicyValue value;
@@ -76,8 +76,8 @@ final class ServantRetentionPolicyImpl
     @Override
     public String toString()
     {
-	return "ServantRetentionPolicy[" +
-	    ((value.value() == ServantRetentionPolicyValue._RETAIN) ?
-		"RETAIN" : "NON_RETAIN" + "]") ;
+        return "ServantRetentionPolicy[" +
+            ((value.value() == ServantRetentionPolicyValue._RETAIN) ?
+                "RETAIN" : "NON_RETAIN" + "]") ;
     }
 }

@@ -47,19 +47,19 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
 import java.io.IOException;
 
 import org.omg.CORBA.portable.ApplicationException;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
 
-import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.trace.Subcontract;
+import com.sun.corba.ee.impl.encoding.ByteBufferWithInfo;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.spi.trace.Subcontract;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
@@ -70,7 +70,7 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 @Subcontract
 public class SharedCDRClientRequestDispatcherImpl
     extends
-	ClientRequestDispatcherImpl
+        ClientRequestDispatcherImpl
 {
 
     @InfoMethod
@@ -87,43 +87,43 @@ public class SharedCDRClientRequestDispatcherImpl
     @Override
     @Subcontract
     public CDRInputObject marshalingComplete(java.lang.Object self,
-					  CDROutputObject outputObject)
-	throws 
-	    ApplicationException, 
-	    org.omg.CORBA.portable.RemarshalException
+                                          CDROutputObject outputObject)
+        throws 
+            ApplicationException, 
+            org.omg.CORBA.portable.RemarshalException
     {
         ORB orb = null;
         MessageMediator messageMediator = null;
-	messageMediator = (MessageMediator)
-	    outputObject.getMessageMediator();
+        messageMediator = (MessageMediator)
+            outputObject.getMessageMediator();
         operationAndId( messageMediator.getOperationName(),
             messageMediator.getRequestId() ) ;
-	orb = (ORB) messageMediator.getBroker();
+        orb = (ORB) messageMediator.getBroker();
         operationAndId(messageMediator.getOperationName(), 
             messageMediator.getRequestId());
 
-	CDROutputObject cdrOutputObject = (CDROutputObject) outputObject;
+        CDROutputObject cdrOutputObject = (CDROutputObject) outputObject;
 
-	//
-	// Create server-side input object.
-	//
+        //
+        // Create server-side input object.
+        //
 
-	ByteBufferWithInfo bbwi = cdrOutputObject.getByteBufferWithInfo();
-	cdrOutputObject.getMessageHeader().setSize(bbwi.getByteBuffer(),
+        ByteBufferWithInfo bbwi = cdrOutputObject.getByteBufferWithInfo();
+        cdrOutputObject.getMessageHeader().setSize(bbwi.getByteBuffer(),
             bbwi.getSize());
 
-	CDRInputObject cdrInputObject =
-	    new CDRInputObject(orb, null, bbwi.getByteBuffer(),
+        CDRInputObject cdrInputObject =
+            new CDRInputObject(orb, null, bbwi.getByteBuffer(),
                             cdrOutputObject.getMessageHeader());
-	messageMediator.setInputObject(cdrInputObject);
-	cdrInputObject.setMessageMediator(messageMediator);
+        messageMediator.setInputObject(cdrInputObject);
+        cdrInputObject.setMessageMediator(messageMediator);
 
-	//
-	// Dispatch
-	//
+        //
+        // Dispatch
+        //
 
-	// REVISIT: Impl cast.
-	((MessageMediatorImpl)messageMediator).handleRequestRequest(
+        // REVISIT: Impl cast.
+        ((MessageMediatorImpl)messageMediator).handleRequestRequest(
             messageMediator);
 
         // InputStream must be closed on the InputObject so that its
@@ -138,24 +138,24 @@ public class SharedCDRClientRequestDispatcherImpl
             // XXX log this
         }
 
-	//
-	// Create client-side input object
-	//
+        //
+        // Create client-side input object
+        //
 
-	cdrOutputObject = (CDROutputObject) messageMediator.getOutputObject();
-	bbwi = cdrOutputObject.getByteBufferWithInfo();
-	cdrOutputObject.getMessageHeader().setSize(bbwi.getByteBuffer(), bbwi.getSize());
-	cdrInputObject =
-	    new CDRInputObject(orb, null, bbwi.getByteBuffer(), 
+        cdrOutputObject = (CDROutputObject) messageMediator.getOutputObject();
+        bbwi = cdrOutputObject.getByteBufferWithInfo();
+        cdrOutputObject.getMessageHeader().setSize(bbwi.getByteBuffer(), bbwi.getSize());
+        cdrInputObject =
+            new CDRInputObject(orb, null, bbwi.getByteBuffer(), 
                             cdrOutputObject.getMessageHeader());
-	messageMediator.setInputObject(cdrInputObject);
-	cdrInputObject.setMessageMediator(messageMediator);
+        messageMediator.setInputObject(cdrInputObject);
+        cdrInputObject.setMessageMediator(messageMediator);
 
-	cdrInputObject.unmarshalHeader();
+        cdrInputObject.unmarshalHeader();
 
-	CDRInputObject inputObject = cdrInputObject;
+        CDRInputObject inputObject = cdrInputObject;
 
-	return processResponse(orb, messageMediator, inputObject);
+        return processResponse(orb, messageMediator, inputObject);
     }
 }
 

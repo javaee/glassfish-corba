@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)IIOPPerformance.java	1.5 99/06/07 */
+/* @(#)IIOPPerformance.java     1.5 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -70,19 +70,19 @@ public class IIOPPerformance extends test.Test
     public void run()
     {
         try {        
-	    Properties orbProps = new Properties() ;
-	    orbProps.put( "org.omg.CORBA.ORBClass", 
-			  "com.sun.corba.se.impl.orb.ORBImpl" ) ;
-	    orbProps.put( "org.omg.CORBA.ORBSingletonClass", 
-			  "com.sun.corba.se.impl.orb.ORBSingleton" ) ;
+            Properties orbProps = new Properties() ;
+            orbProps.put( "org.omg.CORBA.ORBClass", 
+                          "com.sun.corba.ee.impl.orb.ORBImpl" ) ;
+            orbProps.put( "org.omg.CORBA.ORBSingletonClass", 
+                          "com.sun.corba.ee.impl.orb.ORBSingleton" ) ;
             org.omg.CORBA.ORB orb = 
-		org.omg.CORBA.ORB.init(getArgsAsArgs(),orbProps);
+                org.omg.CORBA.ORB.init(getArgsAsArgs(),orbProps);
 
             org.omg.CORBA_2_3.portable.OutputStream sos =
                 (org.omg.CORBA_2_3.portable.OutputStream)orb.create_output_stream();
 
-	    TestOBV2 tobv2 = new TestOBV2();
-	    sos.write_value(tobv2);
+            TestOBV2 tobv2 = new TestOBV2();
+            sos.write_value(tobv2);
 
             Exception exception = new Exception("Test Exception");
             sos.write_value(exception);
@@ -129,11 +129,11 @@ public class IIOPPerformance extends test.Test
                 new javax.rmi.CORBA.serialization.ComplexTestObjectFour();
             sos.write_value(test4);
 
-	    java.util.Properties props = new java.util.Properties();
+            java.util.Properties props = new java.util.Properties();
             props.put("Key1","Value1");
             sos.write_value(props);
 
-	    // Test arrays
+            // Test arrays
             int anIntArray[] = {9,8,7};
             sos.write_value(anIntArray);
 
@@ -149,67 +149,67 @@ public class IIOPPerformance extends test.Test
             // Check 2 dimensional primitive array...
 
             long[][] array2 =   {
-		{9,8,7,6,1},
-		{18,4,6},
-		{0,5,7,9,11,13}
-	    };
+                {9,8,7,6,1},
+                {18,4,6},
+                {0,5,7,9,11,13}
+            };
             sos.write_value(array2);
 
-	    // Recursive array references
-	    Object recursiveArray[] = {null, "Hello", null, null};
-	    recursiveArray[0] = recursiveArray;
-	    recursiveArray[2] = recursiveArray;
-	    recursiveArray[3] = recursiveArray;
-	    sos.write_value(recursiveArray);
+            // Recursive array references
+            Object recursiveArray[] = {null, "Hello", null, null};
+            recursiveArray[0] = recursiveArray;
+            recursiveArray[2] = recursiveArray;
+            recursiveArray[3] = recursiveArray;
+            sos.write_value(recursiveArray);
 
 
 
             // Check 3 dimensional primitive array...
             short[][][] dim3 = {
-		{
-		    {0,8,7,6,1},
-		    {1,5,7,13},
-		    {2,4,6},
-		},
-		{
-		    {3,4,10},
-		    {4,5,7,9,13}
-		},
-		{
-		    {5,4,6},
-		    {6,5,8,9,11,13},
-		    {7,8,7,6,1},
-		    {8,8,7,6,9},
-		},
-	    };
+                {
+                    {0,8,7,6,1},
+                    {1,5,7,13},
+                    {2,4,6},
+                },
+                {
+                    {3,4,10},
+                    {4,5,7,9,13}
+                },
+                {
+                    {5,4,6},
+                    {6,5,8,9,11,13},
+                    {7,8,7,6,1},
+                    {8,8,7,6,9},
+                },
+            };
             sos.write_value(dim3);
 
             // Check single dimensional object array...
-    	    
+            
             ObjectByValue[] array3 =    {
-		new ObjectByValue(5,10,"a","f"),
-		new ObjectByValue(6,11,"b","g"),
-		new ObjectByValue(7,12,"c","h"),
-		new ObjectByValue(8,13,"d","i"),
-		new ObjectByValue(9,14,"e","j"),
-	    };
+                new ObjectByValue(5,10,"a","f"),
+                new ObjectByValue(6,11,"b","g"),
+                new ObjectByValue(7,12,"c","h"),
+                new ObjectByValue(8,13,"d","i"),
+                new ObjectByValue(9,14,"e","j"),
+            };
             sos.write_value(array3);      
             
             // Check multi dimensional object array...
 
             ObjectByValue[][] array4 =   {   {
-		new ObjectByValue(0,10,"a","g"),
-		new ObjectByValue(0,11,"b","h"),
-		new ObjectByValue(0,12,"c","i"),
-	    },
-					     {
-						 new ObjectByValue(1,13,"d","j"),
-						 new ObjectByValue(1,14,"e","k"),
-					     },
-					     {
-						 new ObjectByValue(2,15,"f","l"),
-					     }
-	    };
+                new ObjectByValue(0,10,"a","g"),
+                new ObjectByValue(0,11,"b","h"),
+                new ObjectByValue(0,12,"c","i"),
+            },
+                                             {
+                                                 new ObjectByValue(1,13,"d","j"),
+                                                 new ObjectByValue(1,14,"e","k"),
+                                             },
+                                             {
+                                                 new ObjectByValue(2,15,"f","l"),
+                                             }
+            };
                                 
             sos.write_value(array4);
 
@@ -220,8 +220,8 @@ public class IIOPPerformance extends test.Test
             org.omg.CORBA_2_3.portable.InputStream sis = 
                 (org.omg.CORBA_2_3.portable.InputStream)sos.create_input_stream();
 
-	    TestOBV2 _tobv2 = (TestOBV2)sis.read_value();
-			
+            TestOBV2 _tobv2 = (TestOBV2)sis.read_value();
+                        
             Exception _exception = (Exception)sis.read_value();
             if (!_exception.getMessage().equals("Test Exception"))
                 throw new Error("Test Exception failed!");
@@ -309,36 +309,36 @@ public class IIOPPerformance extends test.Test
             else
                 throw new Error("FAILURE!  Test4 Failed");
 
-	    java.util.Properties _props = (java.util.Properties)sis.read_value();
+            java.util.Properties _props = (java.util.Properties)sis.read_value();
             if (_props.toString().equals(props.toString()))
-            	;
+                ;
             else
-            	throw new Error("FAILURE!  props Failed");
+                throw new Error("FAILURE!  props Failed");
 
 
             int _anIntArray[] = (int[])sis.read_value();
 
             if ((_anIntArray[0] == anIntArray[0]) &&
-            	(_anIntArray[1] == anIntArray[1]) &&
+                (_anIntArray[1] == anIntArray[1]) &&
                 (_anIntArray[2] == anIntArray[2]))
                 ;
             else
-            	throw new Error("FAILURE!  anIntArray Failed");
+                throw new Error("FAILURE!  anIntArray Failed");
 
             Object _aSharedRefsArray[] = (Object[])sis.read_value();
 
             if ((_aSharedRefsArray[0] == _testEmptyA) &&
-            	(_aSharedRefsArray[1] == _test1b) &&
+                (_aSharedRefsArray[1] == _test1b) &&
                 (_aSharedRefsArray[2] == _anIntArray))
                 ;
             else
-            	throw new Error("FAILURE!  aSharedRefsArray[] == Failed");
+                throw new Error("FAILURE!  aSharedRefsArray[] == Failed");
 
             int[] array1Echo = (int[])sis.read_value();
 
             for (int i = 0; i < array1.length; i++) {
                 if (array1[i] != array1Echo[i]) {
-    	            throw new Exception("HelloTest: echoArray (int[]) failed");
+                    throw new Exception("HelloTest: echoArray (int[]) failed");
                 }
             }
 
@@ -347,18 +347,18 @@ public class IIOPPerformance extends test.Test
             for (int i = 0; i < array2.length; i++) {
                 for (int j = 0; j < array2[i].length; j++) {
                     if (array2[i][j] != array2Echo[i][j]) {
-			throw new Exception("HelloTest: echoArray (int[][]) failed");
+                        throw new Exception("HelloTest: echoArray (int[][]) failed");
                     }
                 }
             }
 
-	    // Recursive array references
-	    Object recursiveArrayEcho[] = (Object[])sis.read_value();
-	    if ((recursiveArrayEcho[0] != recursiveArrayEcho) || 
-		(recursiveArrayEcho[2] != recursiveArrayEcho) || 
-		(recursiveArrayEcho[3] != recursiveArrayEcho) || 
-		(!((String)recursiveArrayEcho[1]).equals("Hello")))
-		throw new Exception("RecursiveArray test failed!");
+            // Recursive array references
+            Object recursiveArrayEcho[] = (Object[])sis.read_value();
+            if ((recursiveArrayEcho[0] != recursiveArrayEcho) || 
+                (recursiveArrayEcho[2] != recursiveArrayEcho) || 
+                (recursiveArrayEcho[3] != recursiveArrayEcho) || 
+                (!((String)recursiveArrayEcho[1]).equals("Hello")))
+                throw new Exception("RecursiveArray test failed!");
 
             short[][][] dim3Echo = (short[][][])sis.read_value();
             
@@ -366,7 +366,7 @@ public class IIOPPerformance extends test.Test
                 for (int j = 0; j < dim3[i].length; j++) {
                     for (int k = 0; k < dim3[i][j].length; k++) {
                         if (dim3[i][j][k] != dim3[i][j][k]) {
-            	            throw new Exception("HelloTest: echoArray (short[][][]) failed");
+                            throw new Exception("HelloTest: echoArray (short[][][]) failed");
                         }
                     }
                 }
@@ -375,7 +375,7 @@ public class IIOPPerformance extends test.Test
             ObjectByValue[] array3Echo = (ObjectByValue[])sis.read_value();
             for (int i = 0; i < array3.length; i++) {
                 if (!array3[i].equals(array3Echo[i])) {
-    	            throw new Exception("HelloTest: echoArray (ObjectByValue[]) failed");
+                    throw new Exception("HelloTest: echoArray (ObjectByValue[]) failed");
                 }
             }
 
@@ -384,7 +384,7 @@ public class IIOPPerformance extends test.Test
             for (int i = 0; i < array4.length; i++) {
                 for (int j = 0; j < array4[i].length; j++) {
                     if (!array4[i][j].equals(array4Echo[i][j])) {
-			throw new Exception("HelloTest: echoArray (ObjectByValue[][]) failed");
+                        throw new Exception("HelloTest: echoArray (ObjectByValue[][]) failed");
                     }
                 }
             }
@@ -393,10 +393,10 @@ public class IIOPPerformance extends test.Test
 
         }
         catch(Throwable e)
-	    {
-		status = new Error(e.getMessage());
-		e.printStackTrace();
-	    }
+            {
+                status = new Error(e.getMessage());
+                e.printStackTrace();
+            }
     }
 
 }

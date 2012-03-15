@@ -66,10 +66,10 @@ public final class ParameterDescription implements org.omg.CORBA.portable.IDLEnt
     //public ParameterDescription (String _name, org.omg.CORBA.TypeCode _type, com.sun.org.omg.CORBA.IDLType _type_def, com.sun.org.omg.CORBA.ParameterMode _mode)
     public ParameterDescription (String _name, org.omg.CORBA.TypeCode _type, org.omg.CORBA.IDLType _type_def, com.sun.org.omg.CORBA.ParameterMode _mode)
     {
-	name = _name;
-	type = _type;
-	type_def = _type_def;
-	mode = _mode;
+        name = _name;
+        type = _type;
+        type_def = _type_def;
+        mode = _mode;
     } // ctor
 
 } // class ParameterDescription

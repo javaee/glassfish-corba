@@ -40,7 +40,7 @@
 
 package pi.serverrequestinfo;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import corba.framework.InternalProcess;
 import java.io.PrintStream;
 import java.util.Properties;
@@ -53,32 +53,32 @@ import org.omg.CORBA.ORB;
  * and then returns the name of the method to invoke.  The method is invoked
  * and on the next syncWithServer() call, the results are checked.
  *
- *	Client                      Server
- *	  |                           |
- *	 [ ]     syncWithServer()     | 
- *	 [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
- *	 [ ]                         [ ]
- *	 [ ]     "sayHello"          [ ]   // order cleared here
- *	 [ ]<------------------------[ ]     sr3 sr2 sr1
- *	 [ ]                          |
- *	 [ ]     sayHello()           |    // <important>
- *	 [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
- *	 [ ]                         [ ]
- *	 [ ]     "hello there"       [ ]
- *	 [ ]<------------------------[ ]     sr3 sr2 sr1
- *	 [ ]                          |    // </important>
- *	 [ ]     syncWithServer()     |
- *	 [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
- *	 [ ]                         [ ] 
- *	 [ ]                         [ ]   // check order here
- *	 [ ]                         [ ]   // next test begins soon after.
- *	 ...                         ...
+ *      Client                      Server
+ *        |                           |
+ *       [ ]     syncWithServer()     | 
+ *       [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
+ *       [ ]                         [ ]
+ *       [ ]     "sayHello"          [ ]   // order cleared here
+ *       [ ]<------------------------[ ]     sr3 sr2 sr1
+ *       [ ]                          |
+ *       [ ]     sayHello()           |    // <important>
+ *       [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
+ *       [ ]                         [ ]
+ *       [ ]     "hello there"       [ ]
+ *       [ ]<------------------------[ ]     sr3 sr2 sr1
+ *       [ ]                          |    // </important>
+ *       [ ]     syncWithServer()     |
+ *       [ ]------------------------>[ ]     rs1 rs2 rs3 rr1 rr2 rr3
+ *       [ ]                         [ ] 
+ *       [ ]                         [ ]   // check order here
+ *       [ ]                         [ ]   // next test begins soon after.
+ *       ...                         ...
  */
 public abstract class ServerCommon
     implements InternalProcess 
 {
     // Set from run()
-    com.sun.corba.se.spi.orb.ORB orb;
+    com.sun.corba.ee.spi.orb.ORB orb;
     
     // Set from run()
     PrintStream out;
@@ -119,7 +119,7 @@ public abstract class ServerCommon
     }
 
     /**
-     * Creates a com.sun.corba.se.spi.orb.ORB and notifies the TestInitializer of its presence
+     * Creates a com.sun.corba.ee.spi.orb.ORB and notifies the TestInitializer of its presence
      */
     void createORB( String[] args, Properties props ) {
         // create and initialize the ORB with initializer
@@ -128,7 +128,7 @@ public abstract class ServerCommon
                    System.getProperty("org.omg.CORBA.ORBClass"));
         props.put( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
                    testInitializer, "" );
-        this.orb = (com.sun.corba.se.spi.orb.ORB)ORB.init(args, props);
+        this.orb = (com.sun.corba.ee.spi.orb.ORB)ORB.init(args, props);
         TestInitializer.orb = this.orb;
     }
 
@@ -136,21 +136,21 @@ public abstract class ServerCommon
      * Perform common ServerRequestInfo tests
      */
     void testServerRequestInfo() throws Exception {
-	out.println();
-	out.println( "Running common ServerRequestInfo tests" );
-	out.println( "======================================" );
+        out.println();
+        out.println( "Running common ServerRequestInfo tests" );
+        out.println( "======================================" );
 
-	ServerCommon.server = this;
-	waitForClient();
+        ServerCommon.server = this;
+        waitForClient();
         
-	// Run tests:
-	testRequestId();
-	testAttributesValid();
-	testOneWay();
-	testForwardReference();
+        // Run tests:
+        testRequestId();
+        testAttributesValid();
+        testOneWay();
+        testForwardReference();
         testServiceContext();
-	testException();
-	testRequestInfoStack();
+        testException();
+        testRequestInfoStack();
     }
 
     /**
@@ -170,17 +170,17 @@ public abstract class ServerCommon
             syncObject.notify();
         }
 
-	// If this is a oneway call, wait an extra second to make sure
-	// everything went through okay.
-	if( methodName.equals( "sayOneway" ) ) {
-	    out.println( "    - Delaying for oneway..." );
-	    try {
-		Thread.sleep( 1000 );
-	    }
-	    catch( InterruptedException e ) {
-	    }
-	    out.println( "    - This should be long enough." );
-	}
+        // If this is a oneway call, wait an extra second to make sure
+        // everything went through okay.
+        if( methodName.equals( "sayOneway" ) ) {
+            out.println( "    - Delaying for oneway..." );
+            try {
+                Thread.sleep( 1000 );
+            }
+            catch( InterruptedException e ) {
+            }
+            out.println( "    - This should be long enough." );
+        }
         
         // Wait for client to synchronize with server again.  Now we know
         // for sure that the method invocation is complete.  Even if the
@@ -291,7 +291,7 @@ public abstract class ServerCommon
      * being used.
      */
     protected abstract void testAttributesValid()
-	throws Exception;
+        throws Exception;
 
     /**
      * Tests various attributes are valid.  Attributes tested:

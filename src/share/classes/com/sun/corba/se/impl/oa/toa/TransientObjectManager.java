@@ -46,16 +46,16 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.oa.toa;
+package com.sun.corba.ee.impl.oa.toa;
 
-import com.sun.corba.se.impl.misc.ORBUtility ;
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.impl.misc.ORBUtility ;
+import com.sun.corba.ee.spi.orb.ORB ;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedData;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
-@com.sun.corba.se.spi.trace.TransientObjectManager
+@com.sun.corba.ee.spi.trace.TransientObjectManager
 @ManagedData
 @Description( "Maintains mapping from Object ID to servant")
 public final class TransientObjectManager {
@@ -72,7 +72,7 @@ public final class TransientObjectManager {
 
     public TransientObjectManager( ORB orb )
     {
-	this.orb = orb ;
+        this.orb = orb ;
 
         elementArray = new Element[maxSize];
         elementArray[maxSize-1] = new Element(maxSize-1,null);
@@ -81,7 +81,7 @@ public final class TransientObjectManager {
         freeList = elementArray[0];
     }
 
-    @com.sun.corba.se.spi.trace.TransientObjectManager
+    @com.sun.corba.ee.spi.trace.TransientObjectManager
     public synchronized byte[] storeServant(java.lang.Object servant, java.lang.Object servantData)
     {
         if ( freeList == null ) 
@@ -91,10 +91,10 @@ public final class TransientObjectManager {
         freeList = (Element)freeList.servant;
         
         byte[] result = elem.getKey(servant, servantData);
-	return result ;
+        return result ;
     }
 
-    @com.sun.corba.se.spi.trace.TransientObjectManager
+    @com.sun.corba.ee.spi.trace.TransientObjectManager
     public synchronized java.lang.Object lookupServant(byte transientKey[]) 
     {
         int index = ORBUtility.bytesToInt(transientKey,0);
@@ -103,13 +103,13 @@ public final class TransientObjectManager {
         if (elementArray[index].counter == counter &&
             elementArray[index].valid ) {
             return elementArray[index].servant;
-	}
+        }
 
         // servant not found 
         return null;
     }
 
-    @com.sun.corba.se.spi.trace.TransientObjectManager
+    @com.sun.corba.ee.spi.trace.TransientObjectManager
     public synchronized java.lang.Object lookupServantData(byte transientKey[])
     {
         int index = ORBUtility.bytesToInt(transientKey,0);
@@ -118,7 +118,7 @@ public final class TransientObjectManager {
         if (elementArray[index].counter == counter &&
             elementArray[index].valid ) {
             return elementArray[index].servantData;
-	}
+        }
 
         // servant not found 
         return null;
@@ -127,7 +127,7 @@ public final class TransientObjectManager {
     @InfoMethod
     private void deleteAtIndex( int index ) { }
 
-    @com.sun.corba.se.spi.trace.TransientObjectManager
+    @com.sun.corba.ee.spi.trace.TransientObjectManager
     public synchronized void deleteServant(byte transientKey[])
     {
         int index = ORBUtility.bytesToInt(transientKey,0);
@@ -145,7 +145,7 @@ public final class TransientObjectManager {
                 return elementArray[i].toBytes();
 
         // if we come here Object does not exist
-	return null;
+        return null;
     }
 
     private void doubleSize()
@@ -243,7 +243,7 @@ final class Element {
     @Override
     public String toString() 
     {
-	return "Element[" + index + ", " + counter + "]" ;
+        return "Element[" + index + ", " + counter + "]" ;
     }
 }
 

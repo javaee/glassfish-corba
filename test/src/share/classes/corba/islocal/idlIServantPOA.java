@@ -48,7 +48,7 @@ import corba.hcks.U;
 
 class idlIServantPOA
     extends 
-	idlIPOA
+        idlIPOA
 {
     public static final String baseMsg = idlIServantPOA.class.getName();
 
@@ -58,12 +58,12 @@ class idlIServantPOA
 
     public String o(String arg1)
     {
-	// REVISIT : IDL stubs do NOT have colocated branch yet.
-	// NEW: but now we have a SharedCDR subcontract.
-	Server.checkThread(baseMsg);
-	String result = Server.filter(arg1, baseMsg);
-	U.sop("SERVER: " + result);
-	return result;
+        // REVISIT : IDL stubs do NOT have colocated branch yet.
+        // NEW: but now we have a SharedCDR subcontract.
+        Server.checkThread(baseMsg);
+        String result = Server.filter(arg1, baseMsg);
+        U.sop("SERVER: " + result);
+        return result;
     }
 }
 

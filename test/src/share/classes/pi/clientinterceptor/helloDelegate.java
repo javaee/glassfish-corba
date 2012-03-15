@@ -57,39 +57,39 @@ public class helloDelegate extends Observable implements helloIF {
     private PrintStream out = null;
     
     public helloDelegate( PrintStream out ) {
-	super();
-	this.out = out;
+        super();
+        this.out = out;
     }
 
     public String sayHello() {
-	out.println( "helloServant: sayHello() invoked" );
-	invoked = true;
-	return "Hello, world!";
+        out.println( "helloServant: sayHello() invoked" );
+        invoked = true;
+        return "Hello, world!";
     }
     
     public String saySystemException() {
-	out.println( "helloServant: saySystemException() invoked" );
-	invoked = true;
-	throw new UNKNOWN( "Valid Test Result" );
+        out.println( "helloServant: saySystemException() invoked" );
+        invoked = true;
+        throw new UNKNOWN( "Valid Test Result" );
     }
     
     // This will cause a receive_reply to be invoked since this
     // is a one-way method.
     public void sayOneway() {
-	out.println( "helloServant: sayOneway() invoked" );
-	invoked = true;
+        out.println( "helloServant: sayOneway() invoked" );
+        invoked = true;
     }
     
     public void clearInvoked() {
-	invoked = false;
+        invoked = false;
     }
     
     public boolean wasInvoked() {
-	return invoked;
+        return invoked;
     }
 
     public void resetServant() {
-	setChanged();
-	notifyObservers();
+        setChanged();
+        notifyObservers();
     }
 }

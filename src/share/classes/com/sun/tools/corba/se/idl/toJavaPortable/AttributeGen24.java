@@ -53,7 +53,7 @@ package com.sun.tools.corba.se.idl.toJavaPortable;
 
 // NOTES:
 // -D62023   <klr> New file to implement CORBA 2.4 RTF
-//	REVISIT: These changes should be folded into AttributeGen.
+//      REVISIT: These changes should be folded into AttributeGen.
 
 import java.io.PrintWriter;
 

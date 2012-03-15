@@ -38,10 +38,10 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.spi.protocol.MessageMediator;
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
 import org.omg.CORBA.SystemException;
 
 /**

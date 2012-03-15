@@ -42,13 +42,13 @@
  * and open the template in the editor.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
-import com.sun.corba.se.impl.oa.poa.Policies;
-import com.sun.corba.se.spi.ior.IORTemplate;
+import com.sun.corba.ee.impl.oa.poa.Policies;
+import com.sun.corba.ee.spi.ior.IORTemplate;
 import java.net.Socket;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORB;
 import org.glassfish.pfl.basic.func.UnaryVoidFunction ;
 
 /** This version of an acceptor is the other half of CorbaAcceptorLazyImpl.

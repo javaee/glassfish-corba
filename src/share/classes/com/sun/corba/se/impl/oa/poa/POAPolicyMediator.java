@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.oa.poa ;
+package com.sun.corba.ee.impl.oa.poa ;
 
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
@@ -97,7 +97,7 @@ public interface POAPolicyMediator {
     * @return the resulting Servant.
     */
     java.lang.Object getInvocationServant( byte[] id, 
-	String operation ) throws ForwardRequest ;
+        String operation ) throws ForwardRequest ;
 
     /** Release a servant that was obtained from getInvocationServant.
     */
@@ -133,7 +133,7 @@ public interface POAPolicyMediator {
     void setDefaultServant( Servant servant ) throws WrongPolicy ;
 
     void activateObject( byte[] id, Servant servant ) 
-	throws ObjectAlreadyActive, ServantAlreadyActive, WrongPolicy ;
+        throws ObjectAlreadyActive, ServantAlreadyActive, WrongPolicy ;
 
     /** Deactivate the object that is associated with the given id.
     * Returns the servant for id.

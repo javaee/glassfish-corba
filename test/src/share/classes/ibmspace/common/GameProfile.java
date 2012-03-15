@@ -66,30 +66,30 @@ public class GameProfile implements Identifiable, java.io.Serializable
 
     public GameProfile (String galaxyName, int numPlanets, int numPlayers)
     {
-	String fGalaxyName = galaxyName;
-	fNumberOfPlanets = numPlanets;
-	fNumberOfPlayers = numPlayers;
-	fID = new ID ();
+        String fGalaxyName = galaxyName;
+        fNumberOfPlanets = numPlanets;
+        fNumberOfPlayers = numPlayers;
+        fID = new ID ();
     }
 
     public ID getID ()
     {
-	return fID;
+        return fID;
     }
 
     public String getGalaxyName ()
     {
-	return fGalaxyName;
+        return fGalaxyName;
     }
 
     public int getNumberOfPlanets ()
     {
-	return fNumberOfPlanets;
+        return fNumberOfPlanets;
     }
 
     public int getNumberOfPlayers ()
     {
-	return fNumberOfPlayers;
+        return fNumberOfPlayers;
     }
 
 }

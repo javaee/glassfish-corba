@@ -84,7 +84,7 @@ public class TestObject extends TestObjectSuper implements Testable
     private void readObject(java.io.ObjectInputStream is)
         throws IOException, ClassNotFoundException 
     {
-	is.defaultReadObject();
+        is.defaultReadObject();
     }
 
     private void writeObject(java.io.ObjectOutputStream out)

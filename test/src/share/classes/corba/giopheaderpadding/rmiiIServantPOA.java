@@ -52,12 +52,12 @@ public class rmiiIServantPOA extends PortableRemoteObject
     implements rmiiI {
 
     public rmiiIServantPOA() throws RemoteException { 
-	// DO NOT CALL SUPER - that would connect the object.
+        // DO NOT CALL SUPER - that would connect the object.
     }
 
     public byte fooA(byte x) {
-	U.sop(x + "");
-	return x;
+        U.sop(x + "");
+        return x;
     }
 
     public void fooB() {

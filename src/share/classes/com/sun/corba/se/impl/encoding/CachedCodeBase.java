@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import com.sun.org.omg.CORBA.ValueDefPackage.FullValueDescription;
 
@@ -46,13 +46,13 @@ import com.sun.org.omg.SendingContext.CodeBase;
 import com.sun.org.omg.SendingContext.CodeBaseHelper;
 import com.sun.org.omg.SendingContext._CodeBaseImplBase;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
-import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.Connection;
 
-import com.sun.corba.se.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.IOR ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 import java.util.Hashtable;
 
 /**
@@ -87,7 +87,7 @@ public class CachedCodeBase extends _CodeBaseImplBase
 
     private static Object iorMapLock = new Object() ; 
     private static Hashtable<IOR,CodeBase> iorMap = 
-	new Hashtable<IOR,CodeBase>();
+        new Hashtable<IOR,CodeBase>();
 
     public static synchronized void cleanCache( ORB orb ) {
         synchronized (iorMapLock) {
@@ -221,7 +221,7 @@ public class CachedCodeBase extends _CodeBaseImplBase
 
     private org.omg.CORBA.Object getObjectFromIOR() {
         return CDRInputStream_1_0.internalIORToObject(
-	    conn.getCodeBaseIOR(), null /*stubFactory*/, conn.getBroker());
+            conn.getCodeBaseIOR(), null /*stubFactory*/, conn.getBroker());
     }
 }
 

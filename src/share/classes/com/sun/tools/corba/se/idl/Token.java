@@ -88,14 +88,14 @@ class Token
       Enum                 =   9,
       Exception            =  10,
       FALSE                =  11,
-      Fixed		   =  12, // New addition
+      Fixed                =  12, // New addition
       Float                =  13,
       In                   =  14,
       Inout                =  15,
       Interface            =  16,
       Long                 =  17,
       Module               =  18,
-      Native		   =  19, // New addition
+      Native               =  19, // New addition
       Object               =  20,
       Octet                =  21,
       Oneway               =  22,
@@ -128,9 +128,9 @@ class Token
       Factory              =  47, //            2.4rtf only
       
       // Keywords in CORBA 3.0
-      Component		   =  48,
-      Consumes 		   =  49,
-      Emits		   =  50,
+      Component            =  48,
+      Consumes             =  49,
+      Emits                =  50,
       Finder               =  51,
       GetRaises            =  52,
       Home                 =  53,
@@ -246,12 +246,12 @@ class Token
       "ValueBase",    "valuetype",
       "factory",  // In 2.4rtf only
       // CORBA 3.0 keywords
-      "component",	"consumes",	"emits",
-      "finder",		"getRaises",	"home",
-      "import",		"local",	"manages",
-      "multiple",	"primaryKey",	"provides",
-      "publishes",	"setRaises",	"supports",
-      "typeId",		"typePrefix", 	"uses" } ;
+      "component",      "consumes",     "emits",
+      "finder",         "getRaises",    "home",
+      "import",         "local",        "manages",
+      "multiple",       "primaryKey",   "provides",
+      "publishes",      "setRaises",    "supports",
+      "typeId",         "typePrefix",   "uses" } ;
 
   // <f46082.40> Remove keyword identifiers.
   //static final int
@@ -296,7 +296,7 @@ class Token
   // New keywords in CORBA 3.0 (from CORBA components v. 1)
   private static final int
       First30Keyword    = Component,
-      Last30Keyword	= Uses;
+      Last30Keyword     = Uses;
       
   // Current valid CORBA levels:
   // 2.2 (or <2.3): the default: no OBV support
@@ -314,11 +314,11 @@ class Token
   private static int getLevel( float cLevel ) 
   {
     if (cLevel < 2.3f)
-	return CORBA_LEVEL_22 ;
+        return CORBA_LEVEL_22 ;
     if (Util.absDelta( cLevel, 2.3f ) < 0.001f)
-	return CORBA_LEVEL_23 ;
+        return CORBA_LEVEL_23 ;
     if (cLevel < 3.0f)
-	return CORBA_LEVEL_24RTF ;
+        return CORBA_LEVEL_24RTF ;
     return CORBA_LEVEL_30 ;
   }
 
@@ -326,11 +326,11 @@ class Token
   private static int getLastKeyword( int level ) 
   {
     if (level == CORBA_LEVEL_22)
-	return Last22Keyword ;
+        return Last22Keyword ;
     if (level == CORBA_LEVEL_23)
-	return Last23Keyword ;
+        return Last23Keyword ;
     if (level == CORBA_LEVEL_24RTF)
-	return Last24rtfKeyword ;
+        return Last24rtfKeyword ;
     return Last30Keyword ;
   }
 
@@ -360,37 +360,37 @@ class Token
 
     // If the string is a keyword token, return that token
     for (int i = Token.FirstKeyword; i <= Token.LastKeyword; ++i) {
-	if (string.equals (Token.Keywords[i])) {
-	    // <f60858.1><d62023> Return identifier if lexeme is a keyword in a
-	    // greater CORBA level; collect attributes indicating future keyword/
-	    // identifier collision and deprecations.
+        if (string.equals (Token.Keywords[i])) {
+            // <f60858.1><d62023> Return identifier if lexeme is a keyword in a
+            // greater CORBA level; collect attributes indicating future keyword/
+            // identifier collision and deprecations.
 
-	    // Init is really a funny case.  I don't want to mark it as
-	    // a keyword collision in the 2.2 case, since it was only
-	    // defined to be a keyword briefly in 2.3.
-	    if (i == Token.Init) {
-		if (level == CORBA_LEVEL_23)
-		    deprecated = true ;
-		else 
-		    break ;
-	    } 
+            // Init is really a funny case.  I don't want to mark it as
+            // a keyword collision in the 2.2 case, since it was only
+            // defined to be a keyword briefly in 2.3.
+            if (i == Token.Init) {
+                if (level == CORBA_LEVEL_23)
+                    deprecated = true ;
+                else 
+                    break ;
+            } 
 
-	    if (i > lastKeyword) {
-		collision[0] |= escapedOK; // escapedOK true iff not preprocessing
-		break ;
-	    }
+            if (i > lastKeyword) {
+                collision[0] |= escapedOK; // escapedOK true iff not preprocessing
+                break ;
+            }
 
-	    if (string.equals ("TRUE") || string.equals ("FALSE"))
-		return new Token (Token.BooleanLiteral, string) ;
-	    else
-		return new Token (i, deprecated);
-	} else if (string.equalsIgnoreCase (Token.Keywords[i])) {
-	    // <d62023> PU!  This will go away in a future release, because
-	    // case-insensitive keyword checking will be standard.  For now,
-	    // indicate that a keyword collision has occurred.
-	    collision[0] |= true;
-	    break;
-	}
+            if (string.equals ("TRUE") || string.equals ("FALSE"))
+                return new Token (Token.BooleanLiteral, string) ;
+            else
+                return new Token (i, deprecated);
+        } else if (string.equalsIgnoreCase (Token.Keywords[i])) {
+            // <d62023> PU!  This will go away in a future release, because
+            // case-insensitive keyword checking will be standard.  For now,
+            // indicate that a keyword collision has occurred.
+            collision[0] |= true;
+            break;
+        }
     } // for i <= lastKeyword
 
     return null ;
@@ -706,6 +706,6 @@ class Token
   //int subType = 0;
 
   boolean isWide = false ;  // Only for string and char literals: indicates that this is
-			    // a wide string or char.
+                            // a wide string or char.
 } // class Token
 

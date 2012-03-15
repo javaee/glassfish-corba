@@ -52,34 +52,34 @@ public class ORBInitTest extends CORBATest {
     private boolean failed = false;
 
     protected void doTest() throws Throwable {
-	System.out.println();
+        System.out.println();
 
-	printBeginTest( "[Properties Object] " );
+        printBeginTest( "[Properties Object] " );
         Controller orbd = createORBD();
         orbd.start();
         Controller client = createClient( "pi.orbinit.PropsClient" );
         client.start();
         client.waitFor();
-	printEndTest( client, null );
+        printEndTest( client, null );
         client.stop();
         orbd.stop();
-	pause();
+        pause();
 
-	/* Second time around is invalid unless flags in ClientTestInitializer
-	 * are cleared; so how did this ever work correctly?
-	 * Also note that system vs. props test is not needed here,
-	 * as the ORB initialization test already covers that.
+        /* Second time around is invalid unless flags in ClientTestInitializer
+         * are cleared; so how did this ever work correctly?
+         * Also note that system vs. props test is not needed here,
+         * as the ORB initialization test already covers that.
 
-	printBeginTest( "[System Properties] " );
+        printBeginTest( "[System Properties] " );
         orbd = createORBD();
         orbd.start();
         client = createClient( "pi.orbinit.SystemClient" );
         client.start();
         client.waitFor();
-	printEndTest( client, null );
+        printEndTest( client, null );
         client.stop();
         orbd.stop();
-	*/
+        */
 
         System.out.print( "      Final Result: " );
         if( failed ) {

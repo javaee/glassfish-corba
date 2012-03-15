@@ -47,44 +47,44 @@ approach:
 
     - Use JNDI for all name server access
     - Create client and server ORBs
-	client: ee RMI-IIOP delegates se ORB impl (from JDK)
-	server: ee RMI-IIOP delegates and ORB impl (from workspace)
+        client: ee RMI-IIOP delegates se ORB impl (from JDK)
+        server: ee RMI-IIOP delegates and ORB impl (from workspace)
     - Use explicit ORBs passed to 2 JNDI InitialContext instances
     - data
-	ORB[] orbs ; // 0 is se, 1 is ee
-	InitialContext[] ics ; // ics[i] uses orb[i]
-	    
+        ORB[] orbs ; // 0 is se, 1 is ee
+        InitialContext[] ics ; // ics[i] uses orb[i]
+            
     public interface Echo extends Remote {
-	Echo echo( Echo obj ) throw RemoteException ;
+        Echo echo( Echo obj ) throw RemoteException ;
     }
 
     public class EchoImpl extends PortableRemoteObject implements Echo {
-	public Echo echo( Echo echo ) {
-	    return echo ;
-	}
+        public Echo echo( Echo echo ) {
+            return echo ;
+        }
     }
 
     public class <T> NarrowHelper {
-	private NarrowHelper() {}
+        private NarrowHelper() {}
 
-	public static T narrow( Remote obj, Class<T> cls ) {
-	    return cls.cast( PortableRemoteObject.narrow(
-		obj, cls ) ) ;
-	}
+        public static T narrow( Remote obj, Class<T> cls ) {
+            return cls.cast( PortableRemoteObject.narrow(
+                obj, cls ) ) ;
+        }
     }
 
     import static NarrowHelper.narrow ;
 
     - test
-	- client
-	    Echo myEcho = new EchoImpl() ;
-	    // put client's ORB in env
-	    InitialContext ic = new InitialContext( env ) ;
-	    Echo ec = narrow( ic.lookup( "name" ), Echo.class ) ; 
-	    Echo result = ec.echo( myEcho ) ;
-	    result.echo( ec ) ;
+        - client
+            Echo myEcho = new EchoImpl() ;
+            // put client's ORB in env
+            InitialContext ic = new InitialContext( env ) ;
+            Echo ec = narrow( ic.lookup( "name" ), Echo.class ) ; 
+            Echo result = ec.echo( myEcho ) ;
+            result.echo( ec ) ;
 
-	- server
-	    - creates JNDI init context bound to server ORB
-	    - creates an instance of echo
-	    - registers it with JNDI 
+        - server
+            - creates JNDI init context bound to server ORB
+            - creates an instance of echo
+            - registers it with JNDI 

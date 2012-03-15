@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)JourneyArrow.java	1.3 99/06/07 */
+/* @(#)JourneyArrow.java        1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -83,51 +83,51 @@ public class JourneyArrow extends Arrow
 
     public void setAvailableRange (int range)
     {
-	fAvailableRange = range;
+        fAvailableRange = range;
     }
 
     public void setAcceptedColor (Color color)
     {
-	fAcceptedColor = color;
+        fAcceptedColor = color;
     }
 
     public void setRejectedColor (Color color)
     {
-	fRejectedColor = color;
+        fRejectedColor = color;
     }
 
     public void setShowDistance (boolean show)
     {
-	fShowDistance = show;
+        fShowDistance = show;
     }
 
     public int getDistance ()
     {
-	if ( fCacheBlown ) {
-	    fDistance = (int)(getLength() / 50 + 0.5);
-	}
+        if ( fCacheBlown ) {
+            fDistance = (int)(getLength() / 50 + 0.5);
+        }
 
-	return fDistance;
+        return fDistance;
     }
 
     public void draw (Graphics g)
     {
-	int distance = getDistance ();
+        int distance = getDistance ();
 
-	if ( fShowDistance ) {
-	    fDistanceString = String.valueOf (distance);
-	    setLabel (fDistanceString);
-	} else {
-	    setLabel (null);
-	}
+        if ( fShowDistance ) {
+            fDistanceString = String.valueOf (distance);
+            setLabel (fDistanceString);
+        } else {
+            setLabel (null);
+        }
 
-	if ( distance <= fAvailableRange ) {
-	    g.setColor (fAcceptedColor);
-	} else {
-	    g.setColor (fRejectedColor);
-	}
+        if ( distance <= fAvailableRange ) {
+            g.setColor (fAcceptedColor);
+        } else {
+            g.setColor (fRejectedColor);
+        }
 
-	super.draw (g);
+        super.draw (g);
     }
   
 

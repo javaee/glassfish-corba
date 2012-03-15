@@ -38,14 +38,14 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.servicecontext;
+package com.sun.corba.ee.impl.servicecontext;
 
 import java.util.Map ;
 import java.util.HashMap ;
-import com.sun.corba.se.spi.servicecontext.ServiceContext ;
-import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry ;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.servicecontext.ServiceContext ;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextFactoryRegistry ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 public class ServiceContextFactoryRegistryImpl 
     implements ServiceContextFactoryRegistry
@@ -58,13 +58,13 @@ public class ServiceContextFactoryRegistryImpl
 
     public ServiceContextFactoryRegistryImpl( ORB orb )
     {
-	scMap = new HashMap<Integer, ServiceContext.Factory>() ;
-	this.orb = orb ;
-    }		
+        scMap = new HashMap<Integer, ServiceContext.Factory>() ;
+        this.orb = orb ;
+    }           
 
     public void register( ServiceContext.Factory factory ) 
     {
-	if (scMap.get(factory.getId()) == null) {
+        if (scMap.get(factory.getId()) == null) {
             scMap.put(factory.getId(), factory);
         } else {
             wrapper.registerDuplicateServiceContext();
@@ -73,7 +73,7 @@ public class ServiceContextFactoryRegistryImpl
 
     public ServiceContext.Factory find( int scId )
     {
-	ServiceContext.Factory result = scMap.get( scId ) ;
-	return result ;
+        ServiceContext.Factory result = scMap.get( scId ) ;
+        return result ;
     }
 }

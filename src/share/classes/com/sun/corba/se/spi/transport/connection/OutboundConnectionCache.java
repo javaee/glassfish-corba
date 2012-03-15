@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport.connection;
+package com.sun.corba.ee.spi.transport.connection;
 
 import java.io.IOException ;
 
@@ -119,7 +119,7 @@ public interface OutboundConnectionCache<C extends Connection>
      * <P>
      */
     C get( ContactInfo<C> cinfo, ConnectionFinder<C> finder 
-	) throws IOException ;
+        ) throws IOException ;
 
     /** Behaves the same as get( ContactInfo<C>, ConnectionFinder<C> ) 
      * except that no connection finder is provided, so that step is

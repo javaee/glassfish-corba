@@ -38,18 +38,18 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.copyobject ;
+package com.sun.corba.ee.spi.copyobject ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier ;
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory ;
 import org.glassfish.pfl.dynamic.copyobject.impl.FallbackObjectCopierImpl ;
 
-import com.sun.corba.se.impl.copyobject.ReferenceObjectCopierImpl ;
-import com.sun.corba.se.impl.copyobject.ORBStreamObjectCopierImpl ;
-import com.sun.corba.se.impl.copyobject.JavaStreamORBObjectCopierImpl ;
-import com.sun.corba.se.impl.copyobject.OldReflectObjectCopierImpl ;
-import com.sun.corba.se.impl.copyobject.ReflectObjectCopierImpl ;
+import com.sun.corba.ee.impl.copyobject.ReferenceObjectCopierImpl ;
+import com.sun.corba.ee.impl.copyobject.ORBStreamObjectCopierImpl ;
+import com.sun.corba.ee.impl.copyobject.JavaStreamORBObjectCopierImpl ;
+import com.sun.corba.ee.impl.copyobject.OldReflectObjectCopierImpl ;
+import com.sun.corba.ee.impl.copyobject.ReflectObjectCopierImpl ;
 
 public abstract class CopyobjectDefaults
 {
@@ -62,40 +62,40 @@ public abstract class CopyobjectDefaults
      */
     public static ObjectCopierFactory makeORBStreamObjectCopierFactory( final ORB orb ) 
     {
-	return new ObjectCopierFactory() {
-	    public ObjectCopier make( )
-	    {
-		return new ORBStreamObjectCopierImpl( orb ) ;
-	    }
-	} ;
+        return new ObjectCopierFactory() {
+            public ObjectCopier make( )
+            {
+                return new ORBStreamObjectCopierImpl( orb ) ;
+            }
+        } ;
     }
 
     public static ObjectCopierFactory makeJavaStreamObjectCopierFactory( final ORB orb ) 
     {
-	return new ObjectCopierFactory() {
-	    public ObjectCopier make( )
-	    {
-		return new JavaStreamORBObjectCopierImpl( orb ) ;
-	    }
-	} ;
+        return new ObjectCopierFactory() {
+            public ObjectCopier make( )
+            {
+                return new JavaStreamORBObjectCopierImpl( orb ) ;
+            }
+        } ;
     }
 
     private static final ObjectCopier referenceObjectCopier = new ReferenceObjectCopierImpl() ;
 
     private static ObjectCopierFactory referenceObjectCopierFactory = 
-	new ObjectCopierFactory() {
-	    public ObjectCopier make() 
-	    {
-		return referenceObjectCopier ;
-	    }
-	} ;
+        new ObjectCopierFactory() {
+            public ObjectCopier make() 
+            {
+                return referenceObjectCopier ;
+            }
+        } ;
 
     /** Obtain the reference object "copier".  This does no copies: it just
      * returns whatever is passed to it.
      */
     public static ObjectCopierFactory getReferenceObjectCopierFactory()
     {
-	return referenceObjectCopierFactory ;
+        return referenceObjectCopierFactory ;
     }
 
     /** Create a fallback copier factory from the two ObjectCopierFactory
@@ -105,16 +105,16 @@ public abstract class CopyobjectDefaults
      * throws a ReflectiveCopyException.
      */
     public static ObjectCopierFactory makeFallbackObjectCopierFactory( 
-	final ObjectCopierFactory f1, final ObjectCopierFactory f2 )
+        final ObjectCopierFactory f1, final ObjectCopierFactory f2 )
     {
-	return new ObjectCopierFactory() {
-	    public ObjectCopier make() 
-	    {
-		ObjectCopier c1 = f1.make() ;
-		ObjectCopier c2 = f2.make() ;
-		return new FallbackObjectCopierImpl( c1, c2 ) ;
-	    }
-	} ;
+        return new ObjectCopierFactory() {
+            public ObjectCopier make() 
+            {
+                ObjectCopier c1 = f1.make() ;
+                ObjectCopier c2 = f2.make() ;
+                return new FallbackObjectCopierImpl( c1, c2 ) ;
+            }
+        } ;
     }
 
     /** Obtain the old version of the reflective copier factory.  This is provided only
@@ -122,12 +122,12 @@ public abstract class CopyobjectDefaults
      */
     public static ObjectCopierFactory makeOldReflectObjectCopierFactory( final ORB orb ) 
     {
-	return new ObjectCopierFactory() {
-	    public ObjectCopier make()
-	    {
-		return new OldReflectObjectCopierImpl( orb ) ;
-	    }
-	} ;
+        return new ObjectCopierFactory() {
+            public ObjectCopier make()
+            {
+                return new OldReflectObjectCopierImpl( orb ) ;
+            }
+        } ;
     }
 
     /** Obtain the new reflective copier factory.  This is 3-4 times faster than the stream
@@ -137,11 +137,11 @@ public abstract class CopyobjectDefaults
      */
     public static ObjectCopierFactory makeReflectObjectCopierFactory( final ORB orb ) 
     {
-	return new ObjectCopierFactory() {
-	    public ObjectCopier make( )
-	    {
-		return new ReflectObjectCopierImpl( orb ) ;
-	    }
-	} ;
+        return new ObjectCopierFactory() {
+            public ObjectCopier make( )
+            {
+                return new ReflectObjectCopierImpl( orb ) ;
+            }
+        } ;
     }
 }

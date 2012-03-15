@@ -97,7 +97,7 @@ public class ValueGen24 extends ValueGen
 
   /**
    * <d62023> - delete write_value from non-boxed helpers
-   *	      - delete _write from non-boxed helpers
+   *          - delete _write from non-boxed helpers
    **/
   public void helperWrite (SymtabEntry entry, PrintWriter stream)
   {
@@ -118,11 +118,11 @@ public class ValueGen24 extends ValueGen
 
   /**
    * <d62023> - suppress initializers from mapped value; now generated in
-   *	the Helper class and Factory class
+   *    the Helper class and Factory class
    **/
   protected void writeInitializers ()
   {
-  	// override to do nothing 
+        // override to do nothing 
   } // writeInitializers
 
   /**
@@ -140,10 +140,10 @@ public class ValueGen24 extends ValueGen
        ValueEntry child = v;
        while (child.isSafe ())
        {
-	stream.println(",");
-	ValueEntry parent = (ValueEntry)child.derivedFrom ().elementAt (0);
-	stream.print("    \"" + Util.stripLeadingUnderscoresFromID (parent.repositoryID ().ID ()) + "\"");
-	child = parent;
+        stream.println(",");
+        ValueEntry parent = (ValueEntry)child.derivedFrom ().elementAt (0);
+        stream.print("    \"" + Util.stripLeadingUnderscoresFromID (parent.repositoryID ().ID ()) + "\"");
+        child = parent;
       }
       stream.println();
       stream.println("  };");
@@ -160,19 +160,19 @@ public class ValueGen24 extends ValueGen
 
     public void writeClassName( String name ) 
     {
-	if (!isImplementsWritten) {
-	    stream.print( " implements " ) ;
-	    isImplementsWritten = true ;
-	} else
-	    stream.print( ", " ) ;
+        if (!isImplementsWritten) {
+            stream.print( " implements " ) ;
+            isImplementsWritten = true ;
+        } else
+            stream.print( ", " ) ;
 
-	stream.print( name ) ;
+        stream.print( name ) ;
     }
   }
 
   /**
    * <d62023> CustomMarshal -> CustomValue for custom valuetypes
-   * 	      mapped class is abstract
+   *          mapped class is abstract
    **/
   protected void writeHeading ()
   {
@@ -199,10 +199,10 @@ public class ValueGen24 extends ValueGen
 
     if (parentName.equals ("java.io.Serializable")) {
         if (((ValueEntry)v).isCustom ()) {
-	      isw.writeClassName( "org.omg.CORBA.portable.CustomValue" ) ;
-	      cv = true;
+              isw.writeClassName( "org.omg.CORBA.portable.CustomValue" ) ;
+              cv = true;
         } else
-	      isw.writeClassName( "org.omg.CORBA.portable.StreamableValue" ) ;
+              isw.writeClassName( "org.omg.CORBA.portable.StreamableValue" ) ;
     } else if ( !((ValueEntry)parent).isAbstract ())
         stream.print (" extends " + parentName);
 
@@ -210,23 +210,23 @@ public class ValueGen24 extends ValueGen
     for (int i = 0; i < v.derivedFrom ().size (); i++) {
         parent = (SymtabEntry) v.derivedFrom ().elementAt (i);
         if ( ((ValueEntry)parent).isAbstract ()) {
-	    isw.writeClassName( Util.javaName(parent) ) ;
+            isw.writeClassName( Util.javaName(parent) ) ;
         }
     }
 
     // Write out the supported interfaces
     Enumeration enumeration = v.supports().elements(); 
     while (enumeration.hasMoreElements())  {
-	InterfaceEntry ie = (InterfaceEntry)(enumeration.nextElement()) ;
-	String cname = Util.javaName(ie) ;
-	if (!ie.isAbstract())
-	    cname += "Operations" ;
-	isw.writeClassName( cname ) ;
+        InterfaceEntry ie = (InterfaceEntry)(enumeration.nextElement()) ;
+        String cname = Util.javaName(ie) ;
+        if (!ie.isAbstract())
+            cname += "Operations" ;
+        isw.writeClassName( cname ) ;
     }
     
     // for when a custom valuetype inherits from a non-custom valuetype
     if ( v.isCustom () && !cv) 
-	isw.writeClassName( "org.omg.CORBA.portable.CustomValue" ) ;
+        isw.writeClassName( "org.omg.CORBA.portable.CustomValue" ) ;
 
     stream.println ();
     stream.println ("{");
@@ -262,7 +262,7 @@ public class ValueGen24 extends ValueGen
 
   /**
    * <d62023> Methods need to be abstract
-   *	      writeStreamable
+   *          writeStreamable
    **/
   protected void writeMethods ()
   {
@@ -288,12 +288,12 @@ public class ValueGen24 extends ValueGen
       }
       else
       {
-	// Generate the type referenced by the typedef.
-	if (contained instanceof TypedefEntry)
+        // Generate the type referenced by the typedef.
+        if (contained instanceof TypedefEntry)
           contained.type ().generate (symbolTable, stream);
 
-	// Note that we also need to generate the typedef itself if
-	// contained is a typedef.
+        // Note that we also need to generate the typedef itself if
+        // contained is a typedef.
         contained.generate (symbolTable, stream);
       }
     }
@@ -324,7 +324,7 @@ public class ValueGen24 extends ValueGen
 
       // call super._read if non-abstract value parent
       if ((!parent.isAbstract ()) && (! Util.javaQualifiedName(parent).equals ("java.io.Serializable"))) // <d60929>
-	  stream.println(indent + "super._read (istream);");
+          stream.println(indent + "super._read (istream);");
     }
 
     Vector vMembers = ((ValueEntry) entry).state ();
@@ -364,7 +364,7 @@ public class ValueGen24 extends ValueGen
         return index;
       // call super._read if non-abstract value parent
       if ((!parent.isAbstract ()) && (! Util.javaQualifiedName(parent).equals ("java.io.Serializable"))) // <d60929>
-	  stream.println(indent + "super._write (ostream);");
+          stream.println(indent + "super._write (ostream);");
     }
 
     Vector vMembers = ((ValueEntry) entry ).state ();
@@ -383,7 +383,7 @@ public class ValueGen24 extends ValueGen
         index = ((JavaGenerator)member.generator ()).write (index, indent, name + '.' + memberName, member, stream);
       else
         stream.println (indent + Util.helperName (mType, true) + // <d61056>
-	                      ".write (ostream, " + name + '.' + memberName + ");");
+                              ".write (ostream, " + name + '.' + memberName + ");");
     }
 
     return index;

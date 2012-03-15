@@ -59,37 +59,37 @@ class helloDelegate implements helloIF {
     String symbol;
 
     public helloDelegate( PrintStream out, String symbol ) {
-	super();
-	this.out = out;
-	this.symbol = symbol;
+        super();
+        this.out = out;
+        this.symbol = symbol;
     }
 
     public String sayHello() {
-	ServerCommon.servantInvoked = true;
+        ServerCommon.servantInvoked = true;
         out.println( "    - helloDelegate: sayHello() invoked" );
-	SampleServerRequestInterceptor.methodOrder += symbol;
+        SampleServerRequestInterceptor.methodOrder += symbol;
         return "Hello, world!";
     }
 
     public void sayOneway() {
-	ServerCommon.servantInvoked = true;
+        ServerCommon.servantInvoked = true;
         out.println( "    - helloDelegate: sayOneway() invoked" );
-	SampleServerRequestInterceptor.methodOrder += symbol;
+        SampleServerRequestInterceptor.methodOrder += symbol;
     }
     
     public void saySystemException() {
-	ServerCommon.servantInvoked = true;
+        ServerCommon.servantInvoked = true;
         out.println( "    - helloDelegate: saySystemException() invoked" );
-	SampleServerRequestInterceptor.methodOrder += symbol;
+        SampleServerRequestInterceptor.methodOrder += symbol;
         throw new IMP_LIMIT( SampleServerRequestInterceptor.VALID_MESSAGE );
     }
 
     public void sayUserException() 
-	throws ForwardRequest
+        throws ForwardRequest
     {
-	ServerCommon.servantInvoked = true;
+        ServerCommon.servantInvoked = true;
         out.println( "    - helloDelegate: sayUserException() invoked" );
-	SampleServerRequestInterceptor.methodOrder += symbol;
+        SampleServerRequestInterceptor.methodOrder += symbol;
         throw new ForwardRequest( TestInitializer.helloRef );
     }
     
@@ -103,25 +103,25 @@ class helloDelegate implements helloIF {
     // @param exceptionRaised true if the last invocation resulted in
     //     an exception on the client side.
     public String syncWithServer( boolean exceptionRaised ) {
-	out.println( "    - helloDelegate: syncWithServer() invoked" );
-	// Notify the test case that the client is waiting for 
-	// syncWithServer to return:
-	ServerCommon.syncing = true;
-	ServerCommon.exceptionRaised = exceptionRaised;
-	
-	// Wait for the next test case to start:
-	synchronized( ServerCommon.syncObject ) {
-	    try {
-		ServerCommon.syncObject.wait();
-	    }
-	    catch( InterruptedException e ) {
-		// ignore, assume we are good to go.
-	    }
-	}
-	
-	ServerCommon.syncing = false;
-	
-	return ServerCommon.nextMethodToInvoke;
+        out.println( "    - helloDelegate: syncWithServer() invoked" );
+        // Notify the test case that the client is waiting for 
+        // syncWithServer to return:
+        ServerCommon.syncing = true;
+        ServerCommon.exceptionRaised = exceptionRaised;
+        
+        // Wait for the next test case to start:
+        synchronized( ServerCommon.syncObject ) {
+            try {
+                ServerCommon.syncObject.wait();
+            }
+            catch( InterruptedException e ) {
+                // ignore, assume we are good to go.
+            }
+        }
+        
+        ServerCommon.syncing = false;
+        
+        return ServerCommon.nextMethodToInvoke;
     }
 
 }

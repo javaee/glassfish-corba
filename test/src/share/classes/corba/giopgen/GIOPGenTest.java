@@ -50,32 +50,32 @@ import corba.framework.CORBATest;
 import corba.framework.Controller;
 import corba.framework.Options;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 /**
  * @author Harold Carr
  */
 public class GIOPGenTest extends CORBATest {
     protected void doTest() throws Exception {
-	String thisPackage = GIOPGenTest.class.getPackage().getName();
+        String thisPackage = GIOPGenTest.class.getPackage().getName();
 
-	Controller orbd = createORBD();
-	Controller server;
-	Controller client;
+        Controller orbd = createORBD();
+        Controller server;
+        Controller client;
 
-	orbd.start();
+        orbd.start();
 
-	server = createServer(thisPackage+"."+"Server", "Server");
-	client = createClient(thisPackage+"."+"Client", "Client");
+        server = createServer(thisPackage+"."+"Server", "Server");
+        client = createClient(thisPackage+"."+"Client", "Client");
 
-	server.start();
-	client.start();
+        server.start();
+        client.start();
 
-	client.waitFor(1000 * 60 * 5);
+        client.waitFor(1000 * 60 * 5);
 
-	client.stop();
-	server.stop();
-	orbd.stop();
+        client.stop();
+        server.stop();
+        orbd.stop();
     }
 }
 

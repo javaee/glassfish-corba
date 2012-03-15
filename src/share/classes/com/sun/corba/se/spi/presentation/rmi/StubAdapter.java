@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.presentation.rmi ;
+package com.sun.corba.ee.spi.presentation.rmi ;
 
 import javax.rmi.CORBA.Tie ;
 
@@ -57,9 +57,9 @@ import org.omg.PortableServer.POAManagerPackage.AdapterInactive ;
 
 import org.omg.CORBA.ORB ;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
-import com.sun.corba.se.impl.oa.poa.POAManagerImpl ;
+import com.sun.corba.ee.impl.oa.poa.POAManagerImpl ;
 
 /** Provide access to stub delegate and type id information
  * independent of the stub type.  This class exists because
@@ -78,19 +78,19 @@ public abstract class StubAdapter
 
     public static boolean isStubClass( Class cls )
     {
-	return (ObjectImpl.class.isAssignableFrom( cls )) ||
-	    (DynamicStub.class.isAssignableFrom( cls )) ;
+        return (ObjectImpl.class.isAssignableFrom( cls )) ||
+            (DynamicStub.class.isAssignableFrom( cls )) ;
     }
 
     public static boolean isStub( Object stub )
     {
-	return (stub instanceof DynamicStub) ||
-	    (stub instanceof ObjectImpl) ;
+        return (stub instanceof DynamicStub) ||
+            (stub instanceof ObjectImpl) ;
     }
 
     public static void setDelegate( Object stub, Delegate delegate ) 
     {
-	if (stub instanceof DynamicStub) {
+        if (stub instanceof DynamicStub) {
             ((DynamicStub) stub).setDelegate(delegate);
         } else if (stub instanceof ObjectImpl) {
             ((ObjectImpl) stub)._set_delegate(delegate);
@@ -103,43 +103,43 @@ public abstract class StubAdapter
      */
     public static org.omg.CORBA.Object activateServant( Servant servant ) 
     {
-	POA poa = servant._default_POA() ;
-	org.omg.CORBA.Object ref = null ;
+        POA poa = servant._default_POA() ;
+        org.omg.CORBA.Object ref = null ;
 
-	try {
-	    ref = poa.servant_to_reference( servant ) ;
-	} catch (ServantNotActive sna) {
-	    throw wrapper.getDelegateServantNotActive( sna ) ;
-	} catch (WrongPolicy wp) {
-	    throw wrapper.getDelegateWrongPolicy( wp ) ;
-	}
+        try {
+            ref = poa.servant_to_reference( servant ) ;
+        } catch (ServantNotActive sna) {
+            throw wrapper.getDelegateServantNotActive( sna ) ;
+        } catch (WrongPolicy wp) {
+            throw wrapper.getDelegateWrongPolicy( wp ) ;
+        }
 
-	// Make sure that the POAManager is activated if no other
-	// POAManager state management has taken place.
-	POAManager mgr = poa.the_POAManager() ;
-	if (mgr instanceof POAManagerImpl) {
-	    // This servant is managed by one of our POAs,
-	    // so only activate it if there has not been
-	    // an explicit state change, that is, if the POA
-	    // has never changed state from the initial 
-	    // HOLDING state.
-	    POAManagerImpl mgrImpl = (POAManagerImpl)mgr ;
-	    mgrImpl.implicitActivation() ;
-	} else {
-	    // This servant is not managed by one of our POAs,
-	    // so activate it if the state is HOLDING, which is the
-	    // initial state.  Note that this may NOT be exactly
-	    // what the user intended!
-	    if (mgr.get_state().value() == State._HOLDING) {
-		try {
-		    mgr.activate() ;
-		} catch (AdapterInactive ai) {
-		    throw wrapper.adapterInactiveInActivateServant( ai ) ;
-		}
-	    }
-	}
+        // Make sure that the POAManager is activated if no other
+        // POAManager state management has taken place.
+        POAManager mgr = poa.the_POAManager() ;
+        if (mgr instanceof POAManagerImpl) {
+            // This servant is managed by one of our POAs,
+            // so only activate it if there has not been
+            // an explicit state change, that is, if the POA
+            // has never changed state from the initial 
+            // HOLDING state.
+            POAManagerImpl mgrImpl = (POAManagerImpl)mgr ;
+            mgrImpl.implicitActivation() ;
+        } else {
+            // This servant is not managed by one of our POAs,
+            // so activate it if the state is HOLDING, which is the
+            // initial state.  Note that this may NOT be exactly
+            // what the user intended!
+            if (mgr.get_state().value() == State._HOLDING) {
+                try {
+                    mgr.activate() ;
+                } catch (AdapterInactive ai) {
+                    throw wrapper.adapterInactiveInActivateServant( ai ) ;
+                }
+            }
+        }
 
-	return ref ;
+        return ref ;
     }
 
     /** Given any Tie, return the corresponding object refernce, activating
@@ -147,20 +147,20 @@ public abstract class StubAdapter
      */
     public static org.omg.CORBA.Object activateTie( Tie tie )
     {
-	/** Any implementation of Tie should be either a Servant or an ObjectImpl,
-	 * depending on which style of code generation is used.  rmic -iiop by
-	 * default results in an ObjectImpl-based Tie, while rmic -iiop -poa
-	 * results in a Servant-based Tie.  Dynamic RMI-IIOP also uses Servant-based
-	 * Ties (see impl.presentation.rmi.ReflectiveTie).
-	 */
-	if (tie instanceof ObjectImpl) {
-	    return tie.thisObject() ;
-	} else if (tie instanceof Servant) {
-	    Servant servant = (Servant)tie ;
-	    return activateServant( servant ) ;
-	} else {
-	    throw wrapper.badActivateTieCall() ;
-	}
+        /** Any implementation of Tie should be either a Servant or an ObjectImpl,
+         * depending on which style of code generation is used.  rmic -iiop by
+         * default results in an ObjectImpl-based Tie, while rmic -iiop -poa
+         * results in a Servant-based Tie.  Dynamic RMI-IIOP also uses Servant-based
+         * Ties (see impl.presentation.rmi.ReflectiveTie).
+         */
+        if (tie instanceof ObjectImpl) {
+            return tie.thisObject() ;
+        } else if (tie instanceof Servant) {
+            Servant servant = (Servant)tie ;
+            return activateServant( servant ) ;
+        } else {
+            throw wrapper.badActivateTieCall() ;
+        }
     }
 
 
@@ -169,78 +169,78 @@ public abstract class StubAdapter
      */
     public static Delegate getDelegate( Object stub ) 
     {
-	if (stub instanceof DynamicStub) {
+        if (stub instanceof DynamicStub) {
             return ((DynamicStub) stub).getDelegate();
         } else if (stub instanceof ObjectImpl) {
             return ((ObjectImpl) stub)._get_delegate();
         } else if (stub instanceof Tie) {
-	    Tie tie = (Tie)stub ;
-	    org.omg.CORBA.Object ref = activateTie( tie ) ;
-	    return getDelegate( ref ) ;
-	} else {
+            Tie tie = (Tie)stub ;
+            org.omg.CORBA.Object ref = activateTie( tie ) ;
+            return getDelegate( ref ) ;
+        } else {
             throw wrapper.getDelegateRequiresStub();
         }
     }
     
     public static ORB getORB( Object stub ) 
     {
-	if (stub instanceof DynamicStub) {
-	    return ((DynamicStub)stub).getORB() ;
+        if (stub instanceof DynamicStub) {
+            return ((DynamicStub)stub).getORB() ;
         } else if (stub instanceof ObjectImpl) {
-	    return ((ObjectImpl) stub)._orb() ;
+            return ((ObjectImpl) stub)._orb() ;
         } else {
-	    throw wrapper.getOrbRequiresStub() ;
+            throw wrapper.getOrbRequiresStub() ;
         }
     }
 
     public static String[] getTypeIds( Object stub )
     {
-	if (stub instanceof DynamicStub) {
-	    return ((DynamicStub)stub).getTypeIds() ;
+        if (stub instanceof DynamicStub) {
+            return ((DynamicStub)stub).getTypeIds() ;
         } else if (stub instanceof ObjectImpl) {
-	    return ((ObjectImpl)stub)._ids() ;
+            return ((ObjectImpl)stub)._ids() ;
         } else {
-	    throw wrapper.getTypeIdsRequiresStub() ;
+            throw wrapper.getTypeIdsRequiresStub() ;
         }
     }
 
     public static void connect( Object stub, 
-	ORB orb ) throws java.rmi.RemoteException 
+        ORB orb ) throws java.rmi.RemoteException 
     {
-	if (stub instanceof DynamicStub) {
-	    ((DynamicStub)stub).connect( 
-		(com.sun.corba.se.spi.orb.ORB)orb ) ;
+        if (stub instanceof DynamicStub) {
+            ((DynamicStub)stub).connect( 
+                (com.sun.corba.ee.spi.orb.ORB)orb ) ;
         } else if (stub instanceof javax.rmi.CORBA.Stub) {
-	    ((javax.rmi.CORBA.Stub)stub).connect( orb ) ;
+            ((javax.rmi.CORBA.Stub)stub).connect( orb ) ;
         } else if (stub instanceof ObjectImpl) {
-	    orb.connect( (org.omg.CORBA.Object)stub ) ;
+            orb.connect( (org.omg.CORBA.Object)stub ) ;
         } else {
-	    throw wrapper.connectRequiresStub() ;
+            throw wrapper.connectRequiresStub() ;
         }
     }
 
     public static boolean isLocal( Object stub )
     {
-	if (stub instanceof DynamicStub) {
-	    return ((DynamicStub)stub).isLocal() ;
+        if (stub instanceof DynamicStub) {
+            return ((DynamicStub)stub).isLocal() ;
         } else if (stub instanceof ObjectImpl) {
-	    return ((ObjectImpl)stub)._is_local() ;
+            return ((ObjectImpl)stub)._is_local() ;
         } else {
-	    throw wrapper.isLocalRequiresStub() ;
+            throw wrapper.isLocalRequiresStub() ;
         }
     }
 
     public static OutputStream request( Object stub, 
-	String operation, boolean responseExpected ) 
+        String operation, boolean responseExpected ) 
     {
-	if (stub instanceof DynamicStub) {
-	    return ((DynamicStub)stub).request( operation,
-		responseExpected ) ;
+        if (stub instanceof DynamicStub) {
+            return ((DynamicStub)stub).request( operation,
+                responseExpected ) ;
         } else if (stub instanceof ObjectImpl) {
-	    return ((ObjectImpl)stub)._request( operation,
-		responseExpected ) ;
+            return ((ObjectImpl)stub)._request( operation,
+                responseExpected ) ;
         } else {
-	    throw wrapper.requestRequiresStub() ;
+            throw wrapper.requestRequiresStub() ;
         }
     }
 }

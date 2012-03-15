@@ -53,7 +53,7 @@ import sun.tools.java.CompilerError;
 
 /**
  * ContextStack provides a mechanism to record parsing state.
- * @author	Bryan Atsatt
+ * @author      Bryan Atsatt
  */
 public class ContextStack {
 
@@ -77,18 +77,18 @@ public class ContextStack {
     // String versions of context codes.
     
     private static final String[] CODE_NAMES = {
-	"UNKNOWN ",
-	"Top level type ",
-	"Method ",
-	"Return parameter ",
-	"Parameter ",
-	"Exception ",
-	"Member ",
-	"Constant member ",
-	"Static member ",
-	"Transient member ",
-	"Implements ",
-	"Extends ",
+        "UNKNOWN ",
+        "Top level type ",
+        "Method ",
+        "Return parameter ",
+        "Parameter ",
+        "Exception ",
+        "Member ",
+        "Constant member ",
+        "Static member ",
+        "Transient member ",
+        "Implements ",
+        "Extends ",
     };
     // Member data.
     
@@ -116,14 +116,14 @@ public class ContextStack {
     public boolean anyErrors () {
         return env.nerrors > 0;
     }
- 	
+        
     /**
      * Enable/disable tracing.
      */
     public void setTrace(boolean trace) {
         this.trace = trace;
     }
- 	
+        
     /**
      * Check trace flag.
      */
@@ -144,7 +144,7 @@ public class ContextStack {
     public void setNewContextCode(int code) {
         newCode = code;
     }
-	
+        
     /**
      * Get the current context code.
      */
@@ -428,17 +428,17 @@ class TypeContext {
 
 public String getTypeDescription() {
     if (element instanceof Type) {
-	return ((Type) element).getTypeDescription();
+        return ((Type) element).getTypeDescription();
     } else {
-	return "[unknown type]";
+        return "[unknown type]";
     }
 }
 
 public String toString () {
     if (element != null) {
-	return ContextStack.getContextCodeString(code) + element.getElementName();
+        return ContextStack.getContextCodeString(code) + element.getElementName();
     } else {
-	return ContextStack.getContextCodeString(code) + "null";
+        return ContextStack.getContextCodeString(code) + "null";
     }
 }
 

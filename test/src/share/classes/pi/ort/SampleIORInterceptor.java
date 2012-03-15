@@ -68,13 +68,13 @@ public class SampleIORInterceptor
     private PrintStream out;
 
     public SampleIORInterceptor( String name, PrintStream out ) {
-	this.name = name;
-	this.out = out;
-	out.println( "    - IORInterceptor " + name + " created." );
+        this.name = name;
+        this.out = out;
+        out.println( "    - IORInterceptor " + name + " created." );
     }
 
     public String name() {
-	return name;
+        return name;
     }
 
     public void destroy() {
@@ -88,11 +88,11 @@ public class SampleIORInterceptor
      */
     public void components_established( IORInfo info )
     {
-        com.sun.corba.se.impl.interceptors.IORInfoImpl iorInfoImpl =
-            (com.sun.corba.se.impl.interceptors.IORInfoImpl) info;
+        com.sun.corba.ee.impl.interceptors.IORInfoImpl iorInfoImpl =
+            (com.sun.corba.ee.impl.interceptors.IORInfoImpl) info;
         ObjectReferenceTemplate ort = iorInfoImpl.adapter_template();
         if( !ort.orb_id().equals( Constants.ORB_ID )  && 
-	    !ort.orb_id().equals(com.sun.corba.se.impl.ior.ObjectKeyTemplateBase.JIDL_ORB_ID)) {
+            !ort.orb_id().equals(com.sun.corba.ee.impl.ior.ObjectKeyTemplateBase.JIDL_ORB_ID)) {
             System.err.println( 
                 "ORBId is not passed to components_established correctly..");
             System.exit( -1 );
@@ -106,7 +106,7 @@ public class SampleIORInterceptor
     }
 
     public void adapter_state_changed( ObjectReferenceTemplate[] templates, 
-	short state )
+        short state )
     {
         ORTStateChangeEvaluator.getInstance( ).registerAdapterStateChange( 
             templates, state );

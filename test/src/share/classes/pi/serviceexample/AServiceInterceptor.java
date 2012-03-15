@@ -70,12 +70,12 @@ public class AServiceInterceptor
 
     public AServiceInterceptor(int slotId)
     {
-	this.slotId = slotId;
+        this.slotId = slotId;
     }
 
     void setCodec(Codec codec)
     {
-	this.codec = codec;
+        this.codec = codec;
     }
 
     //
@@ -84,7 +84,7 @@ public class AServiceInterceptor
 
     public String name() 
     {
-	return "AServiceInterceptor";
+        return "AServiceInterceptor";
     }
 
     public void destroy() 
@@ -97,57 +97,57 @@ public class AServiceInterceptor
 
     public void send_request(ClientRequestInfo ri)
     {
-	//
-	// See if the target object contains an ASERVICE_COMPONENT.
-	//
+        //
+        // See if the target object contains an ASERVICE_COMPONENT.
+        //
 
-	try {
-	    TaggedComponent taggedComponent =
-		ri.get_effective_component(TAG_ASERVICE_COMPONENT.value);
+        try {
+            TaggedComponent taggedComponent =
+                ri.get_effective_component(TAG_ASERVICE_COMPONENT.value);
 
-	    Any sAny = null;
-	    try {
-		sAny = codec.decode_value(taggedComponent.component_data,
-					  ASERVICE_COMPONENTHelper.type());
-	    } catch (TypeMismatch e) {
-		System.out.println("Exception handling not shown.");
-	    } catch (FormatMismatch e) {
-		System.out.println("Exception handling not shown.");
-	    }
+            Any sAny = null;
+            try {
+                sAny = codec.decode_value(taggedComponent.component_data,
+                                          ASERVICE_COMPONENTHelper.type());
+            } catch (TypeMismatch e) {
+                System.out.println("Exception handling not shown.");
+            } catch (FormatMismatch e) {
+                System.out.println("Exception handling not shown.");
+            }
 
-	    ASERVICE_COMPONENT aServiceComponent =
-		ASERVICE_COMPONENTHelper.extract(sAny);
+            ASERVICE_COMPONENT aServiceComponent =
+                ASERVICE_COMPONENTHelper.extract(sAny);
 
-	    //
-	    // Only send the service context if the target object requires it.
-	    //
+            //
+            // Only send the service context if the target object requires it.
+            //
 
-	    if (aServiceComponent.requiresAService) {
-		try {
-		    Any any = ri.get_slot(slotId);
-		    if (any.type().kind().equals(TCKind.tk_long)) {
-			int serviceId = any.extract_long();
-			byte[] serviceContextData = {
-			    // Little endian to make it
-			    // easier to see in debugger.
-			    (byte)((serviceId >>>  0) &  0xFF),
-			    (byte)((serviceId >>>  8) &  0xFF),
-			    (byte)((serviceId >>> 16) &  0xFF),
-			    (byte)((serviceId >>> 24) &  0xFF)
-			};
-			ri.add_request_service_context(
-			    new ServiceContext(serviceContextId,
-					       serviceContextData),
-			    false);
-		    }
-		} catch (InvalidSlot e) {
-		    System.out.println("Exception handling not shown.");
-		}
-	    }
-	} catch (BAD_PARAM e) {
-	    // If it is not present, do nothing.
-	    ;
-	}
+            if (aServiceComponent.requiresAService) {
+                try {
+                    Any any = ri.get_slot(slotId);
+                    if (any.type().kind().equals(TCKind.tk_long)) {
+                        int serviceId = any.extract_long();
+                        byte[] serviceContextData = {
+                            // Little endian to make it
+                            // easier to see in debugger.
+                            (byte)((serviceId >>>  0) &  0xFF),
+                            (byte)((serviceId >>>  8) &  0xFF),
+                            (byte)((serviceId >>> 16) &  0xFF),
+                            (byte)((serviceId >>> 24) &  0xFF)
+                        };
+                        ri.add_request_service_context(
+                            new ServiceContext(serviceContextId,
+                                               serviceContextData),
+                            false);
+                    }
+                } catch (InvalidSlot e) {
+                    System.out.println("Exception handling not shown.");
+                }
+            }
+        } catch (BAD_PARAM e) {
+            // If it is not present, do nothing.
+            ;
+        }
     }
 
     public void send_poll(ClientRequestInfo ri)
@@ -172,26 +172,26 @@ public class AServiceInterceptor
 
     public void receive_request_service_contexts(ServerRequestInfo ri)
     {
-	try {
-	    ServiceContext serviceContext =
-		ri.get_request_service_context(serviceContextId);
-	    byte[] data = serviceContext.context_data;
-	    int b1, b2, b3, b4;
-	    b4 = (data[0] <<  0) & 0x000000FF;
-	    b3 = (data[1] <<  8) & 0x0000FF00;
-	    b2 = (data[2] << 16) & 0x00FF0000;
-	    b1 = (data[3] << 24) & 0xFF000000;
-	    int serviceId = (b1 | b2 | b3 | b4);
-	    Any any = ORB.init().create_any();
-	    any.insert_long(serviceId);
-	    ri.set_slot(slotId, any);
-	} catch (BAD_PARAM e) {
-	    // Not present means service is not in effect.
-	    // Do nothing.
-	    ;
-	} catch (InvalidSlot e) {
-	    System.out.println("Exception handling not shown.");
-	}
+        try {
+            ServiceContext serviceContext =
+                ri.get_request_service_context(serviceContextId);
+            byte[] data = serviceContext.context_data;
+            int b1, b2, b3, b4;
+            b4 = (data[0] <<  0) & 0x000000FF;
+            b3 = (data[1] <<  8) & 0x0000FF00;
+            b2 = (data[2] << 16) & 0x00FF0000;
+            b1 = (data[3] << 24) & 0xFF000000;
+            int serviceId = (b1 | b2 | b3 | b4);
+            Any any = ORB.init().create_any();
+            any.insert_long(serviceId);
+            ri.set_slot(slotId, any);
+        } catch (BAD_PARAM e) {
+            // Not present means service is not in effect.
+            // Do nothing.
+            ;
+        } catch (InvalidSlot e) {
+            System.out.println("Exception handling not shown.");
+        }
     }
 
     public void receive_request(ServerRequestInfo ri)

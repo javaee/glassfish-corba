@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.naming.pcosnaming;
+package com.sun.corba.ee.impl.naming.pcosnaming;
 
 // Import general CORBA classes
 import org.omg.CORBA.INTERNAL;
@@ -48,7 +48,7 @@ import org.omg.CosNaming.BindingType;
 import org.omg.CosNaming.NameComponent;
 import org.omg.PortableServer.POA;
 
-import com.sun.corba.se.impl.naming.cosnaming.BindingIteratorImpl;
+import com.sun.corba.ee.impl.naming.cosnaming.BindingIteratorImpl;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -79,10 +79,10 @@ public class PersistentBindingIterator extends BindingIteratorImpl
         Map<InternalBindingKey,InternalBindingValue> aTable,
         POA thePOA ) throws java.lang.Exception
     {
-	super(orb);
-	map = new HashMap<InternalBindingKey,InternalBindingValue>( aTable ) ;
-	iterator = this.map.keySet().iterator() ;
-	currentSize = this.map.size();
+        super(orb);
+        map = new HashMap<InternalBindingKey,InternalBindingValue>( aTable ) ;
+        iterator = this.map.keySet().iterator() ;
+        currentSize = this.map.size();
         biPOA = thePOA;
     }
 
@@ -95,24 +95,24 @@ public class PersistentBindingIterator extends BindingIteratorImpl
    */
     final public boolean nextOneImpl(org.omg.CosNaming.BindingHolder b)
     {
-	// If there are more elements get the next element
-	boolean hasMore = iterator.hasNext();
-	if (hasMore) {
+        // If there are more elements get the next element
+        boolean hasMore = iterator.hasNext();
+        if (hasMore) {
             InternalBindingKey theBindingKey = iterator.next();
             InternalBindingValue theElement = map.get( theBindingKey );
-	    NameComponent n = new NameComponent( theBindingKey.id,
+            NameComponent n = new NameComponent( theBindingKey.id,
                 theBindingKey.kind );
-	    NameComponent[] nlist = new NameComponent[1];
-	    nlist[0] = n;
+            NameComponent[] nlist = new NameComponent[1];
+            nlist[0] = n;
             BindingType theType = theElement.theBindingType;
-	    
-	    b.value =
-	        new Binding( nlist, theType );	
-	} else {
-	    // Return empty but marshalable binding
-	    b.value = new Binding(new NameComponent[0],BindingType.nobject);
-	}
-	return hasMore;
+            
+            b.value =
+                new Binding( nlist, theType );  
+        } else {
+            // Return empty but marshalable binding
+            b.value = new Binding(new NameComponent[0],BindingType.nobject);
+        }
+        return hasMore;
     }
 
     /**
@@ -138,7 +138,7 @@ public class PersistentBindingIterator extends BindingIteratorImpl
    * @return the remaining number of elements in the iterator.   
    */
     public final int remainingElementsImpl() {
-	return currentSize;
+        return currentSize;
     }
 
     private int currentSize;

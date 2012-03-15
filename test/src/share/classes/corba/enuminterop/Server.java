@@ -52,9 +52,9 @@ import org.omg.CosNaming.*;
 
 import org.omg.PortableServer.*;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
                                                                                 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
 
 /**
@@ -126,7 +126,7 @@ public class Server {
 
             Tie tie = javax.rmi.CORBA.Util.getTie( servant ) ;
             // Tie tie = orb.getPresentationManager().getTie();
-	    tie.orb( orb ) ;
+            tie.orb( orb ) ;
             tie.setTarget( (java.rmi.Remote)servant );
             return tie;
         } catch( Exception e ) {

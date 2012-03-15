@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)Arrow.java	1.3 99/06/07 */
+/* @(#)Arrow.java       1.3 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -93,144 +93,144 @@ public class Arrow
 
     public void setHead (Point head)
     {
-	fHead = head;
-	fCacheBlown = true;
+        fHead = head;
+        fCacheBlown = true;
     }
 
     public void setTail (Point tail)
     {
-	fTail = tail;
-	fCacheBlown = true;
+        fTail = tail;
+        fCacheBlown = true;
     }
 
     public void setHeadPadding (int padding)
     {
-	fHeadPadding = padding;
-	fCacheBlown = true;
+        fHeadPadding = padding;
+        fCacheBlown = true;
     }
 
     public int getHeadPadding ()
     {
-	return fHeadPadding;
+        return fHeadPadding;
     }
 
     public void setTailPadding (int padding)
     {
-	fTailPadding = padding;
-	fCacheBlown = true;
+        fTailPadding = padding;
+        fCacheBlown = true;
     }
 
     public int getTailPadding ()
     {
-	return fTailPadding;
+        return fTailPadding;
     }
 
     public void setHeadLength (int length)
     {
-	fHeadLength = length;
-	fCacheBlown = true;
+        fHeadLength = length;
+        fCacheBlown = true;
     }
 
     public int getHeadLength ()
     {
-	return fHeadLength;
+        return fHeadLength;
     }
 
     public void setHeadSeparation (int sep)
     {
-	fHeadSeparation = sep;
-	fCacheBlown = true;
+        fHeadSeparation = sep;
+        fCacheBlown = true;
     }
 
     public int getHeadSeparation ()
     {
-	return fHeadSeparation;
+        return fHeadSeparation;
     }
 
     public void setColor (Color color)
     {
-	fColor = color;
+        fColor = color;
     }
 
     public Color getColor ()
     {
-	return fColor;
+        return fColor;
     }
 
     public void setLabel (String label)
     {
-	fLabel = label;
+        fLabel = label;
     }
 
     public String getLabel ()
     {
-	return fLabel;
+        return fLabel;
     }
 
     public int getLength ()
     {
-	if ( fCacheBlown ) updateCache ();
-	return (int)fLen;
+        if ( fCacheBlown ) updateCache ();
+        return (int)fLen;
     }
 
     public void draw (Graphics g)
     {
-	if ( fCacheBlown ) updateCache ();
+        if ( fCacheBlown ) updateCache ();
 
-	if ( !fCacheBlown ) {
-	    g.setColor (fColor);
-	    g.drawLine (fFrom.x, fFrom.y, fTo.x, fTo.y);
-	    g.fillPolygon (fTipX, fTipY, 4);
-	    if ( fLabel != null ) {
-		g.drawString (fLabel, fLabelLoc.x, fLabelLoc.y);
-	    }
+        if ( !fCacheBlown ) {
+            g.setColor (fColor);
+            g.drawLine (fFrom.x, fFrom.y, fTo.x, fTo.y);
+            g.fillPolygon (fTipX, fTipY, 4);
+            if ( fLabel != null ) {
+                g.drawString (fLabel, fLabelLoc.x, fLabelLoc.y);
+            }
 
-	}
+        }
     }
 
     private void updateCache ()
     {
-	if ( fTail != null && fHead != null ) {
+        if ( fTail != null && fHead != null ) {
 
-	    // Compute lenth and unit lengths in x and y directions
+            // Compute lenth and unit lengths in x and y directions
       
-	    fDX = (double)fHead.x - (double)fTail.x;
-	    fDY = (double)fHead.y - (double)fTail.y;
-	    fLen = Math.sqrt (fDX*fDX + fDY*fDY);
-	    if ( fLen > 0 ) {
-		fUX = fDX/fLen;
-		fUY = fDY/fLen;
-	    } else {
-		fUX = 0;
-		fUY = 0;
-	    }
+            fDX = (double)fHead.x - (double)fTail.x;
+            fDY = (double)fHead.y - (double)fTail.y;
+            fLen = Math.sqrt (fDX*fDX + fDY*fDY);
+            if ( fLen > 0 ) {
+                fUX = fDX/fLen;
+                fUY = fDY/fLen;
+            } else {
+                fUX = 0;
+                fUY = 0;
+            }
 
-	    // Compute shortened to and from points
+            // Compute shortened to and from points
 
-	    int tx = fTail.x + (int)(fUX*fTailPadding);
-	    int ty = fTail.y + (int)(fUY*fTailPadding);
-	    int hx = fHead.x - (int)(fUX*fHeadPadding);
-	    int hy = fHead.y - (int)(fUY*fHeadPadding);
-	    fFrom = new Point (tx,ty);
-	    fTo = new Point (hx,hy);
+            int tx = fTail.x + (int)(fUX*fTailPadding);
+            int ty = fTail.y + (int)(fUY*fTailPadding);
+            int hx = fHead.x - (int)(fUX*fHeadPadding);
+            int hy = fHead.y - (int)(fUY*fHeadPadding);
+            fFrom = new Point (tx,ty);
+            fTo = new Point (hx,hy);
 
-	    // Compute arrow tip points
+            // Compute arrow tip points
 
-	    int bx = fTo.x - (int)(fUX*fHeadLength);
-	    int by = fTo.y - (int)(fUY*fHeadLength);
-	    fTipX[0] = fTo.x;
-	    fTipY[0] = fTo.y;
-	    fTipX[1] = bx - (int)(fUY*fHeadSeparation);
-	    fTipY[1] = by + (int)(fUX*fHeadSeparation);
-	    fTipX[2] = bx;
-	    fTipY[2] = by;
-	    fTipX[3] = bx + (int)(fUY*fHeadSeparation);
-	    fTipY[3] = by - (int)(fUX*fHeadSeparation);
+            int bx = fTo.x - (int)(fUX*fHeadLength);
+            int by = fTo.y - (int)(fUY*fHeadLength);
+            fTipX[0] = fTo.x;
+            fTipY[0] = fTo.y;
+            fTipX[1] = bx - (int)(fUY*fHeadSeparation);
+            fTipY[1] = by + (int)(fUX*fHeadSeparation);
+            fTipX[2] = bx;
+            fTipY[2] = by;
+            fTipX[3] = bx + (int)(fUY*fHeadSeparation);
+            fTipY[3] = by - (int)(fUX*fHeadSeparation);
 
-	    fLabelLoc = new Point ((fFrom.x+fTo.x)/2, (fFrom.y+fTo.y)/2);
+            fLabelLoc = new Point ((fFrom.x+fTo.x)/2, (fFrom.y+fTo.y)/2);
 
-	    fCacheBlown = false;
-	}
+            fCacheBlown = false;
+        }
     }
 
 

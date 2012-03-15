@@ -38,10 +38,10 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.interceptors;
+package com.sun.corba.ee.impl.interceptors;
 
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.impl.corba.AnyImpl;
+import com.sun.corba.ee.spi.orb.ORB;
 import org.omg.PortableInterceptor.Current;
 import org.omg.PortableInterceptor.InvalidSlot;
 import org.omg.CORBA.Any;

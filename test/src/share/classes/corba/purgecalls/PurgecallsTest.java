@@ -49,14 +49,14 @@ import corba.framework.CORBATest;
 
 public class PurgecallsTest
     extends
-	CORBATest
+        CORBATest
 {
     public static final String thisPackage =
-	PurgecallsTest.class.getPackage().getName();
+        PurgecallsTest.class.getPackage().getName();
 
     protected void doTest()
-	throws
-	    Throwable
+        throws
+            Throwable
     {
         Controller orbd   = createORBD();
         orbd.start();

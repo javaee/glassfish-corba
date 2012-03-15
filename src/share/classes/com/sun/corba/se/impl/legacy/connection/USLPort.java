@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.legacy.connection;
+package com.sun.corba.ee.impl.legacy.connection;
 
 import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.Description ;
@@ -53,8 +53,8 @@ public class USLPort
 
     public USLPort (String type, int port)
     {
-	this.type = type;
-	this.port = port;
+        this.type = type;
+        this.port = port;
     }
 
     @ManagedAttribute

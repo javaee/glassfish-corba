@@ -37,18 +37,18 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-//	org/omg/CosTSPortability/ReceiverHolder.java
+//      org/omg/CosTSPortability/ReceiverHolder.java
 
 package org.omg.CosTSPortability;
 public class ReceiverHolder
 {
-    //	instance variable 
+    //  instance variable 
     public org.omg.CosTSPortability.Receiver value;
-    //	constructors 
+    //  constructors 
     public ReceiverHolder() {
-	this(null);
+        this(null);
     }
     public ReceiverHolder(org.omg.CosTSPortability.Receiver __arg) {
-	value = __arg;
+        value = __arg;
     }
 }

@@ -37,9 +37,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
 public class CDRInputStream_1_1 extends CDRInputStream_1_0
 {
@@ -63,7 +63,7 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
 
     @Override
     protected int get_offset() {
-	return bbwi.position() + fragmentOffset;
+        return bbwi.position() + fragmentOffset;
     }
 
     @Override
@@ -93,7 +93,7 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
             // may require a different alignment.
 
             alignment = computeAlignment(bbwi.position(), align);
-    	}
+        }
 
         bbwi.position(bbwi.position() + alignment);
     }
@@ -174,7 +174,7 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
         // assigned, and a single 16 bit Java char isn't enough.
         // Better to use strings for i18n purposes.
         if (getWCharConverter().getNumChars() > 1)
-	    throw wrapper.btcResultMoreThanOneChar() ;
+            throw wrapper.btcResultMoreThanOneChar() ;
 
         return result[0];
     }
@@ -185,14 +185,14 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
         // to 2 byte fixed width encodings.  CORBA formal 99-10-07 15.3.1.6.
         int len = read_long();
 
-    	// Workaround for ORBs which send string lengths of
-    	// zero to mean empty string.
+        // Workaround for ORBs which send string lengths of
+        // zero to mean empty string.
         //
         // IMPORTANT: Do not replace 'new String("")' with "", it may result
         // in a Serialization bug (See serialization.zerolengthstring) and
         // bug id: 4728756 for details
-    	if (len == 0)
-    	    return new String("");
+        if (len == 0)
+            return new String("");
 
         checkForNegativeLength(len);
 

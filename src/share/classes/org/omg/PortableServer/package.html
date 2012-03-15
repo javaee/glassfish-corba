@@ -71,20 +71,20 @@ support in Java[tm] SE 6</A>.
 <P>The <TT>PortableServer</TT> module defines the following POA-related interfaces:
 <P>
 <UL>
-	<LI><TT>POA</TT>
-	<LI><TT>POAManager</TT>
-	<LI><TT>ServantManager</TT>
-	<LI><TT>ServantActivator</TT>
-	<LI><TT>ServantLocator</TT>
-	<LI><TT>AdapterActivator</TT>
-	<LI><TT>ThreadPolicy</TT>
-	<LI><TT>LifespanPolicy</TT>
-	<LI><TT>IdUniquenessPolicy</TT>
-	<LI><TT>IdAssignmentPolicy</TT>
-	<LI><TT>ImplicitActivationPolicy</TT>
-	<LI><TT>ServantRetentionPolicy</TT>
-	<LI><TT>RequestProcessingPolicy</TT>
-	<LI><TT>Current</TT>
+        <LI><TT>POA</TT>
+        <LI><TT>POAManager</TT>
+        <LI><TT>ServantManager</TT>
+        <LI><TT>ServantActivator</TT>
+        <LI><TT>ServantLocator</TT>
+        <LI><TT>AdapterActivator</TT>
+        <LI><TT>ThreadPolicy</TT>
+        <LI><TT>LifespanPolicy</TT>
+        <LI><TT>IdUniquenessPolicy</TT>
+        <LI><TT>IdAssignmentPolicy</TT>
+        <LI><TT>ImplicitActivationPolicy</TT>
+        <LI><TT>ServantRetentionPolicy</TT>
+        <LI><TT>RequestProcessingPolicy</TT>
+        <LI><TT>Current</TT>
 </UL>
 
 <P>In addition, the POA defines the <TT>Servant</TT> native type.
@@ -133,14 +133,14 @@ that it is responsible for delivering the current request and subsequent <code>F
 <P>Most of what <code>PortableServer</code> does is transparent to the user.  The result is that programmers will use only a few of the interfaces mentioned above.  The remaining interfaces will be provided by the ORB implementation.  The interfaces of interest to application programmers are the following:
 <P>
 <ul>
-	<LI><code>AdapterActivator</code>
-	<P>Adapter activators are associated with POAs.  An adapter activator supplies a POA with the ability to create child POAs on demand, as a side-effect of receiving a request that names the child POA (or one of its children), or when <code>find_POA</code> is called with an activate parameter value of <code>TRUE</code>.  An application server that creates all its needed POAs at the beginning of execution does not need to use or provide an adapter activator; it is necessary only for the case in which POAs need to be created during request processing.
-	<P>
-	<LI><code>ServantLocator</code>
-	<P>When the POA has the <code>NON_RETAIN</code> policy, it uses servant managers that are <code>ServantLocator</code>s.
-	<P>
-	<LI><code>ServantActivator</code>
-	<P>When the POA has the <code>RETAIN</code> policy, it uses servant managers that are <code>ServantActivator</code>s.
+        <LI><code>AdapterActivator</code>
+        <P>Adapter activators are associated with POAs.  An adapter activator supplies a POA with the ability to create child POAs on demand, as a side-effect of receiving a request that names the child POA (or one of its children), or when <code>find_POA</code> is called with an activate parameter value of <code>TRUE</code>.  An application server that creates all its needed POAs at the beginning of execution does not need to use or provide an adapter activator; it is necessary only for the case in which POAs need to be created during request processing.
+        <P>
+        <LI><code>ServantLocator</code>
+        <P>When the POA has the <code>NON_RETAIN</code> policy, it uses servant managers that are <code>ServantLocator</code>s.
+        <P>
+        <LI><code>ServantActivator</code>
+        <P>When the POA has the <code>RETAIN</code> policy, it uses servant managers that are <code>ServantActivator</code>s.
 </ul>
 
 
@@ -164,7 +164,7 @@ follows exactly the same pattern as the other holder classes for basic types.
 import javax.naming.InitialContext;
 import javax.naming.Context;
 import javax.rmi.PortableRemoteObject ;
-import com.sun.corba.se.impl.poa.POAORB;
+import com.sun.corba.ee.impl.poa.POAORB;
 import org.omg.PortableServer.*;
 import java.util.*;
 import org.omg.CORBA.*;

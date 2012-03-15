@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport.connection;
+package com.sun.corba.ee.impl.transport.connection;
 
 import java.io.IOException ;
 
@@ -47,11 +47,11 @@ import java.util.logging.Logger ;
 import java.util.Map ;
 import java.util.HashMap ;
 
-import com.sun.corba.se.spi.transport.connection.Connection ;
-import com.sun.corba.se.spi.transport.connection.InboundConnectionCache ;
+import com.sun.corba.ee.spi.transport.connection.Connection ;
+import com.sun.corba.ee.spi.transport.connection.InboundConnectionCache ;
 
-import com.sun.corba.se.spi.transport.concurrent.ConcurrentQueue;
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.spi.transport.concurrent.ConcurrentQueue;
+import com.sun.corba.ee.spi.trace.Transport;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /** Manage connections that are initiated from another VM. 
@@ -66,37 +66,37 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
     private final Map<C,ConnectionState<C>> connectionMap ;
 
     protected String thisClassName() {
-	return "InboundConnectionCacheBlockingImpl" ;
+        return "InboundConnectionCacheBlockingImpl" ;
     }
 
     private static final class ConnectionState<C extends Connection> {
-	final C connection ;		// Connection of the 
-					// ConnectionState
-	int busyCount ;			// Number of calls to 
-					// get without release
-	int expectedResponseCount ;	// Number of expected 
-					// responses not yet 
-					// received
+        final C connection ;            // Connection of the 
+                                        // ConnectionState
+        int busyCount ;                 // Number of calls to 
+                                        // get without release
+        int expectedResponseCount ;     // Number of expected 
+                                        // responses not yet 
+                                        // received
 
-	ConcurrentQueue.Handle reclaimableHandle ;  // non-null iff connection 
-						    // is not in use and has no
-						    // outstanding requests
+        ConcurrentQueue.Handle reclaimableHandle ;  // non-null iff connection 
+                                                    // is not in use and has no
+                                                    // outstanding requests
 
-	ConnectionState( final C conn ) {
-	    this.connection = conn ;
+        ConnectionState( final C conn ) {
+            this.connection = conn ;
 
-	    busyCount = 0 ;
-	    expectedResponseCount = 0 ;
-	    reclaimableHandle = null ;
-	}
+            busyCount = 0 ;
+            expectedResponseCount = 0 ;
+            reclaimableHandle = null ;
+        }
     }
 
     public InboundConnectionCacheBlockingImpl( final String cacheType, 
-	final int highWaterMark, final int numberToReclaim, final long ttl ) {
+        final int highWaterMark, final int numberToReclaim, final long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, ttl ) ;
+        super( cacheType, highWaterMark, numberToReclaim, ttl ) ;
 
-	this.connectionMap = new HashMap<C,ConnectionState<C>>() ;
+        this.connectionMap = new HashMap<C,ConnectionState<C>>() ;
     }
 
     // We do not need to define equals or hashCode for this class.
@@ -132,7 +132,7 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
 
     @Transport
     public synchronized void requestProcessed( final C conn, 
-	final int numResponsesExpected ) {
+        final int numResponsesExpected ) {
         final ConnectionState<C> cs = connectionMap.get( conn ) ;
 
         if (cs == null) {
@@ -216,7 +216,7 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
     // Atomically either get the ConnectionState for conn OR 
     // create a new one AND put it in the cache
     private ConnectionState<C> getConnectionState( C conn ) {
-	// This should be the only place a CacheEntry is constructed.
+        // This should be the only place a CacheEntry is constructed.
         ConnectionState<C> result = connectionMap.get( conn ) ;
         if (result == null) {
             result = new ConnectionState( conn ) ;

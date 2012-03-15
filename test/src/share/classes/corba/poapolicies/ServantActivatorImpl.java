@@ -47,24 +47,24 @@ import org.omg.PortableServer.ServantActivatorPOA;
 
 public class ServantActivatorImpl extends ServantActivatorPOA {
     public Servant incarnate(byte[] oid, POA adapter)
-	throws org.omg.PortableServer.ForwardRequest {
-	Servant servant = new HelloImpl(oid);
-	if (HelloServer.debug)
-	    System.out.println("ServantActivatorImpl.incarnate ("
-			       +" oid = "+oid
-			       +" poa = "+adapter.the_name());
+        throws org.omg.PortableServer.ForwardRequest {
+        Servant servant = new HelloImpl(oid);
+        if (HelloServer.debug)
+            System.out.println("ServantActivatorImpl.incarnate ("
+                               +" oid = "+oid
+                               +" poa = "+adapter.the_name());
 
-	return servant;
+        return servant;
     }
 
     public void etherealize(byte[] oid, POA adapter, Servant servant,
-			    boolean cleanup_in_progress,
-			    boolean remaining_activations) {
-	if (HelloServer.debug)
-	    System.out.println("ServantActivatorImpl.etherealize ("
-			       +" oid = "+oid
-			       +" cleanup = "+cleanup_in_progress
-			       +" remaining_activations = "+remaining_activations
-			       +")");
+                            boolean cleanup_in_progress,
+                            boolean remaining_activations) {
+        if (HelloServer.debug)
+            System.out.println("ServantActivatorImpl.etherealize ("
+                               +" oid = "+oid
+                               +" cleanup = "+cleanup_in_progress
+                               +" remaining_activations = "+remaining_activations
+                               +")");
     }
 }

@@ -52,12 +52,12 @@ import org.omg.PortableInterceptor.ClientRequestInfo;
 import org.omg.PortableInterceptor.ORBInitializer;
 import org.omg.PortableInterceptor.ORBInitInfo;
 
-import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.Connection;
 
-import com.sun.corba.se.spi.legacy.interceptor.RequestInfoExt;
-import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.ee.spi.legacy.interceptor.RequestInfoExt;
+import com.sun.corba.ee.spi.transport.SocketInfo;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 /**
  * @author Harold Carr
@@ -79,179 +79,179 @@ public class Client
 
     public static void setProperties(Properties props)
     {
-	props.setProperty( ORBConstants.DEBUG_PROPERTY,
-	    "subcontract,transport" ) ;
+        props.setProperty( ORBConstants.DEBUG_PROPERTY,
+            "subcontract,transport" ) ;
 
-	//
-	// Debugging flags.  Generally commented out.
-	//
-	/*
-	props.setProperty(ORBConstants.DEBUG_PROPERTY,
-			  "giop,transport,subcontract");
-	*/
+        //
+        // Debugging flags.  Generally commented out.
+        //
+        /*
+        props.setProperty(ORBConstants.DEBUG_PROPERTY,
+                          "giop,transport,subcontract");
+        */
 
-	//
-	// Register the class that knows how to find the information
-	// on socket types X, Y and Z installed by the server side
-	// IORInterceptor.
-	//
+        //
+        // Register the class that knows how to find the information
+        // on socket types X, Y and Z installed by the server side
+        // IORInterceptor.
+        //
 
-	props.setProperty(ORBConstants.IOR_TO_SOCKET_INFO_CLASS_PROPERTY,
-			  IORToSocketInfoImpl.class.getName());
+        props.setProperty(ORBConstants.IOR_TO_SOCKET_INFO_CLASS_PROPERTY,
+                          IORToSocketInfoImpl.class.getName());
 
-	//
-	// Register the socket factory that knows how to create
-	// Sockets of type W X Y and Z.
-	//
+        //
+        // Register the socket factory that knows how to create
+        // Sockets of type W X Y and Z.
+        //
 
-	props.setProperty(ORBConstants.SOCKET_FACTORY_CLASS_PROPERTY,
-			  SocketFactoryImpl.class.getName());
+        props.setProperty(ORBConstants.SOCKET_FACTORY_CLASS_PROPERTY,
+                          SocketFactoryImpl.class.getName());
 
-	//
-	// Register a client interceptor to see what connection
-	// is being used for test (using a proprietary extension).
-	//
+        //
+        // Register a client interceptor to see what connection
+        // is being used for test (using a proprietary extension).
+        //
 
-	props.setProperty(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX
-			  + Client.class.getName(),
-			  "dummy");
+        props.setProperty(ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX
+                          + Client.class.getName(),
+                          "dummy");
 
-	if (withSticky) {
-	    System.out.println("Adding sticky manager");
-	    //
-	    // Register a sticky manager and make sure it sticks.
-	    //
-	    props.setProperty(ORBConstants.IIOP_PRIMARY_TO_CONTACT_INFO_CLASS_PROPERTY,
-			      IIOPPrimaryToContactInfoImpl.class.getName());
-	}
+        if (withSticky) {
+            System.out.println("Adding sticky manager");
+            //
+            // Register a sticky manager and make sure it sticks.
+            //
+            props.setProperty(ORBConstants.IIOP_PRIMARY_TO_CONTACT_INFO_CLASS_PROPERTY,
+                              IIOPPrimaryToContactInfoImpl.class.getName());
+        }
     }
 
     public static void main(String[] av)
     {
         try {
 
-	    if (! ColocatedCS.isColocated) {
-		Properties props = new Properties();
-		setProperties(props);
-		orb = ORB.init(av, props);
-	    }
+            if (! ColocatedCS.isColocated) {
+                Properties props = new Properties();
+                setProperties(props);
+                orb = ORB.init(av, props);
+            }
 
-	    runTest();
+            runTest();
 
-	    if (foundErrors) {
-		throw new Exception("foundErrors");
-	    }
+            if (foundErrors) {
+                throw new Exception("foundErrors");
+            }
 
-	    System.out.println();
-	    System.out.println(baseMsg + ".main: PASSED");
-	    System.out.println(baseMsg + ".main: Test complete.");
+            System.out.println();
+            System.out.println(baseMsg + ".main: PASSED");
+            System.out.println(baseMsg + ".main: Test complete.");
 
         } catch (Throwable t) {
-	    System.out.println(baseMsg + ".main: FAILED");
-	    System.out.println(baseMsg + ".main: Test complete.");
+            System.out.println(baseMsg + ".main: FAILED");
+            System.out.println(baseMsg + ".main: Test complete.");
             t.printStackTrace(System.out);
             System.exit(1);
         }
     }
 
     private static void runTest()
-	throws Exception
+        throws Exception
     {
-	System.out.println("================================================");
-	if (withSticky) {
-	    System.out.println("WITH STICKY");
-	} else {
-	    System.out.println("WITHOUT STICKY");
-	}
+        System.out.println("================================================");
+        if (withSticky) {
+            System.out.println("WITH STICKY");
+        } else {
+            System.out.println("WITHOUT STICKY");
+        }
 
-	/* REVISIT - move to a separate test
-	//////////////////////////////////////////////////
-	// ZeroPortTest
+        /* REVISIT - move to a separate test
+        //////////////////////////////////////////////////
+        // ZeroPortTest
 
-	BEGIN("ZeroPortTest");
+        BEGIN("ZeroPortTest");
 
-	zero1 =
-	    I2Helper.narrow(
-	        Common.getNameService(orb)
-		    .resolve(Common.makeNameComponent(Common.zero1)));
+        zero1 =
+            I2Helper.narrow(
+                Common.getNameService(orb)
+                    .resolve(Common.makeNameComponent(Common.zero1)));
 
-	zero2 =
-	    I2Helper.narrow(
-	        Common.getNameService(orb)
-		    .resolve(Common.makeNameComponent(Common.zero2)));
+        zero2 =
+            I2Helper.narrow(
+                Common.getNameService(orb)
+                    .resolve(Common.makeNameComponent(Common.zero2)));
 
-	zero1.m("10");
-	zero2.m("11");
-	zero1.m("12");
-	zero2.m("13");
+        zero1.m("10");
+        zero2.m("11");
+        zero1.m("12");
+        zero2.m("13");
 
-	END("ZeroPortTest");
-	*/
+        END("ZeroPortTest");
+        */
 
-	//////////////////////////////////////////////////
-	// Sticky test;
+        //////////////////////////////////////////////////
+        // Sticky test;
 
-	BEGIN("Sticky Test");
+        BEGIN("Sticky Test");
 
-	iRef =
-	    IHelper.narrow(
-	        Common.getNameService(orb)
-		    .resolve(Common.makeNameComponent(Common.serverName1)));
+        iRef =
+            IHelper.narrow(
+                Common.getNameService(orb)
+                    .resolve(Common.makeNameComponent(Common.serverName1)));
 
-	unregister(SocketInfo.IIOP_CLEAR_TEXT, iRef, false);
+        unregister(SocketInfo.IIOP_CLEAR_TEXT, iRef, false);
 
-	for (int i = 0; i < Common.socketTypes.length - 1; i++) {
-	    unregister(Common.socketTypes[i], iRef, true);
-	}
+        for (int i = 0; i < Common.socketTypes.length - 1; i++) {
+            unregister(Common.socketTypes[i], iRef, true);
+        }
 
-	System.out.println();
-	System.out.println("DONE with unregister");
-	System.out.println();
+        System.out.println();
+        System.out.println("DONE with unregister");
+        System.out.println();
 
-	//////////////////////////////////////////////////
-	//
-	// Test fallback.
-	// 
-	// This should stick on Z if sticky manager registered.
-	// Otherwise it should go to W.
-	//
-	// Start up a W on the server.  See if it goes to Z or W.
-	//
+        //////////////////////////////////////////////////
+        //
+        // Test fallback.
+        // 
+        // This should stick on Z if sticky manager registered.
+        // Otherwise it should go to W.
+        //
+        // Start up a W on the server.  See if it goes to Z or W.
+        //
 
-	System.out.println();
-	printSeparator("-");
-	System.out.println("TESTING FALLBACK - should stick to W without sticky, Z with sticky");
-	System.out.println();
+        System.out.println();
+        printSeparator("-");
+        System.out.println("TESTING FALLBACK - should stick to W without sticky, Z with sticky");
+        System.out.println();
 
-	BEGIN("register W");
-	iRef.register(Common.socketTypes[0]);  // Register W
-	Thread.sleep(5000);
-	END("register W");
+        BEGIN("register W");
+        iRef.register(Common.socketTypes[0]);  // Register W
+        Thread.sleep(5000);
+        END("register W");
 
 
-	BEGIN("unregister W if no sticky, Z if sticky present");
+        BEGIN("unregister W if no sticky, Z if sticky present");
 
-	// In the following we really don't care whether we unregister
-	// W or Z.  What we care about is which TYPE of connection the
-	// unregister request goes out on.  With a sticky it should be Z.
-	// Without sticky it should be W.
-	// REVISIT: if we separated control (the unregister) from the check
-	// it would easier to understand the test.
-	if (withSticky) {
-	    // unregister Z.
-	    unregister(Common.socketTypes[Common.socketTypes.length - 1],
-		       iRef, true);
-	} else {
-	    // Unregister W.
-	    unregister(Common.socketTypes[0], iRef, true); 
-	}
+        // In the following we really don't care whether we unregister
+        // W or Z.  What we care about is which TYPE of connection the
+        // unregister request goes out on.  With a sticky it should be Z.
+        // Without sticky it should be W.
+        // REVISIT: if we separated control (the unregister) from the check
+        // it would easier to understand the test.
+        if (withSticky) {
+            // unregister Z.
+            unregister(Common.socketTypes[Common.socketTypes.length - 1],
+                       iRef, true);
+        } else {
+            // Unregister W.
+            unregister(Common.socketTypes[0], iRef, true); 
+        }
 
-	END("unregister W if no sticky, Z if sticky present");
+        END("unregister W if no sticky, Z if sticky present");
 
-	END("Sticky Test");
+        END("Sticky Test");
 
-	orb.shutdown(false);
-	orb.destroy();
+        orb.shutdown(false);
+        orb.destroy();
     }
 
     /**
@@ -261,50 +261,50 @@ public class Client
      * from the test.
      */
     private static void unregister(String socketType, I iRef, boolean checkP)
-	throws Exception
+        throws Exception
     {
-	BEGIN("unregister: " + socketType);
-	iRef.unregister(socketType);
-	END("unregister: " + socketType);
+        BEGIN("unregister: " + socketType);
+        iRef.unregister(socketType);
+        END("unregister: " + socketType);
 
-	BEGIN("Request after " + socketType + " unregistered - still on " + socketType + " because of explicit delay at server");
-	System.out.println(iRef.m("After " + socketType + " unregistered"));
-	if (checkP) {
-	    checkSocketType(socketType);
-	}
-	END("Request after " + socketType + " unregistered - still on " + socketType + " because of explicit delay at server");
-	Thread.sleep(5000);
+        BEGIN("Request after " + socketType + " unregistered - still on " + socketType + " because of explicit delay at server");
+        System.out.println(iRef.m("After " + socketType + " unregistered"));
+        if (checkP) {
+            checkSocketType(socketType);
+        }
+        END("Request after " + socketType + " unregistered - still on " + socketType + " because of explicit delay at server");
+        Thread.sleep(5000);
     }
 
     private static void checkSocketType(String socketType)
     {
-	if (ColocatedCS.isColocated) {
-	    socketType = NO_CONNECTION;
-	}
+        if (ColocatedCS.isColocated) {
+            socketType = NO_CONNECTION;
+        }
 
-	if (socketType.equals(lastSocketTypeUsed)) {
-	    System.out.println();
-	    System.out.println("====== Used correct socketType: "
-			       + lastSocketTypeUsed + " ======");
-	    System.out.println();
-	} else {
-	    System.out.println();
-	    System.out.println("++++++ ERROR: INCORRECT SOCKETYPE: "
-			       + lastSocketTypeUsed 
-			       + "; expected: " 
-			       + socketType
-			       + " ++++++");
-	    System.out.println();
-	    foundErrors = true;
-	}
+        if (socketType.equals(lastSocketTypeUsed)) {
+            System.out.println();
+            System.out.println("====== Used correct socketType: "
+                               + lastSocketTypeUsed + " ======");
+            System.out.println();
+        } else {
+            System.out.println();
+            System.out.println("++++++ ERROR: INCORRECT SOCKETYPE: "
+                               + lastSocketTypeUsed 
+                               + "; expected: " 
+                               + socketType
+                               + " ++++++");
+            System.out.println();
+            foundErrors = true;
+        }
     }
 
     private static void printSeparator(String s)
     {
-	for (int i = 0; i < 70; i++) {
-	    System.out.print(s);
-	}
-	System.out.println();
+        for (int i = 0; i < 70; i++) {
+            System.out.print(s);
+        }
+        System.out.println();
     }
 
     //
@@ -313,7 +313,7 @@ public class Client
 
     public String name() 
     {
-	return baseMsg; 
+        return baseMsg; 
     }
 
     public void destroy() 
@@ -326,27 +326,27 @@ public class Client
 
     public void send_request(ClientRequestInfo ri)
     {
-	sopCR(baseMsg, "send_request", ri);
+        sopCR(baseMsg, "send_request", ri);
     }
 
     public void send_poll(ClientRequestInfo ri)
     {
-	sopCR(baseMsg, "send_poll", ri);
+        sopCR(baseMsg, "send_poll", ri);
     }
 
     public void receive_reply(ClientRequestInfo ri)
     {
-	sopCR(baseMsg, "receive_reply", ri);
+        sopCR(baseMsg, "receive_reply", ri);
     }
 
     public void receive_exception(ClientRequestInfo ri)
     {
-	sopCR(baseMsg, "receive_exception", ri);
+        sopCR(baseMsg, "receive_exception", ri);
     }
 
     public void receive_other(ClientRequestInfo ri)
     {
-	sopCR(baseMsg, "receive_other", ri);
+        sopCR(baseMsg, "receive_other", ri);
     }
 
     //
@@ -355,50 +355,50 @@ public class Client
 
     public static void sopCR(String clazz, String point, ClientRequestInfo ri)
     {
-	try {
-	    if (! Common.timing) {
-		System.out.println(clazz + "." + point + " " + ri.operation());
-	    }
-	    if (ri instanceof RequestInfoExt) {
-		RequestInfoExt rie = (RequestInfoExt) ri;
-		if (rie.connection() != null) {
-		    if (! Common.timing) {
-			System.out.println("    request on connection: " + rie.connection());
-		    }
-		    lastConnectionUsed = (Connection) rie.connection();
-		    lastSocketTypeUsed = (String)
-			Common.portToSocketType.get(
-		          new Integer(rie.connection().getSocket().getPort()));
-		    if (lastSocketTypeUsed == null) {
-			// NOTE: the last one is running on an emphemeral port
-			// so it does NOT map.  Just assume it.
-			// Also assume we don't look at the primary which
-			// is also NOT mapped.
-			lastSocketTypeUsed = 
-			    Common.socketTypes[Common.socketTypes.length - 1];
-		    }
-		} else {
-		    lastSocketTypeUsed = NO_CONNECTION;
-		}
-	    }
-	} catch (Throwable e) {
-	    System.out.println(baseMsg + "." + point + ": unexpected exception: " + e);
-	    e.printStackTrace(System.out);
-	    System.exit(1);
-	}
+        try {
+            if (! Common.timing) {
+                System.out.println(clazz + "." + point + " " + ri.operation());
+            }
+            if (ri instanceof RequestInfoExt) {
+                RequestInfoExt rie = (RequestInfoExt) ri;
+                if (rie.connection() != null) {
+                    if (! Common.timing) {
+                        System.out.println("    request on connection: " + rie.connection());
+                    }
+                    lastConnectionUsed = (Connection) rie.connection();
+                    lastSocketTypeUsed = (String)
+                        Common.portToSocketType.get(
+                          new Integer(rie.connection().getSocket().getPort()));
+                    if (lastSocketTypeUsed == null) {
+                        // NOTE: the last one is running on an emphemeral port
+                        // so it does NOT map.  Just assume it.
+                        // Also assume we don't look at the primary which
+                        // is also NOT mapped.
+                        lastSocketTypeUsed = 
+                            Common.socketTypes[Common.socketTypes.length - 1];
+                    }
+                } else {
+                    lastSocketTypeUsed = NO_CONNECTION;
+                }
+            }
+        } catch (Throwable e) {
+            System.out.println(baseMsg + "." + point + ": unexpected exception: " + e);
+            e.printStackTrace(System.out);
+            System.exit(1);
+        }
     }
 
     public void pre_init(ORBInitInfo info)
     {
-	try {
-	    Client interceptor = new Client();
-	    info.add_client_request_interceptor(interceptor);
-	    System.out.println(baseMsg + ".pre_init");
-	} catch (Throwable t) {
-	    System.out.println(baseMsg + ": unexpected exception: " + t);
-	    t.printStackTrace(System.out);
-	    System.exit(1);
-	}
+        try {
+            Client interceptor = new Client();
+            info.add_client_request_interceptor(interceptor);
+            System.out.println(baseMsg + ".pre_init");
+        } catch (Throwable t) {
+            System.out.println(baseMsg + ": unexpected exception: " + t);
+            t.printStackTrace(System.out);
+            System.exit(1);
+        }
     }
 
     public void post_init(ORBInitInfo info)
@@ -407,18 +407,18 @@ public class Client
 
     public static void BEGIN(String msg)
     {
-	System.out.println();
-	printSeparator("-");
-	System.out.println("BEGIN " + msg);
-	System.out.println();
+        System.out.println();
+        printSeparator("-");
+        System.out.println("BEGIN " + msg);
+        System.out.println();
 
     }
 
     public static void END(String msg)
     {
-	System.out.println();
-	System.out.println("END " + msg);
-	printSeparator("-");
+        System.out.println();
+        System.out.println("END " + msg);
+        printSeparator("-");
 
     }
 

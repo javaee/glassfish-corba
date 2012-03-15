@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol;
+package com.sun.corba.ee.impl.protocol;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.KeyAddr;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.KeyAddr;
 
 /**
  * This exception is thrown while reading GIOP 1.2 Request, LocateRequest

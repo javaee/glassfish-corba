@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)Servant.java	1.4 99/06/07 */
+/* @(#)Servant.java     1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -51,7 +51,7 @@ package javax.rmi.fvd;
 
 public  interface Servant
     extends java.rmi.Remote {
-	
+        
     public String ping(String s) throws java.rmi.RemoteException;
 
     public long send(ParentClass value) throws java.rmi.RemoteException;

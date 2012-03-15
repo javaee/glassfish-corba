@@ -42,10 +42,10 @@ JAVAC=$(JAVA_HOME)/bin/javac
 CLASSPATH="$(JAVA_HOME)/lib/tools.jar:."
 
 build:
-	$(JAVAC) -classpath $(CLASSPATH) ClassComparer.java
-	$(JAVAC) -d tst1 tst1/TestClass.java
-	$(JAVAC) -d tst2 tst2/TestClass.java
+        $(JAVAC) -classpath $(CLASSPATH) ClassComparer.java
+        $(JAVAC) -d tst1 tst1/TestClass.java
+        $(JAVAC) -d tst2 tst2/TestClass.java
 
 run:
-	$(JAVA) -classpath $(CLASSPATH) ClassComparer tst1 tst2 TestClass
+        $(JAVA) -classpath $(CLASSPATH) ClassComparer tst1 tst2 TestClass
 

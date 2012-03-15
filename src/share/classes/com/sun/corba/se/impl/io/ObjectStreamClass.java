@@ -46,7 +46,7 @@
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
  */
 
-package com.sun.corba.se.impl.io;
+package com.sun.corba.ee.impl.io;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -73,14 +73,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.corba.se.impl.util.RepositoryId;
+import com.sun.corba.ee.impl.util.RepositoryId;
 
 import org.omg.CORBA.ValueMember;
 
 import sun.corba.Bridge;
 
-import com.sun.corba.se.impl.misc.ClassInfoCache ;
-import com.sun.corba.se.spi.trace.TraceValueHandler;
+import com.sun.corba.ee.impl.misc.ClassInfoCache ;
+import com.sun.corba.ee.spi.trace.TraceValueHandler;
 import org.glassfish.pfl.basic.concurrent.SoftCache;
 
 /**
@@ -92,7 +92,7 @@ import org.glassfish.pfl.basic.concurrent.SoftCache;
  * be found using the lookup method.
  *
  * @author  Roger Riggs
- * @(#)ObjectStreamClass.java	1.17 99/06/07
+ * @(#)ObjectStreamClass.java   1.17 99/06/07
  * @since   JDK1.1
  */
 @TraceValueHandler
@@ -107,13 +107,13 @@ public class ObjectStreamClass implements java.io.Serializable {
     private boolean isEnum ;
 
     private static final Bridge bridge = 
-	AccessController.doPrivileged(
-	    new PrivilegedAction<Bridge>() {
-		public Bridge run() {
-		    return Bridge.get() ;
-		}
-	    } 
-	) ;
+        AccessController.doPrivileged(
+            new PrivilegedAction<Bridge>() {
+                public Bridge run() {
+                    return Bridge.get() ;
+                }
+            } 
+        ) ;
 
     /** Find the descriptor for a class that can be serialized.  Null
      * is returned if the specified class does not implement
@@ -121,10 +121,10 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
     @TraceValueHandler
     static final ObjectStreamClass lookup(Class cl) {
-	ObjectStreamClass desc = lookupInternal(cl);
-	if (desc.isSerializable() || desc.isExternalizable())
-	    return desc;
-	return null;
+        ObjectStreamClass desc = lookupInternal(cl);
+        if (desc.isSerializable() || desc.isExternalizable())
+            return desc;
+        return null;
     }
 
     /*
@@ -133,16 +133,16 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
     static ObjectStreamClass lookupInternal(Class<?> cl)
     {
-	/* Synchronize on the hashtable so no two threads will do
-	 * this at the same time.
-	 */
-	ObjectStreamClass desc = null;
-	synchronized (descriptorFor) {
-	    /* Find the matching descriptor if it already known */
-	    desc = (ObjectStreamClass)descriptorFor.get( cl ) ;
-	    if (desc == null) {
+        /* Synchronize on the hashtable so no two threads will do
+         * this at the same time.
+         */
+        ObjectStreamClass desc = null;
+        synchronized (descriptorFor) {
+            /* Find the matching descriptor if it already known */
+            desc = (ObjectStreamClass)descriptorFor.get( cl ) ;
+            if (desc == null) {
                 /* Check if it's serializable */
-		ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
+                ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
                 boolean serializable = cinfo.isASerializable(cl) ;
                 
                 /* If the class is only Serializable,
@@ -176,35 +176,35 @@ public class ObjectStreamClass implements java.io.Serializable {
                                              serializable, externalizable);
             }
 
-	    // Must always call init.  See bug 4488137.  This code was
-	    // incorrectly changed to return immediately on a non-null
-	    // cache result.  That allowed threads to gain access to
-	    // unintialized instances.
-	    //
-	    // All threads must sync on the member variable lock
-	    // and check the initialization state.
-	    //
-	    // Another possibility is to continue to synchronize on the
-	    // descriptorFor map, but that leads to poor performance
-	    // (see bug 4165204 "ObjectStreamClass can hold global lock
-	    // for a very long time").
-	    //
-	    // We will need to live with 4165204 until we can rewrite 
-	    // this to follow the improved java.io.ObjectStreamClass
-	    // in J2SE 1.4 and later.  Calling desc.init() outside of
-	    // this synchronized block can lead to deadlocks as
-	    // reported in 5104239.
-	    desc.init();
-	}
+            // Must always call init.  See bug 4488137.  This code was
+            // incorrectly changed to return immediately on a non-null
+            // cache result.  That allowed threads to gain access to
+            // unintialized instances.
+            //
+            // All threads must sync on the member variable lock
+            // and check the initialization state.
+            //
+            // Another possibility is to continue to synchronize on the
+            // descriptorFor map, but that leads to poor performance
+            // (see bug 4165204 "ObjectStreamClass can hold global lock
+            // for a very long time").
+            //
+            // We will need to live with 4165204 until we can rewrite 
+            // this to follow the improved java.io.ObjectStreamClass
+            // in J2SE 1.4 and later.  Calling desc.init() outside of
+            // this synchronized block can lead to deadlocks as
+            // reported in 5104239.
+            desc.init();
+        }
 
-	return desc;
+        return desc;
     }
 
     /**
      * The name of the class described by this descriptor.
      */
     public final String getName() {
-	return name;
+        return name;
     }
 
     /**
@@ -214,11 +214,11 @@ public class ObjectStreamClass implements java.io.Serializable {
      * and deserialized using a common format.
      */
     public static final long getSerialVersionUID( java.lang.Class clazz) {
-	ObjectStreamClass theosc = ObjectStreamClass.lookup( clazz );
+        ObjectStreamClass theosc = ObjectStreamClass.lookup( clazz );
         if (theosc != null) {
             return theosc.getSerialVersionUID( );
-	}
-	return 0;
+        }
+        return 0;
     }
 
     /**
@@ -228,7 +228,7 @@ public class ObjectStreamClass implements java.io.Serializable {
      * and deserialized using a common format.
      */
     public final long getSerialVersionUID() {
-	return suid;
+        return suid;
     }
 
     /**
@@ -238,9 +238,9 @@ public class ObjectStreamClass implements java.io.Serializable {
      * and deserialized using a common format.
      */
     public final String getSerialVersionUIDStr() {
-	if (suidStr == null)
-	    suidStr = Long.toHexString(suid).toUpperCase();
-	return suidStr;
+        if (suidStr == null)
+            suidStr = Long.toHexString(suid).toUpperCase();
+        return suidStr;
     }
 
     /**
@@ -248,28 +248,28 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
     public static final long getActualSerialVersionUID( java.lang.Class clazz )
     {
-	ObjectStreamClass theosc = ObjectStreamClass.lookup( clazz );
-	if( theosc != null )
-	{
-		return theosc.getActualSerialVersionUID( );
-	}
-	return 0;
+        ObjectStreamClass theosc = ObjectStreamClass.lookup( clazz );
+        if( theosc != null )
+        {
+                return theosc.getActualSerialVersionUID( );
+        }
+        return 0;
     }
 
     /**
      * Return the actual (computed) serialVersionUID for this class.
      */
     public final long getActualSerialVersionUID() {
-	return actualSuid;
+        return actualSuid;
     }
 
     /**
      * Return the actual (computed) serialVersionUID for this class.
      */
     public final String getActualSerialVersionUIDStr() {
-	if (actualSuidStr == null)
-	    actualSuidStr = Long.toHexString(actualSuid).toUpperCase();
-	return actualSuidStr;
+        if (actualSuidStr == null)
+            actualSuidStr = Long.toHexString(actualSuid).toUpperCase();
+        return actualSuidStr;
     }
 
     /**
@@ -277,7 +277,7 @@ public class ObjectStreamClass implements java.io.Serializable {
      * Null is returned if there is no corresponding local class.
      */
     public final Class forClass() {
-	return ofClass;
+        return ofClass;
     }
 
     /**
@@ -288,37 +288,37 @@ public class ObjectStreamClass implements java.io.Serializable {
      * @since JDK1.2
      */
     public ObjectStreamField[] getFields() {
-    	// Return a copy so the caller can't change the fields.
-	if (fields.length > 0) {
-	    ObjectStreamField[] dup = new ObjectStreamField[fields.length];
-	    System.arraycopy(fields, 0, dup, 0, fields.length);
-	    return dup;
-	} else {
-	    return fields;
-	}
+        // Return a copy so the caller can't change the fields.
+        if (fields.length > 0) {
+            ObjectStreamField[] dup = new ObjectStreamField[fields.length];
+            System.arraycopy(fields, 0, dup, 0, fields.length);
+            return dup;
+        } else {
+            return fields;
+        }
     }
 
     public boolean hasField(ValueMember field)
     {
-	try {
-	    for (int i = 0; i < fields.length; i++) {
-		if (fields[i].getName().equals(field.name)) {
-		    if (fields[i].getSignature().equals(
-			ValueUtility.getSignature(field)))
-			return true;
-		}
-	    }
-	} catch (Exception exc) {
-	    // Ignore this; all we want to do is return false
-	    // Note that ValueUtility.getSignature can throw checked exceptions.
-	}
+        try {
+            for (int i = 0; i < fields.length; i++) {
+                if (fields[i].getName().equals(field.name)) {
+                    if (fields[i].getSignature().equals(
+                        ValueUtility.getSignature(field)))
+                        return true;
+                }
+            }
+        } catch (Exception exc) {
+            // Ignore this; all we want to do is return false
+            // Note that ValueUtility.getSignature can throw checked exceptions.
+        }
 
-	return false;
+        return false;
     }
 
     /* Avoid unnecessary allocations. */
     final ObjectStreamField[] getFieldsNoCopy() {
-	return fields;
+        return fields;
     }
 
     /**
@@ -327,36 +327,36 @@ public class ObjectStreamClass implements java.io.Serializable {
      * is no such named field.
      */
     public final ObjectStreamField getField(String name) {
-    	/* Binary search of fields by name.
-	 */
-    	for (int i = fields.length-1; i >= 0; i--) {
-    	    if (name.equals(fields[i].getName())) {
-    	    	return fields[i];
-	    }
-    	}
-	return null;
+        /* Binary search of fields by name.
+         */
+        for (int i = fields.length-1; i >= 0; i--) {
+            if (name.equals(fields[i].getName())) {
+                return fields[i];
+            }
+        }
+        return null;
     }
 
     public Serializable writeReplace(Serializable value) {
-	if (writeReplaceObjectMethod != null) {
-	    try {
-		return (Serializable) writeReplaceObjectMethod.invoke(value);
-	    } catch(Throwable t) {
-		throw new RuntimeException(t);
-	    }
-	}
-	else return value;
+        if (writeReplaceObjectMethod != null) {
+            try {
+                return (Serializable) writeReplaceObjectMethod.invoke(value);
+            } catch(Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+        else return value;
     }
 
     public Object readResolve(Object value) {
-	if (readResolveObjectMethod != null) {
-	    try {
-		return readResolveObjectMethod.invoke(value);
-	    } catch(Throwable t) {
-		throw new RuntimeException(t);
-	    }
-	}
-	else return value;
+        if (readResolveObjectMethod != null) {
+            try {
+                return readResolveObjectMethod.invoke(value);
+            } catch(Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+        else return value;
     }
 
     /**
@@ -364,13 +364,13 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
     @Override
     public final String toString() {
-	StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
-	sb.append(name);
-	sb.append(": static final long serialVersionUID = ");
-	sb.append(Long.toString(suid));
-	sb.append("L;");
-	return sb.toString();
+        sb.append(name);
+        sb.append(": static final long serialVersionUID = ");
+        sb.append(Long.toString(suid));
+        sb.append("L;");
+        return sb.toString();
     }
 
     /*
@@ -378,31 +378,31 @@ public class ObjectStreamClass implements java.io.Serializable {
      * Don't call this directly, call lookup instead.
      */
     private ObjectStreamClass(java.lang.Class cl, ObjectStreamClass superdesc,
-			      boolean serial, boolean extern)
+                              boolean serial, boolean extern)
     {
-	ofClass = cl;		/* created from this class */
+        ofClass = cl;           /* created from this class */
 
         if (Proxy.isProxyClass(cl)) {
             forProxyClass = true;
         }
 
-	name = cl.getName();
+        name = cl.getName();
         // 6877056
-	final ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
+        final ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
         isEnum = cinfo.isEnum() ;
-	superclass = superdesc;
-	serializable = serial;
+        superclass = superdesc;
+        serializable = serial;
         if (!forProxyClass) {
             // proxy classes are never externalizable
             externalizable = extern;
         }
 
-	/*
-	 * Enter this class in the table of known descriptors.
-	 * Otherwise, when the fields are read it may recurse
-	 * trying to find the descriptor for itself.
-	 */
-	descriptorFor.put( cl, this ) ;
+        /*
+         * Enter this class in the table of known descriptors.
+         * Otherwise, when the fields are read it may recurse
+         * trying to find the descriptor for itself.
+         */
+        descriptorFor.put( cl, this ) ;
     }
 
     /*
@@ -415,191 +415,191 @@ public class ObjectStreamClass implements java.io.Serializable {
      * significantly re-written as in later (1.4) JDK releases.
      */
     private void init() {
-	synchronized (lock) {
-	    // See description at definition of initialized.
-	    if (initialized)
-		return;
+        synchronized (lock) {
+            // See description at definition of initialized.
+            if (initialized)
+                return;
 
-	    final Class cl = ofClass;
+            final Class cl = ofClass;
 
             // 6877056
-	    if (!serializable || externalizable || forProxyClass || isEnum ||
-		name.equals("java.lang.String")) {
-		fields = NO_FIELDS;
-	    } else if (serializable) {
-		fields = null ;
+            if (!serializable || externalizable || forProxyClass || isEnum ||
+                name.equals("java.lang.String")) {
+                fields = NO_FIELDS;
+            } else if (serializable) {
+                fields = null ;
 
-		/* Ask for permission to override field access checks.
-		 */
-		AccessController.doPrivileged(new PrivilegedAction<Object>() {
-		    public Object run() {
-			/* Fill in the list of persistent fields.
-			 * If it is declared, use the declared serialPersistentFields.
-			 * Otherwise, extract the fields from the class itself.
-			 */
-			try {
-			    Field pf = cl.getDeclaredField("serialPersistentFields");
-			    // serial bug 7; the serialPersistentFields were not
-			    // being read and stored as Accessible bit was not set
-			    pf.setAccessible(true);
-			    // serial bug 7; need to find if the field is of type
-			    // java.io.ObjectStreamField
-			    java.io.ObjectStreamField[] f =
-				   (java.io.ObjectStreamField[])pf.get(cl);
-			    int mods = pf.getModifiers();
-			    if ((Modifier.isPrivate(mods)) 
-				&& (Modifier.isStatic(mods)) 
-				&& (Modifier.isFinal(mods))) {
+                /* Ask for permission to override field access checks.
+                 */
+                AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                    public Object run() {
+                        /* Fill in the list of persistent fields.
+                         * If it is declared, use the declared serialPersistentFields.
+                         * Otherwise, extract the fields from the class itself.
+                         */
+                        try {
+                            Field pf = cl.getDeclaredField("serialPersistentFields");
+                            // serial bug 7; the serialPersistentFields were not
+                            // being read and stored as Accessible bit was not set
+                            pf.setAccessible(true);
+                            // serial bug 7; need to find if the field is of type
+                            // java.io.ObjectStreamField
+                            java.io.ObjectStreamField[] f =
+                                   (java.io.ObjectStreamField[])pf.get(cl);
+                            int mods = pf.getModifiers();
+                            if ((Modifier.isPrivate(mods)) 
+                                && (Modifier.isStatic(mods)) 
+                                && (Modifier.isFinal(mods))) {
 
-				fields = translateFields( f ) ;
-			    }
-			} catch (Exception e) {
+                                fields = translateFields( f ) ;
+                            }
+                        } catch (Exception e) {
                             Exceptions.self.couldNotAccessSerialPersistentFields(
                                 e, cl.getName() ) ;
-			}
+                        }
 
-			if (fields == null) {
-			    /* Get all of the declared fields for this
-			     * Class. setAccessible on all fields so they
-			     * can be accessed later.  Create a temporary
-			     * ObjectStreamField array to hold each
-			     * non-static, non-transient field. Then copy the
-			     * temporary array into an array of the correct
-			     * size once the number of fields is known.
-			     */
-			    Field[] actualfields = cl.getDeclaredFields();
+                        if (fields == null) {
+                            /* Get all of the declared fields for this
+                             * Class. setAccessible on all fields so they
+                             * can be accessed later.  Create a temporary
+                             * ObjectStreamField array to hold each
+                             * non-static, non-transient field. Then copy the
+                             * temporary array into an array of the correct
+                             * size once the number of fields is known.
+                             */
+                            Field[] actualfields = cl.getDeclaredFields();
 
-			    int numFields = 0;
-			    ObjectStreamField[] tempFields =
-				new ObjectStreamField[actualfields.length];
-			    for (int i = 0; i < actualfields.length; i++) {
-				Field fld = actualfields[i] ;
-				int modifiers = fld.getModifiers();
-				if (!Modifier.isStatic(modifiers) &&
-				    !Modifier.isTransient(modifiers)) {
-				    fld.setAccessible(true) ;
-				    tempFields[numFields++] = new ObjectStreamField(fld);
-				}
-			    }
+                            int numFields = 0;
+                            ObjectStreamField[] tempFields =
+                                new ObjectStreamField[actualfields.length];
+                            for (int i = 0; i < actualfields.length; i++) {
+                                Field fld = actualfields[i] ;
+                                int modifiers = fld.getModifiers();
+                                if (!Modifier.isStatic(modifiers) &&
+                                    !Modifier.isTransient(modifiers)) {
+                                    fld.setAccessible(true) ;
+                                    tempFields[numFields++] = new ObjectStreamField(fld);
+                                }
+                            }
 
-			    fields = new ObjectStreamField[numFields];
-			    System.arraycopy(tempFields, 0, fields, 0, numFields);
-			} else {
-			    // For each declared persistent field, look for an actual
-			    // reflected Field. If there is one, make sure it's the correct
-			    // type and cache it in the ObjectStreamClass for that field.
-			    for (int j = fields.length-1; j >= 0; j--) {
-				try {
-				    Field reflField = cl.getDeclaredField(fields[j].getName());
-				    if (fields[j].getType() == reflField.getType()) {
-					reflField.setAccessible(true);
-					fields[j].setField(reflField);
-				    } else {
+                            fields = new ObjectStreamField[numFields];
+                            System.arraycopy(tempFields, 0, fields, 0, numFields);
+                        } else {
+                            // For each declared persistent field, look for an actual
+                            // reflected Field. If there is one, make sure it's the correct
+                            // type and cache it in the ObjectStreamClass for that field.
+                            for (int j = fields.length-1; j >= 0; j--) {
+                                try {
+                                    Field reflField = cl.getDeclaredField(fields[j].getName());
+                                    if (fields[j].getType() == reflField.getType()) {
+                                        reflField.setAccessible(true);
+                                        fields[j].setField(reflField);
+                                    } else {
                                         Exceptions.self.fieldTypeMismatch(
                                             cl.getName(),
                                             fields[j].getName(),
                                             fields[j].getType(),
                                             reflField.getName(),
                                             reflField.getType() ) ;
-				    }
-				} catch (NoSuchFieldException e) {
+                                    }
+                                } catch (NoSuchFieldException e) {
                                     Exceptions.self.noSuchField( e, cl.getName(),
                                         fields[j].getName() ) ;
-				}
-			    }
-			}
+                                }
+                            }
+                        }
 
-			return null;
-		    }
-		});
+                        return null;
+                    }
+                });
 
-		if (fields.length > 1)
-		    Arrays.sort(fields);
+                if (fields.length > 1)
+                    Arrays.sort(fields);
 
-		/* Set up field data for use while writing using the API api. */
-		computeFieldInfo();
-	    }
+                /* Set up field data for use while writing using the API api. */
+                computeFieldInfo();
+            }
 
-	    /* Get the serialVersionUID from the class.
-	     * It uses the access override mechanism so make sure
-	     * the field objects is only used here.
-	     *
-	     * NonSerializable classes have a serialVerisonUID of 0L.
-	     */
+            /* Get the serialVersionUID from the class.
+             * It uses the access override mechanism so make sure
+             * the field objects is only used here.
+             *
+             * NonSerializable classes have a serialVerisonUID of 0L.
+             */
              // 6877056
-	     if (isNonSerializable() || isEnum) {
-		 suid = 0L;
-	     } else {
-		 // Lookup special Serializable members using reflection.
-		 AccessController.doPrivileged(new PrivilegedAction<Object>() {
-		    public Object run() {
-			if (forProxyClass) {
-			    // proxy classes always have serialVersionUID of 0L
-			    suid = 0L;
-			} else {
-			    try {
-				final Field f = cl.getDeclaredField("serialVersionUID");
-				int mods = f.getModifiers();
-				// SerialBug 5:  static final SUID should be read
-				if (Modifier.isStatic(mods) && Modifier.isFinal(mods) ) {
-				    f.setAccessible(true);
-				    suid = f.getLong(cl);
-				    // SerialBug 2: should be computed after writeObject
-				    // actualSuid = computeStructuralUID(cl);
-				} else {
-				    suid = _computeSerialVersionUID(cl);
-				    // SerialBug 2: should be computed after writeObject
-				    // actualSuid = computeStructuralUID(cl);
-				}
-			    } catch (NoSuchFieldException ex) {
-				suid = _computeSerialVersionUID(cl);
-				// SerialBug 2: should be computed after writeObject
-				// actualSuid = computeStructuralUID(cl);
-			    } catch (IllegalAccessException ex) {
-				suid = _computeSerialVersionUID(cl);
-			    }
-			}
+             if (isNonSerializable() || isEnum) {
+                 suid = 0L;
+             } else {
+                 // Lookup special Serializable members using reflection.
+                 AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                    public Object run() {
+                        if (forProxyClass) {
+                            // proxy classes always have serialVersionUID of 0L
+                            suid = 0L;
+                        } else {
+                            try {
+                                final Field f = cl.getDeclaredField("serialVersionUID");
+                                int mods = f.getModifiers();
+                                // SerialBug 5:  static final SUID should be read
+                                if (Modifier.isStatic(mods) && Modifier.isFinal(mods) ) {
+                                    f.setAccessible(true);
+                                    suid = f.getLong(cl);
+                                    // SerialBug 2: should be computed after writeObject
+                                    // actualSuid = computeStructuralUID(cl);
+                                } else {
+                                    suid = _computeSerialVersionUID(cl);
+                                    // SerialBug 2: should be computed after writeObject
+                                    // actualSuid = computeStructuralUID(cl);
+                                }
+                            } catch (NoSuchFieldException ex) {
+                                suid = _computeSerialVersionUID(cl);
+                                // SerialBug 2: should be computed after writeObject
+                                // actualSuid = computeStructuralUID(cl);
+                            } catch (IllegalAccessException ex) {
+                                suid = _computeSerialVersionUID(cl);
+                            }
+                        }
 
-			writeReplaceObjectMethod = ObjectStreamClass.getInheritableMethod(cl, 
-			    "writeReplace", Object.class );
+                        writeReplaceObjectMethod = ObjectStreamClass.getInheritableMethod(cl, 
+                            "writeReplace", Object.class );
 
-			readResolveObjectMethod = ObjectStreamClass.getInheritableMethod(cl, 
-			    "readResolve", Object.class );
+                        readResolveObjectMethod = ObjectStreamClass.getInheritableMethod(cl, 
+                            "readResolve", Object.class );
 
-			if (externalizable) 
-			    cons = getExternalizableConstructor(cl) ;
-			else
-			    cons = getSerializableConstructor(cl) ;
+                        if (externalizable) 
+                            cons = getExternalizableConstructor(cl) ;
+                        else
+                            cons = getSerializableConstructor(cl) ;
 
-			if (serializable && !forProxyClass) {
-			    /* Look for the writeObject method
-			     * Set the accessible flag on it here. ObjectOutputStream
-			     * will call it as necessary.
-			     */
-			    writeObjectMethod = getPrivateMethod( cl, "writeObject",
-				Void.TYPE, java.io.ObjectOutputStream.class ) ;
-			    readObjectMethod = getPrivateMethod( cl, "readObject",
-				Void.TYPE, java.io.ObjectInputStream.class ) ;
-			}
-			return null;
-		    }
-		});
-	    }
+                        if (serializable && !forProxyClass) {
+                            /* Look for the writeObject method
+                             * Set the accessible flag on it here. ObjectOutputStream
+                             * will call it as necessary.
+                             */
+                            writeObjectMethod = getPrivateMethod( cl, "writeObject",
+                                Void.TYPE, java.io.ObjectOutputStream.class ) ;
+                            readObjectMethod = getPrivateMethod( cl, "readObject",
+                                Void.TYPE, java.io.ObjectInputStream.class ) ;
+                        }
+                        return null;
+                    }
+                });
+            }
 
-	    // This call depends on a lot of information computed above!
-	    actualSuid = ObjectStreamClass.computeStructuralUID(this, cl);
+            // This call depends on a lot of information computed above!
+            actualSuid = ObjectStreamClass.computeStructuralUID(this, cl);
 
             // Part of GlassFish issue 5161: also need the repo id if the
             // class is Externalizable.
-	    // If we have a write object method, precompute the
-	    // RMI-IIOP stream format version 2 optional data
-	    // repository ID.  
-	    if (hasWriteObject() || isExternalizable())
-		rmiiiopOptionalDataRepId = computeRMIIIOPOptionalDataRepId();
+            // If we have a write object method, precompute the
+            // RMI-IIOP stream format version 2 optional data
+            // repository ID.  
+            if (hasWriteObject() || isExternalizable())
+                rmiiiopOptionalDataRepId = computeRMIIIOPOptionalDataRepId();
 
-	    // This must be done last.
-	    initialized = true;
-	}
+            // This must be done last.
+            initialized = true;
+        }
     }
 
     /**
@@ -608,19 +608,19 @@ public class ObjectStreamClass implements java.io.Serializable {
      * returned method (if any).
      */
     private static Method getPrivateMethod(Class cl, String name, 
-					   Class returnType,
-					   Class... argTypes ) 
+                                           Class returnType,
+                                           Class... argTypes ) 
     {
-	try {
-	    Method meth = cl.getDeclaredMethod(name, argTypes);
-	    meth.setAccessible(true);
-	    int mods = meth.getModifiers();
-	    return ((meth.getReturnType() == returnType) &&
-		    ((mods & Modifier.STATIC) == 0) &&
-		    ((mods & Modifier.PRIVATE) != 0)) ? meth : null;
-	} catch (NoSuchMethodException ex) {
-	    return null;
-	}
+        try {
+            Method meth = cl.getDeclaredMethod(name, argTypes);
+            meth.setAccessible(true);
+            int mods = meth.getModifiers();
+            return ((meth.getReturnType() == returnType) &&
+                    ((mods & Modifier.STATIC) == 0) &&
+                    ((mods & Modifier.PRIVATE) != 0)) ? meth : null;
+        } catch (NoSuchMethodException ex) {
+            return null;
+        }
     }
 
     // Specific to RMI-IIOP
@@ -659,60 +659,60 @@ public class ObjectStreamClass implements java.io.Serializable {
      * be read.
      */
     ObjectStreamClass(String n, long s) {
-	name = n;
-	suid = s;
-	superclass = null;
+        name = n;
+        suid = s;
+        superclass = null;
     }
 
     public static synchronized ObjectStreamField[] translateFields(
-	java.io.ObjectStreamField fields[]) {
+        java.io.ObjectStreamField fields[]) {
 
-	ObjectStreamField[] translation = null;
-		   
-	if (translatedFields == null)
-	    translatedFields = new HashMap<java.io.ObjectStreamField[],
-		ObjectStreamField[]>();
-		   
-	translation = translatedFields.get(fields);
-		   
-	if (translation == null) {
-	    translation = new ObjectStreamField[fields.length] ;
-	    for (int ctr = 0; ctr<fields.length; ctr++) {
-		Class cls = (Class)fields[ctr].getType() ;
-		translation[ctr] = new com.sun.corba.se.impl.io.ObjectStreamField( 
-		    fields[ctr].getName(), cls ) ;
-	    }
+        ObjectStreamField[] translation = null;
+                   
+        if (translatedFields == null)
+            translatedFields = new HashMap<java.io.ObjectStreamField[],
+                ObjectStreamField[]>();
+                   
+        translation = translatedFields.get(fields);
+                   
+        if (translation == null) {
+            translation = new ObjectStreamField[fields.length] ;
+            for (int ctr = 0; ctr<fields.length; ctr++) {
+                Class cls = (Class)fields[ctr].getType() ;
+                translation[ctr] = new com.sun.corba.ee.impl.io.ObjectStreamField( 
+                    fields[ctr].getName(), cls ) ;
+            }
 
-	    translatedFields.put(fields, translation);
-	}
+            translatedFields.put(fields, translation);
+        }
 
-	return translation;
+        return translation;
     }
 
     /* Compare the base class names of streamName and localName.
      *
      * @return  Return true iff the base class name compare.
-     * @parameter streamName	Fully qualified class name.
-     * @parameter localName	Fully qualified class name.
-     * @parameter pkgSeparator	class names use either '.' or '/'.
+     * @parameter streamName    Fully qualified class name.
+     * @parameter localName     Fully qualified class name.
+     * @parameter pkgSeparator  class names use either '.' or '/'.
      *
      * Only compare base class name to allow package renaming.
      */
     static boolean compareClassNames(String streamName,
-				     String localName,
-				     char pkgSeparator) {
-	/* compare the class names, stripping off package names. */
-	int streamNameIndex = streamName.lastIndexOf(pkgSeparator);
-	if (streamNameIndex < 0)
-	    streamNameIndex = 0;
+                                     String localName,
+                                     char pkgSeparator) {
+        /* compare the class names, stripping off package names. */
+        int streamNameIndex = streamName.lastIndexOf(pkgSeparator);
+        if (streamNameIndex < 0)
+            streamNameIndex = 0;
 
-	int localNameIndex = localName.lastIndexOf(pkgSeparator);
-	if (localNameIndex < 0)
-	    localNameIndex = 0;
+        int localNameIndex = localName.lastIndexOf(pkgSeparator);
+        if (localNameIndex < 0)
+            localNameIndex = 0;
 
-	return streamName.regionMatches(false, streamNameIndex,
-					localName, localNameIndex,
-					streamName.length() - streamNameIndex);
+        return streamName.regionMatches(false, streamNameIndex,
+                                        localName, localNameIndex,
+                                        streamName.length() - streamNameIndex);
     }
 
     /*
@@ -720,22 +720,22 @@ public class ObjectStreamClass implements java.io.Serializable {
      * They match if they have the same class name and suid
      */
     final boolean typeEquals(ObjectStreamClass other) {
-	return (suid == other.suid) &&
-	    compareClassNames(name, other.name, '.');
+        return (suid == other.suid) &&
+            compareClassNames(name, other.name, '.');
     }
 
     /*
      * Return the superclass descriptor of this descriptor.
      */
     final void setSuperclass(ObjectStreamClass s) {
-	superclass = s;
+        superclass = s;
     }
 
     /*
      * Return the superclass descriptor of this descriptor.
      */
     final ObjectStreamClass getSuperclass() {
-	return superclass;
+        return superclass;
     }
 
     /**
@@ -749,7 +749,7 @@ public class ObjectStreamClass implements java.io.Serializable {
      * Return whether the class has a writeObject method
      */
     final boolean hasWriteObject() {
-	return writeObjectMethod != null ;
+        return writeObjectMethod != null ;
     }
 
     /**
@@ -759,7 +759,7 @@ public class ObjectStreamClass implements java.io.Serializable {
      * any of its superclasses has a writeObject method,
      */
     final boolean isCustomMarshaled() {
-	return (hasWriteObject() || isExternalizable())
+        return (hasWriteObject() || isExternalizable())
             || (superclass != null && superclass.isCustomMarshaled());
     }
 
@@ -790,7 +790,7 @@ public class ObjectStreamClass implements java.io.Serializable {
      * @since JDK 1.2
      */
     boolean hasExternalizableBlockDataMode() {
-	return hasExternalizableBlockData;
+        return hasExternalizableBlockData;
     }
 
     /**
@@ -803,21 +803,21 @@ public class ObjectStreamClass implements java.io.Serializable {
      * inaccessible/unavailable.
      */
     Object newInstance()
-	throws InstantiationException, InvocationTargetException,
-	       UnsupportedOperationException
+        throws InstantiationException, InvocationTargetException,
+               UnsupportedOperationException
     {
-	if (cons != null) {
-	    try {
-		return cons.newInstance(new Object[0]);
-	    } catch (IllegalAccessException ex) {
-		// should not occur, as access checks have been suppressed
-		InternalError ie = new InternalError();
-		ie.initCause( ex ) ;
-		throw ie ;
-	    }
-	} else {
-	    throw new UnsupportedOperationException();
-	}
+        if (cons != null) {
+            try {
+                return cons.newInstance(new Object[0]);
+            } catch (IllegalAccessException ex) {
+                // should not occur, as access checks have been suppressed
+                InternalError ie = new InternalError();
+                ie.initCause( ex ) ;
+                throw ie ;
+            }
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
     
     /**
@@ -826,14 +826,14 @@ public class ObjectStreamClass implements java.io.Serializable {
      * the defining class may still be non-public.
      */
     private static Constructor getExternalizableConstructor(Class cl) {
-	try {
-	    Constructor cons = cl.getDeclaredConstructor(new Class[0]);
-	    cons.setAccessible(true);
-	    return ((cons.getModifiers() & Modifier.PUBLIC) != 0) ? 
-		cons : null;
-	} catch (NoSuchMethodException ex) {
-	    return null;
-	}
+        try {
+            Constructor cons = cl.getDeclaredConstructor(new Class[0]);
+            cons.setAccessible(true);
+            return ((cons.getModifiers() & Modifier.PUBLIC) != 0) ? 
+                cons : null;
+        } catch (NoSuchMethodException ex) {
+            return null;
+        }
     }
 
     /**
@@ -842,48 +842,48 @@ public class ObjectStreamClass implements java.io.Serializable {
      * returned constructor (if any).
      */
     private static Constructor getSerializableConstructor(Class cl) {
-	Class initCl = cl;
-	while (ClassInfoCache.get( initCl ).isASerializable( initCl )) {
-	    if ((initCl = initCl.getSuperclass()) == null) {
-		return null;
-	    }
-	}
-	try {
-	    Constructor cons = initCl.getDeclaredConstructor(new Class[0]);
-	    int mods = cons.getModifiers();
-	    if ((mods & Modifier.PRIVATE) != 0 ||
-		((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) == 0 &&
-		 !packageEquals(cl, initCl)))
-	    {
-		return null;
-	    }
-	    cons = bridge.newConstructorForSerialization(cl, cons);
-	    cons.setAccessible(true);
-	    return cons;
-	} catch (NoSuchMethodException ex) {
-	    return null;
-	}
+        Class initCl = cl;
+        while (ClassInfoCache.get( initCl ).isASerializable( initCl )) {
+            if ((initCl = initCl.getSuperclass()) == null) {
+                return null;
+            }
+        }
+        try {
+            Constructor cons = initCl.getDeclaredConstructor(new Class[0]);
+            int mods = cons.getModifiers();
+            if ((mods & Modifier.PRIVATE) != 0 ||
+                ((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) == 0 &&
+                 !packageEquals(cl, initCl)))
+            {
+                return null;
+            }
+            cons = bridge.newConstructorForSerialization(cl, cons);
+            cons.setAccessible(true);
+            return cons;
+        } catch (NoSuchMethodException ex) {
+            return null;
+        }
     }
 
     /*
      * Return the ObjectStreamClass of the local class this one is based on.
      */
     final ObjectStreamClass localClassDescriptor() {
-	return localClassDesc;
+        return localClassDesc;
     }
 
     /*
      * Get the Serializability of the class.
      */
     boolean isSerializable() {
-	return serializable;
+        return serializable;
     }
 
     /*
      * Get the externalizability of the class.
      */
     boolean isExternalizable() {
-	return externalizable;
+        return externalizable;
     }
 
     boolean isNonSerializable() {
@@ -896,40 +896,40 @@ public class ObjectStreamClass implements java.io.Serializable {
      * stream.
      */
     private void computeFieldInfo() {
-	primBytes = 0;
-	objFields = 0;
+        primBytes = 0;
+        objFields = 0;
 
-	for (int i = 0; i < fields.length; i++ ) {
-	    switch (fields[i].getTypeCode()) {
-	    case 'B':
-	    case 'Z':
-	    	primBytes += 1;
-	    	break;
-	    case 'C':
-	    case 'S':
-	    	primBytes += 2;
-	    	break;
+        for (int i = 0; i < fields.length; i++ ) {
+            switch (fields[i].getTypeCode()) {
+            case 'B':
+            case 'Z':
+                primBytes += 1;
+                break;
+            case 'C':
+            case 'S':
+                primBytes += 2;
+                break;
 
-	    case 'I':
-	    case 'F':
-	    	primBytes += 4;
-	    	break;
-	    case 'J':
-	    case 'D' :
-	    	primBytes += 8;
-	    	break;
+            case 'I':
+            case 'F':
+                primBytes += 4;
+                break;
+            case 'J':
+            case 'D' :
+                primBytes += 8;
+                break;
 
-	    case 'L':
-	    case '[':
-	    	objFields += 1;
-	    	break;
-	    }
-	}
+            case 'L':
+            case '[':
+                objFields += 1;
+                break;
+            }
+        }
     }
 
     private static void msg( String str )
     {
-	System.out.println( str ) ;
+        System.out.println( str ) ;
     }
 
     /* JDK 1.5 has introduced some new modifier bits (such as SYNTHETIC)
@@ -940,14 +940,14 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
 
     public static final int CLASS_MASK = Modifier.PUBLIC | Modifier.FINAL |
-	Modifier.INTERFACE | Modifier.ABSTRACT ;
+        Modifier.INTERFACE | Modifier.ABSTRACT ;
     public static final int FIELD_MASK = Modifier.PUBLIC | Modifier.PRIVATE |
-	Modifier.PROTECTED | Modifier.STATIC | Modifier.FINAL | 
-	Modifier.TRANSIENT | Modifier.VOLATILE ;
+        Modifier.PROTECTED | Modifier.STATIC | Modifier.FINAL | 
+        Modifier.TRANSIENT | Modifier.VOLATILE ;
     public static final int METHOD_MASK = Modifier.PUBLIC | Modifier.PRIVATE |
-	Modifier.PROTECTED | Modifier.STATIC | Modifier.FINAL | 
-	Modifier.SYNCHRONIZED | Modifier.NATIVE | Modifier.ABSTRACT |
-	Modifier.STRICT ;
+        Modifier.PROTECTED | Modifier.STATIC | Modifier.FINAL | 
+        Modifier.SYNCHRONIZED | Modifier.NATIVE | Modifier.ABSTRACT |
+        Modifier.STRICT ;
     
     /*
      * Compute a hash for the specified class.  Incrementally add
@@ -955,52 +955,52 @@ public class ObjectStreamClass implements java.io.Serializable {
      * Fold the hash into a long.  Use the SHA secure hash function.
      */
     private static long _computeSerialVersionUID(Class cl) {
-	if (DEBUG_SVUID)
-	    msg( "Computing SerialVersionUID for " + cl ) ; 
-	ByteArrayOutputStream devnull = new ByteArrayOutputStream(512);
-	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
+        if (DEBUG_SVUID)
+            msg( "Computing SerialVersionUID for " + cl ) ; 
+        ByteArrayOutputStream devnull = new ByteArrayOutputStream(512);
+        ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
 
-	long h = 0;
-	try {
-	    MessageDigest md = MessageDigest.getInstance("SHA");
-	    DigestOutputStream mdo = new DigestOutputStream(devnull, md);
-	    DataOutputStream data = new DataOutputStream(mdo);
+        long h = 0;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA");
+            DigestOutputStream mdo = new DigestOutputStream(devnull, md);
+            DataOutputStream data = new DataOutputStream(mdo);
 
-	    if (DEBUG_SVUID)
-		msg( "\twriteUTF( \"" + cl.getName() + "\" )" ) ;
-	    data.writeUTF(cl.getName());
+            if (DEBUG_SVUID)
+                msg( "\twriteUTF( \"" + cl.getName() + "\" )" ) ;
+            data.writeUTF(cl.getName());
 
-	    int classaccess = cl.getModifiers();
-	    classaccess &= (Modifier.PUBLIC | Modifier.FINAL |
-			    Modifier.INTERFACE | Modifier.ABSTRACT);
+            int classaccess = cl.getModifiers();
+            classaccess &= (Modifier.PUBLIC | Modifier.FINAL |
+                            Modifier.INTERFACE | Modifier.ABSTRACT);
 
-	    /* Workaround for javac bug that only set ABSTRACT for
-	     * interfaces if the interface had some methods.
-	     * The ABSTRACT bit reflects that the number of methods > 0.
-	     * This is required so correct hashes can be computed
-	     * for existing class files.
-	     * Previously this hack was previously present in the VM.
-	     */
+            /* Workaround for javac bug that only set ABSTRACT for
+             * interfaces if the interface had some methods.
+             * The ABSTRACT bit reflects that the number of methods > 0.
+             * This is required so correct hashes can be computed
+             * for existing class files.
+             * Previously this hack was previously present in the VM.
+             */
             Method[] method = cl.getDeclaredMethods();
-	    if ((classaccess & Modifier.INTERFACE) != 0) {
-		classaccess &= (~Modifier.ABSTRACT);
-		if (method.length > 0) {
-		    classaccess |= Modifier.ABSTRACT;
-		}
-	    }
+            if ((classaccess & Modifier.INTERFACE) != 0) {
+                classaccess &= (~Modifier.ABSTRACT);
+                if (method.length > 0) {
+                    classaccess |= Modifier.ABSTRACT;
+                }
+            }
 
-	    // Mask out any post-1.4 attributes
-	    classaccess &= CLASS_MASK ;
+            // Mask out any post-1.4 attributes
+            classaccess &= CLASS_MASK ;
 
-	    if (DEBUG_SVUID)
-		msg( "\twriteInt( " + classaccess + " ) " ) ;
-	    data.writeInt(classaccess);
+            if (DEBUG_SVUID)
+                msg( "\twriteInt( " + classaccess + " ) " ) ;
+            data.writeInt(classaccess);
 
-	    /*
-	     * Get the list of interfaces supported,
-	     * Accumulate their names their names in Lexical order
-	     * and add them to the hash
-	     */
+            /*
+             * Get the list of interfaces supported,
+             * Accumulate their names their names in Lexical order
+             * and add them to the hash
+             */
             if (!cinfo.isArray()) {
                 /* In 1.2fcs, getInterfaces() was modified to return
                  * {java.lang.Cloneable, java.io.Serializable} when
@@ -1009,171 +1009,171 @@ public class ObjectStreamClass implements java.io.Serializable {
                  * them from its computation.
                  */
 
-	        Class interfaces[] = cl.getInterfaces();
-	        Arrays.sort(interfaces, compareClassByName);
+                Class interfaces[] = cl.getInterfaces();
+                Arrays.sort(interfaces, compareClassByName);
 
-	        for (int i = 0; i < interfaces.length; i++) {
-		    if (DEBUG_SVUID)
-			msg( "\twriteUTF( \"" + interfaces[i].getName() + "\" ) " ) ;
-		    data.writeUTF(interfaces[i].getName());
-	        }
-	    }
+                for (int i = 0; i < interfaces.length; i++) {
+                    if (DEBUG_SVUID)
+                        msg( "\twriteUTF( \"" + interfaces[i].getName() + "\" ) " ) ;
+                    data.writeUTF(interfaces[i].getName());
+                }
+            }
 
-	    /* Sort the field names to get a deterministic order */
+            /* Sort the field names to get a deterministic order */
             Field[] field = cl.getDeclaredFields();
-	    Arrays.sort(field, compareMemberByName);
+            Arrays.sort(field, compareMemberByName);
 
-	    for (int i = 0; i < field.length; i++) {
-		Field f = field[i];
+            for (int i = 0; i < field.length; i++) {
+                Field f = field[i];
 
-		/* Include in the hash all fields except those that are
-		 * private transient and private static.
-		 */
-		int m = f.getModifiers();
-		if (Modifier.isPrivate(m) &&
-		    (Modifier.isTransient(m) || Modifier.isStatic(m)))
-		    continue;
+                /* Include in the hash all fields except those that are
+                 * private transient and private static.
+                 */
+                int m = f.getModifiers();
+                if (Modifier.isPrivate(m) &&
+                    (Modifier.isTransient(m) || Modifier.isStatic(m)))
+                    continue;
 
-		if (DEBUG_SVUID)
-		    msg( "\twriteUTF( \"" + f.getName() + "\" ) " ) ;
-		data.writeUTF(f.getName());
+                if (DEBUG_SVUID)
+                    msg( "\twriteUTF( \"" + f.getName() + "\" ) " ) ;
+                data.writeUTF(f.getName());
 
-		// Mask out any post-1.4 bits
-		m &= FIELD_MASK ;
+                // Mask out any post-1.4 bits
+                m &= FIELD_MASK ;
 
-		if (DEBUG_SVUID)
-		    msg( "\twriteInt( " + m + " ) " ) ;
-		data.writeInt(m);
+                if (DEBUG_SVUID)
+                    msg( "\twriteInt( " + m + " ) " ) ;
+                data.writeInt(m);
 
-		if (DEBUG_SVUID)
-		    msg( "\twriteUTF( \"" + getSignature(f.getType()) + "\" ) " ) ;
-		data.writeUTF(getSignature(f.getType()));
-	    }
+                if (DEBUG_SVUID)
+                    msg( "\twriteUTF( \"" + getSignature(f.getType()) + "\" ) " ) ;
+                data.writeUTF(getSignature(f.getType()));
+            }
 
-	    if (hasStaticInitializer(cl)) {
-		if (DEBUG_SVUID)
-		    msg( "\twriteUTF( \"<clinit>\" ) " ) ;
-		data.writeUTF("<clinit>");
+            if (hasStaticInitializer(cl)) {
+                if (DEBUG_SVUID)
+                    msg( "\twriteUTF( \"<clinit>\" ) " ) ;
+                data.writeUTF("<clinit>");
 
-		if (DEBUG_SVUID)
-		    msg( "\twriteInt( " + Modifier.STATIC + " )" ) ;
-		data.writeInt(Modifier.STATIC); // TBD: what modifiers does it have
+                if (DEBUG_SVUID)
+                    msg( "\twriteInt( " + Modifier.STATIC + " )" ) ;
+                data.writeInt(Modifier.STATIC); // TBD: what modifiers does it have
 
-		if (DEBUG_SVUID)
-		    msg( "\twriteUTF( \"()V\" )" ) ;
-		data.writeUTF("()V");
-	    }
+                if (DEBUG_SVUID)
+                    msg( "\twriteUTF( \"()V\" )" ) ;
+                data.writeUTF("()V");
+            }
 
-	    /*
-	     * Get the list of constructors including name and signature
-	     * Sort lexically, add all except the private constructors
-	     * to the hash with their access flags
-	     */
+            /*
+             * Get the list of constructors including name and signature
+             * Sort lexically, add all except the private constructors
+             * to the hash with their access flags
+             */
 
-	    MethodSignature[] constructors =
-		MethodSignature.removePrivateAndSort(cl.getDeclaredConstructors());
-	    for (int i = 0; i < constructors.length; i++) {
-		MethodSignature c = constructors[i];
-		String mname = "<init>";
-		String desc = c.signature;
-		desc = desc.replace('/', '.');
-		if (DEBUG_SVUID)
-		    msg( "\twriteUTF( \"" + mname + "\" )" ) ;
-		data.writeUTF(mname);
+            MethodSignature[] constructors =
+                MethodSignature.removePrivateAndSort(cl.getDeclaredConstructors());
+            for (int i = 0; i < constructors.length; i++) {
+                MethodSignature c = constructors[i];
+                String mname = "<init>";
+                String desc = c.signature;
+                desc = desc.replace('/', '.');
+                if (DEBUG_SVUID)
+                    msg( "\twriteUTF( \"" + mname + "\" )" ) ;
+                data.writeUTF(mname);
 
-		// mask out post-1.4 modifiers
-		int modifier = c.member.getModifiers() & METHOD_MASK ;
+                // mask out post-1.4 modifiers
+                int modifier = c.member.getModifiers() & METHOD_MASK ;
 
-		if (DEBUG_SVUID)
-		    msg( "\twriteInt( " + modifier + " ) " ) ;
-		data.writeInt( modifier ) ;
+                if (DEBUG_SVUID)
+                    msg( "\twriteInt( " + modifier + " ) " ) ;
+                data.writeInt( modifier ) ;
 
-		if (DEBUG_SVUID)
-		    msg( "\twriteUTF( \"" + desc+ "\" )" ) ;
-		data.writeUTF(desc);
-	    }
+                if (DEBUG_SVUID)
+                    msg( "\twriteUTF( \"" + desc+ "\" )" ) ;
+                data.writeUTF(desc);
+            }
 
-	    /* Include in the hash all methods except those that are
-	     * private transient and private static.
-	     */
-	    MethodSignature[] methods =
-		MethodSignature.removePrivateAndSort(method);
-	    for (int i = 0; i < methods.length; i++ ) {
-		MethodSignature m = methods[i];
-		String desc = m.signature;
-		desc = desc.replace('/', '.');
+            /* Include in the hash all methods except those that are
+             * private transient and private static.
+             */
+            MethodSignature[] methods =
+                MethodSignature.removePrivateAndSort(method);
+            for (int i = 0; i < methods.length; i++ ) {
+                MethodSignature m = methods[i];
+                String desc = m.signature;
+                desc = desc.replace('/', '.');
 
-		if (DEBUG_SVUID)
-		    msg( "\twriteUTF( \"" + m.member.getName()+ "\" )" ) ;
-		data.writeUTF(m.member.getName());
+                if (DEBUG_SVUID)
+                    msg( "\twriteUTF( \"" + m.member.getName()+ "\" )" ) ;
+                data.writeUTF(m.member.getName());
 
-		// mask out post-1.4 modifiers
-		int modifier = m.member.getModifiers() & METHOD_MASK ;
+                // mask out post-1.4 modifiers
+                int modifier = m.member.getModifiers() & METHOD_MASK ;
 
-		if (DEBUG_SVUID)
-		    msg( "\twriteInt( " + modifier + " ) " ) ;
-		data.writeInt( modifier ) ;
+                if (DEBUG_SVUID)
+                    msg( "\twriteInt( " + modifier + " ) " ) ;
+                data.writeInt( modifier ) ;
 
-		if (DEBUG_SVUID)
-		    msg( "\twriteUTF( \"" + desc + "\" )" ) ;
-		data.writeUTF(desc);
-	    }
+                if (DEBUG_SVUID)
+                    msg( "\twriteUTF( \"" + desc + "\" )" ) ;
+                data.writeUTF(desc);
+            }
 
-	    /* Compute the hash value for this class.
-	     * Use only the first 64 bits of the hash.
-	     */
-	    data.flush();
-	    byte hasharray[] = md.digest();
-	    for (int i = 0; i < Math.min(8, hasharray.length); i++) {
-		h += (long)(hasharray[i] & 255) << (i * 8);
-	    }
-	} catch (IOException ignore) {
-	    /* can't happen, but be deterministic anyway. */
-	    h = -1;
-	} catch (NoSuchAlgorithmException complain) {
-	    SecurityException se = new SecurityException() ;
-	    se.initCause( complain ) ;
-	    throw se ;
-	}
+            /* Compute the hash value for this class.
+             * Use only the first 64 bits of the hash.
+             */
+            data.flush();
+            byte hasharray[] = md.digest();
+            for (int i = 0; i < Math.min(8, hasharray.length); i++) {
+                h += (long)(hasharray[i] & 255) << (i * 8);
+            }
+        } catch (IOException ignore) {
+            /* can't happen, but be deterministic anyway. */
+            h = -1;
+        } catch (NoSuchAlgorithmException complain) {
+            SecurityException se = new SecurityException() ;
+            se.initCause( complain ) ;
+            throw se ;
+        }
 
-	return h;
+        return h;
     }
 
     private static long computeStructuralUID(
-	com.sun.corba.se.impl.io.ObjectStreamClass osc, Class cl) {
+        com.sun.corba.ee.impl.io.ObjectStreamClass osc, Class cl) {
 
-	ByteArrayOutputStream devnull = new ByteArrayOutputStream(512);
-	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
-		
-	long h = 0;
-	try {
-	    if (!cinfo.isASerializable(cl) || cinfo.isInterface()) {
-		return 0;
-	    }
+        ByteArrayOutputStream devnull = new ByteArrayOutputStream(512);
+        ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
+                
+        long h = 0;
+        try {
+            if (!cinfo.isASerializable(cl) || cinfo.isInterface()) {
+                return 0;
+            }
 
-	    if (cinfo.isAExternalizable(cl)) {
-		return 1;
-	    }
+            if (cinfo.isAExternalizable(cl)) {
+                return 1;
+            }
 
-	    MessageDigest md = MessageDigest.getInstance("SHA");
-	    DigestOutputStream mdo = new DigestOutputStream(devnull, md);
-	    DataOutputStream data = new DataOutputStream(mdo);
+            MessageDigest md = MessageDigest.getInstance("SHA");
+            DigestOutputStream mdo = new DigestOutputStream(devnull, md);
+            DataOutputStream data = new DataOutputStream(mdo);
 
-	    // Get SUID of parent
-	    Class parent = cl.getSuperclass();
-	    if ((parent != null))  
-	    // SerialBug 1; acc. to spec the one for 
-	    // java.lang.object
-	    // should be computed and put
-	    //     && (parent != java.lang.Object.class)) 
-	    {
-		data.writeLong(computeStructuralUID(lookup(parent), parent));
-	    }
+            // Get SUID of parent
+            Class parent = cl.getSuperclass();
+            if ((parent != null))  
+            // SerialBug 1; acc. to spec the one for 
+            // java.lang.object
+            // should be computed and put
+            //     && (parent != java.lang.Object.class)) 
+            {
+                data.writeLong(computeStructuralUID(lookup(parent), parent));
+            }
 
-	    if (osc.hasWriteObject())
-		data.writeInt(2);
-	    else
-		data.writeInt(1);
+            if (osc.hasWriteObject())
+                data.writeInt(2);
+            else
+                data.writeInt(1);
 
             // CORBA formal 00-11-03 10.6.2:  For each field of the
             // class that is mapped to IDL, sorted lexicographically
@@ -1189,120 +1189,120 @@ public class ObjectStreamClass implements java.io.Serializable {
                 data.writeUTF(field[i].getName());
                 data.writeUTF(field[i].getSignature());
             }
-			
-	    /* Compute the hash value for this class.
-	     * Use only the first 64 bits of the hash.
-	     */
-	    data.flush();
-	    byte hasharray[] = md.digest();
-	    // int minimum = Math.min(8, hasharray.length);
-	    // SerialBug 3: SHA computation is wrong; for loop reversed
-	    //for (int i = minimum; i > 0; i--) 
-	    for (int i = 0; i < Math.min(8, hasharray.length); i++) {
-		h += (long)(hasharray[i] & 255) << (i * 8);
-	    }
-	} catch (IOException ignore) {
-	    /* can't happen, but be deterministic anyway. */
-	    h = -1;
-	} catch (NoSuchAlgorithmException complain) {
-	    SecurityException se = new SecurityException();
-	    se.initCause( complain ) ;
-	    throw se ;
-	}
-	return h;
+                        
+            /* Compute the hash value for this class.
+             * Use only the first 64 bits of the hash.
+             */
+            data.flush();
+            byte hasharray[] = md.digest();
+            // int minimum = Math.min(8, hasharray.length);
+            // SerialBug 3: SHA computation is wrong; for loop reversed
+            //for (int i = minimum; i > 0; i--) 
+            for (int i = 0; i < Math.min(8, hasharray.length); i++) {
+                h += (long)(hasharray[i] & 255) << (i * 8);
+            }
+        } catch (IOException ignore) {
+            /* can't happen, but be deterministic anyway. */
+            h = -1;
+        } catch (NoSuchAlgorithmException complain) {
+            SecurityException se = new SecurityException();
+            se.initCause( complain ) ;
+            throw se ;
+        }
+        return h;
     }
 
     /**
      * Compute the JVM signature for the class.
      */
     static String getSignature(Class clazz) {
-	String type = null;
-	if (ClassInfoCache.get( clazz ).isArray()) {
-	    Class cl = clazz;
-	    int dimensions = 0;
-	    while (ClassInfoCache.get( cl ).isArray()) {
-		dimensions++;
-		cl = cl.getComponentType();
-	    }
-	    StringBuffer sb = new StringBuffer();
-	    for (int i = 0; i < dimensions; i++) {
-		sb.append("[");
-	    }
-	    sb.append(getSignature(cl));
-	    type = sb.toString();
-	} else if (clazz.isPrimitive()) {
-	    if (clazz == Integer.TYPE) {
-		type = "I";
-	    } else if (clazz == Byte.TYPE) {
-		type = "B";
-	    } else if (clazz == Long.TYPE) {
-		type = "J";
-	    } else if (clazz == Float.TYPE) {
-		type = "F";
-	    } else if (clazz == Double.TYPE) {
-		type = "D";
-	    } else if (clazz == Short.TYPE) {
-		type = "S";
-	    } else if (clazz == Character.TYPE) {
-		type = "C";
-	    } else if (clazz == Boolean.TYPE) {
-		type = "Z";
-	    } else if (clazz == Void.TYPE) {
-		type = "V";
-	    }
-	} else {
-	    type = "L" + clazz.getName().replace('.', '/') + ";";
-	}
-	return type;
+        String type = null;
+        if (ClassInfoCache.get( clazz ).isArray()) {
+            Class cl = clazz;
+            int dimensions = 0;
+            while (ClassInfoCache.get( cl ).isArray()) {
+                dimensions++;
+                cl = cl.getComponentType();
+            }
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < dimensions; i++) {
+                sb.append("[");
+            }
+            sb.append(getSignature(cl));
+            type = sb.toString();
+        } else if (clazz.isPrimitive()) {
+            if (clazz == Integer.TYPE) {
+                type = "I";
+            } else if (clazz == Byte.TYPE) {
+                type = "B";
+            } else if (clazz == Long.TYPE) {
+                type = "J";
+            } else if (clazz == Float.TYPE) {
+                type = "F";
+            } else if (clazz == Double.TYPE) {
+                type = "D";
+            } else if (clazz == Short.TYPE) {
+                type = "S";
+            } else if (clazz == Character.TYPE) {
+                type = "C";
+            } else if (clazz == Boolean.TYPE) {
+                type = "Z";
+            } else if (clazz == Void.TYPE) {
+                type = "V";
+            }
+        } else {
+            type = "L" + clazz.getName().replace('.', '/') + ";";
+        }
+        return type;
     }
 
     /*
      * Compute the JVM method descriptor for the method.
      */
     static String getSignature(Method meth) {
-	StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
-	sb.append("(");
+        sb.append("(");
 
-	Class[] params = meth.getParameterTypes(); // avoid clone
-	for (int j = 0; j < params.length; j++) {
-	    sb.append(getSignature(params[j]));
-	}
-	sb.append(")");
-	sb.append(getSignature(meth.getReturnType()));
-	return sb.toString();
+        Class[] params = meth.getParameterTypes(); // avoid clone
+        for (int j = 0; j < params.length; j++) {
+            sb.append(getSignature(params[j]));
+        }
+        sb.append(")");
+        sb.append(getSignature(meth.getReturnType()));
+        return sb.toString();
     }
 
     /*
      * Compute the JVM constructor descriptor for the constructor.
      */
     static String getSignature(Constructor cons) {
-	StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
-	sb.append("(");
+        sb.append("(");
 
-	Class[] params = cons.getParameterTypes(); // avoid clone
-	for (int j = 0; j < params.length; j++) {
-	    sb.append(getSignature(params[j]));
-	}
-	sb.append(")V");
-	return sb.toString();
+        Class[] params = cons.getParameterTypes(); // avoid clone
+        for (int j = 0; j < params.length; j++) {
+            sb.append(getSignature(params[j]));
+        }
+        sb.append(")V");
+        return sb.toString();
     }
 
     /*
      * Cache of Class -> ClassDescriptor Mappings.
      */
     static private final SoftCache<Class<?>,ObjectStreamClass> descriptorFor =
-	new SoftCache<Class<?>,ObjectStreamClass>() ;
+        new SoftCache<Class<?>,ObjectStreamClass>() ;
 
     private static Field[] getDeclaredFields(final Class clz) {
         return AccessController.doPrivileged(
-	    new PrivilegedAction<Field[]>() {
-		public Field[] run() {
-		    return clz.getDeclaredFields();
-		}
-	    }
-	);
+            new PrivilegedAction<Field[]>() {
+                public Field[] run() {
+                    return clz.getDeclaredFields();
+                }
+            }
+        );
     }
 
     /*
@@ -1405,19 +1405,19 @@ public class ObjectStreamClass implements java.io.Serializable {
     private static boolean hasStaticInitializer(Class cl) {
         if (hasStaticInitializerMethod == null) {
             Class classWithThisMethod = 
-		java.io.ObjectStreamClass.class ;
+                java.io.ObjectStreamClass.class ;
             
             try {
                 hasStaticInitializerMethod =
                     classWithThisMethod.getDeclaredMethod(
-			"hasStaticInitializer", Class.class );
+                        "hasStaticInitializer", Class.class );
             } catch (NoSuchMethodException ex) {
                 // NOP: reported below
             }
             
             if (hasStaticInitializerMethod == null) {
                 throw Exceptions.self.cantFindHasStaticInitializer(
-		    classWithThisMethod.getName());
+                    classWithThisMethod.getName());
             }
 
             hasStaticInitializerMethod.setAccessible(true);
@@ -1435,7 +1435,7 @@ public class ObjectStreamClass implements java.io.Serializable {
 
     /* The Class Object for java.io.Serializable */
     private static Class<Externalizable> classExternalizable = 
-	Externalizable.class ;
+        Externalizable.class ;
 
     /** use serialVersionUID from JDK 1.1. for interoperability */
     private static final long serialVersionUID = -6120832682080437368L;
@@ -1453,30 +1453,30 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
     private static class ObjectStreamClassEntry // extends java.lang.ref.SoftReference
     {
-	ObjectStreamClassEntry(ObjectStreamClass c) {
-	    //super(c);
-	    this.c = c;
-	}
+        ObjectStreamClassEntry(ObjectStreamClass c) {
+            //super(c);
+            this.c = c;
+        }
 
-	public Object get()
-	{
-	    return c;
-	}
-	private ObjectStreamClass c;
+        public Object get()
+        {
+            return c;
+        }
+        private ObjectStreamClass c;
     }
 
     /*
      * Comparator object for Classes and Interfaces
      */
     private static Comparator<Class> compareClassByName =
-    	new CompareClassByName();
+        new CompareClassByName();
 
     private static class CompareClassByName 
-	implements Comparator<Class> {
+        implements Comparator<Class> {
 
-	public int compare(Class c1, Class c2) {
-	    return c1.getName().compareTo(c2.getName());
-	}
+        public int compare(Class c1, Class c2) {
+            return c1.getName().compareTo(c2.getName());
+        }
     }
 
     /**
@@ -1486,7 +1486,7 @@ public class ObjectStreamClass implements java.io.Serializable {
         = new CompareObjStrFieldsByName();
 
     private static class CompareObjStrFieldsByName 
-	implements Comparator<ObjectStreamField> {
+        implements Comparator<ObjectStreamField> {
 
         public int compare(ObjectStreamField o1, ObjectStreamField o2) {
             return o1.getName().compareTo(o2.getName());
@@ -1497,88 +1497,88 @@ public class ObjectStreamClass implements java.io.Serializable {
      * Comparator object for Members, Fields, and Methods
      */
     private static Comparator<Member> compareMemberByName =
-    	new CompareMemberByName();
+        new CompareMemberByName();
 
     private static class CompareMemberByName 
-	implements Comparator<Member> {
+        implements Comparator<Member> {
 
-	public int compare(Member o1, Member o2) {
-	    String s1 = o1.getName();
-	    String s2 = o2.getName();
+        public int compare(Member o1, Member o2) {
+            String s1 = o1.getName();
+            String s2 = o2.getName();
 
-	    if ((o1 instanceof Method) && (o2 instanceof Method)) {
-		s1 += getSignature((Method)o1);
-		s2 += getSignature((Method)o2);
-	    } else if ((o1 instanceof Constructor) && (o2 instanceof Constructor)) {
-		s1 += getSignature((Constructor)o1);
-		s2 += getSignature((Constructor)o2);
-	    }
-	    return s1.compareTo(s2);
-	}
+            if ((o1 instanceof Method) && (o2 instanceof Method)) {
+                s1 += getSignature((Method)o1);
+                s2 += getSignature((Method)o2);
+            } else if ((o1 instanceof Constructor) && (o2 instanceof Constructor)) {
+                s1 += getSignature((Constructor)o1);
+                s2 += getSignature((Constructor)o2);
+            }
+            return s1.compareTo(s2);
+        }
     }
 
     /* It is expensive to recompute a method or constructor signature
        many times, so compute it only once using this data structure. */
     private static class MethodSignature 
-	implements Comparator<MethodSignature> {
+        implements Comparator<MethodSignature> {
 
-	Member member;
-	String signature;      // cached parameter signature
+        Member member;
+        String signature;      // cached parameter signature
 
-	/* Given an array of Method or Constructor members,
-	   return a sorted array of the non-private members.*/
-	/* A better implementation would be to implement the returned data
-	   structure as an insertion sorted link list.*/
-	static MethodSignature[] removePrivateAndSort(Member[] m) {
-	    int numNonPrivate = 0;
-	    for (int i = 0; i < m.length; i++) {
-		if (! Modifier.isPrivate(m[i].getModifiers())) {
-		    numNonPrivate++;
-		}
-	    }
-	    MethodSignature[] cm = new MethodSignature[numNonPrivate];
-	    int cmi = 0;
-	    for (int i = 0; i < m.length; i++) {
-		if (! Modifier.isPrivate(m[i].getModifiers())) {
-		    cm[cmi] = new MethodSignature(m[i]);
-		    cmi++;
-		}
-	    }
-	    if (cmi > 0)
-		Arrays.sort(cm, cm[0]);
-	    return cm;
-	}
+        /* Given an array of Method or Constructor members,
+           return a sorted array of the non-private members.*/
+        /* A better implementation would be to implement the returned data
+           structure as an insertion sorted link list.*/
+        static MethodSignature[] removePrivateAndSort(Member[] m) {
+            int numNonPrivate = 0;
+            for (int i = 0; i < m.length; i++) {
+                if (! Modifier.isPrivate(m[i].getModifiers())) {
+                    numNonPrivate++;
+                }
+            }
+            MethodSignature[] cm = new MethodSignature[numNonPrivate];
+            int cmi = 0;
+            for (int i = 0; i < m.length; i++) {
+                if (! Modifier.isPrivate(m[i].getModifiers())) {
+                    cm[cmi] = new MethodSignature(m[i]);
+                    cmi++;
+                }
+            }
+            if (cmi > 0)
+                Arrays.sort(cm, cm[0]);
+            return cm;
+        }
 
-	/* Assumes that o1 and o2 are either both methods
-	   or both constructors.*/
-	public int compare(MethodSignature c1, MethodSignature c2) {
-	    /* Arrays.sort calls compare when o1 and o2 are equal.*/
-	    if (c1 == c2)
-		return 0;
+        /* Assumes that o1 and o2 are either both methods
+           or both constructors.*/
+        public int compare(MethodSignature c1, MethodSignature c2) {
+            /* Arrays.sort calls compare when o1 and o2 are equal.*/
+            if (c1 == c2)
+                return 0;
 
-	    int result;
-	    if (isConstructor()) {
-		result = c1.signature.compareTo(c2.signature);
-	    } else { // is a Method.
-		result = c1.member.getName().compareTo(c2.member.getName());
-		if (result == 0)
-		    result = c1.signature.compareTo(c2.signature);
-	    }
-	    return result;
-	}
+            int result;
+            if (isConstructor()) {
+                result = c1.signature.compareTo(c2.signature);
+            } else { // is a Method.
+                result = c1.member.getName().compareTo(c2.member.getName());
+                if (result == 0)
+                    result = c1.signature.compareTo(c2.signature);
+            }
+            return result;
+        }
 
-	final private boolean isConstructor() {
-	    return member instanceof Constructor;
-	}
+        final private boolean isConstructor() {
+            return member instanceof Constructor;
+        }
 
-	private MethodSignature(Member m) {
-	    member = m;
-	    if (isConstructor()) {
-		signature = ObjectStreamClass.getSignature((Constructor)m);
-	    } else {
-		signature = ObjectStreamClass.getSignature((Method)m);
-	    }
-	}
+        private MethodSignature(Member m) {
+            member = m;
+            if (isConstructor()) {
+                signature = ObjectStreamClass.getSignature((Constructor)m);
+            } else {
+                signature = ObjectStreamClass.getSignature((Method)m);
+            }
+        }
     }
 
     /**
@@ -1590,34 +1590,34 @@ public class ObjectStreamClass implements java.io.Serializable {
      * Copied from the Merlin java.io.ObjectStreamClass.
      */
     private static Method getInheritableMethod(Class cl, String name,
-					       Class returnType,
-					       Class... argTypes )
+                                               Class returnType,
+                                               Class... argTypes )
     {
-	Method meth = null;
-	Class defCl = cl;
-	while (defCl != null) {
-	    try {
-		meth = defCl.getDeclaredMethod(name, argTypes);
-		break;
-	    } catch (NoSuchMethodException ex) {
-		defCl = defCl.getSuperclass();
-	    }
-	}
+        Method meth = null;
+        Class defCl = cl;
+        while (defCl != null) {
+            try {
+                meth = defCl.getDeclaredMethod(name, argTypes);
+                break;
+            } catch (NoSuchMethodException ex) {
+                defCl = defCl.getSuperclass();
+            }
+        }
 
-	if ((meth == null) || (meth.getReturnType() != returnType)) {
-	    return null;
-	}
-	meth.setAccessible(true);
-	int mods = meth.getModifiers();
-	if ((mods & (Modifier.STATIC | Modifier.ABSTRACT)) != 0) {
-	    return null;
-	} else if ((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) != 0) {
-	    return meth;
-	} else if ((mods & Modifier.PRIVATE) != 0) {
-	    return (cl == defCl) ? meth : null;
-	} else {
-	    return packageEquals(cl, defCl) ? meth : null;
-	}
+        if ((meth == null) || (meth.getReturnType() != returnType)) {
+            return null;
+        }
+        meth.setAccessible(true);
+        int mods = meth.getModifiers();
+        if ((mods & (Modifier.STATIC | Modifier.ABSTRACT)) != 0) {
+            return null;
+        } else if ((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) != 0) {
+            return meth;
+        } else if ((mods & Modifier.PRIVATE) != 0) {
+            return (cl == defCl) ? meth : null;
+        } else {
+            return packageEquals(cl, defCl) ? meth : null;
+        }
     }
 
     /**
@@ -1625,7 +1625,7 @@ public class ObjectStreamClass implements java.io.Serializable {
      * Copied from the Merlin java.io.ObjectStreamClass.
      */
     private static boolean packageEquals(Class cl1, Class cl2) {
-	Package pkg1 = cl1.getPackage(), pkg2 = cl2.getPackage();
-	return ((pkg1 == pkg2) || ((pkg1 != null) && (pkg1.equals(pkg2))));
+        Package pkg1 = cl1.getPackage(), pkg2 = cl2.getPackage();
+        return ((pkg1 == pkg2) || ((pkg1 != null) && (pkg1.equals(pkg2))));
     }
 }

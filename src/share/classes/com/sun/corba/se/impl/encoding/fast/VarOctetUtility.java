@@ -37,10 +37,10 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.Reader ;
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.Writer ;
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.Reader ;
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.Writer ;
 
 /** Utility methods for reading and writing VarOctets.
  */
@@ -93,16 +93,16 @@ public class VarOctetUtility {
     /* Non-recursive version is about the same speed as the recursive,
      * so we'll use the recursive version to avoid generating short-lived objects.
     private static void putPositiveVarOctetNR( final long data ) {
-	final byte[] temp = new byte[ EmergeCodeFactory.MAX_OCTETS_FOR_VAR_OCTET ] ;
-	int index = 0 ;
-	long current = data ;
-	while (current > 0) {
-	    temp[ index++ ] = (byte)(current & EmergeCodeFactory.VAR_OCTET_MASK) ;
-	    current >>= EmergeCodeFactory.NUM_BITS_PER_VAR_OCTET ;
-	}
-	// Index is the number of elements in temp; now write them from index-1 to 0
-	for (int ctr=index-1; ctr >= 0; ctr-- )
-	    buffer.buffer().put( temp[ctr] ) ;
+        final byte[] temp = new byte[ EmergeCodeFactory.MAX_OCTETS_FOR_VAR_OCTET ] ;
+        int index = 0 ;
+        long current = data ;
+        while (current > 0) {
+            temp[ index++ ] = (byte)(current & EmergeCodeFactory.VAR_OCTET_MASK) ;
+            current >>= EmergeCodeFactory.NUM_BITS_PER_VAR_OCTET ;
+        }
+        // Index is the number of elements in temp; now write them from index-1 to 0
+        for (int ctr=index-1; ctr >= 0; ctr-- )
+            buffer.buffer().put( temp[ctr] ) ;
     }
     */
 

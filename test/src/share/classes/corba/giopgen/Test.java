@@ -56,7 +56,7 @@ public interface Test
     extends Remote
 {
     public int echo(int x, float y, short[] z, String str, Map m )
-	throws RemoteException;
+        throws RemoteException;
 
     public Object testExceptionContext() throws RemoteException ;
 

@@ -51,7 +51,7 @@ import java.util.Properties;
 
 class idlStaticServant
     extends 
-	_idlIImplBase 
+        _idlIImplBase 
 {
     public static final String baseMsg = idlStaticServant.class.getName();
     public static final String from_idlStaticServant = "from idlStaticServant";
@@ -60,42 +60,42 @@ class idlStaticServant
 
     public idlStaticServant(ORB orb)
     {
-	this.orb = orb;
+        this.orb = orb;
     }
 
     public String syncOK(String arg1)
     {
-	return baseMsg + " " + arg1;
+        return baseMsg + " " + arg1;
     }
 
     public synchronized void asyncOK(byte[] data)
     {
-	try {
-	    U.sop(new String(data, C.UTF8));
-	} catch (Exception e) {
-	    U.sopUnexpectedException(baseMsg + C.asyncOK, e);
-	}
+        try {
+            U.sop(new String(data, C.UTF8));
+        } catch (Exception e) {
+            U.sopUnexpectedException(baseMsg + C.asyncOK, e);
+        }
     }
 
     public void throwUserException()
-	throws idlExampleException
+        throws idlExampleException
     {
-	C.throwUserException(from_idlStaticServant);
+        C.throwUserException(from_idlStaticServant);
     }
 
     public void throwSystemException()
     {
-	C.throwSystemException(from_idlStaticServant);
+        C.throwSystemException(from_idlStaticServant);
     }
 
     public void throwUnknownException()
     {
-	C.throwUnknownException(from_idlStaticServant);
+        C.throwUnknownException(from_idlStaticServant);
     }
 
     public void throwUNKNOWN()
     {
-	C.throwUNKNOWN(from_idlStaticServant);
+        C.throwUNKNOWN(from_idlStaticServant);
     }
 
     public void raiseSystemExceptionInSendReply()
@@ -112,29 +112,29 @@ class idlStaticServant
 
     public String testMonitoring ()
     {
-	return "";
+        return "";
     }
 
     public idlValueTypeA sendValue (idlValueTypeA a, 
-				    idlValueTypeB b, 
-				    idlValueTypeC c,
-				    idlValueTypeD d,
-				    idlValueTypeE e,
-				    int[]         f,
-				    byte[]        g)
+                                    idlValueTypeB b, 
+                                    idlValueTypeC c,
+                                    idlValueTypeD d,
+                                    idlValueTypeE e,
+                                    int[]         f,
+                                    byte[]        g)
     {
-	U.sop(d);
-	return b;
+        U.sop(d);
+        return b;
     }
 
     public org.omg.CORBA.Object getAndSaveUnknownORBVersionIOR()
     {
-	throw new RuntimeException("Not implemented");
+        throw new RuntimeException("Not implemented");
     }
 
     public boolean isIdenticalWithSavedIOR(org.omg.CORBA.Object o)
     {
-	throw new RuntimeException("Not implemented");
+        throw new RuntimeException("Not implemented");
     }
 }
 

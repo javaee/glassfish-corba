@@ -38,16 +38,16 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior.iiop ;
+package com.sun.corba.ee.spi.ior.iiop ;
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orb.ORBVersion;
-import com.sun.corba.se.spi.orb.ORBVersionFactory;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfile;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORBVersion;
+import com.sun.corba.ee.spi.orb.ORBVersionFactory;
 
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.ManagedAttribute ;
@@ -68,7 +68,7 @@ public class GIOPVersion {
     // Minor version 00 is unused.
     // Minor version [01-FF] specifies Java serialization encoding version.
     public static final GIOPVersion V13_XX =
-	new GIOPVersion((byte)13, (byte)ORBConstants.JAVA_ENC_VERSION);
+        new GIOPVersion((byte)13, (byte)ORBConstants.JAVA_ENC_VERSION);
 
     public static final GIOPVersion DEFAULT_VERSION = V1_2;
 
@@ -77,7 +77,7 @@ public class GIOPVersion {
     public static final int VERSION_1_2 = 0x0102;
     public static final int VERSION_1_3 = 0x0103;
     public static final int VERSION_13_XX = 
-	(13 << 8) | ORBConstants.JAVA_ENC_VERSION;
+        (13 << 8) | ORBConstants.JAVA_ENC_VERSION;
 
     // Instance variables
 
@@ -132,7 +132,7 @@ public class GIOPVersion {
 
     public int hashCode() 
     {
-	return 37*major + minor ;
+        return 37*major + minor ;
     }
 
     public boolean lessThan(GIOPVersion gv) {
@@ -196,7 +196,7 @@ public class GIOPVersion {
     public static GIOPVersion chooseRequestVersion(ORB orb, IOR ior ) {
 
         GIOPVersion orbVersion = orb.getORBData().getGIOPVersion();
-	IIOPProfile prof = ior.getProfile() ;
+        IIOPProfile prof = ior.getProfile() ;
         GIOPVersion profVersion = prof.getGIOPVersion();
 
         // Check if the profile is from a legacy Sun ORB.

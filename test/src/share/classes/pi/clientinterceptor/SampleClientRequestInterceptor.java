@@ -105,20 +105,20 @@ public class SampleClientRequestInterceptor
 
     private void printPointEntry( String message, RequestInfo ri )
     {
-	if (printPointEntryFlag) {
-	    System.out.println(message +
-			       " " + ri.request_id() +
-			       " " + ri.operation() +
-			       " " + callCounter);
-	}
+        if (printPointEntryFlag) {
+            System.out.println(message +
+                               " " + ri.request_id() +
+                               " " + ri.operation() +
+                               " " + callCounter);
+        }
     }
 
     public SampleClientRequestInterceptor( String name ) {
-	this.name = name;
+        this.name = name;
     }
 
     public String name() {
-	return name;
+        return name;
     }
 
     public void destroy() {
@@ -127,12 +127,12 @@ public class SampleClientRequestInterceptor
     public void send_request (ClientRequestInfo ri) 
         throws ForwardRequest 
     {
-	// Count all calls (and print entry), not just test ones,
-	// to make sure all ORB internal calls are balanced.
-	callCounter++;	// Starting point - add
-	printPointEntry("send_request", ri);
+        // Count all calls (and print entry), not just test ones,
+        // to make sure all ORB internal calls are balanced.
+        callCounter++;  // Starting point - add
+        printPointEntry("send_request", ri);
 
-	if( !enabled ) return;
+        if( !enabled ) return;
 
         // Log that we did a send_request on this interceptor so we can
         // verify invocation order was correct in test.
@@ -148,20 +148,20 @@ public class SampleClientRequestInterceptor
                 // If we are the second interceptor, it is our turn to
                 // throw a SystemException here.
 
-		// Since this starting point is throwing an exception
-		// an ending point will not be called.  Therefore,
-		// explicitly decrement the call counter.
-		callCounter--;
+                // Since this starting point is throwing an exception
+                // an ending point will not be called.  Therefore,
+                // explicitly decrement the call counter.
+                callCounter--;
                 throw new UNKNOWN( "Valid Test Result" );
             }
             else if( testMode == MODE_FORWARD_REQUEST ) {
                 // If we are the second interceptor, it is our turn to
                 // throw a ForwardRequest here.
 
-		// Since this starting point is throwing an exception
-		// an ending point will not be called.  Therefore,
-		// explicitly decrement the call counter.
-		callCounter--;
+                // Since this starting point is throwing an exception
+                // an ending point will not be called.  Therefore,
+                // explicitly decrement the call counter.
+                callCounter--;
                 throw new ForwardRequest( TestInitializer.helloRefForward );
             }
         }
@@ -169,10 +169,10 @@ public class SampleClientRequestInterceptor
 
     public void send_poll (ClientRequestInfo ri) 
     {
-	callCounter++;	// Starting point - add
-	printPointEntry("send_poll", ri);
+        callCounter++;  // Starting point - add
+        printPointEntry("send_poll", ri);
 
-	if( !enabled ) return;
+        if( !enabled ) return;
 
         // Log that we did a send_poll on this interceptor so we can
         // verify invocation order was correct in test.
@@ -181,11 +181,11 @@ public class SampleClientRequestInterceptor
 
     public void receive_reply (ClientRequestInfo ri) 
     {
-	// Ending points have the print/call statements reverse intentionally.
-	printPointEntry("receive_reply", ri);
-	callCounter--; 	// Ending point - subtracm
+        // Ending points have the print/call statements reverse intentionally.
+        printPointEntry("receive_reply", ri);
+        callCounter--;  // Ending point - subtracm
 
-	if( !enabled ) return;
+        if( !enabled ) return;
 
         // Log that we did a receive_reply on this interceptor so we can
         // verify invocation order was correct in test.
@@ -208,10 +208,10 @@ public class SampleClientRequestInterceptor
     public void receive_exception (ClientRequestInfo ri) 
         throws ForwardRequest
     {
-	printPointEntry("receive_exception", ri);
-	callCounter--; 	// Ending point - subtract
+        printPointEntry("receive_exception", ri);
+        callCounter--;  // Ending point - subtract
 
-	if( !enabled ) return;
+        if( !enabled ) return;
 
         // Log that we did a receive_exception on this interceptor so we can
         // verify invocation order was correct in test.
@@ -227,7 +227,7 @@ public class SampleClientRequestInterceptor
                 // If we are the second interceptor, it is our turn to
                 // throw a ForwardRequest here.
                 
-	        throw new ForwardRequest( TestInitializer.helloRefForward );
+                throw new ForwardRequest( TestInitializer.helloRefForward );
             }
         }
     }
@@ -235,10 +235,10 @@ public class SampleClientRequestInterceptor
     public void receive_other (ClientRequestInfo ri) 
         throws ForwardRequest 
     {
-	printPointEntry("receive_other", ri);
-	callCounter--; 	// Ending point - subtract
+        printPointEntry("receive_other", ri);
+        callCounter--;  // Ending point - subtract
 
-	if( !enabled ) return;
+        if( !enabled ) return;
 
         // Log that we did a receive_other on this interceptor so we can
         // verify invocation order was correct in test.

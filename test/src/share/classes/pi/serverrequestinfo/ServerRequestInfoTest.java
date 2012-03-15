@@ -59,83 +59,83 @@ public class ServerRequestInfoTest
 
     /*
     public static String[] javaFiles = { 
-	"ClientCommon.java",
-	"ServerCommon.java", 
-	"POAClient.java", 
-	"POAServer.java",
-	"POALocalClient.java", 
-	"POALocalServer.java",
-	"DSIPOALocalServer.java",
-	"POARemoteClient.java", 
-	"POARemoteServer.java",
-	"DSIPOARemoteServer.java",
-	"RMIClient.java",
-	"RMIServer.java",
-	"DSIRMIClient.java",
-	"DSIRMIServer.java",
-	"RMILocalClient.java",
-	"DSIRMILocalClient.java",
-	"RMILocalServer.java",
-	"DSIRMILocalServer.java",
-	"RMIRemoteClient.java",
-	"DSIRMIRemoteClient.java",
-	"RMIRemoteServer.java",
-	"DSIRMIRemoteServer.java",
-	"TestInitializer.java",
-	"SampleServerRequestInterceptor.java",
-	"DSIImpl.java",
-	"helloDelegate.java",
-	"helloIF.java",
-	"helloServant.java",
-	"helloDSIServant.java",
-	"helloDSIDeprecatedServant.java",
-	"helloRMIIIOP.java",
-	"PolicyFactoryHundred.java",
-	"PolicyHundred.java",
+        "ClientCommon.java",
+        "ServerCommon.java", 
+        "POAClient.java", 
+        "POAServer.java",
+        "POALocalClient.java", 
+        "POALocalServer.java",
+        "DSIPOALocalServer.java",
+        "POARemoteClient.java", 
+        "POARemoteServer.java",
+        "DSIPOARemoteServer.java",
+        "RMIClient.java",
+        "RMIServer.java",
+        "DSIRMIClient.java",
+        "DSIRMIServer.java",
+        "RMILocalClient.java",
+        "DSIRMILocalClient.java",
+        "RMILocalServer.java",
+        "DSIRMILocalServer.java",
+        "RMIRemoteClient.java",
+        "DSIRMIRemoteClient.java",
+        "RMIRemoteServer.java",
+        "DSIRMIRemoteServer.java",
+        "TestInitializer.java",
+        "SampleServerRequestInterceptor.java",
+        "DSIImpl.java",
+        "helloDelegate.java",
+        "helloIF.java",
+        "helloServant.java",
+        "helloDSIServant.java",
+        "helloDSIDeprecatedServant.java",
+        "helloRMIIIOP.java",
+        "PolicyFactoryHundred.java",
+        "PolicyHundred.java",
 
-	// Interception strategies:
-	"InterceptorStrategy.java",
-	"RequestId1Strategy.java",
-	"AttributesValidStrategy.java",
-	"AdapterIdStrategy.java",
-	"OneWayStrategy.java",
-	"ForwardReferenceStrategy.java",
-	"ServiceContextStrategy.java",
-	"ExceptionStrategy.java",
-	"RequestInfoStackStrategy.java",
-	"GetServerPolicyStrategy.java",
+        // Interception strategies:
+        "InterceptorStrategy.java",
+        "RequestId1Strategy.java",
+        "AttributesValidStrategy.java",
+        "AdapterIdStrategy.java",
+        "OneWayStrategy.java",
+        "ForwardReferenceStrategy.java",
+        "ServiceContextStrategy.java",
+        "ExceptionStrategy.java",
+        "RequestInfoStackStrategy.java",
+        "GetServerPolicyStrategy.java",
 
-	// Invocation strategies:
-	"InvokeStrategy.java",
-	"InvokeVisitAll.java",
-	"InvokeExceptions.java",
-	"InvokeOneWay.java",
-	"InvokeVisitAllForward.java"
+        // Invocation strategies:
+        "InvokeStrategy.java",
+        "InvokeVisitAll.java",
+        "InvokeExceptions.java",
+        "InvokeOneWay.java",
+        "InvokeVisitAllForward.java"
     };
 
     public static String[] rmicClasses = {
-	"pi.serverrequestinfo.helloRMIIIOP"
+        "pi.serverrequestinfo.helloRMIIIOP"
     };
     */
 
     protected void doTest() 
         throws Throwable 
     {
-	/*
+        /*
         Options.addIDLCompilerArgs( "-fall" );
         Options.setJavaFiles(javaFiles);
         Options.setIDLFiles(idlFiles);
-	Options.addRMICArgs( "-nolocalstubs -iiop -keep -g" );
+        Options.addRMICArgs( "-nolocalstubs -iiop -keep -g" );
         Options.setRMICClasses( rmicClasses );
 
         compileIDLFiles();
-	compileRMICFiles();
+        compileRMICFiles();
         compileJavaFiles();
-	*/
+        */
 
-	startORBD(); 
-	System.out.println();
-	System.out.println( "      \t\t\t\tLocal\t\tRemote" );
+        startORBD(); 
+        System.out.println();
+        System.out.println( "      \t\t\t\tLocal\t\tRemote" );
 
         beginTest( "[POA]\t\t\t" );
         testPOALocal();
@@ -172,198 +172,198 @@ public class ServerRequestInfoTest
     private void testPOALocal()
         throws Throwable
     {
-	Controller server;
+        Controller server;
 
-	try {
+        try {
 
-	    // Start only a server - the server will create the client in this
-	    // test.  Create it as a client so no handshake is tested for.
-	    server = createClient( "pi.serverrequestinfo.POALocalServer",
-				   "poalocal" );
-	    server.start();
-	    server.waitFor();
-	    printEndTest( server, null );
-	    server.stop();
-	}
-	finally {
-	}
+            // Start only a server - the server will create the client in this
+            // test.  Create it as a client so no handshake is tested for.
+            server = createClient( "pi.serverrequestinfo.POALocalServer",
+                                   "poalocal" );
+            server.start();
+            server.waitFor();
+            printEndTest( server, null );
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testPOARemote()
-	throws Throwable
+        throws Throwable
     {
-	Controller client, server;
+        Controller client, server;
 
-	try {
+        try {
 
-	    server = createServer( "pi.serverrequestinfo.POARemoteServer",
-					      "poa-server" );
-	    server.start();
-	    client = createClient( "pi.serverrequestinfo.POARemoteClient",
-					      "poa-client" );
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
-	    server.stop();
-	}
-	finally {
-	}
+            server = createServer( "pi.serverrequestinfo.POARemoteServer",
+                                              "poa-server" );
+            server.start();
+            client = createClient( "pi.serverrequestinfo.POARemoteClient",
+                                              "poa-client" );
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testPOADSILocal()
         throws Throwable
     {
-	Controller server;
+        Controller server;
 
-	try {
-	    // Start only a server - the server will create the client in this
-	    // test.  Create it as a client so no handshake is tested for.
-	    server = createClient( "pi.serverrequestinfo.DSIPOALocalServer",
-				   "dsipoalocal" );
-	    server.start();
-	    server.waitFor();
-	    printEndTest( server, null );
-	    server.stop();
-	}
-	finally {
-	}
+        try {
+            // Start only a server - the server will create the client in this
+            // test.  Create it as a client so no handshake is tested for.
+            server = createClient( "pi.serverrequestinfo.DSIPOALocalServer",
+                                   "dsipoalocal" );
+            server.start();
+            server.waitFor();
+            printEndTest( server, null );
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testPOADSIRemote()
-	throws Throwable
+        throws Throwable
     {
-	Controller client, server;
+        Controller client, server;
 
-	try {
-	    server = createServer( "pi.serverrequestinfo.DSIPOARemoteServer",
-					      "dsi-poa-server" );
-	    server.start();
-	    client = createClient( "pi.serverrequestinfo.POARemoteClient",
-					      "dsi-poa-client" );
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
-	    server.stop();
-	}
-	finally {
-	}
+        try {
+            server = createServer( "pi.serverrequestinfo.DSIPOARemoteServer",
+                                              "dsi-poa-server" );
+            server.start();
+            client = createClient( "pi.serverrequestinfo.POARemoteClient",
+                                              "dsi-poa-client" );
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testRMILocal()
         throws Throwable
     {
-	Controller server;
+        Controller server;
 
         try {
 
-	    // Start only a server - the server will create the client in this
-	    // test.  Create it as a client so no handshake is tested for.
-	    server = createClient( "pi.serverrequestinfo.RMILocalServer",
-				   "rmilocal" );
-	    server.start();
-	    server.waitFor();
-	    printEndTest( server, null );
-	    server.stop();
-	}
-	finally {
-	}
+            // Start only a server - the server will create the client in this
+            // test.  Create it as a client so no handshake is tested for.
+            server = createClient( "pi.serverrequestinfo.RMILocalServer",
+                                   "rmilocal" );
+            server.start();
+            server.waitFor();
+            printEndTest( server, null );
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testRMIRemote()
         throws Throwable
     {
-	Controller client, server;
+        Controller client, server;
 
         try {
-	    server = createServer( "pi.serverrequestinfo.RMIRemoteServer",
-				   "rmi-server" );
-	    server.start();
-	    client = createClient( "pi.serverrequestinfo.RMIRemoteClient",
-				   "rmi-client" );
+            server = createServer( "pi.serverrequestinfo.RMIRemoteServer",
+                                   "rmi-server" );
+            server.start();
+            client = createClient( "pi.serverrequestinfo.RMIRemoteClient",
+                                   "rmi-client" );
 
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
-	    server.stop();
-	}
-	finally {
-	}
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
+            server.stop();
+        }
+        finally {
+        }
     }
 
     private void testServerRequestDispatcherDSILocal()
-	throws Throwable
+        throws Throwable
     {
-	Controller server;
+        Controller server;
 
         try {
 
-	    // Start only a server - the server will create the client in this
-	    // test.  Create it as a client so no handshake is tested for.
-	    server = createClient( "pi.serverrequestinfo.DSIRMILocalServer",
-				   "dsirmilocal" );
-	    server.start();
-	    server.waitFor();
-	    printEndTest( server, null );
-	    server.stop();
-	}
-	finally {
-	}
+            // Start only a server - the server will create the client in this
+            // test.  Create it as a client so no handshake is tested for.
+            server = createClient( "pi.serverrequestinfo.DSIRMILocalServer",
+                                   "dsirmilocal" );
+            server.start();
+            server.waitFor();
+            printEndTest( server, null );
+            server.stop();
+        }
+        finally {
+        }
     }
 
 
     private void testServerRequestDispatcherDSIRemote()
-	throws Throwable
+        throws Throwable
     {
-	Controller client, server;
+        Controller client, server;
 
         try {
 
-	    server = createServer( "pi.serverrequestinfo.DSIRMIRemoteServer",
-				   "dsi-rmi-server" );
-	    server.start();
-	    client = createClient( "pi.serverrequestinfo.DSIRMIRemoteClient",
-				   "dsi-rmi-client" );
+            server = createServer( "pi.serverrequestinfo.DSIRMIRemoteServer",
+                                   "dsi-rmi-server" );
+            server.start();
+            client = createClient( "pi.serverrequestinfo.DSIRMIRemoteClient",
+                                   "dsi-rmi-client" );
 
-	    client.start();
-	    client.waitFor();
-	    printEndTest( client, server );
-	    client.stop();
+            client.start();
+            client.waitFor();
+            printEndTest( client, server );
+            client.stop();
             server.stop();
-	}
-	finally {
-	}
+        }
+        finally {
+        }
     }
 
     private void beginTest( String name ) 
-	throws Exception
+        throws Exception
     {
-	System.out.print( "      " + name );
+        System.out.print( "      " + name );
     }
 
     private void endTest( String terminator )
-	throws Exception
+        throws Exception
     {
-	System.out.print( terminator );
+        System.out.print( terminator );
     }
 
     private void printEndTest( Controller client, Controller server ) 
-	throws Throwable
+        throws Throwable
     {
-	if( (server != null) && server.finished() ) {
-	    System.out.print( "FAILED, Server crashed" );
-	    failed = true;
-	}
-	else if( client.exitValue() != Controller.SUCCESS ) {
-	    System.out.print( "FAILED, Client exit value = " + 
-		client.exitValue() );
-	    failed = true;
-	}
-	else {
-	    System.out.print( "PASSED" );
-	}
+        if( (server != null) && server.finished() ) {
+            System.out.print( "FAILED, Server crashed" );
+            failed = true;
+        }
+        else if( client.exitValue() != Controller.SUCCESS ) {
+            System.out.print( "FAILED, Client exit value = " + 
+                client.exitValue() );
+            failed = true;
+        }
+        else {
+            System.out.print( "PASSED" );
+        }
     }
     private void startORBD()
         throws Exception

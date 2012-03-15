@@ -63,9 +63,9 @@ public class Client implements Runnable {
     public void run()
     {
         try {
-	    Properties props = new Properties() ;
-	    //props.setProperty( "com.sun.corba.se.ORBDebug", 
-		//"subcontract,transport,naming,serviceContext,transientObjectManager" ) ;
+            Properties props = new Properties() ;
+            //props.setProperty( "com.sun.corba.ee.ORBDebug", 
+                //"subcontract,transport,naming,serviceContext,transientObjectManager" ) ;
             ORB orb = ORB.init( args, props );
 
             String corbalocURL

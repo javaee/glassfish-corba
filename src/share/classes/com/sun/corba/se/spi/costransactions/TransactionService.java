@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.costransactions;
+package com.sun.corba.ee.spi.costransactions;
 
 /** The TransactionService interface must be implemented by all 
     Java Transaction Services. It provides a procedure for initialization
@@ -47,7 +47,7 @@ package com.sun.corba.se.spi.costransactions;
     programmer; it is only an interface between the ORB and the JTS.
     During initialization, the application programmer must provide the
     ORB with a JTS implementation through the property 
-    "com.sun.corba.se.spi.costransactions.TransactionServiceClass". The ORB
+    "com.sun.corba.ee.spi.costransactions.TransactionServiceClass". The ORB
     then instantiates the JTS and calls identify_ORB() on it.
     The following is an example of the 
     initialization steps required in the application code:
@@ -55,9 +55,9 @@ package com.sun.corba.se.spi.costransactions;
     // Create a properties object. The properties may also be given as <br>
     // command line arguments, applet parameters, etc. <br>
     Properties p = new Properties(); <br>
-    p.put("org.omg.CORBA.ORBClass", "com.sun.corba.se.impl.orb.ORBImpl");
-    p.put("com.sun.corba.se.spi.costransactions.ORBJTSClass", 
-    					"com.xyz.SomeTransactionService");
+    p.put("org.omg.CORBA.ORBClass", "com.sun.corba.ee.impl.orb.ORBImpl");
+    p.put("com.sun.corba.ee.spi.costransactions.ORBJTSClass", 
+                                        "com.xyz.SomeTransactionService");
     // This property is given to the JTS in the Properties parameter in identify_ORB().
     p.put("com.xyz.CosTransactions.SomeProperty", "SomeValue");
 
@@ -80,22 +80,22 @@ package com.sun.corba.se.spi.costransactions;
 public interface TransactionService {
 
     /** get_current() is called by the ORB during initialization to
-	obtain the transaction-service's implementation of the Current
-	pseudo-object. Current is available to the application programmer
-	thru orb.resolve_initial_references("TransactionCurrent").
+        obtain the transaction-service's implementation of the Current
+        pseudo-object. Current is available to the application programmer
+        thru orb.resolve_initial_references("TransactionCurrent").
     */
     public org.omg.CosTransactions.Current get_current();
 
     /** identify_ORB is called by the ORB during initialization to
         provide the JTS implementation with an instance of the ORB object, 
-	and a TSIdentification object. The ORB instance is necessary so
-	that client JTS implementations running in applets do not have
-	to store static data which may cause security flaws.
-	The TSIdentification object is used by the JTS to register its Sender 
-	and Receiver callbacks. The Properties object allows the application
-	to pass information to the JTS implementation.
+        and a TSIdentification object. The ORB instance is necessary so
+        that client JTS implementations running in applets do not have
+        to store static data which may cause security flaws.
+        The TSIdentification object is used by the JTS to register its Sender 
+        and Receiver callbacks. The Properties object allows the application
+        to pass information to the JTS implementation.
     */
     public void identify_ORB(org.omg.CORBA.ORB orb, 
-			     org.omg.CORBA.TSIdentification tsi,
-			     java.util.Properties props);
+                             org.omg.CORBA.TSIdentification tsi,
+                             java.util.Properties props);
 }

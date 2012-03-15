@@ -38,11 +38,11 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.extension ;
+package com.sun.corba.ee.spi.extension ;
 
 import org.omg.CORBA.Policy ;
 import org.omg.CORBA.LocalObject ;
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
 /** Policy used to specify the copyObject implementation to use.
 */
@@ -52,31 +52,31 @@ public class CopyObjectPolicy extends LocalObject implements Policy
 
     public CopyObjectPolicy( int value ) 
     {
-	this.value = value ;
+        this.value = value ;
     }
 
     public int getValue()
     {
-	return value ;
+        return value ;
     }
 
     public int policy_type ()
     {
-	return ORBConstants.COPY_OBJECT_POLICY ;
+        return ORBConstants.COPY_OBJECT_POLICY ;
     }
 
     public org.omg.CORBA.Policy copy ()
     {
-	return this ;
+        return this ;
     }
 
     public void destroy ()
     {
-	// NO-OP
+        // NO-OP
     }
 
     public String toString() 
     {
-	return "CopyObjectPolicy[" + value + "]" ;
+        return "CopyObjectPolicy[" + value + "]" ;
     }
 }

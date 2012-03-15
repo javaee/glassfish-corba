@@ -38,24 +38,24 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.ior;
+package com.sun.corba.ee.impl.ior;
 
 
 import org.omg.CORBA_2_3.portable.OutputStream ;
 
-import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
+import com.sun.corba.ee.spi.protocol.ServerRequestDispatcher ;
 
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
-import com.sun.corba.se.spi.ior.ObjectId ;
-import com.sun.corba.se.spi.ior.ObjectAdapterId ;
+import com.sun.corba.ee.spi.ior.ObjectKeyTemplate ;
+import com.sun.corba.ee.spi.ior.ObjectId ;
+import com.sun.corba.ee.spi.ior.ObjectAdapterId ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orb.ORBVersion ;
-import com.sun.corba.se.spi.orb.ORBVersionFactory ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORBVersion ;
+import com.sun.corba.ee.spi.orb.ORBVersionFactory ;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
-import com.sun.corba.se.spi.logging.IORSystemException ;
+import com.sun.corba.ee.spi.logging.IORSystemException ;
 
 /**
  * @author Ken Cavanaugh
@@ -71,44 +71,44 @@ public class WireObjectKeyTemplate implements ObjectKeyTemplate
     @Override
     public boolean equals( Object obj )
     {
-	if (obj == null) {
-	    return false ;
+        if (obj == null) {
+            return false ;
         }
 
-	return obj instanceof WireObjectKeyTemplate ;
+        return obj instanceof WireObjectKeyTemplate ;
     }
 
     @Override
     public int hashCode()
     {
-	return 53 ; // All WireObjectKeyTemplates are the same, so they should 
-		    // have the same hashCode.
+        return 53 ; // All WireObjectKeyTemplates are the same, so they should 
+                    // have the same hashCode.
     }
 
     public WireObjectKeyTemplate( ORB orb )
     {
-	initORB( orb ) ;
+        initORB( orb ) ;
     }
 
     private void initORB( ORB orb ) 
     {
-	this.orb = orb ;
+        this.orb = orb ;
     }
 
     public void write( ObjectId id, OutputStream os ) 
     {
-	byte[] key = id.getId() ;
-	os.write_octet_array( key, 0, key.length ) ;
+        byte[] key = id.getId() ;
+        os.write_octet_array( key, 0, key.length ) ;
     }
 
     public void write( OutputStream os ) 
     {
-	// Does nothing
+        // Does nothing
     }
 
     public int getSubcontractId()
     {
-	return ORBConstants.DEFAULT_SCID ;
+        return ORBConstants.DEFAULT_SCID ;
     }
 
     // While it might make sense to throw an exception here, this causes
@@ -117,38 +117,38 @@ public class WireObjectKeyTemplate implements ObjectKeyTemplate
     // to return an invalid server id.
     public int getServerId() 
     {
-	return -1 ;
+        return -1 ;
     }
 
     public String getORBId()
     {
-	throw wrapper.orbIdNotAvailable() ;
+        throw wrapper.orbIdNotAvailable() ;
     }
 
     public ObjectAdapterId getObjectAdapterId() 
     {
         return NULL_OBJECT_ADAPTER_ID ;
 
-	// throw wrapper.objectAdapterIdNotAvailable() ;
+        // throw wrapper.objectAdapterIdNotAvailable() ;
     }
 
     // Adapter ID is not available, since our
     // ORB did not implement the object carrying this key.
     public byte[] getAdapterId()
     {
-	throw wrapper.adapterIdNotAvailable() ;
+        throw wrapper.adapterIdNotAvailable() ;
     }
 
     public ORBVersion getORBVersion() 
     {
-	return ORBVersionFactory.getFOREIGN() ;
+        return ORBVersionFactory.getFOREIGN() ;
     }
 
     public ServerRequestDispatcher getServerRequestDispatcher( ObjectId id )
     {
-	byte[] bid = id.getId() ;
-	String str = new String( bid ) ;
-	return orb.getRequestDispatcherRegistry().getServerRequestDispatcher(
+        byte[] bid = id.getId() ;
+        String str = new String( bid ) ;
+        return orb.getRequestDispatcherRegistry().getServerRequestDispatcher(
             str ) ;
     }
 }

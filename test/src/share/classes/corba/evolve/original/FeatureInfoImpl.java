@@ -47,30 +47,30 @@ public class FeatureInfoImpl implements FeatureInfo, java.io.Serializable  {
     protected String description;
     
     public FeatureInfoImpl(String name, String description)
-	    throws IllegalArgumentException {
-	this.name = name;    
-	this.description = description;
+            throws IllegalArgumentException {
+        this.name = name;    
+        this.description = description;
     }
 
     public String getName() {
-	return name;
+        return name;
     }
     
     public String getDescription() {
-	return description;
+        return description;
     }  
 
     public boolean equals(Object o) {
-	if (o == this)
-	    return true;
-	if (!(o instanceof FeatureInfoImpl))
-	    return false;
-	FeatureInfoImpl p = (FeatureInfoImpl) o;
-	return (p.getName().equals(getName()) &&
-		p.getDescription().equals(getDescription()));
+        if (o == this)
+            return true;
+        if (!(o instanceof FeatureInfoImpl))
+            return false;
+        FeatureInfoImpl p = (FeatureInfoImpl) o;
+        return (p.getName().equals(getName()) &&
+                p.getDescription().equals(getDescription()));
     }
 
     public int hashCode() {
-	return getName().hashCode() ^ getDescription().hashCode();
+        return getName().hashCode() ^ getDescription().hashCode();
     }
 }

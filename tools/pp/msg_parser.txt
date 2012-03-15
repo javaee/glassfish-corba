@@ -42,53 +42,53 @@ Types:
 
 Primitives (Java primitives use java type codes)
 
-boolean		Z
+boolean         Z
     read_boolean
 
-byte		B
+byte            B
     read_octet
 
-char		C
+char            C
     read_wchar
 
-short		S   
-    read_short	
+short           S   
+    read_short  
 
-int		I
+int             I
     read_long 
 
-long		J
+long            J
     read_longlong
 
-float		F
+float           F
     read_float
 
-double		D
+double          D
     read_double
 
-String		Q
+String          Q
     read_Value(String.class)
 
-Objref		R
+Objref          R
     read ior only:
     IORFactories.makeIOR( InputStream )
 
-Typecode	T
+Typecode        T
     read_TypeCode
 
-Any		A   
+Any             A   
     look at Util.readAny
-	just do read_any result is either objref or value
+        just do read_any result is either objref or value
 
 (ignore Principal, fixed, and context)
 Abstract Interface
     first read boolean, then either objref or value: handle this in the type string
 
-array of type	@type
+array of type   @type
     read length
     read type for length
 
-object		{ type* }
+object          { type* }
     read header (save info)
     read chunk header if necessary
     NOTE: we do not attempt to determine the type in order to
@@ -134,59 +134,59 @@ Value type
     tag is 0x7FFFFF00
     bit 0: 1 iff codebase URL is present
     bits 1 and 2:
-	0: no type info
-	2: single repoid
-	6: list of repoid
+        0: no type info
+        2: single repoid
+        6: list of repoid
     bit 3: 1 if chunked encoding
 
-value	    -> value_tag [ codebase_URL ] [ type_info ] state
-	    |  value_ref
+value       -> value_tag [ codebase_URL ] [ type_info ] state
+            |  value_ref
 
 value_ref   -> indirection_tag indirection
-	    | null_tag
+            | null_tag
 
 value_tag   -> {long in range 0x7FFFFF00 to 0x7FFFFFFF}
 
 type_info   -> rep_ids
-	    | repository_id
+            | repository_id
 
-state	    -> octects
-	    | value_data* [ end_tag ]
+state       -> octects
+            | value_data* [ end_tag ]
 
 value_data  -> value_chunk 
-	    | value
+            | value
 
-rep_ids	    -> long repository_id+
-	    | indirection_tag indirection
+rep_ids     -> long repository_id+
+            | indirection_tag indirection
 
 repository_id -> string
-	    | indirection_tag indirection
+            | indirection_tag indirection
 
-value_chunk	-> chunk_size_tag octets
+value_chunk     -> chunk_size_tag octets
 
-null_tag	-> (long)0
+null_tag        -> (long)0
 
-indirection_tag	-> (long)0xFFFFFFFF
+indirection_tag -> (long)0xFFFFFFFF
 
-codebase_URL	-> string
-		| indirection_tag indirection
+codebase_URL    -> string
+                | indirection_tag indirection
 
 chunk_size_tag  -> {long in range 1 to 0x7FFFFFEFF}
 
-end_tag		-> {long in range 1-2^31 to -1}
+end_tag         -> {long in range 1-2^31 to -1}
 
-indirection	-> {long in range 1-2^31 to -1}
+indirection     -> {long in range 1-2^31 to -1}
 
-80000001	first end chunk
+80000001        first end chunk
 ...
-FFFFFFFF	last end chunk/indirection
-00000000	null
-00000001	first chunk length
+FFFFFFFF        last end chunk/indirection
+00000000        null
+00000001        first chunk length
 ...
-7FFFFEFF	last chunk length
-7FFFFF00	first value header
+7FFFFEFF        last chunk length
+7FFFFF00        first value header
 ...
-7FFFFFFF	last value header
+7FFFFFFF        last value header
 
 Is there an ambiguity here for an end tag of -1?
 This could either be an end tag, or it could be the start
@@ -225,14 +225,14 @@ Basic implementation is interpreter with stack of type strings.
 Most actions are obvious from the table above, but values are
 complicated:
 
-"{":	start of new value type
+"{":    start of new value type
     - handle ind??rection if present in input stream
     - enter new ValueDatum into table for indirections
     - read value header, code base URL, and repo IDs
     - read chunk length if present
     - push ValueDatum onto interpreter stack
 
-"}":	end of value type
+"}":    end of value type
     - if chunked, skip to end of chunk
     - if chunked, read end tag
     - pop value datum from stack and put into container

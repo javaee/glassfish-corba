@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.corba;
+package com.sun.corba.ee.impl.corba;
 
 public interface TypeCodeFactory {
     void setTypeCode(String id, TypeCodeImpl code);

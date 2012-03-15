@@ -67,9 +67,9 @@ public class CharValue implements java.io.Serializable {
 
     public boolean equals (Object it) {
         boolean result = false;
-    	if (this == it) {
-    	    result = true;
-    	} else if (it != null && it instanceof CharValue) {
+        if (this == it) {
+            result = true;
+        } else if (it != null && it instanceof CharValue) {
             CharValue other = (CharValue) it;
             if (other.value == value) {
                 result = true;

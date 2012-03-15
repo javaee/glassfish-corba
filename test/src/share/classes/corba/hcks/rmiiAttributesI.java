@@ -49,37 +49,37 @@ import java.rmi.RemoteException;
 
 public interface rmiiAttributesI
     extends 
-	Remote 
+        Remote 
 { 
     // Test JavaBeans patterns -> IDL attributes.
     Integer getInteger()
-	throws
-	    RemoteException;
+        throws
+            RemoteException;
 
     void    setInteger(Integer x)
-	throws
-	    RemoteException;
+        throws
+            RemoteException;
 
     boolean isTrue()
-	throws
-	    RemoteException;
+        throws
+            RemoteException;
 
     boolean getTrue()
-	throws
-	    RemoteException;
+        throws
+            RemoteException;
 
     void    setTrue(boolean x)
-	throws
-	    RemoteException;
+        throws
+            RemoteException;
 
     // Test that this is NOT a JavaBeans pattern.
     Integer get()
-	throws
-	    RemoteException;
+        throws
+            RemoteException;
 
     void set(Integer x)
-	throws
-	    RemoteException;
+        throws
+            RemoteException;
 }
 
 // End of file.

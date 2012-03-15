@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.threadpool;
+package com.sun.corba.ee.impl.threadpool;
 
 import java.io.IOException ;
 
@@ -47,10 +47,10 @@ import java.security.AccessController ;
 
 import java.util.concurrent.atomic.AtomicInteger ;
 
-import com.sun.corba.se.spi.threadpool.NoSuchThreadPoolException;
-import com.sun.corba.se.spi.threadpool.ThreadPool;
-import com.sun.corba.se.spi.threadpool.ThreadPoolManager;
-import com.sun.corba.se.spi.threadpool.ThreadPoolChooser;
+import com.sun.corba.ee.spi.threadpool.NoSuchThreadPoolException;
+import com.sun.corba.ee.spi.threadpool.ThreadPool;
+import com.sun.corba.ee.spi.threadpool.ThreadPoolManager;
+import com.sun.corba.ee.spi.threadpool.ThreadPoolChooser;
 
 public class ThreadPoolManagerImpl implements ThreadPoolManager 
 { 
@@ -61,7 +61,7 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager
 
     public ThreadPoolManagerImpl() {
         threadGroup = getThreadGroup() ;
-	threadPool = new ThreadPoolImpl( threadGroup,
+        threadPool = new ThreadPoolImpl( threadGroup,
             THREADPOOL_DEFAULT_NAME ) ;
     }
 
@@ -70,45 +70,45 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager
     private ThreadGroup getThreadGroup() {
         ThreadGroup tg ;
 
-	// See bugs 4916766 and 4936203
-	// We intend to create new threads in a reliable thread group.
-	// This avoids problems if the application/applet
-	// creates a thread group, makes JavaIDL calls which create a new
-	// connection and ReaderThread, and then destroys the thread
-	// group. If our ReaderThreads were to be part of such destroyed thread
-	// group then it might get killed and cause other invoking threads
-	// sharing the same connection to get a non-restartable
-	// CommunicationFailure. We'd like to avoid that.
-	//
-	// Our solution is to create all of our threads in the highest thread
-	// group that we have access to, given our own security clearance.
-	//
+        // See bugs 4916766 and 4936203
+        // We intend to create new threads in a reliable thread group.
+        // This avoids problems if the application/applet
+        // creates a thread group, makes JavaIDL calls which create a new
+        // connection and ReaderThread, and then destroys the thread
+        // group. If our ReaderThreads were to be part of such destroyed thread
+        // group then it might get killed and cause other invoking threads
+        // sharing the same connection to get a non-restartable
+        // CommunicationFailure. We'd like to avoid that.
+        //
+        // Our solution is to create all of our threads in the highest thread
+        // group that we have access to, given our own security clearance.
+        //
         try { 
-	    // try to get a thread group that's as high in the threadgroup  
-	    // parent-child hierarchy, as we can get to.
-	    // this will prevent an ORB thread created during applet-init from 
-	    // being killed when an applet dies.
-	    tg = AccessController.doPrivileged( 
-		new PrivilegedAction<ThreadGroup>() { 
-		    public ThreadGroup run() { 
-			ThreadGroup tg = Thread.currentThread().getThreadGroup() ;  
-			ThreadGroup ptg = tg ; 
-			try { 
-			    while (ptg != null) { 
-				tg = ptg;  
-				ptg = tg.getParent(); 
-			    } 
-			} catch (SecurityException se) { 
-			    // Discontinue going higher on a security exception.
-			}
-			return new ThreadGroup(tg, "ORB ThreadGroup " + tgCount.getAndIncrement() ); 
-		    } 
-		}
-	    );
-	} catch (SecurityException e) { 
-	    // something wrong, we go back to the original code 
-	    tg = Thread.currentThread().getThreadGroup(); 
-	}
+            // try to get a thread group that's as high in the threadgroup  
+            // parent-child hierarchy, as we can get to.
+            // this will prevent an ORB thread created during applet-init from 
+            // being killed when an applet dies.
+            tg = AccessController.doPrivileged( 
+                new PrivilegedAction<ThreadGroup>() { 
+                    public ThreadGroup run() { 
+                        ThreadGroup tg = Thread.currentThread().getThreadGroup() ;  
+                        ThreadGroup ptg = tg ; 
+                        try { 
+                            while (ptg != null) { 
+                                tg = ptg;  
+                                ptg = tg.getParent(); 
+                            } 
+                        } catch (SecurityException se) { 
+                            // Discontinue going higher on a security exception.
+                        }
+                        return new ThreadGroup(tg, "ORB ThreadGroup " + tgCount.getAndIncrement() ); 
+                    } 
+                }
+            );
+        } catch (SecurityException e) { 
+            // something wrong, we go back to the original code 
+            tg = Thread.currentThread().getThreadGroup(); 
+        }
 
         return tg ;
     }
@@ -200,9 +200,9 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager
      * passed as argument
      */
     public ThreadPoolChooser getThreadPoolChooser(String componentId) {
-	//FIXME: This method is not used, but should be fixed once
-	//nio select starts working and we start using ThreadPoolChooser
-	return null;
+        //FIXME: This method is not used, but should be fixed once
+        //nio select starts working and we start using ThreadPoolChooser
+        return null;
     }
     /**
      * Return an instance of ThreadPoolChooser based on the componentIndex that was
@@ -210,9 +210,9 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager
      * does not have to pay the cost of computing hashcode for the componentId
      */
     public ThreadPoolChooser getThreadPoolChooser(int componentIndex) {
-	//FIXME: This method is not used, but should be fixed once
-	//nio select starts working and we start using ThreadPoolChooser
-	return null;
+        //FIXME: This method is not used, but should be fixed once
+        //nio select starts working and we start using ThreadPoolChooser
+        return null;
     }
 
     /**
@@ -220,8 +220,8 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager
      * would enable any component to add a ThreadPoolChooser for their specific use
      */
     public void setThreadPoolChooser(String componentId, ThreadPoolChooser aThreadPoolChooser) {
-	//FIXME: This method is not used, but should be fixed once
-	//nio select starts working and we start using ThreadPoolChooser
+        //FIXME: This method is not used, but should be fixed once
+        //nio select starts working and we start using ThreadPoolChooser
     }
 
     /**
@@ -230,9 +230,9 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager
      * efficient implementation i.e. getThreadPoolChooser(int componentIndex)
      */
     public int getThreadPoolChooserNumericId(String componentId) {
-	//FIXME: This method is not used, but should be fixed once
-	//nio select starts working and we start using ThreadPoolChooser
-	return 0;
+        //FIXME: This method is not used, but should be fixed once
+        //nio select starts working and we start using ThreadPoolChooser
+        return 0;
     }
 
 } 

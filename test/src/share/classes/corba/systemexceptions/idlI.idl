@@ -39,8 +39,8 @@
  */
 module corba {
     module systemexceptions {
-	interface idlI {
-	    void invoke(in long excType);
-	};
+        interface idlI {
+            void invoke(in long excType);
+        };
     };
 };

@@ -55,24 +55,24 @@ import javax.rmi.PortableRemoteObject;
 import javax.naming.InitialContext;
 import javax.naming.Context;
 
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 
 public class ORBManager 
 {
     private static final String poaOrbClass = 
-	"com.sun.corba.se.impl.orb.ORBImpl";
+        "com.sun.corba.ee.impl.orb.ORBImpl";
     private static final String poaOrbSingletonClass =
-	"com.sun.corba.se.impl.orb.ORBSingleton";
+        "com.sun.corba.ee.impl.orb.ORBSingleton";
     private static final String peorbConfigClass = 
-	"corba.orbconfigappserv.UserORBConfiguratorImpl";
+        "corba.orbconfigappserv.UserORBConfiguratorImpl";
 
     public static final String OMG_ORB_CLASS_PROPERTY =
             "org.omg.CORBA.ORBClass";
     public static final String OMG_ORB_SINGLETON_CLASS_PROPERTY =
             "org.omg.CORBA.ORBSingletonClass";
     public static final String SUN_PEORB_CONFIGURATOR_CLASS_PROPERTY =
-	    "com.sun.corba.se.ORBUserConfigurators";
+            "com.sun.corba.ee.ORBUserConfigurators";
     public static final String ORB_UTIL_CLASS_PROPERTY =
             "javax.rmi.CORBA.UtilClass";
     public static final String JNDI_PROVIDER_URL_PROPERTY = 
@@ -85,9 +85,9 @@ public class ORBManager
     public static final String OMG_ORB_INIT_PORT_PROPERTY = 
             "org.omg.CORBA.ORBInitialPort";
     public static final String SUN_ORB_SERVER_HOST_PROPERTY =
-            "com.sun.corba.se.ORBServerHost";
+            "com.sun.corba.ee.ORBServerHost";
     public static final String SUN_ORB_SERVER_PORT_PROPERTY =
-            "com.sun.corba.se.ORBServerPort";
+            "com.sun.corba.ee.ORBServerPort";
 
     public static final String RMIIIOP_STUB_DELEGATE_CLASS_PROPERTY =
             "javax.rmi.CORBA.StubClass";
@@ -95,7 +95,7 @@ public class ORBManager
             "javax.rmi.CORBA.PortableRemoteObjectClass";
     
     public static final String SUN_ORB_SOCKET_FACTORY_CLASS_PROPERTY =
-            "com.sun.corba.se.connection.ORBSocketFactoryClass";
+            "com.sun.corba.ee.connection.ORBSocketFactoryClass";
     
     private static final String J2EE_INITIALIZER = 
             "corba.orbconfigappserv.ORBInitializerImpl";
@@ -103,7 +103,7 @@ public class ORBManager
             "org.omg.PortableInterceptor.ORBInitializerClass.";
 
     public static final String ORB_LISTEN_SOCKET_PROPERTY =
-            "com.sun.corba.se.connection.ORBListenSocket";
+            "com.sun.corba.ee.connection.ORBListenSocket";
     private static final String IIOP_CLEAR_TEXT_CONNECTION =
             "IIOP_CLEAR_TEXT";
 
@@ -115,25 +115,25 @@ public class ORBManager
 
     public static void main(String[] av)
     {
-	testInit("First init:", av, null);
+        testInit("First init:", av, null);
 
-	Properties props = new Properties();
-	props.put(UserORBConfiguratorImpl.propertyName,
-		  "corba.orbconfigappserver.ORBManager");
-	testInit("Second init:", av, props);
+        Properties props = new Properties();
+        props.put(UserORBConfiguratorImpl.propertyName,
+                  "corba.orbconfigappserver.ORBManager");
+        testInit("Second init:", av, props);
 
-	System.out.println();
-	System.out.println("DONE");
+        System.out.println();
+        System.out.println("DONE");
     }
 
     public static void testInit(String msg, String[] av, Properties props)
     {
-	System.out.println();
-	System.out.println(msg);
-	System.out.println();
-	init(av, null);
-	System.out.println(
-         ((com.sun.corba.se.spi.orb.ORB)orb).getORBData().getORBInitialHost());
+        System.out.println();
+        System.out.println(msg);
+        System.out.println();
+        init(av, null);
+        System.out.println(
+         ((com.sun.corba.ee.spi.orb.ORB)orb).getORBData().getORBInitialHost());
     }
 
     /**
@@ -141,18 +141,18 @@ public class ORBManager
      * This must be called before calling other methods within this class.
      */
     public static synchronized void init(String[] args, Properties props)  {
-	/*
+        /*
         if (orb != null) // There should be only ONE ORB.
             return;
-	*/
+        */
 
-	orb = createORB(args, props);
+        orb = createORB(args, props);
     }
 
     public static org.omg.CORBA.ORB getORB() {
-	if ( orb == null ) 
-	    init(null, null);
-	return orb;
+        if ( orb == null ) 
+            init(null, null);
+        return orb;
     }
 
     /**
@@ -160,158 +160,158 @@ public class ORBManager
      * JTS initialization. No one else should have to call this
      */
     public static synchronized void setORB(org.omg.CORBA.ORB theORB) {
-	if ( orb == null ) 
-	    orb = theORB;
+        if ( orb == null ) 
+            orb = theORB;
     }
 
 
     public static int getORBInitialPort() {
-	if ( orbInitialPort == -1 )
-	    checkORBInitialPort(new Properties());
-	return orbInitialPort;
+        if ( orbInitialPort == -1 )
+            checkORBInitialPort(new Properties());
+        return orbInitialPort;
     }
 
     private static synchronized ORB createORB(String[] args, Properties props) 
     {
-	ORB neworb = null;
-	Properties orbInitProperties = new Properties();
-	  
-	System.setProperty(OMG_ORB_CLASS_PROPERTY, poaOrbClass);
-	System.setProperty(OMG_ORB_SINGLETON_CLASS_PROPERTY,
-			   poaOrbSingletonClass);
-	System.setProperty(SUN_PEORB_CONFIGURATOR_CLASS_PROPERTY 
-			   + "." + peorbConfigClass,"");
+        ORB neworb = null;
+        Properties orbInitProperties = new Properties();
+          
+        System.setProperty(OMG_ORB_CLASS_PROPERTY, poaOrbClass);
+        System.setProperty(OMG_ORB_SINGLETON_CLASS_PROPERTY,
+                           poaOrbSingletonClass);
+        System.setProperty(SUN_PEORB_CONFIGURATOR_CLASS_PROPERTY 
+                           + "." + peorbConfigClass,"");
     
         System.setProperty(SUN_ORB_SOCKET_FACTORY_CLASS_PROPERTY,
-			   "corba.orbconfigappserv.SocketFactoryImpl");
+                           "corba.orbconfigappserv.SocketFactoryImpl");
 
         if (System.getProperty(ORB_UTIL_CLASS_PROPERTY) == null) {
             System.setProperty(ORB_UTIL_CLASS_PROPERTY,
-			  "com.sun.corba.se.impl.javax.rmi.CORBA.Util");
+                          "com.sun.corba.ee.impl.javax.rmi.CORBA.Util");
         }
 
-	try {
-	    if (props != null) {
-		orbInitProperties.putAll(props);
-	    }
+        try {
+            if (props != null) {
+                orbInitProperties.putAll(props);
+            }
 
-	    orbInitProperties.put(
-		PI_ORB_INITIALIZER_CLASS_PREFIX + J2EE_INITIALIZER, "");
+            orbInitProperties.put(
+                PI_ORB_INITIALIZER_CLASS_PREFIX + J2EE_INITIALIZER, "");
 
-	    orbInitProperties.put("com.sun.corba.se.ORBAllowLocalOptimization", 
-				  "true" ) ;
+            orbInitProperties.put("com.sun.corba.ee.ORBAllowLocalOptimization", 
+                                  "true" ) ;
 
-	    orbInitProperties.put(OMG_ORB_CLASS_PROPERTY, poaOrbClass);
-	    orbInitProperties.put(OMG_ORB_SINGLETON_CLASS_PROPERTY, 
-				  poaOrbSingletonClass);
-	    
-	    String initialPort = checkORBInitialPort(orbInitProperties);
-	    String orbInitialHost = checkORBInitialHost(orbInitProperties);
-	    // Add -ORBInitRef for INS to work
-	    args = addORBInitRef(args, orbInitialHost, initialPort); 
+            orbInitProperties.put(OMG_ORB_CLASS_PROPERTY, poaOrbClass);
+            orbInitProperties.put(OMG_ORB_SINGLETON_CLASS_PROPERTY, 
+                                  poaOrbSingletonClass);
+            
+            String initialPort = checkORBInitialPort(orbInitProperties);
+            String orbInitialHost = checkORBInitialHost(orbInitProperties);
+            // Add -ORBInitRef for INS to work
+            args = addORBInitRef(args, orbInitialHost, initialPort); 
             // START OF IASRI 4627397, 4658320, 4669565, 4676091, 4738349
             checkAdditionalORBListeners(orbInitProperties);
 
             
             neworb = ORB.init(args, orbInitProperties);
-	}
-	catch ( Exception ex ) {
+        }
+        catch ( Exception ex ) {
             System.out.println(ex);
-	}
+        }
 
-	return neworb;
+        return neworb;
     }
     
     private static String checkORBInitialHost(Properties props) 
     {
-	// Host setting in system properties always takes precedence.
-	String orbInitialHost = System.getProperty(OMG_ORB_INIT_HOST_PROPERTY);
-	if ( orbInitialHost == null )
-	    orbInitialHost = props.getProperty(OMG_ORB_INIT_HOST_PROPERTY);
-	System.out.println("Found orb initial host: " + orbInitialHost);
-	orbInitialHost = DEFAULT_ORB_INIT_HOST;
-	System.setProperty(OMG_ORB_INIT_HOST_PROPERTY, orbInitialHost);
-	System.out.println("Overwriting orb initial host to " + orbInitialHost);
+        // Host setting in system properties always takes precedence.
+        String orbInitialHost = System.getProperty(OMG_ORB_INIT_HOST_PROPERTY);
+        if ( orbInitialHost == null )
+            orbInitialHost = props.getProperty(OMG_ORB_INIT_HOST_PROPERTY);
+        System.out.println("Found orb initial host: " + orbInitialHost);
+        orbInitialHost = DEFAULT_ORB_INIT_HOST;
+        System.setProperty(OMG_ORB_INIT_HOST_PROPERTY, orbInitialHost);
+        System.out.println("Overwriting orb initial host to " + orbInitialHost);
         return orbInitialHost;
     }
 
     private static String checkORBInitialPort(Properties props) 
     {
-	// Port setting in system properties always takes precedence.
-	String initialPort = System.getProperty(OMG_ORB_INIT_PORT_PROPERTY);
-	if ( initialPort == null )
-	    initialPort = props.getProperty(OMG_ORB_INIT_PORT_PROPERTY);
-	if( initialPort == null )
-	    initialPort = DEFAULT_ORB_INIT_PORT;
-	System.setProperty(OMG_ORB_INIT_PORT_PROPERTY, initialPort);
-	orbInitialPort = new Integer(initialPort).intValue();
-	System.out.println("Setting orb initial port to " + initialPort);
-	return initialPort;
+        // Port setting in system properties always takes precedence.
+        String initialPort = System.getProperty(OMG_ORB_INIT_PORT_PROPERTY);
+        if ( initialPort == null )
+            initialPort = props.getProperty(OMG_ORB_INIT_PORT_PROPERTY);
+        if( initialPort == null )
+            initialPort = DEFAULT_ORB_INIT_PORT;
+        System.setProperty(OMG_ORB_INIT_PORT_PROPERTY, initialPort);
+        orbInitialPort = new Integer(initialPort).intValue();
+        System.out.println("Setting orb initial port to " + initialPort);
+        return initialPort;
     }
 
     private static void checkAdditionalORBListeners(Properties props) {
-	StringBuffer listenSockets = new StringBuffer("");
-	listenSockets.append(
+        StringBuffer listenSockets = new StringBuffer("");
+        listenSockets.append(
             (listenSockets.length()>0 ? "," : "")
-	    + "FOO" + ":" + 2000
-	    );
-	// Both ways work.
-	//props.setProperty(ORB_LISTEN_SOCKET_PROPERTY, listenSockets.toString());
-	System.setProperty(ORB_LISTEN_SOCKET_PROPERTY, listenSockets.toString());
+            + "FOO" + ":" + 2000
+            );
+        // Both ways work.
+        //props.setProperty(ORB_LISTEN_SOCKET_PROPERTY, listenSockets.toString());
+        System.setProperty(ORB_LISTEN_SOCKET_PROPERTY, listenSockets.toString());
     }
 
     private static String[] addORBInitRef(String[] args, String orbInitialHost, 
-			   String initialPort)
+                           String initialPort)
     {
-	// Add -ORBInitRef NameService=....
-	// This ensures that INS will be used to talk with the NameService.
-	String[] newArgs;
-	int i=0;
-	if ( args == null ) {
-	    newArgs = new String[2];
-	}
-	else {
-	    newArgs = new String[args.length + 2];
-	    for ( ; i<args.length; i++ )
-		newArgs[i] = args[i];
-	}
-	newArgs[i++] = "-ORBInitRef";
-	newArgs[i++] = "NameService=corbaloc:iiop:1.2@" 
-			+ orbInitialHost + ":" + initialPort
-			+ "/NameService";
-	return newArgs;
+        // Add -ORBInitRef NameService=....
+        // This ensures that INS will be used to talk with the NameService.
+        String[] newArgs;
+        int i=0;
+        if ( args == null ) {
+            newArgs = new String[2];
+        }
+        else {
+            newArgs = new String[args.length + 2];
+            for ( ; i<args.length; i++ )
+                newArgs[i] = args[i];
+        }
+        newArgs[i++] = "-ORBInitRef";
+        newArgs[i++] = "NameService=corbaloc:iiop:1.2@" 
+                        + orbInitialHost + ":" + initialPort
+                        + "/NameService";
+        return newArgs;
     }
 
     public static Tie exportObject(java.rmi.Remote remote) 
         throws java.rmi.RemoteException
     {
-	PortableRemoteObject.exportObject(remote);
-	Tie servantsTie = javax.rmi.CORBA.Util.getTie(remote);
-	
-	// Note: at this point the Tie doesnt have a delegate inside it,
-	// so it is not really "exported".
-	// The following call does orb.connect() which is the real exporting
-	servantsTie.orb(getORB());
-	return servantsTie;
+        PortableRemoteObject.exportObject(remote);
+        Tie servantsTie = javax.rmi.CORBA.Util.getTie(remote);
+        
+        // Note: at this point the Tie doesnt have a delegate inside it,
+        // so it is not really "exported".
+        // The following call does orb.connect() which is the real exporting
+        servantsTie.orb(getORB());
+        return servantsTie;
     }
-	
+        
     private static void checkDelegateProps()
     {
-	java.security.AccessController.doPrivileged(new java.security.PrivilegedAction() {
-	    public java.lang.Object run() {
-	
-		String utilDelegate = System.getProperty(ORB_UTIL_CLASS_PROPERTY);
-		if ( utilDelegate == null || utilDelegate.equals("") ) {
-		    // Set up system properties for RMI-IIOP delegates
-		    System.setProperty(RMIIIOP_STUB_DELEGATE_CLASS_PROPERTY, 
-                            "com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl");
-		    System.setProperty(RMIIIOP_PRO_DELEGATE_CLASS_PROPERTY, 
-                            "com.sun.corba.se.impl.javax.rmi.PortableRemoteObject");
-		}
+        java.security.AccessController.doPrivileged(new java.security.PrivilegedAction() {
+            public java.lang.Object run() {
+        
+                String utilDelegate = System.getProperty(ORB_UTIL_CLASS_PROPERTY);
+                if ( utilDelegate == null || utilDelegate.equals("") ) {
+                    // Set up system properties for RMI-IIOP delegates
+                    System.setProperty(RMIIIOP_STUB_DELEGATE_CLASS_PROPERTY, 
+                            "com.sun.corba.ee.impl.javax.rmi.CORBA.StubDelegateImpl");
+                    System.setProperty(RMIIIOP_PRO_DELEGATE_CLASS_PROPERTY, 
+                            "com.sun.corba.ee.impl.javax.rmi.PortableRemoteObject");
+                }
 
-		return null;
-	    }
-	});
+                return null;
+            }
+        });
     }
 }
 

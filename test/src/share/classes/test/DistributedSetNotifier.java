@@ -53,8 +53,8 @@ package test;
  * DistributedSetNotifier provides a simple interface for DistributedSetMonitor
  * instances to provide event notification. 
  *
- * @version	1.0, 5/13/98
- * @author	Bryan Atsatt
+ * @version     1.0, 5/13/98
+ * @author      Bryan Atsatt
  */
 public interface DistributedSetNotifier {
     public void pinged (String fromSetName);

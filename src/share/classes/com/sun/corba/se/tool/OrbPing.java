@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.tool;
+package com.sun.corba.ee.tool;
 
 import org.glassfish.pfl.basic.tools.argparser.ArgParser;
 import org.glassfish.pfl.basic.tools.argparser.DefaultValue;

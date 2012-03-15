@@ -38,13 +38,13 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior ;
+package com.sun.corba.ee.spi.ior ;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
 
-import com.sun.corba.se.spi.ior.Identifiable ;
+import com.sun.corba.ee.spi.ior.Identifiable ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 /** Factory interface for creating Identifiables.
  */

@@ -39,7 +39,7 @@
  */
 
 /*
- * @(#)BitSieve.java	1.12 06/03/10
+ * @(#)BitSieve.java    1.12 06/03/10
  */
 
 package mymath;

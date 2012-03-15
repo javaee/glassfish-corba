@@ -81,22 +81,22 @@ public class ServerTestInitializer
      * Called after all references are registered
      */
     public void post_init (org.omg.PortableInterceptor.ORBInitInfo info) {
-	IORInterceptor iorInterceptor = new SampleIORInterceptor( "test", out);
-	IORInterceptor npeIORInterceptor = new NPEIORInterceptor( "npe", out);
-	try {
-	    out.println( "    - post_init: adding Sample IOR Interceptor..." );
-	    info.add_ior_interceptor( iorInterceptor );
-	    out.println( "    - post_init: adding NPE IOR Interceptor..." );
-	    info.add_ior_interceptor( npeIORInterceptor );
+        IORInterceptor iorInterceptor = new SampleIORInterceptor( "test", out);
+        IORInterceptor npeIORInterceptor = new NPEIORInterceptor( "npe", out);
+        try {
+            out.println( "    - post_init: adding Sample IOR Interceptor..." );
+            info.add_ior_interceptor( iorInterceptor );
+            out.println( "    - post_init: adding NPE IOR Interceptor..." );
+            info.add_ior_interceptor( npeIORInterceptor );
         }
-	catch( DuplicateName e ) {
-	    out.println( "    - post_init: received DuplicateName!" );
-	    postInitFailed = true;
-	}
+        catch( DuplicateName e ) {
+            out.println( "    - post_init: received DuplicateName!" );
+            postInitFailed = true;
+        }
 
-	out.println( "    - post_init: registering PolicyFactory for 100..." );
-	PolicyFactory policyFactory100 = new PolicyFactoryHundred();
-	info.register_policy_factory( 100, policyFactory100 );
+        out.println( "    - post_init: registering PolicyFactory for 100..." );
+        PolicyFactory policyFactory100 = new PolicyFactoryHundred();
+        info.register_policy_factory( 100, policyFactory100 );
     }
 
 }

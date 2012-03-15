@@ -38,10 +38,10 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.logex.corba ;
+package com.sun.corba.ee.spi.logex.corba ;
 
-import com.sun.corba.se.spi.logex.stdcorba.StandardLogger;
-import com.sun.corba.se.org.omg.CORBA.SUNVMCID;
+import com.sun.corba.ee.spi.logex.stdcorba.StandardLogger;
+import com.sun.corba.ee.org.omg.CORBA.SUNVMCID;
 import java.lang.reflect.Constructor;
 
 import java.lang.reflect.Method;
@@ -107,39 +107,39 @@ public class CorbaExtension extends StandardLogger {
 
     private static final Class<?>[] SYS_EX_CLASSES = {
         UNKNOWN.class, BAD_PARAM.class, NO_MEMORY.class, 
-	IMP_LIMIT.class, COMM_FAILURE.class, INV_OBJREF.class,
-	NO_PERMISSION.class, INTERNAL.class, MARSHAL.class,
-	INITIALIZE.class, NO_IMPLEMENT.class, BAD_TYPECODE.class,
+        IMP_LIMIT.class, COMM_FAILURE.class, INV_OBJREF.class,
+        NO_PERMISSION.class, INTERNAL.class, MARSHAL.class,
+        INITIALIZE.class, NO_IMPLEMENT.class, BAD_TYPECODE.class,
         BAD_OPERATION.class, NO_RESOURCES.class, NO_RESPONSE.class, 
-	PERSIST_STORE.class, BAD_INV_ORDER.class, TRANSIENT.class,
-	FREE_MEM.class, INV_IDENT.class, INV_FLAG.class,
-	INTF_REPOS.class, BAD_CONTEXT.class, OBJ_ADAPTER.class,
+        PERSIST_STORE.class, BAD_INV_ORDER.class, TRANSIENT.class,
+        FREE_MEM.class, INV_IDENT.class, INV_FLAG.class,
+        INTF_REPOS.class, BAD_CONTEXT.class, OBJ_ADAPTER.class,
         DATA_CONVERSION.class, OBJECT_NOT_EXIST.class, TRANSACTION_REQUIRED.class, 
-	TRANSACTION_ROLLEDBACK.class, INVALID_TRANSACTION.class, INV_POLICY.class,
-	CODESET_INCOMPATIBLE.class, REBIND.class, TIMEOUT.class,
-	TRANSACTION_UNAVAILABLE.class, BAD_QOS.class, INVALID_ACTIVITY.class,
+        TRANSACTION_ROLLEDBACK.class, INVALID_TRANSACTION.class, INV_POLICY.class,
+        CODESET_INCOMPATIBLE.class, REBIND.class, TIMEOUT.class,
+        TRANSACTION_UNAVAILABLE.class, BAD_QOS.class, INVALID_ACTIVITY.class,
         ACTIVITY_COMPLETED.class, ACTIVITY_REQUIRED.class } ;
 
     @SuppressWarnings("unchecked")
     private static final List<Constructor<SystemException>> SYS_EX_CONSTRUCTORS =
-	new ArrayList<Constructor<SystemException>>(
+        new ArrayList<Constructor<SystemException>>(
             SYS_EX_CLASSES.length) ;
 
     static {
-	Class<?>[] ptypes = { String.class, int.class,
-	    CompletionStatus.class } ;
+        Class<?>[] ptypes = { String.class, int.class,
+            CompletionStatus.class } ;
 
         for (Class<?> cls : SYS_EX_CLASSES) {
-		try {
+                try {
                     @SuppressWarnings("unchecked")
-		    final Constructor<SystemException> cons =
+                    final Constructor<SystemException> cons =
                         (Constructor<SystemException>)cls.getDeclaredConstructor(
                             ptypes);
-		    SYS_EX_CONSTRUCTORS.add(cons) ;
-		} catch (Exception ex) {
-		    throw new RuntimeException(
-			"Cound not find constructor for " + cls, ex ) ;
-		}
+                    SYS_EX_CONSTRUCTORS.add(cons) ;
+                } catch (Exception ex) {
+                    throw new RuntimeException(
+                        "Cound not find constructor for " + cls, ex ) ;
+                }
 
 
         }
@@ -153,43 +153,43 @@ public class CorbaExtension extends StandardLogger {
         }
 
         throw new RuntimeException(
-	    cls + " is not a subclass of SystemException" ) ;
+            cls + " is not a subclass of SystemException" ) ;
     }
 
     private ORBException getORBException( Method method) {
         final Class<?> cls = method.getDeclaringClass() ;
-	final ORBException orbex = cls.getAnnotation( ORBException.class ) ;
-	return orbex ;
+        final ORBException orbex = cls.getAnnotation( ORBException.class ) ;
+        return orbex ;
     }
 
     private Log getLog( Method method ) {
-	Log log = method.getAnnotation( Log.class );
-	if (log == null) {
-		throw new RuntimeException(
-		    "No Log annotation present on " + method ) ;
+        Log log = method.getAnnotation( Log.class );
+        if (log == null) {
+                throw new RuntimeException(
+                    "No Log annotation present on " + method ) ;
         } else {
-	    return log ;
+            return log ;
         }
     }
 
     private int getExceptionId( Method method ) {
         final Class<?> rtype = method.getReturnType() ;
-	final int exceptionId = findClass( rtype ) ;
-	return exceptionId ;
+        final int exceptionId = findClass( rtype ) ;
+        return exceptionId ;
     }
 
     private int getMinorCode( ORBException orbex, Log log ) {
-	return 200*orbex.group() + log.id() ;
+        return 200*orbex.group() + log.id() ;
     }
 
     public int getMinorCode( Method method ) {
-	final ORBException orbex = getORBException( method ) ;
-	final Log log = getLog( method ) ;
-	final int minorCode = getMinorCode( orbex, log ) ;
+        final ORBException orbex = getORBException( method ) ;
+        final Log log = getLog( method ) ;
+        final int minorCode = getMinorCode( orbex, log ) ;
         final int base = orbex.omgException() ?
             SUNVMCID.value :
             OMGVMCID.value ;
-	return base + minorCode ;
+        return base + minorCode ;
     }
 
     public int getMinorCode( Class<?> cls, String methodName ) {
@@ -215,43 +215,43 @@ public class CorbaExtension extends StandardLogger {
     // MinorCode is 200*groupId + id
     @Override
     public String getLogId( Method method ) {
-	final ORBException orbex = getORBException( method ) ;
-	final Log log = getLog( method ) ;
-	final int minorCode = getMinorCode( orbex, log ) ;
-	final int exceptionId = getExceptionId( method ) ;
+        final ORBException orbex = getORBException( method ) ;
+        final Log log = getLog( method ) ;
+        final int minorCode = getMinorCode( orbex, log ) ;
+        final int exceptionId = getExceptionId( method ) ;
 
-	final int omgId = orbex.omgException() ? 0 : 1 ;
+        final int omgId = orbex.omgException() ? 0 : 1 ;
 
-	final String result = String.format( "%03d%1d%04d",
-	    exceptionId, omgId, minorCode ) ;
+        final String result = String.format( "%03d%1d%04d",
+            exceptionId, omgId, minorCode ) ;
 
-	return result ;
+        return result ;
     }
 
     @Override
     public Exception makeException( String msg, Method method ) {
-	try {
-	    final ORBException orbex = getORBException( method ) ;
-	    final Log log = getLog( method ) ;
-	    final int minorCode = getMinorCode( orbex, log ) ;
-	    final int exceptionId = getExceptionId(method) ;
+        try {
+            final ORBException orbex = getORBException( method ) ;
+            final Log log = getLog( method ) ;
+            final int minorCode = getMinorCode( orbex, log ) ;
+            final int exceptionId = getExceptionId(method) ;
 
-	    final Constructor<SystemException> cons = SYS_EX_CONSTRUCTORS.get(exceptionId) ;
+            final Constructor<SystemException> cons = SYS_EX_CONSTRUCTORS.get(exceptionId) ;
 
-	    final CS cs = method.getAnnotation( CS.class ) ;
-	    final CSValue csv = cs == null ? CSValue.NO : cs.value() ;
+            final CS cs = method.getAnnotation( CS.class ) ;
+            final CSValue csv = cs == null ? CSValue.NO : cs.value() ;
 
-	    final int base = orbex.omgException() ?
-		SUNVMCID.value :
-		OMGVMCID.value ;
+            final int base = orbex.omgException() ?
+                SUNVMCID.value :
+                OMGVMCID.value ;
 
-	    SystemException result = cons.newInstance(msg, base + minorCode,
+            SystemException result = cons.newInstance(msg, base + minorCode,
                 csv.getCompletionStatus()) ;
 
-	    return result ;
-	} catch (Exception exc) {
-	    throw new RuntimeException( exc ) ;
-	}
+            return result ;
+        } catch (Exception exc) {
+            throw new RuntimeException( exc ) ;
+        }
     }
 
     private static final String CLASS_NAME_SUFFIX = "SystemException" ;

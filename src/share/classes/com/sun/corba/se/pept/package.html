@@ -83,11 +83,11 @@ metadata from one location to another.</li>
 <h3>Key PEPt Interfaces</h3>
 <ul>
 
-<li>{@link com.sun.corba.se.pept.transport.ContactInfoList ContactInfoList}
+<li>{@link com.sun.corba.ee.pept.transport.ContactInfoList ContactInfoList}
     - Client-side address selection mechanism and factory for
     alternate encodings, protocols and transports (EPT).</li>
 
-<li>{@link com.sun.corba.se.pept.transport.Acceptor Acceptor}
+<li>{@link com.sun.corba.ee.pept.transport.Acceptor Acceptor}
     - Server-side endpoint, addressing and factory for alternate EPTs.</li>
 
 </ul>
@@ -98,14 +98,14 @@ metadata from one location to another.</li>
 <li><b>Protocol</b>
   <ul>
 
-  <li>{@link com.sun.corba.se.pept.protocol.ClientDelegate ClientDelegate}
+  <li>{@link com.sun.corba.ee.pept.protocol.ClientDelegate ClientDelegate}
   - The presentation block interacts with <code>ClientDelegate</code>
   to initiate and complete a message send (and a possible
   response). <code>ClientDelegate</code> is a "portability" interface,
   to allow different vendors to plug in their implementation into a
   standard presentation block.</li>
 
-  <li>{@link com.sun.corba.se.pept.protocol.ClientRequestDispatcher
+  <li>{@link com.sun.corba.ee.pept.protocol.ClientRequestDispatcher
   ClientRequestDispatcher} - This interface controls the client-side
   dispatch for a given EPT.</li>
 
@@ -114,15 +114,15 @@ metadata from one location to another.</li>
 <li><b>Transport</b>
   <ul>
 
-  <li>{@link com.sun.corba.se.pept.protocol.ContactInfoList
+  <li>{@link com.sun.corba.ee.pept.protocol.ContactInfoList
   ContactInfoList} - A list of <code>ContactInfo</code> associated
   with a <em>ClientDelegate</em></li>.
 
-  <li>{@link com.sun.corba.se.pept.protocol.ContactInfoListIterator
+  <li>{@link com.sun.corba.ee.pept.protocol.ContactInfoListIterator
     ContactInfoListIterator} - An iterator which chooses the "next"
     EPT-specific <code>ContactInfo</code>.</li>
 
-  <li>{@link com.sun.corba.se.pept.protocol.ContactInfoList
+  <li>{@link com.sun.corba.ee.pept.protocol.ContactInfoList
   ContactInfo} - <em><b>The key PEPt client-side interface.</b></em> The
   presentation block uses a <code>ClientDelegate</code> to select an
   EPT-specific <code>ContactInfo</code>.  That <code>ContactInfo</code>
@@ -140,7 +140,7 @@ metadata from one location to another.</li>
 <li><b>Protocol</b>
   <ul>
 
-  <li>{@link com.sun.corba.se.pept.protocol.ServerRequestDispatcher
+  <li>{@link com.sun.corba.ee.pept.protocol.ServerRequestDispatcher
   ServerRequestDispatcher} - This interface controls the server-side
   dispatch for a given EPT.</li>
 
@@ -149,7 +149,7 @@ metadata from one location to another.</li>
 <li><b>Transport</b>
   <ul>
 
-  <li>{@link com.sun.corba.se.pept.protocol.Acceptor Acceptor}
+  <li>{@link com.sun.corba.ee.pept.protocol.Acceptor Acceptor}
   - <em><b>The key PEPt server-side interface.</b></em> <code>Aceptor</code>
   serves as a factory for EPT-specifc
   <code>ServerRequestDispatcher</code>,
@@ -176,12 +176,12 @@ metadata from one location to another.</li>
 <li><b>Encoding</b>
   <ul>
 
-  <li>{@link com.sun.corba.se.pept.encoding.InputObject InputObject}
+  <li>{@link com.sun.corba.ee.pept.encoding.InputObject InputObject}
   - The presentation block uses an <code>InputObject</code> to
   retrieve programming language typed data from encoded data sent in a
   message.</li>
 
-  <li>{@link com.sun.corba.se.pept.encoding.OutputObject OutputObject}
+  <li>{@link com.sun.corba.ee.pept.encoding.OutputObject OutputObject}
   - The presentation block uses an <code>OutputObject</code> to
   post programming language typed data to be encoded and sent in a 
   message.</li>
@@ -191,12 +191,12 @@ metadata from one location to another.</li>
 <li><b>Protocol</b>
   <ul>
 
-  <li>{@link com.sun.corba.se.pept.protocol.MessageMediator MessageMediator}
+  <li>{@link com.sun.corba.ee.pept.protocol.MessageMediator MessageMediator}
   - A "repository" of data associated with a message to be sent or one
   received.  It is the main object used as an argument for methods of
   the interfaces of the PEPt architecture.</li>
 
-  <li>{@link com.sun.corba.se.pept.protocol.ProtocolHandler ProtocolHandler}
+  <li>{@link com.sun.corba.ee.pept.protocol.ProtocolHandler ProtocolHandler}
   - Used to determine an incoming message and dispatch it
   appropriately.</li>
 
@@ -205,7 +205,7 @@ metadata from one location to another.</li>
 <li><b>transport</b>
   <ul>
 
-  <li>{@link com.sun.corba.se.pept.protocol.Connection Connection}
+  <li>{@link com.sun.corba.ee.pept.protocol.Connection Connection}
   - The top-level abstraction of a "connection" between two PEPt
   peers.  Concreate instances may be TCP/IP sockets, Solaris Doors,
   Shared Memory, ATM, etc.</li>
@@ -333,8 +333,8 @@ type.</li>
       <code>OutputObject</code>.</li>
         <ol>
         <li> The <code>ServerRequestDispatcher</code> would use the
-	<code>Acceptor</code> as a factory to create the EPT-specific
-	<code>OutputObject</code>.</li>
+        <code>Acceptor</code> as a factory to create the EPT-specific
+        <code>OutputObject</code>.</li>
         </ol>
       <li> The Tie would set the response data (normal or error) on
       the <code>OutputObject</code>. </li>
@@ -364,7 +364,7 @@ EPT. The question naturally arises, how are these created?</p>
 <h2>Other PEPt Interfaces</h2>
 
 <ul>
-<li>{@link com.sun.corba.se.pept.broker.Broker Broker} - A repository
+<li>{@link com.sun.corba.ee.pept.broker.Broker Broker} - A repository
 of resources such as transport managers, thread pools, thread local
 data structures, etc.</li>
 </ul>

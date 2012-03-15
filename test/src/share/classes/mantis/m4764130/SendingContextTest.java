@@ -48,7 +48,7 @@ import java.util.Properties;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class SendingContextTest extends CORBATest {
 
@@ -58,8 +58,8 @@ public class SendingContextTest extends CORBATest {
             return;
         }
 
-	Controller orbd   = createORBD();
-	orbd.start();
+        Controller orbd   = createORBD();
+        orbd.start();
 
         Controller server = createServer("mantis.m4764130.Server");
         server.start();
@@ -71,7 +71,7 @@ public class SendingContextTest extends CORBATest {
 
         client.stop();
         server.stop();
-	orbd.stop();
+        orbd.stop();
     }
 }
 

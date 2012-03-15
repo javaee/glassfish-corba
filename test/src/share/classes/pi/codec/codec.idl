@@ -45,8 +45,8 @@ module CodecTest
     };
 
     union TestUnion switch (short) {
-	case 1: double d;
-	case 2: float f;
+        case 1: double d;
+        case 2: float f;
     };
 
 };

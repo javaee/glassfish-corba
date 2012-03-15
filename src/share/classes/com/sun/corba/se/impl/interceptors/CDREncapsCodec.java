@@ -38,21 +38,21 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.interceptors;
+package com.sun.corba.ee.impl.interceptors;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TypeCode;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.impl.encoding.EncapsInputStream;
-import com.sun.corba.se.impl.encoding.EncapsOutputStream;
-import com.sun.corba.se.impl.misc.ORBUtility;
-import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.ee.impl.corba.AnyImpl;
+import com.sun.corba.ee.impl.encoding.EncapsInputStream;
+import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 import org.omg.IOP.Codec;
 import org.omg.IOP.CodecPackage.FormatMismatch;
@@ -103,8 +103,8 @@ public final class CDREncapsCodec
     public byte[] encode( Any data ) 
         throws InvalidTypeForEncoding 
     {
-	if ( data == null ) 
-	    throw wrapper.nullParamNoComplete() ;
+        if ( data == null ) 
+            throw wrapper.nullParamNoComplete() ;
         return encodeImpl( data, true );
     }
 
@@ -115,9 +115,9 @@ public final class CDREncapsCodec
     public Any decode ( byte[] data ) 
         throws FormatMismatch 
     {
-	if( data == null ) 
-	    throw wrapper.nullParamNoComplete() ;
-	return decodeImpl( data, null );
+        if( data == null ) 
+            throw wrapper.nullParamNoComplete() ;
+        return decodeImpl( data, null );
     }
 
     /**
@@ -127,8 +127,8 @@ public final class CDREncapsCodec
     public byte[] encode_value( Any data ) 
         throws InvalidTypeForEncoding 
     {
-	if( data == null ) 
-	    throw wrapper.nullParamNoComplete() ;
+        if( data == null ) 
+            throw wrapper.nullParamNoComplete() ;
         return encodeImpl( data, false );
     }
 
@@ -140,11 +140,11 @@ public final class CDREncapsCodec
     public Any decode_value( byte[] data, TypeCode tc ) 
         throws FormatMismatch, TypeMismatch
     {
-	if( data == null ) 
-	    throw wrapper.nullParamNoComplete() ;
-	if( tc == null ) 
-	    throw  wrapper.nullParamNoComplete() ;
-	return decodeImpl( data, tc );
+        if( data == null ) 
+            throw wrapper.nullParamNoComplete() ;
+        if( tc == null ) 
+            throw  wrapper.nullParamNoComplete() ;
+        return decodeImpl( data, tc );
     }
 
     /**
@@ -156,59 +156,59 @@ public final class CDREncapsCodec
     private byte[] encodeImpl( Any data, boolean sendTypeCode ) 
         throws InvalidTypeForEncoding 
     {
-	if( data == null ) 
-	    throw wrapper.nullParamNoComplete() ;
+        if( data == null ) 
+            throw wrapper.nullParamNoComplete() ;
 
-	// _REVISIT_ Note that InvalidTypeForEncoding is never thrown in
-	// the body of this method.  This is due to the fact that CDR*Stream
-	// will never throw an exception if the encoding is invalid.  To
-	// fix this, the CDROutputStream must know the version of GIOP it
-	// is encoding for and it must check to ensure that, for example,
-	// wstring cannot be encoded in GIOP 1.0.
-	//
-	// As part of the GIOP 1.2 work, the CDRInput and OutputStream will
-	// be versioned.  This can be handled once this work is complete.
+        // _REVISIT_ Note that InvalidTypeForEncoding is never thrown in
+        // the body of this method.  This is due to the fact that CDR*Stream
+        // will never throw an exception if the encoding is invalid.  To
+        // fix this, the CDROutputStream must know the version of GIOP it
+        // is encoding for and it must check to ensure that, for example,
+        // wstring cannot be encoded in GIOP 1.0.
+        //
+        // As part of the GIOP 1.2 work, the CDRInput and OutputStream will
+        // be versioned.  This can be handled once this work is complete.
 
-	byte[] retValue;
+        byte[] retValue;
 
-	// Always use CDR encoding for codec streams. If the thread local
-	// encoding version is set to JSG, push CDR encoding to the thread
-	// local state, and pop it at the end of this method.
+        // Always use CDR encoding for codec streams. If the thread local
+        // encoding version is set to JSG, push CDR encoding to the thread
+        // local state, and pop it at the end of this method.
 
-	boolean pop = false;
-	if (ORBUtility.getEncodingVersion() !=
-	    ORBConstants.CDR_ENC_VERSION) {
-	    ORBUtility.pushEncVersionToThreadLocalState(ORBConstants.CDR_ENC_VERSION);
-	    pop = true;
-	}
+        boolean pop = false;
+        if (ORBUtility.getEncodingVersion() !=
+            ORBConstants.CDR_ENC_VERSION) {
+            ORBUtility.pushEncVersionToThreadLocalState(ORBConstants.CDR_ENC_VERSION);
+            pop = true;
+        }
 
-	try {
+        try {
 
-	    // Create output stream with default endianness.
-	    EncapsOutputStream cdrOut =
-		new EncapsOutputStream((com.sun.corba.se.spi.orb.ORB)orb,
-				       giopVersion);
+            // Create output stream with default endianness.
+            EncapsOutputStream cdrOut =
+                new EncapsOutputStream((com.sun.corba.ee.spi.orb.ORB)orb,
+                                       giopVersion);
 
-	    // This is an encapsulation, so put out the endian:
-	    cdrOut.putEndian();
+            // This is an encapsulation, so put out the endian:
+            cdrOut.putEndian();
 
-	    // Sometimes encode type code:
-	    if( sendTypeCode ) {
-		cdrOut.write_TypeCode( data.type() );
-	    }
+            // Sometimes encode type code:
+            if( sendTypeCode ) {
+                cdrOut.write_TypeCode( data.type() );
+            }
 
-	    // Encode value and return.
-	    data.write_value( cdrOut );
+            // Encode value and return.
+            data.write_value( cdrOut );
 
-	    retValue = cdrOut.toByteArray();
+            retValue = cdrOut.toByteArray();
 
-	} finally {
-	    if (pop) {
-		ORBUtility.popEncVersionFromThreadLocalState();
-	    }
-	}
-	
-	return retValue;
+        } finally {
+            if (pop) {
+                ORBUtility.popEncVersionFromThreadLocalState();
+            }
+        }
+        
+        return retValue;
     }
 
     /**
@@ -220,52 +220,52 @@ public final class CDREncapsCodec
     private Any decodeImpl( byte[] data, TypeCode tc ) 
         throws FormatMismatch 
     {
-	if( data == null ) 
-	    throw wrapper.nullParamNoComplete() ;
+        if( data == null ) 
+            throw wrapper.nullParamNoComplete() ;
 
-	AnyImpl any = null;  // return value
+        AnyImpl any = null;  // return value
 
-	// _REVISIT_ Currently there is no way for us to distinguish between
-	// a FormatMismatch and a TypeMismatch because we cannot get this
-	// information from the CDRInputStream.  If a RuntimeException occurs,
-	// it is turned into a FormatMismatch exception.
+        // _REVISIT_ Currently there is no way for us to distinguish between
+        // a FormatMismatch and a TypeMismatch because we cannot get this
+        // information from the CDRInputStream.  If a RuntimeException occurs,
+        // it is turned into a FormatMismatch exception.
 
-	// Always use CDR encoding for codec streams. If the thread local
-	// encoding version is set to JSG, push CDR encoding to the thread
-	// local state, and pop it at the end of this method.
+        // Always use CDR encoding for codec streams. If the thread local
+        // encoding version is set to JSG, push CDR encoding to the thread
+        // local state, and pop it at the end of this method.
 
-	boolean pop = false;
-	if (ORBUtility.getEncodingVersion() !=
-	    ORBConstants.CDR_ENC_VERSION) {
-	    ORBUtility.pushEncVersionToThreadLocalState(ORBConstants.CDR_ENC_VERSION);
-	    pop = true;
-	}
+        boolean pop = false;
+        if (ORBUtility.getEncodingVersion() !=
+            ORBConstants.CDR_ENC_VERSION) {
+            ORBUtility.pushEncVersionToThreadLocalState(ORBConstants.CDR_ENC_VERSION);
+            pop = true;
+        }
 
-	try {
+        try {
 
-	    EncapsInputStream cdrIn = new EncapsInputStream( orb, data, 
+            EncapsInputStream cdrIn = new EncapsInputStream( orb, data, 
                 data.length, giopVersion );
 
-	    cdrIn.consumeEndian();
+            cdrIn.consumeEndian();
 
-	    // If type code not specified, read it from octet stream:
-	    if( tc == null ) {
-		tc = cdrIn.read_TypeCode();
-	    }
+            // If type code not specified, read it from octet stream:
+            if( tc == null ) {
+                tc = cdrIn.read_TypeCode();
+            }
 
-	    // Create a new Any object:
-	    any = new AnyImpl( (com.sun.corba.se.spi.orb.ORB)orb );
-	    any.read_value( cdrIn, tc );
+            // Create a new Any object:
+            any = new AnyImpl( (com.sun.corba.ee.spi.orb.ORB)orb );
+            any.read_value( cdrIn, tc );
 
-	} catch( RuntimeException e ) {
-	    // See above note.  
-	    throw new FormatMismatch();
-	} finally {
-	    if (pop) {
-		ORBUtility.popEncVersionFromThreadLocalState();
-	    }
-	}
+        } catch( RuntimeException e ) {
+            // See above note.  
+            throw new FormatMismatch();
+        } finally {
+            if (pop) {
+                ORBUtility.popEncVersionFromThreadLocalState();
+            }
+        }
 
-	return any;
+        return any;
     }
 }

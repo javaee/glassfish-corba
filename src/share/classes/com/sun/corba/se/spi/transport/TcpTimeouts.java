@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.transport;
+package com.sun.corba.ee.spi.transport;
 
-import com.sun.corba.se.impl.transport.TcpTimeoutsImpl ;
+import com.sun.corba.ee.impl.transport.TcpTimeoutsImpl ;
 
 /** This interface defines the ability to wait for a configurable time, 
  * applying an exponential backoff to increase the time.  The maximum
@@ -90,39 +90,39 @@ public interface TcpTimeouts {
      * and advance has no effect.
      */
     public interface Waiter {
-	/** Advance to the next timeout value.
-	 */
-	void advance() ;
+        /** Advance to the next timeout value.
+         */
+        void advance() ;
 
-	/** Set the current timeout back to the initial
-	 * value.  Accumulated time is not affected.
-	 */
-	void reset() ;
+        /** Set the current timeout back to the initial
+         * value.  Accumulated time is not affected.
+         */
+        void reset() ;
 
-	/** Return the current timeout value.
-	 * Also increments total time.
-	 */
-	int getTimeForSleep() ;
+        /** Return the current timeout value.
+         * Also increments total time.
+         */
+        int getTimeForSleep() ;
 
-	/** Return the current timeout value,
-	 * but do not increment total wait time.
-	 */
-	int getTime() ;
+        /** Return the current timeout value,
+         * but do not increment total wait time.
+         */
+        int getTime() ;
 
-	/** Return the accumulated wait time.
-	 */
-	int timeWaiting() ;
+        /** Return the accumulated wait time.
+         */
+        int timeWaiting() ;
 
-	/** Sleep for the current timeout value.
-	 * Returns true if sleep happened, otherwise false,
-	 * in the case where the Waiter has expired.
-	 */
-	boolean sleepTime() ;
+        /** Sleep for the current timeout value.
+         * Returns true if sleep happened, otherwise false,
+         * in the case where the Waiter has expired.
+         */
+        boolean sleepTime() ;
 
-	/** Returns true if the waiter has expired.  It expires
-	 * once the total wait time exceeds get_max_wait_time.
-	 */
-	boolean isExpired() ;
+        /** Returns true if the waiter has expired.  It expires
+         * once the total wait time exceeds get_max_wait_time.
+         */
+        boolean isExpired() ;
     }
 
     /** Return a Waiter that can be used for computing a series
@@ -133,44 +133,44 @@ public interface TcpTimeouts {
     /** Factory used to create TcpTimeouts instances.
      */
     public interface Factory {
-	/** Create TcpTimeouts assuming that max_single_wait is 
-	 * unbounded.
-	 */
-	TcpTimeouts create( int initial_time_to_wait,
-	    int max_time_to_wait, int backoff_value ) ;
+        /** Create TcpTimeouts assuming that max_single_wait is 
+         * unbounded.
+         */
+        TcpTimeouts create( int initial_time_to_wait,
+            int max_time_to_wait, int backoff_value ) ;
 
-	/** Create TcpTimeouts using all configuration parameters,
-	 * including a bound on the maximum single wait time.
-	 */
-	TcpTimeouts create( int initial_time_to_wait,
-	    int max_time_to_wait, int backoff_value, int max_single_wait ) ;
+        /** Create TcpTimeouts using all configuration parameters,
+         * including a bound on the maximum single wait time.
+         */
+        TcpTimeouts create( int initial_time_to_wait,
+            int max_time_to_wait, int backoff_value, int max_single_wait ) ;
 
-	/** Create TcpTimeouts from a configuration string.  args must
-	 * be a : separated string, with 3 or 4 args, all of which are
-	 * positive decimal integers.  The integers are in the same
-	 * order as the arguments to the other create methods.
-	 */
-	TcpTimeouts create( String args ) ;
+        /** Create TcpTimeouts from a configuration string.  args must
+         * be a : separated string, with 3 or 4 args, all of which are
+         * positive decimal integers.  The integers are in the same
+         * order as the arguments to the other create methods.
+         */
+        TcpTimeouts create( String args ) ;
     }
 
     Factory factory = new Factory() {
-	public TcpTimeouts create( int initial_time_to_wait,
-	    int max_time_to_wait, int backoff_value ) {
+        public TcpTimeouts create( int initial_time_to_wait,
+            int max_time_to_wait, int backoff_value ) {
 
-	    return new TcpTimeoutsImpl( initial_time_to_wait,
-	        max_time_to_wait, backoff_value ) ;
-	}
+            return new TcpTimeoutsImpl( initial_time_to_wait,
+                max_time_to_wait, backoff_value ) ;
+        }
 
-	public TcpTimeouts create( int initial_time_to_wait,
-	    int max_time_to_wait, int backoff_value, int max_single_wait ) {
+        public TcpTimeouts create( int initial_time_to_wait,
+            int max_time_to_wait, int backoff_value, int max_single_wait ) {
 
-	    return new TcpTimeoutsImpl( initial_time_to_wait,
-	        max_time_to_wait, backoff_value, max_single_wait ) ;
-	}
+            return new TcpTimeoutsImpl( initial_time_to_wait,
+                max_time_to_wait, backoff_value, max_single_wait ) ;
+        }
 
-	public TcpTimeouts create( String args ) {
-	    return new TcpTimeoutsImpl( args ) ;
-	}
+        public TcpTimeouts create( String args ) {
+            return new TcpTimeoutsImpl( args ) ;
+        }
     } ;
 }
 

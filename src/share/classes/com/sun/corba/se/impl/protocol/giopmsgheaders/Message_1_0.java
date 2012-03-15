@@ -38,12 +38,12 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.protocol.giopmsgheaders;
+package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
 import java.nio.ByteBuffer;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 
 /*
  * This implements the GIOP 1.0 Message header.
@@ -53,7 +53,7 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
  */
 
 public class Message_1_0
-        extends com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase {
+        extends com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase {
 
     private static ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
@@ -86,30 +86,30 @@ public class Message_1_0
     }
 
     public int getType() {
-    	return this.message_type;
+        return this.message_type;
     }
 
     public int getSize() {
-	    return this.message_size;
+            return this.message_size;
     }
 
     public boolean isLittleEndian() {
-    	return this.byte_order;
+        return this.byte_order;
     }
 
     public boolean moreFragmentsToFollow() {
-    	return false;
+        return false;
     }
 
     // Mutator methods
 
-    public void	setSize(ByteBuffer byteBuffer, int size) {
-	    this.message_size = size;
+    public void setSize(ByteBuffer byteBuffer, int size) {
+            this.message_size = size;
 
         //
-    	// Patch the size field in the header.
-    	//
-	    int patch = size - GIOPMessageHeaderLength;
+        // Patch the size field in the header.
+        //
+            int patch = size - GIOPMessageHeaderLength;
         if (!isLittleEndian()) {
             byteBuffer.put(8,  (byte)((patch >>> 24) & 0xFF));
             byteBuffer.put(9,  (byte)((patch >>> 16) & 0xFF));
@@ -124,7 +124,7 @@ public class Message_1_0
     }
 
     public FragmentMessage createFragmentMessage() {
-	throw wrapper.fragmentationDisallowed() ;
+        throw wrapper.fragmentationDisallowed() ;
     }
         
     // IO methods

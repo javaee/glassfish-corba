@@ -46,8 +46,8 @@ import java.lang.reflect.InvocationTargetException ;
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
 
-import com.sun.corba.se.impl.encoding.fast.EmergeCode ;
-import com.sun.corba.se.impl.encoding.fast.EmergeCodeFactory ;
+import com.sun.corba.ee.impl.encoding.fast.EmergeCode ;
+import com.sun.corba.ee.impl.encoding.fast.EmergeCodeFactory ;
 
 public class EmergeCodeTest {
     // Short constants that are used a lot

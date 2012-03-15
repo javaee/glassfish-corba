@@ -50,7 +50,7 @@
 package test;
 
 import rmic.HelloTest;
-import com.sun.corba.se.impl.util.Version;
+import com.sun.corba.ee.impl.util.Version;
 
 /*
  * @test
@@ -64,7 +64,7 @@ public class InstallTest extends HelloTest {
         if (TIME_IT) startTime = System.currentTimeMillis();
         return Version.asString() +
             "\n    Running on JDK " + System.getProperty("java.version") + "\n" +
-	    "\n    Verifying installation (requires < 2 minutes to complete)";
+            "\n    Verifying installation (requires < 2 minutes to complete)";
     }
 
     public String getPassed () {

@@ -48,8 +48,8 @@ public class ServerTransient
 {
     public static void main(String av[])
     {
-	String[] args = { Common.Transient };
-	ServerCommon.main(args);
+        String[] args = { Common.Transient };
+        ServerCommon.main(args);
     }
 }
 

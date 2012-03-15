@@ -106,10 +106,10 @@ module IOP {
      * these protocols.
      */
     struct TaggedProfile {
-	/** The tag, represented as a profile id. */
+        /** The tag, represented as a profile id. */
         ProfileId tag;
 
-	/** The associated profile data. */
+        /** The associated profile data. */
         sequence <octet> profile_data;
     };
 
@@ -168,13 +168,13 @@ module IOP {
      * "_is_a" or "_get_interface" pseudo-operations.
      */
     struct IOR {
-	/** The type id, represented as a String. */
+        /** The type id, represented as a String. */
         string type_id;
 
-	/** 
-	 * An array of tagged profiles associated with this 
-	 * object reference. 
-	 */
+        /** 
+         * An array of tagged profiles associated with this 
+         * object reference. 
+         */
         sequence <TaggedProfile> profiles;
     };
 
@@ -221,10 +221,10 @@ module IOP {
      * </ul>
      */
     struct TaggedComponent {
-	/** The tag, represented as a component id. */
+        /** The tag, represented as a component id. */
         ComponentId tag;
 
-	/** The component data associated with the component id. */
+        /** The component data associated with the component id. */
         sequence <octet> component_data;
     };
 
@@ -332,10 +332,10 @@ module IOP {
      * associated data.
      */
     struct ServiceContext {
-	/** The service context id */
+        /** The service context id */
         ServiceId context_id;
 
-	/** The data associated with this service context */
+        /** The data associated with this service context */
         sequence <octet> context_data;
     };
 

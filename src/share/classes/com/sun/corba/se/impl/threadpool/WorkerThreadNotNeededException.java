@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.threadpool;
+package com.sun.corba.ee.impl.threadpool;
 
 public class WorkerThreadNotNeededException extends Exception {
     

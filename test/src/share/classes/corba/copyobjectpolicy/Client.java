@@ -70,10 +70,10 @@ import org.omg.PortableServer.POAPackage.AdapterAlreadyExists ;
 
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
-import com.sun.corba.se.spi.extension.ServantCachingPolicy ;
-import com.sun.corba.se.spi.extension.CopyObjectPolicy ;
+import com.sun.corba.ee.spi.extension.ServantCachingPolicy ;
+import com.sun.corba.ee.spi.extension.CopyObjectPolicy ;
 
 import corba.framework.TraceElement ;
 import corba.framework.MethodEvent ;
@@ -86,54 +86,54 @@ public class Client implements InternalProcess
     }
 
     private POA createPOA( POA rootPOA ) 
-	throws AdapterAlreadyExists, InvalidPolicy,
-	    WrongPolicy, RemoteException
+        throws AdapterAlreadyExists, InvalidPolicy,
+            WrongPolicy, RemoteException
     {
         POA tpoa = rootPOA.create_POA( "POA1", rootPOA.the_POAManager(),
-	    new Policy[] {
-		rootPOA.create_lifespan_policy(
-		    LifespanPolicyValue.TRANSIENT),
-		rootPOA.create_request_processing_policy(
-		    RequestProcessingPolicyValue.USE_SERVANT_MANAGER),
-		rootPOA.create_servant_retention_policy(
-		    ServantRetentionPolicyValue.NON_RETAIN),
-		ServantCachingPolicy.getFullPolicy() 
-	    } 
-	) ; 
+            new Policy[] {
+                rootPOA.create_lifespan_policy(
+                    LifespanPolicyValue.TRANSIENT),
+                rootPOA.create_request_processing_policy(
+                    RequestProcessingPolicyValue.USE_SERVANT_MANAGER),
+                rootPOA.create_servant_retention_policy(
+                    ServantRetentionPolicyValue.NON_RETAIN),
+                ServantCachingPolicy.getFullPolicy() 
+            } 
+        ) ; 
 
-    	EchoImpl impl = new EchoImpl();
-	Servant servant = (Servant)(javax.rmi.CORBA.Util.getTie( impl ) ) ;
+        EchoImpl impl = new EchoImpl();
+        Servant servant = (Servant)(javax.rmi.CORBA.Util.getTie( impl ) ) ;
         EchoServantLocator csl = new EchoServantLocator(servant);
         tpoa.set_servant_manager(csl);
 
-	return tpoa ;
+        return tpoa ;
     }
 
     private POA createPOAWithCopyObjectPolicy( POA rootPOA ) 
-	throws AdapterAlreadyExists, InvalidPolicy,
-	    WrongPolicy, RemoteException
+        throws AdapterAlreadyExists, InvalidPolicy,
+            WrongPolicy, RemoteException
     {
         POA tpoa = rootPOA.create_POA( "POA2", rootPOA.the_POAManager(), 
-	    new Policy[] {
-		rootPOA.create_lifespan_policy(
-		    LifespanPolicyValue.TRANSIENT),
-		rootPOA.create_request_processing_policy(
-		    RequestProcessingPolicyValue.USE_SERVANT_MANAGER),
-		rootPOA.create_servant_retention_policy(
-		    ServantRetentionPolicyValue.NON_RETAIN),
-		ServantCachingPolicy.getFullPolicy(),
-		new CopyObjectPolicy( UserConfigurator.REFERENCE_INDEX ) 
-	    } 
-	) ; 
+            new Policy[] {
+                rootPOA.create_lifespan_policy(
+                    LifespanPolicyValue.TRANSIENT),
+                rootPOA.create_request_processing_policy(
+                    RequestProcessingPolicyValue.USE_SERVANT_MANAGER),
+                rootPOA.create_servant_retention_policy(
+                    ServantRetentionPolicyValue.NON_RETAIN),
+                ServantCachingPolicy.getFullPolicy(),
+                new CopyObjectPolicy( UserConfigurator.REFERENCE_INDEX ) 
+            } 
+        ) ; 
 
-    	EchoImpl impl = new EchoImpl();
-	Servant servant = (Servant)(javax.rmi.CORBA.Util.getTie( impl ) ) ;
+        EchoImpl impl = new EchoImpl();
+        Servant servant = (Servant)(javax.rmi.CORBA.Util.getTie( impl ) ) ;
         EchoServantLocator csl = new EchoServantLocator(servant);
         tpoa.set_servant_manager(csl);
 
-	return tpoa ;
+        return tpoa ;
     }
-	
+        
     private Echo createEcho(POA tpoa)
     {
         // create an objref using POA
@@ -145,36 +145,36 @@ public class Client implements InternalProcess
         Echo echoRef 
             = (Echo)PortableRemoteObject.narrow(obj, Echo.class );
 
-	return echoRef ; 
+        return echoRef ; 
     }
     
     private void checkResult( String name )
     {
-	// The expected result is that the make method is
-	// entered, exited, entered, and exited, since
-	// both the argument and the result are copier.
-	MethodEvent mev = MethodEvent.make( name, 
-	    UserConfigurator.makeMethod ) ;
-	List expected = new ArrayList() ;
-	expected.add( new TraceElement( true, mev ) ) ;
-	expected.add( new TraceElement( false, mev ) ) ;
-	expected.add( new TraceElement( true, mev ) ) ;
-	expected.add( new TraceElement( false, mev ) ) ;
-	boolean ok = UserConfigurator.traceAccum.validate( expected ) ;
-	if (!ok)
-	    throw new RuntimeException( "Test failed for " + name ) ;
+        // The expected result is that the make method is
+        // entered, exited, entered, and exited, since
+        // both the argument and the result are copier.
+        MethodEvent mev = MethodEvent.make( name, 
+            UserConfigurator.makeMethod ) ;
+        List expected = new ArrayList() ;
+        expected.add( new TraceElement( true, mev ) ) ;
+        expected.add( new TraceElement( false, mev ) ) ;
+        expected.add( new TraceElement( true, mev ) ) ;
+        expected.add( new TraceElement( false, mev ) ) ;
+        boolean ok = UserConfigurator.traceAccum.validate( expected ) ;
+        if (!ok)
+            throw new RuntimeException( "Test failed for " + name ) ;
     }
 
     private void performTest(PrintStream out, Echo echoRef,
-	String interceptorName ) 
-	throws RemoteException
+        String interceptorName ) 
+        throws RemoteException
     {
-	UserConfigurator.traceAccum.clear() ;
+        UserConfigurator.traceAccum.clear() ;
 
-	Map arg = new HashMap() ;
-	Object result = echoRef.echo( arg ) ;
+        Map arg = new HashMap() ;
+        Object result = echoRef.echo( arg ) ;
 
-	checkResult( interceptorName ) ;
+        checkResult( interceptorName ) ;
     }
 
     public void run(Properties environment,
@@ -186,38 +186,38 @@ public class Client implements InternalProcess
         environment.list(out);
 
         try {
-	    // Create a new ORB with a user configurator to the ORB that uses 
-	    // ProxyInterceptors.
-	    environment.setProperty( "com.sun.corba.se.ORBAllowLocalOptimization",
-		"true" ) ;
-	    environment.setProperty( 
-		"com.sun.corba.se.ORBUserConfigurators.corba.copyobjectpolicy." +
-		"UserConfigurator", "true" ) ;
+            // Create a new ORB with a user configurator to the ORB that uses 
+            // ProxyInterceptors.
+            environment.setProperty( "com.sun.corba.ee.ORBAllowLocalOptimization",
+                "true" ) ;
+            environment.setProperty( 
+                "com.sun.corba.ee.ORBUserConfigurators.corba.copyobjectpolicy." +
+                "UserConfigurator", "true" ) ;
 
-	    //environment.setProperty( "com.sun.corba.se.ORBDebug", 
-		//"transport,subcontract,poa,serviceContext,giop,giopVersion" ) ;
+            //environment.setProperty( "com.sun.corba.ee.ORBDebug", 
+                //"transport,subcontract,poa,serviceContext,giop,giopVersion" ) ;
 
             ORB orb = ORB.init(args, environment);
 
-	    // Create two POAs, both with the minimal servant caching policy,
-	    //	one without a CopyObjectPolicy (test the default), and
-	    //	one with a non-default valued CopyObjectPolicy.
+            // Create two POAs, both with the minimal servant caching policy,
+            //  one without a CopyObjectPolicy (test the default), and
+            //  one with a non-default valued CopyObjectPolicy.
             POA rootPOA = (POA)orb.resolve_initial_references("RootPOA");
             rootPOA.the_POAManager().activate();
 
-	    POA defaultPoa = createPOA(rootPOA);
-	    POA policyPoa = createPOAWithCopyObjectPolicy(rootPOA ) ;
+            POA defaultPoa = createPOA(rootPOA);
+            POA policyPoa = createPOAWithCopyObjectPolicy(rootPOA ) ;
 
-	    // Invoke on an objref created by each POA, using an operation that
-	    // will invoke copyObject.
+            // Invoke on an objref created by each POA, using an operation that
+            // will invoke copyObject.
 
-	    // Examine the traces and verify correct function.
+            // Examine the traces and verify correct function.
 
             Echo echoRef1 = createEcho( defaultPoa ) ;
-	    performTest(out, echoRef1, UserConfigurator.VALUE_NAME );
+            performTest(out, echoRef1, UserConfigurator.VALUE_NAME );
 
             Echo echoRef2 = createEcho( policyPoa ) ;
-	    performTest(out, echoRef2, UserConfigurator.REFERENCE_NAME );
+            performTest(out, echoRef2, UserConfigurator.REFERENCE_NAME );
         } catch (Exception e) {
             e.printStackTrace(err);
             throw e;
@@ -227,7 +227,7 @@ public class Client implements InternalProcess
     public static void main(String args[])
     {
         try {
-	    (new Client()).run(System.getProperties(),
+            (new Client()).run(System.getProperties(),
                                       args,
                                       System.out,
                                       System.err,
@@ -255,7 +255,7 @@ class EchoServantLocator
                              CookieHolder the_cookie)
         throws org.omg.PortableServer.ForwardRequest
     {
-	return servant ;
+        return servant ;
     }
 
     public void postinvoke(byte[] oid, POA adapter, String operation, 

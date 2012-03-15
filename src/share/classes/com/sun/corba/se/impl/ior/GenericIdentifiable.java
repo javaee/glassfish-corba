@@ -38,14 +38,14 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.ior;
+package com.sun.corba.ee.impl.ior;
 
 import java.util.Arrays ;
 
 import org.omg.CORBA_2_3.portable.InputStream;
 import org.omg.CORBA_2_3.portable.OutputStream;
 
-import com.sun.corba.se.spi.ior.Identifiable ;
+import com.sun.corba.ee.spi.ior.Identifiable ;
 
 import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.ManagedAttribute ;
@@ -64,58 +64,58 @@ public abstract class GenericIdentifiable implements Identifiable
     
     public GenericIdentifiable(int id, InputStream is) 
     {
-	this.id = id ;
-	data = EncapsulationUtility.readOctets( is ) ;
+        this.id = id ;
+        data = EncapsulationUtility.readOctets( is ) ;
     }
     
     public int getId() 
     {
-	return id ;
+        return id ;
     }
     
     public void write(OutputStream os) 
     {
-	os.write_ulong( data.length ) ;
-	os.write_octet_array( data, 0, data.length ) ;
+        os.write_ulong( data.length ) ;
+        os.write_octet_array( data, 0, data.length ) ;
     }
     
     public String toString() 
     {
-	return "GenericIdentifiable[id=" + getId() + "]" ;
+        return "GenericIdentifiable[id=" + getId() + "]" ;
     }
     
     public boolean equals(Object obj) 
     {
-	if (obj == null)
-	    return false ;
+        if (obj == null)
+            return false ;
 
-	if (!(obj instanceof GenericIdentifiable))
-	    return false ;
+        if (!(obj instanceof GenericIdentifiable))
+            return false ;
 
-	GenericIdentifiable encaps = (GenericIdentifiable)obj ;
+        GenericIdentifiable encaps = (GenericIdentifiable)obj ;
 
-	return (getId() == encaps.getId()) && 
-	    Arrays.equals( data, encaps.data ) ;
+        return (getId() == encaps.getId()) && 
+            Arrays.equals( data, encaps.data ) ;
     }
    
     public int hashCode() 
     {
-	int result = 17 ;
-	for (int ctr=0; ctr<data.length; ctr++ )
-	    result = 37*result + data[ctr] ;
-	return result ;
+        int result = 17 ;
+        for (int ctr=0; ctr<data.length; ctr++ )
+            result = 37*result + data[ctr] ;
+        return result ;
     }
 
     public GenericIdentifiable(int id, byte[] data) 
     {
-	this.id = id ;
-	this.data = (byte[])(data.clone()) ;
+        this.id = id ;
+        this.data = (byte[])(data.clone()) ;
     }
     
     @ManagedAttribute
     @Description( "The tagged component or profile CDR encoded data" )
     public byte[] getData() 
     {
-	return (byte[])data.clone() ;
+        return (byte[])data.clone() ;
     }
 }

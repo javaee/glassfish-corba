@@ -717,7 +717,7 @@ public class Preprocessor
     // Was the indicated type found in the symbol table?
     if (entry == anErrorOccurred)
     {
-	System.out.println("Error occured ");
+        System.out.println("Error occured ");
       // Don't have to generate an error, scopedName already has.
       scanner.skipLineComment ();
       token = scanner.getToken ();
@@ -727,7 +727,7 @@ public class Preprocessor
       // by this time we have already parsed the ModuleName and the
       // pragma type, therefore setInterfaceType
       if (entry instanceof InterfaceEntry) {
-	  InterfaceEntry ent = (InterfaceEntry) entry;
+          InterfaceEntry ent = (InterfaceEntry) entry;
           ent.setInterfaceType (InterfaceEntry.LOCAL_SIGNATURE_ONLY);
       }
       token = parser.token;
@@ -752,14 +752,14 @@ public class Preprocessor
       // Don't have to generate an error, scopedName already has.
       scanner.skipLineComment ();
       token = scanner.getToken ();
-	System.out.println("Error occured ");
+        System.out.println("Error occured ");
     }
     else
     {
       // by this time we have already parsed the ModuleName and the
       // pragma type, therefore setInterfaceType
       if (entry instanceof InterfaceEntry) {
-	  InterfaceEntry ent = (InterfaceEntry) entry;
+          InterfaceEntry ent = (InterfaceEntry) entry;
           ent.setInterfaceType (InterfaceEntry.LOCALSERVANT);
       }
       token = parser.token;
@@ -882,7 +882,7 @@ public class Preprocessor
     {
       PragmaHandler handler = (PragmaHandler)pragmaHandlers.elementAt (i);
       if (handler.process (pragmaType, currentToken))
-	        break;
+                break;
     }
   } // otherPragmas
 

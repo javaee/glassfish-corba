@@ -52,7 +52,7 @@ import corba.framework.Controller;
 import corba.hcks.C;
 import corba.hcks.U;
 
-import com.sun.corba.se.impl.legacy.connection.LegacyServerSocketManagerImpl;
+import com.sun.corba.ee.impl.legacy.connection.LegacyServerSocketManagerImpl;
 
 public class Client 
 {
@@ -68,29 +68,29 @@ public class Client
     public static void main(String[] av)
     {
         try {
-	    U.sop(main + " starting");
+            U.sop(main + " starting");
 
-	    if (! ColocatedClientServer.isColocated) {
-		U.sop(main + " : creating ORB.");
-		orb = ORB.init(av, null);
-		U.sop(main + " : creating InitialContext.");
-		initialContext = C.createInitialContext(orb);
-	    }
+            if (! ColocatedClientServer.isColocated) {
+                U.sop(main + " : creating ORB.");
+                orb = ORB.init(av, null);
+                U.sop(main + " : creating InitialContext.");
+                initialContext = C.createInitialContext(orb);
+            }
 
-	    rmiiIPOA = (rmiiI)
-		U.lookupAndNarrow(C.rmiiSL, rmiiI.class, initialContext);
+            rmiiIPOA = (rmiiI)
+                U.lookupAndNarrow(C.rmiiSL, rmiiI.class, initialContext);
 
 
-	    U.sop("CLIENT: " + rmiiIPOA.m(rmiiIPOAArg));
+            U.sop("CLIENT: " + rmiiIPOA.m(rmiiIPOAArg));
 
-	    orb.shutdown(true);
+            orb.shutdown(true);
 
         } catch (Exception e) {
             U.sopUnexpectedException(main + " : ", e);
-	    System.exit(1);
+            System.exit(1);
         }
-	U.sop(main + " ending successfully");
-	System.exit(Controller.SUCCESS);
+        U.sop(main + " ending successfully");
+        System.exit(Controller.SUCCESS);
     }
 }
 

@@ -38,9 +38,9 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.ior;
+package com.sun.corba.ee.spi.ior;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
 import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.IncludeSubclass ;
@@ -55,7 +55,7 @@ import org.glassfish.gmbal.ManagedAttribute ;
  */
 @ManagedData
 @Description( "A TaggedProfile contained in an IOR" )
-@IncludeSubclass( { com.sun.corba.se.spi.ior.iiop.IIOPProfile.class } ) 
+@IncludeSubclass( { com.sun.corba.ee.spi.ior.iiop.IIOPProfile.class } ) 
 public interface TaggedProfile extends Identifiable, MakeImmutable
 {
     @ManagedAttribute

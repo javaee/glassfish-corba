@@ -67,13 +67,13 @@ import org.omg.PortableServer.Servant ;
 
 import org.omg.PortableInterceptor.ORBInitializer ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orb.ORBData ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORBData ;
 
-import com.sun.corba.se.impl.orb.ORBDataParserImpl ;
-import com.sun.corba.se.impl.orb.ORBImpl ;
+import com.sun.corba.ee.impl.orb.ORBDataParserImpl ;
+import com.sun.corba.ee.impl.orb.ORBImpl ;
 
-import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.ee.spi.misc.ORBConstants ;
 
 public class Common
 {
@@ -81,91 +81,91 @@ public class Common
     private static final String NameService = "NameService";
 
     public static org.omg.CORBA.Object resolve(String name, ORB orb)
-	throws 
-	    Exception
+        throws 
+            Exception
     {
-	return getNameService(orb).resolve(makeNameComponent(name));
+        return getNameService(orb).resolve(makeNameComponent(name));
     }
 
     public static org.omg.CORBA.Object rebind(String name,
-					      org.omg.CORBA.Object ref,
-					      ORB orb)
-	throws 
-	    Exception
+                                              org.omg.CORBA.Object ref,
+                                              ORB orb)
+        throws 
+            Exception
     {
-	NamingContext nc = getNameService(orb);
-	nc.rebind(makeNameComponent(name), ref);
-	return ref;
+        NamingContext nc = getNameService(orb);
+        nc.rebind(makeNameComponent(name), ref);
+        return ref;
     }
   
     public static NameComponent[] makeNameComponent(String name)
     {
-	Vector result = new Vector();
-	StringTokenizer tokens = new StringTokenizer(name, "/");
-	while (tokens.hasMoreTokens()) {
-	    result.addElement(tokens.nextToken());
-	}
-	NameComponent path[] = new NameComponent[result.size()];
-	for (int i = 0; i < result.size(); ++i) {
-	    path[i] = new NameComponent((String)result.elementAt(i), "");
-	}
-	return path;
+        Vector result = new Vector();
+        StringTokenizer tokens = new StringTokenizer(name, "/");
+        while (tokens.hasMoreTokens()) {
+            result.addElement(tokens.nextToken());
+        }
+        NameComponent path[] = new NameComponent[result.size()];
+        for (int i = 0; i < result.size(); ++i) {
+            path[i] = new NameComponent((String)result.elementAt(i), "");
+        }
+        return path;
     }
 
     public static NamingContext getNameService(ORB orb) throws Exception
     {
-	return NamingContextHelper.narrow(
+        return NamingContextHelper.narrow(
             orb.resolve_initial_references(NameService));
     }
 
     public static void addORBInitializer( ORB orb, ORBInitializer init ) {
 
-	final ORBData odata = orb.getORBData() ;
+        final ORBData odata = orb.getORBData() ;
 
-	// Add init to the end of a copy of the ORBInitializers
-	// from the ORBData.
-	final ORBInitializer[] oldOrbInits = odata.getORBInitializers() ;
-	final int newIndex = oldOrbInits.length ;
-	final ORBInitializer[] newOrbInits = new ORBInitializer[newIndex+1] ;
-	for (int ctr=0; ctr<newIndex; ctr++)
-	    newOrbInits[ctr] = oldOrbInits[ctr] ;
-	newOrbInits[newIndex] = init ;
+        // Add init to the end of a copy of the ORBInitializers
+        // from the ORBData.
+        final ORBInitializer[] oldOrbInits = odata.getORBInitializers() ;
+        final int newIndex = oldOrbInits.length ;
+        final ORBInitializer[] newOrbInits = new ORBInitializer[newIndex+1] ;
+        for (int ctr=0; ctr<newIndex; ctr++)
+            newOrbInits[ctr] = oldOrbInits[ctr] ;
+        newOrbInits[newIndex] = init ;
 
-	// Nasty hack: Use reflection to set the private field!
-	// REVISIT: AS 9 ORB has an ORB API for setting ORBInitializers.
-	AccessController.doPrivileged(
-	    new PrivilegedAction() {
-		public Object run() {
-		    try {
-			final Field fld = 
-			    ORBDataParserImpl.class.getDeclaredField( 
-				"orbInitializers" ) ;
-			fld.setAccessible( true ) ;
-			fld.set( odata, newOrbInits ) ;
-			return null ;
-		    } catch (Exception exc) {
-		      exc.printStackTrace();
-			throw new RuntimeException( 
-			    "Could not set ORBData.orbInitializers", exc ) ;
-		    }
-		}
-	    }
-	)  ;
+        // Nasty hack: Use reflection to set the private field!
+        // REVISIT: AS 9 ORB has an ORB API for setting ORBInitializers.
+        AccessController.doPrivileged(
+            new PrivilegedAction() {
+                public Object run() {
+                    try {
+                        final Field fld = 
+                            ORBDataParserImpl.class.getDeclaredField( 
+                                "orbInitializers" ) ;
+                        fld.setAccessible( true ) ;
+                        fld.set( odata, newOrbInits ) ;
+                        return null ;
+                    } catch (Exception exc) {
+                      exc.printStackTrace();
+                        throw new RuntimeException( 
+                            "Could not set ORBData.orbInitializers", exc ) ;
+                    }
+                }
+            }
+        )  ;
     }
 
     public static ORB makeControlPlaneORB( String initialHost, int initialPort ) {
-	try {
-	    Properties props = new Properties() ;
-	    props.setProperty( ORBConstants.INITIAL_HOST_PROPERTY, initialHost ) ;
-	    props.setProperty( ORBConstants.INITIAL_PORT_PROPERTY, "" + initialPort ) ;
-	    ORB result = new ORBImpl() ;
-	    result.set_parameters( props ) ;
-	    POA rootPOA = (POA) result.resolve_initial_references("RootPOA") ;
-	    rootPOA.the_POAManager().activate() ;
-	    return result ;
-	} catch (Exception exc) {
-	    throw new RuntimeException( exc ) ;
-	}
+        try {
+            Properties props = new Properties() ;
+            props.setProperty( ORBConstants.INITIAL_HOST_PROPERTY, initialHost ) ;
+            props.setProperty( ORBConstants.INITIAL_PORT_PROPERTY, "" + initialPort ) ;
+            ORB result = new ORBImpl() ;
+            result.set_parameters( props ) ;
+            POA rootPOA = (POA) result.resolve_initial_references("RootPOA") ;
+            rootPOA.the_POAManager().activate() ;
+            return result ;
+        } catch (Exception exc) {
+            throw new RuntimeException( exc ) ;
+        }
     }
 
     /** Create an object reference for the given servant and register it
@@ -177,56 +177,56 @@ public class Common
      * to the name service.
      */
     public static void makeObject(
-	ORB orb, Remote impl, String name ) {
+        ORB orb, Remote impl, String name ) {
 
-	try {
-	    Servant servant = (Servant)javax.rmi.CORBA.Util.getTie( impl ) ;
-	    byte[] id = name.getBytes() ;
-	    POA rootPOA = (POA) orb.resolve_initial_references("RootPOA") ;
-	    rootPOA.activate_object_with_id( id, servant ) ;
-	    org.omg.CORBA.Object ref = rootPOA.id_to_reference( id ) ;
-	    rebind( name, ref, orb ) ;	
-	} catch (Exception exc) {
-	    throw new RuntimeException( exc ) ;
-	}
+        try {
+            Servant servant = (Servant)javax.rmi.CORBA.Util.getTie( impl ) ;
+            byte[] id = name.getBytes() ;
+            POA rootPOA = (POA) orb.resolve_initial_references("RootPOA") ;
+            rootPOA.activate_object_with_id( id, servant ) ;
+            org.omg.CORBA.Object ref = rootPOA.id_to_reference( id ) ;
+            rebind( name, ref, orb ) ;  
+        } catch (Exception exc) {
+            throw new RuntimeException( exc ) ;
+        }
     }
 
     public static <T> T getObject( ORB orb, String name, Class<T> type ) {
-	try {
-	    org.omg.CORBA.Object obj = resolve( name, orb ) ;
-	    return type.cast( PortableRemoteObject.narrow( obj, type ) ) ;
-	} catch (Exception exc) {
-	    throw new RuntimeException( exc ) ;
-	}
+        try {
+            org.omg.CORBA.Object obj = resolve( name, orb ) ;
+            return type.cast( PortableRemoteObject.narrow( obj, type ) ) ;
+        } catch (Exception exc) {
+            throw new RuntimeException( exc ) ;
+        }
     }
 
     /** Return all objrefs of type T in the naming context identified by name.
      * Limited to at most 1000 objrefs (to avoid writing more complex code).
      */
     public static <T> List<T> getObjects( ORB orb, String name, Class<T> type ) {
-	try {
-	    org.omg.CORBA.Object obj = resolve( name, orb ) ;
-	    NamingContext nc = NamingContextHelper.narrow( obj ) ;
-	    BindingListHolder blh = new BindingListHolder() ;
-	    BindingIteratorHolder bih = new BindingIteratorHolder() ;
-	    nc.list( 1000, blh, bih ) ;
-	    List<T> result = new ArrayList<T>() ;
-	    for (Binding bind : blh.value) {
-		try {
-		    if (bind.binding_type.value() == BindingType._nobject) {
-			org.omg.CORBA.Object elem = nc.resolve( bind.binding_name ) ;
-			result.add( type.cast( PortableRemoteObject.narrow( elem,
-			    type ) ));
-		    }
-		} catch (Exception exc) {
-		    // elem was not an object of type type: ignore it.
-		}
-	    }
+        try {
+            org.omg.CORBA.Object obj = resolve( name, orb ) ;
+            NamingContext nc = NamingContextHelper.narrow( obj ) ;
+            BindingListHolder blh = new BindingListHolder() ;
+            BindingIteratorHolder bih = new BindingIteratorHolder() ;
+            nc.list( 1000, blh, bih ) ;
+            List<T> result = new ArrayList<T>() ;
+            for (Binding bind : blh.value) {
+                try {
+                    if (bind.binding_type.value() == BindingType._nobject) {
+                        org.omg.CORBA.Object elem = nc.resolve( bind.binding_name ) ;
+                        result.add( type.cast( PortableRemoteObject.narrow( elem,
+                            type ) ));
+                    }
+                } catch (Exception exc) {
+                    // elem was not an object of type type: ignore it.
+                }
+            }
 
-	    return result ;
-	} catch (Exception exc) {
-	    throw new RuntimeException( exc ) ;
-	}
+            return result ;
+        } catch (Exception exc) {
+            throw new RuntimeException( exc ) ;
+        }
     }
 }
 

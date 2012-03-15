@@ -3,7 +3,7 @@
     <data xmlns="http://www.netbeans.org/ns/profiler/1" version="0.4"/>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1">
         <file>
-            <url>src/share/classes/com/sun/corba/se/spi/logging/ORBUtilSystemException.java</url>
+            <url>src/share/classes/com/sun/corba/ee/spi/logging/ORBUtilSystemException.java</url>
             <line>546</line>
         </file>
     </editor-bookmarks>

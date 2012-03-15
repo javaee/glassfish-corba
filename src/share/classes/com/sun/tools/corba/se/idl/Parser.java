@@ -146,7 +146,7 @@ class Parser
     // <f60585.1> Support "-corba [level]" option.
     //scanner = new Scanner (fileEntry, keywords, verbose, emitAll);
     scanner = new Scanner (fileEntry, keywords, verbose, emitAll, corbaLevel,
-	arguments.scannerDebugFlag );
+        arguments.scannerDebugFlag );
     topLevelModule.sourceFile (fileEntry);
 
     // Prime the pump...
@@ -319,14 +319,14 @@ class Parser
         case Token.Interface:
           interfaceProd (entry, InterfaceEntry.NORMAL);
           break;
-	case Token.Local:
-	  match( Token.Local ) ;
-	  if (token.type ==  Token.Interface)
-	      interfaceProd( entry, InterfaceEntry.LOCAL ) ;
-	  else
-	      throw ParseException.syntaxError( scanner, new int[] {
-		  Token.Interface }, token.type ) ;
-	  break ;
+        case Token.Local:
+          match( Token.Local ) ;
+          if (token.type ==  Token.Interface)
+              interfaceProd( entry, InterfaceEntry.LOCAL ) ;
+          else
+              throw ParseException.syntaxError( scanner, new int[] {
+                  Token.Interface }, token.type ) ;
+          break ;
         case Token.Module:
           module (entry);
           break;
@@ -401,33 +401,33 @@ class Parser
       throws IOException, ParseException
   {
     if (token.type == Token.Colon || token.type == Token.LeftBrace) {
-	repIDStack.push (((IDLID)repIDStack.peek ()).clone ());
-	InterfaceEntry entry = stFactory.interfaceEntry (module, 
-	    (IDLID)repIDStack.peek ());
-	entry.sourceFile (scanner.fileEntry ());
-	entry.name (name);
-	entry.setInterfaceType(interfaceType);
-	// Comment must immediately precede "[local | abstract] interface" keyword
-	entry.comment (tokenHistory.lookBack (
-	    entry.getInterfaceType() == InterfaceEntry.NORMAL ? 2 : 3).comment);
+        repIDStack.push (((IDLID)repIDStack.peek ()).clone ());
+        InterfaceEntry entry = stFactory.interfaceEntry (module, 
+            (IDLID)repIDStack.peek ());
+        entry.sourceFile (scanner.fileEntry ());
+        entry.name (name);
+        entry.setInterfaceType(interfaceType);
+        // Comment must immediately precede "[local | abstract] interface" keyword
+        entry.comment (tokenHistory.lookBack (
+            entry.getInterfaceType() == InterfaceEntry.NORMAL ? 2 : 3).comment);
 
-	if (!ForwardEntry.replaceForwardDecl (entry))
-	    ParseException.badAbstract (scanner, entry.fullName ());
-	pigeonhole (module, entry);
-	((IDLID)repIDStack.peek ()).appendToName (name);
-	currentModule = entry;
-	interfaceDcl (entry);
-	currentModule = module;
-	repIDStack.pop ();
+        if (!ForwardEntry.replaceForwardDecl (entry))
+            ParseException.badAbstract (scanner, entry.fullName ());
+        pigeonhole (module, entry);
+        ((IDLID)repIDStack.peek ()).appendToName (name);
+        currentModule = entry;
+        interfaceDcl (entry);
+        currentModule = module;
+        repIDStack.pop ();
     } else  { // This is a forward declaration
-	ForwardEntry entry = stFactory.forwardEntry (module, (IDLID)repIDStack.peek ());
-	entry.sourceFile (scanner.fileEntry ());
-	entry.name (name);
-	entry.setInterfaceType(interfaceType);
-	// comment must immediately precede "interface" keyword.
-	entry.comment (tokenHistory.lookBack (
-	    entry.getInterfaceType() == InterfaceEntry.NORMAL ? 2 : 3).comment);
-	pigeonhole (module, entry);
+        ForwardEntry entry = stFactory.forwardEntry (module, (IDLID)repIDStack.peek ());
+        entry.sourceFile (scanner.fileEntry ());
+        entry.name (name);
+        entry.setInterfaceType(interfaceType);
+        // comment must immediately precede "interface" keyword.
+        entry.comment (tokenHistory.lookBack (
+            entry.getInterfaceType() == InterfaceEntry.NORMAL ? 2 : 3).comment);
+        pigeonhole (module, entry);
     }
   } // interface2
 
@@ -437,23 +437,23 @@ class Parser
   private void interfaceDcl (InterfaceEntry entry) throws IOException, ParseException
   {
     if (token.type != Token.LeftBrace)
-	inheritanceSpec (entry);
+        inheritanceSpec (entry);
     else if (!entry.isAbstract ()) {
-	SymtabEntry objectEntry = qualifiedEntry ("Object");
-	SymtabEntry realOEntry  = typeOf (objectEntry);
-	if (objectEntry == null)
-	    ;  // qualifiedEntry already generated an error message
-	else if (!isInterface(realOEntry))
-	    ParseException.wrongType (scanner, overrideName ("Object"),
-		"interface", objectEntry.typeName ());
-	else
-	    entry.derivedFromAddElement (realOEntry, scanner);
+        SymtabEntry objectEntry = qualifiedEntry ("Object");
+        SymtabEntry realOEntry  = typeOf (objectEntry);
+        if (objectEntry == null)
+            ;  // qualifiedEntry already generated an error message
+        else if (!isInterface(realOEntry))
+            ParseException.wrongType (scanner, overrideName ("Object"),
+                "interface", objectEntry.typeName ());
+        else
+            entry.derivedFromAddElement (realOEntry, scanner);
     }
 
     prep.openScope (entry);
     match (Token.LeftBrace);
     while (token.type != Token.RightBrace)
-	export (entry);
+        export (entry);
     prep.closeScope (entry);
     match (Token.RightBrace);
   } // interfaceDcl
@@ -533,7 +533,7 @@ class Parser
   {
     for (match (Token.Colon); ; match (Token.Comma)) {
         SymtabEntry parent = scopedName (entry.container (), 
-	    stFactory.interfaceEntry ());
+            stFactory.interfaceEntry ());
         SymtabEntry realParent = typeOf (parent);
 
         if (isInterfaceOnly (realParent)) {
@@ -541,13 +541,13 @@ class Parser
             if (entry.derivedFrom ().contains (realParent))
                 ParseException.alreadyDerived (scanner, realParent.fullName (), entry.fullName ());
             else if (!entry.isAbstract () || 
-	        (((InterfaceType)realParent).getInterfaceType() == InterfaceType.ABSTRACT))
+                (((InterfaceType)realParent).getInterfaceType() == InterfaceType.ABSTRACT))
                 entry.derivedFromAddElement (realParent, scanner);
             else
                 ParseException.nonAbstractParent (scanner, entry.fullName (), parent.fullName ());
-	} else if (isForward( realParent )) {
-	    ParseException.illegalForwardInheritance( scanner,
-		entry.fullName(), parent.fullName() ) ;
+        } else if (isForward( realParent )) {
+            ParseException.illegalForwardInheritance( scanner,
+                entry.fullName(), parent.fullName() ) ;
         } else
             ParseException.wrongType (scanner, parent.fullName (), "interface", entryName (parent));
 
@@ -753,17 +753,17 @@ class Parser
         match (Token.Truncatable);
     for (; ; match (Token.Comma), isTruncatable = false) {
         SymtabEntry parent = scopedName (entry.container (), 
-	    stFactory.valueEntry ());
+            stFactory.valueEntry ());
         SymtabEntry realParent = typeOf (parent);
         if (isValue (realParent) && !(realParent instanceof ValueBoxEntry))
             entry.derivedFromAddElement (realParent, isTruncatable, 
-		scanner);
+                scanner);
         else if (isForward(realParent))
-	    ParseException.illegalForwardInheritance( scanner,
-		entry.fullName(), parent.fullName() ) ;
+            ParseException.illegalForwardInheritance( scanner,
+                entry.fullName(), parent.fullName() ) ;
         else
             ParseException.wrongType (scanner, 
-		parent.fullName (), "value", entryName (parent));
+                parent.fullName (), "value", entryName (parent));
         if (token.type != Token.Comma)
             break;
     }
@@ -776,13 +776,13 @@ class Parser
   {
     match (Token.Supports) ;
     for (; ; match( Token.Comma ) ) {
-	SymtabEntry parent = scopedName (entry.container (), stFactory.interfaceEntry ());
-	SymtabEntry realParent = typeOf (parent);
-	if (isInterface(realParent))
-	    entry.derivedFromAddElement (realParent, scanner);
-	else
-	    ParseException.wrongType (scanner, parent.fullName (), "interface", 
-		entryName (parent));
+        SymtabEntry parent = scopedName (entry.container (), stFactory.interfaceEntry ());
+        SymtabEntry realParent = typeOf (parent);
+        if (isInterface(realParent))
+            entry.derivedFromAddElement (realParent, scanner);
+        else
+            ParseException.wrongType (scanner, parent.fullName (), "interface", 
+                entryName (parent));
 
         if (token.type != Token.Comma)
             break;
@@ -1064,7 +1064,7 @@ class Parser
     {
       case Token.Octet:
         entry.type( octetType()) ;
-	break ;
+        break ;
       case Token.Long:
       case Token.Short:
       case Token.Unsigned:
@@ -1180,8 +1180,8 @@ class Parser
     //System.out.println ("verifyIntegral, n = " + n.toString ());
 
     if (t == qualifiedEntry( "octet" )) {
-	if ((n.longValue() > 255) || (n.longValue() < 0))
-	    outOfRange = true ;
+        if ((n.longValue() > 255) || (n.longValue() < 0))
+            outOfRange = true ;
     } else if (t == qualifiedEntry ("long")) {
         if (n.longValue () > Integer.MAX_VALUE || n.longValue() < Integer.MIN_VALUE)
             outOfRange = true;
@@ -1200,7 +1200,7 @@ class Parser
         BigInteger llMax = BigInteger.valueOf (Long.MAX_VALUE);
         BigInteger llMin = BigInteger.valueOf (Long.MIN_VALUE);
         if (((BigInteger)n).compareTo (llMax) > 0 || 
-	    ((BigInteger)n).compareTo (llMin) < 0)
+            ((BigInteger)n).compareTo (llMin) < 0)
             outOfRange = true;
     } else if (t == qualifiedEntry ("unsigned long long")) {
         BigInteger ullMax = BigInteger.valueOf (Long.MAX_VALUE).
@@ -1208,7 +1208,7 @@ class Parser
             add (BigInteger.valueOf (1));
         BigInteger ullMin = BigInteger.valueOf (0);
         if (((BigInteger)n).compareTo (ullMax) > 0 || 
-	    ((BigInteger)n).compareTo (ullMin) < 0)
+            ((BigInteger)n).compareTo (ullMin) < 0)
             outOfRange = true;
     } else {
         String got = null;
@@ -1251,8 +1251,8 @@ class Parser
     } 
     
     if (!e.type().equals( t.name())) {
-	// cannot mix strings and wide strings
-	ParseException.wrongExprType (scanner, t.name(), e.type() ) ;
+        // cannot mix strings and wide strings
+        ParseException.wrongExprType (scanner, t.name(), e.type() ) ;
     }
   } // verifyString
 
@@ -1275,7 +1275,7 @@ class Parser
     if (!t.name ().equals (overrideName ("char")) &&
         !t.name ().equals (overrideName ("wchar")) ||
         !t.name().equals(e.type()) )
-	ParseException.wrongExprType (scanner, t.fullName(), e.type() ) ;
+        ParseException.wrongExprType (scanner, t.fullName(), e.type() ) ;
   } // verifyCharacter
 
   /**
@@ -1308,7 +1308,7 @@ class Parser
     else
     {
       ParseException.wrongExprType (scanner, t.fullName (), 
-	(f instanceof Float) ? "float" : "double");
+        (f instanceof Float) ? "float" : "double");
     }
     if (outOfRange)
       ParseException.outOfRange (scanner, f.toString (), t.fullName ());
@@ -1633,7 +1633,7 @@ class Parser
         }
         break;
       case Token.CharacterLiteral:
-	boolean isWide = token.isWide();
+        boolean isWide = token.isWide();
         match (Token.CharacterLiteral);
         literal = exprFactory.terminal ("'" + string.substring (1) + "'",
             new Character (string.charAt (0)), isWide );
@@ -1821,7 +1821,7 @@ class Parser
           ? entry
           : entry.container ();
       return scopedName (container, stFactory.primitiveEntry (),
-	mustBeReferencable);
+        mustBeReferencable);
     }
     return ((token.type == Token.Sequence) ||
             (token.type == Token.String)   ||
@@ -2116,7 +2116,7 @@ class Parser
       structEntry = makeStructEntry( name, entry, true ) ; 
     } else {
       throw ParseException.syntaxError (scanner, 
-	new int[] { Token.Semicolon, Token.LeftBrace }, token.type);
+        new int[] { Token.Semicolon, Token.LeftBrace }, token.type);
     }
     return structEntry;
   } // structType
@@ -2208,7 +2208,7 @@ class Parser
       unionEntry = makeUnionEntry( name, entry, true ) ;
     } else {
       throw ParseException.syntaxError (scanner, 
-	new int[] { Token.Semicolon, Token.Switch }, token.type);
+        new int[] { Token.Semicolon, Token.Switch }, token.type);
     }
      
     return unionEntry ;
@@ -2492,20 +2492,20 @@ class Parser
     SymtabEntry tsentry = simpleTypeSpec (newEntry, false );
     newEntry.type (tsentry);
     if (!tsentry.isReferencable()) {
-	// This is a sequence type that is referencing an
-	// incomplete forward declaration of a struct or
-	// union.  Save the sequence in a list for later
-	// backpatching.
-	try {
-	    List fwdTypes = (List)tsentry.dynamicVariable( ftlKey ) ;
-	    if (fwdTypes == null) {
-		fwdTypes = new ArrayList() ;
-		tsentry.dynamicVariable( ftlKey, fwdTypes ) ;
-	    }
-	    fwdTypes.add( newEntry ) ;
-	} catch (NoSuchFieldException exc) {
-	    throw new IllegalStateException() ; 
-	}
+        // This is a sequence type that is referencing an
+        // incomplete forward declaration of a struct or
+        // union.  Save the sequence in a list for later
+        // backpatching.
+        try {
+            List fwdTypes = (List)tsentry.dynamicVariable( ftlKey ) ;
+            if (fwdTypes == null) {
+                fwdTypes = new ArrayList() ;
+                tsentry.dynamicVariable( ftlKey, fwdTypes ) ;
+            }
+            fwdTypes.add( newEntry ) ;
+        } catch (NoSuchFieldException exc) {
+            throw new IllegalStateException() ; 
+        }
     }
 
     if (token.type == Token.Comma)
@@ -3127,134 +3127,134 @@ class Parser
 
     private void updateSymbolTable( String fullName, SymtabEntry entry, boolean lcCheck ) 
     {
-	// Check for case-insensitive collision (IDL error).
-	String lcFullName = fullName.toLowerCase();
-	if (lcCheck)
-	    if (lcSymbolTable.get (lcFullName) != null) {
-		ParseException.alreadyDeclared (scanner, fullName);
-	    }
-	symbolTable.put (fullName, entry);
-	lcSymbolTable.put (lcFullName, entry);
-	// <d59809> Allow fully-qualified CORBA types to be resolved by mapping
-	// short name (e.g., CORBA/StringValue) to long name, actual name.
-	String omgPrefix = "org/omg/CORBA" ;
-	if (fullName.startsWith (omgPrefix)) {
-	    overrideNames.put (
-		"CORBA" + fullName.substring (omgPrefix.length()), fullName);
-	}
+        // Check for case-insensitive collision (IDL error).
+        String lcFullName = fullName.toLowerCase();
+        if (lcCheck)
+            if (lcSymbolTable.get (lcFullName) != null) {
+                ParseException.alreadyDeclared (scanner, fullName);
+            }
+        symbolTable.put (fullName, entry);
+        lcSymbolTable.put (lcFullName, entry);
+        // <d59809> Allow fully-qualified CORBA types to be resolved by mapping
+        // short name (e.g., CORBA/StringValue) to long name, actual name.
+        String omgPrefix = "org/omg/CORBA" ;
+        if (fullName.startsWith (omgPrefix)) {
+            overrideNames.put (
+                "CORBA" + fullName.substring (omgPrefix.length()), fullName);
+        }
     }
 
     private void pigeonhole (SymtabEntry container, SymtabEntry entry)
     {
-	if (entry.name().equals (""))
-	    entry.name (unknownNamePrefix + ++sequence);
+        if (entry.name().equals (""))
+            entry.name (unknownNamePrefix + ++sequence);
 
-	// If this object is not in the overrides list, then it is
-	// ok to put it in the table (if it IS in the overrides list,
-	// it is already in the table under a different name).
-	String fullName = entry.fullName();
-	if (overrideNames.get (fullName) == null) {
-	    addToContainer (container, entry);
+        // If this object is not in the overrides list, then it is
+        // ok to put it in the table (if it IS in the overrides list,
+        // it is already in the table under a different name).
+        String fullName = entry.fullName();
+        if (overrideNames.get (fullName) == null) {
+            addToContainer (container, entry);
 
-	    // It is an error is this name already exists in the symbol
-	    // table, unless this is a redefinition of a forward decl.
-	    // Re-opening a module is also legal, but not handled here.
-	    SymtabEntry oldEntry = (SymtabEntry) symbolTable.get (fullName);
+            // It is an error is this name already exists in the symbol
+            // table, unless this is a redefinition of a forward decl.
+            // Re-opening a module is also legal, but not handled here.
+            SymtabEntry oldEntry = (SymtabEntry) symbolTable.get (fullName);
 
-	    if (oldEntry == null) {
-		updateSymbolTable( fullName, entry, true ) ;
-	    } else if (oldEntry instanceof ForwardEntry && 
-		entry instanceof InterfaceEntry) {
+            if (oldEntry == null) {
+                updateSymbolTable( fullName, entry, true ) ;
+            } else if (oldEntry instanceof ForwardEntry && 
+                entry instanceof InterfaceEntry) {
 
-		String repIDPrefix = ((IDLID)entry.repositoryID ()).prefix ();
-		String oldRepIDPrefix = ((IDLID)oldEntry.repositoryID ()).prefix ();
-		if (repIDPrefix.equals (oldRepIDPrefix)) {
-		    updateSymbolTable( fullName, entry, false ) ;
-		} else {
-		    ParseException.badRepIDPrefix (scanner, fullName, 
-			oldRepIDPrefix, repIDPrefix);
-		}
-	    } else if (entry instanceof ForwardEntry && 
-	               (oldEntry instanceof InterfaceEntry || 
-		        oldEntry instanceof ForwardEntry)) {
-		if (oldEntry instanceof ForwardEntry && 
-		    entry.repositoryID () instanceof IDLID &&
-		    oldEntry.repositoryID () instanceof IDLID) {
+                String repIDPrefix = ((IDLID)entry.repositoryID ()).prefix ();
+                String oldRepIDPrefix = ((IDLID)oldEntry.repositoryID ()).prefix ();
+                if (repIDPrefix.equals (oldRepIDPrefix)) {
+                    updateSymbolTable( fullName, entry, false ) ;
+                } else {
+                    ParseException.badRepIDPrefix (scanner, fullName, 
+                        oldRepIDPrefix, repIDPrefix);
+                }
+            } else if (entry instanceof ForwardEntry && 
+                       (oldEntry instanceof InterfaceEntry || 
+                        oldEntry instanceof ForwardEntry)) {
+                if (oldEntry instanceof ForwardEntry && 
+                    entry.repositoryID () instanceof IDLID &&
+                    oldEntry.repositoryID () instanceof IDLID) {
 
-		    String repIDPrefix = 
-			((IDLID)entry.repositoryID ()).prefix ();
-		    String oldRepIDPrefix = 
-			((IDLID)oldEntry.repositoryID ()).prefix ();
+                    String repIDPrefix = 
+                        ((IDLID)entry.repositoryID ()).prefix ();
+                    String oldRepIDPrefix = 
+                        ((IDLID)oldEntry.repositoryID ()).prefix ();
 
-		    if (!(repIDPrefix.equals (oldRepIDPrefix))) {
-			// Disallow multiple ForwardEntry's having same Repository
-			// ID prefixes (CORBA 2.3).
-			ParseException.badRepIDPrefix (scanner, fullName, 
-			    oldRepIDPrefix, repIDPrefix);
-		    }
-		}
-	    } else if (cppModule && entry instanceof ModuleEntry && 
-		oldEntry instanceof ModuleEntry) {
-		// Allow multiple ModuleEntrys when user submits
-		// the -cppModule flag.
-	    } else if (fullName.startsWith ("org/omg/CORBA") || 
-		fullName.startsWith ("CORBA")) {
-		// Ignore CORBA PIDL types entered at preParse() by generator.
-	    } else if (isForwardable( oldEntry, entry )) {
-		// Both oldEntry and entry are structs or unions.
-		// Legality depends on isReferencable on the two entries:
-		// oldEntry	Entry
-		//	T	    T	    ERROR alreadyDeclared
-		//	T	    F	    legal fwd decl
-		//	F	    T	    if defined in same file legal,
-		//			    otherwise ERROR
-		//	F	    F	    legal fwd decl
-		if (oldEntry.isReferencable() && entry.isReferencable())
-		    ParseException.alreadyDeclared (scanner, fullName);
+                    if (!(repIDPrefix.equals (oldRepIDPrefix))) {
+                        // Disallow multiple ForwardEntry's having same Repository
+                        // ID prefixes (CORBA 2.3).
+                        ParseException.badRepIDPrefix (scanner, fullName, 
+                            oldRepIDPrefix, repIDPrefix);
+                    }
+                }
+            } else if (cppModule && entry instanceof ModuleEntry && 
+                oldEntry instanceof ModuleEntry) {
+                // Allow multiple ModuleEntrys when user submits
+                // the -cppModule flag.
+            } else if (fullName.startsWith ("org/omg/CORBA") || 
+                fullName.startsWith ("CORBA")) {
+                // Ignore CORBA PIDL types entered at preParse() by generator.
+            } else if (isForwardable( oldEntry, entry )) {
+                // Both oldEntry and entry are structs or unions.
+                // Legality depends on isReferencable on the two entries:
+                // oldEntry     Entry
+                //      T           T       ERROR alreadyDeclared
+                //      T           F       legal fwd decl
+                //      F           T       if defined in same file legal,
+                //                          otherwise ERROR
+                //      F           F       legal fwd decl
+                if (oldEntry.isReferencable() && entry.isReferencable())
+                    ParseException.alreadyDeclared (scanner, fullName);
 
-		if (entry.isReferencable()) {
-		    String firstFile = 
-			oldEntry.sourceFile().absFilename() ;
-		    String defFile = 
-			entry.sourceFile().absFilename() ;
-		    if (!firstFile.equals( defFile ))
-			ParseException.declNotInSameFile( scanner, 
-			    fullName, firstFile ) ;
-		    else {
-			updateSymbolTable( fullName, entry, false ) ;
+                if (entry.isReferencable()) {
+                    String firstFile = 
+                        oldEntry.sourceFile().absFilename() ;
+                    String defFile = 
+                        entry.sourceFile().absFilename() ;
+                    if (!firstFile.equals( defFile ))
+                        ParseException.declNotInSameFile( scanner, 
+                            fullName, firstFile ) ;
+                    else {
+                        updateSymbolTable( fullName, entry, false ) ;
 
-			List oldRefList ;
+                        List oldRefList ;
 
-			try {
-			    oldRefList = (List)oldEntry.dynamicVariable( 
-				ftlKey ) ;
-			} catch (NoSuchFieldException exc) {
-			    throw new IllegalStateException() ;
-			}
+                        try {
+                            oldRefList = (List)oldEntry.dynamicVariable( 
+                                ftlKey ) ;
+                        } catch (NoSuchFieldException exc) {
+                            throw new IllegalStateException() ;
+                        }
 
-			if (oldRefList != null) {
-			    // Update entries in backpatch list
-			    Iterator iter = oldRefList.iterator() ;
-			    while (iter.hasNext()) {
-				SymtabEntry elem = (SymtabEntry)iter.next() ;
-				elem.type( entry ) ;
-			    }
-			}
-		    }
-		}
-	    } else {
-		ParseException.alreadyDeclared (scanner, fullName);
-	    }
-	}
+                        if (oldRefList != null) {
+                            // Update entries in backpatch list
+                            Iterator iter = oldRefList.iterator() ;
+                            while (iter.hasNext()) {
+                                SymtabEntry elem = (SymtabEntry)iter.next() ;
+                                elem.type( entry ) ;
+                            }
+                        }
+                    }
+                }
+            } else {
+                ParseException.alreadyDeclared (scanner, fullName);
+            }
+        }
     } // pigeonhole
 
     private boolean isForwardable( SymtabEntry oldEntry,
-	SymtabEntry entry )
+        SymtabEntry entry )
     {
-	return ((oldEntry instanceof StructEntry) && 
-	    (entry instanceof StructEntry)) ||
-	   ((oldEntry instanceof UnionEntry) && 
-	    (entry instanceof UnionEntry)) ;
+        return ((oldEntry instanceof StructEntry) && 
+            (entry instanceof StructEntry)) ||
+           ((oldEntry instanceof UnionEntry) && 
+            (entry instanceof UnionEntry)) ;
     }
 
   // pigeonhole checks to see if this entry is already in the symbol
@@ -3510,25 +3510,25 @@ class Parser
     String cname = ptype.fullName();
 
     while ((ptype != null) && !(cname.equals ("")) &&
-	   !(ptype instanceof InterfaceEntry)) {
-	int index = cname.lastIndexOf ('/');
-	if (index < 0) {
-	    cname = "";
-	} else {
-	    cname = cname.substring (0, index);
-	    ptype = (SymtabEntry) symbolTable.get(cname);
-	}
+           !(ptype instanceof InterfaceEntry)) {
+        int index = cname.lastIndexOf ('/');
+        if (index < 0) {
+            cname = "";
+        } else {
+            cname = cname.substring (0, index);
+            ptype = (SymtabEntry) symbolTable.get(cname);
+        }
     }
 
     if ((ptype == null) || !(ptype instanceof InterfaceEntry)) {
-	return null; // could not find an enclosing interface type - give up.
+        return null; // could not find an enclosing interface type - give up.
     }
 
     // check if the enclosing interface supports the type definition.
     String fullName = ptype.fullName () + '/' + name;
     SymtabEntry type = (SymtabEntry) symbolTable.get (fullName);
     if (type != null) {
-	return type; // found type definition.
+        return type; // found type definition.
     }
     
     // search up the interface inheritance tree.
@@ -3669,7 +3669,7 @@ class Parser
   private boolean isInterface (SymtabEntry entry)
   {
     return entry instanceof InterfaceEntry || (entry instanceof ForwardEntry
-	&& !(entry instanceof ForwardValueEntry)) ;
+        && !(entry instanceof ForwardValueEntry)) ;
   }
 
   private boolean isValue (SymtabEntry entry)

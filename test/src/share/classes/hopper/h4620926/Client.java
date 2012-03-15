@@ -48,16 +48,16 @@ public class Client extends Thread {
     private static int numErrors = 0;
 
     private static synchronized void errorOccurred( int clientNo,
-	Exception exc)
+        Exception exc)
     {
-	numErrors++ ;
-	System.out.println(
-	    "\nError in ClientNo " + clientNo + ": " + exc );
+        numErrors++ ;
+        System.out.println(
+            "\nError in ClientNo " + clientNo + ": " + exc );
 
-	System.err.println(
-	    "\nError in ClientNo " + clientNo + ": " + exc );
+        System.err.println(
+            "\nError in ClientNo " + clientNo + ": " + exc );
 
-	exc.printStackTrace();
+        exc.printStackTrace();
     }
 
     private static int counter = 0;
@@ -81,8 +81,8 @@ public class Client extends Thread {
                                    + ref.sayHello());
                 Thread.sleep(2000);
             } catch (Exception e) {
-		errorOccurred(clientNo, e) ;
-	        System.exit( 1 );
+                errorOccurred(clientNo, e) ;
+                System.exit( 1 );
             }
         }
         System.out.println( "TEST PASSED" );
@@ -112,9 +112,9 @@ public class Client extends Thread {
                 c[i].join();
             }
         } catch (Exception e) {
-	    errorOccurred( -1, e );
+            errorOccurred( -1, e );
         }
 
-	System.exit( numErrors>0 ? 1 : 0 ) ;
+        System.exit( numErrors>0 ? 1 : 0 ) ;
     }
 }

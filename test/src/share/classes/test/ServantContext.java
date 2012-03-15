@@ -95,14 +95,14 @@ public class ServantContext implements ServantManager {
     }
     
     private ServantContext ( String nameServerHost, int nameServerPort, 
-			     boolean iiop, String key, String orbDebugFlags ) throws Exception {
-	Test.dprint( "ServantContext constructor called: nameServerHost = " + 
-		     nameServerHost + " nameServerPort = " + nameServerPort + 
-		     " iiop = " + iiop + " key = " + key ) ;
+                             boolean iiop, String key, String orbDebugFlags ) throws Exception {
+        Test.dprint( "ServantContext constructor called: nameServerHost = " + 
+                     nameServerHost + " nameServerPort = " + nameServerPort + 
+                     " iiop = " + iiop + " key = " + key ) ;
         this.nameServerHost = nameServerHost;
         this.nameServerPort = nameServerPort;
         this.iiop = iiop;
-	this.orbDebugFlags = orbDebugFlags ;
+        this.orbDebugFlags = orbDebugFlags ;
         boolean failed = true;
         this.key = key;
 
@@ -112,14 +112,14 @@ public class ServantContext implements ServantManager {
                     nameServerProcess = Util.startNameServer(nameServerPort,iiop);
                     if (nameServerProcess == null) {
                         throw new IOException( 
-			    "ServantContext: could not start name server"); 
+                            "ServantContext: could not start name server"); 
                     }
                 } catch (Error e) {
-		    if (Test.debug)
-			e.printStackTrace() ;
+                    if (Test.debug)
+                        e.printStackTrace() ;
 
                     if (e.getMessage().indexOf( "bootstrap service on port " + 
-						nameServerPort) < 0) {
+                                                nameServerPort) < 0) {
                         throw e;
                     } else {
                         System.out.println("Name server already started.");
@@ -129,34 +129,34 @@ public class ServantContext implements ServantManager {
                 // Are we supposed to start the servant manager in this process?
                 if (!LOCAL_SERVANTS) {
                     servantManagerProcess = Util.startServer( 
-			SERVANT_MANAGER_CLASS, getName(), nameServerHost, 
-			nameServerPort, iiop );
+                        SERVANT_MANAGER_CLASS, getName(), nameServerHost, 
+                        nameServerPort, iiop );
 
                     if (servantManagerProcess == null) {
                         throw new IOException( 
-			    "ServantContext: could not start servant manager"); 
+                            "ServantContext: could not start servant manager"); 
                     }
                 }
             }
             
             if (iiop) {
-		Test.dprint( "starting an ORB" ) ;
-		// Start up the orb...
+                Test.dprint( "starting an ORB" ) ;
+                // Start up the orb...
                 orb = Util.createORB( nameServerHost,nameServerPort,
-				      orbDebugFlags );
+                                      orbDebugFlags );
             }
             
             nameContext = Util.getInitialContext(iiop, 
-		nameServerHost, nameServerPort, orb ) ;
+                nameServerHost, nameServerPort, orb ) ;
             
             // Are we supposed to start the servant manager in this process?
             if (!LOCAL_SERVANTS) {
-		Test.dprint( "LOCAL_SERVANTS is false: looking for servant manager" ) ;
+                Test.dprint( "LOCAL_SERVANTS is false: looking for servant manager" ) ;
                 Object stub = nameContext.lookup(getName());
                 servantManager = (ServantManager) PortableRemoteObject.narrow( 
-		    stub, test.ServantManager.class);
+                    stub, test.ServantManager.class);
             } else {
-		Test.dprint( "LOCAL_SERVANTS is true: starting servant manager" ) ;
+                Test.dprint( "LOCAL_SERVANTS is true: starting servant manager" ) ;
                 ServantManagerImpl impl = new ServantManagerImpl(orb,nameContext);
                 PortableRemoteObject.exportObject(impl);
 
@@ -168,7 +168,7 @@ public class ServantContext implements ServantManager {
                 
                 // Now get the stub...
                 servantManager = (ServantManager) PortableRemoteObject.toStub( 
-		    impl);
+                    impl);
             }
             
             // Did we succeed?
@@ -177,7 +177,7 @@ public class ServantContext implements ServantManager {
                 failed = false;
             }
         } finally {
-	    Test.dprint( "ServantContext constructor is exiting" ) ;
+            Test.dprint( "ServantContext constructor is exiting" ) ;
             if (failed) {
                 // Make sure we clean up...
                 destroy();
@@ -279,7 +279,7 @@ public class ServantContext implements ServantManager {
      * Destroy this context.
      */
     public void destroy () {
-	Test.dprint( "ServantContext.destroy called on " + name ) ;
+        Test.dprint( "ServantContext.destroy called on " + name ) ;
 
         // Remove self from table...
         synchronized (this) {
@@ -290,7 +290,7 @@ public class ServantContext implements ServantManager {
         
         try {
             if (nameServerProcess != null) {
-		Test.dprint( "destroying nameServerProcess" ) ;
+                Test.dprint( "destroying nameServerProcess" ) ;
                 nameServerProcess.destroy();
                 nameServerProcess = null;
             }
@@ -300,7 +300,7 @@ public class ServantContext implements ServantManager {
         
         try {
             if (servantManagerProcess != null) {
-		Test.dprint( "destroying servantManagerProcess" ) ;
+                Test.dprint( "destroying servantManagerProcess" ) ;
                 servantManagerProcess.destroy();
                 nameServerProcess = null;
             }
@@ -322,7 +322,7 @@ public class ServantContext implements ServantManager {
      * Get the default ServantContext.
      */
     public static ServantContext getDefaultContext(boolean iiop) 
-	throws Exception {
+        throws Exception {
         return getContext( null, 1070, true, iiop, null );
     }
     
@@ -336,41 +336,41 @@ public class ServantContext implements ServantManager {
      * @param iiop True if iiop.
      */
     public static synchronized ServantContext getContext(String nameServerHost,
-							 int nameServerPort, boolean createIfNeeded, boolean iiop,
-							 String orbDebugFlags ) throws Exception {
+                                                         int nameServerPort, boolean createIfNeeded, boolean iiop,
+                                                         String orbDebugFlags ) throws Exception {
         
-	Test.dprint( "Entering ServantContext.getContext" ) ;
-	Test.dprint( "/tnameServerHost = " + nameServerHost ) ;
-	Test.dprint( "/tnameServerPort = " + nameServerPort ) ;
-	Test.dprint( "/tcreateIfNeeded = " + createIfNeeded ) ;
-	Test.dprint( "/tiiop = " + iiop ) ;
-	Test.dprint( "/torbDebugFlags = " + orbDebugFlags ) ;
+        Test.dprint( "Entering ServantContext.getContext" ) ;
+        Test.dprint( "/tnameServerHost = " + nameServerHost ) ;
+        Test.dprint( "/tnameServerPort = " + nameServerPort ) ;
+        Test.dprint( "/tcreateIfNeeded = " + createIfNeeded ) ;
+        Test.dprint( "/tiiop = " + iiop ) ;
+        Test.dprint( "/torbDebugFlags = " + orbDebugFlags ) ;
 
         ServantContext result = null;
         
-	try {
-	    if (System.getProperty(LOCAL_SERVANTS_FLAG) != null) {
-		LOCAL_SERVANTS = true;
-	    } else {
-		LOCAL_SERVANTS = false;
-	    }
+        try {
+            if (System.getProperty(LOCAL_SERVANTS_FLAG) != null) {
+                LOCAL_SERVANTS = true;
+            } else {
+                LOCAL_SERVANTS = false;
+            }
       
-	    String key = nameServerHost + ":" + Integer.toString(nameServerPort);
-	    
-	    Object it = contexts.get(key);
-	    
-	    if (it != null) {
-		result = (ServantContext) it;
-	    } else {
-		if (createIfNeeded) {
-		    result = new ServantContext( nameServerHost, nameServerPort,
-						 iiop, key, orbDebugFlags );
-		    contexts.put(key,result);
-		}
-	    }
-	} finally {
-	    Test.dprint( "Exiting ServantContext.getContext" ) ;
-	}
+            String key = nameServerHost + ":" + Integer.toString(nameServerPort);
+            
+            Object it = contexts.get(key);
+            
+            if (it != null) {
+                result = (ServantContext) it;
+            } else {
+                if (createIfNeeded) {
+                    result = new ServantContext( nameServerHost, nameServerPort,
+                                                 iiop, key, orbDebugFlags );
+                    contexts.put(key,result);
+                }
+            }
+        } finally {
+            Test.dprint( "Exiting ServantContext.getContext" ) ;
+        }
         
         return result;
     }

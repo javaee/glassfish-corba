@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.transport;
+package com.sun.corba.ee.impl.transport;
 
 import java.util.Iterator;
 import java.util.List;
@@ -50,18 +50,18 @@ import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TRANSIENT;
 
-import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.transport.TcpTimeouts;
-import com.sun.corba.se.spi.transport.ContactInfo;
-import com.sun.corba.se.spi.transport.ContactInfoList;
-import com.sun.corba.se.spi.transport.ContactInfoListIterator;
-import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
+import com.sun.corba.ee.spi.ior.IOR ;
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.transport.TcpTimeouts;
+import com.sun.corba.ee.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.transport.ContactInfoList;
+import com.sun.corba.ee.spi.transport.ContactInfoListIterator;
+import com.sun.corba.ee.spi.transport.IIOPPrimaryToContactInfo;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.protocol.InvocationInfo;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.impl.protocol.InvocationInfo;
 
-import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.ee.spi.trace.Transport;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 // REVISIT: create a unit test for this class.
@@ -69,7 +69,7 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 @Transport
 public class ContactInfoListIteratorImpl
     implements
-	ContactInfoListIterator
+        ContactInfoListIterator
 {
     protected static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
@@ -96,32 +96,32 @@ public class ContactInfoListIteratorImpl
 
     public ContactInfoListIteratorImpl(
         ORB orb,
-	ContactInfoList corbaContactInfoList,
-	ContactInfo primaryContactInfo,
-	List listOfContactInfos,
+        ContactInfoList corbaContactInfoList,
+        ContactInfo primaryContactInfo,
+        List listOfContactInfos,
         boolean usePerRequestLoadBalancing )
     {
-	this.orb = orb;
-	this.tcpTimeouts = orb.getORBData().getTransportTcpConnectTimeouts() ;
-	this.contactInfoList = corbaContactInfoList;
-	this.primaryContactInfo = primaryContactInfo;
-	if (listOfContactInfos != null) {
-	    // listOfContactInfos is null when used by the legacy
-	    // socket factory.  In that case this iterator is NOT used.
+        this.orb = orb;
+        this.tcpTimeouts = orb.getORBData().getTransportTcpConnectTimeouts() ;
+        this.contactInfoList = corbaContactInfoList;
+        this.primaryContactInfo = primaryContactInfo;
+        if (listOfContactInfos != null) {
+            // listOfContactInfos is null when used by the legacy
+            // socket factory.  In that case this iterator is NOT used.
             
-	    this.effectiveTargetIORIterator = listOfContactInfos.iterator() ;
-	}
-	// List is immutable so no need to synchronize access.
-	this.listOfContactInfos = listOfContactInfos;
+            this.effectiveTargetIORIterator = listOfContactInfos.iterator() ;
+        }
+        // List is immutable so no need to synchronize access.
+        this.listOfContactInfos = listOfContactInfos;
 
-	this.previousContactInfo = null;
-	this.isAddrDispositionRetry = false;
-	this.retryWithPreviousContactInfo = false;
+        this.previousContactInfo = null;
+        this.isAddrDispositionRetry = false;
+        this.retryWithPreviousContactInfo = false;
 
-	this.failureException = null;
+        this.failureException = null;
 
-	this.waiter = tcpTimeouts.waiter() ;
-	this.failedEndpoints = new HashSet<ContactInfo>() ;
+        this.waiter = tcpTimeouts.waiter() ;
+        this.failedEndpoints = new HashSet<ContactInfo>() ;
 
         this.usePRLB = usePerRequestLoadBalancing ;
 
@@ -149,7 +149,7 @@ public class ContactInfoListIteratorImpl
 
     @Transport
     public boolean hasNext() {
-	boolean result = false;
+        boolean result = false;
         if (retryWithPreviousContactInfo) {
             display("backoff before retry previous");
 
@@ -238,26 +238,26 @@ public class ContactInfoListIteratorImpl
 
     public void remove()
     {
-	throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     public ContactInfoList getContactInfoList()
     {
-	return contactInfoList;
+        return contactInfoList;
     }
 
     @Transport
     public void reportSuccess(ContactInfo contactInfo)
     {
         display( "contactInfo", contactInfo) ;
-	failedEndpoints.clear() ;
-	waiter.reset() ; // not strictly necessary
+        failedEndpoints.clear() ;
+        waiter.reset() ; // not strictly necessary
     }
 
     @Transport
     public boolean reportException(ContactInfo contactInfo,
-				   RuntimeException ex) {
-	boolean result = false;
+                                   RuntimeException ex) {
+        boolean result = false;
         display( "contactInfo", contactInfo) ;
 
         failedEndpoints.add( contactInfo ) ;
@@ -305,11 +305,11 @@ public class ContactInfoListIteratorImpl
 
     public RuntimeException getFailureException()
     {
-	if (failureException == null) {
-	    return wrapper.invalidContactInfoListIteratorFailureException() ;
-	} else {
-	    return failureException;
-	}
+        if (failureException == null) {
+            return wrapper.invalidContactInfoListIteratorFailureException() ;
+        } else {
+            return failureException;
+        }
     }
 
     ////////////////////////////////////////////////////
@@ -319,19 +319,19 @@ public class ContactInfoListIteratorImpl
 
     @Transport
     public void reportAddrDispositionRetry(ContactInfo contactInfo,
-					   short disposition)
+                                           short disposition)
     {
-	previousContactInfo.setAddressingDisposition(disposition);
-	isAddrDispositionRetry = true;
-	waiter.reset() ; // necessary
+        previousContactInfo.setAddressingDisposition(disposition);
+        isAddrDispositionRetry = true;
+        waiter.reset() ; // necessary
     }
 
     @Transport
     public void reportRedirect(ContactInfo contactInfo,
-			       IOR forwardedIOR)
+                               IOR forwardedIOR)
     {
-	updateEffectiveTargetIOR(forwardedIOR);
-	waiter.reset() ; // Necessary
+        updateEffectiveTargetIOR(forwardedIOR);
+        waiter.reset() ; // Necessary
     }
 
     ////////////////////////////////////////////////////
@@ -355,15 +355,15 @@ public class ContactInfoListIteratorImpl
 
     public void updateEffectiveTargetIOR(IOR newIOR)
     {
-	contactInfoList.setEffectiveTargetIOR(newIOR);
-	// If we report the exception in _request (i.e., beginRequest
-	// we cannot throw RemarshalException to the stub because _request
-	// does not declare that exception.
-	// To keep the two-level dispatching (first level chooses ContactInfo,
-	// second level is specific to that ContactInfo/EPT) we need to
-	// ensure that the request dispatchers get their iterator from the 
-	// InvocationStack (i.e., ThreadLocal). That way if the list iterator
-	// needs a complete update it happens right here.
+        contactInfoList.setEffectiveTargetIOR(newIOR);
+        // If we report the exception in _request (i.e., beginRequest
+        // we cannot throw RemarshalException to the stub because _request
+        // does not declare that exception.
+        // To keep the two-level dispatching (first level chooses ContactInfo,
+        // second level is specific to that ContactInfo/EPT) we need to
+        // ensure that the request dispatchers get their iterator from the 
+        // InvocationStack (i.e., ThreadLocal). That way if the list iterator
+        // needs a complete update it happens right here.
 
         // Ugly hack for Argela: avoid rotating the iterator in this case,
         // or we rotate the iterator twice on every request.
@@ -372,8 +372,8 @@ public class ContactInfoListIteratorImpl
         // membership changes when the cluster shape does not change.
         ContactInfoListImpl.setSkipRotate() ;
 
-	((InvocationInfo)orb.getInvocationInfo())
-	    .setContactInfoListIterator(contactInfoList.iterator());
+        ((InvocationInfo)orb.getInvocationInfo())
+            .setContactInfoListIterator(contactInfoList.iterator());
     }
 }
 

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)BudgetSummary.java	1.4 99/06/07 */
+/* @(#)BudgetSummary.java       1.4 99/06/07 */
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
@@ -61,8 +61,8 @@ public class BudgetSummary implements Serializable
 
     public BudgetSummary (int numItems, String[] names, double[] percentages)
     {
-	fNames = names;
-	fPercentages = percentages;
+        fNames = names;
+        fPercentages = percentages;
     }
 
 

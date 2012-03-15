@@ -37,12 +37,12 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.encoding.fast ;
+package com.sun.corba.ee.impl.encoding.fast ;
 
 import java.util.concurrent.atomic.AtomicLong ;
 
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.Reader ;
-import com.sun.corba.se.impl.encoding.fast.bytebuffer.Writer ;
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.Reader ;
+import com.sun.corba.ee.impl.encoding.fast.bytebuffer.Writer ;
 import org.glassfish.pfl.basic.contain.Holder;
 import org.glassfish.pfl.basic.contain.Pair;
 import org.glassfish.pfl.basic.func.UnaryFunction;
@@ -53,34 +53,34 @@ import org.glassfish.pfl.basic.func.UnaryFunction;
  */
 public class LabelManager {    
     public final static class Label extends Pair<Long,Long> {
-	public Label( Long first, Long second ) {
-	    super( first, second ) ;
-	}
+        public Label( Long first, Long second ) {
+            super( first, second ) ;
+        }
 
-	public Label( Reader reader ) {
-	    super( VarOctetUtility.get( reader ), VarOctetUtility.get( reader ) ) ;
-	}
+        public Label( Reader reader ) {
+            super( VarOctetUtility.get( reader ), VarOctetUtility.get( reader ) ) ;
+        }
 
-	public void put( Writer writer ) {
-	    VarOctetUtility.put( writer, first() ) ;
-	    VarOctetUtility.put( writer, second() ) ; 
-	}
+        public void put( Writer writer ) {
+            VarOctetUtility.put( writer, first() ) ;
+            VarOctetUtility.put( writer, second() ) ; 
+        }
 
-	public String toString() {
-	    return "Label[ctx=" + first() + ",val=" + second() + "]" ;
-	}
+        public String toString() {
+            return "Label[ctx=" + first() + ",val=" + second() + "]" ;
+        }
     }
 
     private final AtomicLong idCounter = new AtomicLong() ;
 
     private UnaryFunction<Object,LabelManager.Label> allocateLabel =
-	new UnaryFunction<Object,Label>() {
-	    public Label evaluate( final Object arg ) {
-		long contextId = 0 ;
-		long id = idCounter.getAndIncrement() ;
-		return new Label( contextId, id ) ;
-	    }
-	} ;
+        new UnaryFunction<Object,Label>() {
+            public Label evaluate( final Object arg ) {
+                long contextId = 0 ;
+                long id = idCounter.getAndIncrement() ;
+                return new Label( contextId, id ) ;
+            }
+        } ;
 
     // If the contextId is 0, use the msgTable, otherwise
     // use the extTable.
@@ -88,9 +88,9 @@ public class LabelManager {
     private final LookupTable<Object,LabelManager.Label> extTable ;
 
     public LabelManager( LookupTable<Object,Label> extTable ) {
-	this.msgTable = new LookupTableSimpleConcurrentImpl<Object,Label>(
-	    allocateLabel, Label.class ) ;
-	this.extTable = extTable ;
+        this.msgTable = new LookupTableSimpleConcurrentImpl<Object,Label>(
+            allocateLabel, Label.class ) ;
+        this.extTable = extTable ;
     }
 
     /** Exact function TBD, but here are some general principles:
@@ -101,20 +101,20 @@ public class LabelManager {
      * </ul>
      */
     public long getContextId( Object obj ) {
-	/** Implementation to use for now.
-	 */
-	return EmergeCodeFactory.MESSAGE_CONTEXT_ID ;
+        /** Implementation to use for now.
+         */
+        return EmergeCodeFactory.MESSAGE_CONTEXT_ID ;
     }
 
     public Label lookup( Holder<Boolean> firstTime, Object data ) {
-	long contextId = getContextId( data ) ;
+        long contextId = getContextId( data ) ;
         Label label ;
-	if (contextId == 0) {
-	    label = msgTable.lookup( firstTime, data ) ;
+        if (contextId == 0) {
+            label = msgTable.lookup( firstTime, data ) ;
         }  else {
-	    // XXX assume for now that this case must do another 
-	    // getContextId call.  How can we improve this?
-	    label = extTable.lookup( firstTime, data ) ;
+            // XXX assume for now that this case must do another 
+            // getContextId call.  How can we improve this?
+            label = extTable.lookup( firstTime, data ) ;
         }
         return label ;
     }

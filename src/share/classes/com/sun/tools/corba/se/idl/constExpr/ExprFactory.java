@@ -79,7 +79,7 @@ public interface ExprFactory
   ShiftLeft    shiftLeft (Expression left, Expression right);
   ShiftRight   shiftRight (Expression left, Expression right);
   Terminal     terminal (String representation, Character charValue,
-			 boolean isWide );
+                         boolean isWide );
   Terminal     terminal (String representation, Boolean booleanValue);
   //daz  Terminal     terminal (String representation, Long longValue);
   Terminal     terminal (String representation, Double doubleValue);

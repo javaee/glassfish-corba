@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orb ;
+package com.sun.corba.ee.spi.orb ;
 
 import org.omg.CORBA.portable.OutputStream ;
 
@@ -50,12 +50,12 @@ import org.glassfish.gmbal.ManagedAttribute ;
 @Description( "The version of the ORB" )
 public interface ORBVersion extends Comparable<ORBVersion>
 {
-    byte FOREIGN = 0 ;		// ORB from another vendor
-    byte OLD = 1 ;		// JDK 1.3.0 or earlier
-    byte NEW = 2 ;		// JDK 1.3.1 FCS
-    byte JDK1_3_1_01 = 3;	// JDK1_3_1_01 patch
-    byte NEWER = 10 ;		// JDK 1.4.x 
-    byte PEORB = 20 ;		// PEORB in JDK 1.5, S1AS 8, J2EE 1.4
+    byte FOREIGN = 0 ;          // ORB from another vendor
+    byte OLD = 1 ;              // JDK 1.3.0 or earlier
+    byte NEW = 2 ;              // JDK 1.3.1 FCS
+    byte JDK1_3_1_01 = 3;       // JDK1_3_1_01 patch
+    byte NEWER = 10 ;           // JDK 1.4.x 
+    byte PEORB = 20 ;           // PEORB in JDK 1.5, S1AS 8, J2EE 1.4
 
     @ManagedAttribute
     @Description( "ORB version (0=FOREIGN,1=OLD,2=NEW,3=JDK1_3_1_01,10=NEWER,20=PEORB)" )

@@ -38,12 +38,12 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
-import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.encoding.ByteBufferWithInfo;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 
 public interface BufferManagerRead
 {
@@ -61,7 +61,7 @@ public interface BufferManagerRead
      */
 
     public void processFragment ( ByteBuffer byteBuffer, 
-	FragmentMessage header);
+        FragmentMessage header);
 
 
     /**

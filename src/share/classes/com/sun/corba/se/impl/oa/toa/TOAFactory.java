@@ -37,25 +37,25 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.oa.toa ;
+package com.sun.corba.ee.impl.oa.toa ;
 
 import java.util.Map ;
 import java.util.HashMap ;
 
 
-import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
+import com.sun.corba.ee.spi.oa.ObjectAdapterFactory ;
+import com.sun.corba.ee.spi.oa.ObjectAdapter ;
 
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.ee.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.ior.ObjectAdapterId ;
+import com.sun.corba.ee.spi.ior.ObjectAdapterId ;
 
 
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
+import com.sun.corba.ee.impl.javax.rmi.CORBA.Util ;
 
-import com.sun.corba.se.impl.ior.ObjectKeyTemplateBase ;
+import com.sun.corba.ee.impl.ior.ObjectKeyTemplateBase ;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 import org.glassfish.gmbal.AMXMetadata;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
@@ -89,7 +89,7 @@ public class TOAFactory implements ObjectAdapterFactory
 
     public ObjectAdapter find ( ObjectAdapterId oaid ) 
     {
-	if (oaid.equals( ObjectKeyTemplateBase.JIDL_OAID )  ) {
+        if (oaid.equals( ObjectKeyTemplateBase.JIDL_OAID )  ) {
             return getTOA();
         } else {
             throw wrapper.badToaOaid();
@@ -98,46 +98,46 @@ public class TOAFactory implements ObjectAdapterFactory
 
     public void init( ORB orb )
     {
-	this.orb = orb ;
-	tom = new TransientObjectManager( orb ) ;
-	codebaseToTOA = new HashMap<String,TOAImpl>() ;
+        this.orb = orb ;
+        tom = new TransientObjectManager( orb ) ;
+        codebaseToTOA = new HashMap<String,TOAImpl>() ;
         orb.mom().registerAtRoot( this ) ;
     }
 
     public void shutdown( boolean waitForCompletion )
     {
-	if (Util.getInstance() != null) {
-	    Util.getInstance().unregisterTargetsForORB(orb);
-	}
+        if (Util.getInstance() != null) {
+            Util.getInstance().unregisterTargetsForORB(orb);
+        }
     }
 
     public synchronized TOA getTOA( String codebase )
     {
-	TOAImpl myToa = codebaseToTOA.get( codebase ) ;
-	if (myToa == null) {
-	    myToa = new TOAImpl( orb, tom, codebase ) ;
+        TOAImpl myToa = codebaseToTOA.get( codebase ) ;
+        if (myToa == null) {
+            myToa = new TOAImpl( orb, tom, codebase ) ;
 
-	    codebaseToTOA.put( codebase, myToa ) ;
-	}
+            codebaseToTOA.put( codebase, myToa ) ;
+        }
 
-	return myToa ;
+        return myToa ;
     }
 
     public synchronized TOA getTOA() 
     {
-	if (toa == null) {
-	    // The dispatch-only TOA is not used for creating
-	    // objrefs, so its codebase can be null (and must
-	    // be, since we do not have a servant at this point)
-	    toa = new TOAImpl( orb, tom, null ) ;
+        if (toa == null) {
+            // The dispatch-only TOA is not used for creating
+            // objrefs, so its codebase can be null (and must
+            // be, since we do not have a servant at this point)
+            toa = new TOAImpl( orb, tom, null ) ;
         }
 
-	return toa ;
+        return toa ;
     }
 
     public ORB getORB() 
     {
-	return orb ;
+        return orb ;
     }
 } ;
 

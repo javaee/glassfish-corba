@@ -65,11 +65,11 @@ public class FeatureInfoImpl implements FeatureInfo, Serializable {
     }
 
     public String getName() {
-	return name;
+        return name;
     }
     
     public String getDescription() {
-	return description;
+        return description;
     }
     
     public Descriptor getDescriptor() {
@@ -77,71 +77,71 @@ public class FeatureInfoImpl implements FeatureInfo, Serializable {
     }
 
     public boolean equals(Object o) {
-	if (o == this)
-	    return true;
-	if (!(o instanceof FeatureInfoImpl))
-	    return false;
-	FeatureInfoImpl p = (FeatureInfoImpl) o;
-	return (p.getName().equals(getName()) &&
-		p.getDescription().equals(getDescription()) &&
+        if (o == this)
+            return true;
+        if (!(o instanceof FeatureInfoImpl))
+            return false;
+        FeatureInfoImpl p = (FeatureInfoImpl) o;
+        return (p.getName().equals(getName()) &&
+                p.getDescription().equals(getDescription()) &&
                 p.getDescriptor().equals(getDescriptor()));
     }
 
     public int hashCode() {
-	return getName().hashCode() ^ getDescription().hashCode() ^
+        return getName().hashCode() ^ getDescription().hashCode() ^
                getDescriptor().hashCode();
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
 
-	if (descriptor != null &&
-	    descriptor.getClass() == ImmutableDescriptor.class) {
-	    
-	    out.write(1);
+        if (descriptor != null &&
+            descriptor.getClass() == ImmutableDescriptor.class) {
+            
+            out.write(1);
 
-	    final String[] names = descriptor.getFieldNames();
+            final String[] names = descriptor.getFieldNames();
 
-	    out.writeObject(names);
-	    out.writeObject(descriptor.getFieldValues(names));
-	} else {
-	    out.write(0);
+            out.writeObject(names);
+            out.writeObject(descriptor.getFieldValues(names));
+        } else {
+            out.write(0);
 
-	    out.writeObject(descriptor);
-	}
+            out.writeObject(descriptor);
+        }
     }
 
     private void readObject(ObjectInputStream in)
-	throws IOException, ClassNotFoundException {
+        throws IOException, ClassNotFoundException {
 
-	in.defaultReadObject();
+        in.defaultReadObject();
 
-	switch (in.read()) {
-	case 1:
-	    final String[] names = (String[])in.readObject();
+        switch (in.read()) {
+        case 1:
+            final String[] names = (String[])in.readObject();
 
-	    if (names.length == 0) {
-		descriptor = ImmutableDescriptor.EMPTY_DESCRIPTOR;
-	    } else {
-		final Object[] values = (Object[])in.readObject();
-		descriptor = new ImmutableDescriptor(names, values);
-	    }
+            if (names.length == 0) {
+                descriptor = ImmutableDescriptor.EMPTY_DESCRIPTOR;
+            } else {
+                final Object[] values = (Object[])in.readObject();
+                descriptor = new ImmutableDescriptor(names, values);
+            }
 
-	    break;
-	case 0:
-	    descriptor = (Descriptor)in.readObject();
+            break;
+        case 0:
+            descriptor = (Descriptor)in.readObject();
 
-	    if (descriptor == null) {
-		descriptor = ImmutableDescriptor.EMPTY_DESCRIPTOR;
-	    }
+            if (descriptor == null) {
+                descriptor = ImmutableDescriptor.EMPTY_DESCRIPTOR;
+            }
 
-	    break;
-	case -1: // from an earlier version of the JMX API
-	    descriptor = ImmutableDescriptor.EMPTY_DESCRIPTOR;
+            break;
+        case -1: // from an earlier version of the JMX API
+            descriptor = ImmutableDescriptor.EMPTY_DESCRIPTOR;
 
-	    break;
-	default:
-	    throw new StreamCorruptedException("Got unexpected byte.");
-	}
+            break;
+        default:
+            throw new StreamCorruptedException("Got unexpected byte.");
+        }
     }
 }

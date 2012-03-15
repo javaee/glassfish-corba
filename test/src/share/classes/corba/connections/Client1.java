@@ -48,8 +48,8 @@ public class Client1
 {
     public static void main(String[] av)
     {
-	String[] args = { "Client1" };
-	Client.main(args);
+        String[] args = { "Client1" };
+        Client.main(args);
     }
 }
 

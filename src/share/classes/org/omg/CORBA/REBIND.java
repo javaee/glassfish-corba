@@ -61,7 +61,7 @@ public final class REBIND extends SystemException {
      * minor code set to 0 and CompletionStatus set to COMPLETED_NO.
      */
     public REBIND() {
-	this("");
+        this("");
     }
 
     /**

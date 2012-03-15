@@ -58,7 +58,7 @@ public final class Bounds extends org.omg.CORBA.UserException {
      * Constructs a <code>Bounds</code> exception with no reason message.
      */
     public Bounds() {
-	super();
+        super();
     }
 
     /**
@@ -67,6 +67,6 @@ public final class Bounds extends org.omg.CORBA.UserException {
      * @param reason the String containing a reason message
      */
     public Bounds(String reason) {
-	super(reason);
+        super(reason);
     }
 }

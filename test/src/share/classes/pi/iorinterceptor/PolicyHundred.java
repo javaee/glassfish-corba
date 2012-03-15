@@ -52,7 +52,7 @@ public class PolicyHundred extends LocalObject
     private int value;
 
     public PolicyHundred( int value ) {
-	this.value = value;
+        this.value = value;
     }
 
     public int policy_type( ) {
@@ -69,7 +69,7 @@ public class PolicyHundred extends LocalObject
     }
 
     public int getValue() {
-	return value;
+        return value;
     }
 }
   

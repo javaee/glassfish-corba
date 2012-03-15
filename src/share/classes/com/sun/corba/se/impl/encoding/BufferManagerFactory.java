@@ -38,12 +38,12 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.encoding;
+package com.sun.corba.ee.impl.encoding;
 
-import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.orb.ORB;
 
 import org.omg.CORBA.INTERNAL;
 
@@ -71,9 +71,9 @@ public class BufferManagerFactory
         // fragments on a given connection to determine what fragment size
         // they're using, then use that ourselves?
 
-	if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
-	    return new BufferManagerReadGrow();
-	}
+        if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
+            return new BufferManagerReadGrow();
+        }
 
         switch (version.intValue()) 
         {
@@ -94,12 +94,12 @@ public class BufferManagerFactory
     public static BufferManagerRead newBufferManagerRead(
             int strategy, byte encodingVersion, ORB orb) {
 
-	if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
-	    if (strategy != BufferManagerFactory.GROW) {
-		throw wrapper.invalidBuffMgrStrategy("newBufferManagerRead");
-	    }
-	    return new BufferManagerReadGrow();
-	}
+        if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
+            if (strategy != BufferManagerFactory.GROW) {
+                throw wrapper.invalidBuffMgrStrategy("newBufferManagerRead");
+            }
+            return new BufferManagerReadGrow();
+        }
         switch (strategy) {
             case BufferManagerFactory.GROW:
                 return new BufferManagerReadGrow();
@@ -114,13 +114,13 @@ public class BufferManagerFactory
     }
 
     public static BufferManagerWrite newBufferManagerWrite(
-            int strategy, byte encodingVersion,	ORB orb) {
-	if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
-	    if (strategy != BufferManagerFactory.GROW) {
-		throw wrapper.invalidBuffMgrStrategy("newBufferManagerWrite");
-	    }
-	    return new BufferManagerWriteGrow(orb);
-	}
+            int strategy, byte encodingVersion, ORB orb) {
+        if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
+            if (strategy != BufferManagerFactory.GROW) {
+                throw wrapper.invalidBuffMgrStrategy("newBufferManagerWrite");
+            }
+            return new BufferManagerWriteGrow(orb);
+        }
         switch (strategy) {
             case BufferManagerFactory.GROW:
                 return new BufferManagerWriteGrow(orb);
@@ -136,12 +136,12 @@ public class BufferManagerFactory
 
     public static BufferManagerWrite newBufferManagerWrite(
         GIOPVersion version, byte encodingVersion, ORB orb) {
-	if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
-	    return new BufferManagerWriteGrow(orb);
-	}
+        if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
+            return new BufferManagerWriteGrow(orb);
+        }
         return BufferManagerFactory.newBufferManagerWrite(
-	    orb.getORBData().getGIOPBuffMgrStrategy(version),
-	    encodingVersion, orb);
+            orb.getORBData().getGIOPBuffMgrStrategy(version),
+            encodingVersion, orb);
     }
 
     public static BufferManagerRead defaultBufferManagerRead(ORB orb) {

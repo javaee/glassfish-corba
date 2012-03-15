@@ -101,138 +101,138 @@ public class Arguments
 
     protected void setDebugFlags( String args ) 
     {
-	StringTokenizer st = new StringTokenizer( args, "," ) ;
-	while (st.hasMoreTokens()) {
-	    String token = st.nextToken() ;
+        StringTokenizer st = new StringTokenizer( args, "," ) ;
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken() ;
 
-	    // If there is a public boolean data member in this class
-	    // named token + "DebugFlag", set it to true.
-	    try {
-		Field fld = this.getClass().getField( token + "DebugFlag" ) ; 
-		int mod = fld.getModifiers() ;
-		if (Modifier.isPublic( mod ) && !Modifier.isStatic( mod ))
-		    if (fld.getType() == boolean.class)
-			fld.setBoolean( this, true ) ;
-	    } catch (Exception exc) {
-		// ignore it
-	    }
-	}
+            // If there is a public boolean data member in this class
+            // named token + "DebugFlag", set it to true.
+            try {
+                Field fld = this.getClass().getField( token + "DebugFlag" ) ; 
+                int mod = fld.getModifiers() ;
+                if (Modifier.isPublic( mod ) && !Modifier.isStatic( mod ))
+                    if (fld.getType() == boolean.class)
+                        fld.setBoolean( this, true ) ;
+            } catch (Exception exc) {
+                // ignore it
+            }
+        }
     }
 
     /**
     * Collect the command-line parameters.
     **/
     void parseArgs (String[] args) throws InvalidArgument {
-	Vector unknownArgs = new Vector ();
-	int    i           = 0;
+        Vector unknownArgs = new Vector ();
+        int    i           = 0;
 
-	try {
-	    // Process command line parameters
-	    for (i = 0; i < args.length - 1; ++i) {
-		if (args[i].charAt (0) != '-' && args[i].charAt (0) != '/')
-		    throw new InvalidArgument (args[i]);
-		String lcArg = args[i].substring (1).toLowerCase ();
+        try {
+            // Process command line parameters
+            for (i = 0; i < args.length - 1; ++i) {
+                if (args[i].charAt (0) != '-' && args[i].charAt (0) != '/')
+                    throw new InvalidArgument (args[i]);
+                String lcArg = args[i].substring (1).toLowerCase ();
 
-		// Include path
-		if (lcArg.equals ("i")) {
-		    includePaths.addElement (args[++i]);
-		} else if (lcArg.startsWith ("i")) {
-		    includePaths.addElement (args[i].substring (2));
-		} else if (lcArg.equals ("v") || lcArg.equals ("verbose")) {
-		    // Verbose mode
-		    verbose = true;
-		} else if (lcArg.equals ("d")) {
-		    // Define symbol
-		    definedSymbols.put (args[++i], "");
-		} else if (lcArg.equals( "debug" )) {
-		    // Turn on debug flags
-		    setDebugFlags( args[++i] ) ;
-		} else if (lcArg.startsWith ("d")) {
-		    definedSymbols.put (args[i].substring (2), "");
-		} else if (lcArg.equals ("emitall")) {
-		    // Emit bindings for included sources
-		    emitAll = true;
-		} else if (lcArg.equals ("keep")) {
-		    // Keep old files
-		    keepOldFiles = true;
-		} else if (lcArg.equals ("nowarn")) {
-		    // <d62023> Suppress warnings
-		    noWarn = true;
-		} else if (lcArg.equals ("trace")) {
-		    // Allow tracing.
-		    Runtime.getRuntime ().traceMethodCalls (true);
-		}
-		// <f46082.51> Remove -stateful feature.
-		//else if (lcArg.equals ("stateful"))
-		//{
-		//  Emit stateful bindings.
-		//  parseStateful = true;
-		//}
-		// CPPModule
-		else if ( lcArg.equals ("cppmodule")) {
-		    cppModule = true;
-		} else if (lcArg.equals ("version"))  {
-		    // Version
-		    versionRequest = true;
-		} else if (lcArg.equals ("corba"))  {
-		    // CORBA level
-		    if (i + 1 >= args.length)
-			throw new InvalidArgument (args[i]);
-		    String level = args[++i];
-		    if (level.charAt (0) == '-')
-			throw new InvalidArgument (args[i - 1]);
-		    try {
-			corbaLevel = new Float (level).floatValue ();
-		    } catch (NumberFormatException e) {
-			throw new InvalidArgument (args[i]);
-		    }
-		} else {
-		    unknownArgs.addElement (args[i]);
-		    ++i;
-		    while (i < (args.length - 1) &&
-			args[i].charAt (0) != '-' &&
-			args[i].charAt (0) != '/') {
-			unknownArgs.addElement (args[i++]);
-		    }
-		    --i;
-		}
+                // Include path
+                if (lcArg.equals ("i")) {
+                    includePaths.addElement (args[++i]);
+                } else if (lcArg.startsWith ("i")) {
+                    includePaths.addElement (args[i].substring (2));
+                } else if (lcArg.equals ("v") || lcArg.equals ("verbose")) {
+                    // Verbose mode
+                    verbose = true;
+                } else if (lcArg.equals ("d")) {
+                    // Define symbol
+                    definedSymbols.put (args[++i], "");
+                } else if (lcArg.equals( "debug" )) {
+                    // Turn on debug flags
+                    setDebugFlags( args[++i] ) ;
+                } else if (lcArg.startsWith ("d")) {
+                    definedSymbols.put (args[i].substring (2), "");
+                } else if (lcArg.equals ("emitall")) {
+                    // Emit bindings for included sources
+                    emitAll = true;
+                } else if (lcArg.equals ("keep")) {
+                    // Keep old files
+                    keepOldFiles = true;
+                } else if (lcArg.equals ("nowarn")) {
+                    // <d62023> Suppress warnings
+                    noWarn = true;
+                } else if (lcArg.equals ("trace")) {
+                    // Allow tracing.
+                    Runtime.getRuntime ().traceMethodCalls (true);
+                }
+                // <f46082.51> Remove -stateful feature.
+                //else if (lcArg.equals ("stateful"))
+                //{
+                //  Emit stateful bindings.
+                //  parseStateful = true;
+                //}
+                // CPPModule
+                else if ( lcArg.equals ("cppmodule")) {
+                    cppModule = true;
+                } else if (lcArg.equals ("version"))  {
+                    // Version
+                    versionRequest = true;
+                } else if (lcArg.equals ("corba"))  {
+                    // CORBA level
+                    if (i + 1 >= args.length)
+                        throw new InvalidArgument (args[i]);
+                    String level = args[++i];
+                    if (level.charAt (0) == '-')
+                        throw new InvalidArgument (args[i - 1]);
+                    try {
+                        corbaLevel = new Float (level).floatValue ();
+                    } catch (NumberFormatException e) {
+                        throw new InvalidArgument (args[i]);
+                    }
+                } else {
+                    unknownArgs.addElement (args[i]);
+                    ++i;
+                    while (i < (args.length - 1) &&
+                        args[i].charAt (0) != '-' &&
+                        args[i].charAt (0) != '/') {
+                        unknownArgs.addElement (args[i++]);
+                    }
+                    --i;
+                }
             }
-	} catch (ArrayIndexOutOfBoundsException e) {
-	    // If there is any array indexing problem, it is probably
-	    // because the qualifier on the last argument is missing.
-	    // Report that this last argument is invalid.
-	    throw new InvalidArgument (args[args.length - 1]);
-	}
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // If there is any array indexing problem, it is probably
+            // because the qualifier on the last argument is missing.
+            // Report that this last argument is invalid.
+            throw new InvalidArgument (args[args.length - 1]);
+        }
 
-	// <d57319>
-	// The last argument is the file argument or "-version", which may
-	// be specified without a file argument.
-	if (i == args.length - 1) {
-	    if (args[i].toLowerCase ().equals ("-version"))
-		versionRequest = true;
-	    else
-		file = args[i];
-	} else
-	    throw new InvalidArgument ();
+        // <d57319>
+        // The last argument is the file argument or "-version", which may
+        // be specified without a file argument.
+        if (i == args.length - 1) {
+            if (args[i].toLowerCase ().equals ("-version"))
+                versionRequest = true;
+            else
+                file = args[i];
+        } else
+            throw new InvalidArgument ();
 
-	// Get and process the idl.config file.
-	Properties props = new Properties ();
-	try {
-	  DataInputStream stream = FileLocator.locateFileInClassPath ("idl.config");
-	  props.load (stream);
-	  addIncludePaths (props);
-	} catch (IOException e) {
-	}
+        // Get and process the idl.config file.
+        Properties props = new Properties ();
+        try {
+          DataInputStream stream = FileLocator.locateFileInClassPath ("idl.config");
+          props.load (stream);
+          addIncludePaths (props);
+        } catch (IOException e) {
+        }
 
-	// Call parseOtherArgs.  By default, if there are unknown args,
-	// InvalidArgument is called.  A call to parseOtherArgs is useful
-	// only when this framework has been extended.
-	String[] otherArgs;
-	if (unknownArgs.size () > 0) {
-	    otherArgs = new String[unknownArgs.size ()];
-	    unknownArgs.copyInto (otherArgs);
-	} else
-	    otherArgs = new String[0];
+        // Call parseOtherArgs.  By default, if there are unknown args,
+        // InvalidArgument is called.  A call to parseOtherArgs is useful
+        // only when this framework has been extended.
+        String[] otherArgs;
+        if (unknownArgs.size () > 0) {
+            otherArgs = new String[unknownArgs.size ()];
+            unknownArgs.copyInto (otherArgs);
+        } else
+            otherArgs = new String[0];
 
         parseOtherArgs (otherArgs, props);
     } // parseArgs

@@ -63,7 +63,7 @@ public final class BAD_INV_ORDER extends SystemException {
      * minor code of 0 and a completion state of COMPLETED_NO.
      */
     public BAD_INV_ORDER() {
-	this("");
+        this("");
     }
 
     /**

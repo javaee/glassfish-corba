@@ -40,7 +40,7 @@
 
 package pi.clientrequestinfo;
 
-import com.sun.corba.se.impl.interceptors.*;
+import com.sun.corba.ee.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 
 /**
@@ -63,10 +63,10 @@ public class RequestId2Strategy
     private int count = 0;
 
     public void send_request (
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
         throws ForwardRequest
     {
-	super.send_request( interceptor, ri );
+        super.send_request( interceptor, ri );
 
         try {
             if( count == 0 ) {
@@ -90,9 +90,9 @@ public class RequestId2Strategy
     }
 
     public void receive_reply(
-	SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
+        SampleClientRequestInterceptor interceptor, ClientRequestInfo ri)
     {
-	super.receive_reply( interceptor, ri );
+        super.receive_reply( interceptor, ri );
 
         try {
             // check to make sure inner ids match.

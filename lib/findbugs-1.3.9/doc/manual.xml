@@ -20,11 +20,11 @@
     <othername>H.</othername>
     <surname>Hovemeyer</surname>
   </author>
-        <author>
-                <firstname>William</firstname>
-                <othername>W.</othername>
-                <surname>Pugh</surname>
-        </author>
+	<author>
+		<firstname>William</firstname>
+		<othername>W.</othername>
+		<surname>Pugh</surname>
+	</author>
 </authorgroup>
 
 <copyright>
@@ -177,15 +177,15 @@ To compile &FindBugs; from source, you will need the following:
 </para>
 
 <warning>
-        <para>
-                The version of &Ant; included as <filename>/usr/bin/ant</filename> on
-                Redhat Linux systems will <emphasis>not</emphasis> work for compiling
-                &FindBugs;.  We recommend you install a binary distribution of &Ant;
-                downloaded from the <ulink url="http://ant.apache.org/">&Ant; website</ulink>.
-                Make sure that when you run &Ant; your <replaceable>JAVA_HOME</replaceable>
-                environment variable points to the directory in which you installed
-                JDK 1.5 (or later).
-        </para>
+	<para>
+		The version of &Ant; included as <filename>/usr/bin/ant</filename> on
+		Redhat Linux systems will <emphasis>not</emphasis> work for compiling
+		&FindBugs;.  We recommend you install a binary distribution of &Ant;
+		downloaded from the <ulink url="http://ant.apache.org/">&Ant; website</ulink>.
+		Make sure that when you run &Ant; your <replaceable>JAVA_HOME</replaceable>
+		environment variable points to the directory in which you installed
+		JDK 1.5 (or later).
+	</para>
 </warning>
 
 <para>
@@ -238,7 +238,7 @@ used by the <ulink url="http://ant.apache.org/">&Ant;</ulink>
 If you do not want to build the FindBugs documentation, then you
 can ignore this file.
 </para>
-        
+	
 <para>
 The <filename>local.properties</filename> overrides definitions
 in the <filename>build.properties</filename> file.
@@ -315,25 +315,25 @@ where <replaceable>target</replaceable> is one of the following:
   </varlistentry>
   
   <varlistentry>
-        <term><command>runjunit</command></term>
-        <listitem>
-                <para>
-                        This target compiles and runs the internal JUnit tests included
-                        in &FindBugs;.  It will print an error message if any unit
-                        tests fail.
-                </para>
-        </listitem>
+	<term><command>runjunit</command></term>
+	<listitem>
+		<para>
+			This target compiles and runs the internal JUnit tests included
+			in &FindBugs;.  It will print an error message if any unit
+			tests fail.
+		</para>
+	</listitem>
   </varlistentry>
   
   <varlistentry>
-        <term><command>bindist</command></term>
-        <listitem>
-                <para>
-                        Builds a binary distribution of &FindBugs;.
-                        The target creates both <filename>.zip</filename> and
-                        <filename>.tar.gz</filename> archives.
-                </para>
-        </listitem>
+	<term><command>bindist</command></term>
+	<listitem>
+		<para>
+			Builds a binary distribution of &FindBugs;.
+			The target creates both <filename>.zip</filename> and
+			<filename>.tar.gz</filename> archives.
+		</para>
+	</listitem>
   </varlistentry>
 </variablelist>
 </para>
@@ -381,12 +381,12 @@ command line user interface.  This chapter describes
 how to run each of these user interfaces.
 </para>
 
-        <warning>
-                <para>
-                        This chapter is in the process of being re-written.
-                        The rewrite is not complete yet.
-                </para>
-        </warning>
+	<warning>
+		<para>
+			This chapter is in the process of being re-written.
+			The rewrite is not complete yet.
+		</para>
+	</warning>
 
 <!--
 <sect1>
@@ -395,160 +395,160 @@ how to run each of these user interfaces.
 -->
 
 <sect1>
-        <title>Quick Start</title>
-        <para>
-                If you are running &FindBugs; on a  Windows system,
-                double-click on the file <filename>&FBHomeWin;\lib\findbugs.jar</filename> to start the &FindBugs; GUI.
-        </para>
-        
-        <para>
-                On a Unix, Linux, or Mac OS X system, run the <filename>&FBHome;/bin/findbugs</filename>
-                script, or run the command <screen>
+	<title>Quick Start</title>
+	<para>
+		If you are running &FindBugs; on a  Windows system,
+		double-click on the file <filename>&FBHomeWin;\lib\findbugs.jar</filename> to start the &FindBugs; GUI.
+	</para>
+	
+	<para>
+		On a Unix, Linux, or Mac OS X system, run the <filename>&FBHome;/bin/findbugs</filename>
+		script, or run the command <screen>
 <command>java -jar &FBHome;/lib/findbugs.jar</command></screen>
-        to run the &FindBugs; GUI.
-        </para>
-        
-        <para>
-        Refer to <xref linkend="gui"/> for information on how to use the GUI.
-        </para>
+	to run the &FindBugs; GUI.
+	</para>
+	
+	<para>
+	Refer to <xref linkend="gui"/> for information on how to use the GUI.
+	</para>
 </sect1>
 
 <sect1>
-        
-        <title>Executing &FindBugs;</title>
+	
+	<title>Executing &FindBugs;</title>
 
-        <para>
-                This section describes how to invoke the &FindBugs; program.
-                There are two ways to invoke &FindBugs;: directly, or using a
-                wrapper script.
-        </para>
+	<para>
+		This section describes how to invoke the &FindBugs; program.
+		There are two ways to invoke &FindBugs;: directly, or using a
+		wrapper script.
+	</para>
 
 
-        <sect2 id="directInvocation">
-                <title>Direct invocation of &FindBugs;</title>
-                
-                <para>
-                        The preferred method of running &FindBugs; is to directly execute
-                        <filename>&FBHome;/lib/findbugs.jar</filename> using the <command>-jar</command>
-                        command line switch of the JVM (<command>java</command>) executable.
-                        (Versions of &FindBugs; prior to 1.3.5 required a wrapper script
-                        to invoke &FindBugs;.)
-                </para>
-                
-                <para>
-                        The general syntax of invoking &FindBugs; directly is the following:
+	<sect2 id="directInvocation">
+		<title>Direct invocation of &FindBugs;</title>
+		
+		<para>
+			The preferred method of running &FindBugs; is to directly execute
+			<filename>&FBHome;/lib/findbugs.jar</filename> using the <command>-jar</command>
+			command line switch of the JVM (<command>java</command>) executable.
+			(Versions of &FindBugs; prior to 1.3.5 required a wrapper script
+			to invoke &FindBugs;.)
+		</para>
+		
+		<para>
+			The general syntax of invoking &FindBugs; directly is the following:
 <screen>
-        <command>java <replaceable>[JVM arguments]</replaceable> -jar &FBHome;/lib/findbugs.jar <replaceable>options...</replaceable></command>
+	<command>java <replaceable>[JVM arguments]</replaceable> -jar &FBHome;/lib/findbugs.jar <replaceable>options...</replaceable></command>
 </screen>
-                </para>
+		</para>
 
-<!--    
-                <para>
-                        By default, executing <filename>findbugs.jar</filename> runs the
-                        &FindBugs; graphical user interface (GUI).  On windows systems,
-                        you can double-click on <filename>findbugs.jar</filename> to launch
-                        the GUI.  From a command line, the command
-                        <screen>
+<!--	
+		<para>
+			By default, executing <filename>findbugs.jar</filename> runs the
+			&FindBugs; graphical user interface (GUI).  On windows systems,
+			you can double-click on <filename>findbugs.jar</filename> to launch
+			the GUI.  From a command line, the command
+			<screen>
 java -jar <replaceable>&FBHome;</replaceable>/lib/findbugs.jar</screen>
-                        will launch the GUI.
-                </para>
+			will launch the GUI.
+		</para>
 -->
 
-                <sect3 id="chooseUI">
-                        <title>Choosing the User Interface</title>
-                
-                <para>
-                        The first command line option chooses the &FindBugs; user interface to execute.
-                        Possible values are:
-                </para>
-                <itemizedlist>
-                        <listitem>
-                                <para>
-                                <command>-gui</command>: runs the graphical user interface (GUI)
-                                </para>
-                        </listitem>
-                        
-                        <listitem>
-                                <para>
-                                        <command>-textui</command>: runs the command line user interface
-                                </para>
-                        </listitem>
+		<sect3 id="chooseUI">
+			<title>Choosing the User Interface</title>
+		
+		<para>
+			The first command line option chooses the &FindBugs; user interface to execute.
+			Possible values are:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+				<command>-gui</command>: runs the graphical user interface (GUI)
+				</para>
+			</listitem>
+			
+			<listitem>
+				<para>
+					<command>-textui</command>: runs the command line user interface
+				</para>
+			</listitem>
 
-                        <listitem>
-                                <para>
-                                        <command>-version</command>: displays the &FindBugs; version number
-                                </para>
-                        </listitem>
+			<listitem>
+				<para>
+					<command>-version</command>: displays the &FindBugs; version number
+				</para>
+			</listitem>
 
-                        <listitem>
-                                <para>
-                                        <command>-help</command>: displays help information for the
-                                        &FindBugs; command line user interface
-                                </para>
-                        </listitem>
+			<listitem>
+				<para>
+					<command>-help</command>: displays help information for the
+					&FindBugs; command line user interface
+				</para>
+			</listitem>
 
-                        <listitem>
-                                <para>
-                                        <command>-gui1</command>: executes the original (obsolete)
-                                        &FindBugs; graphical user interface
-                                </para>
-                        </listitem>
-                </itemizedlist>
-                
-                </sect3>
-                
-                <sect3 id="jvmArgs">
-                        <title>Java Virtual Machine (JVM) arguments</title>
-                        
-                        <para>
-                                Several Java Virtual Machine arguments are useful when invoking
-                                &FindBugs;.
-                        </para>
-                        
-                        <variablelist>
-                                <varlistentry>
-                                        <term><command>-Xmx<replaceable>NN</replaceable>m</command></term>
-                                        <listitem>
-                                                <para>
-                                                        Set the maximum Java heap size to <replaceable>NN</replaceable>
-                                                        megabytes.  &FindBugs; generally requires a large amount of
-                                                        memory.  For a very large project, using 1500 megabytes
-                                                        is not unusual.
-                                                </para>
-                                        </listitem>
-                                </varlistentry>
+			<listitem>
+				<para>
+					<command>-gui1</command>: executes the original (obsolete)
+					&FindBugs; graphical user interface
+				</para>
+			</listitem>
+		</itemizedlist>
+		
+		</sect3>
+		
+		<sect3 id="jvmArgs">
+			<title>Java Virtual Machine (JVM) arguments</title>
+			
+			<para>
+				Several Java Virtual Machine arguments are useful when invoking
+				&FindBugs;.
+			</para>
+			
+			<variablelist>
+				<varlistentry>
+					<term><command>-Xmx<replaceable>NN</replaceable>m</command></term>
+					<listitem>
+						<para>
+							Set the maximum Java heap size to <replaceable>NN</replaceable>
+							megabytes.  &FindBugs; generally requires a large amount of
+							memory.  For a very large project, using 1500 megabytes
+							is not unusual.
+						</para>
+					</listitem>
+				</varlistentry>
 
-                                <varlistentry>
-                                        <term><command>-D<replaceable>name</replaceable>=<replaceable>value</replaceable></command></term>
-                                        <listitem>
-                                                <para>
-                                                        Set a Java system property.  For example, you might use the
-                                                        argument <command>-Duser.language=ja</command> to display
-                                                        GUI messages in Japanese.
-                                                </para>
-                                        </listitem>
-                                </varlistentry>
+				<varlistentry>
+					<term><command>-D<replaceable>name</replaceable>=<replaceable>value</replaceable></command></term>
+					<listitem>
+						<para>
+							Set a Java system property.  For example, you might use the
+							argument <command>-Duser.language=ja</command> to display
+							GUI messages in Japanese.
+						</para>
+					</listitem>
+				</varlistentry>
 
-                                <!--
-                                <varlistentry>
-                                        <term></term>
-                                        <listitem>
-                                                <para>
-                                                </para>
-                                        </listitem>
-                                </varlistentry>
-                                -->
-                        </variablelist>
-                </sect3>
-                
-        </sect2>
-        
-        <sect2 id="wrapperScript">
-                <title>Invocation of &FindBugs; using a wrapper script</title>
+				<!--
+				<varlistentry>
+					<term></term>
+					<listitem>
+						<para>
+						</para>
+					</listitem>
+				</varlistentry>
+				-->
+			</variablelist>
+		</sect3>
+		
+	</sect2>
+	
+	<sect2 id="wrapperScript">
+		<title>Invocation of &FindBugs; using a wrapper script</title>
 
-                <para>
-                        Another way to run &FindBugs; is to use a wrapper script.
-                </para>
+		<para>
+			Another way to run &FindBugs; is to use a wrapper script.
+		</para>
 
 <para>
 On Unix-like systems, use the following command to invoke the wrapper script:
@@ -570,14 +570,14 @@ directory to your <filename>PATH</filename> environment variable and then invoke
 FindBugs using the <command>findbugs</command> command.
 </para>
 
-        <sect3 id="wrapperOptions">
-                <title>Wrapper script command line options</title>
-                <para>The &FindBugs; wrapper scripts support the following command-line options.
-                Note that these command line options are <emphasis>not</emphasis> handled by
-                the &FindBugs; program per se; rather, they are handled by the wrapper
-                script.
-                </para>
-        <variablelist>
+	<sect3 id="wrapperOptions">
+		<title>Wrapper script command line options</title>
+		<para>The &FindBugs; wrapper scripts support the following command-line options.
+		Note that these command line options are <emphasis>not</emphasis> handled by
+		the &FindBugs; program per se; rather, they are handled by the wrapper
+		script.
+		</para>
+	<variablelist>
   <varlistentry>
     <term><command>-jvmArgs <replaceable>args</replaceable></command></term>
     <listitem>
@@ -634,9 +634,9 @@ FindBugs using the <command>findbugs</command> command.
     </listitem>
   </varlistentry>
 
-        </variablelist>
-                
-        </sect3>
+	</variablelist>
+		
+	</sect3>
 
 </sect2>
 
@@ -663,9 +663,9 @@ The second invokes the Command Line Interface (Text UI):
 -->
 
 <para>
-        This section describes the command line options supported by &FindBugs;.
-        These command line options may be used when invoking &FindBugs; directly,
-        or when using a wrapper script.
+	This section describes the command line options supported by &FindBugs;.
+	These command line options may be used when invoking &FindBugs; directly,
+	or when using a wrapper script.
 </para>
 
 <sect2>
@@ -694,8 +694,8 @@ These options may be used with both the GUI and command-line interfaces.
     <term><command>-effort:max</command></term>
     <listitem>
       <para>
-                Enable analyses which increase precision and find more bugs, but which
-                may require more memory and take more time to complete.
+		Enable analyses which increase precision and find more bugs, but which
+		may require more memory and take more time to complete.
       </para>
     </listitem>
   </varlistentry>
@@ -713,12 +713,12 @@ These options may be used with both the GUI and command-line interfaces.
   
   <!--
   <varlistentry>
-          <term><command></command></term>
-          <listitem>
-                  <para>
-                          
-                  </para>
-          </listitem>
+	  <term><command></command></term>
+	  <listitem>
+		  <para>
+			  
+		  </para>
+	  </listitem>
   </varlistentry>
   -->
 
@@ -737,7 +737,7 @@ These options are only accepted by the Graphical User Interface.
     <term><command>-look:</command><replaceable>plastic|gtk|native</replaceable></term>
     <listitem>
        <para>
-                Set Swing look and feel.
+		Set Swing look and feel.
        </para>
     </listitem>
   </varlistentry>
@@ -833,13 +833,13 @@ These options are only accepted by the Text User Interface.
   </varlistentry>
   
   <varlistentry>
-        <term><command>-relaxed</command></term>
-        <listitem>
-                <para>
-                        Relaxed reporting mode.  For many detectors, this option
-                        suppresses the heuristics used to avoid reporting false positives.
-                </para>
-        </listitem>
+	<term><command>-relaxed</command></term>
+	<listitem>
+		<para>
+			Relaxed reporting mode.  For many detectors, this option
+			suppresses the heuristics used to avoid reporting false positives.
+		</para>
+	</listitem>
   </varlistentry>
 
   <varlistentry>
@@ -864,16 +864,16 @@ These options are only accepted by the Text User Interface.
     <ulink url="http://www.w3.org/TR/xslt">XSLT</ulink>
     stylesheet to generate the HTML: you can find this file in <filename>findbugs.jar</filename>,
     or in the &FindBugs; source or binary distributions.  Variants of this option include
-        <command>-html:plain.xsl</command>, <command>-html:fancy.xsl</command> and <command>-html:fancy-hist.xsl</command>.
-        The <filename>plain.xsl</filename> stylesheet does not use Javascript or DOM,
-        and may work better with older web browsers, or for printing.  The <filename>fancy.xsl</filename>
-        stylesheet uses DOM and Javascript for navigation and CSS for
-        visual presentation. The <command>fancy-hist.xsl</command> an evolution of <command>fancy.xsl</command> stylesheet.
-        It makes an extensive use of DOM and Javascript for dynamically filtering the lists of bugs.
-        </para>         
-                
-        <para>
-        If you want to specify your own
+	<command>-html:plain.xsl</command>, <command>-html:fancy.xsl</command> and <command>-html:fancy-hist.xsl</command>.
+	The <filename>plain.xsl</filename> stylesheet does not use Javascript or DOM,
+	and may work better with older web browsers, or for printing.  The <filename>fancy.xsl</filename>
+	stylesheet uses DOM and Javascript for navigation and CSS for
+	visual presentation. The <command>fancy-hist.xsl</command> an evolution of <command>fancy.xsl</command> stylesheet.
+	It makes an extensive use of DOM and Javascript for dynamically filtering the lists of bugs.
+	</para>		
+		
+	<para>
+  	If you want to specify your own
     XSLT stylesheet to perform the transformation to HTML, specify the option as
     <command>-html:<replaceable>myStylesheet.xsl</replaceable></command>,
     where <replaceable>myStylesheet.xsl</replaceable> is the filename of the
@@ -961,11 +961,11 @@ These options are only accepted by the Text User Interface.
 </chapter>
 
 <chapter id="gui">
-        <title>Using the &FindBugs; GUI</title>
+	<title>Using the &FindBugs; GUI</title>
 
-        <para>
-                This chapter describes how to use the &FindBugs; graphical user interface (GUI).
-        </para>
+	<para>
+		This chapter describes how to use the &FindBugs; graphical user interface (GUI).
+	</para>
 
 <sect1>
 <title>Creating a Project</title>
@@ -1303,13 +1303,13 @@ using the &FindBugs; task.
        Optional attribute.
        It specifies the output format.  If set to "xml" (the default), output
        is in XML format.
-           If set to "xml:withMessages", output is in XML format augmented with
-           human-readable messages.  (You should use this format if you plan
-                to generate a report using an XSL stylesheet.)
-           If set to "html", output is in HTML formatted (default stylesheet is default.xsl).
-                If set to "text", output is in ad-hoc text format.
+	   If set to "xml:withMessages", output is in XML format augmented with
+	   human-readable messages.  (You should use this format if you plan
+		to generate a report using an XSL stylesheet.)
+	   If set to "html", output is in HTML formatted (default stylesheet is default.xsl).
+		If set to "text", output is in ad-hoc text format.
        If set to "emacs", output is in <ulink url="http://www.gnu.org/software/emacs/">Emacs</ulink> error message format.
-           If set to "xdocs", output is xdoc XML for use with Apache Maven.
+	   If set to "xdocs", output is xdoc XML for use with Apache Maven.
        </para>
     </listitem>
   </varlistentry>
@@ -1358,17 +1358,17 @@ using the &FindBugs; task.
        </para>
     </listitem>
   </varlistentry>
-        
+	
   <varlistentry>
-          <term><literal>effort</literal></term>
-          <listitem>
-                  <para>
-                          Set the analysis effort level.  The value specified should be
-                          one of <literal>min</literal>, <literal>default</literal>,
-                          or <literal>max</literal>.  See <xref linkend="commandLineOptions"/>
-                          for more information about setting the analysis level.
-                  </para>
-          </listitem>
+	  <term><literal>effort</literal></term>
+	  <listitem>
+		  <para>
+			  Set the analysis effort level.  The value specified should be
+			  one of <literal>min</literal>, <literal>default</literal>,
+			  or <literal>max</literal>.  See <xref linkend="commandLineOptions"/>
+			  for more information about setting the analysis level.
+		  </para>
+	  </listitem>
   </varlistentry>
 
   <varlistentry>
@@ -1384,7 +1384,7 @@ using the &FindBugs; task.
        <para>Synonym for effort="max".</para>
     </listitem>
   </varlistentry>
-        
+	
   <varlistentry>
     <term><literal>visitors</literal></term>
     <listitem>
@@ -1499,16 +1499,16 @@ using the &FindBugs; task.
        </para>
     </listitem>
   </varlistentry>
-        
+	
   <varlistentry>
-          <term><literal>warningsProperty</literal></term>
-          <listitem>
-                  <para>
-                          Optional attribute which specifies the name of a property
-                          that will be set to "true" if any warnings are reported by
-                          &FindBugs; on the analyzed program.
-                  </para>
-          </listitem>
+	  <term><literal>warningsProperty</literal></term>
+	  <listitem>
+		  <para>
+			  Optional attribute which specifies the name of a property
+			  that will be set to "true" if any warnings are reported by
+			  &FindBugs; on the analyzed program.
+		  </para>
+	  </listitem>
   </varlistentry>
 
 </variablelist>
@@ -1752,80 +1752,80 @@ In other words, each of the children must be true for the predicate to be true.
  <varlistentry>
    <term><literal>&lt;Bug&gt;</literal></term>
    <listitem><para>
-                        This element specifies a particular bug pattern or patterns to match.
-                        The <literal>pattern</literal> attribute is a comma-separated list of
-                        bug pattern types.  You can find the bug pattern types for particular
-                        warnings by looking at the output produced by the <command>-xml</command>
-                        output option (the <literal>type</literal> attribute of <literal>BugInstance</literal>
-                        elements), or from the <ulink url="../bugDescriptions.html">bug
-                        descriptions document</ulink>.
+			This element specifies a particular bug pattern or patterns to match.
+			The <literal>pattern</literal> attribute is a comma-separated list of
+			bug pattern types.  You can find the bug pattern types for particular
+			warnings by looking at the output produced by the <command>-xml</command>
+			output option (the <literal>type</literal> attribute of <literal>BugInstance</literal>
+			elements), or from the <ulink url="../bugDescriptions.html">bug
+			descriptions document</ulink>.
    </para><para>
-                        For more coarse-grained matching, use <literal>code</literal> attribute. It takes
-                        a comma-separated list of bug abbreviations. For most-coarse grained matching use 
-                        <literal>category</literal> attriute, that takes a comma separated list of bug category names: 
-                        <literal>CORRECTNESS</literal>, <literal>MT_CORRECTNESS</literal>, 
-                        <literal>BAD_PRACTICICE</literal>, <literal>PERFORMANCE</literal>, <literal>STYLE</literal>. 
-   </para><para>                        
-                        If more than one of the attributes mentioned above are specified on the same 
-                        <literal>&lt;Bug&gt;</literal> element, all bug patterns that match either one of specified 
-                        pattern names, or abreviations, or categories will be matched.
+   			For more coarse-grained matching, use <literal>code</literal> attribute. It takes
+   			a comma-separated list of bug abbreviations. For most-coarse grained matching use 
+   			<literal>category</literal> attriute, that takes a comma separated list of bug category names: 
+   			<literal>CORRECTNESS</literal>, <literal>MT_CORRECTNESS</literal>, 
+   			<literal>BAD_PRACTICICE</literal>, <literal>PERFORMANCE</literal>, <literal>STYLE</literal>. 
+   </para><para>   			
+   			If more than one of the attributes mentioned above are specified on the same 
+   			<literal>&lt;Bug&gt;</literal> element, all bug patterns that match either one of specified 
+   			pattern names, or abreviations, or categories will be matched.
    </para><para>   
-                        As a backwards compatibility measure, <literal>&lt;BugPattern&gt;</literal> and
-                        <literal>&lt;BugCode&gt;</literal> elements may be used instead of 
-                        <literal>&lt;Bug&gt;</literal> element. Each of these uses a
-                        <literal>name</literal> attribute for specifying accepted values list. Support for these
-                        elements may be removed in a future release.
+   			As a backwards compatibility measure, <literal>&lt;BugPattern&gt;</literal> and
+   			<literal>&lt;BugCode&gt;</literal> elements may be used instead of 
+   			<literal>&lt;Bug&gt;</literal> element. Each of these uses a
+   			<literal>name</literal> attribute for specifying accepted values list. Support for these
+   			elements may be removed in a future release.
    </para></listitem>
  </varlistentry>
 
  <varlistentry>
-        <term><literal>&lt;Priority&gt;</literal></term>
-        <listitem>
-                <para>
-                        This element matches warnings with a particular priority.
-                        The <literal>value</literal> attribute should be an integer value:
-                        1 to match high-priority warnings, 2 to match medium-priority warnings,
-                        or 3 to match low-priority warnings.
-                </para>
-        </listitem>
+	<term><literal>&lt;Priority&gt;</literal></term>
+	<listitem>
+		<para>
+			This element matches warnings with a particular priority.
+			The <literal>value</literal> attribute should be an integer value:
+			1 to match high-priority warnings, 2 to match medium-priority warnings,
+			or 3 to match low-priority warnings.
+		</para>
+	</listitem>
  </varlistentry>
 
 
  <varlistentry>
    <term><literal>&lt;Package&gt;</literal></term>
-        <listitem>
-                <para> 
-                        This element matches warnings associated with classes within the package specified 
-                        using <literal>name</literal> attribute. Nested packages are not included (along the 
-                        lines of Java import statement). However matching multiple packages can be achieved 
-                        easily using regex name match.
-                </para>
-        </listitem>
+	<listitem>
+		<para> 
+			This element matches warnings associated with classes within the package specified 
+			using <literal>name</literal> attribute. Nested packages are not included (along the 
+			lines of Java import statement). However matching multiple packages can be achieved 
+			easily using regex name match.
+		</para>
+	</listitem>
   </varlistentry>
-                
+		
  <varlistentry>
    <term><literal>&lt;Class&gt;</literal></term>
-        <listitem>
-                <para>
-                        This element matches warnings associated with a particular class. The 
-                        <literal>name</literal> attribute is used to specify the exact or regex match pattern 
-                        for the class name.
-                </para>
-                
-                <para>
-                        As a backward compatibility measure, instead of element of this type, you can use
-                         <literal>class</literal> attribute on a <literal>Match</literal> element to specify 
-                         exact an class name or <literal>classregex</literal> attribute to specify a regular
-                         expression to match the class name against.
-                </para>
-                
-                <para>
-                        If the <literal>Match</literal> element contains neither a <literal>Class</literal> element, 
-                        nor a <literal>class</literal> / <literal>classregex</literal> attribute, the predicate will apply 
-                        to all classes. Such predicate is likely to match more bug instances than you want, unless it is 
-                        refined further down with apropriate method or field predicates.
-                </para>
-        </listitem>
+	<listitem>
+		<para>
+			This element matches warnings associated with a particular class. The 
+			<literal>name</literal> attribute is used to specify the exact or regex match pattern 
+			for the class name.
+		</para>
+		
+		<para>
+			As a backward compatibility measure, instead of element of this type, you can use
+			 <literal>class</literal> attribute on a <literal>Match</literal> element to specify 
+			 exact an class name or <literal>classregex</literal> attribute to specify a regular
+			 expression to match the class name against.
+		</para>
+		
+		<para>
+			If the <literal>Match</literal> element contains neither a <literal>Class</literal> element, 
+			nor a <literal>class</literal> / <literal>classregex</literal> attribute, the predicate will apply 
+			to all classes. Such predicate is likely to match more bug instances than you want, unless it is 
+			refined further down with apropriate method or field predicates.
+		</para>
+	</listitem>
  </varlistentry>
 
  <varlistentry>
@@ -2008,8 +2008,8 @@ as expected.
 </para>
 
 <para>
-        6. Match a particular bug pattern in a particular method.
-        
+	6. Match a particular bug pattern in a particular method.
+	
 <programlisting>
 <![CDATA[
     <!-- A method with an open stream false positive. -->
@@ -2023,8 +2023,8 @@ as expected.
 </para>
 
 <para>
-        7. Match a particular bug pattern with a given priority in a particular method.
-        
+	7. Match a particular bug pattern with a given priority in a particular method.
+	
 <programlisting>
 <![CDATA[
     <!-- A method with a dead local store false positive (medium priority). -->
@@ -2039,9 +2039,9 @@ as expected.
 </para>
 
 <para>
-        8. Match minor bugs introduced by AspectJ compiler (you are probably not interested in these unless
-        you are an AspectJ developer).
-        
+	8. Match minor bugs introduced by AspectJ compiler (you are probably not interested in these unless
+	you are an AspectJ developer).
+	
 <programlisting>
 <![CDATA[
     <Match> 
@@ -2058,8 +2058,8 @@ as expected.
 </para>
 
 <para>
-        9. Match bugs in specific parts of the code base
-        
+	9. Match bugs in specific parts of the code base
+	
 <programlisting>
 <![CDATA[
     <!-- match unused fields warnings in Messages classes in all packages -->
@@ -2082,24 +2082,24 @@ as expected.
 </para>
 
 <para>
-        10. Match bugs on fieds or methods with specific signatures
+	10. Match bugs on fieds or methods with specific signatures
 <programlisting>
 <![CDATA[
-        <!-- match System.exit(...) usage warnings in void main(String[]) methods in all classes -->
-        <Match>
-          <Method returns="void" name="main" params="java.lang.String[]" />
-          <Method pattern="DM_EXIT" />
-        </Match>
-        <!-- match UuF warnings on fields of type com.foobar.DebugInfo on all classes -->
-        <Match>
-          <Field type="com.foobar.DebugInfo" />
-          <Bug code="UuF" />
-        </Match>
+	<!-- match System.exit(...) usage warnings in void main(String[]) methods in all classes -->
+	<Match>
+	  <Method returns="void" name="main" params="java.lang.String[]" />
+	  <Method pattern="DM_EXIT" />
+	</Match>
+	<!-- match UuF warnings on fields of type com.foobar.DebugInfo on all classes -->
+	<Match>
+	  <Field type="com.foobar.DebugInfo" />
+	  <Bug code="UuF" />
+	</Match>
 ]]>
-</programlisting>       
+</programlisting>	
 
 </para>
-        
+	
 </sect1>
 
 <sect1>
@@ -2675,9 +2675,9 @@ These are the options accepted by the <command>rejarForAnalysis</command> script
    Data mining
    **************************************************************************
 -->
-        
+	
 <chapter id="datamining">
-        <title>Data mining of bugs with &FindBugs;&trade;</title>
+	<title>Data mining of bugs with &FindBugs;&trade;</title>
 
 <para>
 FindBugs incorporates an ability to perform sophisticated queries on bug
@@ -2690,7 +2690,7 @@ of infinite recursive loops in your code over time.</para>
 These techniques all depend upon the XML format used by FindBugs for storing warnings.
 These XML files usually contain just the warnings from one particular analysis run, but
 they can also store the results from analyzing a sequence of software builds or versions.
-        </para>
+	</para>
 
 <para>
 Any FindBugs XML bug database contains a version name and timestamp. 
@@ -2699,7 +2699,7 @@ are analyzed (e.g., the timestamp is intended to be the time the class files
 were generated, not analyzed). Each bug database also contains a version name.
 Both the version name and timestamp can be set manually using the 
 <command>setBugDatabaseInfo</command> (<xref linkend="setBugDatabaseInfo" />) command.
-        </para>
+	</para>
 
 <para>A multiversion bug database assigns a sequence number to each version of
 the analyzed code. These sequence numbers are simply successive integers,
@@ -2732,10 +2732,10 @@ the examples assume that the <literal>findbugs.lib</literal>
 ]]>
 </programlisting>
 
-        <sect1 id="commands">
-                <title>Commands</title>
-                
-                <para>
+	<sect1 id="commands">
+		<title>Commands</title>
+		
+		<para>
 All tools for FindBugs data mining are can be invoked from the command line,
 and some of the more useful tools can also be invoked from an
 ant build file.</para>
@@ -2743,89 +2743,89 @@ ant build file.</para>
 <para>
 Briefly, the command-line tools are:</para>
 
-                <variablelist>
-                        <varlistentry>
-                                <term><command><link linkend="unionBugs">unionBugs</link></command></term>
-                                <listitem>
-                                        <para>
-                                                 combine the results from separate analysis of disjoint
-                classes
-                                        </para>
-                                </listitem>
-                        </varlistentry>
-                        <varlistentry>
-                                <term><command><link linkend="computeBugHistory">computeBugHistory</link></command></term>
-                                <listitem>
-                                        <para>Merge bug warnings from multiple versions of
-                        analyzed code into
-                        a single multiversion bug database. This can either be used
-                        to add more versions to an existing multiversion database,
-                        or to create a multiversion database from a sequence of single version
-                        bug warning databases.</para>
-                                </listitem>
-                        </varlistentry>
-                        <varlistentry>
-                                <term><command><link linkend="setBugDatabaseInfo">setBugDatabaseInfo</link></command></term>
-                                <listitem>
-                                        <para>Set information such as the revision name or
+		<variablelist>
+			<varlistentry>
+				<term><command><link linkend="unionBugs">unionBugs</link></command></term>
+				<listitem>
+					<para>
+						 combine the results from separate analysis of disjoint
+		classes
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><command><link linkend="computeBugHistory">computeBugHistory</link></command></term>
+				<listitem>
+					<para>Merge bug warnings from multiple versions of
+			analyzed code into
+			a single multiversion bug database. This can either be used
+			to add more versions to an existing multiversion database,
+			or to create a multiversion database from a sequence of single version
+			bug warning databases.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><command><link linkend="setBugDatabaseInfo">setBugDatabaseInfo</link></command></term>
+				<listitem>
+					<para>Set information such as the revision name or
 timestamp in an XML bug database</para>
-                                </listitem>
-                        </varlistentry>
-                        <varlistentry>
-                                <term><command><link linkend="listBugDatabaseInfo">listBugDatabaseInfo</link></command></term>
-                                <listitem>
-                                        <para>List information such as the revision name and
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><command><link linkend="listBugDatabaseInfo">listBugDatabaseInfo</link></command></term>
+				<listitem>
+					<para>List information such as the revision name and
 timestamp for a list of XML bug databases</para>
-                                </listitem>
-                        </varlistentry>
-                        <varlistentry>
-                                <term><command><link linkend="filterBugs">filterBugs</link></command></term>
-                                <listitem>
-                                        <para>Select a subset of a bug database</para>
-                                </listitem>
-                        </varlistentry>
-                        <varlistentry>
-                                <term><command><link linkend="mineBugHistory">mineBugHistory</link></command></term>
-                                <listitem>
-                                        <para>Generate a tabular listing of the number of warnings in each
-                version of a multiversion bug database</para>
-                                </listitem>
-                        </varlistentry>
-                        <varlistentry>
-                                <term><command><link linkend="defectDensity">defectDensity</link></command></term>
-                                <listitem>
-                                        <para>List information about defect density
-                                                 (warnings per 1000 NCSS)
-                                                 for the entire project and each class and package</para>
-                                </listitem>
-                        </varlistentry>
-                        <varlistentry>
-                                <term><command><link linkend="convertXmlToText">convertXmlToText</link></command></term>
-                                <listitem>
-                                        <para>Convert bug warnings in XML format to 
-                                        a textual one-line-per-bug format, or to HTML</para>
-                                </listitem>
-                        </varlistentry>
-                </variablelist>
-                
-                
-                <sect2 id="unionBugs">
-                        <title>unionBugs</title>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><command><link linkend="filterBugs">filterBugs</link></command></term>
+				<listitem>
+					<para>Select a subset of a bug database</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><command><link linkend="mineBugHistory">mineBugHistory</link></command></term>
+				<listitem>
+					<para>Generate a tabular listing of the number of warnings in each
+		version of a multiversion bug database</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><command><link linkend="defectDensity">defectDensity</link></command></term>
+				<listitem>
+					<para>List information about defect density
+						 (warnings per 1000 NCSS)
+						 for the entire project and each class and package</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><command><link linkend="convertXmlToText">convertXmlToText</link></command></term>
+				<listitem>
+					<para>Convert bug warnings in XML format to 
+					a textual one-line-per-bug format, or to HTML</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		
+		
+		<sect2 id="unionBugs">
+			<title>unionBugs</title>
 
-                <para>
-                If you have, for example, separately analyzing each jar file used in an application,
-                you can use this command to combine the separately generated xml bug warning files into
-                a single file containing all of the warnings.</para>
+		<para>
+		If you have, for example, separately analyzing each jar file used in an application,
+		you can use this command to combine the separately generated xml bug warning files into
+		a single file containing all of the warnings.</para>
 
-                        <para>Do <emphasis>not</emphasis> use this command to combine results from analyzing different versions of the same
-                        file; use <command>computeBugHistory</command> instead.</para>
+			<para>Do <emphasis>not</emphasis> use this command to combine results from analyzing different versions of the same
+			file; use <command>computeBugHistory</command> instead.</para>
 
-                        <para>Specify the xml files on the command line. The result is sent to standard output.</para>
-                </sect2>
+			<para>Specify the xml files on the command line. The result is sent to standard output.</para>
+		</sect2>
 
-                <sect2 id="computeBugHistory">
-                        <title>computeBugHistory</title>
-                
+		<sect2 id="computeBugHistory">
+			<title>computeBugHistory</title>
+		
 <para>Use this command to generate a bug database containing information from different builds or versions
 of software you are analyzing.
 History is taken from the first file provided as input; any following
@@ -2861,17 +2861,17 @@ To specify input files, nest them inside with a
 ]]>
 </programlisting>
 
-                <table id="computeBugHistoryTable">
-                        <title>Options for computeBugHistory command</title>
-                        <tgroup cols="3" align="left">
-                                <thead>
-                                <row>
-                                        <entry>Command-line option</entry>
-                                        <entry>Ant attribute</entry>
-                                        <entry>Meaning</entry>
-                                </row>
-                                        </thead>
-                                <tbody>
+		<table id="computeBugHistoryTable">
+			<title>Options for computeBugHistory command</title>
+			<tgroup cols="3" align="left">
+  				<thead>
+    				<row>
+      					<entry>Command-line option</entry>
+      					<entry>Ant attribute</entry>
+      					<entry>Meaning</entry>
+    				</row>
+  					</thead>
+  				<tbody>
 <row><entry>-output &lt;file&gt;</entry>           <entry>output="&lt;file&gt;"</entry>           <entry>save output in the named file (may also be an input file)</entry></row>
 <row><entry>-overrideRevisionNames[:truth]</entry> <entry>overrideRevisionNames="[true|false]"</entry><entry>override revision names for each version with names computed from the filenames</entry></row>
 <row><entry>-noPackageMoves[:truth]</entry>        <entry>noPackageMoves="[true|false]"</entry><entry>if a class has moved to another package, treat warnings in that class as seperate</entry></row>
@@ -2879,13 +2879,13 @@ To specify input files, nest them inside with a
 <row><entry>-precisePriorityMatch[:truth]</entry>  <entry>precisePriorityMatch="[true|false]"</entry><entry>consider two warnings as the same only if priorities match exactly</entry></row>
 <row><entry>-quiet[:truth]</entry>                 <entry>quiet="[true|false]"</entry><entry>don't generate any output to standard out unless there is an error</entry></row>
 <row><entry>-withMessages[:truth]</entry>          <entry>withMessages="[true|false]"</entry><entry>include human-readable messages describing the warnings in XML output</entry></row>
-                                </tbody>
-                        </tgroup>
-                </table>
+				</tbody>
+			</tgroup>
+		</table>
 
-                </sect2>        
-                <sect2 id="filterBugs">
-                        <title>filterBugs</title>
+		</sect2>	
+		<sect2 id="filterBugs">
+			<title>filterBugs</title>
 <para>This command is used to select a subset of warnings from a FindBugs XML warning file
 and write the selected subset to a new FindBugs warning file.</para>
 <para>
@@ -2923,17 +2923,17 @@ the ant call with a <literal>&lt;datafile&gt;</literal> element.  For example:
 ]]>
 </programlisting>
 
-                <table id="filterOptionsTable">
-                        <title>Options for filterBugs command</title>
-                        <tgroup cols="3" align="left">
-                                <thead>
-                                <row>
-                                        <entry>Command-line option</entry>
-                                        <entry>Ant attribute</entry>
-                                        <entry>Meaning</entry>
-                                </row>
-                                        </thead>
-                                <tbody>
+		<table id="filterOptionsTable">
+			<title>Options for filterBugs command</title>
+			<tgroup cols="3" align="left">
+  				<thead>
+    				<row>
+      					<entry>Command-line option</entry>
+      					<entry>Ant attribute</entry>
+      					<entry>Meaning</entry>
+    				</row>
+  					</thead>
+  				<tbody>
 <row><entry></entry>                            <entry>input="&lt;file&gt;"</entry>             <entry>use file as input</entry></row>
 <row><entry></entry>                            <entry>output="&lt;file&gt;"</entry>            <entry>output results to file</entry></row>
 <row><entry>-not</entry>                        <entry>not="[true|false]"</entry>               <entry>reverse (all) switches for the filter</entry></row>
@@ -2959,14 +2959,14 @@ the ant call with a <literal>&lt;datafile&gt;</literal> element.  For example:
 <row><entry>-category &lt;category&gt;</entry>  <entry>category="&lt;category&gt;"</entry>      <entry>allow only warnings with a category that starts with this string</entry></row>
 <row><entry>-designation &lt;designation&gt;</entry> <entry>designation="&lt;designation&gt;"</entry> <entry>allow only warnings with this designation (e.g., -designation SHOULD_FIX)</entry></row>
 <row><entry>-withMessages[:truth] </entry>      <entry>withMessages="[true|false]"</entry>      <entry>the generated XML should contain textual messages</entry></row>
-                                </tbody>
-                        </tgroup>
-                </table>
-                                
-                </sect2>
-                
-                <sect2 id="mineBugHistory">
-                        <title>mineBugHistory</title>
+				</tbody>
+			</tgroup>
+		</table>
+		  		
+		</sect2>
+		
+		<sect2 id="mineBugHistory">
+			<title>mineBugHistory</title>
 <para>This command generates a table containing counts of the numbers of warnings
 in each version of a multiversion bug database.</para>
 
@@ -2998,66 +2998,66 @@ attribute or nest it inside the ant call with a
 ]]>
 </programlisting>
 
-                <table id="mineBugHistoryOptionsTable">
-                        <title>Options for mineBugHistory command</title>
-                        <tgroup cols="3" align="left">
-                                <thead>
-                                <row>
-                                        <entry>Command-line option</entry>
-                                        <entry>Ant attribute</entry>
-                                        <entry>Meaning</entry>
-                                </row>
-                                </thead>
-                                <tbody>
+		<table id="mineBugHistoryOptionsTable">
+			<title>Options for mineBugHistory command</title>
+			<tgroup cols="3" align="left">
+  				<thead>
+    				<row>
+      					<entry>Command-line option</entry>
+      					<entry>Ant attribute</entry>
+      					<entry>Meaning</entry>
+    				</row>
+  				</thead>
+  				<tbody>
 <row><entry></entry>               <entry>input="&lt;file&gt;"</entry>             <entry>use file as input</entry></row>
 <row><entry></entry>               <entry>output="&lt;file&gt;"</entry>            <entry>write output to file</entry></row>
 <row><entry>-formatDates</entry>   <entry>formatDates="[true|false]"</entry>       <entry>render dates in textual form</entry></row>
 <row><entry>-noTabs</entry>        <entry>noTabs="[true|false]"</entry>            <entry>delimit columns with groups of spaces instead of tabs (see below)</entry></row>
 <row><entry>-summary</entry>       <entry>summary="[true|false]"</entry>           <entry>output terse summary of changes over the last ten entries</entry></row>
-                                </tbody>
-                        </tgroup>
-                </table>
+				</tbody>
+			</tgroup>
+		</table>
 
-                <para>
-                The <option>-noTabs</option> output can be easier to read from a shell
-                with a fixed-width font.
-                Because numeric columns are right-justified, spaces may precede the
-                first column value. This option also causes <option>-formatDates</option>
-                to render dates in terser format without embedded whitespace.
-                </para>
+		<para>
+		The <option>-noTabs</option> output can be easier to read from a shell
+		with a fixed-width font.
+		Because numeric columns are right-justified, spaces may precede the
+		first column value. This option also causes <option>-formatDates</option>
+		to render dates in terser format without embedded whitespace.
+		</para>
 
-                <para>The table is a tab-separated (barring <option>-noTabs</option>)
-                table with the following columns:</para>
+		<para>The table is a tab-separated (barring <option>-noTabs</option>)
+		table with the following columns:</para>
 
-                <table id="mineBugHistoryColumns">
-                        <title>Columns in mineBugHistory output</title>
-                        <tgroup cols="2" align="left">
-                                <thead>
-                                <row>
-                                        <entry>Title</entry>
-                                        <entry>Meaning</entry>
-                                </row>
-                                        </thead>
-                                <tbody>
-                                          <row><entry>seq</entry><entry>Sequence number (successive integers, starting at 0)</entry></row>
-                                          <row><entry>version</entry><entry>Version name</entry></row>
-                                          <row><entry>time</entry><entry>Release timestamp</entry></row>
-                                          <row><entry>classes</entry><entry>Number of classes analyzed</entry></row>
-                                          <row><entry>NCSS</entry><entry>Non Commenting Source Statements</entry></row>
-                                          <row><entry>added</entry><entry>Count of new warnings for a class that existed in the previous version</entry></row>
-                                          <row><entry>newCode</entry><entry>Count of new warnings for a class that did not exist in the previous version</entry></row>
-                                          <row><entry>fixed</entry><entry>Count of warnings removed from a class that remains in the current version</entry></row>
-                                          <row><entry>removed</entry><entry>Count of warnings in the previous version for a class that is not present in the current version</entry></row>
-                                          <row><entry>retained</entry><entry>Count of warnings that were in both the previous and current version</entry></row>
-                                          <row><entry>dead</entry><entry>Warnings that were present in earlier versions but in neither the current version or the immediately preceeding version</entry></row>
-                                          <row><entry>active</entry><entry>Total warnings present in the current version</entry></row>
-                                </tbody>
-                                </tgroup>
-                </table>                                                
-                </sect2>
-                
-                <sect2 id="defectDensity">
-                        <title>defectDensity</title>
+		<table id="mineBugHistoryColumns">
+			<title>Columns in mineBugHistory output</title>
+			<tgroup cols="2" align="left">
+  				<thead>
+    				<row>
+      					<entry>Title</entry>
+      					<entry>Meaning</entry>
+    				</row>
+  					</thead>
+  				<tbody>
+					  <row><entry>seq</entry><entry>Sequence number (successive integers, starting at 0)</entry></row>
+					  <row><entry>version</entry><entry>Version name</entry></row>
+					  <row><entry>time</entry><entry>Release timestamp</entry></row>
+					  <row><entry>classes</entry><entry>Number of classes analyzed</entry></row>
+					  <row><entry>NCSS</entry><entry>Non Commenting Source Statements</entry></row>
+					  <row><entry>added</entry><entry>Count of new warnings for a class that existed in the previous version</entry></row>
+					  <row><entry>newCode</entry><entry>Count of new warnings for a class that did not exist in the previous version</entry></row>
+					  <row><entry>fixed</entry><entry>Count of warnings removed from a class that remains in the current version</entry></row>
+					  <row><entry>removed</entry><entry>Count of warnings in the previous version for a class that is not present in the current version</entry></row>
+					  <row><entry>retained</entry><entry>Count of warnings that were in both the previous and current version</entry></row>
+					  <row><entry>dead</entry><entry>Warnings that were present in earlier versions but in neither the current version or the immediately preceeding version</entry></row>
+					  <row><entry>active</entry><entry>Total warnings present in the current version</entry></row>
+				</tbody>
+				</tgroup>
+		</table>						
+		</sect2>
+		
+		<sect2 id="defectDensity">
+			<title>defectDensity</title>
 <para>
 This command lists information about defect density (warnings per 1000 NCSS) for the entire project and each class and package.
 It can either be invoked with no files specified on the command line (in which case it reads from standard input)
@@ -3065,33 +3065,33 @@ or with one file specified on the command line.</para>
 <para>It generates a table with the following columns, and with one
 row for the entire project, and one row for each package or class that contains at least
 4 warnings.</para>
-                <table id="defectDensityColumns">
-                        <title>Columns in defectDensity output</title>
-                        <tgroup cols="2" align="left">
-                                <thead>
-                                <row>
-                                        <entry>Title</entry>
-                                        <entry>Meaning</entry>
-                                </row>
-                                        </thead>
-                                <tbody>
-                                          <row><entry>kind</entry><entry>project, package or class</entry></row>
-                                          <row><entry>name</entry><entry>The name of the project, package or class</entry></row>
-                                          <row><entry>density</entry><entry>Number of warnings generated per 1000 lines of NCSS.</entry></row>
-                                          <row><entry>bugs</entry><entry>Number of warnings</entry></row>
-                                          <row><entry>NCSS</entry><entry>Calculated number of NCSS</entry></row>
-                                </tbody>
-                                </tgroup>
-                        </table>
-                </sect2>
-                
-                <sect2 id="convertXmlToText">
-                        <title>convertXmlToText</title>
-                        
-                        <para>
-                                This command converts a warning collection in XML format to a text
-                                format with one line per warning, or to HTML.
-                        </para>
+		<table id="defectDensityColumns">
+			<title>Columns in defectDensity output</title>
+			<tgroup cols="2" align="left">
+  				<thead>
+    				<row>
+      					<entry>Title</entry>
+      					<entry>Meaning</entry>
+    				</row>
+  					</thead>
+  				<tbody>
+					  <row><entry>kind</entry><entry>project, package or class</entry></row>
+					  <row><entry>name</entry><entry>The name of the project, package or class</entry></row>
+					  <row><entry>density</entry><entry>Number of warnings generated per 1000 lines of NCSS.</entry></row>
+					  <row><entry>bugs</entry><entry>Number of warnings</entry></row>
+					  <row><entry>NCSS</entry><entry>Calculated number of NCSS</entry></row>
+				</tbody>
+				</tgroup>
+			</table>
+		</sect2>
+		
+		<sect2 id="convertXmlToText">
+			<title>convertXmlToText</title>
+			
+			<para>
+				This command converts a warning collection in XML format to a text
+				format with one line per warning, or to HTML.
+			</para>
 
 <para>This functionality may also can be accessed from ant.
 First create a taskdef for <command>convertXmlToText</command> in your
@@ -3107,45 +3107,45 @@ build file:
 </programlisting>
 
 <para>Attributes for this ant task are listed in the following table.</para>
-                        
-                        <table id="convertXmlToTextTable">
-                        <title>Options for convertXmlToText command</title>
-                        <tgroup cols="3" align="left">
-                                <thead>
-                                <row>
-                                        <entry>Command-line option</entry>
-                                        <entry>Ant attribute</entry>
-                                        <entry>Meaning</entry>
-                                </row>
-                                        </thead>
-                                <tbody>
+			
+			<table id="convertXmlToTextTable">
+			<title>Options for convertXmlToText command</title>
+			<tgroup cols="3" align="left">
+  				<thead>
+    				<row>
+      					<entry>Command-line option</entry>
+      					<entry>Ant attribute</entry>
+      					<entry>Meaning</entry>
+    				</row>
+  					</thead>
+  				<tbody>
 <row><entry></entry>                   <entry>input="&lt;filename&gt;"</entry>         <entry>use file as input</entry></row>
 <row><entry></entry>                   <entry>output="&lt;filename&gt;"</entry>        <entry>output results to file</entry></row>
 <row><entry>-longBugCodes</entry>      <entry>longBugCodes="[true|false]"</entry>      <entry>use the full bug pattern code instead of two-letter abbreviation</entry></row>
 <row><entry></entry>                   <entry>format="text"</entry>                    <entry>generate plain text output with one bug per line (command-line default)</entry></row>
 <row><entry>-html[:stylesheet]</entry> <entry>format="html:&lt;stylesheet&gt;"</entry> <entry>generate output with specified stylesheet (see below), or default.xsl if unspecified</entry></row>
-                                </tbody>
-                        </tgroup>
-                    </table>
-                        
-                        <para>
-                        You may specify plain.xsl, default.xsl, fancy.xsl, fancy-hist.xsl,
-                        or your own XSL stylesheet for the -html/format option.
-                        Despite the name of this option, you may specify
-                        a stylesheet that emits something other than html.
-                        When applying a stylesheet other than those included
-                        with FindBugs (listed above), the -html/format option should be used
-                        with a path or URL to the stylesheet.
-                        </para>
-                </sect2>
-                
-                <sect2 id="setBugDatabaseInfo">
-                        <title>setBugDatabaseInfo</title>
-                        
-                        <para>
-                                This command sets meta-information in a specified warning collection.
-                                It takes the following options:
-                        </para>
+				</tbody>
+			</tgroup>
+		    </table>
+			
+			<para>
+			You may specify plain.xsl, default.xsl, fancy.xsl, fancy-hist.xsl,
+			or your own XSL stylesheet for the -html/format option.
+			Despite the name of this option, you may specify
+			a stylesheet that emits something other than html.
+			When applying a stylesheet other than those included
+			with FindBugs (listed above), the -html/format option should be used
+			with a path or URL to the stylesheet.
+			</para>
+		</sect2>
+		
+		<sect2 id="setBugDatabaseInfo">
+			<title>setBugDatabaseInfo</title>
+			
+			<para>
+				This command sets meta-information in a specified warning collection.
+				It takes the following options:
+			</para>
 
 <para>This functionality may also can be accessed from ant.
 First create a taskdef for <command>setBugDatabaseInfo</command> in your
@@ -3174,80 +3174,80 @@ attribute or nest it inside the ant call with a
 ]]>
 </programlisting>
 
-                <table id="setBugDatabaseInfoOptions">
-                        <title>setBugDatabaseInfo Options</title>
-                        <tgroup cols="3" align="left">
-                                <thead>
-                                <row>
-                                        <entry>Command-line option</entry>
-                                        <entry>Ant attribute</entry>
-                                        <entry>Meaning</entry>
-                                </row>
-                                </thead>
-                                <tbody>
-                                          <row><entry></entry>                              <entry>input="&lt;file&gt;"</entry>           <entry>use file as input</entry></row>
-                                          <row><entry></entry>                              <entry>output="&lt;file&gt;"</entry>          <entry>write output to file</entry></row>
-                                          <row><entry>-name &lt;name&gt;</entry>            <entry>name="&lt;name&gt;"</entry>            <entry>set name for (last) revision</entry></row>
-                                          <row><entry>-timestamp &lt;when&gt;</entry>       <entry>timestamp="&lt;when&gt;"</entry>       <entry>set timestamp for (last) revision</entry></row>
-                                          <row><entry>-source &lt;directory&gt;</entry>     <entry>source="&lt;directory&gt;"</entry>     <entry>add specified directory to the source search path</entry></row>
-                                          <row><entry>-findSource &lt;directory&gt;</entry> <entry>findSource="&lt;directory&gt;"</entry> <entry>find and add all relevant source directions contained within specified directory</entry></row>
-                                          <row><entry>-suppress &lt;filter file&gt;</entry> <entry>suppress="&lt;filter file&gt;"</entry> <entry>suppress warnings matched by this file (replaces previous suppressions)</entry></row>
-                                          <row><entry>-withMessages</entry>                 <entry>withMessages="[true|false]"</entry>    <entry>add textual messages to XML</entry></row>
-                                          <row><entry>-resetSource</entry>                  <entry>resetSource="[true|false]"</entry>     <entry>remove all source search paths</entry></row>
-                                </tbody>
-                                </tgroup>
-                        </table>
-                </sect2>
-                
-                <sect2 id="listBugDatabaseInfo">
-                        <title>listBugDatabaseInfo</title>
-                        
-                        <para>This command takes a list of zero or more xml bug database filenames on the command line.
+		<table id="setBugDatabaseInfoOptions">
+			<title>setBugDatabaseInfo Options</title>
+			<tgroup cols="3" align="left">
+  				<thead>
+    				<row>
+      					<entry>Command-line option</entry>
+      					<entry>Ant attribute</entry>
+      					<entry>Meaning</entry>
+    				</row>
+  				</thead>
+  				<tbody>
+					  <row><entry></entry>                              <entry>input="&lt;file&gt;"</entry>           <entry>use file as input</entry></row>
+					  <row><entry></entry>                              <entry>output="&lt;file&gt;"</entry>          <entry>write output to file</entry></row>
+					  <row><entry>-name &lt;name&gt;</entry>            <entry>name="&lt;name&gt;"</entry>            <entry>set name for (last) revision</entry></row>
+					  <row><entry>-timestamp &lt;when&gt;</entry>       <entry>timestamp="&lt;when&gt;"</entry>       <entry>set timestamp for (last) revision</entry></row>
+					  <row><entry>-source &lt;directory&gt;</entry>     <entry>source="&lt;directory&gt;"</entry>     <entry>add specified directory to the source search path</entry></row>
+					  <row><entry>-findSource &lt;directory&gt;</entry> <entry>findSource="&lt;directory&gt;"</entry> <entry>find and add all relevant source directions contained within specified directory</entry></row>
+					  <row><entry>-suppress &lt;filter file&gt;</entry> <entry>suppress="&lt;filter file&gt;"</entry> <entry>suppress warnings matched by this file (replaces previous suppressions)</entry></row>
+					  <row><entry>-withMessages</entry>                 <entry>withMessages="[true|false]"</entry>    <entry>add textual messages to XML</entry></row>
+					  <row><entry>-resetSource</entry>                  <entry>resetSource="[true|false]"</entry>     <entry>remove all source search paths</entry></row>
+			 	</tbody>
+				</tgroup>
+			</table>
+		</sect2>
+		
+		<sect2 id="listBugDatabaseInfo">
+			<title>listBugDatabaseInfo</title>
+			
+			<para>This command takes a list of zero or more xml bug database filenames on the command line.
 If zero file names are provided, it reads from standard input and does not generate
 a table header.</para>
 
 <para>There is only one option: <option>-formatDates</option> renders dates
-        in textual form.
-        </para>
-                        
+	in textual form.
+	</para>
+			
 <para>The output is a table one row per bug database and the following columns:</para>
-                <table id="listBugDatabaseInfoColumns">
-                        <title>listBugDatabaseInfo Columns</title>
-                        <tgroup cols="2" align="left">
-                                <thead>
-                                <row>
-                                        <entry>Column</entry>
-                                        <entry>Meaning</entry>
-                                </row>
-                                </thead>
-                                <tbody>
-                                          <row><entry>version</entry><entry>version name</entry></row>
-                                          <row><entry>time</entry><entry>Release timestamp</entry></row>
-                                          <row><entry>classes</entry><entry>Number of classes analyzed</entry></row>
-                                          <row><entry>NCSS</entry><entry>Non Commenting Source Statements analyzed</entry></row>
-                                          <row><entry>total</entry><entry>Total number of warnings of all kinds</entry></row>
-                                          <row><entry>high</entry><entry>Total number of high priority warnings of all kinds</entry></row>
-                                          <row><entry>medium</entry><entry>Total number of medium/normal priority warnings of all kinds</entry></row>
-                                          <row><entry>low</entry><entry>Total number of low priority warnings of all kinds</entry></row>
-                                          <row><entry>filename</entry><entry>filename of database</entry></row>
+		<table id="listBugDatabaseInfoColumns">
+			<title>listBugDatabaseInfo Columns</title>
+			<tgroup cols="2" align="left">
+  				<thead>
+    				<row>
+      					<entry>Column</entry>
+      					<entry>Meaning</entry>
+    				</row>
+  				</thead>
+  				<tbody>
+					  <row><entry>version</entry><entry>version name</entry></row>
+					  <row><entry>time</entry><entry>Release timestamp</entry></row>
+					  <row><entry>classes</entry><entry>Number of classes analyzed</entry></row>
+					  <row><entry>NCSS</entry><entry>Non Commenting Source Statements analyzed</entry></row>
+					  <row><entry>total</entry><entry>Total number of warnings of all kinds</entry></row>
+					  <row><entry>high</entry><entry>Total number of high priority warnings of all kinds</entry></row>
+					  <row><entry>medium</entry><entry>Total number of medium/normal priority warnings of all kinds</entry></row>
+					  <row><entry>low</entry><entry>Total number of low priority warnings of all kinds</entry></row>
+					  <row><entry>filename</entry><entry>filename of database</entry></row>
 <!--
-                                          <row><entry></entry><entry></entry></row>
-                                          <row><entry></entry><entry></entry></row>
-                                          <row><entry></entry><entry></entry></row>
-                                          <row><entry></entry><entry></entry></row>
-                                          <row><entry></entry><entry></entry></row>
-                                          <row><entry></entry><entry></entry></row>
+					  <row><entry></entry><entry></entry></row>
+					  <row><entry></entry><entry></entry></row>
+					  <row><entry></entry><entry></entry></row>
+					  <row><entry></entry><entry></entry></row>
+					  <row><entry></entry><entry></entry></row>
+					  <row><entry></entry><entry></entry></row>
 -->
-                                </tbody>
-                                </tgroup>
-                        </table>
-                        
-                </sect2>
+			 	</tbody>
+				</tgroup>
+			</table>
+			
+		</sect2>
 
-        </sect1>
-        
-        <sect1 id="examples">
-                <title>Examples</title>
+	</sect1>
+	
+	<sect1 id="examples">
+		<title>Examples</title>
 <sect2 id="unixscriptsexamples">
    <title>Mining history using proveded shell scrips</title>
 <para>In all of the following, the commands are given in a directory that contains
@@ -3258,53 +3258,53 @@ directories jdk1.6.0-b12, jdk1.6.0-b13, ..., jdk1.6.0-b60.</para>
 computeBugHistory jdk1.6.0-b* | filterBugs -bugPattern IL_ | mineBugHistory -formatDates
 </screen>
 <para>to generate the following output:</para>
-        
+	
 <screen>
-seq     version time    classes NCSS    added   newCode fixed   removed retained        dead    active
-0       jdk1.6.0-b12    "Thu Nov 11 09:07:20 EST 2004"  13128   811569  0       4       0       0       0       0       4
-1       jdk1.6.0-b13    "Thu Nov 18 06:02:06 EST 2004"  13128   811570  0       0       0       0       4       0       4
-2       jdk1.6.0-b14    "Thu Dec 02 06:12:26 EST 2004"  13145   811786  0       0       2       0       2       0       2
-3       jdk1.6.0-b15    "Thu Dec 09 06:07:04 EST 2004"  13174   811693  0       0       1       0       1       2       1
-4       jdk1.6.0-b16    "Thu Dec 16 06:21:28 EST 2004"  13175   811715  0       0       0       0       1       3       1
-5       jdk1.6.0-b17    "Thu Dec 23 06:27:22 EST 2004"  13176   811974  0       0       0       0       1       3       1
-6       jdk1.6.0-b19    "Thu Jan 13 06:41:16 EST 2005"  13176   812011  0       0       0       0       1       3       1
-7       jdk1.6.0-b21    "Thu Jan 27 05:57:52 EST 2005"  13177   812173  0       0       0       0       1       3       1
-8       jdk1.6.0-b23    "Thu Feb 10 05:44:36 EST 2005"  13179   812188  0       0       0       0       1       3       1
-9       jdk1.6.0-b26    "Thu Mar 03 06:04:02 EST 2005"  13199   811770  0       0       0       0       1       3       1
-10      jdk1.6.0-b27    "Thu Mar 10 04:48:38 EST 2005"  13189   812440  0       0       0       0       1       3       1
-11      jdk1.6.0-b28    "Thu Mar 17 02:54:22 EST 2005"  13185   812056  0       0       0       0       1       3       1
-12      jdk1.6.0-b29    "Thu Mar 24 03:09:20 EST 2005"  13117   809468  0       0       0       0       1       3       1
-13      jdk1.6.0-b30    "Thu Mar 31 02:53:32 EST 2005"  13118   809501  0       0       0       0       1       3       1
-14      jdk1.6.0-b31    "Thu Apr 07 03:00:14 EDT 2005"  13117   809572  0       0       0       0       1       3       1
-15      jdk1.6.0-b32    "Thu Apr 14 02:56:56 EDT 2005"  13169   811096  0       0       0       0       1       3       1
-16      jdk1.6.0-b33    "Thu Apr 21 02:46:22 EDT 2005"  13187   811942  0       0       0       0       1       3       1
-17      jdk1.6.0-b34    "Thu Apr 28 02:49:00 EDT 2005"  13195   813488  0       1       0       0       1       3       2
-18      jdk1.6.0-b35    "Thu May 05 02:49:04 EDT 2005"  13457   829837  0       0       0       0       2       3       2
-19      jdk1.6.0-b36    "Thu May 12 02:59:46 EDT 2005"  13462   831278  0       0       0       0       2       3       2
-20      jdk1.6.0-b37    "Thu May 19 02:55:08 EDT 2005"  13464   831971  0       0       0       0       2       3       2
-21      jdk1.6.0-b38    "Thu May 26 03:08:16 EDT 2005"  13564   836565  0       0       0       0       2       3       2
-22      jdk1.6.0-b39    "Fri Jun 03 03:10:48 EDT 2005"  13856   849992  0       1       0       0       2       3       3
-23      jdk1.6.0-b40    "Thu Jun 09 03:30:28 EDT 2005"  15972   959619  0       2       0       0       3       3       5
-24      jdk1.6.0-b41    "Thu Jun 16 03:19:22 EDT 2005"  15972   959619  0       0       0       0       5       3       5
-25      jdk1.6.0-b42    "Fri Jun 24 03:38:54 EDT 2005"  15966   958581  0       0       0       0       5       3       5
-26      jdk1.6.0-b43    "Thu Jul 14 03:09:34 EDT 2005"  16041   960544  0       0       0       0       5       3       5
-27      jdk1.6.0-b44    "Thu Jul 21 03:05:54 EDT 2005"  16041   960547  0       0       0       0       5       3       5
-28      jdk1.6.0-b45    "Thu Jul 28 03:26:10 EDT 2005"  16037   960606  0       0       1       0       4       3       4
-29      jdk1.6.0-b46    "Thu Aug 04 03:02:48 EDT 2005"  15936   951355  0       0       0       0       4       4       4
-30      jdk1.6.0-b47    "Thu Aug 11 03:18:56 EDT 2005"  15964   952387  0       0       1       0       3       4       3
-31      jdk1.6.0-b48    "Thu Aug 18 08:10:40 EDT 2005"  15970   953421  0       0       0       0       3       5       3
-32      jdk1.6.0-b49    "Thu Aug 25 03:24:38 EDT 2005"  16048   958940  0       0       0       0       3       5       3
-33      jdk1.6.0-b50    "Thu Sep 01 01:52:40 EDT 2005"  16287   974937  1       0       0       0       3       5       4
-34      jdk1.6.0-b51    "Thu Sep 08 01:55:36 EDT 2005"  16362   979377  0       0       0       0       4       5       4
-35      jdk1.6.0-b52    "Thu Sep 15 02:04:08 EDT 2005"  16477   979399  0       0       0       0       4       5       4
-36      jdk1.6.0-b53    "Thu Sep 22 02:00:28 EDT 2005"  16019   957900  0       0       1       0       3       5       3
-37      jdk1.6.0-b54    "Thu Sep 29 01:54:34 EDT 2005"  16019   957900  0       0       0       0       3       6       3
-38      jdk1.6.0-b55    "Thu Oct 06 01:54:14 EDT 2005"  16051   959014  0       0       0       0       3       6       3
-39      jdk1.6.0-b56    "Thu Oct 13 01:54:12 EDT 2005"  16211   970835  0       0       0       0       3       6       3
-40      jdk1.6.0-b57    "Thu Oct 20 01:55:26 EDT 2005"  16279   971627  0       0       0       0       3       6       3
-41      jdk1.6.0-b58    "Thu Oct 27 01:56:30 EDT 2005"  16283   971945  0       0       0       0       3       6       3
-42      jdk1.6.0-b59    "Thu Nov 03 01:56:58 EST 2005"  16232   972193  0       0       0       0       3       6       3
-43      jdk1.6.0-b60    "Thu Nov 10 01:54:18 EST 2005"  16235   972346  0       0       0       0       3       6       3
+seq	version	time	classes	NCSS	added	newCode	fixed	removed	retained	dead	active
+0	jdk1.6.0-b12	"Thu Nov 11 09:07:20 EST 2004"	13128	811569	0	4	0	0	0	0	4
+1	jdk1.6.0-b13	"Thu Nov 18 06:02:06 EST 2004"	13128	811570	0	0	0	0	4	0	4
+2	jdk1.6.0-b14	"Thu Dec 02 06:12:26 EST 2004"	13145	811786	0	0	2	0	2	0	2
+3	jdk1.6.0-b15	"Thu Dec 09 06:07:04 EST 2004"	13174	811693	0	0	1	0	1	2	1
+4	jdk1.6.0-b16	"Thu Dec 16 06:21:28 EST 2004"	13175	811715	0	0	0	0	1	3	1
+5	jdk1.6.0-b17	"Thu Dec 23 06:27:22 EST 2004"	13176	811974	0	0	0	0	1	3	1
+6	jdk1.6.0-b19	"Thu Jan 13 06:41:16 EST 2005"	13176	812011	0	0	0	0	1	3	1
+7	jdk1.6.0-b21	"Thu Jan 27 05:57:52 EST 2005"	13177	812173	0	0	0	0	1	3	1
+8	jdk1.6.0-b23	"Thu Feb 10 05:44:36 EST 2005"	13179	812188	0	0	0	0	1	3	1
+9	jdk1.6.0-b26	"Thu Mar 03 06:04:02 EST 2005"	13199	811770	0	0	0	0	1	3	1
+10	jdk1.6.0-b27	"Thu Mar 10 04:48:38 EST 2005"	13189	812440	0	0	0	0	1	3	1
+11	jdk1.6.0-b28	"Thu Mar 17 02:54:22 EST 2005"	13185	812056	0	0	0	0	1	3	1
+12	jdk1.6.0-b29	"Thu Mar 24 03:09:20 EST 2005"	13117	809468	0	0	0	0	1	3	1
+13	jdk1.6.0-b30	"Thu Mar 31 02:53:32 EST 2005"	13118	809501	0	0	0	0	1	3	1
+14	jdk1.6.0-b31	"Thu Apr 07 03:00:14 EDT 2005"	13117	809572	0	0	0	0	1	3	1
+15	jdk1.6.0-b32	"Thu Apr 14 02:56:56 EDT 2005"	13169	811096	0	0	0	0	1	3	1
+16	jdk1.6.0-b33	"Thu Apr 21 02:46:22 EDT 2005"	13187	811942	0	0	0	0	1	3	1
+17	jdk1.6.0-b34	"Thu Apr 28 02:49:00 EDT 2005"	13195	813488	0	1	0	0	1	3	2
+18	jdk1.6.0-b35	"Thu May 05 02:49:04 EDT 2005"	13457	829837	0	0	0	0	2	3	2
+19	jdk1.6.0-b36	"Thu May 12 02:59:46 EDT 2005"	13462	831278	0	0	0	0	2	3	2
+20	jdk1.6.0-b37	"Thu May 19 02:55:08 EDT 2005"	13464	831971	0	0	0	0	2	3	2
+21	jdk1.6.0-b38	"Thu May 26 03:08:16 EDT 2005"	13564	836565	0	0	0	0	2	3	2
+22	jdk1.6.0-b39	"Fri Jun 03 03:10:48 EDT 2005"	13856	849992	0	1	0	0	2	3	3
+23	jdk1.6.0-b40	"Thu Jun 09 03:30:28 EDT 2005"	15972	959619	0	2	0	0	3	3	5
+24	jdk1.6.0-b41	"Thu Jun 16 03:19:22 EDT 2005"	15972	959619	0	0	0	0	5	3	5
+25	jdk1.6.0-b42	"Fri Jun 24 03:38:54 EDT 2005"	15966	958581	0	0	0	0	5	3	5
+26	jdk1.6.0-b43	"Thu Jul 14 03:09:34 EDT 2005"	16041	960544	0	0	0	0	5	3	5
+27	jdk1.6.0-b44	"Thu Jul 21 03:05:54 EDT 2005"	16041	960547	0	0	0	0	5	3	5
+28	jdk1.6.0-b45	"Thu Jul 28 03:26:10 EDT 2005"	16037	960606	0	0	1	0	4	3	4
+29	jdk1.6.0-b46	"Thu Aug 04 03:02:48 EDT 2005"	15936	951355	0	0	0	0	4	4	4
+30	jdk1.6.0-b47	"Thu Aug 11 03:18:56 EDT 2005"	15964	952387	0	0	1	0	3	4	3
+31	jdk1.6.0-b48	"Thu Aug 18 08:10:40 EDT 2005"	15970	953421	0	0	0	0	3	5	3
+32	jdk1.6.0-b49	"Thu Aug 25 03:24:38 EDT 2005"	16048	958940	0	0	0	0	3	5	3
+33	jdk1.6.0-b50	"Thu Sep 01 01:52:40 EDT 2005"	16287	974937	1	0	0	0	3	5	4
+34	jdk1.6.0-b51	"Thu Sep 08 01:55:36 EDT 2005"	16362	979377	0	0	0	0	4	5	4
+35	jdk1.6.0-b52	"Thu Sep 15 02:04:08 EDT 2005"	16477	979399	0	0	0	0	4	5	4
+36	jdk1.6.0-b53	"Thu Sep 22 02:00:28 EDT 2005"	16019	957900	0	0	1	0	3	5	3
+37	jdk1.6.0-b54	"Thu Sep 29 01:54:34 EDT 2005"	16019	957900	0	0	0	0	3	6	3
+38	jdk1.6.0-b55	"Thu Oct 06 01:54:14 EDT 2005"	16051	959014	0	0	0	0	3	6	3
+39	jdk1.6.0-b56	"Thu Oct 13 01:54:12 EDT 2005"	16211	970835	0	0	0	0	3	6	3
+40	jdk1.6.0-b57	"Thu Oct 20 01:55:26 EDT 2005"	16279	971627	0	0	0	0	3	6	3
+41	jdk1.6.0-b58	"Thu Oct 27 01:56:30 EDT 2005"	16283	971945	0	0	0	0	3	6	3
+42	jdk1.6.0-b59	"Thu Nov 03 01:56:58 EST 2005"	16232	972193	0	0	0	0	3	6	3
+43	jdk1.6.0-b60	"Thu Nov 10 01:54:18 EST 2005"	16235	972346	0	0	0	0	3	6	3
 </screen>
 
 <para>
@@ -3320,9 +3320,9 @@ found by FindBugs in each build of Sun's JDK1.6.0. The blue area indicates the n
 recursive loops in that build, the red area above it indicates the number of infinite recursive loops that existed
 in some previous version but not in the current version (thus, the combined height of the red and blue areas
 is guaranteed to never decrease, and goes up whenever a new infinite recursive loop bug is introduced). The height
-of the red area is computed as the sum of the fixed, removed and dead values for each version.          
+of the red area is computed as the sum of the fixed, removed and dead values for each version.		
 The reductions in builds 13 and 14 came after Sun was notified about the bugs found by FindBugs in the JDK.
-        </para>
+	</para>
 <mediaobject>
 <imageobject>
 <imagedata fileref="infiniteRecursiveLoops.png"  />
@@ -3342,57 +3342,57 @@ generating the table:
 </para>
 
 <screen>
-seq     version time    classes NCSS    added   newCode fixed   removed retained        dead    active
-0       jdk1.6.0-b12    "Thu Nov 11 09:07:20 EST 2004"  13128   811569  0       1075    0       0       0       0       1075
-1       jdk1.6.0-b13    "Thu Nov 18 06:02:06 EST 2004"  13128   811570  0       0       0       0       1075    0       1075
-2       jdk1.6.0-b14    "Thu Dec 02 06:12:26 EST 2004"  13145   811786  3       0       6       0       1069    0       1072
-3       jdk1.6.0-b15    "Thu Dec 09 06:07:04 EST 2004"  13174   811693  2       1       3       0       1069    6       1072
-4       jdk1.6.0-b16    "Thu Dec 16 06:21:28 EST 2004"  13175   811715  0       0       1       0       1071    9       1071
-5       jdk1.6.0-b17    "Thu Dec 23 06:27:22 EST 2004"  13176   811974  0       0       1       0       1070    10      1070
-6       jdk1.6.0-b19    "Thu Jan 13 06:41:16 EST 2005"  13176   812011  0       0       0       0       1070    11      1070
-7       jdk1.6.0-b21    "Thu Jan 27 05:57:52 EST 2005"  13177   812173  0       0       1       0       1069    11      1069
-8       jdk1.6.0-b23    "Thu Feb 10 05:44:36 EST 2005"  13179   812188  0       0       0       0       1069    12      1069
-9       jdk1.6.0-b26    "Thu Mar 03 06:04:02 EST 2005"  13199   811770  0       0       2       1       1066    12      1066
-10      jdk1.6.0-b27    "Thu Mar 10 04:48:38 EST 2005"  13189   812440  1       0       1       1       1064    15      1065
-11      jdk1.6.0-b28    "Thu Mar 17 02:54:22 EST 2005"  13185   812056  0       0       0       0       1065    17      1065
-12      jdk1.6.0-b29    "Thu Mar 24 03:09:20 EST 2005"  13117   809468  3       0       8       26      1031    17      1034
-13      jdk1.6.0-b30    "Thu Mar 31 02:53:32 EST 2005"  13118   809501  0       0       0       0       1034    51      1034
-14      jdk1.6.0-b31    "Thu Apr 07 03:00:14 EDT 2005"  13117   809572  0       0       0       0       1034    51      1034
-15      jdk1.6.0-b32    "Thu Apr 14 02:56:56 EDT 2005"  13169   811096  1       1       0       1       1033    51      1035
-16      jdk1.6.0-b33    "Thu Apr 21 02:46:22 EDT 2005"  13187   811942  3       0       2       1       1032    52      1035
-17      jdk1.6.0-b34    "Thu Apr 28 02:49:00 EDT 2005"  13195   813488  0       1       0       0       1035    55      1036
-18      jdk1.6.0-b35    "Thu May 05 02:49:04 EDT 2005"  13457   829837  0       36      2       0       1034    55      1070
-19      jdk1.6.0-b36    "Thu May 12 02:59:46 EDT 2005"  13462   831278  0       0       0       0       1070    57      1070
-20      jdk1.6.0-b37    "Thu May 19 02:55:08 EDT 2005"  13464   831971  0       1       1       0       1069    57      1070
-21      jdk1.6.0-b38    "Thu May 26 03:08:16 EDT 2005"  13564   836565  1       7       2       6       1062    58      1070
-22      jdk1.6.0-b39    "Fri Jun 03 03:10:48 EDT 2005"  13856   849992  6       39      5       0       1065    66      1110
-23      jdk1.6.0-b40    "Thu Jun 09 03:30:28 EDT 2005"  15972   959619  7       147     11      0       1099    71      1253
-24      jdk1.6.0-b41    "Thu Jun 16 03:19:22 EDT 2005"  15972   959619  0       0       0       0       1253    82      1253
-25      jdk1.6.0-b42    "Fri Jun 24 03:38:54 EDT 2005"  15966   958581  3       0       1       2       1250    82      1253
-26      jdk1.6.0-b43    "Thu Jul 14 03:09:34 EDT 2005"  16041   960544  5       11      15      8       1230    85      1246
-27      jdk1.6.0-b44    "Thu Jul 21 03:05:54 EDT 2005"  16041   960547  0       0       0       0       1246    108     1246
-28      jdk1.6.0-b45    "Thu Jul 28 03:26:10 EDT 2005"  16037   960606  19      0       2       0       1244    108     1263
-29      jdk1.6.0-b46    "Thu Aug 04 03:02:48 EDT 2005"  15936   951355  13      1       1       32      1230    110     1244
-30      jdk1.6.0-b47    "Thu Aug 11 03:18:56 EDT 2005"  15964   952387  163     8       7       20      1217    143     1388
-31      jdk1.6.0-b48    "Thu Aug 18 08:10:40 EDT 2005"  15970   953421  0       0       0       0       1388    170     1388
-32      jdk1.6.0-b49    "Thu Aug 25 03:24:38 EDT 2005"  16048   958940  1       11      1       0       1387    170     1399
-33      jdk1.6.0-b50    "Thu Sep 01 01:52:40 EDT 2005"  16287   974937  19      27      16      7       1376    171     1422
-34      jdk1.6.0-b51    "Thu Sep 08 01:55:36 EDT 2005"  16362   979377  1       15      3       0       1419    194     1435
-35      jdk1.6.0-b52    "Thu Sep 15 02:04:08 EDT 2005"  16477   979399  0       0       1       1       1433    197     1433
-36      jdk1.6.0-b53    "Thu Sep 22 02:00:28 EDT 2005"  16019   957900  13      12      16      20      1397    199     1422
-37      jdk1.6.0-b54    "Thu Sep 29 01:54:34 EDT 2005"  16019   957900  0       0       0       0       1422    235     1422
-38      jdk1.6.0-b55    "Thu Oct 06 01:54:14 EDT 2005"  16051   959014  1       4       7       0       1415    235     1420
-39      jdk1.6.0-b56    "Thu Oct 13 01:54:12 EDT 2005"  16211   970835  6       8       37      0       1383    242     1397
-40      jdk1.6.0-b57    "Thu Oct 20 01:55:26 EDT 2005"  16279   971627  0       0       0       0       1397    279     1397
-41      jdk1.6.0-b58    "Thu Oct 27 01:56:30 EDT 2005"  16283   971945  0       1       1       0       1396    279     1397
-42      jdk1.6.0-b59    "Thu Nov 03 01:56:58 EST 2005"  16232   972193  6       0       5       0       1392    280     1398
-43      jdk1.6.0-b60    "Thu Nov 10 01:54:18 EST 2005"  16235   972346  0       0       0       0       1398    285     1398
-44      jdk1.6.0-b61    "Thu Nov 17 01:58:42 EST 2005"  16202   971134  2       0       4       0       1394    285     1396
+seq	version	time	classes	NCSS	added	newCode	fixed	removed	retained	dead	active
+0	jdk1.6.0-b12	"Thu Nov 11 09:07:20 EST 2004"	13128	811569	0	1075	0	0	0	0	1075
+1	jdk1.6.0-b13	"Thu Nov 18 06:02:06 EST 2004"	13128	811570	0	0	0	0	1075	0	1075
+2	jdk1.6.0-b14	"Thu Dec 02 06:12:26 EST 2004"	13145	811786	3	0	6	0	1069	0	1072
+3	jdk1.6.0-b15	"Thu Dec 09 06:07:04 EST 2004"	13174	811693	2	1	3	0	1069	6	1072
+4	jdk1.6.0-b16	"Thu Dec 16 06:21:28 EST 2004"	13175	811715	0	0	1	0	1071	9	1071
+5	jdk1.6.0-b17	"Thu Dec 23 06:27:22 EST 2004"	13176	811974	0	0	1	0	1070	10	1070
+6	jdk1.6.0-b19	"Thu Jan 13 06:41:16 EST 2005"	13176	812011	0	0	0	0	1070	11	1070
+7	jdk1.6.0-b21	"Thu Jan 27 05:57:52 EST 2005"	13177	812173	0	0	1	0	1069	11	1069
+8	jdk1.6.0-b23	"Thu Feb 10 05:44:36 EST 2005"	13179	812188	0	0	0	0	1069	12	1069
+9	jdk1.6.0-b26	"Thu Mar 03 06:04:02 EST 2005"	13199	811770	0	0	2	1	1066	12	1066
+10	jdk1.6.0-b27	"Thu Mar 10 04:48:38 EST 2005"	13189	812440	1	0	1	1	1064	15	1065
+11	jdk1.6.0-b28	"Thu Mar 17 02:54:22 EST 2005"	13185	812056	0	0	0	0	1065	17	1065
+12	jdk1.6.0-b29	"Thu Mar 24 03:09:20 EST 2005"	13117	809468	3	0	8	26	1031	17	1034
+13	jdk1.6.0-b30	"Thu Mar 31 02:53:32 EST 2005"	13118	809501	0	0	0	0	1034	51	1034
+14	jdk1.6.0-b31	"Thu Apr 07 03:00:14 EDT 2005"	13117	809572	0	0	0	0	1034	51	1034
+15	jdk1.6.0-b32	"Thu Apr 14 02:56:56 EDT 2005"	13169	811096	1	1	0	1	1033	51	1035
+16	jdk1.6.0-b33	"Thu Apr 21 02:46:22 EDT 2005"	13187	811942	3	0	2	1	1032	52	1035
+17	jdk1.6.0-b34	"Thu Apr 28 02:49:00 EDT 2005"	13195	813488	0	1	0	0	1035	55	1036
+18	jdk1.6.0-b35	"Thu May 05 02:49:04 EDT 2005"	13457	829837	0	36	2	0	1034	55	1070
+19	jdk1.6.0-b36	"Thu May 12 02:59:46 EDT 2005"	13462	831278	0	0	0	0	1070	57	1070
+20	jdk1.6.0-b37	"Thu May 19 02:55:08 EDT 2005"	13464	831971	0	1	1	0	1069	57	1070
+21	jdk1.6.0-b38	"Thu May 26 03:08:16 EDT 2005"	13564	836565	1	7	2	6	1062	58	1070
+22	jdk1.6.0-b39	"Fri Jun 03 03:10:48 EDT 2005"	13856	849992	6	39	5	0	1065	66	1110
+23	jdk1.6.0-b40	"Thu Jun 09 03:30:28 EDT 2005"	15972	959619	7	147	11	0	1099	71	1253
+24	jdk1.6.0-b41	"Thu Jun 16 03:19:22 EDT 2005"	15972	959619	0	0	0	0	1253	82	1253
+25	jdk1.6.0-b42	"Fri Jun 24 03:38:54 EDT 2005"	15966	958581	3	0	1	2	1250	82	1253
+26	jdk1.6.0-b43	"Thu Jul 14 03:09:34 EDT 2005"	16041	960544	5	11	15	8	1230	85	1246
+27	jdk1.6.0-b44	"Thu Jul 21 03:05:54 EDT 2005"	16041	960547	0	0	0	0	1246	108	1246
+28	jdk1.6.0-b45	"Thu Jul 28 03:26:10 EDT 2005"	16037	960606	19	0	2	0	1244	108	1263
+29	jdk1.6.0-b46	"Thu Aug 04 03:02:48 EDT 2005"	15936	951355	13	1	1	32	1230	110	1244
+30	jdk1.6.0-b47	"Thu Aug 11 03:18:56 EDT 2005"	15964	952387	163	8	7	20	1217	143	1388
+31	jdk1.6.0-b48	"Thu Aug 18 08:10:40 EDT 2005"	15970	953421	0	0	0	0	1388	170	1388
+32	jdk1.6.0-b49	"Thu Aug 25 03:24:38 EDT 2005"	16048	958940	1	11	1	0	1387	170	1399
+33	jdk1.6.0-b50	"Thu Sep 01 01:52:40 EDT 2005"	16287	974937	19	27	16	7	1376	171	1422
+34	jdk1.6.0-b51	"Thu Sep 08 01:55:36 EDT 2005"	16362	979377	1	15	3	0	1419	194	1435
+35	jdk1.6.0-b52	"Thu Sep 15 02:04:08 EDT 2005"	16477	979399	0	0	1	1	1433	197	1433
+36	jdk1.6.0-b53	"Thu Sep 22 02:00:28 EDT 2005"	16019	957900	13	12	16	20	1397	199	1422
+37	jdk1.6.0-b54	"Thu Sep 29 01:54:34 EDT 2005"	16019	957900	0	0	0	0	1422	235	1422
+38	jdk1.6.0-b55	"Thu Oct 06 01:54:14 EDT 2005"	16051	959014	1	4	7	0	1415	235	1420
+39	jdk1.6.0-b56	"Thu Oct 13 01:54:12 EDT 2005"	16211	970835	6	8	37	0	1383	242	1397
+40	jdk1.6.0-b57	"Thu Oct 20 01:55:26 EDT 2005"	16279	971627	0	0	0	0	1397	279	1397
+41	jdk1.6.0-b58	"Thu Oct 27 01:56:30 EDT 2005"	16283	971945	0	1	1	0	1396	279	1397
+42	jdk1.6.0-b59	"Thu Nov 03 01:56:58 EST 2005"	16232	972193	6	0	5	0	1392	280	1398
+43	jdk1.6.0-b60	"Thu Nov 10 01:54:18 EST 2005"	16235	972346	0	0	0	0	1398	285	1398
+44	jdk1.6.0-b61	"Thu Nov 17 01:58:42 EST 2005"	16202	971134	2	0	4	0	1394	285	1396
 </screen>
 </sect2>
 
 <sect2 id="incrementalhistory">
-        <title>Incremental history maintenance</title>
+	<title>Incremental history maintenance</title>
 
 <para>
 If db.xml contains the results of running findbugs over builds b12 - b60, we can update db.xml to include the results of analyzing b61 with the commands:
@@ -3401,9 +3401,9 @@ If db.xml contains the results of running findbugs over builds b12 - b60, we can
 computeBugHistory -output db.xml db.xml jdk1.6.0-b61/jre/lib/rt.xml
 </screen>
 </sect2>
-                
-                        </sect1>
-        
+		
+			</sect1>
+	
          <sect1 id="antexample">
             <title>Ant example</title>
 <para>
@@ -3416,7 +3416,7 @@ Here is a complete ant script example for both running findbugs and running a ch
    <property name="findbugs.home" value="/Users/ben/Documents/workspace/findbugs/findbugs" />
    <property name="jvmargs" value="-server -Xss1m -Xmx800m -Duser.language=en -Duser.region=EN -Dfindbugs.home=${findbugs.home}" />
 
-        <path id="findbugs.lib">
+	<path id="findbugs.lib">
       <fileset dir="${findbugs.home}/lib">
          <include name="findbugs-ant.jar"/>
       </fileset>
@@ -3467,10 +3467,10 @@ Here is a complete ant script example for both running findbugs and running a ch
 
       <!-- Set info to the latest analysis -->
       <setBugDatabaseInfo home="${findbugs.home}"
-                          withMessages="true"
-                          name="asm-util-3.0.jar"
-                          input="out.xml"
-                          output="out-rel.xml"/>
+      	                  withMessages="true"
+      	                  name="asm-util-3.0.jar"
+      	                  input="out.xml"
+      	                  output="out-rel.xml"/>
 
       <!-- Checking if history file already exists (out-hist.xml) -->
       <condition property="mining.historyfile.available">
@@ -3504,18 +3504,18 @@ Here is a complete ant script example for both running findbugs and running a ch
    <target name="history" if="mining.historyfile.available">
       <!-- Merging ${data.file} into ${hist.file} -->
       <computeBugHistory home="${findbugs.home}"
-                         withMessages="true"
-                         output="${hist.file}">
-          <dataFile name="${hist.file}"/>
-          <dataFile name="${data.file}"/>
+      	                 withMessages="true"
+      	                 output="${hist.file}">
+      	  <dataFile name="${hist.file}"/>
+      	  <dataFile name="${data.file}"/>
       </computeBugHistory>
 
       <!-- Compute history into ${hist.summary.file} -->
       <mineBugHistory home="${findbugs.home}"
-                      formatDates="true"
+      	              formatDates="true"
                       noTabs="true"
-                      input="${hist.file}"
-                      output="${hist.summary.file}"/>
+      	              input="${hist.file}"
+      	              output="${hist.summary.file}"/>
    </target>
 
 </project>
@@ -3636,42 +3636,42 @@ in the Ant task.</para>
 <para>Greg Bentz provided a fix for the hashcode/equals detector.</para>
 
 <para>K. Hashimoto contributed internationalization fixes and several other
-        bug fixes.</para>
+	bug fixes.</para>
 
 <para>
-        Glenn Boysko contributed support for ignoring specified local
-        variables in the dead local store detector.
+	Glenn Boysko contributed support for ignoring specified local
+	variables in the dead local store detector.
 </para>
-        
+	
 <para>
-        Jay Dunning contributed a detector to find equality comparisons
-        of floating-point values, and overhauled the analysis summary
-        report and its representation in the saved XML format.
-</para>
-
-<para>
-        Olivier Parent contributed updated French translations for bug descriptions and
-        Swing GUI.
+	Jay Dunning contributed a detector to find equality comparisons
+	of floating-point values, and overhauled the analysis summary
+	report and its representation in the saved XML format.
 </para>
 
 <para>
-        Chris Nappin contributed the <filename>plain.xsl</filename>
-        stylesheet.
+	Olivier Parent contributed updated French translations for bug descriptions and
+	Swing GUI.
 </para>
 
 <para>
-        Etienne Giraudy contributed the <filename>fancy.xsl</filename> and  <filename>fancy-hist.xsl</filename>
-        stylesheets, and made improvements to the <command>-xml:withMessages</command>
-        option.
+	Chris Nappin contributed the <filename>plain.xsl</filename>
+	stylesheet.
 </para>
-        
+
 <para>
-        Takashi Okamoto fixed bugs in the project preferences dialog
-        in the Eclipse plugin, and contributed to its internationalization and localization.
+	Etienne Giraudy contributed the <filename>fancy.xsl</filename> and  <filename>fancy-hist.xsl</filename>
+	stylesheets, and made improvements to the <command>-xml:withMessages</command>
+	option.
 </para>
-        
+	
+<para>
+	Takashi Okamoto fixed bugs in the project preferences dialog
+	in the Eclipse plugin, and contributed to its internationalization and localization.
+</para>
+	
 <para>Thomas Einwaller fixed bugs in the project preferences dialog in the Eclipse plugin.</para>
-        
+	
 <para>Jeff Knox contributed support for the warningsProperty attribute
 in the Ant task.</para>
 

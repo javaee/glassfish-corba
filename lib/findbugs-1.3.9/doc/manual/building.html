@@ -14,14 +14,14 @@ To compile <span class="application">FindBugs</span> from source, you will need 
       <a href="http://ant.apache.org/" target="_top">Apache <span class="application">Ant</span></a>, version 1.6.3 or later
     </p></li></ul></div><p>
 </p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top"><p>
-                The version of <span class="application">Ant</span> included as <code class="filename">/usr/bin/ant</code> on
-                Redhat Linux systems will <span class="emphasis"><em>not</em></span> work for compiling
-                <span class="application">FindBugs</span>.  We recommend you install a binary distribution of <span class="application">Ant</span>
-                downloaded from the <a href="http://ant.apache.org/" target="_top"><span class="application">Ant</span> website</a>.
-                Make sure that when you run <span class="application">Ant</span> your <em class="replaceable"><code>JAVA_HOME</code></em>
-                environment variable points to the directory in which you installed
-                JDK 1.5 (or later).
-        </p></td></tr></table></div><p>
+		The version of <span class="application">Ant</span> included as <code class="filename">/usr/bin/ant</code> on
+		Redhat Linux systems will <span class="emphasis"><em>not</em></span> work for compiling
+		<span class="application">FindBugs</span>.  We recommend you install a binary distribution of <span class="application">Ant</span>
+		downloaded from the <a href="http://ant.apache.org/" target="_top"><span class="application">Ant</span> website</a>.
+		Make sure that when you run <span class="application">Ant</span> your <em class="replaceable"><code>JAVA_HOME</code></em>
+		environment variable points to the directory in which you installed
+		JDK 1.5 (or later).
+	</p></td></tr></table></div><p>
 If you want to be able to generate formatted versions of the <span class="application">FindBugs</span> documentation,
 you will also need the following software:
 </p><div class="itemizedlist"><ul type="disc"><li><p>
@@ -96,14 +96,14 @@ where <em class="replaceable"><code>target</code></em> is one of the following:
        This target formats the documentation.  (It also compiles some of
        the source code as a side-effect.)
        </p></dd><dt><span class="term"><span><strong class="command">runjunit</strong></span></span></dt><dd><p>
-                        This target compiles and runs the internal JUnit tests included
-                        in <span class="application">FindBugs</span>.  It will print an error message if any unit
-                        tests fail.
-                </p></dd><dt><span class="term"><span><strong class="command">bindist</strong></span></span></dt><dd><p>
-                        Builds a binary distribution of <span class="application">FindBugs</span>.
-                        The target creates both <code class="filename">.zip</code> and
-                        <code class="filename">.tar.gz</code> archives.
-                </p></dd></dl></div><p>
+			This target compiles and runs the internal JUnit tests included
+			in <span class="application">FindBugs</span>.  It will print an error message if any unit
+			tests fail.
+		</p></dd><dt><span class="term"><span><strong class="command">bindist</strong></span></span></dt><dd><p>
+			Builds a binary distribution of <span class="application">FindBugs</span>.
+			The target creates both <code class="filename">.zip</code> and
+			<code class="filename">.tar.gz</code> archives.
+		</p></dd></dl></div><p>
 </p><p>
 After running an <span class="application">Ant</span> command, you should see output similar to
 the following (after some other messages regarding the tasks that

@@ -3,47 +3,47 @@
 <head>
 <title>FindBugs Report</title>
 <style type="text/css">
-                .tablerow0 {
-                        background: #EEEEEE;
-                }
+		.tablerow0 {
+			background: #EEEEEE;
+		}
 
-                .tablerow1 {
-                        background: white;
-                }
+		.tablerow1 {
+			background: white;
+		}
 
-                .detailrow0 {
-                        background: #EEEEEE;
-                }
+		.detailrow0 {
+			background: #EEEEEE;
+		}
 
-                .detailrow1 {
-                        background: white;
-                }
+		.detailrow1 {
+			background: white;
+		}
 
-                .tableheader {
-                        background: #b9b9fe;
-                        font-size: larger;
-                }
+		.tableheader {
+			background: #b9b9fe;
+			font-size: larger;
+		}
 
-                .tablerow0:hover, .tablerow1:hover {
-                        background: #aaffaa;
-                }
-                </style>
+		.tablerow0:hover, .tablerow1:hover {
+			background: #aaffaa;
+		}
+		</style>
 <script type="text/javascript">
-                        function toggleRow(elid) {
-                                if (document.getElementById) {
-                                        element = document.getElementById(elid);
-                                        if (element) {
-                                                if (element.style.display == 'none') {
-                                                        element.style.display = 'block';
-                                                        //window.status = 'Toggle on!';
-                                                } else {
-                                                        element.style.display = 'none';
-                                                        //window.status = 'Toggle off!';
-                                                }
-                                        }
-                                }
-                        }
-                </script>
+			function toggleRow(elid) {
+				if (document.getElementById) {
+					element = document.getElementById(elid);
+					if (element) {
+						if (element.style.display == 'none') {
+							element.style.display = 'block';
+							//window.status = 'Toggle on!';
+						} else {
+							element.style.display = 'none';
+							//window.status = 'Toggle off!';
+						}
+					}
+				}
+			}
+		</script>
 
 </head>
 <body>
@@ -669,14 +669,14 @@
 <h2>
 <a name="CD_CIRCULAR_DEPENDENCY">CD_CIRCULAR_DEPENDENCY: Test for circular dependencies among classes.</a>
 </h2>
-        
+	
     <p>
     This class has a circular dependency with other classes. This makes building these classes
     difficult, as each is dependent on the other to build correctly. Consider using interfaces
     to break the hard dependency.
     </p>
     
-          
+  	  
 <h2>
 <a name="DLS_DEAD_LOCAL_STORE">DLS_DEAD_LOCAL_STORE: Dead store to local variable</a>
 </h2>
@@ -705,10 +705,10 @@ is never used.
 
   <p> Returning a reference to a mutable object value stored in one of the object's fields
   exposes the internal representation of the object.&nbsp; 
-        If instances
-        are accessed by untrusted code, and unchecked changes to
-        the mutable object would compromise security or other
-        important properties, you will need to do something different.
+	If instances
+	are accessed by untrusted code, and unchecked changes to
+	the mutable object would compromise security or other
+	important properties, you will need to do something different.
   Returning a new copy of the object is better approach in many situations.</p>
 
     
@@ -757,7 +757,7 @@ an infinite recursive loop that will result in a stack overflow.</p>
 <a name="MS_SHOULD_BE_FINAL">MS_SHOULD_BE_FINAL: Field isn't final but should be</a>
 </h2>
 
-        <p>
+	<p>
  A mutable static field could be changed by malicious code or
         by accident from another package.
         The field could be made final to avoid
@@ -793,7 +793,7 @@ written to. Deferencing this value will generate a null pointer exception.
   masking potential bugs.
   </p>
   
-          
+	  
 <h2>
 <a name="UCF_USELESS_CONTROL_FLOW">UCF_USELESS_CONTROL_FLOW: Useless control flow in method</a>
 </h2>

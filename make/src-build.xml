@@ -649,6 +649,7 @@
     <!-- Enhance the ORB for the tracing faciliy -->
 
     <target name="compile-enhancer" depends="init">
+        <mkdir dir="${classes.dir}"/>
         <echo message="Compiling enhancer"/>
         <javac srcdir="${src.dir}" destdir="${classes.dir}" 
                 classpathref="classpath.master" 
@@ -761,7 +762,7 @@
         <echo message="Copying resources files"/>
         <copy todir="${classes.dir}" overwrite="false">
             <fileset dir="${src.dir}">
-                <include name="com/sun/corba/ee/impl/orbutil/resources/sunorb.properties"/>
+                <include name="com/sun/corba/ee/impl/resources/sunorb*.properties"/>
                 <include name="sun/rmi/rmic/resources/rmic.properties"/>
             </fileset>
         </copy>

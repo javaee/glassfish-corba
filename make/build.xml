@@ -63,6 +63,7 @@
 
         <!-- ORB Test directories -->
 
+        <property name="test"                           value="*JUnitTest"/>
         <property name="test.run.base"                  value="${root.dir}/test/run"/>
         <property name="test.output"                    value="${test.run.base}/gen"/>
         <property name="junit.reports"                  value="${test.run.base}/junitreports"/>
@@ -87,8 +88,8 @@
         <property name="ejb-jar"                        value="${root.dir}/lib/ejb-2_1-api.jar"/>
         <property name="ejb3-jar"                       value="${root.dir}/lib/javax.ejb.jar"/>
         <property name="ejbcontainer-jar"               value="${root.dir}/lib/ejb-container.jar"/>
-        <property name="junit-jar"                      value="${root.dir}/lib/ant-junit.jar"/>
-        <property name="ant-junit-jar"                  value="${root.dir}/lib/junit.jar"/>
+        <property name="junit-jar"                      value="${root.dir}/lib/junit.jar"/>
+        <property name="ant-junit-jar"                  value="${root.dir}/lib/ant-junit.jar"/>
         <property name="testng-jar"                     value="${root.dir}/lib/testng.jar"/>
         <property name="japex-jar"                      value="${root.dir}/lib/japex.jar"/>
 
@@ -1689,6 +1690,16 @@
                 <!-- <test name="corba.messagetrace.Client" todir="${junit.reports}"/> -->
                 <test name="corba.misc.Client" todir="${junit.reports}"/>
                 <test name="corba.dynamicrmiiiop.Client" todir="${junit.reports}"/>
+            </test-cases>
+        </run-junit-test>
+    </target>
+
+    <target name="test-junit" depends="test-init">
+        <run-junit-test>
+            <test-cases>
+                <batchtest todir="${junit.reports}">
+                  <fileset dir="${test-classes.dir}" includes="**/${test}.class" />
+                </batchtest>
             </test-cases>
         </run-junit-test>
     </target>

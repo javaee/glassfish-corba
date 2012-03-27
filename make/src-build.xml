@@ -916,24 +916,9 @@
     <!-- ========================= COMPILE-IDL-COMPILER ================== -->
     <!-- Compile the IDL compiler -->
     <target name="compile-idl-compiler" depends="init">
-        <echo message="Copying .prp files"/>
-        <copy todir="${classes.dir}" overwrite="false">
-            <fileset dir="${src.dir}"
-                includes="com/sun/tools/corba/se/idl/**/*.prp"/>
-        </copy>
-        <echo message="Compiling idl compiler"/>
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" 
-                classpathref="classpath.master" 
-                deprecation="${deprecation}"
-                debug="${javac.debug}" 
-                optimize="${javac.optimize}"
-                failonerror="true">
-            <include name="com/sun/tools/corba/se/idl/**"/>
-        </javac>
-        <echo message="Copying .idl files"/>
-        <copy todir="${lib.dir}" flatten="yes" overwrite="false">
-            <fileset dir="${src.dir}" includes="org/omg/CORBA/*.idl"/>
-        </copy>
+        <available file="${idlc.jar}" property="idlc.jar.exists"/>
+        <fail unless="idlc.jar.exists"
+              message="the idlc jar was not found - it should be built with maven before starting this build."/>
     </target>
 
 
@@ -1252,6 +1237,21 @@
     
     <!-- ========================= IDL ========================= -->
 
+    <property name="idlc-base"      value="idlc/src/main/"/>
+    <property name="idlc-classes"   value="idlc/target/classes/"/>
+    <property name="idlc-src"       value="${idlc-base}/java"/>
+    <property name="idlc-resources" value="${idlc-base}/resources"/>
+    <property name="idlc-idl"       value="${idlc-base}/idl"/>
+    <property name="m2.repo"        value="${user.home}/.m2/repository"/>
+    <property name="idlc.jar"       value="${m2.repo}/com/sun/corba/idlc/3.1.0/idlc-3.1.0.jar"/>
+
+
+    <path id="idlc.classpath">
+        <pathelement location="${idlc.jar}"/>
+        <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
+    </path>
+
+
     <!-- Checks to see if the destination directory for the IDL invocation exists
          and if it does exist then has the idl file been changed in reference to 
          the generated files  -->
@@ -1274,7 +1274,7 @@
      if="idl-file-changed">
         <echo message="Running IDL compiler ${idl-value}"/>
         <java classname="com.sun.tools.corba.se.idl.toJavaPortable.Compile"
-         classpathref="classpath.master" fork="true">
+         classpathref="idlc.classpath" fork="true">
             <arg line="${td-value}"/>
             <arg line="${includes-value}"/>
             <arg line="${corba-value}"/>
@@ -1291,6 +1291,10 @@
     <!-- This target runs all the idl invocations and generates Java sources for
          each of the idl files in corba sources only -->
     <target name="run-all-idl" depends="compile-idl-compiler">
+        <echo message="Copying .idl files"/>
+        <copy todir="${lib.dir}" flatten="yes" overwrite="false">
+            <fileset dir="${src.dir}" includes="org/omg/CORBA/*.idl"/>
+        </copy>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
             <param name="includes-value"
@@ -1300,12 +1304,9 @@
             <param name="D-value" value=""/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes"
-             value="-pkgPrefix PortableServer org.omg"/>
-            <param name="idl-value"
-             value="${src.dir}/org/omg/PortableServer/poa.idl"/>
-            <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/org/omg/PortableServer"/>
+            <param name="pkg-prefixes"  value="-pkgPrefix PortableServer org.omg"/>
+            <param name="idl-value"     value="${src.dir}/org/omg/PortableServer/poa.idl"/>
+            <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/PortableServer"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">

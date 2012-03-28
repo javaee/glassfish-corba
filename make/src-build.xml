@@ -1243,7 +1243,8 @@
     <property name="idlc-resources" value="${idlc-base}/resources"/>
     <property name="idlc-idl"       value="${idlc-base}/idl"/>
     <property name="m2.repo"        value="${user.home}/.m2/repository"/>
-    <property name="idlc.jar"       value="${m2.repo}/com/sun/corba/idlc/3.1.0/idlc-3.1.0.jar"/>
+    <property name="idlc-version"   value="4.0-SNAPSHOT"/>
+    <property name="idlc.jar"       value="${m2.repo}/com/sun/corba/idlc/${idlc-version}/idlc-${idlc-version}.jar"/>
 
 
     <path id="idlc.classpath">

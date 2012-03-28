@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.glassfish.gmbal:gmbal:3.2.0-b003">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/gmbal/gmbal/3.2.0-b003/gmbal-3.2.0-b003.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/gmbal/gmbal/3.2.0-b003/gmbal-3.2.0-b003-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/gmbal/gmbal/3.2.0-b003/gmbal-3.2.0-b003-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

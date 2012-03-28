@@ -10,6 +10,7 @@ s.*
 p.*
 *.sjava
 *.class
+*.bfile
 www/javadoc/**
 test-output/**
 experimental/**
@@ -18,6 +19,7 @@ test/build/**
 test/run/**
 optional/build/**
 optional/test/build/**
+target/**
 make/errorfile
 webrev/**
 NORENAME

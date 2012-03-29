@@ -1,96 +1,138 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.corba</groupId>
     <artifactId>glassfish-corba</artifactId>
     <name>GlassFish Corba</name>
     <version>4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-  <build>
+    <build>
         <plugins>
-           <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <configuration>
-                  <source>1.6</source>
-                  <target>1.6</target>
-              </configuration>
-           </plugin>
-           <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>build-helper-maven-plugin</artifactId>
-              <version>1.1</version>
-              <executions>
-                <execution>
-                  <id>add-source</id>
-                  <phase>generate-sources</phase>
-                  <goals>
-                      <goal>add-source</goal>
-                  </goals>
-                  <configuration>
-                      <sources>
-                          <source>src/main/java</source>
-                      </sources>
-                  </configuration>
-                </execution>
-              </executions>
-           </plugin>
-        
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>idlj-maven-plugin</artifactId>
+                <version>1.2-SNAPSHOT</version>
+                <executions>
+                  <execution>
+                    <goals>
+                      <goal>generate</goal>
+                    </goals>
+                  </execution>
+                </executions>
+                <configuration>
+                    <includeDirs>
+                        <includeDir>src/main/idl-includes</includeDir>
+                    </includeDirs>
+                    <sources>
+                        <source>
+                            <packagePrefixes>
+                                <packagePrefix><type>CosNaming</type>          <prefix>org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>CosTransactions</type>    <prefix>org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>CosTSInteroperation</type><prefix>org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>CosTSPortability</type>   <prefix>org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>Dynamic</type>            <prefix>org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>DynamicAny</type>         <prefix>org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>IOP</type>                <prefix>org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>Messaging</type>          <prefix>org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>PortableInterceptor</type><prefix>org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>PortableServer</type>     <prefix>org.omg</prefix></packagePrefix>
+                            </packagePrefixes>
+                            <defines>
+                                <define>
+                                    <symbol>CORBA3</symbol>
+                                </define>
+                            </defines>
+                            <additionalArguments>
+                                <additionalArgument>-corba</additionalArgument>
+                                <additionalArgument>3.0</additionalArgument>
+                            </additionalArguments>
+                        </source>
+                    </sources>
+                </configuration>
+            </plugin>
         </plugins>
-  </build>
-  <properties>
+    </build>
+    <properties>
         <sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
-  </properties>
-  <dependencies>
-<!--
-  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
-  Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
-  
-  The contents of this file are subject to the terms of either the GNU
-  General Public License Version 2 only ("GPL") or the Common Development
-  and Distribution License("CDDL") (collectively, the "License").  You
-  may not use this file except in compliance with the License.  You can
-  obtain a copy of the License at
-  https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
-  or packager/legal/LICENSE.txt.  See the License for the specific
-  language governing permissions and limitations under the License.
-  
-  When distributing the software, include this License Header Notice in each
-  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
-  
-  GPL Classpath Exception:
-  Oracle designates this particular file as subject to the "Classpath"
-  exception as provided by Oracle in the GPL Version 2 section of the License
-  file that accompanied this code.
-  
-  Modifications:
-  If applicable, add the following below the License Header, with the fields
-  enclosed by brackets [] replaced by your own identifying information:
-  "Portions Copyright [year] [name of copyright owner]"
-  
-  Contributor(s):
-  If you wish your version of this file to be governed by only the CDDL or
-  only the GPL Version 2, indicate your decision by adding "[Contributor]
-  elects to include this software in this distribution under the [CDDL or GPL
-  Version 2] license."  If you don't indicate a single choice of license, a
-  recipient has the option to distribute your version of this file under
-  either the CDDL, the GPL Version 2 or to extend the choice of license to
-  its licensees as provided above.  However, if you add GPL Version 2 code
-  and therefore, elected the GPL Version 2 license, then the option applies
-  only if the new code is made subject to such option by the copyright
-  holder.
--->
-  <!--
-    <dependency>   
-      <groupId>deps</groupId>
-      <artifactId>dep1</artifactId>
-      <version>0.1</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/build/libcache/management-api.jar:${basedir}/build/libcache/gmbal.jar:${basedir}/build/libcache/org.osgi.core.jar</systemPath>
-    </dependency>
-  -->
-  </dependencies>
+    </properties>
+    <dependencies>
+        <!--
+          DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+          Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+
+          The contents of this file are subject to the terms of either the GNU
+          General Public License Version 2 only ("GPL") or the Common Development
+          and Distribution License("CDDL") (collectively, the "License").  You
+          may not use this file except in compliance with the License.  You can
+          obtain a copy of the License at
+          https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+          or packager/legal/LICENSE.txt.  See the License for the specific
+          language governing permissions and limitations under the License.
+
+          When distributing the software, include this License Header Notice in each
+          file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+
+          GPL Classpath Exception:
+          Oracle designates this particular file as subject to the "Classpath"
+          exception as provided by Oracle in the GPL Version 2 section of the License
+          file that accompanied this code.
+
+          Modifications:
+          If applicable, add the following below the License Header, with the fields
+          enclosed by brackets [] replaced by your own identifying information:
+          "Portions Copyright [year] [name of copyright owner]"
+
+          Contributor(s):
+          If you wish your version of this file to be governed by only the CDDL or
+          only the GPL Version 2, indicate your decision by adding "[Contributor]
+          elects to include this software in this distribution under the [CDDL or GPL
+          Version 2] license."  If you don't indicate a single choice of license, a
+          recipient has the option to distribute your version of this file under
+          either the CDDL, the GPL Version 2 or to extend the choice of license to
+          its licensees as provided above.  However, if you add GPL Version 2 code
+          and therefore, elected the GPL Version 2 license, then the option applies
+          only if the new code is made subject to such option by the copyright
+          holder.
+        -->
+        <!--
+          <dependency>
+            <groupId>deps</groupId>
+            <artifactId>dep1</artifactId>
+            <version>0.1</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/build/libcache/management-api.jar:${basedir}/build/libcache/gmbal.jar:${basedir}/build/libcache/org.osgi.core.jar</systemPath>
+          </dependency>
+        -->
+    </dependencies>
 </project>
 

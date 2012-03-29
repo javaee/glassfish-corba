@@ -968,7 +968,7 @@
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/org/omg/IOP -i ${src.dir}/org/omg/Messaging -i ${src.dir}/org/omg/CORBA -i ${src.dir}/org/omg/PortableInterceptor"/>
+            <param name="includes-value" value="-i ${omgapi.idl.dir} -i ${omgapi.include.dir}"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fallTIE"/>
             <param name="D-value" value="-D CORBA3"/>
@@ -1085,7 +1085,7 @@
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/org/omg/PortableInterceptor"/>
+            <param name="includes-value" value="-i ${omgapi.idl.dir} -i ${omgapi.include.dir}"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value="-D CORBA3"/>

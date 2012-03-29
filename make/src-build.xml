@@ -106,6 +106,21 @@
         <property name="src.dir"                value="src/share/classes"/>
         <property name="javadoc.dir"            value="www/javadoc"/>
         <property name="build.sysclasspath"     value="ignore"/>
+        <property name="omgapi.idl.dir"         value="omgapi/src/main/idl"/>
+        <property name="omgapi.include.dir"     value="omgapi/src/main/idl-includes"/>
+        <property name="csiv2.idl.dir"          value="csiv2-idl/src/main/idl"/>
+
+
+        <property name="idlc-base"      value="idlc/src/main/"/>
+        <property name="idlc-classes"   value="idlc/target/classes/"/>
+        <property name="idlc-src"       value="${idlc-base}/java"/>
+        <property name="idlc-resources" value="${idlc-base}/resources"/>
+        <property name="idlc-idl"       value="${idlc-base}/idl"/>
+        <property name="m2.repo"        value="${user.home}/.m2/repository"/>
+        <property name="m2-orb.version" value="4.0-SNAPSHOT"/>
+        <property name="idlc.jar"       value="${m2.repo}/com/sun/corba/idlc/${m2-orb.version}/idlc-${m2-orb.version}.jar"/>
+        <property name="omgapi.jar"     value="${m2.repo}/com/sun/corba/glassfish-corba-omgapi/${m2-orb.version}/glassfish-corba-omgapi-${m2-orb.version}.jar"/>
+
 
         <!-- javac flags -->
         <property name="deprecation"            value="off"/>
@@ -170,6 +185,7 @@
         <path id="classpath.master">
             <path refid="dependency.classpath"/>
 
+            <pathelement location="${omgapi.jar}"/>
             <pathelement location="${classes.dir}"/>
             <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
         </path>
@@ -699,7 +715,7 @@
     <!-- ========================= COMPILE ========================= -->
 
     <target name="compile" depends="init, compile-enhancer, 
-        compile-idl-compiler, run-all-idl, delete-java-sources, copy-resources">
+        verify-maven-jars, run-all-idl, delete-java-sources, copy-resources">
         <echo message="Compiling ORB sources"/>
         <javac destdir="${classes.dir}" 
                 classpathref="classpath.master"
@@ -711,7 +727,7 @@
                 memoryMaximumSize="512m"> 
             <src path="${src.dir}"/>
             <src path="${gensrc.dir}"/>
-            <include name="org/omg/**"/>
+            <exclude name="org/omg/**"/>
             <exclude name="org/omg/PortableInterceptor/UNKNOWN.java"/>
             <include name="com/sun/corba/ee/org/omg/**"/>
             <exclude name="com/sun/corba/ee/org/omg/CORBA/**"/>
@@ -915,10 +931,13 @@
 
     <!-- ========================= COMPILE-IDL-COMPILER ================== -->
     <!-- Compile the IDL compiler -->
-    <target name="compile-idl-compiler" depends="init">
+    <target name="verify-maven-jars" depends="init">
         <available file="${idlc.jar}" property="idlc.jar.exists"/>
         <fail unless="idlc.jar.exists"
               message="the idlc jar was not found - it should be built with maven before starting this build."/>
+        <available file="${omgapi.jar}" property="omgapi.jar.exists"/>
+        <fail unless="omgapi.jar.exists"
+              message="the omgapi jar was not found - it should be built with maven before starting this build."/>
     </target>
 
 
@@ -1237,15 +1256,6 @@
     
     <!-- ========================= IDL ========================= -->
 
-    <property name="idlc-base"      value="idlc/src/main/"/>
-    <property name="idlc-classes"   value="idlc/target/classes/"/>
-    <property name="idlc-src"       value="${idlc-base}/java"/>
-    <property name="idlc-resources" value="${idlc-base}/resources"/>
-    <property name="idlc-idl"       value="${idlc-base}/idl"/>
-    <property name="m2.repo"        value="${user.home}/.m2/repository"/>
-    <property name="idlc-version"   value="4.0-SNAPSHOT"/>
-    <property name="idlc.jar"       value="${m2.repo}/com/sun/corba/idlc/${idlc-version}/idlc-${idlc-version}.jar"/>
-
 
     <path id="idlc.classpath">
         <pathelement location="${idlc.jar}"/>
@@ -1291,155 +1301,14 @@
 
     <!-- This target runs all the idl invocations and generates Java sources for
          each of the idl files in corba sources only -->
-    <target name="run-all-idl" depends="compile-idl-compiler">
+    <target name="run-all-idl" depends="verify-maven-jars">
         <echo message="Copying .idl files"/>
         <copy todir="${lib.dir}" flatten="yes" overwrite="false">
             <fileset dir="${src.dir}" includes="org/omg/CORBA/*.idl"/>
         </copy>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
-            <param name="corba-value" value="-corba 3.0"/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes"  value="-pkgPrefix PortableServer org.omg"/>
-            <param name="idl-value"     value="${src.dir}/org/omg/PortableServer/poa.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/PortableServer"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
-            <param name="corba-value" value="-corba 3.0"/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value="-D CORBA3"/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix IOP org.omg"/>
-            <param name="idl-value"
-             value="${src.dir}/org/omg/PortableInterceptor/IOP.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/IOP"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
-            <param name="corba-value" value="-corba 3.0"/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value"
-             value="${src.dir}/org/omg/PortableInterceptor/CORBAX.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/CORBA"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
-            <param name="corba-value" value="-corba 3.0"/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix Messaging org.omg"/>
-            <param name="idl-value"
-             value="${src.dir}/org/omg/PortableInterceptor/Messaging.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/Messaging"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
-            <param name="corba-value" value="-corba 3.0"/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value="-D CORBA3"/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes"
-             value="-pkgPrefix PortableInterceptor org.omg -pkgPrefix Dynamic org.omg -pkgPrefix IOP org.omg"/>
-            <param name="idl-value"
-             value="${src.dir}/org/omg/PortableInterceptor/Interceptors.idl"/>
-            <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/org/omg/PortableInterceptor"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/CORBA"/>
-            <param name="corba-value" value="-corba 3.0"/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix DynamicAny org.omg"/>
-            <param name="idl-value"
-             value="${src.dir}/org/omg/DynamicAny/DynamicAny.idl"/>
-            <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/org/omg/DynamicAny"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/CosNaming"/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix CosNaming org.omg"/>
-            <param name="idl-value"
-             value="${src.dir}/org/omg/CosNaming/nameservice.idl"/>
-            <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/org/omg/CosNaming"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer -i ${src.dir}/org/omg/CosTransactions"/>
-            <param name="corba-value" value="-corba 3.0"/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value="-D CORBA3"/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes"
-             value="-pkgPrefix CosTransactions org.omg"/>
-            <param name="idl-value"
-             value="${src.dir}/org/omg/CosTransactions/CosTransactions.idl"/>
-            <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/org/omg/CosTransactions"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
-            <param name="corba-value" value="-corba 3.0"/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value="-D CORBA3"/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes"
-             value="-pkgPrefix CosTSInteroperation org.omg"/>
-            <param name="idl-value"
-             value="${src.dir}/org/omg/CosTransactions/CosTSInteroperation.idl"/>
-            <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/org/omg/CosTSInteroperation"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/ee/org/omg/CSI"/>
+            <param name="includes-value" value="-i ${csiv2.idl.dir} -i ${omgapi.idl.dir} -i ${omgapi.include.dir}"/>
             <param name="corba-value" value=""/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value=""/>
@@ -1447,16 +1316,14 @@
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes"
              value="-pkgPrefix CSI com.sun.corba.ee.org.omg"/>
-            <param name="idl-value"
-             value="${src.dir}/com/sun/corba/ee/org/omg/CSI/CSI.idl"/>
+            <param name="idl-value" value="${csiv2.idl.dir}/CSI.idl"/>
             <param name="idl-gensrc-dir"
              value="${gensrc.dir}/com/sun/corba/ee/org/omg/CSI"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/ee/org/omg/CSI"/>
+            <param name="includes-value" value="-i ${csiv2.idl.dir} -i ${omgapi.idl.dir} -i ${omgapi.include.dir}"/>
             <param name="corba-value" value=""/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value=""/>
@@ -1464,16 +1331,14 @@
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes"
              value="-pkgPrefix GSSUP com.sun.corba.ee.org.omg -pkgPrefix CSI com.sun.corba.ee.org.omg"/>
-            <param name="idl-value"
-             value="${src.dir}/com/sun/corba/ee/org/omg/GSSUP/GSSUP.idl"/>
+            <param name="idl-value" value="${csiv2.idl.dir}/GSSUP.idl"/>
             <param name="idl-gensrc-dir"
              value="${gensrc.dir}/com/sun/corba/ee/org/omg/GSSUP"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value"
-             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/ee/org/omg/CSI"/>
+            <param name="includes-value" value="-i ${csiv2.idl.dir} -i ${omgapi.idl.dir} -i ${omgapi.include.dir}"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value="-D CORBA3"/>
@@ -1481,8 +1346,7 @@
             <param name="pkg-translate" value="-pkgTranslate IOP org.omg.IOP"/>
             <param name="pkg-prefixes"
              value="-pkgPrefix CSIIOP com.sun.corba.ee.org.omg -pkgPrefix CSI com.sun.corba.ee.org.omg"/>
-            <param name="idl-value"
-             value="${src.dir}/com/sun/corba/ee/org/omg/CSIIOP/CSIIOP.idl"/>
+            <param name="idl-value" value="${csiv2.idl.dir}/CSIIOP.idl"/>
             <param name="idl-gensrc-dir"
              value="${gensrc.dir}/com/sun/corba/ee/org/omg/CSIIOP"/>
             <param name="generated-files" value="**/*.java"/>

@@ -41,7 +41,7 @@
 package corba.simpledynamic;
 
 import org.glassfish.pfl.basic.func.NullaryFunction;
-import com.sun.corba.ee.impl.orbutil.newtimer.generated.TimingPoints;
+//import com.sun.corba.ee.impl.orbutil.newtimer.generated.TimingPoints;
 import org.glassfish.pfl.tf.timer.spi.TimerManager;
 import org.glassfish.pfl.tf.timer.spi.TimerGroup;
 import org.glassfish.pfl.tf.timer.spi.LogEventHandler;
@@ -335,6 +335,7 @@ public class FrameworkClient extends Framework {
         }
     }
 
+/*
     private static class CDRTimerContext {
         private LogEventHandler clientLEH ;
         private LogEventHandler serverLEH ;
@@ -376,18 +377,21 @@ public class FrameworkClient extends Framework {
             serverLEH.clear() ;
         }
     }
+*/
 
     private static final boolean DEBUG_5161 = false ;
 
     private Echo clientRef5161 = null ;
-    private CDRTimerContext timerContext = null ;
+    //private CDRTimerContext timerContext = null ;
 
     private void doOperation( String msg, NullaryFunction func ) {
         System.out.println( msg ) ;
         try {
+/*
             if (DEBUG_5161) {
                 timerContext.enable() ;
             }
+*/
 
             func.evaluate() ;
         // } catch (Exception exc) {
@@ -395,13 +399,16 @@ public class FrameworkClient extends Framework {
             // exc.printStackTrace() ;
             // Assert.fail( "Failed with exception " + exc ) ;
         } finally {
+/*
             if (DEBUG_5161) {
                 timerContext.disable() ;
                 timerContext.display( msg ) ;
                 timerContext.clear() ;
             }
+*/
         }
     }
+/*
 
     @BeforeGroups( { GROUP_5161 } )
     public void init5161() {
@@ -443,6 +450,7 @@ public class FrameworkClient extends Framework {
             }
         } ) ;
     }
+*/
 
     // @Test( groups = { GROUP_5161 } )
     public void test5161() throws RemoteException {

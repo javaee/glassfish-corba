@@ -1675,7 +1675,7 @@
         <delete dir="${test.run.base}" quiet="false"/>
     </target>
 
-    <target name="test-rmi-iiop" depends="test-init">
+    <target name="test-rmi-iiop" depends="clean-test-output, test-init">
         <java classname="com.sun.corba.ee.impl.util.ORBProperties" classpathref="test-classpath.master"/>
         <run-test args="-file ../src/share/classes/test/AllTests.tdesc -verbose"/>
     </target>

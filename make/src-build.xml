@@ -121,6 +121,7 @@
         <property name="idlc.jar"       value="${m2.repo}/com/sun/corba/idlc/${m2-orb.version}/idlc-${m2-orb.version}.jar"/>
         <property name="omgapi.jar"     value="${m2.repo}/com/sun/corba/glassfish-corba-omgapi/${m2-orb.version}/glassfish-corba-omgapi-${m2-orb.version}.jar"/>
         <property name="csiv2-idl.jar"  value="${m2.repo}/com/sun/corba/glassfish-corba-csiv2-idl/${m2-orb.version}/glassfish-corba-csiv2-idl-${m2-orb.version}.jar"/>
+        <property name="orb.jar"        value="${m2.repo}/com/sun/corba/glassfish-corba-orb/${m2-orb.version}/glassfish-corba-orb-${m2-orb.version}.jar"/>
 
 
         <!-- javac flags -->
@@ -186,6 +187,7 @@
         <path id="classpath.master">
             <path refid="dependency.classpath"/>
 
+            <pathelement location="${orb.jar}"/>
             <pathelement location="${csiv2-idl.jar}"/>
             <pathelement location="${omgapi.jar}"/>
             <pathelement location="${classes.dir}"/>
@@ -448,32 +450,7 @@
     </target>
 
     <target name="make-bundles" depends="init, make-src-bundle">
-        <make-bundle 
-            classpath="${classes.dir}" 
-            version="${orb.version}"
-            outDir="${releaselib.dir}/bundles"
-            bundlename="glassfish-corba-orb"
-            outFile="glassfish-corba-orb.jar">
-            <directive-list>
-                <directive type="Export-Package" name="orb.export"/>
-                <directive type="Private-Package" name="orb.private"/>
-                <directive type="ORB-Class-Provider" name="orb.orb-class-provider"/>
-                <directive type="Bundle-Activator" value="com.sun.corba.ee.impl.osgi.loader.OSGIListener"/>
-                <directive type="DynamicImport-Package" value="org.glassfish.flashlight.provider"/>
-                <directive type="Probe-Provider-Class-Names" name="orb.probe-provider-class-names"/>
-            </directive-list>
-        </make-bundle>
         <make-bundle
-            classpath="${classes.dir}" 
-            version="${orb.version}"
-            outDir="${releaselib.dir}/bundles"
-            bundlename="glassfish-corba-internal-api"
-            outFile="glassfish-corba-internal-api.jar">
-            <directive-list>
-                <directive type="Export-Package" name="internal-api.export"/>
-            </directive-list>
-        </make-bundle>
-        <make-bundle 
             classpath="${classes.dir}" 
             version="${orb.version}"
             outDir="${releaselib.dir}/bundles"
@@ -1275,7 +1252,7 @@
 
     <target name="build" depends="init, compile, 
         generate-orb-resources, enhance-orb,
-        compile-timing-points, make-bundles, make-poms, subset-build, archive-bundles"/>
+        compile-timing-points"/>
 
     <target name="subset-build" depends="make-subset-bundles, make-subset-poms"/>
 

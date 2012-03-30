@@ -144,8 +144,6 @@ public class AnyImpl extends Any {
     // in a BAD_OPERATION exception being raised.
     private boolean isInitialized = false;
 
-    private static final int DEFAULT_BUFFER_SIZE = 32;
-
     /*
      * This boolean array tells us if a given typecode must be
      * streamed. Objects that are immutable don't have to be streamed.
@@ -199,16 +197,6 @@ public class AnyImpl extends Any {
         orb = null ;
     }
 
-    static AnyImpl convertToNative(ORB orb, Any any) {
-        if (any instanceof AnyImpl) {
-            return (AnyImpl)any;
-        } else {
-            AnyImpl anyImpl = new AnyImpl(orb, any);
-            anyImpl.typeCode = TypeCodeImpl.convertToNative(orb, anyImpl.typeCode);
-            return anyImpl;
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // Constructors
 
@@ -258,7 +246,7 @@ public class AnyImpl extends Any {
     /**
      * returns the type of the element contained in the Any.
      *
-     * @result          the TypeCode for the element in the Any
+     * @return          the TypeCode for the element in the Any
      */
     public TypeCode type() {
         return typeCode;
@@ -303,7 +291,7 @@ public class AnyImpl extends Any {
      * checks for equality between Anys.
      *
      * @param otherAny  the Any to be compared with.
-     * @result          true if the Anys are equal, false otherwise.
+     * @return          true if the Anys are equal, false otherwise.
      */
     @DynamicType
     public boolean equal(Any otherAny) {
@@ -475,10 +463,7 @@ public class AnyImpl extends Any {
                         throw wrapper.unionDiscriminatorError();
                     }
 
-                    if ( ! equalMember(realType.member_type(memberIndex), myStream, otherStream)) {
-                        return false;
-                    }
-                    return true;
+                    return equalMember(realType.member_type(memberIndex), myStream, otherStream);
                 }
                 case TCKind._tk_sequence: {
                     int length = myStream.read_long();
@@ -534,7 +519,7 @@ public class AnyImpl extends Any {
     /**
      * returns an output stream that an Any value can be marshaled into. 
      *
-     * @result          the OutputStream to marshal value of Any into
+     * @return          the OutputStream to marshal value of Any into
      */
     public org.omg.CORBA.portable.OutputStream create_output_stream()
     {
@@ -545,7 +530,7 @@ public class AnyImpl extends Any {
     /**
      * returns an input stream that an Any value can be marshaled out of.
      *
-     * @result          the InputStream to marshal value of Any out of.
+     * @return          the InputStream to marshal value of Any out of.
      */
     @DynamicType
     public org.omg.CORBA.portable.InputStream create_input_stream() {
@@ -593,7 +578,7 @@ public class AnyImpl extends Any {
             } else {
                 org.omg.CORBA_2_3.portable.OutputStream out =
                     (org.omg.CORBA_2_3.portable.OutputStream)orb.create_output_stream();
-                typeCode.copy((org.omg.CORBA_2_3.portable.InputStream)in, out);
+                typeCode.copy(in, out);
                 stream = (CDRInputObject)out.create_input_stream();
             }
         } else {
@@ -692,15 +677,15 @@ public class AnyImpl extends Any {
         }
 
         int tc = realType().kind().value() ;
-        for (int ctr=0; ctr<expected.length; ctr++) {
-            if (tc == expected[ctr]) {
+        for (int anExpected1 : expected) {
+            if (tc == anExpected1) {
                 return;
             }
         }
 
         List<String> list = new ArrayList<String>() ;
-        for (int ctr=0; ctr<expected.length; ctr++) {
-            list.add(getTCKindName(expected[ctr]));
+        for (int anExpected : expected) {
+            list.add(getTCKindName(anExpected));
         }
 
         String tcName = getTCKindName( tc ) ;
@@ -887,7 +872,7 @@ public class AnyImpl extends Any {
     {
         //debug.log ("extract_boolean");
         checkExtractBadOperation( TCKind._tk_boolean ) ;
-        return (value == 0)? false: true;
+        return value != 0;
     }
 
     /**
@@ -962,7 +947,7 @@ public class AnyImpl extends Any {
         //debug.log ("insert_string");
         // Make sure type code information for bounded strings is not erased
         if (typeCode.kind() == TCKind.tk_string) {
-            int length = 0;
+            int length;
             try { 
                 length = typeCode.length(); 
             } catch (BadKind bad) {
@@ -971,8 +956,7 @@ public class AnyImpl extends Any {
 
             // Check if bounded strings length is not exceeded
             if (length != 0 && s != null && s.length() > length) {
-                throw wrapper.badStringBounds( Integer.valueOf( s.length() ),
-                                               Integer.valueOf( length ) ) ;
+                throw wrapper.badStringBounds(s.length(), length) ;
             }
         } else {
             typeCode = orb.get_primitive_tc(TCKind._tk_string);
@@ -999,7 +983,7 @@ public class AnyImpl extends Any {
         //debug.log ("insert_wstring");
         // Make sure type code information for bounded strings is not erased
         if (typeCode.kind() == TCKind.tk_wstring) {
-            int length = 0;
+            int length;
             try { 
                 length = typeCode.length(); 
             } catch (BadKind bad) {
@@ -1103,7 +1087,7 @@ public class AnyImpl extends Any {
         }
 
         // Check if the object contained here is of the type in typeCode
-        org.omg.CORBA.Object obj = null;
+        org.omg.CORBA.Object obj;
         try {
             obj = (org.omg.CORBA.Object) object;
             if (typeCode.id().equals("IDL:omg.org/CORBA/Object:1.0") || obj._is_a(typeCode.id())) {
@@ -1305,6 +1289,9 @@ public class AnyImpl extends Any {
      * It's used by createTypeCodeForClass.  The tcORB passed in
      * should have the desired ORB version, and is used to
      * create the type codes.
+     * @param c the class
+     * @param tcORB the orb to use to find the type code
+     * @return the appropriate primitive type code
      */
     private TypeCode getPrimitiveTypeCodeForClass (Class c, ORB tcORB)
     {
@@ -1346,17 +1333,6 @@ public class AnyImpl extends Any {
             // _REVISIT_ Not sure if this is right.
             return tcORB.get_primitive_tc (TCKind.tk_any);
         }
-    }
-
-    // Extracts a member value according to the given TypeCode from the given complex Any
-    // (at the Anys current internal stream position, consuming the anys stream on the way)
-    // and returns it wrapped into a new Any
-    public Any extractAny(TypeCode memberType, ORB orb) {
-        Any returnValue = orb.create_any();
-        OutputStream out = returnValue.create_output_stream();
-        TypeCodeImpl.convertToNative(orb, memberType).copy((InputStream)stream, out);
-        returnValue.read_value(out.create_input_stream(), memberType);
-        return returnValue;
     }
 
     // This method could very well be moved into TypeCodeImpl or a common utility class,

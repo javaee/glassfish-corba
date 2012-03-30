@@ -120,6 +120,7 @@
         <property name="m2-orb.version" value="4.0-SNAPSHOT"/>
         <property name="idlc.jar"       value="${m2.repo}/com/sun/corba/idlc/${m2-orb.version}/idlc-${m2-orb.version}.jar"/>
         <property name="omgapi.jar"     value="${m2.repo}/com/sun/corba/glassfish-corba-omgapi/${m2-orb.version}/glassfish-corba-omgapi-${m2-orb.version}.jar"/>
+        <property name="csiv2-idl.jar"  value="${m2.repo}/com/sun/corba/glassfish-corba-csiv2-idl/${m2-orb.version}/glassfish-corba-csiv2-idl-${m2-orb.version}.jar"/>
 
 
         <!-- javac flags -->
@@ -185,6 +186,7 @@
         <path id="classpath.master">
             <path refid="dependency.classpath"/>
 
+            <pathelement location="${csiv2-idl.jar}"/>
             <pathelement location="${omgapi.jar}"/>
             <pathelement location="${classes.dir}"/>
             <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
@@ -461,29 +463,7 @@
                 <directive type="Probe-Provider-Class-Names" name="orb.probe-provider-class-names"/>
             </directive-list>
         </make-bundle>
-        <make-bundle 
-            classpath="${classes.dir}" 
-            version="${orb.version}"
-            outDir="${releaselib.dir}/bundles"
-            bundlename="glassfish-corba-omgapi"
-            outFile="glassfish-corba-omgapi.jar">
-            <directive-list>
-                <directive type="Export-Package" name="omgapi.export"/>
-                <directive type="Import-Package" value="!*"/>
-                <directive type="Fragment-Host" value="system.bundle; extension:=framework"/>
-            </directive-list>
-        </make-bundle>
-        <make-bundle 
-            classpath="${classes.dir}" 
-            version="${orb.version}"
-            outDir="${releaselib.dir}/bundles"
-            bundlename="glassfish-corba-csiv2-idl"
-            outFile="glassfish-corba-csiv2-idl.jar">
-            <directive-list>
-                <directive type="Export-Package" name="csiv2-idl.export"/>
-            </directive-list>
-        </make-bundle>
-        <make-bundle 
+        <make-bundle
             classpath="${classes.dir}" 
             version="${orb.version}"
             outDir="${releaselib.dir}/bundles"
@@ -937,7 +917,10 @@
               message="the idlc jar was not found - it should be built with maven before starting this build."/>
         <available file="${omgapi.jar}" property="omgapi.jar.exists"/>
         <fail unless="omgapi.jar.exists"
-              message="the omgapi jar was not found - it should be built with maven before starting this build."/>
+              message="the glassfish-corba-omgapi jar was not found - it should be built with maven before starting this build."/>
+        <available file="${csiv2-idl.jar}" property="csiv2-idl.jar.exists"/>
+        <fail unless="csiv2-idl.jar.exists"
+              message="the glassfish-corba-csiv2-idl jar was not found - it should be built with maven before starting this build."/>
     </target>
 
 
@@ -1153,29 +1136,6 @@
                  version="true"
                  use="true"
                  windowtitle="${subset2}"/>
-
-        <!-- =================================================== -->
-
-        <mkdir dir="${javadoc.dir}/${subset3}"/>
-        <javadoc packagenames="${subset3-doc-includes}"
-                 sourcepath="${src.dir}:${gensrc.dir}"
-                 classpathref="classpath.master"
-                 destdir="${javadoc.dir}/${subset3}"
-                 author="true"
-                 version="true"
-                 use="true"
-                 windowtitle="${subset3}"/>
-        <!-- =================================================== -->
-
-        <mkdir dir="${javadoc.dir}/${subset4}"/>
-        <javadoc packagenames="${subset4-doc-includes}"
-                 sourcepath="${src.dir}:${gensrc.dir}"
-                 classpathref="classpath.master"
-                 destdir="${javadoc.dir}/${subset4}"
-                 author="true"
-                 version="true"
-                 use="true"
-                 windowtitle="${subset4}"/>
     </target>
 
     <target name="javadoc-bundle-subsets" depends="javadoc-subsets">
@@ -1189,20 +1149,6 @@
         <jar jarfile="${releaselib.dir}/bundles/${subset2}-javadocs.jar"
             duplicate="fail">
             <fileset dir="${javadoc.dir}/${subset2}">
-                <include name="**/**"/>
-            </fileset>
-        </jar>
-
-        <jar jarfile="${releaselib.dir}/bundles/${subset3}-javadocs.jar"
-            duplicate="fail">
-            <fileset dir="${javadoc.dir}/${subset3}">
-                <include name="**/**"/>
-            </fileset>
-        </jar>
-
-        <jar jarfile="${releaselib.dir}/bundles/${subset4}-javadocs.jar"
-            duplicate="fail">
-            <fileset dir="${javadoc.dir}/${subset4}">
                 <include name="**/**"/>
             </fileset>
         </jar>
@@ -1306,52 +1252,7 @@
         <copy todir="${lib.dir}" flatten="yes" overwrite="false">
             <fileset dir="${src.dir}" includes="org/omg/CORBA/*.idl"/>
         </copy>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${csiv2.idl.dir} -i ${omgapi.idl.dir} -i ${omgapi.include.dir}"/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes"
-             value="-pkgPrefix CSI com.sun.corba.ee.org.omg"/>
-            <param name="idl-value" value="${csiv2.idl.dir}/CSI.idl"/>
-            <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/com/sun/corba/ee/org/omg/CSI"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${csiv2.idl.dir} -i ${omgapi.idl.dir} -i ${omgapi.include.dir}"/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes"
-             value="-pkgPrefix GSSUP com.sun.corba.ee.org.omg -pkgPrefix CSI com.sun.corba.ee.org.omg"/>
-            <param name="idl-value" value="${csiv2.idl.dir}/GSSUP.idl"/>
-            <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/com/sun/corba/ee/org/omg/GSSUP"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${csiv2.idl.dir} -i ${omgapi.idl.dir} -i ${omgapi.include.dir}"/>
-            <param name="corba-value" value="-corba 3.0"/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value="-D CORBA3"/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value="-pkgTranslate IOP org.omg.IOP"/>
-            <param name="pkg-prefixes"
-             value="-pkgPrefix CSIIOP com.sun.corba.ee.org.omg -pkgPrefix CSI com.sun.corba.ee.org.omg"/>
-            <param name="idl-value" value="${csiv2.idl.dir}/CSIIOP.idl"/>
-            <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/com/sun/corba/ee/org/omg/CSIIOP"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
+         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
             <param name="includes-value"
              value="-i ${gensrc.dir}/com/sun/corba/ee/spi/activation"/>

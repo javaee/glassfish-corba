@@ -49,23 +49,8 @@
                   </execution>
                 </executions>
                 <configuration>
-                    <includeDirs>
-                        <includeDir>src/main/idl-includes</includeDir>
-                    </includeDirs>
                     <sources>
                         <source>
-                            <packagePrefixes>
-                                <packagePrefix><type>CosNaming</type>          <prefix>org.omg</prefix></packagePrefix>
-                                <packagePrefix><type>CosTransactions</type>    <prefix>org.omg</prefix></packagePrefix>
-                                <packagePrefix><type>CosTSInteroperation</type><prefix>org.omg</prefix></packagePrefix>
-                                <packagePrefix><type>CosTSPortability</type>   <prefix>org.omg</prefix></packagePrefix>
-                                <packagePrefix><type>Dynamic</type>            <prefix>org.omg</prefix></packagePrefix>
-                                <packagePrefix><type>DynamicAny</type>         <prefix>org.omg</prefix></packagePrefix>
-                                <packagePrefix><type>IOP</type>                <prefix>org.omg</prefix></packagePrefix>
-                                <packagePrefix><type>Messaging</type>          <prefix>org.omg</prefix></packagePrefix>
-                                <packagePrefix><type>PortableInterceptor</type><prefix>org.omg</prefix></packagePrefix>
-                                <packagePrefix><type>PortableServer</type>     <prefix>org.omg</prefix></packagePrefix>
-                            </packagePrefixes>
                             <defines>
                                 <define>
                                     <symbol>CORBA3</symbol>

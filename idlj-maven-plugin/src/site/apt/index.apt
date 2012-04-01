@@ -1,0 +1,24 @@
+ ------
+ Introduction 
+ ------
+ Jesse McConnell <jesse.mcconnell@gmail.com>
+ ------
+ Mon Nov 13 2006
+ ------
+
+CORBA IDL Compiler Maven Plugin
+
+ The CORBA IDL Compiler Maven Plugin is used for processing IDL files into java
+ sources.
+
+* Goals Overview
+
+   The CORBA IDL Compiler Maven Plugin has two goals:
+
+   * {{{generate-mojo.html} idlj:generate}} Process CORBA IDL files in IDLJ.
+
+   * {{{generate-test-mojo.html} idlj:generate-test}} Process CORBA IDL test files in IDLJ.
+
+* Usage
+
+  Instructions on how to use the CORBA IDL Compiler Maven Plugin can be found on the {{{usage.html}usage page}}.

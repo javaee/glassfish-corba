@@ -25,7 +25,6 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -62,7 +61,6 @@ public class IdljTranslator
      * @param idlFile the path to the file to compile
      * @param source the source tag available in the configuration tree of the maven plugin
      * @throws MojoExecutionException the exception is thrown whenever the compilation fails or crashes
-     * @see CompilerTranslator#invokeCompiler(String, List, String, String, Source)
      */
     public void invokeCompiler( String sourceDirectory, File[] includeDirs, String targetDirectory, String idlFile,
                                 Source source )
@@ -176,11 +174,10 @@ public class IdljTranslator
     private Class getCompilerClass()
         throws MojoExecutionException
     {
-        ClassLoader cl = this.getClass().getClassLoader();
         Class idljCompiler;
         try
         {
-            idljCompiler = Class.forName( getIDLCompilerClass() );
+            idljCompiler = getClassLoaderFacade().loadClass(getIDLCompilerClass());
         }
         catch ( ClassNotFoundException e )
         {
@@ -189,7 +186,7 @@ public class IdljTranslator
                 File javaHome = new File( System.getProperty( "java.home" ) );
                 File toolsJar = new File( javaHome, "../lib/tools.jar" );
                 URL toolsJarUrl = toolsJar.toURL();
-                URLClassLoader urlLoader = new URLClassLoader( new URL[] { toolsJarUrl }, cl );
+                getClassLoaderFacade().prependUrls(toolsJarUrl);
 
                 // Unfortunately the idlj compiler reads messages using the
                 // system class path.
@@ -198,9 +195,9 @@ public class IdljTranslator
                     + System.getProperty( "path.separator" ) + toolsJar.getAbsolutePath() );
                 if ( System.getProperty( "java.vm.name" ).indexOf( "HotSpot" ) != -1 )
                 {
-                    urlLoader.loadClass( "com.sun.tools.corba.se.idl.som.cff.FileLocator" );
+                    getClassLoaderFacade().loadClass("com.sun.tools.corba.se.idl.som.cff.FileLocator");
                 }
-                idljCompiler = urlLoader.loadClass( getIDLCompilerClass() );
+                idljCompiler = getClassLoaderFacade().loadClass(getIDLCompilerClass());
             }
             catch ( Exception notUsed )
             {

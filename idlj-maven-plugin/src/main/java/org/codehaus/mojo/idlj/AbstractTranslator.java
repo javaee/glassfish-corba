@@ -21,6 +21,9 @@ package org.codehaus.mojo.idlj;
 
 import org.apache.maven.plugin.logging.Log;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+
 /**
  * Shared capabilities for translators.
  * 
@@ -45,6 +48,9 @@ public abstract class AbstractTranslator
      * the <code>Log</code> that will used for the messages
      */
     private Log log;
+
+    /* A facade to enable unit testing to control compiler access. */
+    private static ClassLoaderFacade classLoaderFacade = new ClassLoaderFacadeImpl();
 
     /**
      * @return the debug
@@ -94,4 +100,42 @@ public abstract class AbstractTranslator
         this.failOnError = failOnError;
     }
 
+    static void setClassLoaderFacade(ClassLoaderFacade classLoaderFacade) {
+        AbstractTranslator.classLoaderFacade = classLoaderFacade;
+    }
+
+    protected ClassLoaderFacade getClassLoaderFacade() {
+        return classLoaderFacade;
+    }
+
+    /**
+     An interface for loading the proper IDL compiler class.
+     */
+    public static interface ClassLoaderFacade {
+        void prependUrls(URL... urls);
+
+        Class loadClass(String idlCompilerClass) throws ClassNotFoundException;
+
+        URL getResource(String resourceName);
+    }
+
+    /**
+     * The implementation of ClassLoaderFacade used at runtime.
+     */
+    static class ClassLoaderFacadeImpl implements ClassLoaderFacade {
+        ClassLoader classLoader = getClass().getClassLoader();
+
+        public void prependUrls(URL... urls) {
+            classLoader = new URLClassLoader(urls, classLoader);
+        }
+
+        public Class loadClass(String idlCompilerClass) throws ClassNotFoundException {
+            return classLoader.loadClass(idlCompilerClass);
+        }
+
+        public URL getResource(String resourceName) {
+            return classLoader.getResource( resourceName );
+        }
+
+    }
 }

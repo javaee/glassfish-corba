@@ -184,7 +184,6 @@ public class JacorbTranslator
      * @param idlFile the path to the file to compile
      * @param source //TODO ???
      * @throws MojoExecutionException the exeception is thrown whenever the compilation fails or crashes
-     * @see CompilerTranslator#invokeCompiler(String, List, String, String, Source)
      */
     public void invokeCompiler( String sourceDirectory, File[] includeDirs, String targetDirectory, String idlFile,
                                 Source source )
@@ -261,7 +260,7 @@ public class JacorbTranslator
         Class compilerClass;
         try
         {
-            compilerClass = Class.forName( "org.jacorb.idl.parser" );
+            compilerClass = getClassLoaderFacade().loadClass("org.jacorb.idl.parser");
         }
         catch ( ClassNotFoundException e )
         {

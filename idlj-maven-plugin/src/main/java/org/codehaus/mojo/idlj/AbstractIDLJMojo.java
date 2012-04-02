@@ -103,6 +103,26 @@ public abstract class AbstractIDLJMojo
     private String compiler;
 
     /**
+     * The interface between this class and the rest of the world - unit tests replace the default implementation.
+     */
+    private DependenciesFacade dependenciesFacade;
+
+    /**
+     * The default implementation of the dependencies.
+     */
+    private static final DependenciesFacade DEPENDENCIES_FACADE = new DependenciesFacadeImpl();
+
+
+    protected AbstractIDLJMojo() {
+        this( DEPENDENCIES_FACADE );
+
+    }
+
+    AbstractIDLJMojo( DependenciesFacade dependenciesFacade ) {
+        this.dependenciesFacade = dependenciesFacade;
+    }
+
+    /**
      * @return the source directory that contains the IDL files
      * @throws MojoExecutionException
      */
@@ -129,18 +149,18 @@ public abstract class AbstractIDLJMojo
     public void execute()
         throws MojoExecutionException
     {
-        if ( !getOutputDirectory().exists() )
+        if ( !dependenciesFacade.exists(getOutputDirectory()))
         {
-            getOutputDirectory().mkdirs();
+            dependenciesFacade.createDirectory(getOutputDirectory());
         }
-        if ( !getOutputDirectory().canWrite() )
-            throw new MojoExecutionException( "Cannot write in : " + getOutputDirectory() );
+        if ( !dependenciesFacade.isWriteable(getOutputDirectory()))
+            throw new MojoExecutionException( "Cannot write in : " + getOutputDirectory());
 
         addCompileSourceRoot();
 
-        if ( !timestampDirectory.exists() )
+        if ( !dependenciesFacade.exists(timestampDirectory))
         {
-            timestampDirectory.mkdirs();
+            dependenciesFacade.createDirectory(timestampDirectory);
         }
 
         CompilerTranslator translator;
@@ -167,10 +187,8 @@ public abstract class AbstractIDLJMojo
 
         if ( sources != null )
         {
-            for ( Iterator it = sources.iterator(); it.hasNext(); )
-            {
-                Source source = (Source) it.next();
-                processSource( source, translator );
+            for (Object source : sources) {
+                processSource((Source)source, translator);
             }
         }
         else
@@ -210,7 +228,7 @@ public abstract class AbstractIDLJMojo
             {
                 URI relativeURI = getSourceDirectory().toURI().relativize( idlFile.toURI() );
                 File timestampFile = new File( timestampDirectory.toURI().resolve( relativeURI ) );
-                FileUtils.copyFile( idlFile, timestampFile );
+                dependenciesFacade.copyFile(idlFile, timestampFile);
             }
             catch ( IOException e )
             {
@@ -222,9 +240,9 @@ public abstract class AbstractIDLJMojo
     /**
      * Determine which idl files need to be compiled.
      *
-     * @param source the <code>Source</code> that rapresent which file to compile
-     * @return a set of file that need to be compiled
-     * @throws MojoExecutionException if the selection of the file to compile fails
+     * @param source the <code>Source</code> that represents which files to compile
+     * @return a set of files that need to be compiled
+     * @throws MojoExecutionException if the selection of the files to compile fails
      */
     private Set computeStaleGrammars( Source source )
         throws MojoExecutionException
@@ -242,7 +260,7 @@ public abstract class AbstractIDLJMojo
         {
             excludes = new HashSet();
         }
-        SourceInclusionScanner scanner = new StaleSourceScanner( staleMillis, includes, excludes );
+        SourceInclusionScanner scanner = dependenciesFacade.createSourceInclusionScanner(staleMillis, includes, excludes);
         scanner.addSourceMapping( new SuffixMapping( ".idl", ".idl" ) );
 
         Set staleSources = new HashSet();
@@ -251,7 +269,7 @@ public abstract class AbstractIDLJMojo
         getLog().debug( "sourceDir : " + sourceDir );
         try
         {
-            if ( sourceDir.exists() && sourceDir.isDirectory() )
+            if ( dependenciesFacade.exists(sourceDir) && dependenciesFacade.isDirectory(sourceDir))
             {
                 staleSources.addAll( scanner.getIncludedSources( sourceDir, timestampDirectory ) );
             }
@@ -291,6 +309,48 @@ public abstract class AbstractIDLJMojo
     protected MavenProjectHelper getProjectHelper()
     {
         return projectHelper;
+    }
+
+    interface DependenciesFacade {
+
+        SourceInclusionScanner createSourceInclusionScanner(int updatedWithinMsecs, Set includes, Set excludes);
+
+        void copyFile(File sourceFile, File targetFile) throws IOException;
+
+        boolean exists(File outputDirectory);
+
+        void createDirectory(File directory);
+
+        boolean isWriteable(File directory);
+
+        boolean isDirectory(File file);
+    }
+
+    static class DependenciesFacadeImpl implements DependenciesFacade {
+
+        public void copyFile(File sourceFile, File targetFile) throws IOException {
+            FileUtils.copyFile(sourceFile, targetFile);
+        }
+
+        public SourceInclusionScanner createSourceInclusionScanner(int updatedWithinMsecs, Set includes, Set excludes) {
+            return new StaleSourceScanner(updatedWithinMsecs, includes, excludes );
+        }
+
+        public boolean exists(File file) {
+            return file.exists();
+        }
+
+        public void createDirectory(File directory) {
+            directory.mkdirs();
+        }
+
+        public boolean isWriteable(File directory) {
+            return directory.canWrite();
+        }
+
+        public boolean isDirectory(File file) {
+            return file.isDirectory();
+        }
     }
 
 }

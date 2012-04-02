@@ -55,6 +55,14 @@ public class IDLJMojo
      */
     private File outputDirectory;
 
+
+    public IDLJMojo() {
+    }
+
+    public IDLJMojo(DependenciesFacade dependenciesFacade) {
+        super(dependenciesFacade);
+    }
+
     /**
      * @return the source directory that contains the IDL files
      * @throws MojoExecutionException

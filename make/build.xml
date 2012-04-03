@@ -136,6 +136,7 @@
 
     <target name="compile-tests-main-gen" depends="init">
         <echo message="Compiling all tests"/>
+        <mkdir dir="${test-classes.dir}"/>
         <javac destdir="${test-classes.dir}" 
                 classpathref="test-classpath.master"
                 deprecation="${deprecation}"
@@ -246,6 +247,7 @@
              values1 and values2 contain different versions of the
              same classes for testing class evolution.
         -->
+        <mkdir dir="${test-values1.dir}"/>
         <javac destdir="${test-values1.dir}" 
                 classpathref="test-classpath.master"
                 deprecation="${deprecation}"
@@ -256,6 +258,7 @@
             <src path="${test.src.dir}/values1"/>
             <include name="**"/>
         </javac>
+        <mkdir dir="${test-values2.dir}"/>
         <javac destdir="${test-values2.dir}" 
                 classpathref="test-classpath.master"
                 deprecation="${deprecation}"
@@ -1797,6 +1800,9 @@
     </patternset>
 
     <target name="instrument-cobertura" depends="init">
+        <mkdir dir="${cobertura.classes.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${orblib.classes.dir}"/>
         <cobertura-instrument todir="${cobertura.classes.dir}" datafile="${cobertura.instrument.datafile}">
             <fileset dir="${classes.dir}">
                 <patternset refid="gf.orb.classes"/>

@@ -123,6 +123,7 @@
         <property name="csiv2-idl.jar"  value="${m2.repo}/com/sun/corba/glassfish-corba-csiv2-idl/${m2-orb.version}/glassfish-corba-csiv2-idl-${m2-orb.version}.jar"/>
         <property name="orb.jar"        value="${m2.repo}/com/sun/corba/glassfish-corba-orb/${m2-orb.version}/glassfish-corba-orb-${m2-orb.version}.jar"/>
 
+        <property name="orbmain.test.classes" value="orbmain/target/test-classes"/>
 
         <!-- javac flags -->
         <property name="deprecation"            value="off"/>
@@ -672,7 +673,7 @@
     <!-- ========================= COMPILE ========================= -->
 
     <target name="compile" depends="init, compile-enhancer, 
-        verify-maven-jars, run-all-idl, delete-java-sources, copy-resources">
+        verify-maven-jars, delete-java-sources, copy-resources">
         <echo message="Compiling ORB sources"/>
         <javac destdir="${classes.dir}" 
                 classpathref="classpath.master"
@@ -1250,17 +1251,13 @@
 
     <!-- ============================== main targets ================================== -->
 
-    <target name="build" depends="init, compile, 
-        generate-orb-resources, enhance-orb,
-        compile-timing-points"/>
+    <target name="build" depends="init, compile, generate-orb-resources"/>
 
     <target name="subset-build" depends="make-subset-bundles, make-subset-poms"/>
 
     <!-- no-enhance is used for Cobertura coverage, which fails miserable with enhanced classes -->
 
-    <target name="build-no-enhance" depends="init, compile, 
-        generate-orb-resources, generate-timing-points, compile-timing-points,
-        make-bundles, make-poms, archive-bundles"/>
+    <target name="build-no-enhance" depends="init, compile, generate-orb-resources, make-bundles, make-poms, archive-bundles"/>
 
     <target name="release" depends="init">
         <echo message="releasing to ${repo.url}"/>

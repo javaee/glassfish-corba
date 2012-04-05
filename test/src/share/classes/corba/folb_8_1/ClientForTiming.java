@@ -57,7 +57,7 @@ import com.sun.corba.ee.spi.transport.SocketInfo;
 import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import com.sun.corba.ee.impl.transport.ContactInfoListImpl;
-import com.sun.corba.ee.impl.orbutil.newtimer.generated.TimingPoints;
+//import com.sun.corba.ee.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.ee.spi.protocol.ClientDelegate;
 import org.glassfish.pfl.tf.timer.spi.LogEventHandler;
 import org.glassfish.pfl.tf.timer.spi.Timer;
@@ -83,11 +83,13 @@ public class ClientForTiming
     public static String[] av;
 
     public static ORB orb;
+/*
     public static TimerManager<TimingPoints> tm ;
     public static TimerFactory tf ;
     public static TimerEventController controller ;
     public static LogEventHandler log ;
     public static TimingPoints tp ;
+*/
     public static Timer totalTestTime ;
     public static Timer clientInvoke ;
 
@@ -194,17 +196,17 @@ public class ClientForTiming
         // Timing loop.
 
         setTimerPoints(true);
-        controller.enter( totalTestTime ) ;
+        //controller.enter( totalTestTime ) ;
 
         loop(NUMBER_OF_TIMING_LOOPS, failover, cache);
 
-        controller.exit( totalTestTime ) ;
+        //controller.exit( totalTestTime ) ;
         setTimerPoints(false);
 
         File file = new File(makeFileName(failoverSupport, failover, cache));
         file.delete();
 //      TimerUtils.dumpLogToFile( tf, log, file ) ;
-        log.clear() ;
+        //log.clear() ;
 
         END(failoverSupport, failover, cache);
     }
@@ -321,9 +323,9 @@ public class ClientForTiming
         dprint();
 
         for (int i = 0 ; i < times; ++i) {
-            controller.enter( clientInvoke ) ;
+            //controller.enter( clientInvoke ) ;
             i2Ref.foo(1);
-            controller.exit( clientInvoke ) ;
+            //controller.exit( clientInvoke ) ;
 
             if (failover) {
                 // We want the connection setup to show up in failover time.
@@ -364,6 +366,7 @@ public class ClientForTiming
 
         Client.setProperties(props);
         orb = (ORB) ORB.init(av, props);
+/*
         tm = orb.makeTimerManager( TimingPoints.class ) ;
         tf = tm.factory() ;
         tp = tm.points() ;
@@ -376,6 +379,7 @@ public class ClientForTiming
         // Create the extra timers for this test
         totalTestTime = tf.makeTimer( "totalTestTime", "Total Test Execution Time" ) ;
         clientInvoke = tf.makeTimer( "clientInvoke", "Execution Time of Client Invoke" ) ;
+*/
         // Not available: tp.transport().add( totalTestTime ) ;
         // Not available: tp.transport().add( clientInvoke ) ;
 

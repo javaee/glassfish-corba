@@ -61,19 +61,22 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>idlj-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <sources>
                         <source>
+                            <includes>
+                                <include>activation/*.idl</include>
+                            </includes>
                             <packagePrefixes>
-                                <packagePrefix><type>activation</type>    <prefix>com.sun.corba.ee.spi</prefix></packagePrefix>
+                                <packagePrefix><type>activation</type><prefix>com.sun.corba.ee.spi</prefix></packagePrefix>
                             </packagePrefixes>
-                            <additionalArguments>
-                                <additionalArgument>-corba</additionalArgument>
-                                <additionalArgument>3.0</additionalArgument>
-                                <additionalArgument>-pkgTranslate</additionalArgument>
-                                <additionalArgument>IOP</additionalArgument>
-                                <additionalArgument>org.omg.IOP</additionalArgument>
-                            </additionalArguments>
                         </source>
                     </sources>
                 </configuration>

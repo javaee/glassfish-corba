@@ -39,9 +39,10 @@
 How to build ORB .jars for delivery to GlassFish:
 
 ---------------------------------------
-cd <ws>/make
+cd <ws>
+mvn clean install
+cd make
 ant clean
-ant build
 ant build-tests
 ant test-all
 --------------------------------------- 

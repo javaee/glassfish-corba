@@ -40,16 +40,22 @@ How to build ORB .jars for delivery to GlassFish:
 
 ---------------------------------------
 cd <ws>/make
+# Build product .jar bundles. Bundles generated at:
+# <ws>/build/rename/ee/build/release/lib/bundles-archive.zip 
 ant clean
 ant build
+#
+# Build and run dev tests
 ant build-tests
-ant test-all
+ant test-all   
+#
+# (optional) Run dev tests with code coverage enabled. 
+# Cobertura code coverage report generated at: <ws>/uild/cobertura/index.html
+ant do-cobertura-test
+#
 --------------------------------------- 
 
 For details, see 
 <ws>/make/build.xml 
 <ws>/make/src-build.xml
-
-Generated Bundles: <ws>/build/rename/ee/build/release/lib/bundles-archive.zip 
-
 

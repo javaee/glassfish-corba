@@ -1799,17 +1799,32 @@
         <exclude name="com/sun/corba/ee/spi/orbutil/argparser/*.java"/>
     </patternset>
 
+    
+    <!-- Superset of subset1-patternset .. subset4-patternset for code coverage report
+    -->
+    <patternset id="gf.orb.all.classes">
+        <include name="com/sun/corba/ee/**/*.class"/>
+        <include name="com/sun/org/omg/**/*.class"/>
+        <include name="javax/rmi/CORBA/**/*.class"/>
+        <include name="org/omg/**/*.class"/>
+    </patternset>    
+        
+    <!-- Superset of subset1-patternset .. subset4-patternset for code coverage report
+    -->
+    <patternset id="gf.orb.all.sources">
+        <include name="com/sun/corba/ee/**/*.java"/>
+        <include name="com/sun/org/omg/**/*.java"/>
+        <include name="javax/rmi/CORBA/**/*.java"/>
+        <include name="org/omg/**/*.java"/>
+    </patternset>
+    
     <target name="instrument-cobertura" depends="init">
         <mkdir dir="${cobertura.classes.dir}"/>
         <mkdir dir="${classes.dir}"/>
-        <mkdir dir="${orblib.classes.dir}"/>
         <cobertura-instrument todir="${cobertura.classes.dir}" datafile="${cobertura.instrument.datafile}">
             <fileset dir="${classes.dir}">
-                <patternset refid="gf.orb.classes"/>
-            </fileset>
-            <fileset dir="${orblib.classes.dir}">
-                <patternset refid="gf.orblib.classes"/>
-            </fileset>
+                <patternset refid="gf.orb.all.classes"/>
+            </fileset>            
         </cobertura-instrument>
     </target>
     
@@ -1825,18 +1840,12 @@
     <target name="report-cobertura" depends="init, merge-cobertura">
         <cobertura-report format="html" destdir="${cobertura.dir}" datafile="${cobertura.merge.datafile}">
             <fileset dir="${src.dir}">
-                <patternset refid="gf.orb.sources"/>
-            </fileset>
-            <fileset dir="${orblib.src.dir}">
-                <patternset refid="gf.orblib.sources"/>
+                <patternset refid="gf.orb.all.sources"/>
             </fileset>
         </cobertura-report>
         <cobertura-report format="xml" destdir="${cobertura.dir}" datafile="${cobertura.merge.datafile}">
             <fileset dir="${src.dir}">
-                <patternset refid="gf.orb.sources"/>
-            </fileset>
-            <fileset dir="${orblib.src.dir}">
-                <patternset refid="gf.orblib.sources"/>
+                <patternset refid="gf.orb.all.sources"/>
             </fileset>
         </cobertura-report>
     </target>

@@ -14,6 +14,7 @@
         <module>omgapi</module>
         <module>csiv2-idl</module>
         <module>orbmain</module>
+        <module>exception-annotation-processor</module>
     </modules>
     <build>
         <plugins>

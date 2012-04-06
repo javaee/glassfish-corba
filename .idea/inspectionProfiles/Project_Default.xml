@@ -3,6 +3,7 @@
     <option name="myName" value="Project Default" />
     <option name="myLocal" value="false" />
     <inspection_tool class="Deprecation" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="ExtendsAnnotation" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="SynchronizationOnLocalVariableOrMethodParameter" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="reportLocalVariables" value="true" />
       <option name="reportMethodParameters" value="true" />

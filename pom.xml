@@ -13,8 +13,8 @@
         <module>idlj-maven-plugin</module>
         <module>omgapi</module>
         <module>csiv2-idl</module>
-        <module>orbmain</module>
         <module>exception-annotation-processor</module>
+        <module>orbmain</module>
     </modules>
     <build>
         <plugins>

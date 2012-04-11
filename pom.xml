@@ -8,6 +8,39 @@
     <version>4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <developers>
+        <developer>
+            <name>Harshad Vilekar</name>
+            <email>harshad.vilekar@oracle.com</email>
+            <id>hvilekar</id>
+        </developer>
+        <developer>
+            <name>Russell Gold</name>
+            <email>russell.gold@oracle.com</email>
+            <id>russgold</id>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>CDDL+GPL</name>
+            <url>https://glassfish.java.net/public/CDDL+GPL.html</url>
+        </license>
+    </licenses>
+
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://java.net/jira/browse/GLASSFISH_CORBA</url>
+    </issueManagement>
+
+    <mailingLists>
+        <mailingList>
+            <name>CORBA Developer</name>
+            <post>dev@glassfish-corba.java.net</post>
+            <archive>http://java.net/projects/glassfish-corba/lists/dev/archive</archive>
+        </mailingList>
+    </mailingLists>
+
     <modules>
         <module>idlj</module>
         <module>idlj-maven-plugin</module>
@@ -16,6 +49,7 @@
         <module>exception-annotation-processor</module>
         <module>orbmain</module>
     </modules>
+
     <build>
         <plugins>
 
@@ -43,11 +77,11 @@
                 <artifactId>idlj-maven-plugin</artifactId>
                 <version>1.2-SNAPSHOT</version>
                 <executions>
-                  <execution>
-                    <goals>
-                      <goal>generate</goal>
-                    </goals>
-                  </execution>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
                 </executions>
                 <configuration>
                     <sources>
@@ -67,8 +101,44 @@
             </plugin>
         </plugins>
     </build>
+
     <properties>
         <sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadoc</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
 

@@ -99,11 +99,13 @@
         <property name="lib.dir"                location="${build.dir}/lib"/>
         <property name="gensrc.dir"             location="${build.dir}/gensrc"/>
         <property name="classes.dir"            location="${build.dir}/classes"/>
+        <property name="orblib.classes.dir"     value="${classes.dir}"/>
         <property name="releaselib.dir"         location="${build.dir}/release/lib"/>   
         <property name="libcache.dir"           location="${build.dir}/libcache"/>
 
         <!-- Main ORB build directories -->
         <property name="src.dir"                value="src/share/classes"/>
+        <property name="orblib.src.dir"         value="${src.dir}"/>
         <property name="javadoc.dir"            value="www/javadoc"/>
         <property name="build.sysclasspath"     value="ignore"/>
         <property name="omgapi.idl.dir"         value="omgapi/src/main/idl"/>

@@ -44,7 +44,12 @@ mvn clean install
 cd make
 ant clean
 ant build-tests
-ant test-all
+ant test-all   
+#
+# (temporarily broken) Run dev tests with code coverage enabled. 
+# Cobertura code coverage report generated at: <ws>/build/cobertura/index.html
+ant do-cobertura-test
+#
 --------------------------------------- 
 
 For details, see 

@@ -76,6 +76,7 @@
     <property name="root.dir"                   value="${basedir}"/>
     <property file="make/build.properties"/>
     <property name="orb.version"                value="${release.version}-${build.version}"/>
+    <property name="management-api.version"     value="3.1.0-b001"/>
     <property name="gmbal.version"              value="3.2.0-b003"/>
     <property name="pfl.version"                value="3.2.0-b001"/>
     <echo message="Version is ${release.version}-${build.version}"/>
@@ -95,7 +96,7 @@
         <property name="emma-jar"               value="${root.dir}/lib/emma.jar"/>
 
         <!-- Places where the build puts things -->
-        <property name="build.dir"              location="build"/>
+        <property name="build.dir"              location="${root.dir}/build"/>
         <property name="lib.dir"                location="${build.dir}/lib"/>
         <property name="gensrc.dir"             location="${build.dir}/gensrc"/>
         <property name="classes.dir"            location="${build.dir}/classes"/>
@@ -104,20 +105,14 @@
         <property name="libcache.dir"           location="${build.dir}/libcache"/>
 
         <!-- Main ORB build directories -->
-        <property name="src.dir"                value="src/share/classes"/>
+        <property name="src.dir"                value="${root.dir}/src/share/classes"/>
         <property name="orblib.src.dir"         value="${src.dir}"/>
-        <property name="javadoc.dir"            value="www/javadoc"/>
+        <property name="javadoc.dir"            value="${root.dir}/www/javadoc"/>
         <property name="build.sysclasspath"     value="ignore"/>
-        <property name="omgapi.idl.dir"         value="omgapi/src/main/idl"/>
-        <property name="omgapi.include.dir"     value="omgapi/src/main/idl-includes"/>
-        <property name="csiv2.idl.dir"          value="csiv2-idl/src/main/idl"/>
+        <property name="omgapi.idl.dir"         value="${root.dir}/omgapi/src/main/idl"/>
+        <property name="omgapi.include.dir"     value="${root.dir}/omgapi/src/main/idl-includes"/>
 
 
-        <property name="idlc-base"      value="idlc/src/main/"/>
-        <property name="idlc-classes"   value="idlc/target/classes/"/>
-        <property name="idlc-src"       value="${idlc-base}/java"/>
-        <property name="idlc-resources" value="${idlc-base}/resources"/>
-        <property name="idlc-idl"       value="${idlc-base}/idl"/>
         <property name="m2.repo"        value="${user.home}/.m2/repository"/>
         <property name="m2-orb.version" value="4.0-SNAPSHOT"/>
         <property name="idlc.jar"       value="${m2.repo}/com/sun/corba/idlc/${m2-orb.version}/idlc-${m2-orb.version}.jar"/>
@@ -125,7 +120,7 @@
         <property name="csiv2-idl.jar"  value="${m2.repo}/com/sun/corba/glassfish-corba-csiv2-idl/${m2-orb.version}/glassfish-corba-csiv2-idl-${m2-orb.version}.jar"/>
         <property name="orb.jar"        value="${m2.repo}/com/sun/corba/glassfish-corba-orb/${m2-orb.version}/glassfish-corba-orb-${m2-orb.version}.jar"/>
 
-        <property name="orbmain.test.classes" value="orbmain/target/test-classes"/>
+        <property name="orbmain.test.classes" value="${root.dir}/orbmain/target/test-classes"/>
 
         <!-- javac flags -->
         <property name="deprecation"            value="off"/>
@@ -147,9 +142,19 @@
         <property name="copyright.skip"
             value=".hg,.DS_Store,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom,felix-cache"/>
 
-        <property name="gmbal-jar"              location="${libcache.dir}/gmbal.jar"/>
-        <property name="management-api-jar"     location="${libcache.dir}/management-api.jar"/>
-        
+        <property name="gmbal-jar"           location="${m2.repo}/org/glassfish/gmbal/gmbal/${gmbal.version}/gmbal-${gmbal.version}.jar"/>
+        <property name="management-api-jar"
+                  location="${m2.repo}/org/glassfish/external/management-api/${management-api.version}/management-api-${management-api.version}.jar"/>
+        <property name="org-osgi-core-jar"   location="${m2.repo}/org/apache/felix/org.osgi.core/1.2.0/org.osgi.core-1.2.0.jar"/>
+        <property name="pfl-asm-jar"         location="${m2.repo}/org/glassfish/pfl/pfl-asm/${pfl.version}/pfl-asm-${pfl.version}.jar"/>
+        <property name="pfl-basic-jar"       location="${m2.repo}/org/glassfish/pfl/pfl-basic/${pfl.version}/pfl-basic-${pfl.version}.jar"/>
+        <property name="pfl-basic-tools-jar" location="${m2.repo}/org/glassfish/pfl/pfl-basic-tools/${pfl.version}/pfl-basic-tools-${pfl.version}.jar"/>
+        <property name="pfl-dynamic-jar"     location="${m2.repo}/org/glassfish/pfl/pfl-dynamic/${pfl.version}/pfl-dynamic-${pfl.version}.jar"/>
+        <property name="pfl-tf-jar"          location="${m2.repo}/org/glassfish/pfl/pfl-tf/${pfl.version}/pfl-tf-${pfl.version}.jar"/>
+        <property name="pfl-tf-tools-jar"    location="${m2.repo}/org/glassfish/pfl/pfl-tf-tools/${pfl.version}/pfl-tf-tools-${pfl.version}.jar"/>
+        <property name="pfl-test-jar"        location="${m2.repo}/org/glassfish/pfl/pfl-test/${pfl.version}/pfl-test-${pfl.version}.jar"/>
+
+        <!--
         <get-and-copy-dependencies name="dependency" 
             repository="http://download.java.net/maven/2"
             destDir="${libcache.dir}">
@@ -186,6 +191,20 @@
                     version="${pfl.version}" scope="runtime"/>
             </dependency-list>
         </get-and-copy-dependencies>
+        -->
+        
+        <path id="dependency.classpath">
+            <pathelement location="${gmbal-jar}"/>
+            <pathelement location="${management-api-jar}"/>
+            <pathelement location="${org-osgi-core-jar}"/>
+            <pathelement location="${pfl-asm-jar}"/>
+            <pathelement location="${pfl-basic-jar}"/>
+            <pathelement location="${pfl-basic-tools-jar}"/>
+            <pathelement location="${pfl-dynamic-jar}"/>
+            <pathelement location="${pfl-tf-jar}"/>
+            <pathelement location="${pfl-tf-tools-jar}"/>
+            <pathelement location="${pfl-test-jar}"/>
+        </path>
 
         <path id="classpath.master">
             <path refid="dependency.classpath"/>
@@ -466,9 +485,6 @@
         </make-bundle>
     </target>
 
-    <target name="make-subset-bundles" depends="src-bundle-subsets, javadoc-bundle-subsets">
-
-    </target>
     <!-- Maven POM files and release targets -->
 
     <macrodef name="make-corba-pom">
@@ -548,36 +564,6 @@
         </make-corba-pom>
         <make-corba-pom artifactid="glassfish-corba-source" 
             description="All ORB source code">
-        </make-corba-pom>
-    </target>
-
-    <target name="make-subset-poms" depends="make-poms">
-        <make-corba-pom artifactid="${subset1}-source" 
-            description="The ORB implementation: source code">
-        </make-corba-pom>
-        <make-corba-pom artifactid="${subset1}-javadocs" 
-            description="The ORB implementation: javadocs">
-        </make-corba-pom>
-        <!-- =================== -->
-        <make-corba-pom artifactid="${subset2}-source" 
-            description="ORB API for IIOP FOLB: source code">
-        </make-corba-pom>
-        <make-corba-pom artifactid="${subset2}-javadocs" 
-            description="ORB API for IIOP FOLB: javadocs">
-        </make-corba-pom>
-        <!-- =================== -->
-        <make-corba-pom artifactid="${subset3}-source" 
-            description="OMG standard CORBA APIs: source code">
-        </make-corba-pom>
-        <make-corba-pom artifactid="${subset3}-javadocs" 
-            description="OMG standard CORBA APIs: javadocs">
-        </make-corba-pom>
-        <!-- =================== -->
-        <make-corba-pom artifactid="${subset4}-source" 
-            description="IDL generated definitions for CSIv2: source code">
-        </make-corba-pom>
-        <make-corba-pom artifactid="${subset4}-javadocs" 
-            description="IDL generated definitions for CSIv2: javadocs">
         </make-corba-pom>
     </target>
 
@@ -672,83 +658,7 @@
         <run-enhance mode="TimingPoints"/>
     </target>
 
-    <!-- ========================= COMPILE ========================= -->
 
-    <target name="compile" depends="init, compile-enhancer, 
-        verify-maven-jars, delete-java-sources, copy-resources">
-        <echo message="Compiling ORB sources"/>
-        <javac destdir="${classes.dir}" 
-                classpathref="classpath.master"
-                deprecation="${deprecation}"
-                debug="${javac.debug}" 
-                optimize="${javac.optimize}"
-                failonerror="true"
-                fork="true"
-                memoryMaximumSize="512m"> 
-            <src path="${src.dir}"/>
-            <src path="${gensrc.dir}"/>
-            <exclude name="org/omg/**"/>
-            <exclude name="org/omg/PortableInterceptor/UNKNOWN.java"/>
-            <include name="com/sun/corba/ee/org/omg/**"/>
-            <exclude name="com/sun/corba/ee/org/omg/CORBA/**"/>
-            <include name="javax/rmi/**"/>
-            <include name="javax/transaction/**"/>
-            <include name="javax/activity/**"/>
-            <include name="com/sun/corba/ee/internal/**"/>
-            <include name="com/sun/corba/ee/pept/**"/>
-            <include name="com/sun/corba/ee/spi/**"/>
-            <include name="com/sun/corba/ee/impl/**"/>
-            <include name="com/sun/corba/ee/impl/**"/>
-            <include name="com/sun/corba/ee/tool/**"/>
-            <include name="sun/corba/**"/>
-            <include name="sun/rmi/rmic/**"/>
-            <compilerarg
-                value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-            <compilerarg
-                value="-Xbootclasspath/p:${toString:classpath.master}"/>
-        </javac>
-    </target>
-
-    <target name="generate-orb-resources"
-     depends="init, compile">
-        <java classname="org.glassfish.pfl.basic.tools.logex.ExceptionResourceGenerator"
-            fork="true"
-            classpathref="classpath.master"
-            dir="${root.dir}">
-
-            <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-
-<!--
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Xnoagent"/>
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=12321"/>
--->
-            <arg value="-verbose"/>
-            <arg value="1"/>
-            <arg value="-source"/>
-            <arg value="${classes.dir}"/>
-            <arg value="-destination"/>
-            <arg value="${classes.dir}"/>
-        </java>
-    </target>
-
-
-    <!-- ========================= COPY-RESOURCES ========================= -->
-    <target name="copy-resources" depends="init">
-        <echo message="Copying resources files"/>
-        <copy todir="${classes.dir}" overwrite="false">
-            <fileset dir="${src.dir}">
-                <include name="com/sun/corba/ee/impl/resources/sunorb*.properties"/>
-                <include name="sun/rmi/rmic/resources/rmic.properties"/>
-            </fileset>
-        </copy>
-        <copy todir="${classes.dir}" flatten="true" overwrite="false">
-            <fileset dir="${src.dir}">
-                <include
-                    name="com/sun/corba/ee/impl/presentation/rmi/jndi.properties"/>
-            </fileset>
-        </copy>
-    </target>
 
     <!-- ========================= DELETE-JAVA-SOURCE ===================== -->
     <target name="delete-java-sources" depends="init">
@@ -1080,61 +990,6 @@
         <delete dir="${test.run.base}"/>
     </target>
 
-    <!-- ========================= JAVADOC ========================= -->
-
-    <target name="javadoc" depends="init">
-        <mkdir dir="${javadoc.dir}"/>
-        <javadoc packagenames="com.sun.corba.ee.spi.*"
-                 sourcepath="${src.dir}:${gensrc.dir}"
-                 classpathref="classpath.master"
-                 destdir="${javadoc.dir}/glassfish-corba"
-                 author="true"
-                 version="true"
-                 use="true"
-                 windowtitle="Sun Java CORBA ORB SPI"/>
-    </target>
-
-    <target name="javadoc-subsets" depends="init">
-        <mkdir dir="${javadoc.dir}/${subset1}"/>
-        <javadoc packagenames="${subset1-doc-includes}"
-                 excludepackagenames="${subset1-doc-excludes}"
-                 sourcepath="${src.dir}:${gensrc.dir}"
-                 classpathref="classpath.master"
-                 destdir="${javadoc.dir}/${subset1}"
-                 author="true"
-                 version="true"
-                 use="true"
-                 windowtitle="${subset1}"/>
-
-        <!-- =================================================== -->
-        <mkdir dir="${javadoc.dir}/${subset2}"/>
-        <javadoc packagenames="${subset2-doc-includes}"
-                 sourcepath="${src.dir}:${gensrc.dir}"
-                 classpathref="classpath.master"
-                 destdir="${javadoc.dir}/${subset2}"
-                 author="true"
-                 version="true"
-                 use="true"
-                 windowtitle="${subset2}"/>
-    </target>
-
-    <target name="javadoc-bundle-subsets" depends="javadoc-subsets">
-        <jar jarfile="${releaselib.dir}/bundles/${subset1}-javadocs.jar"
-            duplicate="fail">
-            <fileset dir="${javadoc.dir}/${subset1}">
-                <include name="**/**"/>
-            </fileset>
-        </jar>
-
-        <jar jarfile="${releaselib.dir}/bundles/${subset2}-javadocs.jar"
-            duplicate="fail">
-            <fileset dir="${javadoc.dir}/${subset2}">
-                <include name="**/**"/>
-            </fileset>
-        </jar>
-
-    </target>
-
     <!-- ========================= Renaming ========================= -->
 
     <target name="rename" depends="init">
@@ -1224,73 +1079,6 @@
         </java>
     </target>
 
-
-    <!-- This target runs all the idl invocations and generates Java sources for
-         each of the idl files in corba sources only -->
-    <target name="run-all-idl" depends="verify-maven-jars">
-        <echo message="Copying .idl files"/>
-        <copy todir="${lib.dir}" flatten="yes" overwrite="false">
-            <fileset dir="${src.dir}" includes="org/omg/CORBA/*.idl"/>
-        </copy>
-         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value"
-             value="-i ${gensrc.dir}/com/sun/corba/ee/spi/activation"/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value="-oldImplBase"/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes"
-             value="-pkgPrefix activation com.sun.corba.ee.spi"/>
-            <param name="idl-value"
-             value="${src.dir}/com/sun/corba/ee/spi/activation/activation.idl"/>
-            <param name="idl-gensrc-dir"
-             value="${gensrc.dir}/com/sun/corba/ee/spi/activation"/>
-            <param name="generated-files" value="**/*.java"/>
-        </antcall>
-    </target>
-
     <!-- ============================== main targets ================================== -->
 
-    <target name="build" depends="init, compile, generate-orb-resources"/>
-
-    <target name="subset-build" depends="make-subset-bundles, make-subset-poms"/>
-
-    <!-- no-enhance is used for Cobertura coverage, which fails miserable with enhanced classes -->
-
-    <target name="build-no-enhance" depends="init, compile, generate-orb-resources, make-bundles, make-poms, archive-bundles"/>
-
-    <target name="release" depends="init">
-        <echo message="releasing to ${repo.url}"/>
-        <release-to-maven destination="${repo.url}"/>
-    </target>
-
-    <target name="release-local" depends="init">
-        <echo message="releasing to local repository"/>
-        <release-to-local-maven/>
-    </target>
-
-    <target name="archive-bundles" depends="init">
-        <mkdir dir="${releaselib.dir}/glassfish/modules"/>
-        <copy todir="${releaselib.dir}/glassfish/modules">
-            <fileset dir="${releaselib.dir}/bundles">
-                <include name="glassfish-corba-*.jar"/>
-                <exclude name="glassfish-corba-*source.jar"/>
-                <exclude name="glassfish-corba-*javadocs.jar"/>
-                <exclude name="glassfish-corba-osgi-test.jar"/> 
-            </fileset>
-        </copy>
-        <zip destfile="${releaselib.dir}/bundles-archive.zip" compress="false"
-            basedir="${releaselib.dir}"
-            includes="glassfish/modules/*"/>
-        <delete dir="${releaselib.dir}/glassfish/modules"/>
-    </target>
-
-    <target name="archive-workspace" depends="init">
-        <delete file="${releaselib.dir}/ws.zip"/>
-        <zip destfile="${root.dir}/ws.zip" basedir="${root.dir}" level="9"
-         includes="build/**,lib/**,make/**,src/**,test/**"/>
-        <move file="${root.dir}/ws.zip" todir="${releaselib.dir}"/>
-    </target>
 </project>

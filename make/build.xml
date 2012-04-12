@@ -47,17 +47,17 @@
     <import file="src-build.xml"/>
 
     <target name="init" depends="corba-src.init">
-        <property name="test.src.dir"                   value="test/src/share/classes"/>
+        <property name="test.src.dir"                   value="${root.dir}/test/src/share/classes"/>
 
         <!-- cobertura related -->
-        <property name="cobertura.dir"                  value="build/cobertura"/>
+        <property name="cobertura.dir"                  value="${root.dir}/build/cobertura"/>
         <property name="cobertura.classes.dir"          value="${cobertura.dir}/classes"/>
         <property name="cobertura.instrument.datafile"  value="${cobertura.dir}/cobertura.instrument.ser"/>
         <property name="cobertura.datafile"             value="${cobertura.dir}/cobertura.data.ser"/>
         <property name="cobertura.merge.datafile"       value="${cobertura.dir}/cobertura.merge.ser"/>
 
         <!-- Emma related -->
-        <property name="emma.dir"                       value="build/coverage"/>
+        <property name="emma.dir"                       value="${root.dir}/build/coverage"/>
         <property name="emma.classes.dir"               location="${emma.dir}/classes"/>
         <property name="emma.metadata.file"             location="${emma.dir}/coverage.em"/>
 
@@ -79,7 +79,7 @@
         <mkdir dir="${test-gensrc.dir}"/>
 
         <!-- Findbugs related -->
-        <property name="findbugs.dir"                   location="build/findbugs"/>
+        <property name="findbugs.dir"                   location="${root.dir}/build/findbugs"/>
         <property name="findbugs.home"                  value="${root.dir}/lib/findbugs-1.3.9"/>
         <property name="findbugs.exclude.file"          value="${root.dir}/make/findbugs-filter.xml"/>
         
@@ -89,7 +89,7 @@
         <property name="ejb3-jar"                       value="${root.dir}/lib/javax.ejb.jar"/>
         <property name="ejbcontainer-jar"               value="${root.dir}/lib/ejb-container.jar"/>
         <property name="junit-jar"                      value="${root.dir}/lib/junit.jar"/>
-        <property name="ant-junit-jar"                  value="${root.dir}/lib/ant-junit.jar"/>
+        <property name="ant-junit-jar"                  value="${root.dir}/lib/ant-1.7.0/lib/ant-junit.jar"/>
         <property name="testng-jar"                     value="${root.dir}/lib/testng.jar"/>
         <property name="japex-jar"                      value="${root.dir}/lib/japex.jar"/>
 
@@ -354,7 +354,7 @@
   
     <taskdef name="java2html"
         classname="de.java2html.anttasks.Java2HtmlTask"
-        classpath="lib/java2html.jar"
+        classpath="${root.dir}/lib/java2html.jar"
     />
 
     <target name="copy-idl" depends="init">
@@ -366,10 +366,10 @@
     </target>
 
     <target name="source-to-html" depends="init,copy-idl">
-        <mkdir dir="www/sources"/>
+        <mkdir dir="${root.dir}/www/sources"/>
         <java2html
             srcdir="${src.dir}"
-            destdir="www/sources/orb"
+            destdir="${root.dir}/www/sources/orb"
             includes="**/*.java"
             showLineNumbers="true"
             style="kawa"
@@ -378,7 +378,7 @@
         />
         <java2html
             srcdir="${orblib.src.dir}"
-            destdir="www/sources/orblib"
+            destdir="${root.dir}/www/sources/orblib"
             includes="**/*.java"
             showLineNumbers="true"
             style="kawa"
@@ -1691,8 +1691,8 @@
         <run-junit-test>
             <test-cases>
                 <!-- <test name="corba.messagetrace.Client" todir="${junit.reports}"/> -->
-                <test name="corba.misc.Client" todir="${junit.reports}"/>
-                <test name="corba.dynamicrmiiiop.Client" todir="${junit.reports}"/>
+                <test name="corba.misc.MiscCorbaTest" todir="${junit.reports}"/>
+                <test name="corba.dynamicrmiiiop.DynamicRmiIIOPJUnitTest" todir="${junit.reports}"/>
             </test-cases>
         </run-junit-test>
     </target>
@@ -1730,7 +1730,7 @@
 
     <!-- Running cobertura on the ORB (similar to emma)
     -->
-    <property name="cobertura.lib.dir" value="${basedir}/lib/cobertura-1.9.4.1"/>
+    <property name="cobertura.lib.dir" value="${root.dir}/lib/cobertura-1.9.4.1"/>
 
     <path id="cobertura.classpath">
         <fileset dir="${cobertura.lib.dir}">
@@ -1879,111 +1879,9 @@
     <pathelement location="${emma.lib.dir}/emma_ant.jar"/>
     </path>
 
-    <target name="emma" depends="init,clean-emma,emma-instr,test,emma-report">
-    </target>
-
-    <!-- TODO: If we keep emma, we should derive the includes from the patternsets in src-build.
-    -->
-
-    <target name="emma-instr" depends="init">
-    <mkdir dir="${emma.classes.dir}"/>
-    <emma>
-        <instr mode="copy" merge="true" outdir="${emma.classes.dir}" outfile="${emma.metadata.file}">
-            <instrpath>
-                <pathelement location="${classes.dir}"/>
-                <pathelement location="${orblib.classes.dir}"/>
-            </instrpath>
-            <filter includes="com.sun.corba.ee.spi.*"/>
-            <filter includes="com.sun.corba.ee.spi.*.*"/>
-            <filter includes="com.sun.corba.ee.spi.*.*.*"/>
-            <filter includes="com.sun.corba.ee.impl.*"/>
-            <filter includes="com.sun.corba.ee.impl.*.*"/>
-            <filter includes="com.sun.corba.ee.impl.*.*.*"/>
-            <filter includes="javax.rmi.PortableRemoteObject"/>
-            <filter includes="javax.rmi.CORBA.*"/>
-            <filter includes="com.sun.corba.ee.spi.folb.GroupInfoServiceBase"/>
-
-            <!-- exclude IDL and scheme generated classes -->
-            <filter excludes="com.sun.corba.ee.spi.folb.*"/>
-            <filter excludes="com.sun.corba.ee.impl.logging.*"/>
-
-            <!-- exclude ORB classes not used in the app server -->
-            <filter excludes="com.sun.corba.ee.spi.activation.*"/>
-            <filter excludes="com.sun.corba.ee.spi.activation.InitialNameServicePackage.*"/>
-            <filter excludes="com.sun.corba.ee.spi.activation.LocatorPackage.*"/>
-            <filter excludes="com.sun.corba.ee.spi.activation.RepositoryPackage.*"/>
-            <filter excludes="com.sun.corba.ee.impl.activation.*"/>
-            <filter excludes="com.sun.corba.ee.impl.orbutil.copyobject.CodegenCopier*"/>
-            <filter excludes="com.sun.corba.ee.impl.orbutil.copyobject.FastCache*"/>
-            <filter excludes="com.sun.corba.ee.spi.orbutil.proxy.*"/>
-            <filter excludes="com.sun.corba.ee.impl.dynamicany.*"/>
-            <filter excludes="com.sun.corba.ee.impl.encoding.fast.*"/>
-            <filter excludes="com.sun.corba.ee.impl.naming.pcosnaming.*"/>
-            <filter excludes="com.sun.corba.ee.impl.orbutil.newtimer.generated.*"/>
-            <filter excludes="com.sun.corba.ee.internal.*.*"/>
-            <filter excludes="com.sun.corba.ee.org.omg"/>
-            <filter excludes="com.sun.org.omg"/>
-            <filter excludes="com.sun.corba.ee.org.objectweb"/>
-            <filter excludes="com.sun.corba.ee.impl.txpoa.*"/>
-            <filter excludes="com.sun.corba.ee.impl.osgi.main.*"/>
-            <filter excludes="com.sun.corba.ee.spi.osgi.*"/>
-            <filter excludes="com.sun.corba.ee.impl.presentation.rmi.proxy.*"/>
-            <filter excludes="com.sun.corba.ee.spi.orbutil.file.*"/>
-            <filter excludes="com.sun.corba.ee.spi.orbutil.argparser.*"/>
-            <filter excludes="javax.rmi.*"/>
-        </instr>
-    </emma>
-    </target>
-
-    <!-- this loads <emma> and <emmajava> custom tasks: -->
-    <taskdef resource="emma_ant.properties" classpathref="emma.lib" />
-    
-    <target name="emma-report" depends="init">
-    <emma>
-      <report sort="+block,+name,+method,+class"
-              metrics="method:80,block:70,line:70,class:80"
-      >
-        <sourcepath>
-          <pathelement location="${src.dir}"/>
-          <pathelement location="${orblib.src.dir}"/>
-        </sourcepath>
-        <!-- collect all EMMA data dumps (metadata and runtime)
-             [this can be done via nested <fileset> fileset elements
-             or <file> elements pointing to a single file]:
-        -->
-        <fileset dir="${emma.dir}" >
-          <include name="*.ec" />
-          <include name="*.em" />
-        </fileset>
-
-        <!-- for every type of report desired, configure a nested
-             element; various report parameters
-             can be inherited from the parent <report>
-             and individually overridden for each report type:
-        <txt outfile="${coverage.dir}/coverage.txt"
-             depth="package"
-             columns="class,method,block,line,name"
-        />
-        <xml outfile="${coverage.dir}/coverage.xml"
-             depth="package"
-        />
-        -->
-        <html outfile="../${emma.dir}/coverage.html"
-             depth="method"
-             columns="name,class,method,block,line"
-        />
-        <xml outfile="../${emma.dir}/coverage.xml"
-            depth="method"
-            columns="name,class,method,block,line"
-        />
-      </report>
-    </emma>
-    </target>
 
     <target name="do-rename" depends="clean, rename"/>
 
-    <target name="do-release" depends="clean, build, make-bundles, release-local"/>
-
-    <target name="do-cobertura-test" depends="clean, build-no-enhance, instrument-cobertura, build-tests, test-all, report-cobertura"/>
+<!--    <target name="do-cobertura-test" depends="clean, build-no-enhance, instrument-cobertura, build-tests, test-all, report-cobertura"/>    -->
 </project>
 

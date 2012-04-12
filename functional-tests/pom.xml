@@ -1,0 +1,108 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.sun.corba</groupId>
+    <artifactId>glassfish-corba-tests</artifactId>
+    <name>GlassFish Corba Functional Tests</name>
+    <version>4.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.glassfish.pfl</groupId>
+            <artifactId>pfl-asm</artifactId>
+            <version>3.2.0-b001</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.pfl</groupId>
+            <artifactId>pfl-basic</artifactId>
+            <version>3.2.0-b001</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.pfl</groupId>
+            <artifactId>pfl-basic-tools</artifactId>
+            <version>3.2.0-b001</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.pfl</groupId>
+            <artifactId>pfl-dynamic</artifactId>
+            <version>3.2.0-b001</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.pfl</groupId>
+            <artifactId>pfl-tf</artifactId>
+            <version>3.2.0-b001</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.pfl</groupId>
+            <artifactId>pfl-tf-tools</artifactId>
+            <version>3.2.0-b001</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.pfl</groupId>
+            <artifactId>pfl-test</artifactId>
+            <version>3.2.0-b001</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.gmbal</groupId>
+            <artifactId>gmbal</artifactId>
+            <version>3.2.0-b003</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.external</groupId>
+            <artifactId>management-api</artifactId>
+            <version>3.1.0-b001</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>ant</groupId>
+                        <artifactId>ant-junit</artifactId>
+                        <version>1.6.5</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                        <version>4.4</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>run-tests</id>
+                        <phase>integration-test</phase>
+                        <configuration>
+                            <target>
+                                <ant antfile="../make/build.xml" target="build-tests">
+                                    <property name="test-build.dir" value="${project.build.directory}/test"/>
+                                    <property name="root.dir" value=".."/>
+                                </ant>
+                                <ant antfile="../make/build.xml" target="test-all">
+                                    <property name="test-build.dir" value="${project.build.directory}/test"/>
+                                    <property name="root.dir" value=".."/>
+                                </ant>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    </project>

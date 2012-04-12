@@ -108,6 +108,12 @@
 
     <profiles>
         <profile>
+            <id>all-tests</id>
+            <modules>
+                <module>functional-tests</module>
+            </modules>
+        </profile>
+        <profile>
             <id>release</id>
             <build>
                 <plugins>

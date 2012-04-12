@@ -1691,8 +1691,8 @@
         <run-junit-test>
             <test-cases>
                 <!-- <test name="corba.messagetrace.Client" todir="${junit.reports}"/> -->
-                <test name="corba.misc.MiscCorbaTest" todir="${junit.reports}"/>
-                <test name="corba.dynamicrmiiiop.DynamicRmiIIOPJUnitTest" todir="${junit.reports}"/>
+                <test name="corba.misc.Client" todir="${junit.reports}"/>
+                <test name="corba.dynamicrmiiiop.Client" todir="${junit.reports}"/>
             </test-cases>
         </run-junit-test>
     </target>

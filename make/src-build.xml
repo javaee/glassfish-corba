@@ -71,8 +71,6 @@
         This is the Ant file that builds the GlassFish ORB.
     </description>
 
-    <import file="modules.xml"/>
-
     <property name="root.dir"                   value="${basedir}"/>
     <property file="make/build.properties"/>
     <property name="orb.version"                value="${release.version}-${build.version}"/>
@@ -81,7 +79,7 @@
     <property name="pfl.version"                value="3.2.0-b001"/>
     <echo message="Version is ${release.version}-${build.version}"/>
 
-    <target name="init" depends="modules.init">
+    <target name="init">
         <property name="repo.url"
             value="svn:https://svn.java.net/svn/maven2-repository~svn/trunk/repository"/>
         <property name="file.url"               value="file:/tmp/maven"/>
@@ -471,144 +469,8 @@
         </jar>
     </target>
 
-    <target name="make-bundles" depends="init, make-src-bundle">
-        <make-bundle
-            classpath="${classes.dir}" 
-            version="${orb.version}"
-            outDir="${releaselib.dir}/bundles"
-            bundlename="glassfish-corba-osgi-test"
-            outFile="glassfish-corba-osgi-test.jar">
-            <directive-list>
-                <directive type="Private-Package" name="osgi-test.private"/>
-                <directive type="Bundle-Activator" value="com.sun.corba.ee.impl.osgi.main"/>
-            </directive-list>
-        </make-bundle>
-    </target>
 
-    <!-- Maven POM files and release targets -->
-
-    <macrodef name="make-corba-pom">
-        <attribute name="artifactId"/>
-        <attribute name="description"/>
-        <element name="dep-list" optional="true"/>
-        <sequential>
-            <make-pom 
-                outdir="${releaselib.dir}/bundles"
-                groupId="com.sun.corba" 
-                artifactId="@{artifactId}" 
-                version="${orb.version}"
-                description="@{description}"
-                url="http://kenai.com/hg/gf-corba-v3-mirror~staging">
-                <element-list>
-                    <developer
-                        id="hvilekar"
-                        name="Harshad Vilekar"
-                        email="harshad.vilekar@oracle.com"/>
-                    <license
-                        name="CDDL+GPL"
-                        url="https://glassfish.java.net/public/CDDL+GPL.html"/>
-                    <issueManagement
-                        system="JIRA"
-                        url="http://kenai.com/jira/browse/GF_CORBA_V3_MIRROR"/>
-                    <mailingLists
-                        name="CORBA Developer"
-                        archive="dev@gf-v3-corba-mirror.kenai.com"/>
-                    <dep-list/>
-                </element-list>
-            </make-pom>
-        </sequential>
-    </macrodef>
-
-    <target name="make-poms" depends="init">
-        <make-corba-pom artifactid="glassfish-corba-csiv2-idl" 
-            description="IDL generated definitions for CSIv2">
-        </make-corba-pom>
-        <make-corba-pom artifactid="glassfish-corba-internal-api" 
-            description="ORB API for IIOP FOLB">
-        </make-corba-pom>
-        <make-corba-pom artifactid="glassfish-corba-omgapi" 
-            description="OMG standard CORBA APIs">
-        </make-corba-pom>
-        <make-corba-pom artifactid="glassfish-corba-orb" 
-            description="The ORB implementation">
-            <dep-list>
-                <dependency
-                    groupId="com.sun.corba"
-                    artifactId="glassfish-corba-internal-api"
-                    version="${orb.version}"/>
-                <dependency
-                    groupId="com.sun.corba"
-                    artifactId="glassfish-corba-omgapi"
-                    version="${orb.version}"/>
-                <dependency
-                    groupId="org.glassfish.pfl"
-                    artifactId="pfl-basic"
-                    version="${pfl.version}"/>
-                <dependency
-                    groupId="org.glassfish.pfl"
-                    artifactId="pfl-tf"
-                    version="${pfl.version}"/>
-                <dependency
-                    groupId="org.glassfish.pfl"
-                    artifactId="pfl-dynamic"
-                    version="${pfl.version}"/>
-                <dependency
-                    groupId="org.glassfish.external"
-                    artifactId="management-api"
-                    version="3.1.0-b001"/>
-                <dependency
-                    groupId="org.glassfish.gmbal"
-                    artifactId="gmbal"
-                    version="${gmbal.version}"/>
-            </dep-list>
-        </make-corba-pom>
-        <make-corba-pom artifactid="glassfish-corba-source" 
-            description="All ORB source code">
-        </make-corba-pom>
-    </target>
-
-    <macrodef name="corba-push-to-local-maven">
-        <attribute name="module"/>
-        <sequential>
-            <push-to-local-maven outdir="${releaselib.dir}/bundles"
-                module="@{module}"/>
-        </sequential>
-    </macrodef>
-
-    <macrodef name="corba-push-to-maven">
-        <attribute name="module"/>
-        <attribute name="destination"/>
-        <sequential>
-            <push-to-maven outdir="${releaselib.dir}/bundles"
-                module="@{module}" destination="@{destination}"/>
-        </sequential>
-    </macrodef>
-
-    <macrodef name="release-to-maven">
-        <attribute name="destination"/>
-        <sequential>
-            <echo message="Releasing modules with version ${orb.version} to @{destination}"/>
-            <corba-push-to-maven destination="@{destination}" module="glassfish-corba-csiv2-idl"/>
-            <corba-push-to-maven destination="@{destination}" module="glassfish-corba-internal-api"/>
-            <corba-push-to-maven destination="@{destination}" module="glassfish-corba-omgapi"/>
-            <corba-push-to-maven destination="@{destination}" module="glassfish-corba-orb"/>
-            <corba-push-to-maven destination="@{destination}" module="glassfish-corba-source"/>
-        </sequential>
-    </macrodef>
-
-    <macrodef name="release-to-local-maven">
-        <sequential>
-            <echo message="Releasing modules with version ${orb.version} to @{destination}"/>
-            <corba-push-to-local-maven module="glassfish-corba-csiv2-idl"/>
-            <corba-push-to-local-maven module="glassfish-corba-internal-api"/>
-            <corba-push-to-local-maven module="glassfish-corba-omgapi"/>
-            <corba-push-to-local-maven module="glassfish-corba-orb"/>
-            <corba-push-to-local-maven module="glassfish-corba-source"/>
-        </sequential>
-    </macrodef>
-
-
-    <!-- Enhance the ORB for the tracing faciliy -->
+    <!-- Enhance the ORB for the tracing facility -->
 
     <target name="compile-enhancer" depends="init">
         <mkdir dir="${classes.dir}"/>

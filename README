@@ -41,7 +41,7 @@ How to build ORB .jars for delivery to GlassFish:
 ---------------------------------------
 # to build and run all tests:
 cd <ws>
-mvn -P all-tests clean verify
+mvn -P all-tests clean install
 #
 # to produce jars for deployment (including source and javadoc jars):
 cd <ws>

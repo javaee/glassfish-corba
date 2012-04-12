@@ -27,7 +27,7 @@
         <dependency>
           <groupId>org.glassfish.pfl</groupId>
           <artifactId>pfl-basic</artifactId>
-          <version>3.2.0-b001</version>
+          <version>${pfl-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -37,7 +37,7 @@
         <dependency>
           <groupId>org.glassfish.pfl</groupId>
           <artifactId>pfl-dynamic</artifactId>
-          <version>3.2.0-b001</version>
+          <version>${pfl-version}</version>
         </dependency>
         <dependency>
           <groupId>org.glassfish.gmbal</groupId>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.glassfish.pfl</groupId>
             <artifactId>pfl-test</artifactId>
-            <version>3.2.0-b001</version>
+            <version>${pfl-version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -75,6 +75,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>${maven-bundle-plugin-version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>

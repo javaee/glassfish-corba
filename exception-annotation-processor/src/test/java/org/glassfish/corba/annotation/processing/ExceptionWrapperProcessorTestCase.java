@@ -100,7 +100,14 @@ public class ExceptionWrapperProcessorTestCase {
     @Test
     public void givenAnnotationElement_canCreateFileObject() throws IOException {
         FileObject fileObject = fileGenerator.createResource(new TestFiler());
-        assertEquals("file:" + System.getProperty("user.dir") + "/CLASS_OUTPUT/org/glassfish/corba/AnException.properties", fileObject.toUri().toString());
+        assertEquals(asUnixPath("file:" + System.getProperty("user.dir") + "/CLASS_OUTPUT/org/glassfish/corba/AnException.properties"),
+                asUnixPath(fileObject.toUri().toString()));
+    }
+
+    private String asUnixPath( String path ) {
+        String result = path.replace('\\', '/');
+        if (result.startsWith("file:/C:")) result = "file:C:" + result.substring(8);
+        return result;
     }
 
     private TestElement createAnnotatedClass(String className, String prefix) {

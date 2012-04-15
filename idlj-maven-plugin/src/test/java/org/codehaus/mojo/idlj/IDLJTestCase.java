@@ -85,7 +85,7 @@ public class IDLJTestCase {
     }
 
     private String getCurrentDir() {
-        return System.getProperty("user.dir");
+        return System.getProperty("user.dir").replace('\\','/');
     }
 
     private void assertArgumentsContains(String... expectedArgs) {
@@ -182,7 +182,9 @@ public class IDLJTestCase {
 
     static class TestIdlCompiler {
         public static void main(String... args) {
-            IDLJTestCase.args = args.clone();
+            IDLJTestCase.args = new String[ args.length];
+            for (int i = 0; i < args.length; i++)
+                IDLJTestCase.args[i] = args[i].replace('\\','/');
         }
     }
 

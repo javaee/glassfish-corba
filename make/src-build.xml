@@ -118,7 +118,7 @@
         <property name="csiv2-idl.jar"  value="${m2.repo}/com/sun/corba/glassfish-corba-csiv2-idl/${m2-orb.version}/glassfish-corba-csiv2-idl-${m2-orb.version}.jar"/>
         <property name="orb.jar"        value="${m2.repo}/com/sun/corba/glassfish-corba-orb/${m2-orb.version}/glassfish-corba-orb-${m2-orb.version}.jar"/>
 
-        <property name="orbmain.test.classes" value="${root.dir}/orbmain/target/test-classes"/>
+        <property name="mavenized.test.classes" value="${root.dir}/functional-tests/target/test-classes"/>
 
         <!-- javac flags -->
         <property name="deprecation"            value="off"/>

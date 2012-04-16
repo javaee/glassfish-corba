@@ -83,29 +83,6 @@
                     </instructions>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>idlj-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate-test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <sources>
-                        <source>
-                            <includes>
-                                <include>activation/*.idl</include>
-                            </includes>
-                            <packagePrefixes>
-                                <packagePrefix><type>activation</type><prefix>com.sun.corba.ee.spi</prefix></packagePrefix>
-                            </packagePrefixes>
-                        </source>
-                    </sources>
-                </configuration>
-            </plugin>
-        </plugins>
+         </plugins>
     </build>
 </project>

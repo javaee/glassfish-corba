@@ -98,7 +98,7 @@
             <pathelement location="${cobertura.classes.dir}"/>
 
             <path refid="classpath.master"/>
-            <pathelement location="${orbmain.test.classes}"/>
+            <pathelement location="${mavenized.test.classes}"/>
             <pathelement location="${emma-jar}"/>
             <pathelement location="${jdo-jar}"/>
             <pathelement location="${ant-junit-jar}"/>

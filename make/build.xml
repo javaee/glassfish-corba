@@ -1518,7 +1518,7 @@
                 -->
                 <jvmarg value="-Dhttp.server.port=${http.server.port}"/>
                 <jvmarg value="-Djava.rmi.server.codebase=http://localhost:${http.server.port}/"/>
-                <jvmarg value="-Dhttp.server.root.directory=../build/values2/classes"/>
+                <jvmarg value="-Dhttp.server.root.directory=${test-build.dir}/values2/classes"/>
                 <jvmarg value="-Djava.security.policy=../src/share/classes/test.policy"/>
                 <jvmarg value="-Djava.security.debug=debug"/>
                 <jvmarg value="-Dorg.omg.CORBA.ORBClass=com.sun.corba.ee.impl.orb.ORBImpl"/>
@@ -1576,7 +1576,7 @@
                 <sysproperty key="corba.test.orb.classpath" value="${toString:test-classpath.master}"/>
                 <sysproperty key="http.server.port" value="${http.server.port}"/>
                 <sysproperty key="java.rmi.server.codebase" value="http://localhost:${http.server.port}/"/>
-                <sysproperty key="http.server.root.directory" value="../build/values2/classes"/>
+                <sysproperty key="http.server.root.directory" value="${test-build.dir}/values2/classes"/>
                 <sysproperty key="java.security.policy" value="../src/share/classes/test.policy"/>
                 <sysproperty key="java.security.debug" value="debug"/>
                 <sysproperty key="org.omg.CORBA.ORBClass" value="com.sun.corba.ee.impl.orb.ORBImpl"/>

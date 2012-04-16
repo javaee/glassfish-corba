@@ -146,10 +146,12 @@
                                 <ant antfile="../make/build.xml" target="build-tests">
                                     <property name="test-build.dir" value="${project.build.directory}/test"/>
                                     <property name="root.dir" value=".."/>
+                                    <property name="m2.repo" value="${settings.localRepository}"/>
                                 </ant>
                                 <ant antfile="../make/build.xml" target="test-all">
                                     <property name="test-build.dir" value="${project.build.directory}/test"/>
                                     <property name="root.dir" value=".."/>
+                                    <property name="m2.repo" value="${settings.localRepository}"/>
                                 </ant>
                             </target>
                         </configuration>

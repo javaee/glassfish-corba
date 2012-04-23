@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Osmorc" name="OSGi">
+      <configuration manifestGenerationMode="OsmorcControlled" manifestLocation="" jarfileLocation="glassfish-corba-orb-4.0-SNAPSHOT.jar" outputPathType="CompilerOutputPath" bndFileLocation="" bundlorFileLocation="" bundleActivator="" bundleSymbolicName="com.sun.corba.glassfish-corba-orb" bundleVersion="4.0.0.SNAPSHOT" ignoreFilePattern="" useProjectDefaultManifestFileLocation="true" alwaysRebuildBundleJAR="false" doNotSynchronizeWithMaven="false">
+        <additionalProperties>
+          <property key="Bundle-Description" value="null" />
+          <property key="Export-Package" value="com.sun.corba.ee.*,com.sun.org.omg.*" />
+          <property key="Bundle-Name" value="GlassFish Corba ORB" />
+          <property key="Include-Resource" value="com/sun/corba/ee/impl/resources/sunorb.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb.properties,com/sun/corba/ee/impl/resources/sunorb_de.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_de.properties,com/sun/corba/ee/impl/resources/sunorb_es.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_es.properties,com/sun/corba/ee/impl/resources/sunorb_fr.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_fr.properties,com/sun/corba/ee/impl/resources/sunorb_it.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_it.properties,com/sun/corba/ee/impl/resources/sunorb_ja.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_ja.properties,com/sun/corba/ee/impl/resources/sunorb_ko.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_ko.properties,com/sun/corba/ee/impl/resources/sunorb_sv.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_sv.properties,com/sun/corba/ee/impl/resources/sunorb_zh_CN.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_zh_CN.properties,com/sun/corba/ee/impl/resources/sunorb_zh_TW.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_zh_TW.properties" />
+        </additionalProperties>
+        <additionalJARContents />
+      </configuration>
+    </facet>
+  </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
@@ -8,7 +21,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/idl" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/target/generated-test-sources/idl" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/idlj-timestamp" />
     </content>
@@ -30,6 +42,9 @@
     <orderEntry type="library" scope="TEST" name="Maven: javax.jdo:jdo2-api:2.3-eb" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: javax.transaction:transaction-api:1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.pfl:pfl-test:3.2.0-b001" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.easymock:easymock:3.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: cglib:cglib-nodep:2.2.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.objenesis:objenesis:1.2" level="project" />
   </component>
 </module>
 

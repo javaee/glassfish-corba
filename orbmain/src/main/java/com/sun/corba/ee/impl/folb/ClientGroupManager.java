@@ -715,7 +715,21 @@ public class ClientGroupManager
         receivedIORUpdateInfo() ;
         receivedIORUpdate = true ;
 
-        byte[] data = iorServiceContext.context_data;
+        IOR ior = extractIOR(iorServiceContext.context_data);
+        synchronized (lastIORLock) {
+            lastIOR = ior; // Used by LB.
+            gis.notifyObservers();
+        }
+        reportLocatedIOR(ri, ior);
+
+    }
+
+    protected void reportLocatedIOR(ClientRequestInfo ri, IOR ior) {
+        // REVISIT - interface;
+        ((ClientRequestInfoImpl)ri).setLocatedIOR(ior);
+    }
+
+    protected IOR extractIOR(byte[] data) {
         Any any = null;
         try {
             any = codec.decode_value(data, ForwardRequestHelper.type());
@@ -729,13 +743,7 @@ public class ClientGroupManager
         //  This code has nothing to do with PortableInterceptor.
         ForwardRequest fr = ForwardRequestHelper.extract(any);
         org.omg.CORBA.Object ref = fr.forward;
-        IOR ior = orb.getIOR(ref,false);
-        synchronized (lastIORLock) {
-            lastIOR = ior; // Used by LB.
-            gis.notifyObservers();
-        }
-        // REVISIT - interface;
-        ((ClientRequestInfoImpl)ri).setLocatedIOR(ior);
+        return orb.getIOR(ref,false);
     }
 
     ////////////////////////////////////////////////////

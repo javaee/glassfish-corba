@@ -1,23 +1,23 @@
 package com.sun.corba.ee.impl.folb;
 
-import com.sun.corba.ee.impl.corba.AnyImpl;
 import com.sun.corba.ee.impl.interceptors.CodecFactoryImpl;
 import com.sun.corba.ee.spi.folb.GroupInfoServiceObserver;
+import com.sun.corba.ee.spi.ior.IOR;
 import com.sun.corba.ee.spi.misc.ORBConstants;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.orb.ORBData;
 import com.sun.corba.ee.spi.transport.ContactInfo;
 import com.sun.corba.ee.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.ee.spi.transport.IORToSocketInfo;
-import org.glassfish.corba.testutils.TestCorbaObject;
+import org.glassfish.corba.testutils.StubCorbaObject;
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.CORBA.Any;
 import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CORBA.Object;
 import org.omg.IOP.*;
 import org.omg.IOP.CodecFactoryPackage.UnknownEncoding;
 import org.omg.IOP.CodecPackage.InvalidTypeForEncoding;
+import org.omg.IOP.TaggedComponent;
 import org.omg.PortableInterceptor.*;
 import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
 
@@ -30,7 +30,7 @@ import static org.junit.Assert.fail;
 
 public class GroupManagerServiceInterceptorsTest implements GroupInfoServiceObserver {
 
-    private final ClientGroupManager clientGroupManager = new ClientGroupManager();
+    private final TestClientGroupManager clientGroupManager = new TestClientGroupManager();
     private final TestORB orb = stub(TestORB.class);
     private final TestORBData orbData = stub(TestORBData.class);
     private final TestORBInitInfo orbInitInfo = stub(TestORBInitInfo.class);
@@ -41,7 +41,7 @@ public class GroupManagerServiceInterceptorsTest implements GroupInfoServiceObse
     private static final byte[] COMPONENT_DATA_2 = new byte[]{9, 3, 3};
 
     private int numMembershipChanges;
-    private Codec codec;
+    private IOR locatedIOR;
 
     public void membershipChange() {
         numMembershipChanges++;
@@ -54,7 +54,6 @@ public class GroupManagerServiceInterceptorsTest implements GroupInfoServiceObse
         clientGroupManager.addObserver(this);
         CodecFactoryImpl codecFactory = new CodecFactoryImpl(orb);
         orb.register_initial_reference(ORBConstants.CODEC_FACTORY_NAME, codecFactory);
-        codec = codecFactory.create_codec(new Encoding((short)0, (byte)1, (byte)2));
         preInitInitializers();
         postInitInitializers();
         clientGroupManager.reset(contactInfo);
@@ -78,7 +77,7 @@ public class GroupManagerServiceInterceptorsTest implements GroupInfoServiceObse
 
     @Test
     public void whenRequestIORContainsNoFolbMembershipComponent_doNothing() throws ForwardRequest {
-        defineFolbRequestTaggedComponents();  // No components defined
+        defineFolbMembershipTaggedComponents();  // No components defined
 
         sendRequest();
 
@@ -87,7 +86,7 @@ public class GroupManagerServiceInterceptorsTest implements GroupInfoServiceObse
 
     @Test
     public void whenRequestIORContainsOneFolbMembershipComponent_createCorrespondingServiceContext() throws ForwardRequest {
-        defineFolbRequestTaggedComponents(COMPONENT_DATA_1);
+        defineFolbMembershipTaggedComponents(COMPONENT_DATA_1);
 
         sendRequest();
 
@@ -96,7 +95,7 @@ public class GroupManagerServiceInterceptorsTest implements GroupInfoServiceObse
 
     @Test
     public void whenRequestIORContainsMultipleFolbMembershipComponents_useFirstForServiceContext() throws ForwardRequest {
-        defineFolbRequestTaggedComponents(COMPONENT_DATA_1, COMPONENT_DATA_2);
+        defineFolbMembershipTaggedComponents(COMPONENT_DATA_1, COMPONENT_DATA_2);
 
         sendRequest();
 
@@ -119,20 +118,19 @@ public class GroupManagerServiceInterceptorsTest implements GroupInfoServiceObse
 
     @Test
     public void whenReceiveReplyWithFolbServiceContext_issueCallback() throws ForwardRequest, InvalidTypeForEncoding {
-        TestIOR ior = createIORWithFolbTaggedComponents();
-        Object forwardTo = TestObject.createObjectWithIOR(ior);
-        ForwardRequest forwardRequest = new ForwardRequest(forwardTo);
-        Any any = new AnyImpl(orb);
-        ForwardRequestHelper.insert(any, forwardRequest);
-        setFolbIorUpdateContext(codec.encode(any));
+        TestIOR ior = createIORWithFolbMembershipTaggedComponents();
+        setFolbIorUpdateContext(ior);
 
         receiveReply();
 
         assertEquals(1, numMembershipChanges);
+        assertEquals(ior,locatedIOR);
     }
 
-    private void setFolbIorUpdateContext(byte[] data) {
-        clientRequestInfo.setReplyServiceContext(new ServiceContext(ORBConstants.FOLB_IOR_UPDATE_SERVICE_CONTEXT_ID, data));
+    private void setFolbIorUpdateContext(TestIOR ior) {
+        byte[] encodedIOR = {1,1,1,1};
+        clientGroupManager.setIORWithEncoding(ior,encodedIOR);
+        clientRequestInfo.setReplyServiceContext(new ServiceContext(ORBConstants.FOLB_IOR_UPDATE_SERVICE_CONTEXT_ID, encodedIOR));
     }
 
 
@@ -170,16 +168,16 @@ public class GroupManagerServiceInterceptorsTest implements GroupInfoServiceObse
         clientRequestInfo.setOperation(operationName);
     }
 
-    private void defineFolbRequestTaggedComponents(byte[]... componentData) {
-        clientRequestInfo.setEffectiveTarget(createObjectWithFolbTaggedComponents(componentData));
+    private void defineFolbMembershipTaggedComponents(byte[]... componentData) {
+        clientRequestInfo.setEffectiveTarget(createObjectWithFolbMembershipTaggedComponents(componentData));
     }
 
-    private Object createObjectWithFolbTaggedComponents(byte[]... componentData) {
-        TestIOR ior = createIORWithFolbTaggedComponents(componentData);
-        return TestObject.createObjectWithIOR(ior);
+    private Object createObjectWithFolbMembershipTaggedComponents(byte[]... componentData) {
+        TestIOR ior = createIORWithFolbMembershipTaggedComponents(componentData);
+        return StubObject.createObjectWithIOR(ior);
     }
 
-    private static TestIOR createIORWithFolbTaggedComponents(byte[]... componentData) {
+    private static TestIOR createIORWithFolbMembershipTaggedComponents(byte[]... componentData) {
         TaggedComponent[] taggedComponents = new TaggedComponent[componentData.length];
         for (int i = 0; i < taggedComponents.length; i++)
             taggedComponents[i] = new TaggedComponent(ORBConstants.FOLB_MEMBERSHIP_LABEL_TAGGED_COMPONENT_ID, componentData[i]);
@@ -188,13 +186,36 @@ public class GroupManagerServiceInterceptorsTest implements GroupInfoServiceObse
     }
 
 
-    abstract static class TestORBInitInfo extends TestCorbaObject implements ORBInitInfo {
+    abstract static class TestORBInitInfo extends StubCorbaObject implements ORBInitInfo {
         List<ClientRequestInterceptor> clientRequestInterceptors = new ArrayList<ClientRequestInterceptor>();
 
         public void add_client_request_interceptor(ClientRequestInterceptor interceptor) throws DuplicateName {
             clientRequestInterceptors.add(interceptor);
         }
 
+    }
+
+    class TestClientGroupManager extends ClientGroupManager {
+
+
+        private TestIOR ior;
+        private byte[] encodedIOR;
+
+        @Override
+        protected IOR extractIOR(byte[] data) {
+            assertEqualData(encodedIOR,data);
+            return ior;
+        }
+
+        @Override
+        protected void reportLocatedIOR(ClientRequestInfo ri, IOR ior) {
+            locatedIOR = ior;
+        }
+
+        void setIORWithEncoding(TestIOR ior, byte[] encodedIOR) {
+            this.ior = ior;
+            this.encodedIOR = encodedIOR;
+        }
     }
 
     abstract static class TestORBData implements ORBData {

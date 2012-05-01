@@ -3,7 +3,7 @@ package org.glassfish.corba.testutils;
 import org.omg.CORBA.*;
 import org.omg.CORBA.Object;
 
-public class TestCorbaObject implements org.omg.CORBA.Object {
+public class StubCorbaObject implements org.omg.CORBA.Object {
     public boolean _is_a(String s) {
         return false;
     }

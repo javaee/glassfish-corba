@@ -7,9 +7,9 @@ import org.omg.CORBA.portable.ObjectImpl;
 
 import static org.glassfish.corba.testutils.EasyStub.stub;
 
-public class TestObject extends ObjectImpl {
+public class StubObject extends ObjectImpl {
     static org.omg.CORBA.Object createObjectWithIOR(IOR ior) {
-        TestObject result = new TestObject();
+        StubObject result = new StubObject();
         result._set_delegate(createDelegateWithIOR(ior));
         return result;
     }

@@ -51,6 +51,7 @@ import javax.rmi.CORBA.Tie ;
 
 import java.nio.ByteBuffer ;
 
+import corba.util.TransportManagerUtil;
 import org.omg.CORBA.TypeCode ;
 import org.omg.CORBA.ValueMember ;
 import org.omg.CORBA.PUBLIC_MEMBER ;
@@ -610,7 +611,7 @@ public class Client extends TestCase
             mtm.clear() ;
             mtm.enable( false ) ;
 
-            sentMD = ctm.getMessageData( dataSent ) ;
+            sentMD = TransportManagerUtil.getMessageData(dataSent, clientORB) ;
             // temporarily commented out receivedMD = ctm.getMessageData( dataReceived ) ;
         }
 
@@ -665,7 +666,7 @@ public class Client extends TestCase
                 init() ;
                 for (int ctr=0; ctr<dataSent.length; ctr++) {
                     byte[] data = dataSent[ctr] ;
-                    Message msg = ctm.getMessage( data ) ;      
+                    Message msg = TransportManagerUtil.getMessage(data, clientORB) ;
                     checkMessage( msg, 
                         ctr==0 ? Message.GIOPRequest : Message.GIOPFragment, 
                         ctr, dataSent.length ) ;

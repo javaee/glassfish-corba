@@ -375,7 +375,13 @@ public class CDROutputObject
     {
         return corbaMessageMediator;
     }
-    
+
+    public CDRInputObject createInputObject(ORB orb) {
+        ByteBufferWithInfo bbwi = getByteBufferWithInfo();
+        getMessageHeader().setSize(bbwi.getByteBuffer(), bbwi.getSize());
+        return new CDRInputObject(orb, null, bbwi.getByteBuffer(), getMessageHeader());
+    }
+
     // We can move this out somewhere later.  For now, it serves its purpose
     // to create a concrete CDR delegate based on the GIOP version.
     private static class OutputStreamFactory {

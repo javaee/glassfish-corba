@@ -14,6 +14,7 @@ import javax.lang.model.util.Types;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
+import javax.xml.stream.util.StreamReaderDelegate;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.net.URI;
@@ -72,6 +73,15 @@ public class ExceptionWrapperProcessorTestCase {
     public void processor_extendsAbstractProcessor() {
         Class superclass = ExceptionWrapperProcessor.class.getSuperclass();
         assertEquals(AbstractProcessor.class, superclass);
+    }
+
+    @Test
+    public void processer_isRegistered() throws IOException {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("META-INF/services/javax.annotation.processing.Processor");
+        assertNotNull("Resource not found in classpath",inputStream);
+        InputStreamReader isr = new InputStreamReader(inputStream);
+        BufferedReader reader = new BufferedReader(isr);
+        assertEquals(ExceptionWrapperProcessor.class.getName(), reader.readLine());
     }
 
     @Test

@@ -41,7 +41,6 @@
 package corba.travelmuse;
 
 import com.sun.corba.ee.impl.misc.ORBUtility;
-import com.sun.corba.ee.spi.transport.TransportManager;
 import com.sun.corba.ee.spi.transport.MessageData;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -49,6 +48,7 @@ import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 
+import corba.util.TransportManagerUtil;
 import org.testng.annotations.Test ;
 import org.testng.annotations.Configuration ;
 import org.testng.Assert ;
@@ -93,14 +93,13 @@ public class Client {
     @Test
     public void travelMuse() {
         try {
-            msg( "test case travelMuse" ) ;          
-            TransportManager ctm = (TransportManager) myOrb.getCorbaTransportManager() ;
+            msg( "test case travelMuse" ) ;
             InputStream inputFile ;
             inputFile = new FileInputStream("../src/share/classes/corba/travelmuse/mtm.bin");
             ObjectInputStream in = new ObjectInputStream(inputFile);
             Object baResult=in.readObject();
             byte[][] baResult1=(byte[][])baResult;
-            MessageData md = ctm.getMessageData(baResult1);
+            MessageData md = TransportManagerUtil.getMessageData(baResult1, myOrb);
             int bnum = 0 ;
             for (byte[] data : baResult1) {
                 ByteBuffer bb = ByteBuffer.wrap( data ) ;

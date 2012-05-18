@@ -224,7 +224,7 @@ public class MessageMediatorImpl
     //
     // Acceptor constructor.
     //
-    public MessageMediatorImpl(ORB orb,
+    private MessageMediatorImpl(ORB orb,
                                     Connection connection)
     {
         this.orb = orb;

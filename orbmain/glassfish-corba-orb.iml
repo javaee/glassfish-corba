@@ -21,9 +21,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/idl" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/target/bundles" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/idlj-timestamp" />
+      <excludeFolder url="file://$MODULE_DIR$/target/surefire-reports" />
       <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
     </content>
     <orderEntry type="inheritedJdk" />

@@ -50,6 +50,7 @@ import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message ;
 // REVISIT - impl/poa specific:
 import com.sun.corba.ee.impl.oa.poa.Policies;
 
+import com.sun.corba.ee.spi.orb.ORB;
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.ManagedObject ;
@@ -92,32 +93,6 @@ public interface TransportManager {
 
     // Methods for GIOP debugging support
 
-    /** Analyze the header of a message.  This provides enough information to
-     * classify the message and group related messages together for use in 
-     * the getMessageData method.  Also, if data is a GIOP 1.2 message,
-     * the result of this call will contain a valid request ID.
-     */
-    Message getMessage( byte[] data ) ;
-
-    /** Prepare a series of raw GIOP messages for analysis.
-     * messages must be a series of GIOP messages that
-     * satisfy the following conditions:
-     * <OL>
-     * <LI>If there is more than one message, the first message must be
-     * a request or a reply.
-     * <LI>If there is more than one message, all messages after the first
-     * must be fragment messages.
-     * <LI>If there is more than one message, all messages must share the
-     * same request ID (for GIOP 1.2).
-     * <LI>The more fragments bit must be set on all messages except the
-     * last message.
-     * </OL>
-     * An instance of MessageData is returned, with all message headers fully
-     * unmarshalled, and the CDRInputStream is positioned at the start of the
-     * message body (if any).
-     */
-    MessageData getMessageData( byte[][] messages ) ;
-
     /** Return a MessageTraceManager for the current thread.
      * Each thread that calls getMessageTraceManager gets its own
      * independent copy.
@@ -141,6 +116,7 @@ public interface TransportManager {
     public void registerAcceptor(Acceptor acceptor);
 
     public void unregisterAcceptor(Acceptor acceptor);
+
 }
     
 // End of file.

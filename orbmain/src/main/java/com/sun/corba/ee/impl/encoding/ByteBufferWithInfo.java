@@ -64,14 +64,14 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 // data in this object's ByteBuffer.
 
 @Transport
-public class ByteBufferWithInfo
+class ByteBufferWithInfo
 {
     private ORB orb;
     private ByteBuffer byteBuffer;// Marshal buffer.
     private int     needed;     // How many more bytes are needed on overflow.
     private boolean fragmented; // Did the overflow operation fragment?
 
-    public ByteBufferWithInfo(org.omg.CORBA.ORB orb,
+    ByteBufferWithInfo(org.omg.CORBA.ORB orb,
                               ByteBuffer byteBuffer,
                               int index)
     {
@@ -82,12 +82,12 @@ public class ByteBufferWithInfo
         this.setFragmented(false);
     }
 
-    public ByteBufferWithInfo(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer)
+    ByteBufferWithInfo(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer)
     {
         this(orb, byteBuffer, 0);
     }
 
-    public ByteBufferWithInfo(org.omg.CORBA.ORB orb,
+    ByteBufferWithInfo(org.omg.CORBA.ORB orb,
                               BufferManagerWrite bufferManager)
     {
         this(orb, bufferManager, true);
@@ -113,7 +113,7 @@ public class ByteBufferWithInfo
     // byte buffers. Hence, the reason for the boolean 'usePooledByteBuffers'.
     // See EncapsOutputStream for additional information.
 
-    public ByteBufferWithInfo(org.omg.CORBA.ORB orb, 
+    ByteBufferWithInfo(org.omg.CORBA.ORB orb,
                               BufferManagerWrite bufferManager,
                               boolean usePooledByteBuffers)
     {
@@ -138,7 +138,7 @@ public class ByteBufferWithInfo
     }
 
     // Shallow copy constructor
-    public ByteBufferWithInfo (ByteBufferWithInfo bbwi)
+    ByteBufferWithInfo (ByteBufferWithInfo bbwi)
     {
         this.orb = bbwi.orb;
         // IMPORTANT: Cannot simply assign the reference of

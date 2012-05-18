@@ -56,7 +56,6 @@ import org.omg.CORBA.portable.ApplicationException;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
 
-import com.sun.corba.ee.impl.encoding.ByteBufferWithInfo;
 import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
 import com.sun.corba.ee.spi.trace.Subcontract;
@@ -102,19 +101,13 @@ public class SharedCDRClientRequestDispatcherImpl
         operationAndId(messageMediator.getOperationName(), 
             messageMediator.getRequestId());
 
-        CDROutputObject cdrOutputObject = (CDROutputObject) outputObject;
+        CDROutputObject cdrOutputObject = outputObject;
 
         //
         // Create server-side input object.
         //
 
-        ByteBufferWithInfo bbwi = cdrOutputObject.getByteBufferWithInfo();
-        cdrOutputObject.getMessageHeader().setSize(bbwi.getByteBuffer(),
-            bbwi.getSize());
-
-        CDRInputObject cdrInputObject =
-            new CDRInputObject(orb, null, bbwi.getByteBuffer(),
-                            cdrOutputObject.getMessageHeader());
+        CDRInputObject cdrInputObject = cdrOutputObject.createInputObject(orb);
         messageMediator.setInputObject(cdrInputObject);
         cdrInputObject.setMessageMediator(messageMediator);
 
@@ -142,12 +135,8 @@ public class SharedCDRClientRequestDispatcherImpl
         // Create client-side input object
         //
 
-        cdrOutputObject = (CDROutputObject) messageMediator.getOutputObject();
-        bbwi = cdrOutputObject.getByteBufferWithInfo();
-        cdrOutputObject.getMessageHeader().setSize(bbwi.getByteBuffer(), bbwi.getSize());
-        cdrInputObject =
-            new CDRInputObject(orb, null, bbwi.getByteBuffer(), 
-                            cdrOutputObject.getMessageHeader());
+        cdrOutputObject = messageMediator.getOutputObject();
+        cdrInputObject = cdrOutputObject.createInputObject(orb);
         messageMediator.setInputObject(cdrInputObject);
         cdrInputObject.setMessageMediator(messageMediator);
 
@@ -157,6 +146,7 @@ public class SharedCDRClientRequestDispatcherImpl
 
         return processResponse(orb, messageMediator, inputObject);
     }
+
 }
 
 // End of file.

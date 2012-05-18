@@ -21,6 +21,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/idl" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/target/bundles" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/idlj-timestamp" />
       <excludeFolder url="file://$MODULE_DIR$/target/surefire-reports" />
@@ -47,6 +48,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.easymock:easymock:3.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: cglib:cglib-nodep:2.2.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.objenesis:objenesis:1.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.simplestub:simplestub:1.0.b001" level="project" />
   </component>
 </module>
 

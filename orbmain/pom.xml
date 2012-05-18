@@ -74,6 +74,12 @@
             <version>3.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.simplestub</groupId>
+            <artifactId>simplestub</artifactId>
+            <version>1.0.b001</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

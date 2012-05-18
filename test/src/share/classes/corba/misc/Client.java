@@ -299,17 +299,6 @@ public class Client extends TestCase
     }
     */
 
-    /** Test for bug 6158378: problem with marshaling tagged components.
-     */
-    public void testAlternateIIOPAddress()
-    {
-        IIOPAddress addr = IIOPFactories.makeIIOPAddress( "localhost",
-            2345 ) ;
-        AlternateIIOPAddressComponent comp = 
-            IIOPFactories.makeAlternateIIOPAddressComponent( addr ) ;
-        org.omg.IOP.TaggedComponent tcomp = comp.getIOPComponent( orb ) ;
-        assertEquals( tcomp.tag, TAG_ALTERNATE_IIOP_ADDRESS.value ) ;
-    }
 
     private static int counter = 1 ;
 

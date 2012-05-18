@@ -112,11 +112,11 @@
 
 
         <property name="m2.repo"        value="${user.home}/.m2/repository"/>
-        <property name="m2-orb.version" value="4.0-SNAPSHOT"/>
+        <property name="m2-orb.version" value="4.0.0-b001"/>
         <property name="idlc.jar"       value="${m2.repo}/com/sun/corba/idlc/${m2-orb.version}/idlc-${m2-orb.version}.jar"/>
-        <property name="omgapi.jar"     value="${m2.repo}/com/sun/corba/glassfish-corba-omgapi/${m2-orb.version}/glassfish-corba-omgapi-${m2-orb.version}.jar"/>
-        <property name="csiv2-idl.jar"  value="${m2.repo}/com/sun/corba/glassfish-corba-csiv2-idl/${m2-orb.version}/glassfish-corba-csiv2-idl-${m2-orb.version}.jar"/>
-        <property name="orb.jar"        value="${m2.repo}/com/sun/corba/glassfish-corba-orb/${m2-orb.version}/glassfish-corba-orb-${m2-orb.version}.jar"/>
+        <property name="omgapi.jar"     value="${m2.repo}/org/glassfish/corba/glassfish-corba-omgapi/${m2-orb.version}/glassfish-corba-omgapi-${m2-orb.version}.jar"/>
+        <property name="csiv2-idl.jar"  value="${m2.repo}/org/glassfish/corba/glassfish-corba-csiv2-idl/${m2-orb.version}/glassfish-corba-csiv2-idl-${m2-orb.version}.jar"/>
+        <property name="orb.jar"        value="${m2.repo}/org/glassfish/corba/glassfish-corba-orb/${m2-orb.version}/glassfish-corba-orb-${m2-orb.version}.jar"/>
 
         <property name="mavenized.test.classes" value="${root.dir}/functional-tests/target/test-classes"/>
 

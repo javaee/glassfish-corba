@@ -13,9 +13,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: com.sun.corba:glassfish-corba-csiv2-idl:4.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.sun.corba:glassfish-corba-omgapi:4.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.sun.corba:glassfish-corba-orb:4.0-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="glassfish-corba-csiv2-idl" />
+    <orderEntry type="module" module-name="glassfish-corba-omgapi" />
+    <orderEntry type="module" module-name="glassfish-corba-orb" />
     <orderEntry type="library" name="Maven: org.glassfish.pfl:pfl-basic:3.2.0-b001" level="project" />
     <orderEntry type="library" name="Maven: org.apache.felix:org.osgi.core:1.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.pfl:pfl-dynamic:3.2.0-b001" level="project" />
@@ -25,7 +25,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.pfl:pfl-tf:3.2.0-b001" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.pfl:pfl-tf-tools:3.2.0-b001" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.pfl:pfl-basic-tools:3.2.0-b001" level="project" />
-    <orderEntry type="library" name="Maven: com.sun.corba:exception-annotation-processor:4.0-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="exception-annotation-processor" />
     <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.pfl:pfl-test:3.2.0-b001" level="project" />
   </component>
 </module>

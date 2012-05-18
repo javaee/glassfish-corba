@@ -42,6 +42,7 @@ package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
 
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.org.omg.SendingContext.CodeBase;
 
 import com.sun.corba.ee.spi.orb.ORB;
@@ -99,6 +100,15 @@ public class CDRInputObject
     }
 
     private boolean unmarshaledHeader;
+
+    public void addFragment(FragmentMessage header, ByteBuffer byteBuffer) {
+        getBufferManager().processFragment(byteBuffer, header);
+    }
+
+    public void cancelProcessing(int requestId) {
+        BufferManagerReadStream bufferManager = (BufferManagerReadStream) getBufferManager();
+        bufferManager.cancelProcessing(requestId);
+    }
 
     private static class InputStreamFactory {
         public static CDRInputStreamBase newInputStream(

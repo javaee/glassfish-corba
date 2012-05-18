@@ -48,6 +48,7 @@ import java.util.EmptyStackException;
 import java.util.Iterator;
 import java.util.Queue;
 
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.*;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.ExceptionList;
@@ -92,7 +93,6 @@ import com.sun.corba.ee.spi.transport.ContactInfo;
 
 import com.sun.corba.ee.impl.corba.RequestImpl;
 import com.sun.corba.ee.impl.encoding.BufferManagerFactory;
-import com.sun.corba.ee.impl.encoding.BufferManagerReadStream;
 import com.sun.corba.ee.impl.encoding.BufferManagerWrite;
 import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
@@ -101,30 +101,6 @@ import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 import com.sun.corba.ee.spi.logging.InterceptorsSystemException;
 import com.sun.corba.ee.spi.misc.ORBConstants;
 import com.sun.corba.ee.impl.misc.ORBUtility;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.AddressingDispositionHelper;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.CancelRequestMessage;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage_1_1;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage_1_2;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateRequestMessage;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateRequestMessage_1_0;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateRequestMessage_1_1;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateRequestMessage_1_2;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateReplyOrReplyMessage;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateReplyMessage;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateReplyMessage_1_0;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateReplyMessage_1_1;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateReplyMessage_1_2;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageHandler;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage_1_0;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage_1_1;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage_1_2;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.RequestMessage;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.RequestMessage_1_0 ;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.RequestMessage_1_1 ;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.RequestMessage_1_2 ;
 import com.sun.corba.ee.spi.trace.Subcontract;
 import com.sun.corba.ee.spi.trace.Transport;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
@@ -1244,8 +1220,7 @@ public class MessageMediatorImpl
                     return;
                 }
 
-                inObj.getBufferManager()
-                    .processFragment(dispatchByteBuffer, header);
+                inObj.addFragment(header, dispatchByteBuffer);
 
                 if (! header.moreFragmentsToFollow()) {
                     if (connection.isServer()) {
@@ -1306,8 +1281,7 @@ public class MessageMediatorImpl
                     releaseByteBufferToPool();
                     return;
                 }
-                inObj.getBufferManager().processFragment( dispatchByteBuffer,
-                    header);
+                inObj.addFragment(header, dispatchByteBuffer);
 
                 // REVISIT: but if it is a server don't you have to remove the
                 // stream from the map?
@@ -1467,9 +1441,7 @@ public class MessageMediatorImpl
         // that the requests which have been dispatched to the
         // target's method will never be cancelled.
 
-        BufferManagerReadStream bufferManager = (BufferManagerReadStream)
-            mediator.getInputObject().getBufferManager();
-        bufferManager.cancelProcessing(cancelReqId);
+        mediator.getInputObject().cancelProcessing(cancelReqId);
     }
 
     ////////////////////////////////////////////////////
@@ -2296,9 +2268,7 @@ public class MessageMediatorImpl
     public void cancelRequest() {
         CDRInputObject inObj = getInputObject();
         if (inObj != null) {
-            BufferManagerReadStream bufferManager =
-                (BufferManagerReadStream) inObj.getBufferManager();
-            bufferManager.cancelProcessing(getRequestId());
+            inObj.cancelProcessing(getRequestId());
         }
     }
 

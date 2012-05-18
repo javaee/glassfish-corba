@@ -260,6 +260,10 @@ public class CDROutputObject
         return impl.getByteBufferWithInfo();
     }
 
+    public final int getBufferPosition() {
+        return getByteBufferWithInfo().position();
+    }
+
     // REVISIT - make protected once all encoding together
     public final void setByteBufferWithInfo(ByteBufferWithInfo bbwi) {
         impl.setByteBufferWithInfo(bbwi);

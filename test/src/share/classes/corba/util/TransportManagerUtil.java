@@ -47,13 +47,11 @@ public class TransportManagerUtil {
             // Check that moreFragments == (ctr < messages.length)?
 
             if (ctr==0) {
-                firstMessage = msg ;
-                inobj = new CDRInputObject(orb, connection,
-                    msg.getByteBuffer(), msg ) ;
-                buffman = inobj.getBufferManager() ;
+                firstMessage = msg;
+                inobj = new CDRInputObject(orb, connection, msg.getByteBuffer(), msg ) ;
                 inobj.performORBVersionSpecificInit() ;
             } else {
-                buffman.processFragment( msg.getByteBuffer(), (FragmentMessage)msg ) ;
+                inobj.addFragment( (FragmentMessage)msg, msg.getByteBuffer() ); ;
             }
         }
 

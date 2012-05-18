@@ -389,9 +389,9 @@ public class Client extends LocalObject
         org.omg.CORBA.Object fragTestStub = getStub(orb);      
         CDROutputObject os = (CDROutputObject)
             StubAdapter.request(fragTestStub, "fooA", false); // CASE 1
-        int beforePaddingIndex = os.getByteBufferWithInfo().position();
+        int beforePaddingIndex = os.getBufferPosition();
         os.write_char('a'); // forces padding if not already naturally aligned
-        int afterPaddingIndex = os.getByteBufferWithInfo().position();
+        int afterPaddingIndex = os.getBufferPosition();
         int paddingLength = afterPaddingIndex-beforePaddingIndex-charLength;
         if ((paddingLength < 0) || (paddingLength > align)) {
             throw new RuntimeException("marshalling error"); // cannot happen
@@ -409,9 +409,9 @@ public class Client extends LocalObject
         // that will force non-alignment.
         os = (CDROutputObject)
             StubAdapter.request(fragTestStub, "fooAA", false); // CASE 2
-        beforePaddingIndex = os.getByteBufferWithInfo().position();
+        beforePaddingIndex = os.getBufferPosition();
         os.write_char('a'); // forces padding if not already naturally aligned
-        afterPaddingIndex = os.getByteBufferWithInfo().position();
+        afterPaddingIndex = os.getBufferPosition();
         paddingLength = afterPaddingIndex-beforePaddingIndex-charLength;
         if ((paddingLength < 0) || (paddingLength > align)) {
             throw new RuntimeException("marshalling error"); // cannot happen
@@ -429,8 +429,8 @@ public class Client extends LocalObject
             throw new RuntimeException("Header padding error");
         }        
     }
-    
-    static void runMessageError(ORB orb) 
+
+    static void runMessageError(ORB orb)
     {
         org.omg.CORBA.Object fragTestStub = getStub(orb);
         IOR ior = orb.getIOR( fragTestStub, false ) ;

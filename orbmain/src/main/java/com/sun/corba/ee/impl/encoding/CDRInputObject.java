@@ -174,7 +174,7 @@ public class CDRInputObject
         impl.setParent(this);
     }
 
-    public CDRInputObject(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, int size,
+    private CDRInputObject(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, int size,
         boolean littleEndian, GIOPVersion version, byte encodingVersion, BufferManagerRead bufMgr) {
 
         this(orb, byteBuffer, size, littleEndian, version, encodingVersion,

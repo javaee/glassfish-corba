@@ -44,8 +44,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>${maven-bundle-plugin-version}</version>
-                <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Export-Package>com.sun.corba.ee.org.omg.*</Export-Package>

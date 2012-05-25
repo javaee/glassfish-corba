@@ -3,7 +3,8 @@
   <parent>
     <artifactId>mojo-parent</artifactId>
     <groupId>org.codehaus.mojo</groupId>
-    <version>20</version>
+    <version>30</version>
+    <relativePath></relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>idlj-maven-plugin</artifactId>

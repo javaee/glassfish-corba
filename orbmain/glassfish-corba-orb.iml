@@ -4,6 +4,7 @@
     <facet type="Osmorc" name="OSGi">
       <configuration manifestGenerationMode="OsmorcControlled" manifestLocation="" jarfileLocation="glassfish-corba-orb-4.0.0-b001.jar" outputPathType="CompilerOutputPath" bndFileLocation="" bundlorFileLocation="" bundleActivator="" bundleSymbolicName="org.glassfish.corba.glassfish-corba-orb" bundleVersion="4.0.0.b001" ignoreFilePattern="" useProjectDefaultManifestFileLocation="true" alwaysRebuildBundleJAR="false" doNotSynchronizeWithMaven="false">
         <additionalProperties>
+          <property key="Bundle-Description" value="null" />
           <property key="Export-Package" value="com.sun.corba.ee.*,com.sun.org.omg.*" />
           <property key="Bundle-Name" value="GlassFish Corba ORB" />
           <property key="Include-Resource" value="com/sun/corba/ee/impl/resources/sunorb.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb.properties,com/sun/corba/ee/impl/resources/sunorb_de.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_de.properties,com/sun/corba/ee/impl/resources/sunorb_es.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_es.properties,com/sun/corba/ee/impl/resources/sunorb_fr.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_fr.properties,com/sun/corba/ee/impl/resources/sunorb_it.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_it.properties,com/sun/corba/ee/impl/resources/sunorb_ja.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_ja.properties,com/sun/corba/ee/impl/resources/sunorb_ko.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_ko.properties,com/sun/corba/ee/impl/resources/sunorb_sv.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_sv.properties,com/sun/corba/ee/impl/resources/sunorb_zh_CN.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_zh_CN.properties,com/sun/corba/ee/impl/resources/sunorb_zh_TW.properties=$MODULE_DIR$/src/main/resources/com/sun/corba/ee/impl/resources/sunorb_zh_TW.properties" />
@@ -20,9 +21,11 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/idl" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/target/bundles" />
+      <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/test-annotations" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/annotations" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/idlj-timestamp" />
+      <excludeFolder url="file://$MODULE_DIR$/target/surefire" />
       <excludeFolder url="file://$MODULE_DIR$/target/surefire-reports" />
       <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
     </content>
@@ -47,7 +50,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.easymock:easymock:3.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: cglib:cglib-nodep:2.2.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.objenesis:objenesis:1.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.simplestub:simplestub:1.0.b001" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.simplestub:simplestub:0.1" level="project" />
   </component>
 </module>
 

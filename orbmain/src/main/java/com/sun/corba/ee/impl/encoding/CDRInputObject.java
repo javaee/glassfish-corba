@@ -742,10 +742,6 @@ public class CDRInputObject
         impl.setBufferLength(value);
     }
 
-    protected final int getIndex() {
-        return impl.getIndex();
-    }
-
     protected final void setIndex(int value) {
         impl.setIndex(value);
     }

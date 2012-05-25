@@ -5,7 +5,6 @@
     <groupId>org.glassfish.corba</groupId>
     <artifactId>glassfish-corba-csiv2-idl</artifactId>
     <name>GlassFish Corba CSIv2 IDL</name>
-    <version>${orb-version}</version>
     <packaging>bundle</packaging>
     <parent>
         <groupId>org.glassfish.corba</groupId>

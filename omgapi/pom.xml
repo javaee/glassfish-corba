@@ -6,7 +6,6 @@
     <artifactId>glassfish-corba-omgapi</artifactId>
     <packaging>bundle</packaging>
     <name>GlassFish Corba OMG API</name>
-    <version>${orb-version}</version>
     <parent>
         <groupId>org.glassfish.corba</groupId>
         <artifactId>glassfish-corba</artifactId>

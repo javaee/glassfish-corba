@@ -213,15 +213,6 @@ public class Client
         return bytes ;
     }
 
-    private byte[] getBytes( InputStream is )
-    {
-        CDRInputObject cis = (CDRInputObject)is ;
-        int len = cis.getBufferLength() ;
-        byte[] result = new byte[ len ] ;
-        cis.read_octet_array( result, 0, len ) ;
-        return result ;
-    }
-
     private CDRInputObject makeInputStream( OutputStream os )
     {
         byte[] bytes = getBytes( os ) ;

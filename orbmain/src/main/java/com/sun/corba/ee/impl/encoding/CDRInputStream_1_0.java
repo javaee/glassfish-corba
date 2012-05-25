@@ -681,7 +681,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
         // skip the two null terminator bytes
         read_wchar();
-        // bbwi.position(bbwi.position() + 2);
 
         return new String(c);
     }
@@ -1075,8 +1074,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
             if (repositoryIDString.equals(repIdStrs.getWStringValueRepId())) {
                 value = read_wstring();
-            } else if (repositoryIDString.equals(
-                repIdStrs.getClassDescValueRepId())) {
+            } else if (repositoryIDString.equals(repIdStrs.getClassDescValueRepId())) {
                 value = readClass();
             } else {
                 Class valueClass = expectedType;
@@ -1881,17 +1879,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     // CDRInputStream state management.
     //
 
-    /** 
-     * Are we at the end of the input stream?
-     */
-//     public final boolean isAtEnd() {
-//      return bbwi.position() == bbwi.buflen;
-//     }
 
-//     public int available() throws IOException {
-//         return bbwi.buflen - bbwi.position();
-//     }
-    
     @CdrRead
     private String read_repositoryIds() {
                 

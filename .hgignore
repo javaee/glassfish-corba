@@ -19,7 +19,7 @@ test/build/**
 test/run/**
 optional/build/**
 optional/test/build/**
-target/**
+**/target/**
 make/errorfile
 webrev/**
 NORENAME

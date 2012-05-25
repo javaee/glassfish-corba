@@ -15,7 +15,7 @@ public class CDRMemoryManagementTest extends EncodingTestBase {
 
         getInputObject().read_long();
 
-        assertEquals(0, getNumBuffersReturned());
+        assertEquals(0, getNumBuffersReleased());
     }
 
     @Test
@@ -26,7 +26,7 @@ public class CDRMemoryManagementTest extends EncodingTestBase {
         getInputObject().read_long();
         getInputObject().read_long();
 
-        assertEquals(1, getNumBuffersReturned());
+        assertEquals(1, getNumBuffersReleased());
     }
 
     @Test
@@ -38,7 +38,7 @@ public class CDRMemoryManagementTest extends EncodingTestBase {
         getInputObject().mark(0);
         getInputObject().read_long();
 
-        assertEquals(0, getNumBuffersReturned());
+        assertEquals(0, getNumBuffersReleased());
     }
 
     @Test
@@ -52,7 +52,7 @@ public class CDRMemoryManagementTest extends EncodingTestBase {
         getInputObject().reset();
         getInputObject().read_long();
 
-        assertEquals(1, getNumBuffersReturned());
+        assertEquals(1, getNumBuffersReleased());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class CDRMemoryManagementTest extends EncodingTestBase {
         getInputObject().read_short();
         getInputObject().close();
 
-        assertEquals(2, getNumBuffersReturned());
+        assertEquals(2, getNumBuffersReleased());
     }
 
     @Test
@@ -75,6 +75,6 @@ public class CDRMemoryManagementTest extends EncodingTestBase {
         getInputObject().mark(0);
         getInputObject().close();
 
-        assertEquals(2, getNumBuffersReturned());
+        assertEquals(2, getNumBuffersReleased());
     }
 }

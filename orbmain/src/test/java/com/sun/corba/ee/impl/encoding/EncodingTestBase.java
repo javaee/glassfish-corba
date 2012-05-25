@@ -117,8 +117,8 @@ public class EncodingTestBase {
             message.body[i] = (byte) (FF & values[i]);
     }
 
-    protected final int getNumBuffersReturned() {
-        return pool.getNumBuffersReturned();
+    protected final int getNumBuffersReleased() {
+        return pool.getNumBuffersReleased();
     }
 
     enum Endian {big_endian, little_endian}
@@ -148,7 +148,7 @@ public class EncodingTestBase {
     static abstract class ByteBufferPoolFake implements ByteBufferPool {
         private List<ByteBuffer> buffers = new ArrayList<ByteBuffer>();
 
-        protected int getNumBuffersReturned() {
+        protected int getNumBuffersReleased() {
             return buffers.size();
         }
 

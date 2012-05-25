@@ -24,9 +24,10 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.glassfish.pfl</groupId>
-          <artifactId>pfl-basic</artifactId>
-          <version>${pfl-version}</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>exception-annotation-processor</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -34,20 +35,25 @@
             <version>1.2.0</version>
         </dependency>
         <dependency>
-          <groupId>org.glassfish.pfl</groupId>
-          <artifactId>pfl-dynamic</artifactId>
-          <version>${pfl-version}</version>
-        </dependency>
-        <dependency>
           <groupId>org.glassfish.gmbal</groupId>
           <artifactId>gmbal</artifactId>
           <version>3.2.0-b003</version>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.corba</groupId>
-            <artifactId>exception-annotation-processor</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
+          <groupId>org.glassfish.pfl</groupId>
+          <artifactId>pfl-basic</artifactId>
+          <version>${pfl-version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.glassfish.pfl</groupId>
+          <artifactId>pfl-dynamic</artifactId>
+          <version>${pfl-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.pfl</groupId>
+            <artifactId>pfl-test</artifactId>
+            <version>${pfl-version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -59,12 +65,6 @@
             <groupId>javax.jdo</groupId>
             <artifactId>jdo2-api</artifactId>
             <version>2.3-eb</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.pfl</groupId>
-            <artifactId>pfl-test</artifactId>
-            <version>${pfl-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

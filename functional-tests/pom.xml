@@ -2,65 +2,70 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.glassfish.corba</groupId>
+    <parent>
+        <groupId>org.glassfish.corba</groupId>
+        <artifactId>glassfish-corba-parent</artifactId>
+        <version>4.0.0-b001-SNAPSHOT</version>
+        <relativePath>../orbparent</relativePath>
+    </parent>
+
     <artifactId>glassfish-corba-tests</artifactId>
     <name>GlassFish Corba Functional Tests</name>
-    <version>4.0.0-b001-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.glassfish.corba</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>glassfish-corba-csiv2-idl</artifactId>
-            <version>4.0.0-b001</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.corba</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>glassfish-corba-omgapi</artifactId>
-            <version>4.0.0-b001</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.corba</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>glassfish-corba-orb</artifactId>
-            <version>4.0.0-b001</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.pfl</groupId>
             <artifactId>pfl-asm</artifactId>
-            <version>3.2.0-b001</version>
+            <version>${pfl-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.pfl</groupId>
             <artifactId>pfl-basic</artifactId>
-            <version>3.2.0-b001</version>
+            <version>${pfl-version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.pfl</groupId>
             <artifactId>pfl-basic-tools</artifactId>
-            <version>3.2.0-b001</version>
+            <version>${pfl-version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.pfl</groupId>
             <artifactId>pfl-dynamic</artifactId>
-            <version>3.2.0-b001</version>
+            <version>${pfl-version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.pfl</groupId>
             <artifactId>pfl-tf</artifactId>
-            <version>3.2.0-b001</version>
+            <version>${pfl-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.pfl</groupId>
             <artifactId>pfl-tf-tools</artifactId>
-            <version>3.2.0-b001</version>
+            <version>${pfl-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.pfl</groupId>
             <artifactId>pfl-test</artifactId>
-            <version>3.2.0-b001</version>
+            <version>${pfl-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -107,10 +112,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -147,11 +148,13 @@
                                     <property name="test-build.dir" value="${project.build.directory}/test"/>
                                     <property name="root.dir" value=".."/>
                                     <property name="m2.repo" value="${settings.localRepository}"/>
+                                    <property name="m2-orb.version" value="${project.version}"/>
                                 </ant>
                                 <ant antfile="../make/build.xml" target="test-all">
                                     <property name="test-build.dir" value="${project.build.directory}/test"/>
                                     <property name="root.dir" value=".."/>
                                     <property name="m2.repo" value="${settings.localRepository}"/>
+                                    <property name="m2-orb.version" value="${project.version}"/>
                                 </ant>
                             </target>
                         </configuration>

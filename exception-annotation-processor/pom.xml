@@ -11,14 +11,13 @@
     </parent>
 
     <artifactId>exception-annotation-processor</artifactId>
-    <version>1.0</version>
     <name>GlassFish Corba Exception Annotation Processor</name>
 
     <dependencies>
         <dependency>
             <groupId>org.glassfish.pfl</groupId>
             <artifactId>pfl-basic</artifactId>
-            <version>3.2.0-b001</version>
+            <version>${pfl-version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

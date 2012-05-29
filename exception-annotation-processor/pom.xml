@@ -5,13 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.glassfish.corba</groupId>
-        <artifactId>glassfish-corba-parent</artifactId>
+        <artifactId>glassfish-corba</artifactId>
         <version>4.0.0-b001-SNAPSHOT</version>
-        <relativePath>../orbparent</relativePath>
     </parent>
 
     <artifactId>exception-annotation-processor</artifactId>
-    <name>GlassFish Corba Exception Annotation Processor</name>
+    <name>Exception Annotation Processor</name>
 
     <dependencies>
         <dependency>

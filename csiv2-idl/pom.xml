@@ -5,18 +5,19 @@
 
     <parent>
         <groupId>org.glassfish.corba</groupId>
-        <artifactId>glassfish-corba</artifactId>
+        <artifactId>glassfish-corba-parent</artifactId>
         <version>4.0.0-b001-SNAPSHOT</version>
+        <relativePath>../orbparent</relativePath>
     </parent>
 
     <artifactId>glassfish-corba-csiv2-idl</artifactId>
-    <name>GlassFish Corba CSIv2 IDL</name>
+    <name>GlassFish CSIv2 IDL</name>
     <packaging>bundle</packaging>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.glassfish.corba</groupId>
                 <artifactId>idlj-maven-plugin</artifactId>
                 <configuration>
                     <includeDirs>

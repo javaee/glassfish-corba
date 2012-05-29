@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+<!--
   <parent>
     <artifactId>mojo-parent</artifactId>
     <groupId>org.codehaus.mojo</groupId>
     <version>30</version>
     <relativePath></relativePath>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+-->
+    <parent>
+        <groupId>org.glassfish.corba</groupId>
+        <artifactId>glassfish-corba</artifactId>
+        <version>4.0.0-b001-SNAPSHOT</version>
+    </parent>
   <artifactId>idlj-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>CORBA IDL Compiler Maven Plugin</name>
+<!--
   <version>1.2-SNAPSHOT</version>
+-->
   <description>
     This plugin is for processing IDL files into java sources.
   </description>
@@ -88,11 +97,13 @@
     </license>
   </licenses>
 
+<!--
   <scm>
     <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/idlj-maven-plugin/</connection>
     <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/idlj-maven-plugin/</developerConnection>
     <url>http://svn.codehaus.org/mojo/trunk/mojo/idlj-maven-plugin/</url>
   </scm>
+-->
 
   <dependencies>
     <dependency>

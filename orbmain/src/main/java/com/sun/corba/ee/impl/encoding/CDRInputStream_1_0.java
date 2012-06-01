@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -282,11 +282,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         }
 
         return 0;
-    }
-
-    public int getSize()
-    {
-        return bbwi.position();
     }
 
     @InfoMethod
@@ -1081,12 +1076,9 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
                 // By this point, either the expectedType or repositoryIDString
                 // is guaranteed to be non-null.
-                if (valueClass == null ||
-                    !repositoryIDString.equals(repIdStrs.createForAnyType(
-                        expectedType,cinfo))) {
+                if (valueClass == null || !repositoryIDString.equals(repIdStrs.createForAnyType(expectedType,cinfo))) {
 
-                    valueClass = getClassFromString(repositoryIDString,
-                        codebase_URL, expectedType);
+                    valueClass = getClassFromString(repositoryIDString, codebase_URL, expectedType);
                     cinfo = ClassInfoCache.get( valueClass ) ;
                 }
 
@@ -1097,11 +1089,9 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                     // class information is not available.
                     // Fix for issue 1828: pass the class name for a better log
                     // message.
-                    RepositoryIdInterface repositoryID
-                        = repIdStrs.getFromString(repositoryIDString);
+                    RepositoryIdInterface repositoryID = repIdStrs.getFromString(repositoryIDString);
 
-                    throw wrapper.couldNotFindClass(
-                        repositoryID.getClassName()) ;
+                    throw wrapper.couldNotFindClass(repositoryID.getClassName()) ;
                 }
 
                 if (cinfo.isEnum()) {
@@ -2244,8 +2234,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                                      String codebaseURL,
                                      Class<?> expectedType)
     {
-        RepositoryIdInterface repositoryID 
-            = repIdStrs.getFromString(repositoryIDString);
+        RepositoryIdInterface repositoryID = repIdStrs.getFromString(repositoryIDString);
 
         ClassCodeBaseHandler ccbh = orb.classCodeBaseHandler() ;
         if (ccbh != null) {

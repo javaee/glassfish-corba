@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -49,8 +49,6 @@ import java.rmi.Remote ;
 import java.rmi.RemoteException ;
 
 import java.util.Map ;
-import java.util.concurrent.ConcurrentMap ;
-import java.util.concurrent.ConcurrentHashMap ;
 import java.util.WeakHashMap ;
 
 import org.omg.CORBA.UserException ;
@@ -154,7 +152,7 @@ public class ClassInfoCache {
 
         ClassInfo( Class<?> cls ) {
             isArray = cls.isArray() ;
-            isEnum = checkForEnum( cls ) ;
+            isEnum = isEnum(cls) ;
             isInterface = cls.isInterface() ;
             isProxyClass = Proxy.isProxyClass( cls ) ;
 
@@ -168,7 +166,7 @@ public class ClassInfoCache {
             }
         }
 
-        private final boolean checkForEnum(Class<?> cls) {
+        private boolean isEnum(Class<?> cls) {
             // Issue 11681
             // This ugly method is needed because isEnum returns FALSE
             // on enum.getClass().isEnum() if enum has an abstract method,
@@ -277,7 +275,7 @@ public class ClassInfoCache {
 
     public static synchronized ClassInfo get( Class<?> cls ) {
         ClassInfo result = classData.get( cls ) ;
-        if (result == null) {
+        if (result == null && cls != null) {
             result = new ClassInfo( cls ) ;
             classData.put( cls, result ) ;
         }

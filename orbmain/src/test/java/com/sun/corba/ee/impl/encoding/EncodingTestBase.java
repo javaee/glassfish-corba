@@ -48,9 +48,11 @@ import com.sun.corba.ee.spi.orb.ORBVersion;
 import com.sun.corba.ee.spi.orb.ORBVersionFactory;
 import com.sun.corba.ee.spi.transport.ByteBufferPool;
 import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.org.omg.SendingContext.CodeBase;
 import org.glassfish.simplestub.SimpleStub;
 import org.glassfish.simplestub.Stub;
 import org.junit.Before;
+import org.omg.CORBA.portable.ValueFactory;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -114,7 +116,13 @@ public class EncodingTestBase {
 
     protected final CDRInputObject getInputObject() {
         if (inputObject == null)
-            inputObject = new CDRInputObject(orb, connection, getByteBuffer(), message);
+            inputObject = createInputObject();
+        return inputObject;
+    }
+
+    private CDRInputObject createInputObject() {
+        CDRInputObject inputObject = new CDRInputObject(orb, connection, getByteBuffer(), message);
+        inputObject.performORBVersionSpecificInit();
         return inputObject;
     }
 
@@ -165,6 +173,10 @@ public class EncodingTestBase {
         message.body = new byte[values.length];
         for (int i = 0; i < values.length; i++)
             message.body[i] = (byte) (FF & values[i]);
+    }
+
+    protected final void setMessageBody(byte[] values) {
+        message.body = values.clone();
     }
 
     protected final int getNumBuffersReleased() {
@@ -239,6 +251,11 @@ public class EncodingTestBase {
             return pool;
         }
 
+        @Override
+        public ValueFactory lookup_value_factory(String repID) {
+            return null;
+        }
+
         public void setByteBufferPool(ByteBufferPool pool) {
             this.pool = pool;
         }
@@ -269,6 +286,10 @@ public class EncodingTestBase {
             return codeSets;
         }
 
+        @Override
+        public CodeBase getCodeBase() {
+            return null;
+        }
     }
 
     //--------------------------------------- fake implementation of a Message -----------------------------------------

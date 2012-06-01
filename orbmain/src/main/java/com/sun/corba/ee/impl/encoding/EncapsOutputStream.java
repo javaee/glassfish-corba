@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -103,14 +103,14 @@ public class EncapsOutputStream extends CDROutputObject
                               GIOPVersion version, 
                               boolean isLittleEndian)
     {
-        super(orb, version, ORBUtility.getEncodingVersion(), isLittleEndian,
+        super(orb, version, isLittleEndian,
               BufferManagerFactory.newBufferManagerWrite(
                                         BufferManagerFactory.GROW,
                                         ORBUtility.getEncodingVersion(),
                                         orb),
               ORBConstants.STREAM_FORMAT_VERSION_1,
-              usePooledByteBuffers,
-              false); 
+              usePooledByteBuffers
+        );
     }
 
     @Override

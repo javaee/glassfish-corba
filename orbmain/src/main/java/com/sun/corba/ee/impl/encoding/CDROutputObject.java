@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,7 +45,6 @@ import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.protocol.MessageMediator ;
 import com.sun.corba.ee.spi.transport.TransportManager;
 import com.sun.corba.ee.spi.transport.Connection;
-import com.sun.corba.ee.spi.misc.ORBConstants ;
 
 import com.sun.corba.ee.impl.misc.ORBUtility;
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
@@ -70,13 +69,10 @@ public class CDROutputObject
     implements com.sun.corba.ee.impl.encoding.MarshalOutputStream,
                org.omg.CORBA.DataOutputStream, org.omg.CORBA.portable.ValueOutputStream
 {
-    protected static final ORBUtilSystemException wrapper =
-        ORBUtilSystemException.self ;
-    private static final OMGSystemException omgWrapper =
-        OMGSystemException.self ;
+    protected static final ORBUtilSystemException wrapper = ORBUtilSystemException.self ;
+    private static final OMGSystemException omgWrapper = OMGSystemException.self ;
     private static final long serialVersionUID = -3801946738338642735L;
 
-    private transient ORB orb;
     private transient CDROutputStreamBase impl;
 
     private Message header;
@@ -87,7 +83,6 @@ public class CDROutputObject
     // Should never be called.
     private void readObject( ObjectInputStream is ) throws IOException,
         ClassNotFoundException {
-        orb = null ;
         impl = null ;
         corbaMessageMediator = null ;
         connection = null ;
@@ -95,54 +90,37 @@ public class CDROutputObject
     }
 
     @CdrWrite
-    private void createCDROutputStream(ORB orb, GIOPVersion version, byte encodingVersion, 
-        boolean littleEndian, BufferManagerWrite bufferManager, 
-        byte streamFormatVersion, boolean usePooledByteBuffers, boolean directWrite) {
-        impl = OutputStreamFactory.newOutputStream(orb, 
-            version, encodingVersion, directWrite);
-        impl.init(orb, littleEndian, bufferManager, streamFormatVersion, 
-            usePooledByteBuffers);
-
+    private void createCDROutputStream(ORB orb, GIOPVersion version,
+                                       boolean littleEndian, BufferManagerWrite bufferManager,
+                                       byte streamFormatVersion, boolean usePooledByteBuffers) {
+        impl = OutputStreamFactory.newOutputStream(version);
+        impl.init(orb, littleEndian, bufferManager, streamFormatVersion, usePooledByteBuffers);
         impl.setParent(this);
     }
 
-    public CDROutputObject(ORB orb, GIOPVersion version, byte encodingVersion, 
-        boolean littleEndian, BufferManagerWrite bufferManager, 
-        byte streamFormatVersion, boolean usePooledByteBuffers, boolean directWrite)
+    public CDROutputObject(ORB orb, GIOPVersion version,
+                           boolean littleEndian, BufferManagerWrite bufferManager,
+                           byte streamFormatVersion, boolean usePooledByteBuffers)
     {
-        createCDROutputStream( orb, version, encodingVersion, littleEndian,
-            bufferManager, streamFormatVersion,usePooledByteBuffers, directWrite ) ;
+        createCDROutputStream( orb, version, littleEndian,
+                               bufferManager, streamFormatVersion, usePooledByteBuffers) ;
 
         this.header = null ;
         this.corbaMessageMediator = null ;
         this.connection = null ;
     }
 
-    public CDROutputObject(ORB orb, GIOPVersion version, byte encodingVersion, 
-        boolean littleEndian, BufferManagerWrite bufferManager, 
-        byte streamFormatVersion, boolean usePooledByteBuffers) 
-    {
-        this(orb, version, encodingVersion, littleEndian, 
-             bufferManager, streamFormatVersion, usePooledByteBuffers, true);
-    }
 
-    public CDROutputObject(ORB orb, GIOPVersion version, byte encodingVersion, 
-        boolean littleEndian, BufferManagerWrite bufferManager, 
-        byte streamFormatVersion) 
-    {
-        this(orb, version, encodingVersion, littleEndian, 
-             bufferManager, streamFormatVersion, true);
+    public CDROutputObject(ORB orb, GIOPVersion version,
+                           boolean littleEndian, BufferManagerWrite bufferManager,
+                           byte streamFormatVersion) {
+        this(orb, version, littleEndian, bufferManager, streamFormatVersion, true);
     }
 
     private CDROutputObject( ORB orb, GIOPVersion giopVersion, 
-        Message header, BufferManagerWrite manager, 
-        byte streamFormatVersion, MessageMediator mediator)
-    {
-        this(orb, giopVersion, header.getEncodingVersion(), false, manager, 
-            streamFormatVersion, 
-            (mediator != null && mediator.getConnection() != null) 
-                ? mediator.getConnection().shouldUseDirectByteBuffers() 
-                : false ) ;
+                             Message header, BufferManagerWrite manager,
+                             byte streamFormatVersion, MessageMediator mediator) {
+        this(orb, giopVersion, false, manager, streamFormatVersion, usePooledBuffers(mediator)) ;
 
         this.header = header;
         this.corbaMessageMediator = mediator;
@@ -150,14 +128,14 @@ public class CDROutputObject
         getBufferManager().setOutputObject(this);
     }
 
-    public CDROutputObject(ORB orb, MessageMediator messageMediator,
-        Message header, byte streamFormatVersion) 
-    {
-        this( orb, messageMediator.getGIOPVersion(), header, 
-            BufferManagerFactory.newBufferManagerWrite(
-                messageMediator.getGIOPVersion(),
-                header.getEncodingVersion(), orb),
-            streamFormatVersion, messageMediator);
+    private static boolean usePooledBuffers(MessageMediator mediator) {
+        return (mediator != null && mediator.getConnection() != null) && mediator.getConnection().shouldUseDirectByteBuffers();
+    }
+
+    public CDROutputObject(ORB orb, MessageMediator messageMediator, Message header, byte streamFormatVersion) {
+        this(orb, messageMediator.getGIOPVersion(), header,
+                BufferManagerFactory.newBufferManagerWrite(messageMediator.getGIOPVersion(), header.getEncodingVersion(), orb),
+                streamFormatVersion, messageMediator);
     }
 
     // NOTE: 
@@ -166,25 +144,21 @@ public class CDROutputObject
     public CDROutputObject(ORB orb, MessageMediator messageMediator,
                            Message header,
                            byte streamFormatVersion,
-                           int strategy) 
-    {
-        this( orb, messageMediator.getGIOPVersion(), header, 
-            BufferManagerFactory.newBufferManagerWrite(
-                strategy, header.getEncodingVersion(), orb),
-            streamFormatVersion, messageMediator);
+                           int strategy) {
+        this(orb, messageMediator.getGIOPVersion(), header,
+                BufferManagerFactory.newBufferManagerWrite(strategy, header.getEncodingVersion(), orb),
+                streamFormatVersion, messageMediator);
     }
 
     // REVISIT 
     // Used on sendCancelRequest.
     // Used for needs addressing mode.
-    public CDROutputObject(ORB orb, MessageMediator mediator,
-        GIOPVersion giopVersion, Connection connection, Message header,
-        byte streamFormatVersion) {
+    public CDROutputObject(ORB orb, MessageMediator mediator, GIOPVersion giopVersion,
+                           Connection connection, Message header, byte streamFormatVersion) {
 
         this( orb, giopVersion, header, 
-            BufferManagerFactory.newBufferManagerWrite( giopVersion, 
-                header.getEncodingVersion(), orb),
-            streamFormatVersion, mediator ) ;
+              BufferManagerFactory.newBufferManagerWrite( giopVersion, header.getEncodingVersion(), orb),
+              streamFormatVersion, mediator ) ;
         this.connection = connection ;
     }
 
@@ -390,9 +364,7 @@ public class CDROutputObject
     // to create a concrete CDR delegate based on the GIOP version.
     private static class OutputStreamFactory {
         
-        public static CDROutputStreamBase newOutputStream(
-                ORB orb, GIOPVersion version, byte encodingVersion,
-                boolean directWrite) {
+        public static CDROutputStreamBase newOutputStream(GIOPVersion version) {
             switch(version.intValue()) {
                 case GIOPVersion.VERSION_1_0:
                     return new CDROutputStream_1_0();

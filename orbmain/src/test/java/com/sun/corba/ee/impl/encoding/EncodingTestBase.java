@@ -42,10 +42,12 @@ package com.sun.corba.ee.impl.encoding;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.orb.ORBData;
 import com.sun.corba.ee.spi.orb.ORBVersion;
 import com.sun.corba.ee.spi.orb.ORBVersionFactory;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.transport.ByteBufferPool;
 import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.org.omg.SendingContext.CodeBase;
@@ -63,6 +65,7 @@ import static com.sun.corba.ee.impl.encoding.EncodingTestBase.Fragments.*;
 import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_0;
 import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_1;
 import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_2;
+import static org.junit.Assert.assertArrayEquals;
 
 public class EncodingTestBase {
     protected static final byte REQUEST = 0;
@@ -71,6 +74,7 @@ public class EncodingTestBase {
     protected static final int UTF_16 = OSFCodeSetRegistry.UTF_16.getNumber();
     protected static final int FE = 0xfe;
     protected static final int FF = 0xff;
+    protected static final int PAD = 0;  // use for output tests only, to make comparison possible
 
     private ORBDataFake orbData = Stub.create(ORBDataFake.class);
     private ORBFake orb = Stub.create(ORBFake.class);
@@ -78,8 +82,11 @@ public class EncodingTestBase {
     private MessageFake message = Stub.create(MessageFake.class);
     private MessageFake fragment = Stub.create(MessageFake.class);
     private ByteBufferPoolFake pool = Stub.create(ByteBufferPoolFake.class);
+    private MessageMediatorFake mediator = Stub.create(MessageMediatorFake.class);
 
     private CDRInputObject inputObject;
+    private CDROutputObject outputObject;
+    private byte formatVersion = ORBConstants.STREAM_FORMAT_VERSION_1;
 
     static byte flags(Endian endian, Fragments fragments) {
         byte result = 0;
@@ -97,6 +104,15 @@ public class EncodingTestBase {
     public void setUp() throws Exception {
         orb.setORBData(orbData);
         orb.setByteBufferPool(pool);
+        mediator.setConnection(connection);
+    }
+
+    protected final void useStreamFormatVersion1() {
+        formatVersion = ORBConstants.STREAM_FORMAT_VERSION_1;
+    }
+
+    protected final void useStreamFormatVersion2() {
+        formatVersion = ORBConstants.STREAM_FORMAT_VERSION_2;
     }
 
     protected final void setCharEncoding(int encoding) {
@@ -183,6 +199,38 @@ public class EncodingTestBase {
         return pool.getNumBuffersReleased();
     }
 
+    // Note: the tests assume that the buffer contents start after the header. For the output logic, the object is created
+    // positioned after the header, so the comparison must skip that.
+
+    protected final CDROutputObject getOutputObject() {
+        if (outputObject == null)
+            outputObject = createOutputObject();
+        return outputObject;
+    }
+
+    private CDROutputObject createOutputObject() {
+        CDROutputObject outputObject = new CDROutputObject(orb, mediator, message.giopVersion, connection, message, formatVersion);
+        outputObject.setIndex(Message.GIOPMessageHeaderLength);
+        return outputObject;
+    }
+
+    protected final void expectByteArray(byte... expected) {
+        assertArrayEquals(expected, subBuffer(getOutputObject().toByteArray(), Message.GIOPMessageHeaderLength));
+    }
+
+    private byte[] subBuffer(byte[] input, int start) {
+        byte[] result = new byte[input.length-start];
+        System.arraycopy(input, start, result, 0, result.length);
+        return result;
+    }
+
+    protected final void expectByteArray(int... expected) {
+        byte[] bytes = new byte[expected.length];
+        for (int i = 0; i < expected.length; i++)
+            bytes[i] = (byte) (FF & expected[i]);
+        expectByteArray(bytes);
+    }
+
     enum Endian {big_endian, little_endian}
 
     enum Fragments {no_more_fragments, more_fragments}
@@ -196,11 +244,27 @@ public class EncodingTestBase {
     @SimpleStub(strict=true)
     static abstract class ORBDataFake implements ORBData {
         private AsynchronousAction asynchronousAction;
+        private int giopBufferSize = 250;
 
         @Override
         public int fragmentReadTimeout() {
             if (asynchronousAction != null) asynchronousAction.exec();
             return 1;
+        }
+
+        @Override
+        public int getGIOPBuffMgrStrategy(GIOPVersion gv) {
+            return 0;
+        }
+
+        @Override
+        public int getGIOPBufferSize() {
+            return giopBufferSize;
+        }
+
+        @Override
+        public boolean useByteOrderMarkers() {
+            return true;
         }
     }
 
@@ -289,6 +353,28 @@ public class EncodingTestBase {
         @Override
         public CodeBase getCodeBase() {
             return null;
+        }
+
+        @Override
+        public boolean shouldUseDirectByteBuffers() {
+            return false;
+        }
+    }
+
+    //---------------------------------- fake implementation of a Message Mediator -------------------------------------
+
+    @SimpleStub(strict = true)
+    static abstract class MessageMediatorFake implements MessageMediator {
+
+        private Connection connection;
+
+        public void setConnection(Connection connection) {
+            this.connection = connection;
+        }
+
+        @Override
+        public Connection getConnection() {
+            return connection;
         }
     }
 

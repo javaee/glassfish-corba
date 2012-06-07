@@ -69,6 +69,7 @@ import java.lang.reflect.Proxy;
 import javax.rmi.CORBA.ValueHandler;
 import javax.rmi.CORBA.ValueHandlerMultiFormat;
 
+import com.sun.org.omg.CORBA.portable.ValueHelper;
 import org.omg.CORBA.CustomMarshal;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.SystemException;
@@ -976,9 +977,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     @SuppressWarnings({"deprecation"})
     @CdrWrite
-    public void write_value(Serializable object, 
-        org.omg.CORBA.portable.BoxedValueHelper factory)
-    {
+    public void write_value(Serializable object, BoxedValueHelper factory) {
         if (object == null) {
             // Write null tag and return
             write_long(0);
@@ -990,38 +989,19 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             return;
         } 
 
-        // Save mustChunk in case a recurisive call from the ValueHandler or IDL
+        // Save mustChunk in case a recursive call from the ValueHandler or IDL
         // generated code calls write_value with a possibly different value of mustChunk
         boolean oldMustChunk = mustChunk;
 
-        boolean isCustom = false;
-        if (factory instanceof com.sun.org.omg.CORBA.portable.ValueHelper) {
-            short modifier;
-            try {
-                modifier = ((com.sun.org.omg.CORBA.portable.ValueHelper)factory)
-                    .get_type().type_modifier();
-            } catch(BadKind ex) {  // tk_value_box
-                modifier = VM_NONE.value;
-            }  
-
-            if (object instanceof CustomMarshal &&
-                modifier == VM_CUSTOM.value) {
-                isCustom = true;
-                mustChunk = true;
-            }
-
-            if (modifier == VM_TRUNCATABLE.value) {
-                mustChunk = true;
-            }
-        }
+        // can set mustChunk
+        boolean isCustom = isCustom(object, factory);
 
         if (mustChunk && inBlock) {
             end_block();
         }
 
-        int indirection = writeValueTag(mustChunk, orb.getORBData().useRepId(), 
-            getCodebase(object.getClass()));
-                    
+        int indirection = writeValueTag(mustChunk, orb.getORBData().useRepId(), getCodebase(object.getClass()));
+
         if (orb.getORBData().useRepId()) {
             write_repositoryId(factory.get_id());
         }
@@ -1046,7 +1026,32 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         }
 
     }
-        
+
+    private boolean isCustom(Serializable object, BoxedValueHelper factory) {
+        boolean isCustom = false;
+        if (factory instanceof com.sun.org.omg.CORBA.portable.ValueHelper) {
+            short modifier = getTypeModifier((ValueHelper) factory);
+
+            if (object instanceof CustomMarshal && modifier == VM_CUSTOM.value) {
+                isCustom = true;
+                mustChunk = true;
+            } else if (modifier == VM_TRUNCATABLE.value) {
+                mustChunk = true;
+            }
+        }
+        return isCustom;
+    }
+
+    private short getTypeModifier(ValueHelper factory) {
+        short modifier;
+        try {
+            modifier = ((ValueHelper)factory).get_type().type_modifier();
+        } catch(BadKind ex) {  // tk_value_box
+            modifier = VM_NONE.value;
+        }
+        return modifier;
+    }
+
     public int get_offset() {
         return bbwi.position();
     }
@@ -1442,8 +1447,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     @CdrWrite
-    private int writeValueTag(boolean chunkIt, boolean useRepId, 
-                                    String codebase) {
+    private int writeValueTag(boolean chunkIt, boolean useRepId, String codebase) {
         int indirection = 0;
         if (chunkIt && !useRepId){
             if (codebase == null) {

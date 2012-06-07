@@ -59,6 +59,7 @@ import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
 
 import com.sun.corba.ee.spi.trace.CdrWrite ;
+import org.omg.CORBA.portable.BoxedValueHelper;
 
 /**
  * @author Harold Carr
@@ -517,8 +518,7 @@ public class CDROutputObject
     }
 
     @Override
-    public final void write_value(java.io.Serializable value, 
-                            org.omg.CORBA.portable.BoxedValueHelper factory) {
+    public final void write_value(java.io.Serializable value, BoxedValueHelper factory) {
         impl.write_value(value, factory);
     }
 

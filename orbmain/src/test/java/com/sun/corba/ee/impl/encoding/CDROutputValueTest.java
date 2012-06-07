@@ -41,88 +41,74 @@ package com.sun.corba.ee.impl.encoding;
 
 import com.sun.corba.ee.impl.util.RepositoryId;
 import com.sun.corba.ee.spi.orb.ORBVersionFactory;
+import org.glassfish.simplestub.Stub;
 import org.junit.Test;
 import org.omg.CORBA.MARSHAL;
+import org.omg.CORBA.VM_TRUNCATABLE;
 import org.omg.CORBA.portable.IndirectionException;
 
 import java.io.*;
 
 import static org.junit.Assert.*;
 
-public class CDRInputValueTest extends ValueTestBase {
+public class CDROutputValueTest extends ValueTestBase {
 
+    Value1Helper value1Helper = Stub.create(Value1Helper.class);
 
     @Test
-    public void canReadStringValue() throws IOException {
+    public void canWriteStringValue() throws IOException {
         writeValueTag(ONE_REPID_ID);
         writeRepId(RepositoryId.kWStringValueRepID);
         writeStringValue_1_2("This, too!");
-        setMessageBody( getGeneratedBody() );
 
-        Object object = getInputObject().read_value();
-        assertTrue( object instanceof String);
-        assertEquals("This, too!", object);
+        getOutputObject().write_value("This, too!");
+        expectByteArray(getGeneratedBody());
     }
 
     @Test
-    public void canReadStringValueInAChunk() throws IOException {
-        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
-        writeRepId(RepositoryId.kWStringValueRepID);
-
-        startChunk();
-        writeStringValue_1_2("This, too!");
-        endChunk();
-        writeEndTag(-1);
-
-        setMessageBody( getGeneratedBody() );
-
-        Object object = getInputObject().read_value();
-        assertTrue(object instanceof String);
-        assertEquals("This, too!", object);
-    }
-
-    @Test(expected = MARSHAL.class)
-    public void whenRepIdNotRecognized_throwException() throws IOException {
-        writeValueTag(ONE_REPID_ID);
-        writeRepId("RMI:com.sun.corba.ee.impl.encoding.NoSuchValue:3E1F37A79F0D0984:F72C4A0542764A7B");
-
-        writeWchar_1_2('x');
-        writeInt(3);
-
-        setMessageBody( getGeneratedBody() );
-
-        getInputObject().read_value();
-    }
-
-    @Test
-    public void canReadSerializedValue() throws IOException {
+    public void canWriteSerializedValue() throws IOException {
         writeValueTag(ONE_REPID_ID);
         writeRepId(Value1.REPID);
 
         writeWchar_1_2('x');
         writeInt(3);
 
-        setMessageBody( getGeneratedBody() );
+        Value1 value1 = new Value1('x', 3);
+        getOutputObject().write_value(value1);
 
-        Object object = getInputObject().read_value();
-        assertTrue(object instanceof Value1);
-        Value1 value1 = (Value1) object;
-        assertEquals('x', value1.aChar);
-        assertEquals(3, value1.anInt);
+        setMessageBody(getGeneratedBody());
+        expectByteArray(getGeneratedBody());
     }
 
     @Test
-    public void canReadSerializedEnum() throws IOException {
+    public void canWriteSerializedValueInChunk() throws IOException {
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
+        writeRepId(Value1.REPID);
+
+        startChunk();
+        writeWchar_1_2('x');
+        writeInt(3);
+        endChunk();
+        writeEndTag(-1);
+
+        value1Helper.setModifier(VM_TRUNCATABLE.value);
+        useRepId();
+        getOutputObject().write_value(new Value1('x', 3), value1Helper);
+        expectByteArray(getGeneratedBody());
+    }
+
+    @Test
+    public void canWriteSerializedEnum() throws IOException {
         writeValueTag(ONE_REPID_ID);
         writeRepId(Enum1.REPID);
 
         writeString(Enum1.strange.toString());
 
-        setMessageBody( getGeneratedBody() );
-
-        Object object = getInputObject().read_value();
-        assertEquals( Enum1.strange, object);
+        getOutputObject().write_value(Enum1.strange);
+        expectByteArray(getGeneratedBody());
     }
+
+/*
 
     @Test
     public void canReadIDLEntity() throws IOException {
@@ -196,26 +182,6 @@ public class CDRInputValueTest extends ValueTestBase {
         Object object2 = getInputObject().read_value();
         assertSame(object1, object2);
         assertEquals( 'x', ((Value1) object1).aChar);
-    }
-
-    @Test
-    public void canReadSerializedValueInChunk() throws IOException {
-        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
-        writeRepId(Value1.REPID);
-
-        startChunk();
-        writeWchar_1_2('x');
-        writeInt(3);
-        endChunk();
-        writeEndTag(-1);
-
-        setMessageBody( getGeneratedBody() );
-
-        Object object = getInputObject().read_value();
-        assertTrue(object instanceof Value1);
-        Value1 value1 = (Value1) object;
-        assertEquals('x', value1.aChar);
-        assertEquals(3, value1.anInt);
     }
 
     @Test
@@ -320,5 +286,5 @@ public class CDRInputValueTest extends ValueTestBase {
         assertSame(object1, object2);
     }
 
-
+*/
 }

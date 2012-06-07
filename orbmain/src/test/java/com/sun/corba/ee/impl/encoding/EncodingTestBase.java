@@ -50,6 +50,7 @@ import com.sun.corba.ee.spi.orb.ORBVersionFactory;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.transport.ByteBufferPool;
 import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import com.sun.org.omg.SendingContext.CodeBase;
 import org.glassfish.simplestub.SimpleStub;
 import org.glassfish.simplestub.Stub;
@@ -58,6 +59,7 @@ import org.omg.CORBA.portable.ValueFactory;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.sun.corba.ee.impl.encoding.EncodingTestBase.Endian.*;
@@ -105,6 +107,14 @@ public class EncodingTestBase {
         orb.setORBData(orbData);
         orb.setByteBufferPool(pool);
         mediator.setConnection(connection);
+    }
+
+    protected final void useRepId() {
+        orbData.useRepId = true;
+    }
+
+    protected final void useEnumDesc() {
+        orbData.useEnumDesc = true;
     }
 
     protected final void useStreamFormatVersion1() {
@@ -215,7 +225,12 @@ public class EncodingTestBase {
     }
 
     protected final void expectByteArray(byte... expected) {
-        assertArrayEquals(expected, subBuffer(getOutputObject().toByteArray(), Message.GIOPMessageHeaderLength));
+        try {
+            assertArrayEquals(expected, subBuffer(getOutputObject().toByteArray(), Message.GIOPMessageHeaderLength));
+        } catch (AssertionError e) {
+            System.out.println("expected: " + HexBin.encode(expected));
+            System.out.println("  actual: " + HexBin.encode(subBuffer(getOutputObject().toByteArray(), Message.GIOPMessageHeaderLength)));
+        }
     }
 
     private byte[] subBuffer(byte[] input, int start) {
@@ -245,6 +260,8 @@ public class EncodingTestBase {
     static abstract class ORBDataFake implements ORBData {
         private AsynchronousAction asynchronousAction;
         private int giopBufferSize = 250;
+        private boolean useRepId;
+        private boolean useEnumDesc;
 
         @Override
         public int fragmentReadTimeout() {
@@ -265,6 +282,16 @@ public class EncodingTestBase {
         @Override
         public boolean useByteOrderMarkers() {
             return true;
+        }
+
+        @Override
+        public boolean useRepId() {
+            return useRepId;
+        }
+
+        @Override
+        public boolean useEnumDesc() {
+            return useEnumDesc;
         }
     }
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,6 +39,8 @@
  */
 package com.sun.corba.ee.spi.transport;
 
+import java.nio.ByteBuffer;
+
 /** Interface that supports capturing the GIOP messages for the
  * last non-co-located invocation in the current thread.
  * This enables easy capture of the GIOP messages for testing
@@ -71,4 +73,6 @@ public interface MessageTraceManager {
      * message(s) received since the last call to clear().  
      */
     byte[][] getDataReceived() ;
+
+    void recordDataSent(ByteBuffer message);
 }

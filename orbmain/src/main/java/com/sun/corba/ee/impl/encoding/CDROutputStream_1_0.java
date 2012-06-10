@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -296,8 +296,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     // Always grow the single buffer. This needs to delegate
     // fragmentation policy for IIOP 1.1.
     //
-    protected void grow(int align, int n) 
-    {
+    protected void grow(int align, int n) {
         bbwi.setNumberOfBytesNeeded(n);
 
         bufferManagerWrite.overflow(bbwi);

@@ -108,45 +108,41 @@ public class CDROutputValueTest extends ValueTestBase {
         expectByteArray(getGeneratedBody());
     }
 
-/*
-
     @Test
-    public void canReadIDLEntity() throws IOException {
-        writeValueTag(ONE_REPID_ID);
+    public void canWriteIDLEntity() throws IOException {
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
         writeRepId(IDLValue.REPID);
 
-        int aByte = 0x45;
+        byte aByte = 0x45;
+
+        startChunk();
         writeByte(aByte);
+        endChunk();
+        writeEndTag(-1);
 
-        setMessageBody( getGeneratedBody() );
-
-        Object object = getInputObject().read_value();
-        assertTrue(object instanceof IDLValue);
-        IDLValue value = (IDLValue) object;
-        assertEquals(0x45, value.aByte);
-        assertEquals(0x450, value.anInt);
+        IDLValue value = new IDLValue(aByte);
+        getOutputObject().write_value(value);
+        expectByteArray(getGeneratedBody());
     }
 
     @Test
-    public void canReadSerializedValueWithIndirection() throws IOException {
+    public void canWriteSerializedValueWithIndirection() throws IOException {
         int location = getCurrentLocation();
-        writeValueTag(ONE_REPID_ID | USE_CODEBASE);
-        writeCodebase("ignore this");
+        writeValueTag(ONE_REPID_ID);
         writeRepId(Value1.REPID);
 
         writeWchar_1_2('x');
         writeInt(3);
         writeIndirectionTo(location);
 
-        setMessageBody( getGeneratedBody() );
-
-        Object object1 = getInputObject().read_value();
-        Object object2 = getInputObject().read_value();
-        assertSame(object1, object2);
+        Value1 value = new Value1('x', 3);
+        getOutputObject().write_value(value);
+        getOutputObject().write_value(value);
+        expectByteArray(getGeneratedBody());
     }
 
     @Test
-    public void canReadSerializedValueWithIndirection_in1_1() throws IOException {
+    public void canWriteSerializedValueWithIndirection_in1_1() throws IOException {
         useV1_1();
         int location = getCurrentLocation();
         writeValueTag(ONE_REPID_ID);
@@ -156,16 +152,14 @@ public class CDROutputValueTest extends ValueTestBase {
         writeInt(3);
         writeIndirectionTo(location);
 
-        setMessageBody( getGeneratedBody() );
-
-        Object object1 = getInputObject().read_value();
-        Object object2 = getInputObject().read_value();
-        assertSame(object1, object2);
-        assertEquals('x', ((Value1) object1).aChar);
+        Value1 value = new Value1('x', 3);
+        getOutputObject().write_value(value);
+        getOutputObject().write_value(value);
+        expectByteArray(getGeneratedBody());
     }
 
     @Test
-    public void canReadSerializedValueWithIndirection_in1_0() throws IOException {
+    public void canWriteSerializedValueWithIndirection_in1_0() throws IOException {
         useV1_0();
         setOrbVersion(ORBVersionFactory.getOLD());
         int location = getCurrentLocation();
@@ -176,13 +170,23 @@ public class CDROutputValueTest extends ValueTestBase {
         writeInt(3);
         writeIndirectionTo(location);
 
-        setMessageBody( getGeneratedBody() );
-
-        Object object1 = getInputObject().read_value();
-        Object object2 = getInputObject().read_value();
-        assertSame(object1, object2);
-        assertEquals( 'x', ((Value1) object1).aChar);
+        Value1 value = new Value1('x', 3);
+        getOutputObject().write_value(value);
+        getOutputObject().write_value(value);
+        expectByteArray(getGeneratedBody());
     }
+
+    @Test
+    public void whenBufferFull_sendFragment() {
+        setFragmentSize(20);
+        getOutputObject().write_long(1);
+        getOutputObject().write_long(2);
+        getOutputObject().write_long(3);
+    }
+
+/*
+
+// write codebase
 
     @Test
     public void canReadSerializedValueWithContinuationChunk() throws IOException {

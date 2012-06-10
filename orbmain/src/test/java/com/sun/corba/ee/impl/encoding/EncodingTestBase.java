@@ -41,6 +41,7 @@ package com.sun.corba.ee.impl.encoding;
 
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.transport.MessageTraceManagerImpl;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.ee.spi.misc.ORBConstants;
 import com.sun.corba.ee.spi.orb.ORB;
@@ -50,13 +51,17 @@ import com.sun.corba.ee.spi.orb.ORBVersionFactory;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.transport.ByteBufferPool;
 import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.MessageTraceManager;
+import com.sun.corba.ee.spi.transport.TransportManager;
 import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import com.sun.org.omg.SendingContext.CodeBase;
 import org.glassfish.simplestub.SimpleStub;
 import org.glassfish.simplestub.Stub;
 import org.junit.Before;
+import org.omg.CORBA.portable.OutputStream;
 import org.omg.CORBA.portable.ValueFactory;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,6 +73,7 @@ import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_0;
 import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_1;
 import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_2;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.fail;
 
 public class EncodingTestBase {
     protected static final byte REQUEST = 0;
@@ -85,10 +91,13 @@ public class EncodingTestBase {
     private MessageFake fragment = Stub.create(MessageFake.class);
     private ByteBufferPoolFake pool = Stub.create(ByteBufferPoolFake.class);
     private MessageMediatorFake mediator = Stub.create(MessageMediatorFake.class);
+    private TransportManagerFake transportManager = Stub.create(TransportManagerFake.class);
 
     private CDRInputObject inputObject;
     private CDROutputObject outputObject;
     private byte formatVersion = ORBConstants.STREAM_FORMAT_VERSION_1;
+
+    private List<byte[]> fragments = new ArrayList<byte[]>();
 
     static byte flags(Endian endian, Fragments fragments) {
         byte result = 0;
@@ -106,7 +115,9 @@ public class EncodingTestBase {
     public void setUp() throws Exception {
         orb.setORBData(orbData);
         orb.setByteBufferPool(pool);
+        orb.transportManager = transportManager;
         mediator.setConnection(connection);
+        connection.fragments = fragments;
     }
 
     protected final void useRepId() {
@@ -115,6 +126,10 @@ public class EncodingTestBase {
 
     protected final void useEnumDesc() {
         orbData.useEnumDesc = true;
+    }
+
+    protected final void setFragmentSize(int size) {
+        orbData.giopFragmentSize = size;
     }
 
     protected final void useStreamFormatVersion1() {
@@ -230,6 +245,7 @@ public class EncodingTestBase {
         } catch (AssertionError e) {
             System.out.println("expected: " + HexBin.encode(expected));
             System.out.println("  actual: " + HexBin.encode(subBuffer(getOutputObject().toByteArray(), Message.GIOPMessageHeaderLength)));
+            throw e;
         }
     }
 
@@ -254,6 +270,17 @@ public class EncodingTestBase {
         void exec();
     }
 
+
+    //--------------------------------- fake implementation of a TransportManager --------------------------------------
+
+    @SimpleStub(strict=true)
+    static abstract class TransportManagerFake implements TransportManager {
+        @Override
+        public MessageTraceManager getMessageTraceManager() {
+            return new MessageTraceManagerImpl();
+        }
+    }
+
     //-------------------------------------- fake implementation of an ORBData -----------------------------------------
 
     @SimpleStub(strict=true)
@@ -262,6 +289,7 @@ public class EncodingTestBase {
         private int giopBufferSize = 250;
         private boolean useRepId;
         private boolean useEnumDesc;
+        private int giopFragmentSize = 250;
 
         @Override
         public int fragmentReadTimeout() {
@@ -271,7 +299,7 @@ public class EncodingTestBase {
 
         @Override
         public int getGIOPBuffMgrStrategy(GIOPVersion gv) {
-            return 0;
+            return gv.equals(GIOPVersion.V1_0) ? BufferManagerFactory.GROW : BufferManagerFactory.STREAM;
         }
 
         @Override
@@ -292,6 +320,11 @@ public class EncodingTestBase {
         @Override
         public boolean useEnumDesc() {
             return useEnumDesc;
+        }
+
+        @Override
+        public int getGIOPFragmentSize() {
+            return giopFragmentSize;
         }
     }
 
@@ -318,6 +351,7 @@ public class EncodingTestBase {
         private ORBDataFake orbData;
         private ORBVersion version = ORBVersionFactory.getFOREIGN();
         private ByteBufferPool pool;
+        private TransportManager transportManager = null;
 
         void setORBData(ORBDataFake orbData) {
             this.orbData = orbData;
@@ -350,6 +384,11 @@ public class EncodingTestBase {
         public void setByteBufferPool(ByteBufferPool pool) {
             this.pool = pool;
         }
+
+        @Override
+        public TransportManager getTransportManager() {
+            return transportManager;
+        }
     }
 
     //------------------------------------- fake implementation of a Connection ----------------------------------------
@@ -358,7 +397,9 @@ public class EncodingTestBase {
     static abstract class ConnectionFake implements Connection {
         int char_encoding = ISO_8859_1;
         int wchar_encoding = UTF_16;
+        boolean locked;
         private CodeSetComponentInfo.CodeSetContext codeSets;
+        List<byte[]> fragments;
 
         void setCharEncoding(int char_encoding) {
             this.char_encoding = char_encoding;
@@ -385,6 +426,33 @@ public class EncodingTestBase {
         @Override
         public boolean shouldUseDirectByteBuffers() {
             return false;
+        }
+
+        @Override
+        public void writeLock() {
+            locked = true;
+        }
+
+        @Override
+        public void writeUnlock() {
+            locked = false;
+        }
+
+        @Override
+        public void sendWithoutLock(CDROutputObject outputObject) {
+            try {
+                if (!locked) fail("sendWithoutLock called while connection is not locked");
+                outputObject.writeTo(this);
+            } catch (IOException e) {
+                fail("Connection reported: " + e);
+            }
+        }
+
+        @Override
+        public void write(ByteBuffer byteBuffer) throws IOException {
+            byte[] buf = new byte[byteBuffer.remaining()];
+            byteBuffer.get(buf);
+            fragments.add(buf);
         }
     }
 
@@ -416,6 +484,8 @@ public class EncodingTestBase {
         byte[] body;
         byte[] data;
         int headerIndex = 0;
+        int sizeInHeader;
+        private boolean startedNewMessage;
 
         byte[] getMessageData() {
             if (data != null) return data;
@@ -470,6 +540,25 @@ public class EncodingTestBase {
         @Override
         public boolean moreFragmentsToFollow() {
             return fragments == more_fragments;
+        }
+
+        @Override
+        public void setSize(ByteBuffer byteBuffer, int size) {
+            sizeInHeader = size;
+        }
+
+        @Override
+        public FragmentMessage createFragmentMessage() {
+            return Stub.create(MessageFake.class);
+        }
+
+        public int getSizeInHeader() {
+            return sizeInHeader;
+        }
+
+        @Override
+        public void write(OutputStream ostream) {
+            startedNewMessage = true;
         }
     }
 }

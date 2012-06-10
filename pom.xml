@@ -58,7 +58,6 @@
 
     <modules>
         <module>idlj</module>
-        <module>idlj-maven-plugin</module>
         <module>omgapi</module>
         <module>csiv2-idl</module>
         <module>exception-annotation-processor</module>
@@ -84,18 +83,6 @@
                 </configuration>
             </plugin>
 
-<!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
--->
-
         </plugins>
 
         <pluginManagement>
@@ -105,6 +92,33 @@
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>2.3.7</version>
                     <extensions>true</extensions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>idlj-maven-plugin</artifactId>
+                    <version>1.1.1</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <sources>
+                            <source>
+                                <defines>
+                                    <define>
+                                        <symbol>CORBA3</symbol>
+                                    </define>
+                                </defines>
+                                <additionalArguments>
+                                    <additionalArgument>-corba</additionalArgument>
+                                    <additionalArgument>3.0</additionalArgument>
+                                </additionalArguments>
+                            </source>
+                        </sources>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

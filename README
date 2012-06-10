@@ -43,10 +43,6 @@ How to build ORB .jars for delivery to GlassFish:
 cd <ws>
 mvn -P all-tests clean install
 #
-# to produce jars for deployment (including source and javadoc jars):
-cd <ws>
-mvn -P release clean install
-#
 # (temporarily broken) Run dev tests with code coverage enabled. 
 # Cobertura code coverage report generated at: <ws>/build/cobertura/index.html
 ant do-cobertura-test

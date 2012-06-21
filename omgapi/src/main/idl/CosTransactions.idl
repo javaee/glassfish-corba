@@ -136,8 +136,6 @@ module CosTransactions {
 
     // Current transaction
     interface Current : CORBA::Current {
-        // This pragma makes Current to be treated as a corba local object.
-        #pragma sun_local Current ""
         void begin()
         raises(SubtransactionsUnavailable);
         void commit(in boolean report_heuristics)

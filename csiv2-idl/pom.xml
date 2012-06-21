@@ -27,14 +27,8 @@
                                 <packagePrefix><type>CSI</type>    <prefix>com.sun.corba.ee.org.omg</prefix></packagePrefix>
                                 <packagePrefix><type>CSIIOP</type> <prefix>com.sun.corba.ee.org.omg</prefix></packagePrefix>
                                 <packagePrefix><type>GSSUP</type>  <prefix>com.sun.corba.ee.org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>IOP</type>    <prefix>org.omg</prefix></packagePrefix>
                             </packagePrefixes>
-                            <additionalArguments>
-                                <additionalArgument>-corba</additionalArgument>
-                                <additionalArgument>3.0</additionalArgument>
-                                <additionalArgument>-pkgTranslate</additionalArgument>
-                                <additionalArgument>IOP</additionalArgument>
-                                <additionalArgument>org.omg.IOP</additionalArgument>
-                            </additionalArguments>
                         </source>
                     </sources>
                 </configuration>

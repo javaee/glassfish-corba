@@ -39,6 +39,7 @@ package com.sun.corba.ee.impl.encoding;
  * holder.
  */
 
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.util.RepositoryId;
 import com.sun.corba.ee.spi.orb.ORBVersionFactory;
 import org.glassfish.simplestub.Stub;
@@ -178,10 +179,23 @@ public class CDROutputValueTest extends ValueTestBase {
 
     @Test
     public void whenBufferFull_sendFragment() {
-        setFragmentSize(20);
+        setFragmentSize(Message.GIOPMessageHeaderLength + 8);
         getOutputObject().write_long(1);
         getOutputObject().write_long(2);
         getOutputObject().write_long(3);
+
+        expectByteArrays(new byte[] {0,0,0,1, 0,0,0,2}, new byte[]{0,0,0,3});
+    }
+
+    @Test
+    public void whenBufferFullInV1_0_expandIt() {
+        useV1_0();
+        setBufferSize(Message.GIOPMessageHeaderLength + 8);
+        getOutputObject().write_long(1);
+        getOutputObject().write_long(2);
+        getOutputObject().write_long(3);
+
+        expectByteArray(0,0,0,1, 0,0,0,2, 0,0,0,3);
     }
 
 /*

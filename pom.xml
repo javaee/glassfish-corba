@@ -105,6 +105,7 @@
                     <configuration>
                         <sources>
                             <source>
+                                <compatible>false</compatible>
                                 <defines>
                                     <define>
                                         <symbol>CORBA3</symbol>

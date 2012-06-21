@@ -72,8 +72,7 @@ import static com.sun.corba.ee.impl.encoding.EncodingTestBase.Fragments.*;
 import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_0;
 import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_1;
 import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_2;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class EncodingTestBase {
     protected static final byte REQUEST = 0;
@@ -126,6 +125,10 @@ public class EncodingTestBase {
 
     protected final void useEnumDesc() {
         orbData.useEnumDesc = true;
+    }
+
+    protected final void setBufferSize(int size) {
+        orbData.giopBufferSize = size;
     }
 
     protected final void setFragmentSize(int size) {
@@ -198,6 +201,9 @@ public class EncodingTestBase {
         getInputObject().addFragment(fragment, ByteBuffer.wrap(fragment.getMessageData()));
     }
 
+    /**
+     * Sets the message 'more fragments coming' flag.
+     */
     protected final void expectMoreFragments() {
         message.fragments = more_fragments;
     }
@@ -240,13 +246,27 @@ public class EncodingTestBase {
     }
 
     protected final void expectByteArray(byte... expected) {
+        getOutputObject().getBufferManager().sendMessage();
+        assertEquals(1, fragments.size());
+        expectFragment(0, expected);
+    }
+
+    private void expectFragment(int index, byte[] expected) {
+        byte[] actual = subBuffer(fragments.get(index), Message.GIOPMessageHeaderLength);
         try {
-            assertArrayEquals(expected, subBuffer(getOutputObject().toByteArray(), Message.GIOPMessageHeaderLength));
+            assertArrayEquals(expected, actual);
         } catch (AssertionError e) {
             System.out.println("expected: " + HexBin.encode(expected));
-            System.out.println("  actual: " + HexBin.encode(subBuffer(getOutputObject().toByteArray(), Message.GIOPMessageHeaderLength)));
+            System.out.println("  actual: " + HexBin.encode(actual));
             throw e;
         }
+    }
+
+    protected final void expectByteArrays(byte[]... expected) {
+        getOutputObject().getBufferManager().sendMessage();
+        assertEquals(expected.length, fragments.size());
+        for (int i = 0; i < expected.length; i++)
+            expectFragment(i, expected[i]);
     }
 
     private byte[] subBuffer(byte[] input, int start) {
@@ -341,6 +361,11 @@ public class EncodingTestBase {
         @Override
         public void releaseByteBuffer(ByteBuffer buffer) {
             buffers.add(buffer);
+        }
+
+        @Override
+        public ByteBuffer getByteBuffer(int theSize) {
+            return ByteBuffer.allocate(theSize);
         }
     }
 
@@ -559,6 +584,8 @@ public class EncodingTestBase {
         @Override
         public void write(OutputStream ostream) {
             startedNewMessage = true;
+            for (int i = 0; i < GIOPMessageHeaderLength; i++)
+                ostream.write_octet((byte) 0);
         }
     }
 }

@@ -60,6 +60,7 @@
         <module>csiv2-idl</module>
         <module>exception-annotation-processor</module>
         <module>orbmain</module>
+        <module>internal-api</module>
     </modules>
 
     <properties>

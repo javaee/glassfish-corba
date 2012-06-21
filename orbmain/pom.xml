@@ -23,6 +23,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>glassfish-corba-internal-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>exception-annotation-processor</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>

@@ -94,6 +94,7 @@
                 <configuration>
                     <sources>
                         <source>
+                            <compatible>true</compatible>
                             <includes>
                                 <include>activation/*.idl</include>
                             </includes>

@@ -44,6 +44,8 @@
                 <configuration>
                     <instructions>
                         <Export-Package>org.omg.*,com.sun.*,javax.rmi.CORBA</Export-Package>
+                        <Import-Package>!org.omg.PortableServer.ServantLocatorPackage</Import-Package>
+                        <Fragment-Host>system.bundle; extension:=framework</Fragment-Host>
                     </instructions>
                 </configuration>
             </plugin>

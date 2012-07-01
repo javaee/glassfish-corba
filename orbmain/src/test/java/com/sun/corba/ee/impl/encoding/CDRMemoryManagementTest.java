@@ -93,15 +93,30 @@ public class CDRMemoryManagementTest extends EncodingTestBase {
         assertEquals(1, getNumBuffersReleased());
     }
 
+
+    @Test
+    public void whenFragmentAddedAfterMarkActive_releaseSubsequentFragmentOnClose() throws IOException {
+        setMessageBody(0, 0, 0, 1);
+        addFragment(0, 0, 0, 2);
+
+        getInputObject().read_long();
+        getInputObject().mark(0);
+        getInputObject().read_long();
+        getInputObject().close();
+
+        assertEquals(2, getNumBuffersReleased());
+    }
+
     @Test
     public void whenInputObjectClosed_releaseAllFragments() throws IOException {
         setMessageBody(0, 0, 0, 1);
         addFragment(0, 0, 0, 2);
+        addFragment(0, 0, 0, 3);
 
         getInputObject().read_short();
         getInputObject().close();
 
-        assertEquals(2, getNumBuffersReleased());
+        assertEquals(3, getNumBuffersReleased());
     }
 
     @Test

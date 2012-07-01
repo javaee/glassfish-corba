@@ -179,10 +179,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
      * 
      * NOTE: Requires this.orb
      */
-    protected ContactInfoListIterator getContactInfoListIterator()
-    {
-        return (ContactInfoListIterator)
-            ((InvocationInfo)this.orb.getInvocationInfo())
-                .getContactInfoListIterator();
+    protected ContactInfoListIterator getContactInfoListIterator() {
+        return (ContactInfoListIterator) this.orb.getInvocationInfo().getContactInfoListIterator();
     }
 }

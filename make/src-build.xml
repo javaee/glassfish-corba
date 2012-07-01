@@ -172,6 +172,7 @@
 
             <pathelement location="${orb.jar}"/>
             <pathelement location="${csiv2-idl.jar}"/>
+            <pathelement location="${internal-api.jar}"/>
             <pathelement location="${omgapi.jar}"/>
             <pathelement location="${classes.dir}"/>
             <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->

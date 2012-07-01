@@ -45,8 +45,6 @@ import com.sun.org.omg.SendingContext.CodeBase;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.ee.impl.misc.ORBUtility;
 
-import com.sun.corba.ee.spi.orb.ORB;
-
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 /**
@@ -75,24 +73,18 @@ public class EncapsInputStream extends CDRInputObject
                              GIOPVersion version) {
         super(orb, ByteBuffer.wrap(buf), size, littleEndian,
               version, ORBUtility.getEncodingVersion(),
-              BufferManagerFactory.newBufferManagerRead(
-                                      BufferManagerFactory.GROW,
-                                      ORBUtility.getEncodingVersion(),
-                                      (ORB)orb),
+                BufferManagerFactory.newReadEncapsulationBufferManager(),
               false); 
 
         performORBVersionSpecificInit();
     }
 
-    public EncapsInputStream(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, 
+    public EncapsInputStream(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer,
                              int size, boolean littleEndian,
                              GIOPVersion version) {
         super(orb, byteBuffer, size, littleEndian, 
               version, ORBUtility.getEncodingVersion(),
-              BufferManagerFactory.newBufferManagerRead(
-                                      BufferManagerFactory.GROW,
-                                      ORBUtility.getEncodingVersion(),
-                                      (com.sun.corba.ee.spi.orb.ORB)orb),
+              BufferManagerFactory.newReadEncapsulationBufferManager(),
               false); 
 
         performORBVersionSpecificInit();
@@ -142,10 +134,7 @@ public class EncapsInputStream extends CDRInputObject
               size, 
               false, 
               version, ORBUtility.getEncodingVersion(),
-              BufferManagerFactory.newBufferManagerRead(
-                                      BufferManagerFactory.GROW,
-                                      ORBUtility.getEncodingVersion(),
-                                      (ORB)orb),
+              BufferManagerFactory.newReadEncapsulationBufferManager(),
               false); // IDLJavaSerializationInputStream::directRead == false
 
         this.codeBase = codeBase;

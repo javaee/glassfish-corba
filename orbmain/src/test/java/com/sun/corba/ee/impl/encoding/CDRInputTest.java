@@ -563,6 +563,26 @@ public class CDRInputTest extends EncodingTestBase {
         getInputObject().read_long();
     }
 
+    @Test
+    public void whenUsingV1_2_interruptedThreadDoesNotCauseTimeout() {
+        useV1_2();
+        setMessageBody(0, 23, pad(), pad());
+        expectMoreFragments();
+
+        whileWaitingForFragmentsDo(new AsynchronousAction() {
+            int iteration = 0;
+            public void exec() {
+                if (iteration++ == 0)
+                    Thread.currentThread().interrupt();
+                else
+                    addFragment(0, 0, 0, 7);
+            }
+        });
+
+        getInputObject().read_short();
+        getInputObject().read_long();
+    }
+
     @Test(expected = RequestCanceledException.class)
     public void whenUsingV1_2_throwExceptionWhenCanceledDuringWait() {
         useV1_2();

@@ -104,10 +104,7 @@ public class EncapsOutputStream extends CDROutputObject
                               boolean isLittleEndian)
     {
         super(orb, version, isLittleEndian,
-              BufferManagerFactory.newBufferManagerWrite(
-                                        BufferManagerFactory.GROW,
-                                        ORBUtility.getEncodingVersion(),
-                                        orb),
+              BufferManagerFactory.newWriteEncapsulationBufferManager(orb),
               ORBConstants.STREAM_FORMAT_VERSION_1,
               usePooledByteBuffers
         );

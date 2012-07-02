@@ -45,6 +45,7 @@
     </description>
 
     <import file="src-build.xml"/>
+    <property name="build.compiler" value="extJavac"/>
 
     <target name="init" depends="corba-src.init">
         <property name="test.src.dir"                   value="${root.dir}/test/src/share/classes"/>

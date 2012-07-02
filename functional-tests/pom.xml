@@ -76,6 +76,12 @@
             <version>3.1.0-b001</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.testng</groupId>
+          <artifactId>testng</artifactId>
+          <version>6.1.1</version>
+          <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -97,10 +103,17 @@
                             <compatible>true</compatible>
                             <includes>
                                 <include>activation/*.idl</include>
+                                <include>corba/legacybootstrapserver/*.idl</include>
                             </includes>
                             <packagePrefixes>
                                 <packagePrefix><type>activation</type><prefix>com.sun.corba.ee.spi</prefix></packagePrefix>
                             </packagePrefixes>
+                        </source>
+                        <source>
+                            <compatible>false</compatible>
+                            <includes>
+                                <include>corba/connectintercept_1_4/*.idl</include>
+                            </includes>
                         </source>
                     </sources>
                 </configuration>

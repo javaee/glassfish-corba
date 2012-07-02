@@ -38,10 +38,14 @@ package com.sun.corba.ee.impl.encoding;
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+import com.sun.corba.ee.impl.corba.TypeCodeImpl;
+import com.sun.corba.ee.impl.io.ValueUtility;
+import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.orb.ORBVersionFactory;
 import org.junit.Test;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.MARSHAL;
+import org.omg.CORBA.TCKind;
 
 import java.io.IOException;
 
@@ -225,21 +229,21 @@ public class CDROutputTest extends EncodingTestBase {
 
     @Test
     public void canWriteBooleanArray() {
-        getOutputObject().write_boolean_array(new boolean[] {true, true, false, true, false}, 0, 4);
+        getOutputObject().write_boolean_array(new boolean[]{true, true, false, true, false}, 0, 4);
 
         expectByteArray(1, 1, 0, 1);
     }
 
     @Test
     public void canWriteOctetArray() {
-        getOutputObject().write_octet_array(new byte[] {2, -3, 6, 2}, 0, 4);
+        getOutputObject().write_octet_array(new byte[]{2, -3, 6, 2}, 0, 4);
 
         expectByteArray(2, -3, 6, 2);
     }
 
     @Test
     public void canWriteShortArray() {
-        getOutputObject().write_short_array(new short[] {-3, 1, 515, -1}, 1, 3);
+        getOutputObject().write_short_array(new short[]{-3, 1, 515, -1}, 1, 3);
 
         expectByteArray(0, 1, 2, 3, -1, -1);
     }
@@ -253,44 +257,59 @@ public class CDROutputTest extends EncodingTestBase {
 
     @Test
     public void canWriteLongArray() {
-        getOutputObject().write_long_array(new int[] {66051, -738}, 0, 2);
+        getOutputObject().write_long_array(new int[]{66051, -738}, 0, 2);
 
         expectByteArray(0, 1, 2, 3, -1, -1, -3, 30);
     }
 
     @Test
     public void canWriteULongArray() {
-        getOutputObject().write_ulong_array(new int[] {66051, -738}, 0, 2);
+        getOutputObject().write_ulong_array(new int[]{66051, -738}, 0, 2);
 
         expectByteArray(0, 1, 2, 3, -1, -1, -3, 30);
     }
 
     @Test
     public void canWriteLongLongArray() {
-        getOutputObject().write_longlong_array(new long[] {1099511628039L, -532}, 0, 2);
+        getOutputObject().write_longlong_array(new long[]{1099511628039L, -532}, 0, 2);
 
         expectByteArray(PAD, PAD, PAD, PAD, 0, 0, 1, 0, 0, 0, 1, 7, -1, -1, -1, -1, -1, -1, -3, -20);
     }
 
     @Test
     public void canWriteULongLongArray() {
-        getOutputObject().write_ulonglong_array(new long[] {1099511628039L, -532}, 0, 2);
+        getOutputObject().write_ulonglong_array(new long[]{1099511628039L, -532}, 0, 2);
 
         expectByteArray(PAD, PAD, PAD, PAD, 0, 0, 1, 0, 0, 0, 1, 7, -1, -1, -1, -1, -1, -1, -3, -20);
     }
 
     @Test
     public void canWriteCharArray() {
-        getOutputObject().write_char_array(new char[] {'b', 'u', 'c', 'k', 'l', 'e', 'u', 'p'}, 0, 8);
+        getOutputObject().write_char_array(new char[]{'b', 'u', 'c', 'k', 'l', 'e', 'u', 'p'}, 0, 8);
 
         expectByteArray('b', 'u', 'c', 'k', 'l', 'e', 'u', 'p');
     }
 
     @Test
     public void canWriteWCharArray() {
-        getOutputObject().write_wchar_array(new char[] {'b', 'u', 't'}, 0, 3);
+        getOutputObject().write_wchar_array(new char[]{'b', 'u', 't'}, 0, 3);
 
         expectByteArray(4, FE, FF, 0, 'b', 4, FE, FF, 0, 'u', 4, FE, FF, 0, 't');
+    }
+
+    @Test
+    public void canWriteTypeCode_withNoBody() {
+        getOutputObject().write_TypeCode(new TypeCodeImpl((ORB) getOutputObject().orb(), TCKind._tk_float));
+
+        expectByteArray(0, 0, 0, 6);
+    }
+
+
+    @Test
+    public void canWriteStringTypeCode() {
+        getOutputObject().write_TypeCode(new TypeCodeImpl((ORB) getOutputObject().orb(), TCKind._tk_string, 256));
+
+        expectByteArray(0, 0, 0, 18, 0, 0, 1, 0);
     }
 
     /*
@@ -410,30 +429,6 @@ public class CDROutputTest extends EncodingTestBase {
         });
         getInputObject().read_short();
         getInputObject().read_long();
-    }
-
-    @Test
-    public void whenTypeCodeHasNoBody_readKindOnly() {
-        setMessageBody( 0, 0, 0, 6);
-        TypeCode typeCode = getInputObject().read_TypeCode();
-        assertEquals(TCKind.tk_float, typeCode.kind());
-    }
-
-    @Test
-    public void whenTypeCodeIsString_readLength() throws BadKind {
-        setMessageBody( 0, 0, 0, 18, 0, 0, 1, 0);
-        TypeCode typeCode = getInputObject().read_TypeCode();
-        assertEquals(TCKind.tk_string, typeCode.kind());
-        assertEquals(256, typeCode.length());
-    }
-
-    @Test
-    public void whenTypeCodeIsFixed_readDigitsAndScale() throws BadKind {
-        setMessageBody( 0, 0, 0, 28, 0, 10, 0, 6);
-        TypeCode typeCode = getInputObject().read_TypeCode();
-        assertEquals(TCKind.tk_fixed, typeCode.kind());
-        assertEquals(10, typeCode.fixed_digits());
-        assertEquals(6, typeCode.fixed_scale());
     }
 
     @Test

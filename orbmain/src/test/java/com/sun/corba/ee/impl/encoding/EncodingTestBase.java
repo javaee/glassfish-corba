@@ -246,7 +246,7 @@ public class EncodingTestBase {
     }
 
     protected final void expectByteArray(byte... expected) {
-        getOutputObject().getBufferManager().sendMessage();
+        getOutputObject().finishSendingMessage();
         assertEquals(1, fragments.size());
         expectFragment(0, expected);
     }

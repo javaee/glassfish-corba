@@ -106,8 +106,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
             typeMap.get(id) ;
     }
 
-    public void writeRawBuffer(org.omg.CORBA.portable.OutputStream s,
-        int firstLong) {
+    public void writeRawBuffer(org.omg.CORBA.portable.OutputStream s, int firstLong) {
         // Writes this streams buffer to the given OutputStream
         // without byte order flag and length as is the case for encapsulations.
 

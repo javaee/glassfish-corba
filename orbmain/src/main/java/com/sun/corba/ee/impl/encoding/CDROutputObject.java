@@ -92,19 +92,18 @@ public class CDROutputObject
 
     @CdrWrite
     private void createCDROutputStream(ORB orb, GIOPVersion version,
-                                       boolean littleEndian, BufferManagerWrite bufferManager,
+                                       BufferManagerWrite bufferManager,
                                        byte streamFormatVersion, boolean usePooledByteBuffers) {
         impl = OutputStreamFactory.newOutputStream(version);
-        impl.init(orb, littleEndian, bufferManager, streamFormatVersion, usePooledByteBuffers);
+        impl.init(orb, bufferManager, streamFormatVersion, usePooledByteBuffers);
         impl.setParent(this);
     }
 
     public CDROutputObject(ORB orb, GIOPVersion version,
-                           boolean littleEndian, BufferManagerWrite bufferManager,
+                           BufferManagerWrite bufferManager,
                            byte streamFormatVersion, boolean usePooledByteBuffers)
     {
-        createCDROutputStream( orb, version, littleEndian,
-                               bufferManager, streamFormatVersion, usePooledByteBuffers) ;
+        createCDROutputStream( orb, version, bufferManager, streamFormatVersion, usePooledByteBuffers) ;
 
         this.header = null ;
         this.corbaMessageMediator = null ;
@@ -112,16 +111,10 @@ public class CDROutputObject
     }
 
 
-    public CDROutputObject(ORB orb, GIOPVersion version,
-                           boolean littleEndian, BufferManagerWrite bufferManager,
-                           byte streamFormatVersion) {
-        this(orb, version, littleEndian, bufferManager, streamFormatVersion, true);
-    }
-
-    private CDROutputObject( ORB orb, GIOPVersion giopVersion, 
+    private CDROutputObject( ORB orb, GIOPVersion giopVersion,
                              Message header, BufferManagerWrite manager,
                              byte streamFormatVersion, MessageMediator mediator) {
-        this(orb, giopVersion, false, manager, streamFormatVersion, usePooledBuffers(mediator)) ;
+        this(orb, giopVersion, manager, streamFormatVersion, usePooledBuffers(mediator)) ;
 
         this.header = header;
         this.corbaMessageMediator = mediator;
@@ -270,9 +263,7 @@ public class CDROutputObject
             throw wrapper.unknownCodeset(charSet);
         }
 
-        return CodeSetConversion.impl().getCTBConverter(charSet, 
-                                                        isLittleEndian(), 
-                                                        false);
+        return CodeSetConversion.impl().getCTBConverter(charSet, false, false);
     }
 
     protected CodeSetConversion.CTBConverter createWCharCTBConverter() {
@@ -309,22 +300,16 @@ public class CDROutputObject
         // the stream.
         if (wcharSet == OSFCodeSetRegistry.UTF_16) {
             if (getGIOPVersion().equals(GIOPVersion.V1_2)) {
-                return CodeSetConversion.impl().getCTBConverter(wcharSet, 
-                                                                false, 
-                                                                useByteOrderMarkers);
+                return CodeSetConversion.impl().getCTBConverter(wcharSet, false, useByteOrderMarkers);
             }
 
             if (getGIOPVersion().equals(GIOPVersion.V1_1)) {
-                return CodeSetConversion.impl().getCTBConverter(wcharSet,
-                                                                isLittleEndian(),
-                                                                false);
+                return CodeSetConversion.impl().getCTBConverter(wcharSet, false, false);
             }
         }
 
         // In the normal case, let the converter system handle it
-        return CodeSetConversion.impl().getCTBConverter(wcharSet, 
-                                                        isLittleEndian(),
-                                                        useByteOrderMarkers);
+        return CodeSetConversion.impl().getCTBConverter(wcharSet, false, useByteOrderMarkers);
     }
 
     // If we're local and don't have a Connection, use the
@@ -613,10 +598,6 @@ public class CDROutputObject
 
     protected final void setByteBuffer(ByteBuffer byteBuffer) {
         impl.setByteBuffer(byteBuffer);
-    }
-
-    public final boolean isLittleEndian() {
-        return impl.isLittleEndian();
     }
 
     // REVISIT: was protected - but need to access from xgiop.

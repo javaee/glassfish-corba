@@ -114,20 +114,17 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 {
     private static final int INDIRECTION_TAG = 0xffffffff;
 
-    protected boolean littleEndian;
     protected BufferManagerWrite bufferManagerWrite;
     ByteBufferWithInfo bbwi;
 
     protected ORB orb;
-    protected static final ORBUtilSystemException wrapper =
-        ORBUtilSystemException.self ;
+    protected static final ORBUtilSystemException wrapper = ORBUtilSystemException.self ;
 
     protected int blockSizeIndex = -1;
     protected int blockSizePosition = 0;
 
     protected byte streamFormatVersion;
 
-    private static final int DEFAULT_BUFFER_SIZE = 1024;
     private static final String kWriteMethod = "write";
 
     // Enum cache
@@ -181,29 +178,19 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     // REVISIT - This should be re-factored so that including whether
     // to use pool byte buffers or not doesn't need to be known.
     public void init(org.omg.CORBA.ORB orb,
-                        boolean littleEndian,
-                        BufferManagerWrite bufferManager,
-                        byte streamFormatVersion,
-                        boolean usePooledByteBuffers)
+                     BufferManagerWrite bufferManager,
+                     byte streamFormatVersion,
+                     boolean usePooledByteBuffers)
     {
         // ORB must not be null.  See CDROutputStream constructor.
         this.orb = (ORB)orb;
 
-        this.littleEndian = littleEndian;
         this.bufferManagerWrite = bufferManager;
         this.bbwi = new ByteBufferWithInfo(orb, bufferManager, usePooledByteBuffers);
         this.streamFormatVersion = streamFormatVersion;
 
         createRepositoryIdHandlers();
     }
-
-    public void init(org.omg.CORBA.ORB orb,
-                        boolean littleEndian,
-                        BufferManagerWrite bufferManager,
-                        byte streamFormatVersion)
-   {
-       init(orb, littleEndian, bufferManager, streamFormatVersion, true);
-   }
 
     private void createRepositoryIdHandlers()
     {
@@ -303,11 +290,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     public final void putEndian() throws SystemException {
-        write_boolean(littleEndian);
-    }
-
-    public final boolean littleEndian() {
-        return littleEndian;
+        write_boolean(false); // Java always uses big-endian
     }
 
     void freeInternalCaches() {
@@ -322,11 +305,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         if (repositoryIdCache != null) {
             repositoryIdCache.done();
         }
-    }
-
-    // No such type in java
-    public final void write_longdouble(double x) {
-        throw wrapper.longDoubleNotImplemented() ;
     }
 
     @PrimitiveWrite
@@ -362,19 +340,9 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         write_octet(converter.getBytes()[0]);
     }
 
-    private void writeLittleEndianWchar(char x) {
-        bbwi.getByteBuffer().put((byte)(x & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
-    }
-
     private void writeBigEndianWchar(char x) {
         bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
         bbwi.getByteBuffer().put((byte)(x & 0xFF));
-    }
-
-    private void writeLittleEndianShort(short x) {
-        bbwi.getByteBuffer().put((byte)(x & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
     }
 
     private void writeBigEndianShort(short x) {
@@ -382,29 +350,11 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         bbwi.getByteBuffer().put((byte)(x & 0xFF));
     }
 
-    private void writeLittleEndianLong(int x) {
-        bbwi.getByteBuffer().put((byte)(x & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 16) & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 24) & 0xFF));
-    }
-
     private void writeBigEndianLong(int x) {
         bbwi.getByteBuffer().put((byte)((x >>> 24) & 0xFF));
         bbwi.getByteBuffer().put((byte)((x >>> 16) & 0xFF));
         bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
         bbwi.getByteBuffer().put((byte)(x & 0xFF));
-    }
-
-    private void writeLittleEndianLongLong(long x) {
-        bbwi.getByteBuffer().put((byte)(x & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 16) & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 24) & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 32) & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 40) & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 48) & 0xFF));
-        bbwi.getByteBuffer().put((byte)((x >>> 56) & 0xFF));
     }
 
     private void writeBigEndianLongLong(long x) {
@@ -429,24 +379,16 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
         // If it's one of our legacy ORBs, do what they did:
         alignAndReserve(2, 2);
-        
-        if (littleEndian) {
-            writeLittleEndianWchar(x);
-        } else {
-            writeBigEndianWchar(x);
-        }
+
+        writeBigEndianWchar(x);
     }
 
     @PrimitiveWrite
     public void write_short(short x) 
     {
         alignAndReserve(2, 2);
-        
-        if (littleEndian) {
-            writeLittleEndianShort(x);
-        } else {
-            writeBigEndianShort(x);
-        }
+
+        writeBigEndianShort(x);
     }
 
     public final void write_ushort(short x)
@@ -458,12 +400,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     public void write_long(int x) 
     {
         alignAndReserve44() ;
-
-        if (littleEndian) {
-            writeLittleEndianLong(x);
-        } else {
-            writeBigEndianLong(x);
-        }
+        writeBigEndianLong(x);
     }
 
     public final void write_ulong(int x)
@@ -476,11 +413,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     {
         alignAndReserve(8, 8);
 
-        if (littleEndian) {
-            writeLittleEndianLongLong(x);
-        } else {
-            writeBigEndianLongLong(x);
-        }
+        writeBigEndianLongLong(x);
     }
 
     public final void write_ulonglong(long x)
@@ -638,7 +571,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             tci = new TypeCodeImpl(orb, tc);
         }
 
-        tci.write_value((org.omg.CORBA_2_3.portable.OutputStream)parent);
+        tci.write_value(parent);
     }
  
     @CdrWrite
@@ -657,7 +590,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     
         IOR ior = orb.getIOR( ref, true ) ;
         ior.write(parent);
-        return;
     }
 
     // ------------ RMI related methods --------------------------
@@ -1041,10 +973,11 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         return isCustom;
     }
 
+    @SuppressWarnings("deprecated")
     private short getTypeModifier(ValueHelper factory) {
         short modifier;
         try {
-            modifier = ((ValueHelper)factory).get_type().type_modifier();
+            modifier = factory.get_type().type_modifier();
         } catch(BadKind ex) {  // tk_value_box
             modifier = VM_NONE.value;
         }
@@ -1076,11 +1009,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     // calling alignAndReserve.  Otherwise, it's possible to get into
     // recursive scenarios which lose the chunking state.
     protected void writeLongWithoutAlign(int x) {
-        if (littleEndian) {
-            writeLittleEndianLong(x);
-        } else {
-            writeBigEndianLong(x);
-        }
+        writeBigEndianLong(x);
     }
 
     @InfoMethod
@@ -1284,28 +1213,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     @CdrWrite
-    public void write_string_array(String[] value, int offset, int length) {
-        if ( value == null ) {
-            throw wrapper.nullParam();
-        }
-            
-        for(int i = 0; i < length; i++) {
-            write_string(value[offset + i]);
-        }
-    }
-    
-    @CdrWrite
-    public void write_wstring_array(String[] value, int offset, int length) {
-        if ( value == null ) {
-            throw wrapper.nullParam();
-        }
-            
-        for(int i = 0; i < length; i++) {
-            write_wstring(value[offset + i]);
-        }
-    }
-
-    @CdrWrite
     public final void write_any_array(org.omg.CORBA.Any value[], int offset, int length)
     {
         for(int i = 0; i < length; i++) {
@@ -1338,10 +1245,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     public int getIndex() {
         return bbwi.position();
-    }
-
-    public boolean isLittleEndian() {
-        return littleEndian;
     }
 
     public void setIndex(int value) {
@@ -1447,7 +1350,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     @CdrWrite
     private int writeValueTag(boolean chunkIt, boolean useRepId, String codebase) {
-        int indirection = 0;
+        int indirection;
         if (chunkIt && !useRepId){
             if (codebase == null) {
                 write_long(repIdUtil.getStandardRMIChunkedNoRepStrId());
@@ -1466,7 +1369,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
                 indirection = get_offset() - 4;
                 write_codebase(codebase, get_offset());
             }
-        } else if (!chunkIt && !useRepId) {
+        } else if (!useRepId) {
             if (codebase == null) {
                 write_long(repIdUtil.getStandardRMIUnchunkedNoRepStrId());
                 indirection = get_offset() - 4;
@@ -1475,7 +1378,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
                 indirection = get_offset() - 4;
                 write_codebase(codebase, get_offset());
             }
-        } else if (!chunkIt && useRepId) {
+        } else {
             if (codebase == null) {
                 write_long(repIdUtil.getStandardRMIUnchunkedId());
                 indirection = get_offset() - 4;
@@ -1638,7 +1541,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             
             // getDeclaredMethod requires RuntimePermission accessDeclaredMembers
             // if a different class loader is used (even though the javadoc says otherwise)
-            Method writeMethod = null;
+            Method writeMethod;
             try {
                 writeMethod = AccessController.doPrivileged(
                     new PrivilegedExceptionAction<Method>() {

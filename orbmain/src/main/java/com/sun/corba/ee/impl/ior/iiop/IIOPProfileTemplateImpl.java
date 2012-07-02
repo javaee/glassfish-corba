@@ -62,8 +62,6 @@ import com.sun.corba.ee.spi.ior.iiop.IIOPFactories ;
 
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
 
-import com.sun.corba.ee.impl.encoding.CDROutputObject ;
-
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion ;
 import com.sun.corba.ee.spi.orb.ORB ;
 
@@ -160,8 +158,8 @@ public class IIOPProfileTemplateImpl extends TaggedProfileTemplateBase
         // Note that this cannot be accomplished with a codec!
 
         // Use the byte order of the given stream
-        OutputStream encapsulatedOS = new EncapsOutputStream( (ORB)os.orb(),
-            ((CDROutputObject)os).isLittleEndian() ) ;
+        OutputStream encapsulatedOS = new EncapsOutputStream( (ORB)os.orb()
+        ) ;
 
         okeyTemplate.write( id, encapsulatedOS ) ;
         EncapsulationUtility.writeOutputStream( encapsulatedOS, os ) ;

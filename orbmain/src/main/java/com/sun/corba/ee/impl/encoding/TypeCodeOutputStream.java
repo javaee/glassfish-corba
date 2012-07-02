@@ -58,20 +58,12 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
     private boolean isEncapsulation = false;
 
     public TypeCodeOutputStream(ORB orb) {
-        super(orb, false);
-    }
-
-    public TypeCodeOutputStream(ORB orb, boolean littleEndian) {
-        super(orb, littleEndian);
+        super(orb);
     }
 
     @Override
-    public org.omg.CORBA.portable.InputStream create_input_stream()
-    {
-        TypeCodeInputStream tcis 
-            = new TypeCodeInputStream((ORB)orb(), getByteBuffer(), getIndex(), 
-                isLittleEndian(), getGIOPVersion());
-        return tcis;
+    public org.omg.CORBA.portable.InputStream create_input_stream() {
+        return new TypeCodeInputStream(orb(), getByteBuffer(), getIndex(), false, getGIOPVersion());
     }
 
     public void setEnclosingOutputStream(OutputStream enclosure) {
@@ -133,8 +125,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
     }
 
     public TypeCodeOutputStream createEncapsulation(org.omg.CORBA.ORB _orb) {
-        TypeCodeOutputStream encap = new TypeCodeOutputStream((ORB)_orb,
-            isLittleEndian());
+        TypeCodeOutputStream encap = new TypeCodeOutputStream((ORB)_orb);
         encap.setEnclosingOutputStream(this);
         encap.makeEncapsulation();
         return encap;
@@ -147,10 +138,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
     }
 
     public static TypeCodeOutputStream wrapOutputStream(OutputStream os) {
-        boolean littleEndian = ((os instanceof CDROutputObject) ?
-            ((CDROutputObject)os).isLittleEndian() : false);
-        TypeCodeOutputStream tos = new TypeCodeOutputStream((ORB)os.orb(),
-            littleEndian);
+        TypeCodeOutputStream tos = new TypeCodeOutputStream((ORB)os.orb());
         tos.setEnclosingOutputStream(os);
         return tos;
     }

@@ -45,7 +45,6 @@ import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
 import com.sun.corba.ee.spi.misc.ORBConstants;
-import com.sun.corba.ee.impl.misc.ORBUtility;
 
 /**
  * Encapsulations are supposed to explicitly define their
@@ -79,6 +78,7 @@ public class EncapsOutputStream extends CDROutputObject
     // iiop/ORB
     // iiop/GIOPImpl
     // corba/AnyImpl
+    // IIOPProfileTemplate
     public EncapsOutputStream(ORB orb) {
         // GIOP version 1.2 with no fragmentation, big endian,
         // UTF8 for char data and UTF-16 for wide char data;
@@ -90,23 +90,8 @@ public class EncapsOutputStream extends CDROutputObject
     // REVISIT.  A UTF-16 encoding with GIOP 1.1 will not work
     // with byte order markers.
     public EncapsOutputStream(ORB orb, GIOPVersion version) {
-        this(orb, version, false);
-    }    
-
-    // Used by IIOPProfileTemplate
-    // 
-    public EncapsOutputStream(ORB orb, boolean isLittleEndian) {
-        this(orb, GIOPVersion.V1_2, isLittleEndian);
-    }
-
-    public EncapsOutputStream(ORB orb,
-                              GIOPVersion version, 
-                              boolean isLittleEndian)
-    {
-        super(orb, version, isLittleEndian,
-              BufferManagerFactory.newWriteEncapsulationBufferManager(orb),
-              ORBConstants.STREAM_FORMAT_VERSION_1,
-              usePooledByteBuffers
+        super(orb, version, BufferManagerFactory.newWriteEncapsulationBufferManager(orb),
+              ORBConstants.STREAM_FORMAT_VERSION_1, usePooledByteBuffers
         );
     }
 
@@ -117,7 +102,7 @@ public class EncapsOutputStream extends CDROutputObject
         return new EncapsInputStream(orb(),
                                      getByteBuffer(),
                                      getSize(),
-                                     isLittleEndian(),
+                                     false,
                                      getGIOPVersion());
     }
     
@@ -136,18 +121,15 @@ public class EncapsOutputStream extends CDROutputObject
         // and don't use byte order markers since we're limited to a 2 byte
         // fixed width encoding.
         if (getGIOPVersion().equals(GIOPVersion.V1_1))
-            return CodeSetConversion.impl().getCTBConverter(
-                OSFCodeSetRegistry.UTF_16, isLittleEndian(), false);
+            return CodeSetConversion.impl().getCTBConverter(OSFCodeSetRegistry.UTF_16, false, false);
 
         // Assume anything else meets GIOP 1.2 requirements
         //
         // Use byte order markers?  If not, use big endian in GIOP 1.2.  
         // (formal 00-11-03 15.3.16)
 
-        boolean useBOM = ((ORB)orb()).getORBData()
-            .useByteOrderMarkersInEncapsulations();
+        boolean useBOM = ((ORB)orb()).getORBData().useByteOrderMarkersInEncapsulations();
 
-        return CodeSetConversion.impl().getCTBConverter(
-            OSFCodeSetRegistry.UTF_16, false, useBOM);
+        return CodeSetConversion.impl().getCTBConverter(OSFCodeSetRegistry.UTF_16, false, useBOM);
     }
 }

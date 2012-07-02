@@ -40,15 +40,12 @@
 package com.sun.corba.ee.impl.encoding;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
 
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.ee.spi.orb.ORB;
 
 /**
  * Describes CDROutputObject delegates and provides some
@@ -68,13 +65,12 @@ abstract class CDROutputStreamBase extends java.io.OutputStream
     public void init(org.omg.CORBA.ORB orb, 
                      BufferManagerWrite bufferManager,
                      byte streamFormatVersion) {
-        init(orb, false, bufferManager, streamFormatVersion, true);
+        init(orb, bufferManager, streamFormatVersion, true);
     }
 
     // See EncapsOutputStream, the only one that uses the
     // non-pooled ByteBuffers, for additional info.
     protected abstract void init(org.omg.CORBA.ORB orb,
-                                 boolean littleEndian,
                                  BufferManagerWrite bufferManager,
                                  byte streamFormatVersion,
                                  boolean usePooledByteBuffers);
@@ -162,8 +158,6 @@ abstract class CDROutputStreamBase extends java.io.OutputStream
 
     public abstract ByteBuffer getByteBuffer();
     public abstract void setByteBuffer(ByteBuffer byteBuffer);
-
-    public abstract boolean isLittleEndian();
 
     public abstract ByteBufferWithInfo getByteBufferWithInfo();
     public abstract void setByteBufferWithInfo(ByteBufferWithInfo bbwi);

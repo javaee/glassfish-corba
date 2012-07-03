@@ -104,6 +104,7 @@
                             <includes>
                                 <include>activation/*.idl</include>
                                 <include>corba/legacybootstrapserver/*.idl</include>
+                                <include>corba/hcks/oldhcks.idl</include>
                             </includes>
                             <packagePrefixes>
                                 <packagePrefix><type>activation</type><prefix>com.sun.corba.ee.spi</prefix></packagePrefix>
@@ -113,9 +114,33 @@
                             <compatible>false</compatible>
                             <includes>
                                 <include>corba/connectintercept_1_4/*.idl</include>
+                                <include>corba/hcks/hcks.idl</include>
                             </includes>
                         </source>
                     </sources>
+                </configuration>
+            </plugin>
+
+            <!-- generate rmic stubs -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rmic-maven-plugin</artifactId>
+                <configuration>
+                    <testOutputDirectory>${project.build.testOutputDirectory}</testOutputDirectory>
+                    <includes>
+                        <include>corba.hcks.rmiiIServant</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rmic-maven-plugin</artifactId>
+                <configuration>
+                    <testOutputDirectory>${project.build.testOutputDirectory}</testOutputDirectory>
+                    <poa>true</poa>
+                    <includes>
+                        <include>corba.hcks.rmiiIServantPOA</include>
+                    </includes>
                 </configuration>
             </plugin>
 

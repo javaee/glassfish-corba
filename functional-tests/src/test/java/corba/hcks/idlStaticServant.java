@@ -51,7 +51,7 @@ import java.util.Properties;
 
 class idlStaticServant
     extends 
-        _idlIImplBase 
+        _idlIImplBase
 {
     public static final String baseMsg = idlStaticServant.class.getName();
     public static final String from_idlStaticServant = "from idlStaticServant";

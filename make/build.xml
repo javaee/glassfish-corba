@@ -1209,18 +1209,6 @@
         <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
             <param name="rmic-args-value" value=""/>
             <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/hcks/rmiiIServant.class"/>
-            <param name="sourcefile-name" value="corba/hcks/rmiiIServant.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/hcks/rmiiIServantPOA.class"/>
-            <param name="sourcefile-name" value="corba/hcks/rmiiIServantPOA.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value=""/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
             <param name="classfile-name" value="corba/connections/RemoteService.class"/>
             <param name="sourcefile-name" value="corba/connections/RemoteService.java"/>
         </antcall>

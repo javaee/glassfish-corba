@@ -56,20 +56,21 @@ import java.io.IOException ;
 import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 import org.omg.CORBA.Any;
+import org.omg.CORBA.DataOutputStream;
 import org.omg.CORBA.TypeCode;
 
 import com.sun.corba.ee.spi.trace.CdrWrite ;
 import org.omg.CORBA.portable.BoxedValueHelper;
+import org.omg.CORBA.portable.ValueOutputStream;
 
 /**
  * @author Harold Carr
  */
 @CdrWrite
-public class CDROutputObject 
-    extends org.omg.CORBA_2_3.portable.OutputStream
-    implements com.sun.corba.ee.impl.encoding.MarshalOutputStream,
-               org.omg.CORBA.DataOutputStream, org.omg.CORBA.portable.ValueOutputStream
-{
+public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
+                             implements MarshalOutputStream, DataOutputStream, ValueOutputStream {
+
+    private static final CDRInputObjectFactory INPUT_OBJECT_FACTORY = new CDRInputObjectFactory();
     protected static final ORBUtilSystemException wrapper = ORBUtilSystemException.self ;
     private static final OMGSystemException omgWrapper = OMGSystemException.self ;
     private static final long serialVersionUID = -3801946738338642735L;
@@ -101,8 +102,7 @@ public class CDROutputObject
 
     public CDROutputObject(ORB orb, GIOPVersion version,
                            BufferManagerWrite bufferManager,
-                           byte streamFormatVersion, boolean usePooledByteBuffers)
-    {
+                           byte streamFormatVersion, boolean usePooledByteBuffers) {
         createCDROutputStream( orb, version, bufferManager, streamFormatVersion, usePooledByteBuffers) ;
 
         this.header = null ;
@@ -173,8 +173,7 @@ public class CDROutputObject
      * output stream.  Has the side-effect of pushing any current
      * Message onto the Message list.
      */
-    public void writeTo(Connection connection)
-        throws java.io.IOException {
+    public void writeTo(Connection connection)  throws java.io.IOException {
         //
         // Update the GIOP MessageHeader size field.
         //
@@ -203,16 +202,14 @@ public class CDROutputObject
     }
 
     /** overrides create_input_stream from CDROutputStream */
-    public org.omg.CORBA.portable.InputStream create_input_stream()
-    {
+    public org.omg.CORBA.portable.InputStream create_input_stream() {
         // XREVISIT
         return null;
         //return new XIIOPInputStream(orb(), getByteBuffer(), getIndex(), 
             //isLittleEndian(), getMessageHeader(), conn);
     }
 
-    public Connection getConnection()
-    {
+    public Connection getConnection() {
         // REVISIT - only set when doing sendCancelRequest.
         if (connection != null) {
             return connection;
@@ -341,9 +338,13 @@ public class CDROutputObject
     }
 
     public CDRInputObject createInputObject(ORB orb) {
-        ByteBufferWithInfo bbwi = getByteBufferWithInfo();
-        getMessageHeader().setSize(bbwi.getByteBuffer(), bbwi.getSize());
-        return new CDRInputObject(orb, null, bbwi.getByteBuffer(), getMessageHeader());
+        return createInputObject(orb, INPUT_OBJECT_FACTORY);
+    }
+
+    protected CDRInputObject createInputObject(ORB orb, InputObjectFactory factory) {
+        CDRInputObject inputObject = factory.createInputObject(this, orb, getByteBuffer(), getSize(), getGIOPVersion());
+        impl.dereferenceBuffer();
+        return inputObject;
     }
 
     // We can move this out somewhere later.  For now, it serves its purpose
@@ -596,10 +597,6 @@ public class CDROutputObject
         return impl.getByteBuffer();
     }
 
-    protected final void setByteBuffer(ByteBuffer byteBuffer) {
-        impl.setByteBuffer(byteBuffer);
-    }
-
     // REVISIT: was protected - but need to access from xgiop.
     public final BufferManagerWrite getBufferManager() {
         return impl.getBufferManager();
@@ -642,6 +639,19 @@ public class CDROutputObject
 
     public void end_value() {
         impl.end_value();
+    }
+
+    protected interface InputObjectFactory {
+        CDRInputObject createInputObject(CDROutputObject outputObject, ORB orb, ByteBuffer byteBuffer, int size, GIOPVersion giopVersion);
+    }
+
+    private static class CDRInputObjectFactory implements InputObjectFactory {
+        @Override
+        public CDRInputObject createInputObject(CDROutputObject outputObject, ORB orb, ByteBuffer byteBuffer, int size, GIOPVersion giopVersion) {
+            Message messageHeader = outputObject.getMessageHeader();
+            messageHeader.setSize(byteBuffer, size);
+            return new CDRInputObject(orb, null, byteBuffer, messageHeader);
+        }
     }
 }
 

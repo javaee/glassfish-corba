@@ -730,10 +730,6 @@ public class CDRInputObject
         impl.setByteBuffer(byteBuffer);
     }
 
-    protected final void setByteBufferWithInfo(ByteBufferWithInfo bbwi) {
-        impl.setByteBufferWithInfo(bbwi);
-    }
-
     public final int getBufferLength() {
         return impl.getBufferLength();
     }

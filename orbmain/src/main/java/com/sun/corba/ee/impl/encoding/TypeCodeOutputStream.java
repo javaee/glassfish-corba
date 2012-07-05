@@ -41,6 +41,7 @@
 package com.sun.corba.ee.impl.encoding;
 
 
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import org.omg.CORBA_2_3.portable.OutputStream;
 
 import com.sun.corba.ee.spi.orb.ORB;
@@ -51,8 +52,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.nio.ByteBuffer;
 
-public final class TypeCodeOutputStream extends EncapsOutputStream 
-{
+public final class TypeCodeOutputStream extends EncapsOutputStream {
+
+    private static final InputObjectFactory TYPE_CODE_INPUT_OBJECT_FACTORY = new TypeCodeInputStreamFactory();
+
     private OutputStream enclosure = null;
     private Map<String,Integer> typeMap = null;
     private boolean isEncapsulation = false;
@@ -63,7 +66,14 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
 
     @Override
     public org.omg.CORBA.portable.InputStream create_input_stream() {
-        return new TypeCodeInputStream(orb(), getByteBuffer(), getIndex(), false, getGIOPVersion());
+        return createInputObject(null, TYPE_CODE_INPUT_OBJECT_FACTORY);
+    }
+
+    private static class TypeCodeInputStreamFactory implements InputObjectFactory {
+        @Override
+        public CDRInputObject createInputObject(CDROutputObject outputObject, ORB orb, ByteBuffer byteBuffer, int size, GIOPVersion giopVersion) {
+            return new TypeCodeInputStream(outputObject.orb(), byteBuffer, size, false, giopVersion);
+        }
     }
 
     public void setEnclosingOutputStream(OutputStream enclosure) {

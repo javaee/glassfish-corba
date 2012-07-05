@@ -93,7 +93,6 @@ import java.lang.reflect.Proxy;
 import javax.rmi.CORBA.Tie;
 import javax.rmi.CORBA.ValueHandler;
 
-import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.transport.ByteBufferPool;
 
 import com.sun.corba.ee.spi.protocol.ClientDelegate;
@@ -345,8 +344,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // This probably means that we're in an RMI-IIOP
         // Serializable's readObject method or a custom marshaled
         // IDL type is reading too much/in an incorrect order
-        int requiredNumBytes =
-                            computeAlignment(bbwi.position(), align) + dataSize;
+        int requiredNumBytes = computeAlignment(bbwi.position(), align) + dataSize;
 
         if (blockLength != maxBlockLength &&
             blockLength < get_offset() + requiredNumBytes) {
@@ -632,7 +630,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // Skip past terminating null byte
         //
         if (bbwi.position() + 1 > bbwi.getLength()) {
-            alignAndCheck(1, 1);
+            alignAndCheck(1, 1);                                                              // todo test this case
         }
         bbwi.position(bbwi.position() + 1);
 
@@ -1640,7 +1638,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 if (anEndTag != chunkedValueNestingLevel) {
                     bbwi.position(bbwi.position() - 4);
                 }
-            } else {
+            } else {                                                                             // todo test this case
                 // When talking to Kestrel or Ladybird, we use our old
                 // end tag rules and are less strict.  If the end tag
                 // isn't what we expected, we back up, assuming
@@ -1921,7 +1919,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             return result;
         }
 
-        throw wrapper.badRepIdIndirection( bbwi.position() ) ;
+        throw wrapper.badRepIdIndirection( bbwi.position() ) ;                              // todo test this case
     }
 
     @CdrRead
@@ -1944,7 +1942,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             return result;
         }
 
-        throw wrapper.badCodebaseIndirection( bbwi.position() ) ;
+        throw wrapper.badCodebaseIndirection( bbwi.position() ) ;                            // todo test this case
     }
 
     /* DataInputStream methods */
@@ -2088,23 +2086,15 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     public int getBufferLength() {
-        return bbwi.getLength();
+        return bbwi.getLength();                                                                // todo test this
     }
 
     public void setBufferLength(int value) {
         bbwi.setLength(value);
     }
 
-    public void setByteBufferWithInfo(ByteBufferWithInfo bbwi) {
-        this.bbwi = bbwi;
-    }
-
     public void setByteBuffer(ByteBuffer byteBuffer) {
-        bbwi.setByteBuffer(byteBuffer);
-    }
-
-    public int getIndex() {
-        return bbwi.position();
+        bbwi.setByteBuffer(byteBuffer);                                                         // todo test this case
     }
 
     public void setIndex(int value) {
@@ -2124,7 +2114,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     @CdrRead
-    private void skipToOffset(int offset) {
+    private void skipToOffset(int offset) {                                                        // todo test this
         // Number of bytes to skip
         int len = offset - get_offset();
 
@@ -2427,48 +2417,16 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     @Override
     @CdrRead
-    public void close() throws IOException
-    {
+    public void close() throws IOException {
 
         // tell BufferManagerRead to release any ByteBuffers
         getBufferManager().close(bbwi);
 
-        // It's possible bbwi.byteBuffer is shared between
-        // this InputStream and an OutputStream. Thus, we check
-        // if the Input/Output streams are using the same ByteBuffer.
-        // If they sharing the same ByteBuffer we need to ensure only
-        // one of those ByteBuffers are released to the ByteBufferPool.
-
-        if (bbwi != null && getByteBuffer() != null)
-        {
-            MessageMediator messageMediator = parent.getMessageMediator();
-            if (messageMediator != null)
-            {
-                CDROutputObject outputObj = messageMediator.getOutputObject();
-
-                if (outputObj != null)
-                {
-                    // are byteBuffers shared?
-                    if (bbwi.getByteBuffer() == outputObj.getByteBuffer())
-                    {
-                        // Set OutputStream's ByteBuffer and bbwi to null
-                        // so its ByteBuffer cannot be released to the pool
-                        outputObj.setByteBuffer(null);
-                        outputObj.setByteBufferWithInfo(null);
-                    }
-                }
-            }
+        if (bbwi != null && getByteBuffer() != null) {
 
             // release this stream's ByteBuffer to the pool
             ByteBufferPool byteBufferPool = orb.getByteBufferPool();
-            if (orb.cdrDebugFlag) {
-                // print address of ByteBuffer being released
-                int bbAddress = System.identityHashCode(bbwi.getByteBuffer());
-                bufferMessage(".close - releasing ByteBuffer id (",
-                    bbAddress, ") to ByteBufferPool." );
-            }
             byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
-            bbwi.setByteBuffer(null);
             bbwi = null;
         }
     }

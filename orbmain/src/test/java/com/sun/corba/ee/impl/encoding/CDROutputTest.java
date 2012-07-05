@@ -46,8 +46,11 @@ import org.junit.Test;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.TCKind;
+import org.omg.CORBA_2_3.portable.InputStream;
 
 import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
 
 public class CDROutputTest extends EncodingTestBase {
 
@@ -310,6 +313,97 @@ public class CDROutputTest extends EncodingTestBase {
         getOutputObject().write_TypeCode(new TypeCodeImpl((ORB) getOutputObject().orb(), TCKind._tk_string, 256));
 
         expectByteArray(0, 0, 0, 18, 0, 0, 1, 0);
+    }
+
+
+    @Test
+    public void canWriteObjRefTypeCode() {
+        getOutputObject().write_TypeCode(new TypeCodeImpl((ORB) getOutputObject().orb(), TCKind._tk_objref, "aa", "bb"));
+
+        expectByteArray(0,0,0,14, 0,0,0,19, 0,0,0,0, 0,0,0,3, 'a','a',0,0, 0,0,0,3, 'b','b',0 );
+    }
+
+    @Test
+    public void WhenOutputStreamClosed_releaseBuffer() throws IOException {
+        getOutputObject().write_ulong(123);
+        getOutputObject().close();
+
+        assertEquals(1, getNumBuffersReleased());
+    }
+
+    @Test
+    public void WhenOutputStreamClosedFirst_sharedBuffersAreOnlyReleasedOnce() throws IOException {
+        getOutputObject().write_ulong(123);
+        CDRInputObject inputObject = getOutputObject().createInputObject(getOrb());
+        getOutputObject().getMessageMediator().setInputObject(inputObject);
+        inputObject.setMessageMediator(getOutputObject().getMessageMediator());
+        assertEquals(123, inputObject.read_ulong());
+        getOutputObject().close();
+        inputObject.close();
+
+        assertEquals(1, getNumBuffersReleased());
+    }
+
+    @Test
+    public void WhenInputStreamClosedFirst_sharedBuffersAreOnlyReleasedOnce() throws IOException {
+        getOutputObject().write_ulong(123);
+        CDRInputObject inputObject = getOutputObject().createInputObject(getOrb());
+        getOutputObject().getMessageMediator().setInputObject(inputObject);
+        inputObject.setMessageMediator(getOutputObject().getMessageMediator());
+        getOutputObject().getMessageMediator().setOutputObject(getOutputObject());
+        assertEquals(123, inputObject.read_ulong());
+        inputObject.close();
+        getOutputObject().close();
+
+        assertEquals(1, getNumBuffersReleased());
+    }
+
+    @Test
+    public void WhenEncapsOutputStreamClosedFirst_sharedBuffersAreOnlyReleasedOnce() throws IOException {
+        EncapsOutputStream os = new EncapsOutputStream( getOrb() );
+        os.write_ulong(123);
+        InputStream is = (InputStream)(os.create_input_stream() );
+        assertEquals(123, is.read_ulong());
+        os.close();
+        is.close();
+
+        assertEquals(1, getNumBuffersReleased());
+    }
+
+    @Test
+    public void WhenEncapsInputStreamClosedFirst_sharedBuffersAreOnlyReleasedOnce() throws IOException {
+        EncapsOutputStream os = new EncapsOutputStream( getOrb() );
+        os.write_ulong(123);
+        InputStream is = (InputStream)(os.create_input_stream() );
+        assertEquals(123, is.read_ulong());
+        is.close();
+        os.close();
+
+        assertEquals(1, getNumBuffersReleased());
+    }
+
+    @Test
+    public void WhenTypeCodeOutputStreamClosedFirst_sharedBuffersAreOnlyReleasedOnce() throws IOException {
+        TypeCodeOutputStream os = new TypeCodeOutputStream( getOrb() );
+        os.write_ulong(123);
+        InputStream is = (InputStream)(os.create_input_stream() );
+        assertEquals(123, is.read_ulong());
+        os.close();
+        is.close();
+
+        assertEquals(1, getNumBuffersReleased());
+    }
+
+    @Test
+    public void WhenTypeCodeInputStreamClosedFirst_sharedBuffersAreOnlyReleasedOnce() throws IOException {
+        TypeCodeOutputStream os = new TypeCodeOutputStream( getOrb() );
+        os.write_ulong(123);
+        InputStream is = (InputStream)(os.create_input_stream() );
+        assertEquals(123, is.read_ulong());
+        is.close();
+        os.close();
+
+        assertEquals(1, getNumBuffersReleased());
     }
 
     /*

@@ -198,6 +198,32 @@ public class CDROutputValueTest extends ValueTestBase {
         expectByteArray(0,0,0,1, 0,0,0,2, 0,0,0,3);
     }
 
+    @Test
+    public void whenBufferFullWhileWritingPrimitive_generateContinuationAfterFirstPrimitiveInNewFragment() {
+        setFragmentSize(Message.GIOPMessageHeaderLength + 16);
+        getOutputObject().start_block();
+        getOutputObject().write_long(1);
+        getOutputObject().write_long(2);
+        getOutputObject().write_long(3);
+        getOutputObject().write_long(5);
+        getOutputObject().write_long(6);
+        getOutputObject().write_long(9);
+        getOutputObject().end_block();
+
+        expectByteArrays(new byte[] {0,0,0,16, 0,0,0,1, 0,0,0,2, 0,0,0,3}, new byte[] {0,0,0,5, 0,0,0,8, 0,0,0,6, 0,0,0,9});
+    }
+
+    @Test
+    public void whenBufferFullWhileMidChunkAndWritingArray_generateContinuationAfterArray() {
+        setFragmentSize(Message.GIOPMessageHeaderLength + 16);
+        getOutputObject().start_block();
+        getOutputObject().write_long_array(new int[] {1, 2, 3, 5, 6}, 0, 5);
+        getOutputObject().write_long(9);
+        getOutputObject().end_block();
+
+        expectByteArrays(new byte[] {0,0,0,20, 0,0,0,1, 0,0,0,2, 0,0,0,3}, new byte[] {0,0,0,5, 0,0,0,6, 0,0,0,4, 0,0,0,9});
+    }
+
 /*
 
 // write codebase

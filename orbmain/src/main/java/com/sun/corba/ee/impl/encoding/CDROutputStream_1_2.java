@@ -203,33 +203,6 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
 
     @Override
     @CdrWrite
-    protected void alignAndReserve44() {
-        // headerPadding bit is set by the write operation of RequestMessage_1_2
-        // or ReplyMessage_1_2 classes. When set, the very first body write
-        // operation (from the stub code) would trigger an alignAndReserve 
-        // method call, that would in turn add the appropriate header padding,
-        // such that the body is aligned on a 8-octet boundary. The padding
-        // is required for GIOP versions 1.2 and above, only if body is present.
-        if (headerPadding == true) {
-            headerPadding = false;
-            alignOnBoundary(ORBConstants.GIOP_12_MSG_BODY_ALIGNMENT);
-        }
-        
-        // In GIOP 1.2, we always end fragments at our
-        // fragment size, which is an "evenly divisible
-        // 8 byte boundary" (aka divisible by 16).  A fragment can 
-        // end with appropriate alignment padding, but no padding
-        // is needed with respect to the next GIOP fragment
-        // header since it ends on an 8 byte boundary.
-
-        bbwi.position(bbwi.position() + computeAlignment4());
-
-        if (bbwi.position() + 4  > bbwi.getLength())
-            grow44() ;
-    }
-
-    @Override
-    @CdrWrite
     protected void alignAndReserve(int align, int n) {
 
         // headerPadding bit is set by the write operation of RequestMessage_1_2
@@ -262,60 +235,6 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
     @InfoMethod
     private void handlingFragmentCase() { }
 
-    @CdrWrite
-    @Override
-    protected void grow44() {
-        // Save the current size for possible post-fragmentation calculation
-        int oldSize = bbwi.position();
-
-        // See notes where specialChunk is defined, as well as the
-        // above notes for primitiveAcrossFragmentedChunk.
-        //
-        // If we're writing a primitive and chunking, we need to update
-        // the chunk length to include the length of the primitive (unless
-        // this complexity is handled by specialChunk).
-        //
-        // Note that this is wasted processing in the grow case, but that
-        // we don't actually close the chunk in that case.
-        boolean handleChunk = (inBlock && !specialChunk);
-        if (handleChunk) {
-            outOfSequenceWrite();
-
-            int oldIndex = bbwi.position();
-
-            bbwi.position(blockSizeIndex - 4);
-
-            writeLongWithoutAlign((oldIndex - blockSizeIndex) + 4);
-
-            bbwi.position(oldIndex);
-        }
-
-        bbwi.setNumberOfBytesNeeded(4);
-        bufferManagerWrite.overflow(bbwi);
-
-        // At this point, if we fragmented, we should have a ByteBufferWithInfo
-        // with the fragment header already marshalled.  The buflen and position
-        // should be updated accordingly, and the fragmented flag should be set.
-
-        // Note that fragmented is only true in the streaming and collect cases.
-        if (bbwi.isFragmented()) {
-            handlingFragmentCase();
-
-            // Clear the flag
-            bbwi.setFragmented(false);
-
-            // Update fragmentOffset so indirections work properly.
-            // At this point, oldSize is the entire length of the
-            // previous buffer.  bbwi.position() is the length of the
-            // fragment header of this buffer.
-            fragmentOffset += (oldSize - bbwi.position());
-
-            // We just fragmented, and need to signal that we should
-            // start a new chunk after writing the primitive.
-            if (handleChunk)
-                primitiveAcrossFragmentedChunk = true;
-        }
-    }
 
     @Override
     @CdrWrite

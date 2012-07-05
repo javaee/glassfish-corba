@@ -119,6 +119,10 @@ public class EncodingTestBase {
         connection.fragments = fragments;
     }
 
+    protected final ORB getOrb() {
+        return orb;
+    }
+
     protected final void useRepId() {
         orbData.useRepId = true;
     }
@@ -487,6 +491,8 @@ public class EncodingTestBase {
     static abstract class MessageMediatorFake implements MessageMediator {
 
         private Connection connection;
+        private CDRInputObject inputObject;
+        private CDROutputObject outputObject;
 
         public void setConnection(Connection connection) {
             this.connection = connection;
@@ -495,6 +501,26 @@ public class EncodingTestBase {
         @Override
         public Connection getConnection() {
             return connection;
+        }
+
+        @Override
+        public void setInputObject(CDRInputObject inputObject) {
+            this.inputObject = inputObject;
+        }
+
+        @Override
+        public CDRInputObject getInputObject() {
+            return inputObject;
+        }
+
+        @Override
+        public void setOutputObject(CDROutputObject outputObject) {
+            this.outputObject = outputObject;
+        }
+
+        @Override
+        public CDROutputObject getOutputObject() {
+            return outputObject;
         }
     }
 
@@ -509,7 +535,7 @@ public class EncodingTestBase {
         byte[] body;
         byte[] data;
         int headerIndex = 0;
-        int sizeInHeader;
+        int sizeInHeader = -1;
         private boolean startedNewMessage;
 
         byte[] getMessageData() {
@@ -544,7 +570,7 @@ public class EncodingTestBase {
 
         @Override
         public int getSize() {
-            return getMessageData().length;
+            return sizeInHeader >=0 ? sizeInHeader : getMessageData().length;
         }
 
         @Override

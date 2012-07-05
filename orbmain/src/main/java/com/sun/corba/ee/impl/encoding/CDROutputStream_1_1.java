@@ -72,7 +72,7 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
         int alignment = computeAlignment(align);
 
         if (bbwi.position() + n + alignment > bbwi.getLength()) {
-            grow(align, n);
+            grow(align, n);                                                                 // todo test this case
 
             // Must recompute the alignment after a grow.
             // In the case of fragmentation, the alignment
@@ -88,7 +88,7 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
     }
 
     @Override
-    protected void grow(int align, int n) {
+    protected void grow(int align, int n) {                                               // todo test this case
         // Save the current size for possible post-fragmentation calculation
         int oldSize = bbwi.position();
 

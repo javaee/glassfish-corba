@@ -46,6 +46,8 @@ import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
 import com.sun.corba.ee.spi.misc.ORBConstants;
 
+import java.nio.ByteBuffer;
+
 /**
  * Encapsulations are supposed to explicitly define their
  * code sets and GIOP version.  The original resolution to issue 2784 
@@ -68,6 +70,7 @@ public class EncapsOutputStream extends CDROutputObject
     // the EncapsOutputStream doesn't know it's using pooled
     // byte buffers.
     final static boolean usePooledByteBuffers = false;
+    private static final InputObjectFactory INPUT_STREAM_FACTORY = new EncapsInputStreamFactory();
 
     // REVISIT - Right now, valuetypes in encapsulations will
     // only use stream format version 1, which may create problems
@@ -98,12 +101,14 @@ public class EncapsOutputStream extends CDROutputObject
     @Override
     public org.omg.CORBA.portable.InputStream create_input_stream() {
         freeInternalCaches();
+        return createInputObject(null, INPUT_STREAM_FACTORY);
+    }
 
-        return new EncapsInputStream(orb(),
-                                     getByteBuffer(),
-                                     getSize(),
-                                     false,
-                                     getGIOPVersion());
+    private static class EncapsInputStreamFactory implements InputObjectFactory {
+        @Override
+        public CDRInputObject createInputObject(CDROutputObject outputObject, ORB orb, ByteBuffer byteBuffer, int size, GIOPVersion giopVersion) {
+            return new EncapsInputStream(outputObject.orb(), byteBuffer, size, false, giopVersion);
+        }
     }
     
     @Override

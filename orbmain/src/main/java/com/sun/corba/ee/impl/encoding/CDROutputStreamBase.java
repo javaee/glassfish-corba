@@ -62,7 +62,7 @@ abstract class CDROutputStreamBase extends java.io.OutputStream
         this.parent = parent;
     }
 
-    public void init(org.omg.CORBA.ORB orb, 
+    public void init(org.omg.CORBA.ORB orb,
                      BufferManagerWrite bufferManager,
                      byte streamFormatVersion) {
         init(orb, bufferManager, streamFormatVersion, true);
@@ -76,6 +76,7 @@ abstract class CDROutputStreamBase extends java.io.OutputStream
                                  boolean usePooledByteBuffers);
 
     public abstract void write_boolean(boolean value);
+
     public abstract void write_char(char value);
     public abstract void write_wchar(char value);
     public abstract void write_octet(byte value);
@@ -114,50 +115,50 @@ abstract class CDROutputStreamBase extends java.io.OutputStream
                               org.omg.CORBA.ContextList contexts) {
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }
-
     public abstract org.omg.CORBA.ORB orb();
 
     // org.omg.CORBA_2_3.portable.OutputStream
     public abstract void write_value(java.io.Serializable value);
+
     public abstract void write_value(java.io.Serializable value, java.lang.Class clz);
     public abstract void write_value(java.io.Serializable value, String repository_id);
-    public abstract void write_value(java.io.Serializable value, 
+    public abstract void write_value(java.io.Serializable value,
                                      org.omg.CORBA.portable.BoxedValueHelper factory);
     public abstract void write_abstract_interface(java.lang.Object obj);
-
     // java.io.OutputStream
-//     public abstract void write(byte b[]) throws IOException;
-//     public abstract void write(byte b[], int off, int len) throws IOException;
-//     public abstract void flush() throws IOException;
-//     public abstract void close() throws IOException;
 
     // com.sun.corba.ee.impl.encoding.MarshalOutputStream
     public abstract void start_block();
+
     public abstract void end_block();
     public abstract void putEndian();
     public abstract void writeTo(java.io.OutputStream s)
         throws IOException;
     public abstract byte[] toByteArray();
-
     // org.omg.CORBA.DataOutputStream
     public abstract void write_Abstract (java.lang.Object value);
+
     public abstract void write_Value (java.io.Serializable value);
     public abstract void write_any_array(org.omg.CORBA.Any[] seq, int offset, int length);
-
     // org.omg.CORBA.portable.ValueBase
     public abstract String[] _truncatable_ids();
 
     // Needed by request and reply messages for GIOP versions >= 1.2 only.
     abstract void setHeaderPadding(boolean headerPadding);
-    
+
     // Required by IIOPOutputStream and other subclasses
     public abstract int getSize();
 
     public abstract int getIndex();
-    public abstract void setIndex(int value);
 
+    public abstract void setIndex(int value);
+    //     public abstract void close() throws IOException;
+//     public abstract void flush() throws IOException;
+//     public abstract void write(byte b[], int off, int len) throws IOException;
+//     public abstract void write(byte b[]) throws IOException;
+
+    abstract void dereferenceBuffer();
     public abstract ByteBuffer getByteBuffer();
-    public abstract void setByteBuffer(ByteBuffer byteBuffer);
 
     public abstract ByteBufferWithInfo getByteBufferWithInfo();
     public abstract void setByteBufferWithInfo(ByteBufferWithInfo bbwi);

@@ -183,12 +183,9 @@ abstract class CDRInputStreamBase extends java.io.InputStream
     public abstract ByteBuffer getByteBuffer();
     public abstract void setByteBuffer(ByteBuffer byteBuffer);
 
-    public abstract void setByteBufferWithInfo(ByteBufferWithInfo bbwi);
-
     public abstract int getBufferLength();
     public abstract void setBufferLength(int value);
 
-    public abstract int getIndex();
     public abstract void setIndex(int value);
 
     public abstract void orb(org.omg.CORBA.ORB orb);

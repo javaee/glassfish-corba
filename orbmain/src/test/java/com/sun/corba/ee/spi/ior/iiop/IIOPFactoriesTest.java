@@ -16,7 +16,7 @@ public class IIOPFactoriesTest {
         IIOPAddress addr = IIOPFactories.makeIIOPAddress( "localhost", 2345 ) ;
         AlternateIIOPAddressComponent comp = IIOPFactories.makeAlternateIIOPAddressComponent( addr ) ;
         org.omg.IOP.TaggedComponent tcomp = comp.getIOPComponent( Stub.create(ORBFake.class) ) ;
-        assertEquals( tcomp.tag, TAG_ALTERNATE_IIOP_ADDRESS.value ) ;
+        assertEquals( tcomp.tag, TAG_ALTERNATE_IIOP_ADDRESS.value );
     }
 
     @SimpleStub(strict=true)

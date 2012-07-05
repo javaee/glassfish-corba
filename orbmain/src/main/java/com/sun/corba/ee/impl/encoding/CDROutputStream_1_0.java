@@ -83,7 +83,6 @@ import org.omg.CORBA.portable.CustomValue;
 import org.omg.CORBA.portable.StreamableValue;
 import org.omg.CORBA.portable.BoxedValueHelper;
 
-import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.transport.ByteBufferPool;
 
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
@@ -113,6 +112,7 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 public class CDROutputStream_1_0 extends CDROutputStreamBase
 {
     private static final int INDIRECTION_TAG = 0xffffffff;
+    private static final boolean BIG_ENDIAN = false;
 
     protected BufferManagerWrite bufferManagerWrite;
     ByteBufferWithInfo bbwi;
@@ -236,14 +236,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         // No-op for GIOP 1.0
     }
 
-    protected final int computeAlignment4() {
-        int incr = bbwi.position() & 3 ;
-        if (incr != 0) {
-            return 4 - incr;
-        }
-        return 0 ;
-    }
-
     protected final int computeAlignment(int align) {
         if (align > 1) {
             int incr = bbwi.position() & (align - 1);
@@ -255,14 +247,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         return 0;
     }
 
-    protected void alignAndReserve44() {
-        bbwi.position(bbwi.position() + computeAlignment4());
-
-        if (bbwi.position() + 4  > bbwi.getLength()) {
-            grow44();
-        }
-    }
-
     protected void alignAndReserve(int align, int n) {
 
         bbwi.position(bbwi.position() + computeAlignment(align));
@@ -270,12 +254,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         if (bbwi.position() + n  > bbwi.getLength()) {
             grow(align, n);
         }
-    }
-
-    protected void grow44() {
-        bbwi.setNumberOfBytesNeeded(4);
-
-        bufferManagerWrite.overflow(bbwi);
     }
 
     //
@@ -290,7 +268,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     public final void putEndian() throws SystemException {
-        write_boolean(false); // Java always uses big-endian
+        write_boolean(BIG_ENDIAN); // Java always writes big-endian
     }
 
     void freeInternalCaches() {
@@ -399,7 +377,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @PrimitiveWrite
     public void write_long(int x) 
     {
-        alignAndReserve44() ;
+        alignAndReserve(4, 4);
         writeBigEndianLong(x);
     }
 
@@ -1224,19 +1202,15 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     // CDROutputStream state management.
     //
 
-    public void writeTo(java.io.OutputStream s) 
-        throws java.io.IOException 
-    {
+    public void writeTo(java.io.OutputStream s) throws java.io.IOException {
         byte[] tmpBuf = ORBUtility.getByteBufferArray(bbwi.getByteBuffer());
         s.write(tmpBuf, 0, bbwi.position());    
     }
 
     public void writeOctetSequenceTo(org.omg.CORBA.portable.OutputStream s) {
-
         byte[] buf = ORBUtility.getByteBufferArray(bbwi.getByteBuffer());
         s.write_long(bbwi.position());
         s.write_octet_array(buf, 0, bbwi.position());
-
     }
 
     public final int getSize() {
@@ -1265,10 +1239,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             result = bbwi.getByteBuffer();
         }
         return result;
-    }
-
-    public void setByteBuffer(ByteBuffer byteBuffer) {
-        bbwi.setByteBuffer(byteBuffer);
     }
 
     private void freeValueCache() {
@@ -1427,7 +1397,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     private void writeEndTag(boolean chunked){
         if (chunked) {
             if (get_offset() == end_flag_position) {
-                if (bbwi.position() == end_flag_index) {
+                if (bbwi.position() == end_flag_index) {                                         // todo test this case
                     // We are exactly at the same position and index as the
                     // end of the last end tag.  Thus, we can back up over it
                     // and compact the tags.
@@ -1736,11 +1706,10 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     @InfoMethod
-    private void startValueInfo( String repId, int offset, 
-        int position ) { } 
+    private void startValueInfo( String repId, int offset, int position ) { }
 
     @CdrWrite
-    public void start_value(String rep_id) {
+    public void start_value(String rep_id) {                                       // todo test this
         startValueInfo( rep_id, get_offset(), bbwi.position() ) ;
 
         if (inBlock) {
@@ -1798,26 +1767,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         // tell BufferManagerWrite to release any ByteBuffers
         getBufferManager().close();
 
-        // It's possible bbwi.byteBuffer is shared between
-        // this OutputStream and an InputStream. Thus, we check
-        // if the Input/Output streams are using the same ByteBuffer.
-        // If they sharing the same ByteBuffer we need to ensure only
-        // one of those ByteBuffers are released to the ByteBufferPool.
-
         if (getByteBufferWithInfo() != null && getByteBuffer() != null) {
-            MessageMediator messageMediator = parent.getMessageMediator();
-            if (messageMediator != null) {
-                CDRInputObject inputObj = messageMediator.getInputObject();
-                if (inputObj != null) {
-                    // shared byteBuffers?
-                    if (bbwi.getByteBuffer() == inputObj.getByteBuffer()) {
-                        // Set InputStream's ByteBuffer and bbwi to null
-                        // so its ByteBuffer cannot be released to the pool
-                        inputObj.setByteBuffer(null);
-                        inputObj.setByteBufferWithInfo(null);
-                    }
-                }
-            }
 
             // release this stream's ByteBuffer to the pool
             ByteBufferPool byteBufferPool = orb.getByteBufferPool();
@@ -1833,4 +1783,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     @InfoMethod
     private void releaseByteBuffer(int bbAddress) { }
+
+    void dereferenceBuffer() {
+        bbwi = null;
+    }
 }

@@ -9,7 +9,7 @@
     <groupId>org.glassfish.corba</groupId>
     <artifactId>glassfish-corba</artifactId>
     <version>4.0.0-b003-SNAPSHOT</version>
-    <name>GlassFish Corba</name>
+    <name>ORB Implementation</name>
     <packaging>pom</packaging>
     <description>A CORBA ORB for Glassfish</description>
 
@@ -143,6 +143,22 @@
         </pluginManagement>
 
     </build>
+
+    <reporting>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>findbugs-maven-plugin</artifactId>
+          <version>2.5.1</version>
+        </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>cobertura-maven-plugin</artifactId>
+            <version>2.5.1</version>
+          </plugin>
+      </plugins>
+    </reporting>
+
 
 </project>
 

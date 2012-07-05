@@ -8,7 +8,7 @@
 
     <artifactId>glassfish-corba-omgapi</artifactId>
     <packaging>bundle</packaging>
-    <name>GlassFish Corba OMG API</name>
+    <name>Generated OMG APIs</name>
 
     <build>
         <plugins>

@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>glassfish-corba-csiv2-idl</artifactId>
-    <name>GlassFish CSIv2 IDL</name>
+    <name>Generated CSIv2 APIs</name>
     <packaging>bundle</packaging>
 
     <build>

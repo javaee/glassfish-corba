@@ -7,7 +7,7 @@
     </parent>
 
     <artifactId>glassfish-corba-tests</artifactId>
-    <name>Corba Functional Tests</name>
+    <name>Functional Tests</name>
     <packaging>pom</packaging>
 
     <dependencies>

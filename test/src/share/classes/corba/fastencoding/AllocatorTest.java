@@ -47,8 +47,8 @@ import org.testng.annotations.BeforeGroups ;
 import org.testng.annotations.AfterGroups ;
 import org.testng.Assert ;
 
-import com.sun.corba.ee.impl.encoding.fast.bytebuffer.Slab ;
-import com.sun.corba.ee.impl.encoding.fast.bytebuffer.Allocator ;
+import com.sun.corba.ee.impl.fast.bytebuffer.Slab ;
+import com.sun.corba.ee.impl.fast.bytebuffer.Allocator ;
 
 public class AllocatorTest {
     private static final int SLAB_SIZE = 100000 ;

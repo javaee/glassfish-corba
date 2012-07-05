@@ -46,9 +46,9 @@ import java.util.HashMap ;
 
 import org.testng.annotations.Test ;
 
-import com.sun.corba.ee.impl.encoding.fast.LookupTable ;
-import com.sun.corba.ee.impl.encoding.fast.LookupTableSimpleConcurrentImpl ;
-import com.sun.corba.ee.impl.encoding.fast.LookupTableConcurrentImpl ;
+import com.sun.corba.ee.impl.fast.LookupTable ;
+import com.sun.corba.ee.impl.fast.LookupTableSimpleConcurrentImpl ;
+import com.sun.corba.ee.impl.fast.LookupTableConcurrentImpl ;
 import org.glassfish.pfl.basic.contain.Holder;
 import org.glassfish.pfl.basic.func.UnaryFunction;
 

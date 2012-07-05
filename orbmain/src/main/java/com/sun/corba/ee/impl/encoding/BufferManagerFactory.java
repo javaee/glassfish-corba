@@ -56,7 +56,6 @@ public class BufferManagerFactory {
     private static final ORBUtilSystemException wrapper = ORBUtilSystemException.self ;
 
     public static final int GROW    = 0;
-    public static final int COLLECT = 1;
     public static final int STREAM  = 2;
 
     // The next two methods allow creation of BufferManagers based on GIOP version.
@@ -104,13 +103,10 @@ public class BufferManagerFactory {
         switch (strategy) {
             case BufferManagerFactory.GROW:
                 return new BufferManagerWriteGrow(orb);
-            case BufferManagerFactory.COLLECT:
-                return new BufferManagerWriteCollect(orb);
             case BufferManagerFactory.STREAM:
                 return new BufferManagerWriteStream(orb);
             default:
-                throw new INTERNAL("Unknown buffer manager write strategy: "
-                                   + strategy);
+                throw new INTERNAL("Unknown buffer manager write strategy: " + strategy);
         }
     }
 

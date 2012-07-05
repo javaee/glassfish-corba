@@ -161,7 +161,6 @@ abstract class CDROutputStreamBase extends java.io.OutputStream
     public abstract ByteBuffer getByteBuffer();
 
     public abstract ByteBufferWithInfo getByteBufferWithInfo();
-    public abstract void setByteBufferWithInfo(ByteBufferWithInfo bbwi);
 
     public abstract BufferManagerWrite getBufferManager();
 

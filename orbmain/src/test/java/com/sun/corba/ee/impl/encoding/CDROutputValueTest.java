@@ -43,6 +43,7 @@ import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.util.RepositoryId;
 import com.sun.corba.ee.spi.orb.ORBVersionFactory;
 import org.glassfish.simplestub.Stub;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.VM_TRUNCATABLE;
@@ -178,13 +179,37 @@ public class CDROutputValueTest extends ValueTestBase {
     }
 
     @Test
+    public void canWriteCustomValueInChunk_withCompactedEndTags() throws IOException {
+        getOutputObject().start_value("ID1");
+        getOutputObject().write_long(73);
+        getOutputObject().start_value("ID2");
+        getOutputObject().write_long(37);
+        getOutputObject().end_value();
+        getOutputObject().end_value();
+
+        expectByteArrays(new byte[] {0x7F,FF,FF,0x0A, 0,0,0,4, 'I','D','1',0, 0,0,0,4, 0,0,0,73,
+                                          0x7F,FF,FF,0x0A, 0,0,0,4, 'I','D','2',0, 0,0,0,4, 0,0,0,37, FF,FF,FF,FF });
+    }
+
+    @Test
     public void whenBufferFull_sendFragment() {
         setFragmentSize(Message.GIOPMessageHeaderLength + 8);
         getOutputObject().write_long(1);
-        getOutputObject().write_long(2);
+        getOutputObject().write_short((short) 2);
         getOutputObject().write_long(3);
 
-        expectByteArrays(new byte[] {0,0,0,1, 0,0,0,2}, new byte[]{0,0,0,3});
+        expectByteArrays(new byte[] {0,0,0,1, 0,2, 0,0}, new byte[] {0,0,0,3});
+    }
+
+    @Test
+    public void whenBufferFullInV1_1_sendFragment() {
+        useV1_1();
+        setFragmentSize(Message.GIOPMessageHeaderLength + 8);
+        getOutputObject().write_long(1);
+        getOutputObject().write_short((short) 2);
+        getOutputObject().write_long(3);
+
+        expectByteArrays(new byte[] {0,0,0,1, 0,2}, new byte[] {0,0,0,3});
     }
 
     @Test
@@ -192,10 +217,10 @@ public class CDROutputValueTest extends ValueTestBase {
         useV1_0();
         setBufferSize(Message.GIOPMessageHeaderLength + 8);
         getOutputObject().write_long(1);
-        getOutputObject().write_long(2);
+        getOutputObject().write_short((short) 2);
         getOutputObject().write_long(3);
 
-        expectByteArray(0,0,0,1, 0,0,0,2, 0,0,0,3);
+        expectByteArray(0,0,0,1, 0,2, 0,0, 0,0,0,3);
     }
 
     @Test

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -111,13 +111,12 @@ public class ByteBufferPoolImpl implements ByteBufferPool {
     /**
      * Locations where ByteBuffers are released to the pool:
      * 1. ByteBufferWithInfo.growBuffer()
-     * 2. BufferManagerWriteCollect.sendMessage()
-     * 3. CDROutputStream_1_0.close()
-     * 4. CDRInputStream_1_0.close()
-     * 5. BufferManagerReadStream.underflow()
-     * 6. BufferManagerWrite.close()
-     * 7. BufferManagerRead.close()
-     * 8. CorbaMessageMediatorImpl.releaseByteBufferToPool()
+     * 2. CDROutputStream_1_0.close()
+     * 3. CDRInputStream_1_0.close()
+     * 4. BufferManagerReadStream.underflow()
+     * 5. BufferManagerWrite.close()
+     * 6. BufferManagerRead.close()
+     * 7. CorbaMessageMediatorImpl.releaseByteBufferToPool()
     */
     public void releaseByteBuffer(ByteBuffer buffer) {
         // nothing to do here other than help the garbage collector

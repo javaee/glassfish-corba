@@ -229,11 +229,6 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
         return getByteBufferWithInfo().position();
     }
 
-    // REVISIT - make protected once all encoding together
-    public final void setByteBufferWithInfo(ByteBufferWithInfo bbwi) {
-        impl.setByteBufferWithInfo(bbwi);
-    }
-
     /*
      * Override the default CDR factory behavior to get the
      * negotiated code sets from the connection.
@@ -620,10 +615,6 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
 
     protected final void freeInternalCaches() {
         impl.freeInternalCaches();
-    }
-
-    public void alignOnBoundary(int octetBoundary) {
-        impl.alignOnBoundary(octetBoundary);
     }
 
     // Needed by request and reply messages for GIOP versions >= 1.2 only.

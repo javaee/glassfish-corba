@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -72,7 +72,7 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
         int alignment = computeAlignment(align);
 
         if (bbwi.position() + n + alignment > bbwi.getLength()) {
-            grow(align, n);                                                                 // todo test this case
+            grow(align, n);
 
             // Must recompute the alignment after a grow.
             // In the case of fragmentation, the alignment
@@ -88,7 +88,7 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
     }
 
     @Override
-    protected void grow(int align, int n) {                                               // todo test this case
+    protected void grow(int align, int n) {
         // Save the current size for possible post-fragmentation calculation
         int oldSize = bbwi.position();
 

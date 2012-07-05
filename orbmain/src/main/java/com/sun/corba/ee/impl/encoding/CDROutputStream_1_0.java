@@ -962,6 +962,10 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         return modifier;
     }
 
+    /**
+     * Returns the current position relative to the start of the message.
+     * @return
+     */
     public int get_offset() {
         return bbwi.position();
     }
@@ -1229,10 +1233,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         return bbwi;
     }
 
-    public void setByteBufferWithInfo(ByteBufferWithInfo bbwi) {
-        this.bbwi = bbwi;
-    }
-
     public ByteBuffer getByteBuffer() {
         ByteBuffer result = null;
         if (bbwi != null) {
@@ -1397,12 +1397,12 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     private void writeEndTag(boolean chunked){
         if (chunked) {
             if (get_offset() == end_flag_position) {
-                if (bbwi.position() == end_flag_index) {                                         // todo test this case
+                if (bbwi.position() == end_flag_index) {
                     // We are exactly at the same position and index as the
                     // end of the last end tag.  Thus, we can back up over it
                     // and compact the tags.
                     bbwi.position(bbwi.position() - 4);
-                } else {
+                } else {                                            // reg - is this even possible any more?
                     // Special case in which we're at the beginning of a new
                     // fragment, but the position is the same.  We can't back up,
                     // so we just write the new end tag without compaction.  This
@@ -1709,7 +1709,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     private void startValueInfo( String repId, int offset, int position ) { }
 
     @CdrWrite
-    public void start_value(String rep_id) {                                       // todo test this
+    public void start_value(String rep_id) {
         startValueInfo( rep_id, get_offset(), bbwi.position() ) ;
 
         if (inBlock) {

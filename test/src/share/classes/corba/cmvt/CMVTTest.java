@@ -46,10 +46,9 @@ import com.sun.corba.ee.spi.misc.ORBConstants;
 
 public class CMVTTest extends CORBATest {
     static final int GROW = 0;
-    static final int COLLECT = 1;
     static final int STREAM = 2;
     static String[] GIOP_version = { "1.0", "1.1", "1.2" };
-    static String[] GIOP_strategy = { "GROW", "CLCT", "STRM" };
+    static String[] GIOP_strategy = { "GROW", "STRM" };
 
     private void printBeginTest(int clientVersion,
                                 int clientStrategy,
@@ -138,9 +137,9 @@ public class CMVTTest extends CORBATest {
         runTest( "1_2_grow" );
 
         //1.2 + stream
-        setClient(2,2);
-        setServer(2,2);
-        printBeginTest(2,2,2,2);
+        setClient(2,1);
+        setServer(2,1);
+        printBeginTest(2,1,2,1);
         runTest( "1_2_stream" );
 
         System.out.print("      Test result : " );

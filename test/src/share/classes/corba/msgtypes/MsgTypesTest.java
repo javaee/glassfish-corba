@@ -157,38 +157,7 @@ public class MsgTypesTest extends CORBATest {
 
             for (int server_strategy = GROW, j = 0; j < GIOP_version.length; j++) {
 
-                printBeginTest(i, client_strategy, j, server_strategy);
-
-                Properties serverProps = Options.getServerProperties();
-                serverProps.put(ORBConstants.GIOP_VERSION, GIOP_version[i]);
-                serverProps.put(ORBConstants.GIOP_11_BUFFMGR, "" + server_strategy);
-                serverProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + server_strategy);
-                // serverProps.put(ORBConstants.DEBUG_PROPERTY, "transport,subcontract" ) ;
-
-                Controller server = createServer("corba.msgtypes.Server",
-                    testName( true, i, client_strategy, j, server_strategy));
-                Controller client = createClient("corba.msgtypes.Client",
-                    testName( false, i, client_strategy, j, server_strategy));
-
-                server.start();
-                client.start();
-
-                client.waitFor(60000);
-
-                if (client.exitValue() != Controller.SUCCESS) {
-                    errors++;
-                    printEndTest("LocateMsgTest FAILED, Client exit value = " +
-                                 client.exitValue());
-                } else {
-                    if (server.finished()) {
-                        errors++;
-                        printEndTest("LocateMsgTest FAILED, Server crashed");
-                    } else {
-                        printEndTest("LocateMsgTest PASSED");
-                    }
-                }
-                client.stop();
-                server.stop();
+                runTest(client_strategy, i, server_strategy, j);
 
                 if (GIOP_version[j].equals("1.1") && server_strategy == GROW) {
                     server_strategy = STREAM; j--;
@@ -205,6 +174,44 @@ public class MsgTypesTest extends CORBATest {
                 client_strategy = GROW; i--;
             }
         }
+    }
+
+    private void runTest(int client_strategy, int client_version, int server_strategy, int server_version) throws Exception {
+        // skip non-longer support COLLECT strategy tests
+        if (client_strategy == COLLECT || server_strategy == COLLECT) return;
+
+        printBeginTest(client_version, client_strategy, server_version, server_strategy);
+
+        Properties serverProps = Options.getServerProperties();
+        serverProps.put(ORBConstants.GIOP_VERSION, GIOP_version[client_version]);
+        serverProps.put(ORBConstants.GIOP_11_BUFFMGR, "" + server_strategy);
+        serverProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + server_strategy);
+        // serverProps.put(ORBConstants.DEBUG_PROPERTY, "transport,subcontract" ) ;
+
+        Controller server = createServer("corba.msgtypes.Server",
+            testName( true, client_version, client_strategy, server_version, server_strategy));
+        Controller client = createClient("corba.msgtypes.Client",
+            testName( false, client_version, client_strategy, server_version, server_strategy));
+
+        server.start();
+        client.start();
+
+        client.waitFor(60000);
+
+        if (client.exitValue() != Controller.SUCCESS) {
+            errors++;
+            printEndTest("LocateMsgTest FAILED, Client exit value = " +
+                         client.exitValue());
+        } else {
+            if (server.finished()) {
+                errors++;
+                printEndTest("LocateMsgTest FAILED, Server crashed");
+            } else {
+                printEndTest("LocateMsgTest PASSED");
+            }
+        }
+        client.stop();
+        server.stop();
     }
 
     public void runEarlyReply() throws Throwable {

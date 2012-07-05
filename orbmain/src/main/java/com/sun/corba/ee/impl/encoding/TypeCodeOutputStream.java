@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -158,15 +158,13 @@ public final class TypeCodeOutputStream extends EncapsOutputStream {
 
     @Override
     public int getRealIndex(int index) {
-        int topPos = getTopLevelPosition();
-        return topPos;
+        return getTopLevelPosition();
     }
 
     public byte[] getTypeCodeBuffer() {
         // Returns the buffer trimmed of the trailing zeros and without the
         // known _kind value at the beginning.
         ByteBuffer theBuffer = getByteBuffer();
-        //System.out.println("outBuffer length = " + (getIndex() - 4));
         byte[] tcBuffer = new byte[getIndex() - 4];
         // Micro-benchmarks show that DirectByteBuffer.get(int) is faster
         // than DirectByteBuffer.get(byte[], offset, length).
@@ -177,12 +175,4 @@ public final class TypeCodeOutputStream extends EncapsOutputStream {
         return tcBuffer;
     }
 
-    public void printTypeMap() {
-        System.out.println("typeMap = {");
-        for (String id : typeMap.keySet()) {
-            System.out.println("  key = " + id + ", value = "
-                + typeMap.get(id));
-        }
-        System.out.println("}");
-    }
 }

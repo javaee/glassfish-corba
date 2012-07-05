@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -57,7 +57,6 @@ public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeRe
 {
     private Map<Integer,TypeCodeImpl> typeMap = null;
     private InputStream enclosure = null;
-    private boolean isEncapsulation = false;
 
     public TypeCodeInputStream(org.omg.CORBA.ORB orb, byte[] data, int size) {
         super(orb, data, size);
@@ -81,20 +80,14 @@ public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeRe
 
     public void addTypeCodeAtPosition(TypeCodeImpl tc, int position) {
         if (typeMap == null) {
-            //if (TypeCodeImpl.debug) System.out.println("Creating typeMap");
             typeMap = new HashMap<Integer,TypeCodeImpl>(16);
         }
-        //if (TypeCodeImpl.debug) System.out.println(this + " adding tc " + tc + " at position " + position);
         typeMap.put(position, tc);
     }
 
     public TypeCodeImpl getTypeCodeAtPosition(int position) {
         if (typeMap == null)
             return null;
-        //if (TypeCodeImpl.debug) {
-            //System.out.println("Getting tc " + typeMap.get(position) +
-                               //" at position " + position);
-        //}
         return typeMap.get(position);
     }
 
@@ -116,21 +109,10 @@ public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeRe
             // had to read the enclosed stream completely when creating it.
             // This is why the size of the enclosed stream needs to be substracted.
             int topPos = ((TypeCodeReader)enclosure).getTopLevelPosition();
-            // Substract getBufferLength from the parents pos because it read this stream
+            // Subtract getBufferLength from the parents pos because it read this stream
             // from its own when creating it
-            int pos = topPos - getBufferLength() + getPosition();
-            //if (TypeCodeImpl.debug) {
-                //System.out.println("TypeCodeInputStream.getTopLevelPosition using getTopLevelPosition " + topPos +
-                    //(isEncapsulation ? " - encaps length 4" : "") +
-                    //" - getBufferLength() " + getBufferLength() +
-                    //" + getPosition() " + getPosition() + " = " + pos);
-            //}
-            return pos;
+            return topPos - getBufferLength() + getPosition();
         }
-        //if (TypeCodeImpl.debug) {
-            //System.out.println("TypeCodeInputStream.getTopLevelPosition returning getPosition() = " +
-                               //getPosition() + " because enclosure is " + enclosure);
-        //}
         return getPosition();
     }
 
@@ -160,7 +142,6 @@ public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeRe
     protected void makeEncapsulation() {
         // first entry in an encapsulation is the endianess
         consumeEndian();
-        isEncapsulation = true;
     }
 
     public void printTypeMap() {

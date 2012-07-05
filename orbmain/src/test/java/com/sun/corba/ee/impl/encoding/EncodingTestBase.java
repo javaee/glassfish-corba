@@ -79,8 +79,8 @@ public class EncodingTestBase {
     protected static final int ISO_8859_1 = OSFCodeSetRegistry.ISO_8859_1.getNumber();
     protected static final int UTF_8 = OSFCodeSetRegistry.UTF_8.getNumber();
     protected static final int UTF_16 = OSFCodeSetRegistry.UTF_16.getNumber();
-    protected static final int FE = 0xfe;
-    protected static final int FF = 0xff;
+    protected static final byte FE = -2;
+    protected static final byte FF = -1;
     protected static final int PAD = 0;  // use for output tests only, to make comparison possible
 
     private ORBDataFake orbData = Stub.create(ORBDataFake.class);

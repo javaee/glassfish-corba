@@ -25,7 +25,7 @@ public class _Base_Stub extends Stub implements Base {
     };
     
     public String[] _ids() { 
-        return _type_ids;
+        return (String[]) _type_ids.clone();
     }
     
     public void method() throws java.rmi.RemoteException, rmic.TestException {

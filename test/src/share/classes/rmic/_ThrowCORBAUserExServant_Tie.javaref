@@ -53,7 +53,7 @@ public class _ThrowCORBAUserExServant_Tie extends ObjectImpl implements Tie {
     }
     
     public String[] _ids() { 
-        return _type_ids;
+        return (String[]) _type_ids.clone();
     }
     
     public OutputStream _invoke(String method, InputStream _in, ResponseHandler reply) throws SystemException {

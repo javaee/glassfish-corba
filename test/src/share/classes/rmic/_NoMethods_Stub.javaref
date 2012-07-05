@@ -25,6 +25,6 @@ public class _NoMethods_Stub extends Stub implements NoMethods {
     };
     
     public String[] _ids() { 
-        return _type_ids;
+        return (String[]) _type_ids.clone();
     }
 }

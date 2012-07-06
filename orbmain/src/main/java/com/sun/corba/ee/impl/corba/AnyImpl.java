@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1229,7 +1229,7 @@ public class AnyImpl extends Any {
      * @return The newly created TypeCode.
      */
     @DynamicType
-    public TypeCode createTypeCodeForClass (java.lang.Class c, ORB tcORB) {
+    public static TypeCode createTypeCodeForClass (java.lang.Class c, ORB tcORB) {
         // Look in the cache first
         TypeCodeImpl classTC = tcORB.getTypeCodeForClass(c);
         if (classTC != null) {
@@ -1273,8 +1273,7 @@ public class AnyImpl extends Any {
 
         // Anything else
         // We know that this is a TypeCodeImpl since it is our ORB
-        classTC = (TypeCodeImpl)ValueUtility.createTypeCodeForClass(
-            tcORB, c, ORBUtility.createValueHandler(tcORB));
+        classTC = (TypeCodeImpl)ValueUtility.createTypeCodeForClass(tcORB, c, ORBUtility.createValueHandler(tcORB));
         // Intruct classTC to store its buffer
         classTC.setCaching(true);
         // Update the cache
@@ -1293,7 +1292,7 @@ public class AnyImpl extends Any {
      * @param tcORB the orb to use to find the type code
      * @return the appropriate primitive type code
      */
-    private TypeCode getPrimitiveTypeCodeForClass (Class c, ORB tcORB)
+    private static TypeCode getPrimitiveTypeCodeForClass (Class c, ORB tcORB)
     {
         //debug.log ("getPrimitiveTypeCodeForClass");
 

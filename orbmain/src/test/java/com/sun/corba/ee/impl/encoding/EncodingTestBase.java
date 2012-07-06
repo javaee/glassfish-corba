@@ -39,6 +39,7 @@ package com.sun.corba.ee.impl.encoding;
  * holder.
  */
 
+import com.sun.corba.ee.impl.orb.ORBImpl;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.transport.MessageTraceManagerImpl;
@@ -64,7 +65,6 @@ import org.omg.CORBA.portable.ValueFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.sun.corba.ee.impl.encoding.EncodingTestBase.Endian.*;
@@ -107,7 +107,7 @@ public class EncodingTestBase {
 
     /** Returns a random value to ensure that the test never reads it. **/
     static byte pad() {
-        return (byte) (FF & (int) (Math.random() * 256));
+        return (byte) ((int) (Math.random() * 256));
     }
 
     @Before
@@ -158,7 +158,7 @@ public class EncodingTestBase {
     protected final EncapsInputStream createEncapsulatedInputStream(int... contents) {
         byte[] bytes = new byte[contents.length];
         for (int i = 0; i < contents.length; i++)
-            bytes[i] = (byte) (FF & contents[i]);
+            bytes[i] = (byte) contents[i];
         return new EncapsInputStream(orb, bytes, bytes.length, isLittleEndian(), message.giopVersion);
     }
 
@@ -201,7 +201,7 @@ public class EncodingTestBase {
     protected final void addFragment(int... values) {
         fragment.body = new byte[values.length];
         for (int i = 0; i < values.length; i++)
-            fragment.body[i] = (byte) (FF & values[i]);
+            fragment.body[i] = (byte) (values[i]);
         getInputObject().addFragment(fragment, ByteBuffer.wrap(fragment.getMessageData()));
     }
 
@@ -223,7 +223,7 @@ public class EncodingTestBase {
     protected final void setMessageBody(int... values) {
         message.body = new byte[values.length];
         for (int i = 0; i < values.length; i++)
-            message.body[i] = (byte) (FF & values[i]);
+            message.body[i] = (byte) values[i];
     }
 
     protected final void setMessageBody(byte[] values) {
@@ -282,7 +282,7 @@ public class EncodingTestBase {
     protected final void expectByteArray(int... expected) {
         byte[] bytes = new byte[expected.length];
         for (int i = 0; i < expected.length; i++)
-            bytes[i] = (byte) (FF & expected[i]);
+            bytes[i] = (byte) (expected[i]);
         expectByteArray(bytes);
     }
 
@@ -376,11 +376,15 @@ public class EncodingTestBase {
     //---------------------------------------- fake implementation of the ORB ------------------------------------------
 
     @SimpleStub(strict = true)
-    static abstract class ORBFake extends ORB {
+    static abstract class ORBFake extends ORBImpl {
         private ORBDataFake orbData;
         private ORBVersion version = ORBVersionFactory.getFOREIGN();
         private ByteBufferPool pool;
         private TransportManager transportManager = null;
+
+        protected ORBFake() {
+            initializePrimitiveTypeCodeConstants();
+        }
 
         void setORBData(ORBDataFake orbData) {
             this.orbData = orbData;

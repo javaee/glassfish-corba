@@ -256,6 +256,7 @@ public class Client extends LocalObject
         LocateRequestMessage msg = getLocateRequestMessage(orb, ior);
         MessageMediator messageMediator =
             beginRequest(orb, fragTestStub, msg);
+
         CDROutputObject os = (CDROutputObject)
             messageMediator.getOutputObject();
         // create GIOP header and write to output buffer
@@ -272,7 +273,7 @@ public class Client extends LocalObject
 
         // send first fragment. This will cause the server to start the
         // worker thread and the worker thread will block to read stream.
-        os.getBufferManager().overflow(os.getByteBufferWithInfo());
+        os.sendFirstFragment();
 
         // send cancel request
         try {
@@ -282,7 +283,7 @@ public class Client extends LocalObject
         System.out.println("AbortiveCancelRequestMsg sent successfully");
     }
 
-    static void runAbortiveCancelRequest2(ORB orb) 
+    static void runAbortiveCancelRequest2(ORB orb)
     {
 
         org.omg.CORBA.Object fragTestStub = getStub(orb);
@@ -308,7 +309,7 @@ public class Client extends LocalObject
         // This will cause the server to start the
         // worker thread and the worker thread will block to read stream for
         // umarshalling method input parameters.
-        os.getBufferManager().overflow(os.getByteBufferWithInfo());
+        os.sendFirstFragment();
 
         // send cancel request
         try {
@@ -387,8 +388,7 @@ public class Client extends LocalObject
         int align = ORBConstants.GIOP_12_MSG_BODY_ALIGNMENT; // 8 bytes length
         int charLength = 1;
         org.omg.CORBA.Object fragTestStub = getStub(orb);      
-        CDROutputObject os = (CDROutputObject)
-            StubAdapter.request(fragTestStub, "fooA", false); // CASE 1
+        CDROutputObject os = (CDROutputObject) StubAdapter.request(fragTestStub, "fooA", false); // CASE 1
         int beforePaddingIndex = os.getBufferPosition();
         os.write_char('a'); // forces padding if not already naturally aligned
         int afterPaddingIndex = os.getBufferPosition();

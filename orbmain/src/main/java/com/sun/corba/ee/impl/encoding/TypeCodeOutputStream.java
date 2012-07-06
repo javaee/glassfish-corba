@@ -46,8 +46,6 @@ import org.omg.CORBA_2_3.portable.OutputStream;
 
 import com.sun.corba.ee.spi.orb.ORB;
 
-import com.sun.corba.ee.impl.misc.ORBUtility;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.nio.ByteBuffer;
@@ -116,23 +114,6 @@ public final class TypeCodeOutputStream extends EncapsOutputStream {
             typeMap.get(id) ;
     }
 
-    public void writeRawBuffer(org.omg.CORBA.portable.OutputStream s, int firstLong) {
-        // Writes this streams buffer to the given OutputStream
-        // without byte order flag and length as is the case for encapsulations.
-
-        // Make sure to align s to 4 byte boundaries.
-        // Unfortunately we can't do just this:
-        // s.alignAndReserve(4, 4);
-        // So we have to take the first four bytes given in firstLong
-        // and write them
-        // with a call to write_long which will trigger the alignment.
-        // Then write the rest of the byte array.
-
-        s.write_long(firstLong);
-        byte[] buf = ORBUtility.getByteBufferArray(getByteBuffer());
-        s.write_octet_array(buf, 4, getIndex() - 4);
-    }
-
     public TypeCodeOutputStream createEncapsulation(org.omg.CORBA.ORB _orb) {
         TypeCodeOutputStream encap = new TypeCodeOutputStream((ORB)_orb);
         encap.setEnclosingOutputStream(this);
@@ -162,17 +143,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream {
     }
 
     public byte[] getTypeCodeBuffer() {
-        // Returns the buffer trimmed of the trailing zeros and without the
-        // known _kind value at the beginning.
-        ByteBuffer theBuffer = getByteBuffer();
-        byte[] tcBuffer = new byte[getIndex() - 4];
-        // Micro-benchmarks show that DirectByteBuffer.get(int) is faster
-        // than DirectByteBuffer.get(byte[], offset, length).
-        // REVISIT - May want to check if buffer is direct or non-direct
-        //           and use array copy if ByteBuffer is non-direct.
-        for (int i = 0; i < tcBuffer.length; i++)
-            tcBuffer[i] = theBuffer.get(i+4);
-        return tcBuffer;
+        return toByteArray(4);
     }
 
 }

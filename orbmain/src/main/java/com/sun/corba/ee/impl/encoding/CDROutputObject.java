@@ -81,6 +81,10 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
     private transient MessageMediator corbaMessageMediator;
     private transient Connection connection;
 
+    public void sendFirstFragment() {
+        getBufferManager().overflow(impl.getByteBufferWithInfo());
+    }
+
     // This needed only to get FindBugs to shut up about transient fields.
     // Should never be called.
     private void readObject( ObjectInputStream is ) throws IOException,
@@ -178,7 +182,7 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
         // Update the GIOP MessageHeader size field.
         //
 
-        ByteBufferWithInfo bbwi = getByteBufferWithInfo();
+        ByteBufferWithInfo bbwi = impl.getByteBufferWithInfo();
 
         getMessageHeader().setSize(bbwi.getByteBuffer(), bbwi.getSize());
 
@@ -217,16 +221,8 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
         return corbaMessageMediator.getConnection();
     }
 
-    // XREVISIT - If CDROutputObject doesn't live in the iiop
-    // package, it will need this, here, to give package access
-    // to xgiop.
-    // REVISIT - make protected once all encoding together
-    public final ByteBufferWithInfo getByteBufferWithInfo() {
-        return impl.getByteBufferWithInfo();
-    }
-
     public final int getBufferPosition() {
-        return getByteBufferWithInfo().position();
+        return impl.getByteBufferWithInfo().position();
     }
 
     /*
@@ -337,7 +333,7 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
     }
 
     protected CDRInputObject createInputObject(ORB orb, InputObjectFactory factory) {
-        CDRInputObject inputObject = factory.createInputObject(this, orb, getByteBuffer(), getSize(), getGIOPVersion());
+        CDRInputObject inputObject = factory.createInputObject(this, orb, impl.getByteBuffer(), getSize(), getGIOPVersion());
         impl.dereferenceBuffer();
         return inputObject;
     }
@@ -552,6 +548,15 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
         return impl.toByteArray();
     }
 
+    /**
+     * Returns the contents of this stream, from the specified start index to the current output position.
+     * @param start the index at which to start copying the data.
+     * @return a byte array representation of part of the output.
+     */
+    public final byte[] toByteArray(int start) {
+        return impl.toByteArray(start);
+    }
+
     // org.omg.CORBA.DataOutputStream
     public final void write_Abstract (java.lang.Object value) {
         impl.write_Abstract(value);
@@ -586,10 +591,6 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
 
     protected final void setIndex(int value) {
         impl.setIndex(value);
-    }
-
-    protected final ByteBuffer getByteBuffer() {
-        return impl.getByteBuffer();
     }
 
     // REVISIT: was protected - but need to access from xgiop.

@@ -38,6 +38,7 @@ package com.sun.corba.ee.impl.encoding;
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+import com.sun.corba.ee.impl.corba.AnyImpl;
 import com.sun.corba.ee.impl.corba.TypeCodeImpl;
 import com.sun.corba.ee.impl.io.ValueUtility;
 import com.sun.corba.ee.spi.orb.ORB;
@@ -46,9 +47,11 @@ import org.junit.Test;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.TCKind;
+import org.omg.CORBA.TypeCode;
 import org.omg.CORBA_2_3.portable.InputStream;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -307,7 +310,6 @@ public class CDROutputTest extends EncodingTestBase {
         expectByteArray(0, 0, 0, 6);
     }
 
-
     @Test
     public void canWriteStringTypeCode() {
         getOutputObject().write_TypeCode(new TypeCodeImpl((ORB) getOutputObject().orb(), TCKind._tk_string, 256));
@@ -315,6 +317,33 @@ public class CDROutputTest extends EncodingTestBase {
         expectByteArray(0, 0, 0, 18, 0, 0, 1, 0);
     }
 
+    @Test
+    public void canWriteSerializableTypeCode() {
+        String KNOWN_TYPE_CODE = "0000001D000000CE0000000000000067524D493A636F6D2E73756E2E636F7262612E65652E696D706C" +
+                                 "2E656E636F64696E672E4344524F7574707574546573745C553030323453657269616C697A65644461" +
+                                 "74613A323837394346383133394444433741463A393031343243313746444330444632410000000000" +
+                                 "3C636F6D2E73756E2E636F7262612E65652E696D706C2E656E636F64696E672E4344524F7574707574" +
+                                 "546573742453657269616C697A65644461746100000000000000000000000001000000066142797465" +
+                                 "0000000000000A0000";
+        TypeCode typeCode = AnyImpl.createTypeCodeForClass(SerializedData.class, getOrb());
+        getOutputObject().write_TypeCode(typeCode);
+
+        expectByteArray(hexStringToByteArray(KNOWN_TYPE_CODE));
+    }
+
+    static class SerializedData implements Serializable {
+        byte aByte;
+    }
+
+    private byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len/2];
+        for (int i = 0; i < len; i+=2) {
+            data[i/2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                               + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
+    }
 
     @Test
     public void canWriteObjRefTypeCode() {

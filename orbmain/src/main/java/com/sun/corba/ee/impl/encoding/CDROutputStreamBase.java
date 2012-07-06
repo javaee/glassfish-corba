@@ -135,6 +135,8 @@ abstract class CDROutputStreamBase extends java.io.OutputStream
     public abstract void writeTo(java.io.OutputStream s)
         throws IOException;
     public abstract byte[] toByteArray();
+    protected abstract byte[] toByteArray(int start);
+
     // org.omg.CORBA.DataOutputStream
     public abstract void write_Abstract (java.lang.Object value);
 

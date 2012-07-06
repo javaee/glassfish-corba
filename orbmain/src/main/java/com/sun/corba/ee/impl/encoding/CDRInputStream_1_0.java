@@ -2077,24 +2077,12 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         return _ids.clone();
     }
 
-    public ByteBuffer getByteBuffer() {
-        ByteBuffer result = null;
-        if (bbwi != null) {
-            result = bbwi.getByteBuffer();
-        }
-        return result;
-    }
-
     public int getBufferLength() {
         return bbwi.getLength();                                                                // todo test this
     }
 
     public void setBufferLength(int value) {
         bbwi.setLength(value);
-    }
-
-    public void setByteBuffer(ByteBuffer byteBuffer) {
-        bbwi.setByteBuffer(byteBuffer);                                                         // todo test this case
     }
 
     public void setIndex(int value) {
@@ -2422,7 +2410,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // tell BufferManagerRead to release any ByteBuffers
         getBufferManager().close(bbwi);
 
-        if (bbwi != null && getByteBuffer() != null) {
+        if (bbwi != null && bbwi.getByteBuffer() != null) {
 
             // release this stream's ByteBuffer to the pool
             ByteBufferPool byteBufferPool = orb.getByteBufferPool();

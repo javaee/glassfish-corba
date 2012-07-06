@@ -57,7 +57,6 @@ import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 import com.sun.corba.ee.spi.logging.OMGSystemException;
 
 import com.sun.corba.ee.impl.misc.ORBUtility;
-import com.sun.corba.ee.spi.misc.ORBConstants;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.trace.Transport;
 import com.sun.corba.ee.spi.trace.MonitorRead ;
@@ -166,24 +165,18 @@ public class CDRInputObject
         byte encodingVersion, boolean directRead, ByteBuffer byteBuffer,
         int size, boolean littleEndian, BufferManagerRead bufMgr ) {
 
-        impl = InputStreamFactory.newInputStream(this.orb, version,
-            encodingVersion, directRead);
-
+        impl = InputStreamFactory.newInputStream(this.orb, version, encodingVersion, directRead);
         impl.init(orb, byteBuffer, size, littleEndian, bufMgr);
-
         impl.setParent(this);
     }
 
     private CDRInputObject(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, int size,
         boolean littleEndian, GIOPVersion version, byte encodingVersion, BufferManagerRead bufMgr) {
 
-        this(orb, byteBuffer, size, littleEndian, version, encodingVersion,
-             bufMgr, true);
+        this(orb, byteBuffer, size, littleEndian, version, encodingVersion, bufMgr, true);
     }
 
-    public CDRInputObject(ORB orb, Connection corbaConnection,
-        ByteBuffer byteBuffer, Message header)
-    {
+    public CDRInputObject(ORB orb, Connection corbaConnection, ByteBuffer byteBuffer, Message header) {
         this(orb, byteBuffer, header.getSize(), header.isLittleEndian(),
               header.getGIOPVersion(), header.getEncodingVersion(),
               BufferManagerFactory.newBufferManagerRead(
@@ -720,14 +713,6 @@ public class CDRInputObject
 
     public final boolean isLittleEndian() {
         return impl.isLittleEndian();
-    }
-
-    protected final ByteBuffer getByteBuffer() {
-        return impl.getByteBuffer();
-    }
-
-    protected final void setByteBuffer(ByteBuffer byteBuffer) {
-        impl.setByteBuffer(byteBuffer);
     }
 
     public final int getBufferLength() {

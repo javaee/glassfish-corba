@@ -180,9 +180,6 @@ abstract class CDRInputStreamBase extends java.io.InputStream
     
     // Needed by IIOPInputStream and other subclasses
 
-    public abstract ByteBuffer getByteBuffer();
-    public abstract void setByteBuffer(ByteBuffer byteBuffer);
-
     public abstract int getBufferLength();
     public abstract void setBufferLength(int value);
 

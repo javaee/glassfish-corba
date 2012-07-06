@@ -204,11 +204,16 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     public byte[] toByteArray() {
+        return toByteArray(0);
+    }
+
+    @Override
+    protected byte[] toByteArray(int start) {
         byte[] it;
 
-        it = new byte[bbwi.position()];
+        it = new byte[bbwi.position() - start];
 
-        bbwi.getByteBuffer().position(0);
+        bbwi.getByteBuffer().position(start);
         bbwi.getByteBuffer().get(it);
 
         return it;

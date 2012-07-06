@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1652,24 +1652,13 @@ public final class TypeCodeImpl extends TypeCode {
         if (os instanceof TypeCodeOutputStream) {
             this.write_value((TypeCodeOutputStream)os);
         } else {
-            TypeCodeOutputStream wrapperOutStream = null;
-
             if (outBuffer == null) {
-                wrapperOutStream = TypeCodeOutputStream.wrapOutputStream(os);
+                TypeCodeOutputStream wrapperOutStream = TypeCodeOutputStream.wrapOutputStream(os);
                 this.write_value(wrapperOutStream);
-                if (cachingEnabled) {
-                    outBuffer = wrapperOutStream.getTypeCodeBuffer();
-                }
-            } 
-            
-            // Write the first 4 bytes first to trigger alignment.
-            // We know that it is the kind.
-            if (cachingEnabled && outBuffer != null) {
-                os.write_long(_kind);
-                os.write_octet_array(outBuffer, 0, outBuffer.length);
-            } else {
-                wrapperOutStream.writeRawBuffer(os, _kind);
+                outBuffer = wrapperOutStream.getTypeCodeBuffer();
             }
+            os.write_long(_kind);
+            os.write_octet_array(outBuffer, 0, outBuffer.length);
         }
     }
 

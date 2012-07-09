@@ -267,9 +267,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     // fragmentation policy for IIOP 1.1.
     //
     protected void grow(int align, int n) {
-        bbwi.setNumberOfBytesNeeded(n);
-
-        bufferManagerWrite.overflow(bbwi);
+        bufferManagerWrite.overflow(bbwi, n);
     }
 
     public final void putEndian() throws SystemException {

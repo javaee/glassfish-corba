@@ -385,8 +385,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     // This can be overridden....
     @CdrRead
     protected void grow(int align, int n) {
-        bbwi.setNumberOfBytesNeeded(n);
-
         bbwi = bufferManagerRead.underflow(bbwi);
 
     }

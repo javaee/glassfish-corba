@@ -81,8 +81,9 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
     private transient MessageMediator corbaMessageMediator;
     private transient Connection connection;
 
+    // todo this is only used in a pair of legacy tests. Rewrite them as unit tests and remove this method.
     public void sendFirstFragment() {
-        getBufferManager().overflow(impl.getByteBufferWithInfo());
+        getBufferManager().overflow(impl.getByteBufferWithInfo(), 0);
     }
 
     // This needed only to get FindBugs to shut up about transient fields.
@@ -221,6 +222,7 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
         return corbaMessageMediator.getConnection();
     }
 
+    // todo this is only used in a legacy test - rewrite the test as a unit test and remove this method
     public final int getBufferPosition() {
         return impl.getByteBufferWithInfo().position();
     }

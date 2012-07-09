@@ -39,7 +39,6 @@
  */
 package com.sun.corba.ee.impl.encoding;
 
-import java.nio.ByteBuffer;
 import java.util.EmptyStackException;
 
 import sun.corba.Bridge;
@@ -47,17 +46,11 @@ import sun.corba.Bridge;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.portable.RemarshalException;
 
-import com.sun.corba.ee.impl.encoding.CDROutputObject;
 import com.sun.corba.ee.spi.transport.Connection;
 
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.transport.ContactInfoListIterator;
 
-import com.sun.corba.ee.impl.encoding.BufferManagerWrite;
-import com.sun.corba.ee.impl.encoding.ByteBufferWithInfo;
-import com.sun.corba.ee.impl.encoding.CDROutputObject;
-import com.sun.corba.ee.spi.misc.ORBConstants;
-import com.sun.corba.ee.impl.protocol.InvocationInfo;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
@@ -87,7 +80,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
         return orb.getORBData().getGIOPFragmentSize();
     }
 
-    public void overflow (ByteBufferWithInfo bbwi)
+    public void overflow( ByteBufferWithInfo bbwi, int numBytesNeeded )
     {
         // Set the fragment's moreFragments field to true
         MessageBase.setFlag(bbwi.getByteBuffer(), Message.MORE_FRAGMENTS_BIT);

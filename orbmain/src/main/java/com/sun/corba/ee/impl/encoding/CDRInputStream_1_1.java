@@ -103,8 +103,6 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
     //
     @Override
     protected void grow(int align, int n) {
-                
-        bbwi.setNumberOfBytesNeeded(n);
 
         // Save the size of the current buffer for
         // possible fragmentOffset calculation

@@ -107,7 +107,7 @@ public abstract class BufferManagerWrite
      * Should set the bbwi.fragmented flag to true only in cases 2 and 3.
      */
 
-    public abstract void overflow (ByteBufferWithInfo bbwi);
+    public abstract void overflow( ByteBufferWithInfo bbwi, int numBytesNeeded );
 
     /**
      * Called after Stub._invoke (i.e., before complete message has been sent).

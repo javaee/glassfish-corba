@@ -263,8 +263,7 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
             bbwi.position(oldIndex);
         }
 
-        bbwi.setNumberOfBytesNeeded(n);
-        bufferManagerWrite.overflow(bbwi);
+        bufferManagerWrite.overflow(bbwi, n);
 
         // At this point, if we fragmented, we should have a ByteBufferWithInfo
         // with the fragment header already marshalled.  The buflen and position

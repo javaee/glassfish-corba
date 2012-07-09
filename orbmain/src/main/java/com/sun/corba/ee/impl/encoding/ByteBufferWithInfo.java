@@ -68,7 +68,6 @@ class ByteBufferWithInfo
 {
     private ORB orb;
     private ByteBuffer byteBuffer;// Marshal buffer.
-    private int     needed;     // How many more bytes are needed on overflow.
     private boolean fragmented; // Did the overflow operation fragment?
 
     ByteBufferWithInfo(org.omg.CORBA.ORB orb,
@@ -76,9 +75,8 @@ class ByteBufferWithInfo
                               int index)
     {
         this.orb = (com.sun.corba.ee.spi.orb.ORB)orb;
-        this.setByteBuffer(byteBuffer);
-        position(index);
-        this.setNumberOfBytesNeeded(0);
+        this.setByteBuffer( byteBuffer );
+        position( index );
         this.setFragmented(false);
     }
 
@@ -131,9 +129,8 @@ class ByteBufferWithInfo
              this.setByteBuffer(ByteBuffer.allocate(bufferSize));
         }
 
-        this.position(0);
-        this.setLength(bufferSize);
-        this.setNumberOfBytesNeeded(0);
+        this.position( 0 );
+        this.setLength( bufferSize );
         this.setFragmented(false);
     }
 
@@ -150,10 +147,9 @@ class ByteBufferWithInfo
         //            ByteBuffer.duplicate() we'll get independent
         //            positions and limits, but the same ByteBuffer,
         //            (which is what we want).
-        this.setByteBuffer(bbwi.getByteBuffer().duplicate());
-        this.setLength(bbwi.getLength());
-        this.position(bbwi.position());
-        this.setNumberOfBytesNeeded(bbwi.getNumberOfBytesNeeded());
+        this.setByteBuffer( bbwi.getByteBuffer().duplicate() );
+        this.setLength( bbwi.getLength() );
+        this.position( bbwi.position() );
         this.setFragmented(bbwi.isFragmented());
     }
 
@@ -179,11 +175,6 @@ class ByteBufferWithInfo
     public boolean isFragmented()
     {
         return fragmented;
-    }
-
-    // get number of bytes needed on overflow / underflow
-    private int getNumberOfBytesNeeded() {
-        return needed;
     }
 
     public ByteBuffer getByteBuffer() {
@@ -220,11 +211,6 @@ class ByteBufferWithInfo
         this.fragmented = fragmented;
     }
 
-    // mutator to set number of bytes needed on overflow / underflow
-    public void setNumberOfBytesNeeded(int needed) {
-        this.needed = needed;
-    }
-
     // mutator to set byteBuffer
     public void setByteBuffer(ByteBuffer byteBuffer) {
         this.byteBuffer = byteBuffer;
@@ -232,11 +218,11 @@ class ByteBufferWithInfo
     
     // Grow byteBuffer to a size larger than position() + needed
     @Transport
-    public void growBuffer(com.sun.corba.ee.spi.orb.ORB orb)
+    public void growBuffer( ORB orb, int numBytesNeeded )
     {
         int newLength = getLength() * 2;
 
-        while (position() + getNumberOfBytesNeeded() >= newLength)
+        while (position() + numBytesNeeded >= newLength)
             newLength = newLength * 2;
 
         ByteBufferPool byteBufferPool = orb.getByteBufferPool();
@@ -274,7 +260,6 @@ class ByteBufferWithInfo
 
         str.append(" length = " + getLength());
         str.append(" position = " + position());
-        str.append(" needed = " + getNumberOfBytesNeeded());
         str.append(" byteBuffer = " + (getByteBuffer() == null ? "null" : "not null"));
         str.append(" fragmented = " + isFragmented());
 

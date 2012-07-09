@@ -60,9 +60,13 @@ public class BufferManagerReadGrow
 
     public void init(Message msg) {}
 
-    public ByteBufferWithInfo underflow (ByteBufferWithInfo bbwi)
-    {
+    public ByteBufferWithInfo underflow (ByteBufferWithInfo bbwi) {
         throw wrapper.unexpectedEof() ;
+    }
+
+    @Override
+    public boolean isFragmentOnUnderflow() {
+        return false;
     }
 
     public void cancelProcessing(int requestId) {}

@@ -43,7 +43,6 @@ package com.sun.corba.ee.impl.encoding;
 import java.nio.ByteBuffer;
 
 
-import com.sun.corba.ee.impl.encoding.BufferManagerWrite;
 import com.sun.corba.ee.impl.misc.ORBUtility;
 import com.sun.corba.ee.spi.transport.ByteBufferPool;
 import com.sun.corba.ee.spi.orb.ORB;
@@ -64,46 +63,20 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 // data in this object's ByteBuffer.
 
 @Transport
-class ByteBufferWithInfo
-{
-    private ORB orb;
-    private ByteBuffer byteBuffer;// Marshal buffer.
-    private boolean fragmented; // Did the overflow operation fragment?
+class ByteBufferWithInfo {
+    private ByteBuffer byteBuffer;
 
-    ByteBufferWithInfo(org.omg.CORBA.ORB orb,
-                              ByteBuffer byteBuffer,
-                              int index)
-    {
-        this.orb = (com.sun.corba.ee.spi.orb.ORB)orb;
-        this.setByteBuffer( byteBuffer );
-        position( index );
-        this.setFragmented(false);
+    ByteBufferWithInfo( ByteBuffer byteBuffer, int index ) {
+        this.setByteBuffer(byteBuffer);
+        position(index);
     }
 
-    ByteBufferWithInfo(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer)
-    {
-        this(orb, byteBuffer, 0);
-    }
-
-    ByteBufferWithInfo(org.omg.CORBA.ORB orb,
-                              BufferManagerWrite bufferManager)
-    {
-        this(orb, bufferManager, true);
+    ByteBufferWithInfo( ByteBuffer byteBuffer ) {
+        this( byteBuffer, 0);
     }
 
     @InfoMethod
     private void bufferMessage( String head, int bbAddr, String tail ) {
-    }
-
-    @Transport
-    private void bbinfo( ByteBuffer buff ) {
-        if (orb.transportDebugFlag) {
-            // print address of ByteBuffer gotten from pool
-            int bbAddress = System.identityHashCode( buff ) ;
-            bufferMessage(
-                "constructor (ORB, BufferManagerWrite) - got ByteBuffer id (",
-                bbAddress, ") from ByteBufferPool." ) ;
-        }
     }
 
     // Right now, EncapsOutputStream's do not use pooled byte buffers.
@@ -111,33 +84,8 @@ class ByteBufferWithInfo
     // byte buffers. Hence, the reason for the boolean 'usePooledByteBuffers'.
     // See EncapsOutputStream for additional information.
 
-    ByteBufferWithInfo(org.omg.CORBA.ORB orb,
-                              BufferManagerWrite bufferManager,
-                              boolean usePooledByteBuffers)
-    {
-        this.orb = (com.sun.corba.ee.spi.orb.ORB)orb;
-
-        int bufferSize = bufferManager.getBufferSize();
-
-        if (usePooledByteBuffers) {
-            ByteBufferPool byteBufferPool = this.orb.getByteBufferPool();
-            this.setByteBuffer(byteBufferPool.getByteBuffer(bufferSize));
-
-            bbinfo( getByteBuffer() ) ;
-        } else {
-             // don't allocate from pool, allocate non-direct ByteBuffer
-             this.setByteBuffer(ByteBuffer.allocate(bufferSize));
-        }
-
-        this.position( 0 );
-        this.setLength( bufferSize );
-        this.setFragmented(false);
-    }
-
     // Shallow copy constructor
-    ByteBufferWithInfo (ByteBufferWithInfo bbwi)
-    {
-        this.orb = bbwi.orb;
+    ByteBufferWithInfo (ByteBufferWithInfo bbwi) {
         // IMPORTANT: Cannot simply assign the reference of
         //            bbwi.byteBuffer to this.byteBuffer since
         //            bbwi's can be restored via restore-able
@@ -147,10 +95,9 @@ class ByteBufferWithInfo
         //            ByteBuffer.duplicate() we'll get independent
         //            positions and limits, but the same ByteBuffer,
         //            (which is what we want).
-        this.setByteBuffer( bbwi.getByteBuffer().duplicate() );
-        this.setLength( bbwi.getLength() );
-        this.position( bbwi.position() );
-        this.setFragmented(bbwi.isFragmented());
+        this.setByteBuffer(bbwi.getByteBuffer().duplicate());
+        this.setLength(bbwi.getLength());
+        this.position(bbwi.position());
     }
 
     // So IIOPOutputStream seems more intuitive
@@ -169,12 +116,6 @@ class ByteBufferWithInfo
     public int getLength()
     {
          return getByteBuffer().limit();
-    }
-
-    // accessor to fragmented
-    public boolean isFragmented()
-    {
-        return fragmented;
     }
 
     public ByteBuffer getByteBuffer() {
@@ -200,15 +141,8 @@ class ByteBufferWithInfo
     }
 
     // mutator to buffer's length
-    public void setLength(int theLength)
-    {
+    public void setLength(int theLength) {
         getByteBuffer().limit(theLength);
-    }
-
-    // mutator to fragmented
-    public void setFragmented(boolean fragmented)
-    {
-        this.fragmented = fragmented;
     }
 
     // mutator to set byteBuffer
@@ -254,20 +188,17 @@ class ByteBufferWithInfo
         setLength(newLength);
     }
    
-    public String toString()
-    {
-        StringBuffer str = new StringBuffer("ByteBufferWithInfo:");
+    public String toString() {
+        StringBuilder str = new StringBuilder("ByteBufferWithInfo:");
 
-        str.append(" length = " + getLength());
-        str.append(" position = " + position());
-        str.append(" byteBuffer = " + (getByteBuffer() == null ? "null" : "not null"));
-        str.append(" fragmented = " + isFragmented());
+        str.append(" length = ").append(getLength());
+        str.append(" position = ").append(position());
+        str.append(" byteBuffer = ").append(getByteBuffer() == null ? "null" : "not null");
 
         return str.toString();
     }
 
-    protected void dprint(String msg)
-    {
+    protected void dprint(String msg) {
         ORBUtility.dprint("ByteBufferWithInfo", msg);
     }
 }

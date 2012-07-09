@@ -110,7 +110,7 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
 
         bbwi = bufferManagerRead.underflow(bbwi);
 
-        if (bbwi.isFragmented()) {
+        if (bufferManagerRead.isFragmentOnUnderflow()) {
             
             // By this point we should be guaranteed to have
             // a new fragment whose header has already been
@@ -119,9 +119,6 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
             fragmentOffset += (oldSize - bbwi.position());
 
             markAndResetHandler.fragmentationOccured(bbwi);
-
-            // Clear the flag
-            bbwi.setFragmented(false);
         }
     }
 

@@ -62,12 +62,6 @@ abstract class CDROutputStreamBase extends java.io.OutputStream
         this.parent = parent;
     }
 
-    public void init(org.omg.CORBA.ORB orb,
-                     BufferManagerWrite bufferManager,
-                     byte streamFormatVersion) {
-        init(orb, bufferManager, streamFormatVersion, true);
-    }
-
     // See EncapsOutputStream, the only one that uses the
     // non-pooled ByteBuffers, for additional info.
     protected abstract void init(org.omg.CORBA.ORB orb,

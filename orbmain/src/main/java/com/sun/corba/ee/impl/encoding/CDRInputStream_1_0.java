@@ -246,7 +246,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         this.orb = (ORB)orb;
         this.littleEndian = littleEndian;
         this.bufferManagerRead = bufferManager;
-        this.bbwi = new ByteBufferWithInfo(orb,byteBuffer,0);
+        this.bbwi = new ByteBufferWithInfo( byteBuffer,0);
         this.bbwi.setLength(size);
         this.markAndResetHandler = bufferManagerRead.getMarkAndResetHandler();
     }

@@ -62,20 +62,17 @@ public class BufferManagerWriteGrow extends BufferManagerWrite
         return orb.getORBData().getGIOPBufferSize();
     }
 
-    public void overflow( ByteBufferWithInfo bbwi, int numBytesNeeded )
-    {
-        // The code that once lived directly in CDROutputStream.grow()
-        // has been moved ByteBufferWithInfo.growBuffer().
-
+    public void overflow( ByteBufferWithInfo bbwi, int numBytesNeeded ) {
         // Grow ByteBufferWithInfo to a larger size.
         bbwi.growBuffer(orb, numBytesNeeded);
-
-        // Must be false for the grow case
-        bbwi.setFragmented(false);
     }
 
-    public void sendMessage ()
-    {
+    @Override
+    public boolean isFragmentOnOverflow() {
+        return false;
+    }
+
+    public void sendMessage () {
         Connection conn =
               ((CDROutputObject)outputObject).getMessageMediator().getConnection();
 

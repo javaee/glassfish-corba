@@ -92,15 +92,12 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
         // Save the current size for possible post-fragmentation calculation
         int oldSize = bbwi.position();
 
-        super.grow(align, n);
-   
+        bufferManagerWrite.overflow(bbwi, n);
+
         // At this point, if we fragmented, we should have a ByteBufferWithInfo
         // with the fragment header already marshalled.  The size and length fields
         // should be updated accordingly, and the fragmented flag should be set.
-        if (bbwi.isFragmented()) {
-
-            // Clear the flag
-            bbwi.setFragmented(false);
+        if (bufferManagerWrite.isFragmentOnOverflow()) {
 
             // Update fragmentOffset so indirections work properly.
             // At this point, oldSize is the entire length of the

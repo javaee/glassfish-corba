@@ -174,7 +174,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     // Code set converters (created when first needed)
     private CodeSetConversion.CTBConverter charConverter;
     private CodeSetConversion.CTBConverter wcharConverter;
-    
+
     // REVISIT - This should be re-factored so that including whether
     // to use pool byte buffers or not doesn't need to be known.
     public void init(org.omg.CORBA.ORB orb,
@@ -186,10 +186,25 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         this.orb = (ORB)orb;
 
         this.bufferManagerWrite = bufferManager;
-        this.bbwi = new ByteBufferWithInfo(orb, bufferManager, usePooledByteBuffers);
+        this.bbwi = new ByteBufferWithInfo( allocateBuffer( orb, bufferManager, usePooledByteBuffers ) );
         this.streamFormatVersion = streamFormatVersion;
 
         createRepositoryIdHandlers();
+    }
+
+    static ByteBuffer allocateBuffer( org.omg.CORBA.ORB orb, BufferManagerWrite bufferManager,
+                                      boolean usePooledByteBuffers ) {
+        int bufferSize = bufferManager.getBufferSize();
+        ByteBuffer buffer;
+        if (usePooledByteBuffers) {
+            ByteBufferPool byteBufferPool = ((ORB) orb).getByteBufferPool();
+            buffer = byteBufferPool.getByteBuffer( bufferSize );
+        } else {
+            // don't allocate from pool, allocate non-direct ByteBuffer
+            buffer = ByteBuffer.allocate( bufferSize );
+        }
+        buffer.limit( bufferSize );
+        return buffer;
     }
 
     private void createRepositoryIdHandlers()

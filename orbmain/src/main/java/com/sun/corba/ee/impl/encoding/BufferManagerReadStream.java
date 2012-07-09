@@ -88,7 +88,7 @@ public class BufferManagerReadStream
 
     @Transport
     public void processFragment(ByteBuffer byteBuffer, FragmentMessage msg) {
-        ByteBufferWithInfo bbwi = new ByteBufferWithInfo(orb, byteBuffer, msg.getHeaderLength());
+        ByteBufferWithInfo bbwi = new ByteBufferWithInfo( byteBuffer, msg.getHeaderLength());
 
         synchronized (fragmentQueue) {
             if (orb.transportDebugFlag) {
@@ -140,7 +140,6 @@ public class BufferManagerReadStream
             }
 
             result = fragmentQueue.dequeue();
-            result.setFragmented(true);
 
             if (orb.transportDebugFlag) {
                 logBufferMessage("underflow() - dequeued ByteBuffer id (", result.getByteBuffer(), ") from fragment queue.");
@@ -161,6 +160,11 @@ public class BufferManagerReadStream
             }
         }
         return result;
+    }
+
+    @Override
+    public boolean isFragmentOnUnderflow() {
+        return true;
     }
 
     public void init(Message msg) {

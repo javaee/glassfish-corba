@@ -119,7 +119,6 @@ public class BufferManagerWriteStream extends BufferManagerWrite
         // the caller should retry when it runs out of space.
         bbwi.position(0);
         bbwi.setLength(bbwi.getCapacity());
-        bbwi.setFragmented(true);
 
         // Now we must marshal in the fragment header/GIOP header
 
@@ -129,6 +128,11 @@ public class BufferManagerWriteStream extends BufferManagerWrite
         FragmentMessage header = ((CDROutputObject)outputObject).getMessageHeader().createFragmentMessage();
 
         header.write(((CDROutputObject)outputObject));
+    }
+
+    @Override
+    public boolean isFragmentOnOverflow() {
+        return true;
     }
 
     private void sendFragment(boolean isLastFragment)

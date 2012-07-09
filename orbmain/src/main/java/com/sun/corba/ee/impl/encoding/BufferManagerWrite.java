@@ -83,36 +83,19 @@ public abstract class BufferManagerWrite
     public abstract int getBufferSize();
 
     /*
-     * Called from CDROutputStream.grow.
-     *
-     * bbwi.buf contains a byte array which needs to grow by bbwi.needed bytes.
-     * 
-     * This can be handled in several ways:
-     *
-     * 1. Resize the bbwi.buf like the current implementation of
-     *    CDROutputStream.grow.
-     *
-     * 2. Collect the buffer for a later send:
-     *    this.bufQ.put(bbwi);
-     *    return new ByteBufferWithInfo(bbwi.length);
-     *
-     * 3. Send buffer as fragment:
-     *    Backpatch fragment size field in bbwi.buf.
-     *    Set more fragments bit in bbwi.buf.
-     *    this.connection.send(bbwi);
-     *    return reinitialized bbwi.buf with fragment header
-     *
-     * All cases should adjust the returned bbwi.* appropriately.
-     *
-     * Should set the bbwi.fragmented flag to true only in cases 2 and 3.
+     * Invoked when we run out of room to write. Must either expand the buffer or send it as a fragment and clear it.
      */
-
     public abstract void overflow( ByteBufferWithInfo bbwi, int numBytesNeeded );
+
+    /**
+     * Returns true if this buffer manager fragments when an overflow occurs.
+     */
+    public abstract boolean isFragmentOnOverflow();
 
     /**
      * Called after Stub._invoke (i.e., before complete message has been sent).
      *
-     * IIOPOutputStream.writeTo called from IIOPOutputStream.invoke 
+     * IIOPOutputStream.writeTo called from IIOPOutputStream.invoke
      *
      * Case: overflow was never called (bbwi.buf contains complete message).
      *       Backpatch size field.
@@ -136,8 +119,8 @@ public abstract class BufferManagerWrite
      */
 
     public abstract void sendMessage ();
-    
-    /** 
+
+    /**
      * A reference to the connection level stream will be required when
      * sending fragments.
      */
@@ -145,11 +128,11 @@ public abstract class BufferManagerWrite
         this.outputObject = outputObject;
     }
 
+
     /**
      * Close the BufferManagerWrite and do any outstanding cleanup.
      */
      abstract public void close();
-
 
     // XREVISIT - Currently a java.lang.Object during
     // the rip-int-generic transition.  Should eventually

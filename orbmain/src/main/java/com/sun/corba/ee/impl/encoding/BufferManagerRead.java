@@ -76,16 +76,14 @@ public interface BufferManagerRead
 
 
     /**
-     * Case: called from CDRInputStream.grow.
-     * 
-     * Does:
-     *
-     *  this.bufQ.get()
-     *
-     *  If streaming then sync on bufQ and wait if empty.
+     * Invoked when we run out of data to read. Obtains more data from the stream.
      */
+    ByteBufferWithInfo underflow (ByteBufferWithInfo bbwi);
 
-    public ByteBufferWithInfo underflow (ByteBufferWithInfo bbwi);
+    /**
+     * Returns true if this buffer manager reads fragments when it underflows.
+     */
+    boolean isFragmentOnUnderflow();
 
     /**
      * Called once after creating this buffer manager and before

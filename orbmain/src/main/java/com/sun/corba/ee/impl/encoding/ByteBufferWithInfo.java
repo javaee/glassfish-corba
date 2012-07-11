@@ -47,6 +47,7 @@ import com.sun.corba.ee.impl.misc.ORBUtility;
 import com.sun.corba.ee.spi.transport.ByteBufferPool;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.trace.Transport;
+import org.glassfish.grizzly.Buffer;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 
@@ -63,7 +64,8 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 // data in this object's ByteBuffer.
 
 @Transport
-class ByteBufferWithInfo {
+class ByteBufferWithInfo // implements Buffer
+{
     private ByteBuffer byteBuffer;
 
     ByteBufferWithInfo( ByteBuffer byteBuffer, int index ) {
@@ -73,6 +75,30 @@ class ByteBufferWithInfo {
 
     ByteBufferWithInfo( ByteBuffer byteBuffer ) {
         this( byteBuffer, 0);
+    }
+
+    void putLong(long x) {
+        getByteBuffer().put((byte)((x >>> 56) & 0xFF));
+        getByteBuffer().put((byte)((x >>> 48) & 0xFF));
+        getByteBuffer().put((byte)((x >>> 40) & 0xFF));
+        getByteBuffer().put((byte)((x >>> 32) & 0xFF));
+        getByteBuffer().put((byte)((x >>> 24) & 0xFF));
+        getByteBuffer().put((byte)((x >>> 16) & 0xFF));
+        getByteBuffer().put((byte)((x >>> 8) & 0xFF));
+        getByteBuffer().put((byte) (x & 0xFF));
+    }
+
+    void putInt(int x) {
+        getByteBuffer().put((byte) ((x >>> 24) & 0xFF));
+        getByteBuffer().put((byte)((x >>> 16) & 0xFF));
+        getByteBuffer().put((byte)((x >>> 8) & 0xFF));
+        getByteBuffer().put((byte) (x & 0xFF));
+    }
+
+    ByteBufferWithInfo putShort(short x) {
+        getByteBuffer().put((byte)((x >>> 8) & 0xFF));
+        getByteBuffer().put((byte) (x & 0xFF));
+        return this;
     }
 
     @InfoMethod

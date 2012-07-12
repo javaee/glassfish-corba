@@ -149,7 +149,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     protected BufferManagerRead bufferManagerRead;
     protected ByteBufferWithInfo bbwi;
 
-    protected boolean littleEndian;
     protected ORB orb;
     protected ValueHandler valueHandler = null;
 
@@ -228,7 +227,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         result.init(this.orb,
                     this.bbwi.getByteBuffer(),
                     this.bbwi.getLength(),
-                    this.littleEndian,
+                    this.bbwi.littleEndian,
                     this.bufferManagerRead);
 
         return result;
@@ -244,9 +243,9 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                      BufferManagerRead bufferManager) 
     {
         this.orb = (ORB)orb;
-        this.littleEndian = littleEndian;
         this.bufferManagerRead = bufferManager;
         this.bbwi = new ByteBufferWithInfo( byteBuffer,0);
+        setLittleEndian(this.bbwi, littleEndian);
         this.bbwi.setLength(size);
         this.markAndResetHandler = bufferManagerRead.getMarkAndResetHandler();
     }
@@ -394,7 +393,13 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     //
 
     public final void consumeEndian() {
-        littleEndian = read_boolean();
+        ByteBufferWithInfo bbwi1 = bbwi;
+        boolean isLittleEndian = read_boolean();
+        setLittleEndian(bbwi1, isLittleEndian);
+    }
+
+    private static void setLittleEndian(ByteBufferWithInfo bbwi1, boolean littleEndian) {
+        bbwi1.littleEndian = littleEndian;
     }
 
     // No such type in java
@@ -414,30 +419,13 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     @CdrRead
     public char read_wchar() {
-        char result = ' ' ;
-
-        // Don't allow transmission of wchar/wstring data with
-        // foreign ORBs since it's against the spec.
+        // Don't allow transmission of wchar/wstring data with foreign ORBs since it's against the spec.
         if (ORBUtility.isForeignORB(orb)) {
             throw wrapper.wcharDataInGiop10() ;
         }
 
-        // If we're talking to one of our legacy ORBs, do what
-        // they did:
-        int b1, b2;
-
-        alignAndCheck(2, 2);
-
-        if (littleEndian) {
-            b2 = bbwi.getByteBuffer().get() & 0x00FF;
-            b1 = bbwi.getByteBuffer().get() & 0x00FF;
-        } else {
-            b1 = bbwi.getByteBuffer().get() & 0x00FF;
-            b2 = bbwi.getByteBuffer().get() & 0x00FF;
-        }
-
-        result = (char)((b1 << 8) + (b2));
-        return result ;
+        // If we're talking to one of our legacy ORBs, do what they did:
+        return (char) bbwi.getShort();
     }
 
     @CdrRead
@@ -452,21 +440,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     @CdrRead
     public final short read_short() {
-        short result = 0 ;
-        int b1, b2;
-
         alignAndCheck(2, 2);
-
-        if (littleEndian) {
-            b2 = (bbwi.getByteBuffer().get()) & 0x000000FF;
-            b1 = (bbwi.getByteBuffer().get() << 8) & 0x0000FF00;
-        } else {
-            b1 = (bbwi.getByteBuffer().get() << 8) & 0x0000FF00;
-            b2 = (bbwi.getByteBuffer().get()) & 0x000000FF;
-        }
-
-        result = (short)(b1 | b2);
-        return result ;
+        return bbwi.getShort();
     }
 
     public final short read_ushort() {
@@ -475,26 +450,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     @CdrRead
     public final int read_long() {
-        int result = 0 ;
-
-        int b1, b2, b3, b4;
-
         alignAndCheck(4, 4);
-
-        if (littleEndian) {
-            b4 = bbwi.getByteBuffer().get() & 0xFF;
-            b3 = bbwi.getByteBuffer().get() & 0xFF;
-            b2 = bbwi.getByteBuffer().get() & 0xFF;
-            b1 = bbwi.getByteBuffer().get() & 0xFF;
-        } else {
-            b1 = bbwi.getByteBuffer().get() & 0xFF;
-            b2 = bbwi.getByteBuffer().get() & 0xFF;
-            b3 = bbwi.getByteBuffer().get() & 0xFF;
-            b4 = bbwi.getByteBuffer().get() & 0xFF;
-        }
-
-        result = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
-        return result ;
+        return bbwi.getInt();
     }
 
     public final int read_ulong() {
@@ -503,19 +460,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     @CdrRead
     public final long read_longlong() {
-        long i1, i2;
-
         alignAndCheck(8, 8);
-
-        if (littleEndian) {
-            i2 = read_long() & 0xFFFFFFFFL;
-            i1 = (long)read_long() << 32;
-        } else {
-            i1 = (long)read_long() << 32;
-            i2 = read_long() & 0xFFFFFFFFL;
-        }
-
-        return i1 | i2;
+        return bbwi.getLong();
     }
 
     public final long read_ulonglong() {
@@ -603,32 +549,29 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         len--;
         char[] c = new char[len];
 
-        int n = 0;
-        while (n < len) {
-            int avail;
-            int bytes;
-            int wanted;
+        int numRead = 0;
+        while (numRead < len) {
 
-            avail = bbwi.getLength() - bbwi.position();
+            int avail = bbwi.getLength() - bbwi.position();
             if (avail <= 0) {
                 grow(1, 1);
                 avail = bbwi.getLength() - bbwi.position();
             }
-            wanted = len - n;
-            bytes = (wanted < avail) ? wanted : avail;
+            int wanted = len - numRead;
+            int bytes = (wanted < avail) ? wanted : avail;
             // Microbenchmarks are showing a loop of ByteBuffer.get(int) being
             // faster than ByteBuffer.get(byte[], int, int).
             for (int i=0; i<bytes; i++) {
-                c[n+i] = (char) (bbwi.getByteBuffer().get() & 0xFF);
+                c[numRead+i] = (char) (bbwi.getByteBuffer().get() & 0xFF);
             }
-            n += bytes;
+            numRead += bytes;
         }
 
         //
         // Skip past terminating null byte
         //
         if (bbwi.position() + 1 > bbwi.getLength()) {
-            alignAndCheck(1, 1);                                                              // todo test this case
+            alignAndCheck(1, 1);
         }
         bbwi.position(bbwi.position() + 1);
 
@@ -725,8 +668,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     @CdrRead
     public TypeCode read_TypeCode() {
-        TypeCode result = null ;
-
         TypeCodeImpl tc = new TypeCodeImpl(orb);
         tc.read_value(parent);
         return tc ;
@@ -1392,7 +1333,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     @CdrRead
     private Class<?> readClass() {
 
-        String codebases = null, classRepId = null;
+        String codebases, classRepId;
 
         if (orb == null ||
             ORBVersionFactory.getFOREIGN().equals(orb.getORBVersion()) ||
@@ -1623,8 +1564,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 // then the sender must think it's sent more enclosing 
                 // chunked valuetypes than we have.  Throw an exception.
                 if (anEndTag < chunkedValueNestingLevel) {
-                    throw wrapper.unexpectedEnclosingValuetype( anEndTag,
-                        chunkedValueNestingLevel );
+                    throw wrapper.unexpectedEnclosingValuetype( anEndTag, chunkedValueNestingLevel );
                 }
 
                 // If the end tag is bigger than what we expected, but
@@ -1636,8 +1576,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 if (anEndTag != chunkedValueNestingLevel) {
                     bbwi.position(bbwi.position() - 4);
                 }
-            } else {                                                                             // todo test this case
-                // When talking to Kestrel or Ladybird, we use our old
+            } else {
+                // When talking to Kestrel (JDK 1.3) or Ladybird (JDK 1.3.1), we use our old
                 // end tag rules and are less strict.  If the end tag
                 // isn't what we expected, we back up, assuming
                 // compaction.
@@ -2088,7 +2028,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     public boolean isLittleEndian() {
-        return littleEndian;
+        return bbwi.isLittleEndian();
     }
 
     public void orb(org.omg.CORBA.ORB orb) {

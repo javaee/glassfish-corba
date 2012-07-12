@@ -268,6 +268,58 @@ public class CDRInputValueTest extends ValueTestBase {
         assertEquals(3, value2.aValue.anInt);
     }
 
+    @Test(expected = MARSHAL.class)
+    public void whenEndTagTooSmall_throwException() throws IOException {
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
+        writeRepId(Value2.REPID);
+
+        startChunk();
+        writeLong(750);
+        endChunk();
+
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
+        writeRepId(Value1.REPID);
+        startChunk();
+        writeWchar_1_2('x');
+        writeInt(3);
+        endChunk();
+        writeEndTag(-3);
+        writeEndTag(-1);
+
+        setMessageBody( getGeneratedBody() );
+
+        getInputObject().read_value();
+    }
+
+    @Test
+    public void whenTalkingtoLegacyORBAndEndTagTooSmall_ignoreIt() throws IOException {
+        setOrbVersion(ORBVersionFactory.getOLD());
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
+        writeRepId(Value2.REPID);
+
+        startChunk();
+        writeLong(750);
+        endChunk();
+
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
+        writeRepId(Value1.REPID);
+        startChunk();
+        writeWchar_1_2('x');
+        writeInt(3);
+        endChunk();
+        writeEndTag(-3);
+        writeEndTag(-1);
+
+        setMessageBody( getGeneratedBody() );
+
+        Object object = getInputObject().read_value();
+        assertTrue(object instanceof Value2);
+        Value2 value2 = (Value2) object;
+        assertEquals(750,value2.aLong);
+        assertEquals('x', value2.aValue.aChar);
+        assertEquals(3, value2.aValue.anInt);
+    }
+
     @Test
     public void canReadSerializedValueUsingDefaultFactory() throws IOException {
         writeValueTag(ONE_REPID_ID | USE_CODEBASE);

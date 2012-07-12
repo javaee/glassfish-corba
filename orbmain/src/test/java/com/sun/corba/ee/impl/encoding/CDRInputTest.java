@@ -245,6 +245,16 @@ public class CDRInputTest extends EncodingTestBase {
         assertEquals("abcdefgh", getInputObject().read_string());
     }
 
+    @Test
+    public void canReadStringFromOldOrbWithTerminatorInNextFragment() {
+        useV1_1();
+        setOrbVersion(ORBVersionFactory.getOLD());
+        setMessageBody(0, 0, 0, 9, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' );
+        addFragment(0, 'x');
+        assertEquals("abcdefgh", getInputObject().read_string());
+        assertEquals('x', getInputObject().read_char());
+    }
+
     @Test(expected = MARSHAL.class)
     public void whenUsingV1_0_cannotReadWCharString() {
         useV1_0();

@@ -66,6 +66,7 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 @Transport
 class ByteBufferWithInfo // implements Buffer
 {
+    protected boolean littleEndian;
     private ByteBuffer byteBuffer;
 
     ByteBufferWithInfo( ByteBuffer byteBuffer, int index ) {
@@ -75,6 +76,61 @@ class ByteBufferWithInfo // implements Buffer
 
     ByteBufferWithInfo( ByteBuffer byteBuffer ) {
         this( byteBuffer, 0);
+    }
+
+    short getShort() {
+        short result = 0 ;
+        int b1, b2;
+
+        if (littleEndian) {
+            b2 = (getByteBuffer().get()) & 0x000000FF;
+            b1 = (getByteBuffer().get() << 8) & 0x0000FF00;
+        } else {
+            b1 = (getByteBuffer().get() << 8) & 0x0000FF00;
+            b2 = (getByteBuffer().get()) & 0x000000FF;
+        }
+
+        result = (short)(b1 | b2);
+        return result ;
+    }
+
+    long getLong() {
+        long i1, i2;
+
+        if (littleEndian) {
+            i2 = getInt() & 0xFFFFFFFFL;
+            i1 = (long) getInt() << 32;
+        } else {
+            i1 = (long) getInt() << 32;
+            i2 = getInt() & 0xFFFFFFFFL;
+        }
+
+        return i1 | i2;
+    }
+
+    int getInt() {
+        int result = 0 ;
+
+        int b1, b2, b3, b4;
+
+        if (littleEndian) {
+            b4 = getByteBuffer().get() & 0xFF;
+            b3 = getByteBuffer().get() & 0xFF;
+            b2 = getByteBuffer().get() & 0xFF;
+            b1 = getByteBuffer().get() & 0xFF;
+        } else {
+            b1 = getByteBuffer().get() & 0xFF;
+            b2 = getByteBuffer().get() & 0xFF;
+            b3 = getByteBuffer().get() & 0xFF;
+            b4 = getByteBuffer().get() & 0xFF;
+        }
+
+        result = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
+        return result ;
+    }
+
+    boolean isLittleEndian() {
+        return littleEndian;
     }
 
     void putLong(long x) {

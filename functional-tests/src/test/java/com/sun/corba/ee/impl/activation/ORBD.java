@@ -40,34 +40,23 @@
 
 package com.sun.corba.ee.impl.activation;
 
-import java.io.File;
-import java.util.Properties;
-
-import org.omg.CORBA.INITIALIZE;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CosNaming.NamingContext;
-import org.omg.PortableServer.POA;
-
-
-import com.sun.corba.ee.spi.activation.Repository;
-import com.sun.corba.ee.spi.activation.RepositoryPackage.ServerDef;
-import com.sun.corba.ee.spi.activation.Locator;
-import com.sun.corba.ee.spi.activation.LocatorHelper;
+import com.sun.corba.ee.impl.legacy.connection.SocketFactoryAcceptorImpl;
+import com.sun.corba.ee.impl.misc.CorbaResourceUtil;
+import com.sun.corba.ee.impl.naming.cosnaming.TransientNameService;
+import com.sun.corba.ee.impl.transport.AcceptorImpl;
 import com.sun.corba.ee.spi.activation.Activator;
 import com.sun.corba.ee.spi.activation.ActivatorHelper;
-import com.sun.corba.ee.spi.activation.ServerAlreadyRegistered;
+import com.sun.corba.ee.spi.activation.Locator;
+import com.sun.corba.ee.spi.activation.LocatorHelper;
+import com.sun.corba.ee.spi.activation.RepositoryPackage.ServerDef;
 import com.sun.corba.ee.spi.legacy.connection.LegacyServerSocketEndPointInfo;
-import com.sun.corba.ee.spi.transport.SocketInfo;
-import com.sun.corba.ee.spi.transport.Acceptor;
-import com.sun.corba.ee.spi.orb.ORB;
-
-import com.sun.corba.ee.impl.legacy.connection.SocketFactoryAcceptorImpl;
-import com.sun.corba.ee.impl.naming.cosnaming.TransientNameService;
-import com.sun.corba.ee.impl.naming.pcosnaming.NameService;
 import com.sun.corba.ee.spi.misc.ORBConstants;
-import com.sun.corba.ee.impl.misc.CorbaResourceUtil;
-import com.sun.corba.ee.impl.transport.AcceptorImpl;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.Acceptor;
+import com.sun.corba.ee.spi.transport.SocketInfo;
+
+import java.io.File;
+import java.util.Properties;
 
 /**
  * 
@@ -77,12 +66,11 @@ import com.sun.corba.ee.impl.transport.AcceptorImpl;
  */
 public class ORBD
 {
-    private int initSvcPort;
 
     protected void initializeBootNaming(ORB orb)
     {
         // create a bootstrap server
-        initSvcPort = orb.getORBData().getORBInitialPort();
+        int initSvcPort = orb.getORBData().getORBInitialPort();
 
         Acceptor acceptor;
         // REVISIT: see ORBConfigurator. use factory in TransportDefault.
@@ -90,14 +78,14 @@ public class ORBD
             acceptor = 
                 new AcceptorImpl(
                     orb,
-                    initSvcPort,
+                        initSvcPort,
                     LegacyServerSocketEndPointInfo.BOOT_NAMING,
                     SocketInfo.IIOP_CLEAR_TEXT);
         } else {
             acceptor = 
                 new SocketFactoryAcceptorImpl(
                     orb,
-                    initSvcPort,
+                        initSvcPort,
                     LegacyServerSocketEndPointInfo.BOOT_NAMING,
                     SocketInfo.IIOP_CLEAR_TEXT);
         }
@@ -257,8 +245,7 @@ public class ORBD
         dbDirName = dbDir.getAbsolutePath();
         props.put(ORBConstants.DB_DIR_PROPERTY, dbDirName);
         if (!dbDir.exists()) {
-            dbDir.mkdir();
-            dirCreated = true;
+            dirCreated = dbDir.mkdir();
         }
 
         File logDir = new File (dbDir, ORBConstants.SERVER_LOG_DIR ) ;
@@ -268,10 +255,6 @@ public class ORBD
     }
 
     protected File dbDir;
-    protected File getDbDir()
-    {
-        return dbDir;
-    }
 
     private String dbDirName;
     protected String getDbDirName()
@@ -307,10 +290,6 @@ public class ORBD
     }
 
     protected Locator locator;
-    protected Locator getLocator()
-    {
-        return locator;
-    }
 
     protected Activator activator;
     protected Activator getActivator()
@@ -335,19 +314,19 @@ public class ORBD
         String[] server;
         ServerDef serverDef;
 
-        for (int i=0; i < orbServers.length; i++) {
+        for (String[] orbServer : orbServers) {
             try {
-                server = orbServers[i];
-                serverDef = new ServerDef(server[1], server[2], 
-                                          server[3], server[4], server[5] );
+                server = orbServer;
+                serverDef = new ServerDef(server[1], server[2], server[3], server[4], server[5]);
 
-                serverId = Integer.valueOf(orbServers[i][0]).intValue();
+                serverId = Integer.valueOf(orbServer[0]);
 
                 repository.registerServer(serverDef, serverId);
 
                 activator.activate(serverId);
 
-            } catch (Exception ex) {}
+            } catch (Exception ex) {  // ignore errors
+            }
         }
     }
 

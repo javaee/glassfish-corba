@@ -76,12 +76,12 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
         // checkBlockLength since it may move the position
         int alignment = computeAlignment(bbwi.position(), align);
 
-        if (bbwi.position() + n + alignment  > bbwi.getLength()) {    
+        if (bbwi.position() + n + alignment  > bbwi.limit()) {
 
             // Some other ORBs may have found a way to send 1.1
             // fragments which put alignment bytes at the end
             // of a fragment
-            if (bbwi.position() + alignment == bbwi.getLength())                
+            if (bbwi.position() + alignment == bbwi.limit())
             {
                 bbwi.position(bbwi.position() + alignment);
             }

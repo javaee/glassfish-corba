@@ -293,7 +293,6 @@ public class CDRInputValueTest extends ValueTestBase {
 
     @Test
     public void whenTalkingtoLegacyORBAndEndTagTooSmall_ignoreIt() throws IOException {
-        setOrbVersion(ORBVersionFactory.getOLD());
         writeValueTag(ONE_REPID_ID | USE_CHUNKING);
         writeRepId(Value2.REPID);
 
@@ -307,7 +306,6 @@ public class CDRInputValueTest extends ValueTestBase {
         writeWchar_1_2('x');
         writeInt(3);
         endChunk();
-        writeEndTag(-3);
         writeEndTag(-1);
 
         setMessageBody( getGeneratedBody() );

@@ -47,7 +47,6 @@ import com.sun.corba.ee.impl.misc.ORBUtility;
 import com.sun.corba.ee.spi.transport.ByteBufferPool;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.trace.Transport;
-import org.glassfish.grizzly.Buffer;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 
@@ -66,7 +65,7 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 @Transport
 class ByteBufferWithInfo // implements Buffer
 {
-    protected boolean littleEndian;
+    private boolean littleEndian;
     private ByteBuffer byteBuffer;
 
     ByteBufferWithInfo( ByteBuffer byteBuffer, int index ) {
@@ -76,6 +75,18 @@ class ByteBufferWithInfo // implements Buffer
 
     ByteBufferWithInfo( ByteBuffer byteBuffer ) {
         this( byteBuffer, 0);
+    }
+
+    boolean hasRemaining() {
+        return remaining() > 0;
+    }
+
+    int remaining() {
+        return limit() - position();
+    }
+
+    void setLittleEndian(boolean littleEndian) {
+        this.littleEndian = littleEndian;
     }
 
     short getShort() {
@@ -178,7 +189,7 @@ class ByteBufferWithInfo // implements Buffer
         //            positions and limits, but the same ByteBuffer,
         //            (which is what we want).
         this.setByteBuffer(bbwi.getByteBuffer().duplicate());
-        this.setLength(bbwi.getLength());
+        this.setLength(bbwi.limit());
         this.position(bbwi.position());
     }
 
@@ -195,7 +206,7 @@ class ByteBufferWithInfo // implements Buffer
     }
 
     // accessor to buffer's length
-    public int getLength()
+    public int limit()
     {
          return getByteBuffer().limit();
     }
@@ -236,7 +247,7 @@ class ByteBufferWithInfo // implements Buffer
     @Transport
     public void growBuffer( ORB orb, int numBytesNeeded )
     {
-        int newLength = getLength() * 2;
+        int newLength = limit() * 2;
 
         while (position() + numBytesNeeded >= newLength)
             newLength = newLength * 2;
@@ -273,7 +284,7 @@ class ByteBufferWithInfo // implements Buffer
     public String toString() {
         StringBuilder str = new StringBuilder("ByteBufferWithInfo:");
 
-        str.append(" length = ").append(getLength());
+        str.append(" length = ").append(limit());
         str.append(" position = ").append(position());
         str.append(" byteBuffer = ").append(getByteBuffer() == null ? "null" : "not null");
 

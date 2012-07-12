@@ -264,7 +264,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     protected void alignAndReserve(int align, int n) {
         bbwi.position(bbwi.position() + computeAlignment(align));
 
-        if (bbwi.position() + n > bbwi.getLength()) {
+        if (bbwi.position() + n > bbwi.limit()) {
             grow(align, n);
         }
     }
@@ -464,11 +464,11 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
             int bytes;
             int wanted;
 
-            if ((bbwi.position() + 1 > bbwi.getLength()) || align) {
+            if ((bbwi.position() + 1 > bbwi.limit()) || align) {
                 align = false;
                 alignAndReserve(1, 1);
             }
-            avail = bbwi.getLength() - bbwi.position();
+            avail = bbwi.limit() - bbwi.position();
             wanted = (length + offset) - n;
             bytes = (wanted < avail) ? wanted : avail;
             bbwi.getByteBuffer().put(value, n, bytes);

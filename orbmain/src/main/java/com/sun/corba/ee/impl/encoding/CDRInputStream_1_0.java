@@ -139,12 +139,10 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 public class CDRInputStream_1_0 extends CDRInputStreamBase 
     implements RestorableInputStream
 {
-    protected static final ORBUtilSystemException wrapper =
-        ORBUtilSystemException.self ;
-    private static final OMGSystemException omgWrapper =
-        OMGSystemException.self ;
-    private static final String kReadMethod = "read";
-    private static final int maxBlockLength = 0x7fffff00;
+    protected static final ORBUtilSystemException wrapper = ORBUtilSystemException.self;
+    private static final OMGSystemException omgWrapper = OMGSystemException.self;
+    private static final String K_READ_METHOD = "read";
+    private static final int MAX_BLOCK_LENGTH = 0x7fffff00;
 
     protected BufferManagerRead bufferManagerRead;
     protected ByteBufferWithInfo bbwi;
@@ -165,7 +163,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     // private Stack currentStack = null;
 
     // Length of current chunk, or a large positive number if not in a chunk
-    protected int blockLength = maxBlockLength;
+    protected int blockLength = MAX_BLOCK_LENGTH;
 
     // Read end flag (value nesting depth)
     protected int end_flag = 0;
@@ -220,15 +218,15 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         CDRInputStreamBase result = null ;
 
         try {
-            result = (CDRInputStreamBase)this.getClass().newInstance();
+            result = this.getClass().newInstance();
         } catch (Exception e) {
             throw wrapper.couldNotDuplicateCdrInputStream( e ) ;
         }
         result.init(this.orb,
-                    this.bbwi.getByteBuffer(),
-                    this.bbwi.getLength(),
-                    this.bbwi.littleEndian,
-                    this.bufferManagerRead);
+                this.bbwi.getByteBuffer(),
+                this.bbwi.limit(),
+                this.bbwi.isLittleEndian(),
+                this.bufferManagerRead);
 
         return result;
     }
@@ -245,7 +243,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         this.orb = (ORB)orb;
         this.bufferManagerRead = bufferManager;
         this.bbwi = new ByteBufferWithInfo( byteBuffer,0);
-        setLittleEndian(this.bbwi, littleEndian);
+        this.bbwi.setLittleEndian(littleEndian);
         this.bbwi.setLength(size);
         this.markAndResetHandler = bufferManagerRead.getMarkAndResetHandler();
     }
@@ -318,7 +316,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // remain set to maxBlockLength.
         if (blockLength == get_offset()) {
 
-            blockLength = maxBlockLength;
+            blockLength = MAX_BLOCK_LENGTH;
             start_block();
 
             // What's next is either a valuetag or
@@ -327,7 +325,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             // to read the valuetag.  If it's an end tag,
             // then there isn't enough data left in
             // this valuetype to read!
-            if (blockLength == maxBlockLength) {
+            if (blockLength == MAX_BLOCK_LENGTH) {
                 checkForEndTag = true;
             }
 
@@ -345,7 +343,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // IDL type is reading too much/in an incorrect order
         int requiredNumBytes = computeAlignment(bbwi.position(), align) + dataSize;
 
-        if (blockLength != maxBlockLength &&
+        if (blockLength != MAX_BLOCK_LENGTH &&
             blockLength < get_offset() + requiredNumBytes) {
             throw omgWrapper.rmiiiopOptionalDataIncompatible2() ;
         }
@@ -375,7 +373,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         int alignResult = computeAlignment(bbwi.position(), align);
         bbwi.position(bbwi.position() + alignResult);
 
-        if (bbwi.position() + n > bbwi.getLength()) {
+        if (bbwi.position() + n > bbwi.limit()) {
             grow(align, n);
         }
     }
@@ -395,11 +393,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     public final void consumeEndian() {
         ByteBufferWithInfo bbwi1 = bbwi;
         boolean isLittleEndian = read_boolean();
-        setLittleEndian(bbwi1, isLittleEndian);
-    }
-
-    private static void setLittleEndian(ByteBufferWithInfo bbwi1, boolean littleEndian) {
-        bbwi1.littleEndian = littleEndian;
+        bbwi1.setLittleEndian(isLittleEndian);
     }
 
     // No such type in java
@@ -552,11 +546,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         int numRead = 0;
         while (numRead < len) {
 
-            int avail = bbwi.getLength() - bbwi.position();
-            if (avail <= 0) {
-                grow(1, 1);
-                avail = bbwi.getLength() - bbwi.position();
-            }
+            if (!bbwi.hasRemaining()) grow(1, 1);
+            int avail = bbwi.remaining();
             int wanted = len - numRead;
             int bytes = (wanted < avail) ? wanted : avail;
             // Microbenchmarks are showing a loop of ByteBuffer.get(int) being
@@ -570,7 +561,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         //
         // Skip past terminating null byte
         //
-        if (bbwi.position() + 1 > bbwi.getLength()) {
+        if (bbwi.position() + 1 > bbwi.limit()) {
             alignAndCheck(1, 1);
         }
         bbwi.position(bbwi.position() + 1);
@@ -638,17 +629,11 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
         int n = offset;
         while (n < length+offset) {
-            int avail;
-            int bytes;
-            int wanted;
 
-            avail = bbwi.getLength() - bbwi.position();
-            if (avail <= 0) {
-                grow(1, 1);
-                avail = bbwi.getLength() - bbwi.position();
-            }
-            wanted = (length + offset) - n;
-            bytes = (wanted < avail) ? wanted : avail;
+            if (!bbwi.hasRemaining()) grow(1, 1);
+            int avail = bbwi.remaining();
+            int wanted = (length + offset) - n;
+            int bytes = (wanted < avail) ? wanted : avail;
             bbwi.getByteBuffer().get(b, n, bytes);
 
             n += bytes;
@@ -1375,7 +1360,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // look for two-argument static read method
         Method readMethod;
         try {
-            readMethod = helper.getClass().getDeclaredMethod(kReadMethod,
+            readMethod = helper.getClass().getDeclaredMethod(K_READ_METHOD,
                 org.omg.CORBA.portable.InputStream.class, helper.get_class());
         }
         catch(NoSuchMethodException nsme) { // must be boxed value helper
@@ -1447,7 +1432,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                     new PrivilegedExceptionAction<Method>() {
                     @SuppressWarnings("unchecked")
                         public Method run() throws NoSuchMethodException {
-                            return helperClass.getDeclaredMethod(kReadMethod,
+                            return helperClass.getDeclaredMethod(K_READ_METHOD,
                                 org.omg.CORBA.portable.InputStream.class ) ;
                         }
                     }
@@ -1602,9 +1587,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     @InfoMethod
-    private void blockLength( int value ) { }
-
-    @InfoMethod
     private void unreadLastLong() { }
 
     @CdrRead
@@ -1616,24 +1598,18 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
         // if called from alignAndCheck, need to reset blockLength
         // to avoid an infinite recursion loop on read_long() call
-        blockLength = maxBlockLength;
+        blockLength = MAX_BLOCK_LENGTH;
 
         blockLength = read_long();
-        blockLength( blockLength ) ;
 
         // Must remember where we began the chunk to calculate how far
         // along we are.  See notes above about chunkBeginPos.
 
-        if (blockLength > 0 && blockLength < maxBlockLength) {
+        if (blockLength > 0 && blockLength < MAX_BLOCK_LENGTH) {
             blockLength += get_offset();  // _REVISIT_ unsafe, should use a Java long
-            // inBlock = true;
         } else {
-            // System.out.println("start_block snooped a " + Integer.toHexString(blockLength));
-            // not a chunk length field
-            blockLength = maxBlockLength;
-
+            blockLength = MAX_BLOCK_LENGTH;
             bbwi.position(bbwi.position() - 4);
-            unreadLastLong() ;
         }
     }
 
@@ -1655,7 +1631,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         }
 
         // Skip any remaining chunks
-        while (blockLength != maxBlockLength) {
+        while (blockLength != MAX_BLOCK_LENGTH) {
             end_block();
             start_block();
         }
@@ -1680,7 +1656,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             return;
         }
 
-        if (nextLong == 0 || nextLong >= maxBlockLength) {
+        if (nextLong == 0 || nextLong >= MAX_BLOCK_LENGTH) {
 
             // A custom marshaled valuetype left extra data
             // on the wire, and that data had another
@@ -1707,10 +1683,10 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     @CdrRead
     private void end_block() {
         // if in a chunk, check for underflow or overflow
-        if (blockLength != maxBlockLength) {
+        if (blockLength != MAX_BLOCK_LENGTH) {
             if (blockLength == get_offset()) {
                 // Chunk ended correctly
-                blockLength = maxBlockLength;
+                blockLength = MAX_BLOCK_LENGTH;
             } else {
                 // Skip over anything left by bad unmarshaling code (ex:
                 // a buggy custom unmarshaler).  See handleEndOfValue.
@@ -2016,7 +1992,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     public int getBufferLength() {
-        return bbwi.getLength();                                                                // todo test this
+        return bbwi.limit();                                                                // todo test this
     }
 
     public void setBufferLength(int value) {
@@ -2047,15 +2023,11 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         int n = 0;
 
         while (n < len) {
-            int avail;
-            int bytes;
             int wanted;
+            int bytes;
 
-            avail = bbwi.getLength() - bbwi.position();
-            if (avail <= 0) {
-                grow(1, 1);
-                avail = bbwi.getLength() - bbwi.position();
-            }
+            if (!bbwi.hasRemaining()) grow(1, 1);
+            int avail = bbwi.remaining();
 
             wanted = len - n;
             bytes = (wanted < avail) ? wanted : avail;
@@ -2204,7 +2176,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                              CodeSetConversion.BTCConverter converter) {
 
 
-        if (bbwi.getLength() - bbwi.position() >= numBytes) {
+        if (bbwi.remaining() >= numBytes) {
             // If the entire string is in this buffer,
             // just convert directly from the bbwi rather than
             // allocating and copying.
@@ -2257,7 +2229,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     void alignOnBoundary(int octetBoundary) {
         int needed = computeAlignment(bbwi.position(), octetBoundary);
 
-        if (bbwi.position() + needed <= bbwi.getLength())
+        if (bbwi.position() + needed <= bbwi.limit())
         {
             bbwi.position(bbwi.position() + needed);
         }

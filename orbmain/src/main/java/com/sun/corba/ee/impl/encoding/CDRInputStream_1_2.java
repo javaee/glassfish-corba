@@ -118,11 +118,11 @@ public class CDRInputStream_1_2 extends CDRInputStream_1_1
         int savedPosition = bbwi.position();
         int alignIncr = computeAlignment(savedPosition,align);
         int bytesNeeded = alignIncr + n;
-        if (savedPosition + alignIncr <= bbwi.getLength()) {
+        if (savedPosition + alignIncr <= bbwi.limit()) {
             bbwi.position(savedPosition + alignIncr);
         }
 
-        if (savedPosition + bytesNeeded > bbwi.getLength()) {
+        if (savedPosition + bytesNeeded > bbwi.limit()) {
             grow(1, n);
         }
     }

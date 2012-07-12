@@ -71,7 +71,7 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
 
         int alignment = computeAlignment(align);
 
-        if (bbwi.position() + n + alignment > bbwi.getLength()) {
+        if (bbwi.position() + n + alignment > bbwi.limit()) {
             grow(align, n);
 
             // Must recompute the alignment after a grow.

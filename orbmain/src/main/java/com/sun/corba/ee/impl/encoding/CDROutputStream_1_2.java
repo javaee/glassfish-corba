@@ -106,7 +106,7 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
     @Override
     protected void handleSpecialChunkBegin(int requiredSize) {
         // If we're chunking and the item won't fit in the buffer
-        if (inBlock && requiredSize + bbwi.position() > bbwi.getLength()) {
+        if (inBlock && requiredSize + bbwi.position() > bbwi.limit()) {
             specialChunkCase() ;
 
             // Duplicating some code from end_block.  Compute
@@ -225,7 +225,7 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
 
         bbwi.position(bbwi.position() + computeAlignment(align));
 
-        if (bbwi.position() + n  > bbwi.getLength())
+        if (bbwi.position() + n  > bbwi.limit())
             grow(align, n);
     }
 

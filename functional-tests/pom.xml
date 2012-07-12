@@ -127,19 +127,21 @@
                 <artifactId>rmic-maven-plugin</artifactId>
                 <configuration>
                     <testOutputDirectory>${project.build.testOutputDirectory}</testOutputDirectory>
+                    <keep>true</keep>
+                    <sources>
+                        <source>
+                            <poa>true</poa>
+                            <includes>
+                                <include>**/*POA.class</include>
+                            </includes>
+                        </source>
+                        <source>
+                            <excludes>
+                                <exclude>**/*POA.class</exclude>
+                            </excludes>
+                        </source>
+                    </sources>
                     <includes>
-                        <include>corba.hcks.rmiiIServant</include>
-                    </includes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>rmic-maven-plugin</artifactId>
-                <configuration>
-                    <testOutputDirectory>${project.build.testOutputDirectory}</testOutputDirectory>
-                    <poa>true</poa>
-                    <includes>
-                        <include>corba.hcks.rmiiIServantPOA</include>
                     </includes>
                 </configuration>
             </plugin>

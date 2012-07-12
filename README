@@ -48,6 +48,25 @@ mvn -P all-tests clean install
 ant do-cobertura-test
 #
 --------------------------------------- 
+# to run a single test with custom arguments:
+cd <ws>
+mvn -Dtest.args="<args supported by test framework>" install
+
+For example: 
+1. To run a specific test: 
+mvn -Dtest.args="-test corba.connectioncache.ConnectionCacheTest" install
+
+2. To debug a test, client process: 
+mvn -Dtest.args="-test corba.connectioncache.ConnectionCacheTest -rdebug client" install
+
+In the debug mode, the test waits for remote debugger to connect on the port, printed on console. The test continues once the remote debugger connects.
+
+3. To debug a test, server process: 
+mvn -Dtest.args="-test corba.cdrext.CDRExtTest -rdebug server" install
+
+4. Multiple remote debuggers may also be attached to client, server, and controller processes (this is not well tested):
+mvn -Dtest.args=""-test corba.sometest -rdebug client:server:controller" install
+--------------------------------------- 
 
 For details, see 
 <ws>/make/build.xml 

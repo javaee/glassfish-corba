@@ -118,7 +118,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
         // even after fragmenting.  This is the large array case, so
         // the caller should retry when it runs out of space.
         bbwi.position(0);
-        bbwi.setLength(bbwi.getCapacity());
+        bbwi.limit(bbwi.capacity());
 
         // Now we must marshal in the fragment header/GIOP header
 

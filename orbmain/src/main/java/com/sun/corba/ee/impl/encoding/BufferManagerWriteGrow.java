@@ -40,8 +40,11 @@
 
 package com.sun.corba.ee.impl.encoding;
 
+import com.sun.corba.ee.spi.transport.ByteBufferPool;
 import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.corba.ee.spi.orb.ORB;
+
+import java.nio.ByteBuffer;
 
 public class BufferManagerWriteGrow extends BufferManagerWrite
 {
@@ -63,8 +66,24 @@ public class BufferManagerWriteGrow extends BufferManagerWrite
     }
 
     public void overflow( ByteBufferWithInfo bbwi, int numBytesNeeded ) {
-        // Grow ByteBufferWithInfo to a larger size.
-        bbwi.growBuffer(orb, numBytesNeeded);
+        int newLength = bbwi.limit() * 2;
+
+        while (bbwi.position() + numBytesNeeded >= newLength)
+            newLength = newLength * 2;
+
+        ByteBufferPool byteBufferPool = orb.getByteBufferPool();
+        ByteBuffer newBB = byteBufferPool.getByteBuffer(newLength);
+
+        bbwi.flip();
+        newBB.put(bbwi.getByteBuffer());
+
+        byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
+
+        // update the byteBuffer with a larger ByteBuffer
+        bbwi.setByteBuffer(newBB);
+
+        // set this buffer's length to newLength.
+        bbwi.limit(newLength);
     }
 
     @Override

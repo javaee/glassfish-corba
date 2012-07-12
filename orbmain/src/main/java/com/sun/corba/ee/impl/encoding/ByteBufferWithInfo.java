@@ -40,57 +40,71 @@
 
 package com.sun.corba.ee.impl.encoding;
 
+import com.sun.corba.ee.spi.trace.Transport;
+
 import java.nio.ByteBuffer;
 
 
-import com.sun.corba.ee.impl.misc.ORBUtility;
-import com.sun.corba.ee.spi.transport.ByteBufferPool;
-import com.sun.corba.ee.spi.orb.ORB;
-import com.sun.corba.ee.spi.trace.Transport;
-import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
-
-
-// Notes about the class.
-// Assumptions, the ByteBuffer's position is set by the constructor's
-// index variable and the ByteBuffer's limit points to the end of the
-// data.
-// ByteBuffer.position() tracks the current empty position in this
-// buffer.
-// Although, a ByteBuffer's length is often times considered to be
-// it's capacity(), the context in which getLength and setLength is
-// used in this object is actually this object's ByteBuffer's limit.
-// In other words, getLength and setLength represent the end of the
-// data in this object's ByteBuffer.
-
 @Transport
-class ByteBufferWithInfo // implements Buffer
+class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
 {
     private boolean littleEndian;
     private ByteBuffer byteBuffer;
 
-    ByteBufferWithInfo( ByteBuffer byteBuffer, int index ) {
+    ByteBufferWithInfo(ByteBuffer byteBuffer, int index) {
         this.setByteBuffer(byteBuffer);
         position(index);
     }
 
-    ByteBufferWithInfo( ByteBuffer byteBuffer ) {
-        this( byteBuffer, 0);
+    // Shallow copy constructor
+    ByteBufferWithInfo(ByteBufferWithInfo bbwi) {
+        // IMPORTANT: Cannot simply assign the reference of
+        //            bbwi.byteBuffer to this.byteBuffer since
+        //            bbwi's can be restored via restore-able
+        //            stream in CDRInputObject_1_0.java. To
+        //            restore a bbwi, we must also keep the
+        //            bbwi's position and limit. If we use
+        //            ByteBuffer.duplicate() we'll get independent
+        //            positions and limits, but the same ByteBuffer,
+        //            (which is what we want).
+        this.setByteBuffer(bbwi.getByteBuffer().duplicate());
+        this.limit(bbwi.limit());
+        this.position(bbwi.position());
     }
 
-    boolean hasRemaining() {
-        return remaining() > 0;
+    ByteBufferWithInfo(ByteBuffer byteBuffer) {
+        this(byteBuffer, 0);
     }
 
-    int remaining() {
-        return limit() - position();
+    public ByteBuffer getByteBuffer() {
+        return byteBuffer;
+    }
+
+    public void setByteBuffer(ByteBuffer byteBuffer) {
+        this.byteBuffer = byteBuffer;
+    }
+
+    boolean isLittleEndian() {
+        return littleEndian;
     }
 
     void setLittleEndian(boolean littleEndian) {
         this.littleEndian = littleEndian;
     }
 
-    short getShort() {
-        short result = 0 ;
+    public byte get() {
+        return getByteBuffer().get();
+    }
+
+    public boolean hasRemaining() {
+        return remaining() > 0;
+    }
+
+    public int remaining() {
+        return limit() - position();
+    }
+
+    public short getShort() {
         int b1, b2;
 
         if (littleEndian) {
@@ -101,11 +115,10 @@ class ByteBufferWithInfo // implements Buffer
             b2 = (getByteBuffer().get()) & 0x000000FF;
         }
 
-        result = (short)(b1 | b2);
-        return result ;
+        return (short) (b1 | b2);
     }
 
-    long getLong() {
+    public long getLong() {
         long i1, i2;
 
         if (littleEndian) {
@@ -119,8 +132,7 @@ class ByteBufferWithInfo // implements Buffer
         return i1 | i2;
     }
 
-    int getInt() {
-        int result = 0 ;
+    public int getInt() {
 
         int b1, b2, b3, b4;
 
@@ -136,151 +148,61 @@ class ByteBufferWithInfo // implements Buffer
             b4 = getByteBuffer().get() & 0xFF;
         }
 
-        result = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
-        return result ;
+        return (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
     }
 
-    boolean isLittleEndian() {
-        return littleEndian;
-    }
 
-    void putLong(long x) {
-        getByteBuffer().put((byte)((x >>> 56) & 0xFF));
-        getByteBuffer().put((byte)((x >>> 48) & 0xFF));
-        getByteBuffer().put((byte)((x >>> 40) & 0xFF));
-        getByteBuffer().put((byte)((x >>> 32) & 0xFF));
-        getByteBuffer().put((byte)((x >>> 24) & 0xFF));
-        getByteBuffer().put((byte)((x >>> 16) & 0xFF));
-        getByteBuffer().put((byte)((x >>> 8) & 0xFF));
-        getByteBuffer().put((byte) (x & 0xFF));
-    }
-
-    void putInt(int x) {
+    public ByteBufferWithInfo putLong(long x) {
+        getByteBuffer().put((byte) ((x >>> 56) & 0xFF));
+        getByteBuffer().put((byte) ((x >>> 48) & 0xFF));
+        getByteBuffer().put((byte) ((x >>> 40) & 0xFF));
+        getByteBuffer().put((byte) ((x >>> 32) & 0xFF));
         getByteBuffer().put((byte) ((x >>> 24) & 0xFF));
-        getByteBuffer().put((byte)((x >>> 16) & 0xFF));
-        getByteBuffer().put((byte)((x >>> 8) & 0xFF));
-        getByteBuffer().put((byte) (x & 0xFF));
-    }
-
-    ByteBufferWithInfo putShort(short x) {
-        getByteBuffer().put((byte)((x >>> 8) & 0xFF));
+        getByteBuffer().put((byte) ((x >>> 16) & 0xFF));
+        getByteBuffer().put((byte) ((x >>> 8) & 0xFF));
         getByteBuffer().put((byte) (x & 0xFF));
         return this;
     }
 
-    @InfoMethod
-    private void bufferMessage( String head, int bbAddr, String tail ) {
+    public ByteBufferWithInfo putInt(int x) {
+        getByteBuffer().put((byte) ((x >>> 24) & 0xFF));
+        getByteBuffer().put((byte) ((x >>> 16) & 0xFF));
+        getByteBuffer().put((byte) ((x >>> 8) & 0xFF));
+        getByteBuffer().put((byte) (x & 0xFF));
+        return this;
     }
 
-    // Right now, EncapsOutputStream's do not use pooled byte buffers.
-    // EncapsOutputStream's is the only one that does not use pooled
-    // byte buffers. Hence, the reason for the boolean 'usePooledByteBuffers'.
-    // See EncapsOutputStream for additional information.
-
-    // Shallow copy constructor
-    ByteBufferWithInfo (ByteBufferWithInfo bbwi) {
-        // IMPORTANT: Cannot simply assign the reference of
-        //            bbwi.byteBuffer to this.byteBuffer since
-        //            bbwi's can be restored via restore-able
-        //            stream in CDRInputObject_1_0.java. To
-        //            restore a bbwi, we must also keep the
-        //            bbwi's position and limit. If we use
-        //            ByteBuffer.duplicate() we'll get independent
-        //            positions and limits, but the same ByteBuffer,
-        //            (which is what we want).
-        this.setByteBuffer(bbwi.getByteBuffer().duplicate());
-        this.setLength(bbwi.limit());
-        this.position(bbwi.position());
+    public ByteBufferWithInfo putShort(short x) {
+        getByteBuffer().put((byte) ((x >>> 8) & 0xFF));
+        getByteBuffer().put((byte) (x & 0xFF));
+        return this;
     }
 
-    // So IIOPOutputStream seems more intuitive
-    public int getSize() 
-    {
-        return position();
-    }
-
-    // accessor to buffer's capacity
-    public int getCapacity()
-    {
+    public int capacity() {
         return getByteBuffer().capacity();
     }
 
-    // accessor to buffer's length
-    public int limit()
-    {
-         return getByteBuffer().limit();
+    public int limit() {
+        return getByteBuffer().limit();
     }
 
-    public ByteBuffer getByteBuffer() {
-        return byteBuffer;
-    }
-
-    // get position in this buffer
-    public int position()
-    {
+    public int position() {
         return getByteBuffer().position();
     }
 
-    // set position in this buffer
-    public void position(int newPosition)
-    {
+    public void position(int newPosition) {
         getByteBuffer().position(newPosition);
     }
 
-    // flip ByteBuffer (sets limit to position & position to 0)
-    public void flip()
-    {
+    public void flip() {
         getByteBuffer().flip();
     }
 
-    // mutator to buffer's length
-    public void setLength(int theLength) {
+    public ByteBufferWithInfo limit(int theLength) {
         getByteBuffer().limit(theLength);
+        return this;
     }
 
-    // mutator to set byteBuffer
-    public void setByteBuffer(ByteBuffer byteBuffer) {
-        this.byteBuffer = byteBuffer;
-    }
-    
-    // Grow byteBuffer to a size larger than position() + needed
-    @Transport
-    public void growBuffer( ORB orb, int numBytesNeeded )
-    {
-        int newLength = limit() * 2;
-
-        while (position() + numBytesNeeded >= newLength)
-            newLength = newLength * 2;
-
-        ByteBufferPool byteBufferPool = orb.getByteBufferPool();
-        ByteBuffer newBB = byteBufferPool.getByteBuffer(newLength);
-
-        if (orb.transportDebugFlag) {
-            // print address of ByteBuffer just gotten
-            int newbbAddress = System.identityHashCode(newBB);
-            bufferMessage( "growBuffer() - got ByteBuffer id (",
-                newbbAddress, ") from ByteBufferPool." );
-        }
-
-        this.flip();
-        newBB.put(getByteBuffer());
-
-        // return 'old' byteBuffer reference to the ByteBuffer pool
-        if (orb.transportDebugFlag) {
-            // print address of ByteBuffer being released
-            int bbAddress = System.identityHashCode(getByteBuffer());
-            bufferMessage( "growBuffer() - releasing ByteBuffer id (",
-                bbAddress, ") to ByteBufferPool.");
-        }
-        byteBufferPool.releaseByteBuffer(getByteBuffer());
-
-        // update the byteBuffer with a larger ByteBuffer
-        setByteBuffer(newBB);
-
-        // set this buffer's length to newLength.
-        setLength(newLength);
-    }
-   
     public String toString() {
         StringBuilder str = new StringBuilder("ByteBufferWithInfo:");
 
@@ -291,7 +213,4 @@ class ByteBufferWithInfo // implements Buffer
         return str.toString();
     }
 
-    protected void dprint(String msg) {
-        ORBUtility.dprint("ByteBufferWithInfo", msg);
-    }
 }

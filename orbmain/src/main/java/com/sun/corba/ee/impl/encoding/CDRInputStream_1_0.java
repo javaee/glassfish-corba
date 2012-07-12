@@ -244,7 +244,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         this.bufferManagerRead = bufferManager;
         this.bbwi = new ByteBufferWithInfo( byteBuffer,0);
         this.bbwi.setLittleEndian(littleEndian);
-        this.bbwi.setLength(size);
+        this.bbwi.limit(size);
         this.markAndResetHandler = bufferManagerRead.getMarkAndResetHandler();
     }
  
@@ -391,14 +391,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     //
 
     public final void consumeEndian() {
-        ByteBufferWithInfo bbwi1 = bbwi;
-        boolean isLittleEndian = read_boolean();
-        bbwi1.setLittleEndian(isLittleEndian);
-    }
-
-    // No such type in java
-    public final double read_longdouble() {
-        throw wrapper.longDoubleNotImplemented();
+        bbwi.setLittleEndian(read_boolean());
     }
 
     public final boolean read_boolean() {
@@ -424,12 +417,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     @CdrRead
     public final byte read_octet() {
-        byte result = 0 ;
-
         alignAndCheck(1, 1);
-        byte b = bbwi.getByteBuffer().get();
-        result = b;
-        return result ;
+        return bbwi.get();
     }
 
     @CdrRead
@@ -564,7 +553,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         if (bbwi.position() + 1 > bbwi.limit()) {
             alignAndCheck(1, 1);
         }
-        bbwi.position(bbwi.position() + 1);
+        bbwi.get();
 
         return new String(c);
     }
@@ -1996,7 +1985,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     public void setBufferLength(int value) {
-        bbwi.setLength(value);
+        bbwi.limit(value);
     }
 
     public void setIndex(int value) {

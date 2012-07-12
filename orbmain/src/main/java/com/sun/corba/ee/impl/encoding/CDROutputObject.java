@@ -185,7 +185,7 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
 
         ByteBufferWithInfo bbwi = impl.getByteBufferWithInfo();
 
-        getMessageHeader().setSize(bbwi.getByteBuffer(), bbwi.getSize());
+        getMessageHeader().setSize(bbwi.getByteBuffer(), bbwi.position());
 
         ORB lorb = (ORB)orb() ;
         if (lorb != null) {

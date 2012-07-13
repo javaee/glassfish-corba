@@ -76,16 +76,28 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
         this(byteBuffer, 0);
     }
 
-    void get(byte[] buffer, int offset, int length) {
+    public ByteBuffer toByteBuffer() {
+        return getByteBuffer();
+    }
+
+    public ByteBufferWithInfo get(byte[] byteArray) {
+        getByteBuffer().get(byteArray);
+        return this;
+    }
+
+    public ByteBufferWithInfo get(byte[] buffer, int offset, int length) {
         getByteBuffer().get(buffer, offset, length);
+        return this;
     }
 
-    void put(byte x) {
+    public ByteBufferWithInfo put(byte x) {
         getByteBuffer().put(x);
+        return this;
     }
 
-    void put(byte[] buffer, int offset, int length) {
+    public ByteBufferWithInfo put(byte[] buffer, int offset, int length) {
         getByteBuffer().put(buffer, offset, length);
+        return this;
     }
 
     public ByteBuffer getByteBuffer() {
@@ -202,17 +214,25 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
         return getByteBuffer().position();
     }
 
-    public void position(int newPosition) {
+    public ByteBufferWithInfo position(int newPosition) {
         getByteBuffer().position(newPosition);
+        return this;
     }
 
-    public void flip() {
+    public ByteBufferWithInfo flip() {
         getByteBuffer().flip();
+        return this;
     }
 
     public ByteBufferWithInfo limit(int theLength) {
         getByteBuffer().limit(theLength);
         return this;
+    }
+
+    public ByteBufferWithInfo slice() {
+        ByteBufferWithInfo bufferWithInfo = new ByteBufferWithInfo(getByteBuffer().slice());
+        bufferWithInfo.setLittleEndian( isLittleEndian() );
+        return bufferWithInfo;
     }
 
     public String toString() {

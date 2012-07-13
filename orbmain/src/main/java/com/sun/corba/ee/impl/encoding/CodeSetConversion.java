@@ -106,8 +106,6 @@ public class CodeSetConversion
         // What's the maximum number of bytes per character?
         public abstract float getMaxBytesPerChar();
 
-        public abstract boolean isFixedWidthEncoding();
-
         // What byte boundary should the stream align to before
         // calling writeBytes?  For instance, a fixed width
         // encoding with 2 bytes per char in a stream which
@@ -128,14 +126,7 @@ public class CodeSetConversion
     /**
      * Abstraction for byte to char conversion.
      */
-    public abstract static class BTCConverter
-    {
-        // In GIOP 1.1, interoperability can only be achieved with
-        // fixed width encodings like UTF-16.  This is because wstrings
-        // specified how many code points follow rather than specifying
-        // the length in octets.
-        public abstract boolean isFixedWidthEncoding();
-        public abstract int getFixedCharWidth();
+    public abstract static class BTCConverter {
 
         // Called after getChars to determine the true size of the
         // converted array.
@@ -147,7 +138,7 @@ public class CodeSetConversion
         // The same array may be used internally over multiple
         // calls.
         public abstract char[] getChars(byte[] bytes, int offset, int length);
-        public abstract char[] getChars(ByteBuffer buff, int offset, int length);
+        public abstract char[] getChars(ByteBufferWithInfo buff, int offset, int length);
 
     }
 
@@ -254,34 +245,7 @@ public class CodeSetConversion
             //ToDo: if encoding debug is turned on call the below method
             //validateCodesetCache(buffer, strToConvert);
         }
-        
-        void validateCodesetCache(ByteBuffer bb, String strToConvert) {
-                try {
-                    Charset tmpCharset = Charset.forName(codeset.getName());
-                    CharsetDecoder result = tmpCharset.newDecoder();
-                    buffer.position(0);
-                    int pos=0;
-                    CharBuffer charBuf = result.decode(buffer);
-                    if (!strToConvert.equals(charBuf.toString()) ) {
-                        System.out.println(" buff position =" +pos + 
-                        "newPos ="+ buffer.position() +
-                        " orgString ="+ strToConvert + 
-                        " retString =" + charBuf.toString() );
 
-                        ORBUtility.dprint("CodeSetConversion",
-                            "CharBuff pos =" +
-                            charBuf.position() + " limit=" +
-                            charBuf.limit() + " buff limit = " +
-                            buffer.limit() + "numByte =" +
-                            numBytes + " numChar " + numChars );
-                    }
-                } catch (Exception ex) { 
-                    ORBUtility.dprint("CodeSetConversion",
-                        "Exception in CodeSet cache");
-                    ex.printStackTrace();
-                }
-        }
-        
         public final int getNumBytes() {
             return numBytes;
         }
@@ -292,10 +256,6 @@ public class CodeSetConversion
 
         public final void setAlignment(int newAlignment) {
             this.alignment = newAlignment;
-        }
-
-        public final boolean isFixedWidthEncoding() {
-            return codeset.isFixedWidth();
         }
 
         public byte[] getBytes() {
@@ -370,61 +330,26 @@ public class CodeSetConversion
      * for the real work.  Handles translation of exceptions to the 
      * appropriate CORBA versions.
      */
-    private class JavaBTCConverter extends BTCConverter
-    {
-        protected CharsetDecoder btc;
-        private char[] buffer;
+    private class JavaBTCConverter extends BTCConverter {
+        protected CharsetDecoder decoder;
         private int resultingNumChars;
-        private OSFCodeSetRegistry.Entry codeset;
-        WeakHashMap<ByteBuffer, char[]> cacheDecoder = new WeakHashMap<ByteBuffer, char[]>();
 
         public JavaBTCConverter(OSFCodeSetRegistry.Entry codeset) {
-            
-            // Obtain a Decoder
-            btc = this.getConverter(codeset.getName());
-
-            this.codeset = codeset;
-        }
-
-        public final boolean isFixedWidthEncoding() {
-            return codeset.isFixedWidth();
-        }
-
-        // Should only be called if isFixedWidthEncoding is true
-        // IMPORTANT: This calls OSFCodeSetRegistry.Entry, not
-        //            CharsetDecoder.maxCharsPerByte().
-        public final int getFixedCharWidth() {
-            return codeset.getMaxBytesPerChar();
+            decoder = this.getConverter(codeset.getName());
         }
 
         public final int getNumChars() {
             return resultingNumChars;
         }
 
-        public char[] getChars(ByteBuffer buff, int offset, int numBytes) {
+        public char[] getChars(ByteBufferWithInfo buff, int offset, int numBytes) {
             try {
-                buff.limit(numBytes);
-                char [] myCache = cacheDecoder.get(buff);
-
-                if (myCache == null)  {
-                    byte[] byteArray = new byte[numBytes];
-                    buff.get(byteArray);
-                    buff.position(0);
-                    CharBuffer charBuf = btc.decode(buff);
-                    ByteBuffer bbb = ByteBuffer.wrap(byteArray);
-
-                    // CharBuffer returned by the decoder will set its limit
-                    // to byte immediately after the last written byte.
-                    resultingNumChars = charBuf.limit();
-                    buffer = new char[resultingNumChars];
-                    charBuf.get(buffer, 0, resultingNumChars).position(0);
-                    cacheDecoder.put(bbb, buffer);
-               }
-               else {
-                   buffer = myCache;
-                   resultingNumChars = myCache.length;
-               }
-               return buffer;
+                buff.limit(numBytes);       // todo - the old implementation cached a clone of the buffer and results.  How do we do that with a Grizzly Buffer?
+                CharBuffer charBuf = decoder.decode(buff.toByteBuffer());
+                resultingNumChars = charBuf.limit();
+                char[] buffer = new char[resultingNumChars];
+                charBuf.get(buffer, 0, resultingNumChars).position(0);
+                return buffer;
 
             } catch (IllegalStateException ile) {
                 // There were a decoding operation already in progress
@@ -457,7 +382,7 @@ public class CodeSetConversion
             try {
 
                 ByteBuffer byteBuf = ByteBuffer.wrap(bytes, offset, numBytes);
-                CharBuffer charBuf = btc.decode(byteBuf);
+                CharBuffer charBuf = decoder.decode(byteBuf);
 
                 // CharBuffer returned by the decoder will set its limit
                 // to byte immediately after the last written byte.
@@ -469,6 +394,7 @@ public class CodeSetConversion
                 //             decoded. Hence, the check below to ensure the
                 //             char[] returned contains all the chars that have
                 //             been decoded and no more.
+                char[] buffer;
                 if (charBuf.limit() == charBuf.capacity()) {
                     buffer = charBuf.array();
                 } else {
@@ -546,7 +472,7 @@ public class CodeSetConversion
         }
 
         @Override
-        public char[] getChars(ByteBuffer bytes, int offset, int numBytes) {
+        public char[] getChars(ByteBufferWithInfo bytes, int offset, int numBytes) {
             //bytes.position(offset);
             byte [] marker = { bytes.get(), bytes.get() };
             bytes.position(0);
@@ -621,7 +547,7 @@ public class CodeSetConversion
         private void switchToConverter(OSFCodeSetRegistry.Entry newCodeSet) {
 
             // Use the getConverter method from our superclass.
-            btc = super.getConverter(newCodeSet.getName());
+            decoder = super.getConverter(newCodeSet.getName());
         }
     }
 

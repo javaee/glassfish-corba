@@ -224,8 +224,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
 
         it = new byte[bbwi.position() - start];
 
-        bbwi.getByteBuffer().position(start);
-        bbwi.getByteBuffer().get(it);
+        bbwi.position(start);
+        bbwi.get(it);
 
         return it;
     }

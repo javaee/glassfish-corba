@@ -2162,8 +2162,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             // just convert directly from the bbwi rather than
             // allocating and copying.
             int pos = bbwi.position();
-            ByteBuffer bb = bbwi.getByteBuffer().slice();
-            char[] result = converter.getChars(bb, bbwi.position(), numBytes);
+            char[] result = converter.getChars(bbwi.slice(), bbwi.position(), numBytes);
             bbwi.position(pos + numBytes);
             return result;
         } else {

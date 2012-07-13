@@ -40,6 +40,7 @@
 package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
@@ -61,11 +62,11 @@ abstract class CDRInputStreamBase extends java.io.InputStream
         this.parent = parent;
     }
 
-    public abstract void init(org.omg.CORBA.ORB orb, 
-                              ByteBuffer byteBuffer, 
-                              int size, 
-                              boolean littleEndian,
-                              BufferManagerRead bufferManager);
+    abstract void init(org.omg.CORBA.ORB orb,
+                       ByteBuffer byteBuffer,
+                       int bufferSize,
+                       ByteOrder byteOrder,
+                       BufferManagerRead bufferManager);
 
     // org.omg.CORBA.portable.InputStream
     public abstract boolean read_boolean();
@@ -107,8 +108,8 @@ abstract class CDRInputStreamBase extends java.io.InputStream
         throw new org.omg.CORBA.NO_IMPLEMENT();
     }
     public abstract org.omg.CORBA.Object read_Object(java.lang.Class clz);
-    public abstract org.omg.CORBA.ORB orb();
 
+    public abstract org.omg.CORBA.ORB orb();
     // org.omg.CORBA_2_3.portable.InputStream
     public abstract java.io.Serializable read_value();
     public abstract java.io.Serializable read_value(java.lang.Class clz);
@@ -116,12 +117,12 @@ abstract class CDRInputStreamBase extends java.io.InputStream
     public abstract java.io.Serializable read_value(java.lang.String rep_id);
     public abstract java.io.Serializable read_value(java.io.Serializable value);
     public abstract java.lang.Object read_abstract_interface();
-    public abstract java.lang.Object read_abstract_interface(java.lang.Class clz);
 
+    public abstract java.lang.Object read_abstract_interface(java.lang.Class clz);
     // com.sun.corba.ee.impl.encoding.MarshalInputStream
     public abstract void consumeEndian();
-    public abstract int getPosition();
 
+    public abstract int getPosition();
     // org.omg.CORBA.DataInputStream
     public abstract java.lang.Object read_Abstract ();
     public abstract java.io.Serializable read_Value ();
@@ -133,10 +134,11 @@ abstract class CDRInputStreamBase extends java.io.InputStream
     public abstract void read_short_array (org.omg.CORBA.ShortSeqHolder seq, int offset, int length);
     public abstract void read_ushort_array (org.omg.CORBA.UShortSeqHolder seq, int offset, int length);
     public abstract void read_long_array (org.omg.CORBA.LongSeqHolder seq, int offset, int length);
-    public abstract void read_ulong_array (org.omg.CORBA.ULongSeqHolder seq, int offset, int length); 
+    public abstract void read_ulong_array (org.omg.CORBA.ULongSeqHolder seq, int offset, int length);
     public abstract void read_ulonglong_array (org.omg.CORBA.ULongLongSeqHolder seq, int offset, int length);
     public abstract void read_longlong_array (org.omg.CORBA.LongLongSeqHolder seq, int offset, int length);
     public abstract void read_float_array (org.omg.CORBA.FloatSeqHolder seq, int offset, int length);
+
     public abstract void read_double_array (org.omg.CORBA.DoubleSeqHolder seq, int offset, int length);
 
     // org.omg.CORBA.portable.ValueBase
@@ -145,13 +147,13 @@ abstract class CDRInputStreamBase extends java.io.InputStream
     // java.io.InputStream
     // REVISIT - should we make these throw UnsupportedOperationExceptions?
     // Right now, they'll go up to the java.io versions!
-
-//     public abstract int read(byte b[]) throws IOException;
-//     public abstract int read(byte b[], int off, int len) throws IOException 
+    //     public abstract int read(byte b[]) throws IOException;
+//     public abstract int read(byte b[], int off, int len) throws IOException
 //     public abstract long skip(long n) throws IOException;
 //     public abstract int available() throws IOException;
 //     public abstract void close() throws IOException;
     public abstract void mark(int readlimit);
+
     public abstract void reset();
 
     // This should return false so that outside users (people using the JDK)
@@ -172,22 +174,21 @@ abstract class CDRInputStreamBase extends java.io.InputStream
     // Needed by TCUtility
     public abstract java.math.BigDecimal read_fixed(short digits, short scale);
 
-    // Needed by TypeCodeImpl
-    public abstract boolean isLittleEndian();
+    public abstract ByteOrder getByteOrder();
 
     // Needed by request and reply messages for GIOP versions >= 1.2 only.
     abstract void setHeaderPadding(boolean headerPadding);
-    
-    // Needed by IIOPInputStream and other subclasses
 
+    // Needed by IIOPInputStream and other subclasses
     public abstract int getBufferLength();
+
     public abstract void setBufferLength(int value);
 
     public abstract void setIndex(int value);
 
     public abstract void orb(org.omg.CORBA.ORB orb);
-
     public abstract BufferManagerRead getBufferManager();
+
     public abstract GIOPVersion getGIOPVersion();
 
     abstract CodeBase getCodeBase();
@@ -197,8 +198,8 @@ abstract class CDRInputStreamBase extends java.io.InputStream
     abstract void performORBVersionSpecificInit();
 
     public abstract void resetCodeSetConverters();
-
     // ValueInputStream -------------------------
     public abstract void start_value();
+
     public abstract void end_value();
 }

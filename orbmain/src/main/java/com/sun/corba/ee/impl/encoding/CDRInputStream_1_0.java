@@ -52,6 +52,7 @@ package com.sun.corba.ee.impl.encoding;
 import java.io.Serializable;
 import java.io.IOException;
 
+import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
 
@@ -225,29 +226,22 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         result.init(this.orb,
                 this.bbwi.getByteBuffer(),
                 this.bbwi.limit(),
-                this.bbwi.isLittleEndian(),
+                this.bbwi.order(),
                 this.bufferManagerRead);
 
         return result;
     }
 
-    /*
-     * NOTE:  size passed to init means buffer size
-     */
-    public void init(org.omg.CORBA.ORB orb, 
-                     ByteBuffer byteBuffer, 
-                     int size, 
-                     boolean littleEndian,
-                     BufferManagerRead bufferManager) 
-    {
+    @Override
+    void init(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, int bufferSize, ByteOrder byteOrder, BufferManagerRead bufferManager) {
         this.orb = (ORB)orb;
         this.bufferManagerRead = bufferManager;
         this.bbwi = new ByteBufferWithInfo( byteBuffer,0);
-        this.bbwi.setLittleEndian(littleEndian);
-        this.bbwi.limit(size);
+        this.bbwi.order(byteOrder);
+        this.bbwi.limit(bufferSize);
         this.markAndResetHandler = bufferManagerRead.getMarkAndResetHandler();
     }
- 
+
     // See description in CDRInputStream
     void performORBVersionSpecificInit() {
         createRepositoryIdHandlers();
@@ -391,7 +385,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     //
 
     public final void consumeEndian() {
-        bbwi.setLittleEndian(read_boolean());
+        bbwi.order(read_boolean() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN );
     }
 
     public final boolean read_boolean() {
@@ -1984,8 +1978,9 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         bbwi.position(value);
     }
 
-    public boolean isLittleEndian() {
-        return bbwi.isLittleEndian();
+    @Override
+    public ByteOrder getByteOrder() {
+        return bbwi.order();
     }
 
     public void orb(org.omg.CORBA.ORB orb) {

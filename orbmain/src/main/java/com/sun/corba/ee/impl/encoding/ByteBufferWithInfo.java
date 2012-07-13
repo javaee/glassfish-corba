@@ -41,15 +41,17 @@
 package com.sun.corba.ee.impl.encoding;
 
 import com.sun.corba.ee.spi.trace.Transport;
+import org.glassfish.grizzly.Buffer;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 
 @Transport
 class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
 {
-    private boolean littleEndian;
     private ByteBuffer byteBuffer;
+    private ByteOrder order;
 
     ByteBufferWithInfo(ByteBuffer byteBuffer, int index) {
         this.setByteBuffer(byteBuffer);
@@ -108,12 +110,13 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
         this.byteBuffer = byteBuffer;
     }
 
-    boolean isLittleEndian() {
-        return littleEndian;
+    public ByteOrder order() {
+        return order;
     }
 
-    void setLittleEndian(boolean littleEndian) {
-        this.littleEndian = littleEndian;
+    public ByteBufferWithInfo order(ByteOrder byteOrder) {
+        order = byteOrder;
+        return this;
     }
 
     public byte get() {
@@ -131,7 +134,7 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
     public short getShort() {
         int b1, b2;
 
-        if (littleEndian) {
+        if (isLittleEndian()) {
             b2 = (getByteBuffer().get()) & 0x000000FF;
             b1 = (getByteBuffer().get() << 8) & 0x0000FF00;
         } else {
@@ -145,7 +148,7 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
     public long getLong() {
         long i1, i2;
 
-        if (littleEndian) {
+        if (isLittleEndian()) {
             i2 = getInt() & 0xFFFFFFFFL;
             i1 = (long) getInt() << 32;
         } else {
@@ -156,11 +159,15 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
         return i1 | i2;
     }
 
+    private boolean isLittleEndian() {
+        return order == ByteOrder.LITTLE_ENDIAN;
+    }
+
     public int getInt() {
 
         int b1, b2, b3, b4;
 
-        if (littleEndian) {
+        if (isLittleEndian()) {
             b4 = getByteBuffer().get() & 0xFF;
             b3 = getByteBuffer().get() & 0xFF;
             b2 = getByteBuffer().get() & 0xFF;
@@ -231,7 +238,7 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
 
     public ByteBufferWithInfo slice() {
         ByteBufferWithInfo bufferWithInfo = new ByteBufferWithInfo(getByteBuffer().slice());
-        bufferWithInfo.setLittleEndian( isLittleEndian() );
+        bufferWithInfo.order(order());
         return bufferWithInfo;
     }
 

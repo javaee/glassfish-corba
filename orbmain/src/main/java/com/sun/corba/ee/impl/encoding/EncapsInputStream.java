@@ -41,9 +41,10 @@
 package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 import com.sun.org.omg.SendingContext.CodeBase;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.ee.impl.misc.ORBUtility;
 
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
@@ -65,35 +66,27 @@ public class EncapsInputStream extends CDRInputObject
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
 
-    // corba/EncapsOutputStream
-    // corba/ORBSingleton
-    // iiop/ORB
-    public EncapsInputStream(org.omg.CORBA.ORB orb, byte[] buf, 
-                             int size, boolean littleEndian,
+    public EncapsInputStream(org.omg.CORBA.ORB orb, byte[] buf,
+                             int size, ByteOrder byteOrder,
                              GIOPVersion version) {
-        super(orb, ByteBuffer.wrap(buf), size, littleEndian,
-              version, ORBUtility.getEncodingVersion(),
-                BufferManagerFactory.newReadEncapsulationBufferManager(),
-              false); 
+        super(orb, ByteBuffer.wrap(buf), size, byteOrder, version,
+                BufferManagerFactory.newReadEncapsulationBufferManager()
+        );
 
         performORBVersionSpecificInit();
     }
 
     public EncapsInputStream(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer,
-                             int size, boolean littleEndian,
+                             int size, ByteOrder byteOrder,
                              GIOPVersion version) {
-        super(orb, byteBuffer, size, littleEndian, 
-              version, ORBUtility.getEncodingVersion(),
-              BufferManagerFactory.newReadEncapsulationBufferManager(),
-              false); 
+        super(orb, byteBuffer, size, byteOrder, version,
+                BufferManagerFactory.newReadEncapsulationBufferManager()
+        );
 
         performORBVersionSpecificInit();
     }
 
-    // ior/IdentifiableBase
-    // ior/IIOPProfile
-    // corba/ORBSingleton
-    // iiop/ORB
+    // exported to Glassfish - DON'T change this!!!
     public EncapsInputStream(org.omg.CORBA.ORB orb, byte[] data, int size) 
     {
         this(orb, data, size, GIOPVersion.V1_2);
@@ -115,7 +108,7 @@ public class EncapsInputStream extends CDRInputObject
     // mark at the beginning)
     public EncapsInputStream(org.omg.CORBA.ORB orb, byte[] data, int size, GIOPVersion version) 
     {
-        this(orb, data, size, false, version);
+        this(orb, data, size, ByteOrder.BIG_ENDIAN, version);
     }
 
     /**
@@ -132,10 +125,10 @@ public class EncapsInputStream extends CDRInputObject
         super(orb, 
               ByteBuffer.wrap(data), 
               size, 
-              false, 
-              version, ORBUtility.getEncodingVersion(),
-              BufferManagerFactory.newReadEncapsulationBufferManager(),
-              false); // IDLJavaSerializationInputStream::directRead == false
+              ByteOrder.BIG_ENDIAN,
+              version,
+                BufferManagerFactory.newReadEncapsulationBufferManager()
+        ); // IDLJavaSerializationInputStream::directRead == false
 
         this.codeBase = codeBase;
 
@@ -162,8 +155,7 @@ public class EncapsInputStream extends CDRInputObject
         // In GIOP 1.1, we shouldn't have byte order markers.  Take the order
         // of the stream if we don't see them.
         if (getGIOPVersion().equals(GIOPVersion.V1_1))
-            return CodeSetConversion.impl().getBTCConverter(
-                OSFCodeSetRegistry.UTF_16, isLittleEndian());
+            return CodeSetConversion.impl().getBTCConverter(OSFCodeSetRegistry.UTF_16, getByteOrder());
 
         // Assume anything else adheres to GIOP 1.2 requirements.
         //
@@ -172,8 +164,7 @@ public class EncapsInputStream extends CDRInputObject
         //
         // With no byte order marker, it's big endian in GIOP 1.2.  
         // formal 00-11-03 15.3.16.
-        return CodeSetConversion.impl().getBTCConverter(OSFCodeSetRegistry.UTF_16,
-                                                        false);
+        return CodeSetConversion.impl().getBTCConverter(OSFCodeSetRegistry.UTF_16, ByteOrder.BIG_ENDIAN);
     }
 
     @Override

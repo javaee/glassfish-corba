@@ -141,19 +141,11 @@ public class BufferManagerReadStream
 
             result = fragmentQueue.dequeue();
 
-            if (orb.transportDebugFlag) {
-                logBufferMessage("underflow() - dequeued ByteBuffer id (", result.getByteBuffer(), ") from fragment queue.");
-            }
-
             // VERY IMPORTANT
             // Release bbwi.byteBuffer to the ByteBufferPool only if
             // this BufferManagerStream is not marked for potential restore.
             if (!markEngaged && bbwi != null && bbwi.getByteBuffer() != null) {
                 ByteBufferPool byteBufferPool = getByteBufferPool();
-
-                if (orb.transportDebugFlag) {
-                    logBufferMessage("underflow() - releasing ByteBuffer id (", bbwi.getByteBuffer(), ") to ByteBufferPool.");
-                }
 
                 byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
                 bbwi.setByteBuffer(null);
@@ -198,11 +190,6 @@ public class BufferManagerReadStream
             while (fragmentQueue.size() != 0) {
                 abbwi = fragmentQueue.dequeue();
                 if (abbwi != null && abbwi.getByteBuffer() != null) {
-                    if (orb.transportDebugFlag) {
-                        if (inputBbAddress != System.identityHashCode(abbwi.getByteBuffer())) {
-                            logBufferMessage(" close() - fragmentQueue is releasing ByteBuffer id (", abbwi.getByteBuffer(), ") to ByteBufferPool.");
-                        }
-                    }
                     byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
                 }
             }
@@ -222,11 +209,6 @@ public class BufferManagerReadStream
             for (ByteBufferWithInfo abbwi : fragmentStack) {
                 if (abbwi != null && abbwi.getByteBuffer() != null) {
                     if (inputBbAddress != System.identityHashCode(abbwi.getByteBuffer())) {
-                        if (orb.transportDebugFlag) {
-                            String prefix = "close() - fragmentStack - releasing ByteBuffer id (";
-                            String suffix = ") to ByteBufferPool.";
-                            logBufferMessage(prefix, abbwi.getByteBuffer(), suffix);
-                        }
                         byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
                     }
                 }

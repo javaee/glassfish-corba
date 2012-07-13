@@ -39,6 +39,7 @@
  */
 package com.sun.corba.ee.impl.encoding;
 
+import java.nio.ByteOrder;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.WeakHashMap;
@@ -53,7 +54,6 @@ import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.charset.UnmappableCharacterException;
 
-import com.sun.corba.ee.impl.misc.ORBUtility;
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 import com.sun.corba.ee.spi.logging.OMGSystemException;
 
@@ -315,13 +315,9 @@ public class CodeSetConversion
             super(OSFCodeSetRegistry.UTF_16, 2);
         }
 
-        // Using this constructor, we don't use a BOM and use the
-        // byte order specified
+        // Using this constructor, we don't use a BOM and use the byte order specified
         public UTF16CTBConverter(boolean littleEndian) {
-            super(littleEndian ? 
-                  OSFCodeSetRegistry.UTF_16LE : 
-                  OSFCodeSetRegistry.UTF_16BE, 
-                  2);
+            super(littleEndian ? OSFCodeSetRegistry.UTF_16LE : OSFCodeSetRegistry.UTF_16BE, 2);
         }
     }
 
@@ -457,23 +453,21 @@ public class CodeSetConversion
      */
     private class UTF16BTCConverter extends JavaBTCConverter
     {
-        private boolean defaultToLittleEndian;
+        private ByteOrder defaultByteOrder;
         private boolean converterUsesBOM = true;
 
         private static final char UTF16_BE_MARKER = (char) 0xfeff;
         private static final char UTF16_LE_MARKER = (char) 0xfffe;
 
-        // When there isn't a byte order marker, used the byte
-        // order specified.
-        public UTF16BTCConverter(boolean defaultToLittleEndian) {
+        // When there isn't a byte order marker, used the byte order specified.
+        UTF16BTCConverter(ByteOrder defaultByteOrder) {
             super(OSFCodeSetRegistry.UTF_16);
 
-            this.defaultToLittleEndian = defaultToLittleEndian;
+            this.defaultByteOrder = defaultByteOrder;
         }
 
         @Override
         public char[] getChars(ByteBufferWithInfo bytes, int offset, int numBytes) {
-            //bytes.position(offset);
             byte [] marker = { bytes.get(), bytes.get() };
             bytes.position(0);
 
@@ -485,7 +479,7 @@ public class CodeSetConversion
                 return super.getChars(bytes, offset, numBytes);
             } else {
                 if (converterUsesBOM) {
-                    if (defaultToLittleEndian)
+                    if (defaultByteOrder == ByteOrder.LITTLE_ENDIAN)
                         switchToConverter(OSFCodeSetRegistry.UTF_16LE);
                     else
                         switchToConverter(OSFCodeSetRegistry.UTF_16BE);
@@ -508,7 +502,7 @@ public class CodeSetConversion
                 return super.getChars(bytes, offset, numBytes);
             } else {
                 if (converterUsesBOM) {
-                    if (defaultToLittleEndian)
+                    if (defaultByteOrder == ByteOrder.LITTLE_ENDIAN)
                         switchToConverter(OSFCodeSetRegistry.UTF_16LE);
                     else
                         switchToConverter(OSFCodeSetRegistry.UTF_16BE);
@@ -574,7 +568,7 @@ public class CodeSetConversion
      * will use the endianness specified.
      *
      */
-    public CTBConverter getCTBConverter(OSFCodeSetRegistry.Entry codeset,
+    CTBConverter getCTBConverter(OSFCodeSetRegistry.Entry codeset,
                                         boolean littleEndian,
                                         boolean useByteOrderMarkers) {
 
@@ -607,15 +601,14 @@ public class CodeSetConversion
                          1 :
                          codeset.getMaxBytesPerChar());
 
-        CTBConverter converter = null; 
+        CTBConverter converter;
 
         Map<OSFCodeSetRegistry.Entry, CTBConverter> m =  cacheCTBC.get();
-        converter = (JavaCTBConverter) m.get(codeset);
+        converter = m.get(codeset);
         if (converter == null ) {
             converter = new JavaCTBConverter(codeset, alignment);
             m.put(codeset, converter);
-        }
-        else if(converter.getAlignment() != alignment) {
+        } else if(converter.getAlignment() != alignment) {
             ((JavaCTBConverter) converter).setAlignment(alignment);
         }
         return converter;
@@ -632,17 +625,13 @@ public class CodeSetConversion
      * BTCConverter factory for fixed width multibyte encodings.
      */
     public BTCConverter getBTCConverter(OSFCodeSetRegistry.Entry codeset,
-                                        boolean defaultToLittleEndian) {
+                                        ByteOrder defaultByteOrder) {
 
-        if (codeset == OSFCodeSetRegistry.UTF_16 ||
-            codeset == OSFCodeSetRegistry.UCS_2) {
-
-            return new UTF16BTCConverter(defaultToLittleEndian);
+        if (codeset == OSFCodeSetRegistry.UTF_16 || codeset == OSFCodeSetRegistry.UCS_2) {
+            return new UTF16BTCConverter(defaultByteOrder);
         } else {
-
-            BTCConverter converter = null;
             Map<OSFCodeSetRegistry.Entry, BTCConverter> m  = cacheBTCC.get();
-            converter = (JavaBTCConverter) m.get(codeset);
+            BTCConverter converter = m.get(codeset);
             if (converter == null) {
                 converter = new JavaBTCConverter(codeset);
                 m.put(codeset, converter);

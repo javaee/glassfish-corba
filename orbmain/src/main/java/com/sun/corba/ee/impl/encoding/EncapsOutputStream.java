@@ -47,6 +47,7 @@ import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.ee.spi.misc.ORBConstants;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Encapsulations are supposed to explicitly define their
@@ -107,7 +108,7 @@ public class EncapsOutputStream extends CDROutputObject
     private static class EncapsInputStreamFactory implements InputObjectFactory {
         @Override
         public CDRInputObject createInputObject(CDROutputObject outputObject, ORB orb, ByteBuffer byteBuffer, int size, GIOPVersion giopVersion) {
-            return new EncapsInputStream(outputObject.orb(), byteBuffer, size, false, giopVersion);
+            return new EncapsInputStream(outputObject.orb(), byteBuffer, size, ByteOrder.BIG_ENDIAN, giopVersion);
         }
     }
     

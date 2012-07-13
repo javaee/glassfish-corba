@@ -203,8 +203,6 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
     public org.omg.CORBA.portable.InputStream create_input_stream() {
         // XREVISIT
         return null;
-        //return new XIIOPInputStream(orb(), getByteBuffer(), getIndex(), 
-            //isLittleEndian(), getMessageHeader(), conn);
     }
 
     public Connection getConnection() {

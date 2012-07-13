@@ -64,6 +64,7 @@ import org.omg.CORBA.portable.ValueFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -159,7 +160,11 @@ public class EncodingTestBase {
         byte[] bytes = new byte[contents.length];
         for (int i = 0; i < contents.length; i++)
             bytes[i] = (byte) contents[i];
-        return new EncapsInputStream(orb, bytes, bytes.length, isLittleEndian(), message.giopVersion);
+        return new EncapsInputStream(orb, bytes, bytes.length, getByteOrder(), message.giopVersion);
+    }
+
+    private ByteOrder getByteOrder() {
+        return isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
     }
 
     protected final CDRInputObject getInputObject() {

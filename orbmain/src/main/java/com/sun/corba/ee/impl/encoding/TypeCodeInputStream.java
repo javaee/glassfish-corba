@@ -40,6 +40,7 @@
 
 package com.sun.corba.ee.impl.encoding;
 
+import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 import java.nio.ByteBuffer;
@@ -62,20 +63,20 @@ public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeRe
         super(orb, data, size);
     }
 
-    public TypeCodeInputStream(org.omg.CORBA.ORB orb, 
-                               byte[] data, 
+    public TypeCodeInputStream(org.omg.CORBA.ORB orb,
+                               byte[] data,
                                int size,
-                               boolean littleEndian,
+                               ByteOrder byteOrder,
                                GIOPVersion version) {
-        super(orb, data, size, littleEndian, version);
+        super(orb, data, size, byteOrder, version);
     }
 
-    public TypeCodeInputStream(org.omg.CORBA.ORB orb,
+    TypeCodeInputStream(org.omg.CORBA.ORB orb,
                                ByteBuffer byteBuffer,
                                int size,
-                               boolean littleEndian,
+                               ByteOrder byteOrder,
                                GIOPVersion version) {
-        super(orb, byteBuffer, size, littleEndian, version);
+        super(orb, byteBuffer, size, byteOrder, version);
     }
 
     public void addTypeCodeAtPosition(TypeCodeImpl tc, int position) {
@@ -128,11 +129,11 @@ public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeRe
 
         // create an encapsulation using the marshal buffer
         if (is instanceof CDRInputObject) {
-            encap = new TypeCodeInputStream((ORB)_orb, encapBuffer, encapBuffer.length,
-                                            ((CDRInputObject)is).isLittleEndian(),
+            encap = new TypeCodeInputStream(_orb, encapBuffer, encapBuffer.length,
+                                            ((CDRInputObject)is).getByteOrder(),
                                             ((CDRInputObject)is).getGIOPVersion());
         } else {
-            encap = new TypeCodeInputStream((ORB)_orb, encapBuffer, encapBuffer.length);
+            encap = new TypeCodeInputStream(_orb, encapBuffer, encapBuffer.length);
         }
         encap.setEnclosingInputStream(is);
         encap.makeEncapsulation();

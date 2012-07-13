@@ -62,6 +62,8 @@ import com.sun.corba.ee.spi.trace.Transport;
 import com.sun.corba.ee.spi.trace.MonitorRead ;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.nio.ByteOrder;
+
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
 
@@ -110,9 +112,7 @@ public class CDRInputObject
     }
 
     private static class InputStreamFactory {
-        public static CDRInputStreamBase newInputStream(
-                ORB orb, GIOPVersion version, byte encodingVersion,
-                boolean directRead) {
+        public static CDRInputStreamBase newInputStream(GIOPVersion version) {
             switch(version.intValue()) {
                 case GIOPVersion.VERSION_1_0:
                     return new CDRInputStream_1_0();
@@ -135,8 +135,6 @@ public class CDRInputObject
     // 
     // REVISIT.
     public CDRInputObject() {
-        // ((com.sun.corba.ee.spi.orb.ORB)org.omg.CORBA.ORB.init())
-            // .getTimerManager().points() ;
     }
 
      public CDRInputObject(CDRInputObject is) {
@@ -144,15 +142,12 @@ public class CDRInputObject
         impl.setParent(this);
     }
 
-    // Called from EncapsInputStream
-    public CDRInputObject(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, int size, 
-        boolean littleEndian, GIOPVersion version, byte encodingVersion, 
-        BufferManagerRead bufMgr, boolean directRead)
-    {
-        this.orb = (ORB)orb ;
+    protected CDRInputObject(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, int size,
+                             ByteOrder byteOrder, GIOPVersion version,
+                             BufferManagerRead bufMgr) {
 
-        createCDRInputStream( version, encodingVersion, directRead,
-            byteBuffer, size, littleEndian, bufMgr ) ;
+        this.orb = (ORB)orb ;
+        createCDRInputStream(version, byteBuffer, size, byteOrder, bufMgr);
 
         this.corbaConnection = null ;
         this.header = null ;
@@ -160,29 +155,20 @@ public class CDRInputObject
         this.messageMediator = null ;
     }
 
-    @MonitorRead
-    private void createCDRInputStream( GIOPVersion version,
-        byte encodingVersion, boolean directRead, ByteBuffer byteBuffer,
-        int size, boolean littleEndian, BufferManagerRead bufMgr ) {
-
-        impl = InputStreamFactory.newInputStream(this.orb, version, encodingVersion, directRead);
-        impl.init(orb, byteBuffer, size, littleEndian, bufMgr);
+    private void createCDRInputStream(GIOPVersion version, ByteBuffer byteBuffer, int size,
+                                      ByteOrder byteOrder, BufferManagerRead bufMgr) {
+        impl = InputStreamFactory.newInputStream(version);
+        impl.init(orb, byteBuffer, size, byteOrder, bufMgr);
         impl.setParent(this);
     }
 
-    private CDRInputObject(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, int size,
-        boolean littleEndian, GIOPVersion version, byte encodingVersion, BufferManagerRead bufMgr) {
-
-        this(orb, byteBuffer, size, littleEndian, version, encodingVersion, bufMgr, true);
+    protected static ByteOrder toByteOrder(boolean littleEndian) {
+        return littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
     }
 
     public CDRInputObject(ORB orb, Connection corbaConnection, ByteBuffer byteBuffer, Message header) {
-        this(orb, byteBuffer, header.getSize(), header.isLittleEndian(),
-              header.getGIOPVersion(), header.getEncodingVersion(),
-              BufferManagerFactory.newBufferManagerRead(
-                                          header.getGIOPVersion(),
-                                          header.getEncodingVersion(),
-                                          orb));
+        this(orb, byteBuffer, header.getSize(), toByteOrder(header.isLittleEndian()), header.getGIOPVersion(),
+                createBufferManagerRead(orb, header));
 
         this.corbaConnection = corbaConnection;
         this.header = header ;
@@ -190,6 +176,10 @@ public class CDRInputObject
         getBufferManager().init(header);
         setIndex(Message.GIOPMessageHeaderLength);
         setBufferLength(header.getSize());
+    }
+
+    private static BufferManagerRead createBufferManagerRead(ORB orb, Message header) {
+        return BufferManagerFactory.newBufferManagerRead(header.getGIOPVersion(), header.getEncodingVersion(), orb);
     }
 
     // REVISIT - think about this some more.
@@ -234,11 +224,6 @@ public class CDRInputObject
         }
     }
 
-    public final boolean unmarshaledHeader() 
-    {
-        return unmarshaledHeader;
-    }
-
     /**
      * Override the default CDR factory behavior to get the
      * negotiated code sets from the connection.
@@ -256,8 +241,7 @@ public class CDRInputObject
         // code sets by now, fall back on the defaults defined
         // in CDRInputStream.
         if (codesets == null) {
-            return CodeSetConversion.impl().getBTCConverter(
-                OSFCodeSetRegistry.ISO_8859_1, impl.isLittleEndian());
+            return CodeSetConversion.impl().getBTCConverter(OSFCodeSetRegistry.ISO_8859_1, impl.getByteOrder());
         }
         
         OSFCodeSetRegistry.Entry charSet
@@ -267,7 +251,7 @@ public class CDRInputObject
             throw wrapper.unknownCodeset(codesets.getCharCodeSet());
         }
 
-        return CodeSetConversion.impl().getBTCConverter(charSet, isLittleEndian());
+        return CodeSetConversion.impl().getBTCConverter(charSet, getByteOrder());
     }
 
     protected CodeSetConversion.BTCConverter createWCharBTCConverter() {
@@ -302,11 +286,11 @@ public class CDRInputObject
         // we do what our old ORBs did.
         if (wcharSet == OSFCodeSetRegistry.UTF_16) {
             if (getGIOPVersion().equals(GIOPVersion.V1_2)) {
-                return CodeSetConversion.impl().getBTCConverter(wcharSet, false);
+                return CodeSetConversion.impl().getBTCConverter(wcharSet, ByteOrder.BIG_ENDIAN);
             }
         }
 
-        return CodeSetConversion.impl().getBTCConverter(wcharSet, isLittleEndian());
+        return CodeSetConversion.impl().getBTCConverter(wcharSet, getByteOrder());
     }
 
     // If we're local and don't have a Connection, use the
@@ -711,8 +695,8 @@ public class CDRInputObject
         return impl.read_fixed(digits, scale);
     }
 
-    public final boolean isLittleEndian() {
-        return impl.isLittleEndian();
+    public final ByteOrder getByteOrder() {
+        return impl.getByteOrder();
     }
 
     public final int getBufferLength() {

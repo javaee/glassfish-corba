@@ -189,17 +189,10 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
 
         ORB lorb = (ORB)orb() ;
         if (lorb != null) {
-            if (lorb.giopDebugFlag) {
-                ORBUtility.printBuffer( "CDROutputObject Buffer", 
-                                bbwi.getByteBuffer(), System.out ) ;
-            }
-        
             TransportManager ctm = lorb.getTransportManager() ;
-            MessageTraceManagerImpl mtm = 
-                (MessageTraceManagerImpl)ctm.getMessageTraceManager() ;
-            if (mtm.isEnabled()) {
+            MessageTraceManagerImpl mtm = (MessageTraceManagerImpl)ctm.getMessageTraceManager() ;
+            if (mtm.isEnabled())
                 mtm.recordDataSent( bbwi.getByteBuffer()) ;
-            }
         }
 
         bbwi.flip();

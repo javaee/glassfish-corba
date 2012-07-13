@@ -76,6 +76,18 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
         this(byteBuffer, 0);
     }
 
+    void get(byte[] buffer, int offset, int length) {
+        getByteBuffer().get(buffer, offset, length);
+    }
+
+    void put(byte x) {
+        getByteBuffer().put(x);
+    }
+
+    void put(byte[] buffer, int offset, int length) {
+        getByteBuffer().put(buffer, offset, length);
+    }
+
     public ByteBuffer getByteBuffer() {
         return byteBuffer;
     }

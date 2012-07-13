@@ -248,6 +248,19 @@ public class CDROutputTest extends EncodingTestBase {
     }
 
     @Test
+    public void writingEmptyOctetArray_doesNotDoEightByteAlign() {
+        getOutputObject().setHeaderPadding(true);
+        getOutputObject().write_octet_array(new byte[]{}, 0, 0);
+
+        expectByteArray( new byte[0] );
+    }
+
+    @Test(expected = BAD_PARAM.class)
+    public void whenWritingNullArray_anExceptionIsThrown() {
+        getOutputObject().write_octet_array(null, 0, 4);
+    }
+
+    @Test
     public void canWriteShortArray() {
         getOutputObject().write_short_array(new short[]{-3, 1, 515, -1}, 1, 3);
 

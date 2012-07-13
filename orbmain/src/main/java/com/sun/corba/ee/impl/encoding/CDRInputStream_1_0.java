@@ -542,7 +542,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             // Microbenchmarks are showing a loop of ByteBuffer.get(int) being
             // faster than ByteBuffer.get(byte[], int, int).
             for (int i=0; i<bytes; i++) {
-                c[numRead+i] = (char) (bbwi.getByteBuffer().get() & 0xFF);
+                c[numRead+i] = (char) (bbwi.get() & 0xFF);
             }
             numRead += bytes;
         }
@@ -600,32 +600,24 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     @CdrRead
-    public final void read_octet_array(byte[] b, int offset, int length) {
-        if ( b == null ) {
+    public final void read_octet_array(byte[] buffer, int offset, int length) {
+        if ( buffer == null ) {
             throw wrapper.nullParam();
         }
 
-        // Must call alignAndCheck at least once to ensure
-        // we aren't at the end of a chunk.  Of course, we
-        // should only call it if we actually need to read
-        // something, otherwise we might end up with an
-        // exception at the end of the stream.
         if (length == 0) {
             return;
         }
 
         alignAndCheck(1, 1);
 
-        int n = offset;
-        while (n < length+offset) {
-
+        int numWritten = 0;
+        while (numWritten < length) {
             if (!bbwi.hasRemaining()) grow(1, 1);
-            int avail = bbwi.remaining();
-            int wanted = (length + offset) - n;
-            int bytes = (wanted < avail) ? wanted : avail;
-            bbwi.getByteBuffer().get(b, n, bytes);
 
-            n += bytes;
+            int count = Math.min(length - numWritten, bbwi.remaining());
+            bbwi.get(buffer, numWritten + offset, count);
+            numWritten += count;
         }
     }
 
@@ -2171,7 +2163,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             // allocating and copying.
             int pos = bbwi.position();
             ByteBuffer bb = bbwi.getByteBuffer().slice();
-            char[] result = converter.getChars(bb, bbwi.position(),numBytes);
+            char[] result = converter.getChars(bb, bbwi.position(), numBytes);
             bbwi.position(pos + numBytes);
             return result;
         } else {

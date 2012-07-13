@@ -298,14 +298,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
 
     @PrimitiveWrite
     public void write_octet(byte x) {
-        // The 'if' stmt is commented out since we need the alignAndReserve to
-        // be called, particularly when the first body byte is written,
-        // to induce header padding to align the body on a 8-octet boundary,
-        // for GIOP versions 1.2 and above. Refer to internalWriteOctetArray()
-        // method that also has a similar change.
         alignAndReserve(1, 1);
-
-        bbwi.getByteBuffer().put(x);
+        bbwi.put(x);
     }
 
     public final void write_boolean(boolean x) {
@@ -328,8 +322,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     }
 
     private void writeBigEndianWchar(char x) {
-        bbwi.getByteBuffer().put((byte) ((x >>> 8) & 0xFF));
-        bbwi.getByteBuffer().put((byte) (x & 0xFF));
+        bbwi.put((byte) ((x >>> 8) & 0xFF));
+        bbwi.put((byte) (x & 0xFF));
     }
 
     @PrimitiveWrite
@@ -450,30 +444,17 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
 
     // Performs no checks and doesn't tamper with chunking
     void internalWriteOctetArray(byte[] value, int offset, int length) {
-        int n = offset;
+        if (length == 0) return;
 
-        // This flag forces the alignAndReserve method to be called the
-        // first time an octet is written. This is necessary to ensure
-        // that the body is aligned on an 8-octet boundary. Note the 'if'
-        // condition inside the 'while' loop below. Also, refer to the
-        // write_octet() method that has a similar change.
-        boolean align = true;
+        alignAndReserve(1, 1);  // this gives the code the chance to do the eight-byte alignment, if needed
 
-        while (n < length + offset) {
-            int avail;
-            int bytes;
-            int wanted;
+        int numWritten = 0;
+        while (numWritten < length) {
+            if (!bbwi.hasRemaining()) alignAndReserve(1, 1);
 
-            if ((bbwi.position() + 1 > bbwi.limit()) || align) {
-                align = false;
-                alignAndReserve(1, 1);
-            }
-            avail = bbwi.limit() - bbwi.position();
-            wanted = (length + offset) - n;
-            bytes = (wanted < avail) ? wanted : avail;
-            bbwi.getByteBuffer().put(value, n, bytes);
-            bbwi.position(bbwi.getByteBuffer().position());
-            n += bytes;
+            int count = Math.min(length - numWritten, bbwi.remaining());
+            bbwi.put(value, offset + numWritten, count);
+            numWritten += count;
         }
     }
 

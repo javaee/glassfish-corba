@@ -65,7 +65,7 @@ public class BufferManagerWriteGrow extends BufferManagerWrite
         return orb.getORBData().getGIOPBufferSize();
     }
 
-    public void overflow( ByteBufferWithInfo bbwi, int numBytesNeeded ) {
+    public ByteBufferWithInfo overflow(ByteBufferWithInfo bbwi, int numBytesNeeded) {
         int newLength = bbwi.limit() * 2;
 
         while (bbwi.position() + numBytesNeeded >= newLength)
@@ -75,15 +75,11 @@ public class BufferManagerWriteGrow extends BufferManagerWrite
         ByteBuffer newBB = byteBufferPool.getByteBuffer(newLength);
 
         bbwi.flip();
-        newBB.put(bbwi.getByteBuffer());
+        newBB.put(bbwi.toByteBuffer());
 
         byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
 
-        // update the byteBuffer with a larger ByteBuffer
-        bbwi.setByteBuffer(newBB);
-
-        // set this buffer's length to newLength.
-        bbwi.limit(newLength);
+        return new ByteBufferWithInfo(newBB, newBB.position());
     }
 
     @Override

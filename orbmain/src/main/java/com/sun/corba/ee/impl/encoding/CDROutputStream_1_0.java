@@ -275,7 +275,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     // fragmentation policy for IIOP 1.1.
     //
     protected void grow(int align, int n) {
-        bufferManagerWrite.overflow(bbwi, n);
+        bbwi = bufferManagerWrite.overflow(bbwi, n);
     }
 
     public final void putEndian() throws SystemException {
@@ -1159,12 +1159,12 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     //
 
     public void writeTo(java.io.OutputStream s) throws java.io.IOException {
-        byte[] tmpBuf = ORBUtility.getByteBufferArray(bbwi.getByteBuffer());
+        byte[] tmpBuf = ORBUtility.getByteBufferArray(bbwi.toByteBuffer());
         s.write(tmpBuf, 0, bbwi.position());
     }
 
     public void writeOctetSequenceTo(org.omg.CORBA.portable.OutputStream s) {
-        byte[] buf = ORBUtility.getByteBufferArray(bbwi.getByteBuffer());
+        byte[] buf = ORBUtility.getByteBufferArray(bbwi.toByteBuffer());
         s.write_long(bbwi.position());
         s.write_octet_array(buf, 0, bbwi.position());
     }
@@ -1725,12 +1725,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
 
             // release this stream's ByteBuffer to the pool
             ByteBufferPool byteBufferPool = orb.getByteBufferPool();
-            if (orb.cdrDebugFlag) {
-                int bbAddress = System.identityHashCode(bbwi.getByteBuffer());
-                releaseByteBuffer(bbAddress);
-            }
             byteBufferPool.releaseByteBuffer(getByteBuffer());
-            bbwi.setByteBuffer(null);
+            bbwi.releaseByteBuffer();
             bbwi = null;
         }
     }

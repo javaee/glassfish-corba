@@ -80,10 +80,10 @@ public class BufferManagerWriteStream extends BufferManagerWrite
         return orb.getORBData().getGIOPFragmentSize();
     }
 
-    public void overflow( ByteBufferWithInfo bbwi, int numBytesNeeded )
+    public ByteBufferWithInfo overflow(ByteBufferWithInfo bbwi, int numBytesNeeded)
     {
         // Set the fragment's moreFragments field to true
-        MessageBase.setFlag(bbwi.getByteBuffer(), Message.MORE_FRAGMENTS_BIT);
+        MessageBase.setFlag(bbwi, Message.MORE_FRAGMENTS_BIT);
 
         try {
             sendFragment(false);
@@ -128,6 +128,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
         FragmentMessage header = ((CDROutputObject)outputObject).getMessageHeader().createFragmentMessage();
 
         header.write(((CDROutputObject)outputObject));
+        return bbwi;
     }
 
     @Override

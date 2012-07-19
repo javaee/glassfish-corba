@@ -144,11 +144,11 @@ public class BufferManagerReadStream
             // VERY IMPORTANT
             // Release bbwi.byteBuffer to the ByteBufferPool only if
             // this BufferManagerStream is not marked for potential restore.
-            if (!markEngaged && bbwi != null && bbwi.getByteBuffer() != null) {
+            if (!markEngaged && bbwi != null && bbwi.hasByteBuffer()) {
                 ByteBufferPool byteBufferPool = getByteBufferPool();
 
                 byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
-                bbwi.setByteBuffer(null);
+                bbwi.releaseByteBuffer();
             }
         }
         return result;
@@ -189,7 +189,7 @@ public class BufferManagerReadStream
             ByteBufferWithInfo abbwi;
             while (fragmentQueue.size() != 0) {
                 abbwi = fragmentQueue.dequeue();
-                if (abbwi != null && abbwi.getByteBuffer() != null) {
+                if (abbwi != null && abbwi.hasByteBuffer()) {
                     byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
                 }
             }
@@ -207,7 +207,7 @@ public class BufferManagerReadStream
             //            not be released to the ByteBufferPool.
 
             for (ByteBufferWithInfo abbwi : fragmentStack) {
-                if (abbwi != null && abbwi.getByteBuffer() != null) {
+                if (abbwi != null && abbwi.hasByteBuffer()) {
                     if (inputBbAddress != System.identityHashCode(abbwi.getByteBuffer())) {
                         byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
                     }

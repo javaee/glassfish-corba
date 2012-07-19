@@ -85,7 +85,7 @@ public abstract class BufferManagerWrite
     /*
      * Invoked when we run out of room to write. Must either expand the buffer or send it as a fragment and clear it.
      */
-    public abstract void overflow( ByteBufferWithInfo bbwi, int numBytesNeeded );
+    public abstract ByteBufferWithInfo overflow(ByteBufferWithInfo bbwi, int numBytesNeeded);
 
     /**
      * Returns true if this buffer manager fragments when an overflow occurs.

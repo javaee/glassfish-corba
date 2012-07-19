@@ -45,6 +45,7 @@ import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 
+import com.sun.corba.ee.impl.encoding.ByteBufferWithInfo;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 import org.omg.IOP.TaggedProfile;
@@ -752,10 +753,10 @@ public abstract class MessageBase implements Message{
     /**
      * Set a flag in the given buffer (fragment bit, byte order bit, etc)
      */
-    public static void setFlag(ByteBuffer byteBuffer, int flag) {
-        byte b = byteBuffer.get(6);
-        b |= flag;
-        byteBuffer.put(6,b);
+    public static void setFlag(ByteBufferWithInfo bbwi, byte flag) {
+        byte b = bbwi.get(6);
+        b |= (int) flag;
+        bbwi.put(6, b);
     }
 
     private static void AreFragmentsAllowed(byte major, byte minor, byte flag,
@@ -811,9 +812,9 @@ public abstract class MessageBase implements Message{
                 break;
             case ORBConstants.ADDR_DISP_HANDLE_ALL :
                 break;
-            default : 
+            default :
                 throw wrapper.orbTargetAddrPreferenceInExtractObjectkeyInvalid() ;
-        }    
+        }
 
         try {
             ObjectKeyCacheEntry result = null ;
@@ -821,7 +822,7 @@ public abstract class MessageBase implements Message{
                 case KeyAddr.value :
                     byte[] objKey = target.object_key();
                     if (objKey != null) { // AddressingDisposition::KeyAddr
-                        return orb.extractObjectKeyCacheEntry(objKey); 
+                        return orb.extractObjectKeyCacheEntry(objKey);
                     }
                     break;
                 case ProfileAddr.value :
@@ -842,7 +843,7 @@ public abstract class MessageBase implements Message{
                         return new ObjectKeyCacheEntryNoObjectAdapterImpl( objectKey ) ;
                     }
                     break;
-                default : 
+                default :
                     // this cannot happen
                     // There is no need for a explicit exception, since the
                     // TargetAddressHelper.read() would have raised a BAD_OPERATION

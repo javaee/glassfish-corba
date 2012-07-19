@@ -54,6 +54,7 @@ import com.sun.corba.ee.impl.transport.MessageTraceManagerImpl;
 
 import java.io.IOException ;
 import java.io.ObjectInputStream;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.DataOutputStream;
@@ -83,7 +84,32 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
 
     // todo this is only used in a pair of legacy tests. Rewrite them as unit tests and remove this method.
     public void sendFirstFragment() {
-        getBufferManager().overflow(impl.getByteBufferWithInfo(), 0);
+        ByteBufferWithInfo bbwi = getBufferManager().overflow(impl.getByteBufferWithInfo(), 0);
+        setPrivateFieldValue(impl, "bbwi", bbwi);
+    }
+
+    protected void setPrivateFieldValue(Object obj, String fieldName, Object value) {
+        try {
+            Class theClass = obj.getClass();
+            setPrivateFieldValue(obj, theClass, fieldName, value);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void setPrivateFieldValue(Object obj, Class theClass, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
+        try {
+            Field field = theClass.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(obj, value);
+        } catch (NoSuchFieldException e) {
+            if (theClass.equals(Object.class))
+                throw e;
+            else
+                setPrivateFieldValue(obj, theClass.getSuperclass(), fieldName, value);
+        }
     }
 
     // This needed only to get FindBugs to shut up about transient fields.

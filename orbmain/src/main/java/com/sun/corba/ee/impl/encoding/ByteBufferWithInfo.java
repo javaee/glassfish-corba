@@ -41,20 +41,19 @@
 package com.sun.corba.ee.impl.encoding;
 
 import com.sun.corba.ee.spi.trace.Transport;
-import org.glassfish.grizzly.Buffer;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 
 @Transport
-class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
+public class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
 {
     private ByteBuffer byteBuffer;
     private ByteOrder order;
 
     ByteBufferWithInfo(ByteBuffer byteBuffer, int index) {
-        this.setByteBuffer(byteBuffer);
+        this.byteBuffer = byteBuffer;
         position(index);
     }
 
@@ -69,7 +68,7 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
         //            ByteBuffer.duplicate() we'll get independent
         //            positions and limits, but the same ByteBuffer,
         //            (which is what we want).
-        this.setByteBuffer(bbwi.getByteBuffer().duplicate());
+        this.byteBuffer = bbwi.byteBuffer.duplicate();
         this.limit(bbwi.limit());
         this.position(bbwi.position());
     }
@@ -78,36 +77,49 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
         this(byteBuffer, 0);
     }
 
+    public byte get(int index) {
+        return byteBuffer.get(index);
+    }
+
+    public ByteBufferWithInfo put(int index, byte b) {
+        byteBuffer.put(index, b);
+        return this;
+    }
+
+    void releaseByteBuffer() {
+        this.byteBuffer = null;
+    }
+
+    boolean hasByteBuffer() {
+        return byteBuffer != null;
+    }
+
     public ByteBuffer toByteBuffer() {
-        return getByteBuffer();
+        return byteBuffer;
     }
 
     public ByteBufferWithInfo get(byte[] byteArray) {
-        getByteBuffer().get(byteArray);
+        byteBuffer.get(byteArray);
         return this;
     }
 
     public ByteBufferWithInfo get(byte[] buffer, int offset, int length) {
-        getByteBuffer().get(buffer, offset, length);
+        byteBuffer.get(buffer, offset, length);
         return this;
     }
 
     public ByteBufferWithInfo put(byte x) {
-        getByteBuffer().put(x);
+        byteBuffer.put(x);
         return this;
     }
 
     public ByteBufferWithInfo put(byte[] buffer, int offset, int length) {
-        getByteBuffer().put(buffer, offset, length);
+        byteBuffer.put(buffer, offset, length);
         return this;
     }
 
     public ByteBuffer getByteBuffer() {
         return byteBuffer;
-    }
-
-    public void setByteBuffer(ByteBuffer byteBuffer) {
-        this.byteBuffer = byteBuffer;
     }
 
     public ByteOrder order() {
@@ -120,7 +132,7 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
     }
 
     public byte get() {
-        return getByteBuffer().get();
+        return byteBuffer.get();
     }
 
     public boolean hasRemaining() {
@@ -135,11 +147,11 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
         int b1, b2;
 
         if (isLittleEndian()) {
-            b2 = (getByteBuffer().get()) & 0x000000FF;
-            b1 = (getByteBuffer().get() << 8) & 0x0000FF00;
+            b2 = (byteBuffer.get()) & 0x000000FF;
+            b1 = (byteBuffer.get() << 8) & 0x0000FF00;
         } else {
-            b1 = (getByteBuffer().get() << 8) & 0x0000FF00;
-            b2 = (getByteBuffer().get()) & 0x000000FF;
+            b1 = (byteBuffer.get() << 8) & 0x0000FF00;
+            b2 = (byteBuffer.get()) & 0x000000FF;
         }
 
         return (short) (b1 | b2);
@@ -168,15 +180,15 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
         int b1, b2, b3, b4;
 
         if (isLittleEndian()) {
-            b4 = getByteBuffer().get() & 0xFF;
-            b3 = getByteBuffer().get() & 0xFF;
-            b2 = getByteBuffer().get() & 0xFF;
-            b1 = getByteBuffer().get() & 0xFF;
+            b4 = byteBuffer.get() & 0xFF;
+            b3 = byteBuffer.get() & 0xFF;
+            b2 = byteBuffer.get() & 0xFF;
+            b1 = byteBuffer.get() & 0xFF;
         } else {
-            b1 = getByteBuffer().get() & 0xFF;
-            b2 = getByteBuffer().get() & 0xFF;
-            b3 = getByteBuffer().get() & 0xFF;
-            b4 = getByteBuffer().get() & 0xFF;
+            b1 = byteBuffer.get() & 0xFF;
+            b2 = byteBuffer.get() & 0xFF;
+            b3 = byteBuffer.get() & 0xFF;
+            b4 = byteBuffer.get() & 0xFF;
         }
 
         return (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
@@ -184,60 +196,60 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
 
 
     public ByteBufferWithInfo putLong(long x) {
-        getByteBuffer().put((byte) ((x >>> 56) & 0xFF));
-        getByteBuffer().put((byte) ((x >>> 48) & 0xFF));
-        getByteBuffer().put((byte) ((x >>> 40) & 0xFF));
-        getByteBuffer().put((byte) ((x >>> 32) & 0xFF));
-        getByteBuffer().put((byte) ((x >>> 24) & 0xFF));
-        getByteBuffer().put((byte) ((x >>> 16) & 0xFF));
-        getByteBuffer().put((byte) ((x >>> 8) & 0xFF));
-        getByteBuffer().put((byte) (x & 0xFF));
+        byteBuffer.put((byte) ((x >>> 56) & 0xFF));
+        byteBuffer.put((byte) ((x >>> 48) & 0xFF));
+        byteBuffer.put((byte) ((x >>> 40) & 0xFF));
+        byteBuffer.put((byte) ((x >>> 32) & 0xFF));
+        byteBuffer.put((byte) ((x >>> 24) & 0xFF));
+        byteBuffer.put((byte) ((x >>> 16) & 0xFF));
+        byteBuffer.put((byte) ((x >>> 8) & 0xFF));
+        byteBuffer.put((byte) (x & 0xFF));
         return this;
     }
 
     public ByteBufferWithInfo putInt(int x) {
-        getByteBuffer().put((byte) ((x >>> 24) & 0xFF));
-        getByteBuffer().put((byte) ((x >>> 16) & 0xFF));
-        getByteBuffer().put((byte) ((x >>> 8) & 0xFF));
-        getByteBuffer().put((byte) (x & 0xFF));
+        byteBuffer.put((byte) ((x >>> 24) & 0xFF));
+        byteBuffer.put((byte) ((x >>> 16) & 0xFF));
+        byteBuffer.put((byte) ((x >>> 8) & 0xFF));
+        byteBuffer.put((byte) (x & 0xFF));
         return this;
     }
 
     public ByteBufferWithInfo putShort(short x) {
-        getByteBuffer().put((byte) ((x >>> 8) & 0xFF));
-        getByteBuffer().put((byte) (x & 0xFF));
+        byteBuffer.put((byte) ((x >>> 8) & 0xFF));
+        byteBuffer.put((byte) (x & 0xFF));
         return this;
     }
 
     public int capacity() {
-        return getByteBuffer().capacity();
+        return byteBuffer.capacity();
     }
 
     public int limit() {
-        return getByteBuffer().limit();
+        return byteBuffer.limit();
     }
 
     public int position() {
-        return getByteBuffer().position();
+        return byteBuffer.position();
     }
 
     public ByteBufferWithInfo position(int newPosition) {
-        getByteBuffer().position(newPosition);
+        byteBuffer.position(newPosition);
         return this;
     }
 
     public ByteBufferWithInfo flip() {
-        getByteBuffer().flip();
+        byteBuffer.flip();
         return this;
     }
 
     public ByteBufferWithInfo limit(int theLength) {
-        getByteBuffer().limit(theLength);
+        byteBuffer.limit(theLength);
         return this;
     }
 
     public ByteBufferWithInfo slice() {
-        ByteBufferWithInfo bufferWithInfo = new ByteBufferWithInfo(getByteBuffer().slice());
+        ByteBufferWithInfo bufferWithInfo = new ByteBufferWithInfo(byteBuffer.slice());
         bufferWithInfo.order(order());
         return bufferWithInfo;
     }
@@ -247,7 +259,7 @@ class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
 
         str.append(" length = ").append(limit());
         str.append(" position = ").append(position());
-        str.append(" byteBuffer = ").append(getByteBuffer() == null ? "null" : "not null");
+        str.append(" byteBuffer = ").append(byteBuffer == null ? "null" : "not null");
 
         return str.toString();
     }

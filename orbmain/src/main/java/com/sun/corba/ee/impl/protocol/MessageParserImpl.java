@@ -49,7 +49,6 @@ import com.sun.corba.ee.spi.protocol.RequestId;
 import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.corba.ee.spi.protocol.MessageParser;
 
-import com.sun.corba.ee.impl.misc.ORBUtility;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.ee.spi.trace.Giop;
@@ -103,108 +102,6 @@ public class MessageParserImpl implements MessageParser {
         return expectingMoreData;
     }
 
-    @InfoMethod
-    private void display( String msg ) { }
-
-    @InfoMethod
-    private void display( String msg, int value ) { }
-
-    @InfoMethod
-    private void display( String msg, Object value ) { }
-
-    
-    /**
-     * If there are sufficient bytes in the <code>ByteBuffer</code> to compose a
-     * <code>Message</code>, then return a newly initialized <code>Message</code>.
-     * Otherwise, return null.
-     *
-     * The first time <code>parseBytes</code> is invoked, it is assumed the
-     * <code>ByteBuffer.position()</code> is pointing to the beginning of a
-     * GIOP message and <code>ByteBuffer.limit()</code> is pointing to the
-     * end of the data in <code>ByteBuffer</code>.
-     *
-     * When this method exits, <code>this.nextMsgStartPos</code> points to the
-     * location in the ByteBuffer where the beginning of the next
-     * <code>Message</code> begins.  If there is no partial <code>Message</code>
-     * remaining in this <code>ByteBuffer</code> and there are message fragment
-     * request ids awaiting a final fragment when this method exits, this
-     * method will set <code>this.expectingMoreData</code> to <code>false</code>.
-     * Otherwise, it will be set to <code>true</code>.
-     *
-     * Callees of this method may check <code>isExpectingMoreData()</code> to
-     * determine if this <code>MessageParser</code> is expecting more data to
-     * complete a protocol data unit.  Callees may also check
-     * <code>hasMoreBytesToParse()</code> to determine if this
-     * <code>MessageParser</code> has more data to parse in the given
-     * <code>ByteBuffer</code>.
-     *
-     * Use cases and resulting states:
-     * 1.) Not enough bytes to parse a GIOP header
-     *     . moreBytesToParse = false
-     *     . expectingMoreData = true
-     *     . nextMsgStartPos is unchanged
-     *     . byteBuffer.position = byteBuffer.limit
-     *     . byteBuffer.limit = byteBuffer.capacity
-     *     . sizeNeeded = orb.getORBData().getReadByteBufferSize()
-     * 2.) Parsed a GIOP header, but not enough bytes to parse GIOP body
-     *     . moreBytesToParse = false
-     *     . expectingMoreData = true
-     *     . nextMsgStartPos is unchanged
-     *     . byteBuffer.position = byteBuffer.limit
-     *     . byteBuffer.limit = byteBuffer.capacity
-     *     . sizeNeeded = message.getSize()
-     * 3.) Parsed a GIOP fragment message
-     *     . moreBytesToParse = true
-     *     . expectingMoreData = true
-     *     . nextMsgStartPos = old nextMsgStartPos + message size
-     *     . byteBuffer.position = new nextMsgStartPos
-     *     . byteBuffer.limit unchanged
-     *     . sizeNeeded = orb.getORBData().getReadByteBufferSize()
-     * 4.) Parsed a GIOP final fragment and waiting on other request fragments
-     *     . moreBytesToParse = true
-     *     . expectingMoreData = true
-     *     . nextMsgStartPos = old nextMsgStartPos + message size
-     *     . byteBuffer.position = new nextMsgStartPos
-     *     . byteBuffer.limit unchanged
-     *     . sizeNeeded = orb.getORBData().getReadByteBufferSize()
-     * 5.) Parsed a GIOP final fragment, not waiting on other request fragments
-     *     and more bytes in byteBuffer to be parsed
-     *     . moreBytesToParse = true
-     *     . expectingMoreData = false
-     *     . nextMsgStartPos = old nextMsgStartPos + message size
-     *     . byteBuffer.position = new nextMsgStartPos
-     *     . byteBuffer.limit unchanged
-     *     . sizeNeeded = orb.getORBData().getReadByteBufferSize()
-     * 6.) Parsed a GIOP final fragment, not waiting on other request fragments
-     *     and no more bytes in byteBuffer to be parsed
-     *     . moreBytesToParse = false
-     *     . expectingMoreData = false
-     *     . nextMsgStartPos = old nextMsgStartPos + message size
-     *     . byteBuffer.position = new nextMsgStartPos
-     *     . byteBuffer.limit unchanged
-     *     . sizeNeeded = orb.getORBData().getReadByteBufferSize()
-     *
-     * @return <code>Message</code> if one is found in the <code>ByteBuffer</code>.
-     *         Otherwise, returns null.
-     */
-
-    @Giop
-    private void parseBytesGiopInfo( ByteBuffer msgByteBuffer,
-        Message message ) {
-        if (orb.giopDebugFlag) {
-            // For debugging purposes, create view buffer
-            ByteBuffer viewBuf = msgByteBuffer.asReadOnlyBuffer();
-            viewBuf.position(viewBuf.limit());
-            RequestId requestId =
-                      MessageBase.getRequestIdFromMessageBytes(message);
-            display( "Message Type", message.getType() ) ;
-            display( "Request Id", requestId.toString() ) ;
-            display( "Successfully parsed with sliced ByteBuffer", 
-                msgByteBuffer.toString() ) ;
-            ORBUtility.printBuffer("GIOP Message Body",
-                    viewBuf, System.out);
-        }
-    }
 
     @Transport
     public Message parseBytes(ByteBuffer byteBuffer, Connection connection) {
@@ -228,20 +125,13 @@ public class MessageParserImpl implements MessageParser {
                 byteBuffer.position(nextMsgStartPos).limit(savedLimit);
                 message.setByteBuffer(msgByteBuffer);
 
-                parseBytesGiopInfo( msgByteBuffer, message );
-
                 if (MessageBase.messageSupportsFragments(message)) {
                     // are there more fragments to follow?
                     if (message.moreFragmentsToFollow()) {
                         // Add to fragmentList if not already there
-                        RequestId requestId =
-                              MessageBase.getRequestIdFromMessageBytes(message);
+                        RequestId requestId = MessageBase.getRequestIdFromMessageBytes(message);
                         if (!fragmentList.contains(requestId)) {
                             fragmentList.add(requestId);
-                            display( "Added to fragmentList", requestId ) ;
-                        } else {
-                            display( "fragmentList alreadty has an entry for",
-                                requestId ) ;
                         }
                     } else {
                         // no fragments to follow
@@ -252,8 +142,6 @@ public class MessageParserImpl implements MessageParser {
                                 MessageBase.getRequestIdFromMessageBytes(message);
                             if (fragmentList.size() > 0 &&
                                 fragmentList.remove(requestId)) {
-                                display( "Removed from fragmentList", 
-                                    requestId ) ;
                             }
                         }
                     }
@@ -279,15 +167,6 @@ public class MessageParserImpl implements MessageParser {
                 }
                 sizeNeeded = orb.getORBData().getReadByteBufferSize();
             } else {
-                if (orb.transportDebugFlag) {
-                    // not enough bytes available for message body
-                    display( "Not enough bytes available in ByteBuffer for a "
-                        + "complete GIOP message: bytes available ", 
-                        bytesInBuffer ) ;
-                    display( "bytes needed", message.getSize() ) ;
-                    display( "ByteBuffer state", byteBuffer.toString() ) ;
-                }
-
                 // set state for next parseBytes invocation
                 moreBytesToParse = false;
                 expectingMoreData = true;
@@ -298,13 +177,6 @@ public class MessageParserImpl implements MessageParser {
             }
         } else {
             // not enough bytes for message header
-            if (orb.transportDebugFlag) {
-                // not enough bytes available for message body
-                display( "Not enough bytes available in ByteBuffer "
-                    + "to parse 12-byte GIOP header" ) ;
-                display( "bytes available", bytesInBuffer) ;
-                display( "ByteBuffer state", byteBuffer.toString() ) ;
-            }
             // set state for next parseBytes invocation
             moreBytesToParse = false;
             expectingMoreData = true;
@@ -353,25 +225,13 @@ public class MessageParserImpl implements MessageParser {
         sb.append(toStringPrefix()).append("]");
         return sb.toString();
     }
-    
-    /**
-     * Return a string representing this MessageParser's state and
-     * a ByteBuffer's state.
-     */
-    private String stateString(ByteBuffer byteBuffer) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(toStringPrefix()).append(" ").append(byteBuffer.toString());
-        return sb.toString();
-    }
-    
+
     /** Return a common String prefix representing this MessageParser's state */
     private String toStringPrefix() {
         StringBuilder sb = new StringBuilder();
-        sb.append("MessageParserImpl[nextMsgStartPos=" + nextMsgStartPos +
-                ", expectingMoreData=" + expectingMoreData +
-                ", moreBytesToParse=" + moreBytesToParse +
-                ", fragmentList size=" + fragmentList.size() +
-                ", size needed=" + sizeNeeded + "]");
+        sb.append("MessageParserImpl[nextMsgStartPos=").append(nextMsgStartPos).append(", expectingMoreData=").append(expectingMoreData);
+        sb.append(", moreBytesToParse=").append(moreBytesToParse).append(", fragmentList size=").append(fragmentList.size());
+        sb.append(", size needed=").append(sizeNeeded).append("]");
         return sb.toString();
     }
 

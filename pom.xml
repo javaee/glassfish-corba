@@ -96,7 +96,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>idlj-maven-plugin</artifactId>
-                    <version>1.1.1</version>
+                    <version>1.2</version>
                     <executions>
                         <execution>
                             <goals>
@@ -119,6 +119,22 @@
                                 </additionalArguments>
                             </source>
                         </sources>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>rmic-maven-plugin</artifactId>
+                    <version>1.2.0</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>test-rmic</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <iiop>true</iiop>
                     </configuration>
                 </plugin>
 

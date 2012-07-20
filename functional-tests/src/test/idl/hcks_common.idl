@@ -1,0 +1,51 @@
+    typedef sequence<octet> idlJString;
+
+    typedef sequence<long, 10000> IntSeq10000;
+    typedef octet idlOctetArray10000[10000];
+
+    valuetype idlIntSeqValueType IntSeq10000;
+    valuetype idlOctetArrayValueType idlOctetArray10000;
+
+    exception idlExampleException { string reason; };
+    /*
+    abstract valuetype idlAbstractValueType
+    {
+        short getShortA();
+        void  setShortA(in short s);
+    };
+    */
+    valuetype idlValueTypeA /*: idlAbstractValueType*/
+    {
+        private short a;
+        factory init (in short a);
+    };
+
+    valuetype idlValueTypeB : truncatable idlValueTypeA
+    {
+        private short b;
+        factory init (in short a, in short b);
+    };
+
+    custom valuetype idlValueTypeC : truncatable idlValueTypeB
+    {
+        private short c;
+        factory init (in short a, in short b, in short c);
+    };
+
+    custom valuetype idlValueTypeD
+    {
+        private short d;
+        factory init (in short d);
+    };
+
+    valuetype idlValueTypeE
+    {
+        public IntSeq10000 intSeq;
+        public idlOctetArray10000 octetArray;
+    };
+
+    struct recursiveType {
+        string a;
+        string b;
+        sequence<recursiveType,1> s;
+    };

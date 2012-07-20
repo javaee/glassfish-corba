@@ -236,7 +236,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     void init(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, int bufferSize, ByteOrder byteOrder, BufferManagerRead bufferManager) {
         this.orb = (ORB)orb;
         this.bufferManagerRead = bufferManager;
-        this.bbwi = new ByteBufferWithInfo( byteBuffer,0);
+        this.bbwi = new ByteBufferWithInfo(byteBuffer);
+        this.bbwi.position(0);
         this.bbwi.order(byteOrder);
         this.bbwi.limit(bufferSize);
         this.markAndResetHandler = bufferManagerRead.getMarkAndResetHandler();
@@ -2041,7 +2042,9 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             isChunked_ = isChunked;
             valueHandler_ = valueHandler;
             specialNoOptionalDataState_ = specialNoOptionalDataState;
-            bbwi_ = new ByteBufferWithInfo(bbwi);
+            bbwi_ = bbwi.duplicate();
+            bbwi_.limit(bbwi.limit());
+            bbwi_.position(bbwi.position());
         }
     }
 

@@ -47,33 +47,12 @@ import java.nio.ByteOrder;
 
 
 @Transport
-public class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
+public class ByteBufferWithInfo
 {
     private ByteBuffer byteBuffer;
 
-    ByteBufferWithInfo(ByteBuffer byteBuffer, int index) {
-        this.byteBuffer = byteBuffer;
-        position(index);
-    }
-
-    // Shallow copy constructor
-    ByteBufferWithInfo(ByteBufferWithInfo bbwi) {
-        // IMPORTANT: Cannot simply assign the reference of
-        //            bbwi.byteBuffer to this.byteBuffer since
-        //            bbwi's can be restored via restore-able
-        //            stream in CDRInputObject_1_0.java. To
-        //            restore a bbwi, we must also keep the
-        //            bbwi's position and limit. If we use
-        //            ByteBuffer.duplicate() we'll get independent
-        //            positions and limits, but the same ByteBuffer,
-        //            (which is what we want).
-        this.byteBuffer = bbwi.byteBuffer.duplicate();
-        this.limit(bbwi.limit());
-        this.position(bbwi.position());
-    }
-
     ByteBufferWithInfo(ByteBuffer byteBuffer) {
-        this(byteBuffer, 0);
+        this.byteBuffer = byteBuffer;
     }
 
     public byte get(int index) {
@@ -83,14 +62,6 @@ public class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
     public ByteBufferWithInfo put(int index, byte b) {
         byteBuffer.put(index, b);
         return this;
-    }
-
-    void releaseByteBuffer() {
-        this.byteBuffer = null;
-    }
-
-    boolean hasByteBuffer() {
-        return byteBuffer != null;
     }
 
     public ByteBuffer toByteBuffer() {
@@ -135,11 +106,11 @@ public class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
     }
 
     public boolean hasRemaining() {
-        return remaining() > 0;
+        return byteBuffer.hasRemaining();
     }
 
     public int remaining() {
-        return limit() - position();
+        return byteBuffer.remaining();
     }
 
     public short getShort() {
@@ -153,7 +124,6 @@ public class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
     public int getInt() {
         return byteBuffer.getInt();
     }
-
 
     public ByteBufferWithInfo putLong(long x) {
         byteBuffer.putLong(x);
@@ -198,19 +168,11 @@ public class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
     }
 
     public ByteBufferWithInfo slice() {
-        ByteBufferWithInfo bufferWithInfo = new ByteBufferWithInfo(byteBuffer.slice());
-        bufferWithInfo.order(order());
-        return bufferWithInfo;
+        return new ByteBufferWithInfo(byteBuffer.slice());
     }
 
-    public String toString() {
-        StringBuilder str = new StringBuilder("ByteBufferWithInfo:");
-
-        str.append(" length = ").append(limit());
-        str.append(" position = ").append(position());
-        str.append(" byteBuffer = ").append(byteBuffer == null ? "null" : "not null");
-
-        return str.toString();
+    ByteBufferWithInfo duplicate() {
+        return new ByteBufferWithInfo(byteBuffer.duplicate());
     }
 
 }

@@ -88,7 +88,8 @@ public class BufferManagerReadStream
 
     @Transport
     public void processFragment(ByteBuffer byteBuffer, FragmentMessage msg) {
-        ByteBufferWithInfo bbwi = new ByteBufferWithInfo( byteBuffer, msg.getHeaderLength());
+        ByteBufferWithInfo bbwi = new ByteBufferWithInfo(byteBuffer);
+        bbwi.position(msg.getHeaderLength());
 
         synchronized (fragmentQueue) {
             if (orb.transportDebugFlag) {
@@ -144,11 +145,8 @@ public class BufferManagerReadStream
             // VERY IMPORTANT
             // Release bbwi.byteBuffer to the ByteBufferPool only if
             // this BufferManagerStream is not marked for potential restore.
-            if (!markEngaged && bbwi != null && bbwi.hasByteBuffer()) {
-                ByteBufferPool byteBufferPool = getByteBufferPool();
-
-                byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
-                bbwi.releaseByteBuffer();
+            if (!markEngaged && bbwi != null) {
+                getByteBufferPool().releaseByteBuffer(bbwi.getByteBuffer());
             }
         }
         return result;
@@ -189,7 +187,7 @@ public class BufferManagerReadStream
             ByteBufferWithInfo abbwi;
             while (fragmentQueue.size() != 0) {
                 abbwi = fragmentQueue.dequeue();
-                if (abbwi != null && abbwi.hasByteBuffer()) {
+                if (abbwi != null) {
                     byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
                 }
             }
@@ -207,7 +205,7 @@ public class BufferManagerReadStream
             //            not be released to the ByteBufferPool.
 
             for (ByteBufferWithInfo abbwi : fragmentStack) {
-                if (abbwi != null && abbwi.hasByteBuffer()) {
+                if (abbwi != null) {
                     if (inputBbAddress != System.identityHashCode(abbwi.getByteBuffer())) {
                         byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
                     }
@@ -262,7 +260,10 @@ public class BufferManagerReadStream
                     new LinkedList<ByteBufferWithInfo>();
         }
 
-        fragmentStack.addFirst(new ByteBufferWithInfo(newFragment));
+        ByteBufferWithInfo bbwi = newFragment.duplicate();
+        bbwi.limit(newFragment.limit());
+        bbwi.position(newFragment.position());
+        fragmentStack.addFirst(bbwi);
     }
 
     public void reset() {

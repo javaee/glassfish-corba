@@ -185,6 +185,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
 
         this.bufferManagerWrite = bufferManager;
         this.bbwi = new ByteBufferWithInfo(allocateBuffer(orb, bufferManager, usePooledByteBuffers));
+        this.bbwi.position(0);
         this.streamFormatVersion = streamFormatVersion;
 
         createRepositoryIdHandlers();
@@ -1726,7 +1727,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
             // release this stream's ByteBuffer to the pool
             ByteBufferPool byteBufferPool = orb.getByteBufferPool();
             byteBufferPool.releaseByteBuffer(getByteBuffer());
-            bbwi.releaseByteBuffer();
             bbwi = null;
         }
     }

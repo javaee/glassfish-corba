@@ -79,7 +79,7 @@ public class BufferManagerWriteGrow extends BufferManagerWrite
 
         byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
 
-        return new ByteBufferWithInfo(newBB, newBB.position());
+        return new ByteBufferWithInfo(newBB);
     }
 
     @Override

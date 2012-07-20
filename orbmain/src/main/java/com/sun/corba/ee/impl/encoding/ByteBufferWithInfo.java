@@ -50,7 +50,6 @@ import java.nio.ByteOrder;
 public class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
 {
     private ByteBuffer byteBuffer;
-    private ByteOrder order;
 
     ByteBufferWithInfo(ByteBuffer byteBuffer, int index) {
         this.byteBuffer = byteBuffer;
@@ -123,11 +122,11 @@ public class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
     }
 
     public ByteOrder order() {
-        return order;
+        return byteBuffer.order();
     }
 
     public ByteBufferWithInfo order(ByteOrder byteOrder) {
-        order = byteOrder;
+        byteBuffer.order(byteOrder);
         return this;
     }
 
@@ -144,80 +143,30 @@ public class ByteBufferWithInfo // implements org.glassfish.grizzly.Buffer
     }
 
     public short getShort() {
-        int b1, b2;
-
-        if (isLittleEndian()) {
-            b2 = (byteBuffer.get()) & 0x000000FF;
-            b1 = (byteBuffer.get() << 8) & 0x0000FF00;
-        } else {
-            b1 = (byteBuffer.get() << 8) & 0x0000FF00;
-            b2 = (byteBuffer.get()) & 0x000000FF;
-        }
-
-        return (short) (b1 | b2);
+        return byteBuffer.getShort();
     }
 
     public long getLong() {
-        long i1, i2;
-
-        if (isLittleEndian()) {
-            i2 = getInt() & 0xFFFFFFFFL;
-            i1 = (long) getInt() << 32;
-        } else {
-            i1 = (long) getInt() << 32;
-            i2 = getInt() & 0xFFFFFFFFL;
-        }
-
-        return i1 | i2;
-    }
-
-    private boolean isLittleEndian() {
-        return order == ByteOrder.LITTLE_ENDIAN;
+        return byteBuffer.getLong();
     }
 
     public int getInt() {
-
-        int b1, b2, b3, b4;
-
-        if (isLittleEndian()) {
-            b4 = byteBuffer.get() & 0xFF;
-            b3 = byteBuffer.get() & 0xFF;
-            b2 = byteBuffer.get() & 0xFF;
-            b1 = byteBuffer.get() & 0xFF;
-        } else {
-            b1 = byteBuffer.get() & 0xFF;
-            b2 = byteBuffer.get() & 0xFF;
-            b3 = byteBuffer.get() & 0xFF;
-            b4 = byteBuffer.get() & 0xFF;
-        }
-
-        return (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
+        return byteBuffer.getInt();
     }
 
 
     public ByteBufferWithInfo putLong(long x) {
-        byteBuffer.put((byte) ((x >>> 56) & 0xFF));
-        byteBuffer.put((byte) ((x >>> 48) & 0xFF));
-        byteBuffer.put((byte) ((x >>> 40) & 0xFF));
-        byteBuffer.put((byte) ((x >>> 32) & 0xFF));
-        byteBuffer.put((byte) ((x >>> 24) & 0xFF));
-        byteBuffer.put((byte) ((x >>> 16) & 0xFF));
-        byteBuffer.put((byte) ((x >>> 8) & 0xFF));
-        byteBuffer.put((byte) (x & 0xFF));
+        byteBuffer.putLong(x);
         return this;
     }
 
     public ByteBufferWithInfo putInt(int x) {
-        byteBuffer.put((byte) ((x >>> 24) & 0xFF));
-        byteBuffer.put((byte) ((x >>> 16) & 0xFF));
-        byteBuffer.put((byte) ((x >>> 8) & 0xFF));
-        byteBuffer.put((byte) (x & 0xFF));
+        byteBuffer.putInt(x);
         return this;
     }
 
     public ByteBufferWithInfo putShort(short x) {
-        byteBuffer.put((byte) ((x >>> 8) & 0xFF));
-        byteBuffer.put((byte) (x & 0xFF));
+        byteBuffer.putShort(x);
         return this;
     }
 

@@ -45,7 +45,6 @@ import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 
-import com.sun.corba.ee.impl.encoding.ByteBufferWithInfo;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 import org.omg.IOP.TaggedProfile;
@@ -753,10 +752,10 @@ public abstract class MessageBase implements Message{
     /**
      * Set a flag in the given buffer (fragment bit, byte order bit, etc)
      */
-    public static void setFlag(ByteBufferWithInfo bbwi, byte flag) {
-        byte b = bbwi.get(6);
-        b |= (int) flag;
-        bbwi.put(6, b);
+    public static void setFlag(ByteBuffer byteBuffer, int flag) {
+        byte b = byteBuffer.get(6);
+        b |= flag;
+        byteBuffer.put(6, b);
     }
 
     private static void AreFragmentsAllowed(byte major, byte minor, byte flag,

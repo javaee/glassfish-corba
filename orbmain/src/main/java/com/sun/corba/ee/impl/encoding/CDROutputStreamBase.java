@@ -156,8 +156,6 @@ abstract class CDROutputStreamBase extends java.io.OutputStream
     abstract void dereferenceBuffer();
     public abstract ByteBuffer getByteBuffer();
 
-    public abstract ByteBufferWithInfo getByteBufferWithInfo();
-
     public abstract BufferManagerWrite getBufferManager();
 
     public abstract void write_fixed(java.math.BigDecimal bigDecimal, short digits, short scale);

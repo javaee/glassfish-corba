@@ -106,18 +106,18 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
     @Override
     protected void handleSpecialChunkBegin(int requiredSize) {
         // If we're chunking and the item won't fit in the buffer
-        if (inBlock && requiredSize + bbwi.position() > bbwi.limit()) {
+        if (inBlock && requiredSize + byteBuffer.position() > byteBuffer.limit()) {
             specialChunkCase() ;
 
             // Duplicating some code from end_block.  Compute
             // and write the total chunk length.
 
-            int oldSize = bbwi.position();
-            bbwi.position(blockSizeIndex - 4);
+            int oldSize = byteBuffer.position();
+            byteBuffer.position(blockSizeIndex - 4);
 
             //write_long(oldSize - blockSizeIndex);
             writeLongWithoutAlign((oldSize - blockSizeIndex) + requiredSize);
-            bbwi.position(oldSize);
+            byteBuffer.position(oldSize);
 
             // Set the special flag so we don't end the chunk when
             // we fragment
@@ -223,9 +223,9 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
         // is needed with respect to the next GIOP fragment
         // header since it ends on an 8 byte boundary.
 
-        bbwi.position(bbwi.position() + computeAlignment(align));
+        byteBuffer.position(byteBuffer.position() + computeAlignment(align));
 
-        if (bbwi.position() + n  > bbwi.limit())
+        if (byteBuffer.position() + n  > byteBuffer.limit())
             grow(align, n);
     }
 
@@ -241,7 +241,7 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
     protected void grow(int align, int n) {
         
         // Save the current size for possible post-fragmentation calculation
-        int oldSize = bbwi.position();
+        int oldSize = byteBuffer.position();
 
         // See notes where specialChunk is defined, as well as the
         // above notes for primitiveAcrossFragmentedChunk.
@@ -254,18 +254,18 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
         // we don't actually close the chunk in that case.
         boolean handleChunk = (inBlock && !specialChunk);
         if (handleChunk) {
-            int oldIndex = bbwi.position();
+            int oldIndex = byteBuffer.position();
 
-            bbwi.position(blockSizeIndex - 4);
+            byteBuffer.position(blockSizeIndex - 4);
 
             writeLongWithoutAlign((oldIndex - blockSizeIndex) + n);
 
-            bbwi.position(oldIndex);
+            byteBuffer.position(oldIndex);
         }
 
-        bbwi = bufferManagerWrite.overflow(bbwi, n);
+        byteBuffer = bufferManagerWrite.overflow(byteBuffer, n);
 
-        // At this point, if we fragmented, we should have a ByteBufferWithInfo
+        // At this point, if we fragmented, we should have a ByteBuffer
         // with the fragment header already marshaled.  The buflen and position
         // should be updated accordingly.
         if (bufferManagerWrite.isFragmentOnOverflow()) {
@@ -274,7 +274,7 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
             // At this point, oldSize is the entire length of the
             // previous buffer.  bbwi.position() is the length of the
             // fragment header of this buffer.
-            fragmentOffset += (oldSize - bbwi.position());
+            fragmentOffset += (oldSize - byteBuffer.position());
 
             // We just fragmented, and need to signal that we should
             // start a new chunk after writing the primitive.

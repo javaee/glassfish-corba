@@ -39,6 +39,7 @@
  */
 package com.sun.corba.ee.impl.encoding;
 
+import java.nio.ByteBuffer;
 import java.util.EmptyStackException;
 
 import sun.corba.Bridge;
@@ -80,16 +81,15 @@ public class BufferManagerWriteStream extends BufferManagerWrite
         return orb.getORBData().getGIOPFragmentSize();
     }
 
-    public ByteBufferWithInfo overflow(ByteBufferWithInfo bbwi, int numBytesNeeded)
-    {
+    protected ByteBuffer overflow(ByteBuffer byteBuffer, int numBytesNeeded) {
         // Set the fragment's moreFragments field to true
-        MessageBase.setFlag(bbwi, Message.MORE_FRAGMENTS_BIT);
+        MessageBase.setFlag(byteBuffer, Message.MORE_FRAGMENTS_BIT);
 
         try {
             sendFragment(false);
         } catch (SystemException se) {
-            // REVISIT: this part similar to 
-            // CorbaClientRequestDispatchImpl.beginRequest() 
+            // REVISIT: this part similar to
+            // CorbaClientRequestDispatchImpl.beginRequest()
             // and CorbaClientRequestDelegate.request()
             ContactInfoListIterator itr;
             try {
@@ -98,7 +98,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
                 // server side, don't reportException
                 throw se;
             }
-            
+
             // bug 6382377: must not lose exception in PI
             orb.getPIHandler().invokeClientPIEndingPoint( ReplyMessage.SYSTEM_EXCEPTION, se ) ;
 
@@ -106,7 +106,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
             if (retry) {
                 Bridge bridge = Bridge.get();
                 bridge.throwException(new RemarshalException());
-            } else { 
+            } else {
                 // re-throw the SystemException
                 throw se;
             }
@@ -117,18 +117,18 @@ public class BufferManagerWriteStream extends BufferManagerWrite
         // REVISIT - need to account for case when needed > available
         // even after fragmenting.  This is the large array case, so
         // the caller should retry when it runs out of space.
-        bbwi.position(0);
-        bbwi.limit(bbwi.capacity());
+        byteBuffer.position(0);
+        byteBuffer.limit(byteBuffer.capacity());
 
         // Now we must marshal in the fragment header/GIOP header
 
         // REVISIT - we can optimize this by not creating the fragment message
-        // each time.  
+        // each time.
 
         FragmentMessage header = ((CDROutputObject)outputObject).getMessageHeader().createFragmentMessage();
 
         header.write(((CDROutputObject)outputObject));
-        return bbwi;
+        return byteBuffer;
     }
 
     @Override

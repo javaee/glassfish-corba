@@ -146,7 +146,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     private static final int MAX_BLOCK_LENGTH = 0x7fffff00;
 
     protected BufferManagerRead bufferManagerRead;
-    protected ByteBufferWithInfo bbwi;
+    protected ByteBuffer byteBuffer;
 
     protected ORB orb;
     protected ValueHandler valueHandler = null;
@@ -224,9 +224,9 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             throw wrapper.couldNotDuplicateCdrInputStream( e ) ;
         }
         result.init(this.orb,
-                this.bbwi.getByteBuffer(),
-                this.bbwi.limit(),
-                this.bbwi.order(),
+                byteBuffer,
+                byteBuffer.limit(),
+                byteBuffer.order(),
                 this.bufferManagerRead);
 
         return result;
@@ -236,10 +236,10 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     void init(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, int bufferSize, ByteOrder byteOrder, BufferManagerRead bufferManager) {
         this.orb = (ORB)orb;
         this.bufferManagerRead = bufferManager;
-        this.bbwi = new ByteBufferWithInfo(byteBuffer);
-        this.bbwi.position(0);
-        this.bbwi.order(byteOrder);
-        this.bbwi.limit(bufferSize);
+        this.byteBuffer = byteBuffer;
+        this.byteBuffer.position(0);
+        this.byteBuffer.order(byteOrder);
+        this.byteBuffer.limit(bufferSize);
         this.markAndResetHandler = bufferManagerRead.getMarkAndResetHandler();
     }
 
@@ -336,7 +336,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // This probably means that we're in an RMI-IIOP
         // Serializable's readObject method or a custom marshaled
         // IDL type is reading too much/in an incorrect order
-        int requiredNumBytes = computeAlignment(bbwi.position(), align) + dataSize;
+        int requiredNumBytes = computeAlignment(byteBuffer.position(), align) + dataSize;
 
         if (blockLength != MAX_BLOCK_LENGTH &&
             blockLength < get_offset() + requiredNumBytes) {
@@ -348,7 +348,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         //             back to its original location.
         if (checkForEndTag) {
             int nextLong = read_long();
-            bbwi.position(bbwi.position() - 4);
+            byteBuffer.position(byteBuffer.position() - 4);
 
             // It was an end tag, so there wasn't enough data
             // left in the valuetype's encoding on the wire
@@ -365,10 +365,10 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
         // WARNING: Must compute real alignment after calling
         // checkBlockLength since it may move the position
-        int alignResult = computeAlignment(bbwi.position(), align);
-        bbwi.position(bbwi.position() + alignResult);
+        int alignResult = computeAlignment(byteBuffer.position(), align);
+        byteBuffer.position(byteBuffer.position() + alignResult);
 
-        if (bbwi.position() + n > bbwi.limit()) {
+        if (byteBuffer.position() + n > byteBuffer.limit()) {
             grow(align, n);
         }
     }
@@ -377,7 +377,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     // This can be overridden....
     @CdrRead
     protected void grow(int align, int n) {
-        bbwi = bufferManagerRead.underflow(bbwi);
+        byteBuffer = bufferManagerRead.underflow(byteBuffer);
 
     }
 
@@ -386,7 +386,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     //
 
     public final void consumeEndian() {
-        bbwi.order(read_boolean() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN );
+        ByteOrder byteOrder = read_boolean() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+        byteBuffer.order(byteOrder);
     }
 
     public final boolean read_boolean() {
@@ -407,19 +408,19 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         }
 
         // If we're talking to one of our legacy ORBs, do what they did:
-        return (char) bbwi.getShort();
+        return (char) byteBuffer.getShort();
     }
 
     @CdrRead
     public final byte read_octet() {
         alignAndCheck(1, 1);
-        return bbwi.get();
+        return byteBuffer.get();
     }
 
     @CdrRead
     public final short read_short() {
         alignAndCheck(2, 2);
-        return bbwi.getShort();
+        return byteBuffer.getShort();
     }
 
     public final short read_ushort() {
@@ -429,7 +430,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     @CdrRead
     public final int read_long() {
         alignAndCheck(4, 4);
-        return bbwi.getInt();
+        return byteBuffer.getInt();
     }
 
     public final int read_ulong() {
@@ -439,7 +440,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     @CdrRead
     public final long read_longlong() {
         alignAndCheck(8, 8);
-        return bbwi.getLong();
+        return byteBuffer.getLong();
     }
 
     public final long read_ulonglong() {
@@ -530,14 +531,14 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         int numRead = 0;
         while (numRead < len) {
 
-            if (!bbwi.hasRemaining()) grow(1, 1);
-            int avail = bbwi.remaining();
+            if (!byteBuffer.hasRemaining()) grow(1, 1);
+            int avail = byteBuffer.remaining();
             int wanted = len - numRead;
             int bytes = (wanted < avail) ? wanted : avail;
             // Microbenchmarks are showing a loop of ByteBuffer.get(int) being
             // faster than ByteBuffer.get(byte[], int, int).
             for (int i=0; i<bytes; i++) {
-                c[numRead+i] = (char) (bbwi.get() & 0xFF);
+                c[numRead+i] = (char) (byteBuffer.get() & 0xFF);
             }
             numRead += bytes;
         }
@@ -545,10 +546,10 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         //
         // Skip past terminating null byte
         //
-        if (bbwi.position() + 1 > bbwi.limit()) {
+        if (byteBuffer.position() + 1 > byteBuffer.limit()) {
             alignAndCheck(1, 1);
         }
-        bbwi.get();
+        byteBuffer.get();
 
         return new String(c);
     }
@@ -608,10 +609,10 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
         int numWritten = 0;
         while (numWritten < length) {
-            if (!bbwi.hasRemaining()) grow(1, 1);
+            if (!byteBuffer.hasRemaining()) grow(1, 1);
 
-            int count = Math.min(length - numWritten, bbwi.remaining());
-            bbwi.get(buffer, numWritten + offset, count);
+            int count = Math.min(length - numWritten, byteBuffer.remaining());
+            byteBuffer.get(buffer, numWritten + offset, count);
             numWritten += count;
         }
     }
@@ -1535,7 +1536,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 // again.  Even with fragmentation, we'll always be able
                 // to do this.
                 if (anEndTag != chunkedValueNestingLevel) {
-                    bbwi.position(bbwi.position() - 4);
+                    byteBuffer.position(byteBuffer.position() - 4);
                 }
             } else {
                 // When talking to Kestrel (JDK 1.3) or Ladybird (JDK 1.3.1), we use our old
@@ -1543,7 +1544,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 // isn't what we expected, we back up, assuming
                 // compaction.
                 if (anEndTag != end_flag) {
-                    bbwi.position(bbwi.position() - 4);
+                    byteBuffer.position(byteBuffer.position() - 4);
                 }
             }
 
@@ -1559,7 +1560,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     protected int get_offset() {
-        return bbwi.position();
+        return byteBuffer.position();
     }
 
     @InfoMethod
@@ -1585,7 +1586,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             blockLength += get_offset();  // _REVISIT_ unsafe, should use a Java long
         } else {
             blockLength = MAX_BLOCK_LENGTH;
-            bbwi.position(bbwi.position() - 4);
+            byteBuffer.position(byteBuffer.position() - 4);
         }
     }
 
@@ -1621,7 +1622,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // Peek next long
         int nextLong = read_long();
         peekNextLong( nextLong ) ;
-        bbwi.position(bbwi.position() - 4);
+        byteBuffer.position(byteBuffer.position() - 4);
 
         // We did find an end tag, so we're done.  readEndTag
         // should take care of making sure it's the correct
@@ -1809,7 +1810,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             return result;
         }
 
-        throw wrapper.badRepIdIndirection( bbwi.position() ) ;                              // todo test this case
+        throw wrapper.badRepIdIndirection(byteBuffer.position()) ;                              // todo test this case
     }
 
     @CdrRead
@@ -1832,7 +1833,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             return result;
         }
 
-        throw wrapper.badCodebaseIndirection( bbwi.position() ) ;                            // todo test this case
+        throw wrapper.badCodebaseIndirection(byteBuffer.position()) ;                            // todo test this case
     }
 
     /* DataInputStream methods */
@@ -1968,20 +1969,20 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     public int getBufferLength() {
-        return bbwi.limit();                                                                // todo test this
+        return byteBuffer.limit();
     }
 
     public void setBufferLength(int value) {
-        bbwi.limit(value);
+        byteBuffer.limit(value);
     }
 
     public void setIndex(int value) {
-        bbwi.position(value);
+        byteBuffer.position(value);
     }
 
     @Override
     public ByteOrder getByteOrder() {
-        return bbwi.order();
+        return byteBuffer.order();
     }
 
     public void orb(org.omg.CORBA.ORB orb) {
@@ -2003,12 +2004,12 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             int wanted;
             int bytes;
 
-            if (!bbwi.hasRemaining()) grow(1, 1);
-            int avail = bbwi.remaining();
+            if (!byteBuffer.hasRemaining()) grow(1, 1);
+            int avail = byteBuffer.remaining();
 
             wanted = len - n;
             bytes = (wanted < avail) ? wanted : avail;
-            bbwi.position(bbwi.position() + bytes);
+            byteBuffer.position(byteBuffer.position() + bytes);
             n += bytes;
         }
     }
@@ -2018,8 +2019,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     protected MarkAndResetHandler markAndResetHandler = null;
 
-    protected class StreamMemento
-    {
+    protected class StreamMemento {
         // These are the fields that may change after marking
         // the stream position, so we need to save them.
         private int blockLength_;
@@ -2029,11 +2029,10 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         private int stringIndirection_;
         private boolean isChunked_;
         private ValueHandler valueHandler_;
-        private ByteBufferWithInfo bbwi_;
+        private ByteBuffer byteBuffer_;
         private boolean specialNoOptionalDataState_;
 
-        public StreamMemento()
-        {
+        public StreamMemento() {
             blockLength_ = blockLength;
             end_flag_ = end_flag;
             chunkedValueNestingLevel_ = chunkedValueNestingLevel;
@@ -2042,9 +2041,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             isChunked_ = isChunked;
             valueHandler_ = valueHandler;
             specialNoOptionalDataState_ = specialNoOptionalDataState;
-            bbwi_ = bbwi.duplicate();
-            bbwi_.limit(bbwi.limit());
-            bbwi_.position(bbwi.position());
+            byteBuffer_ = byteBuffer.duplicate();
         }
     }
 
@@ -2064,7 +2061,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         isChunked = mem.isChunked_;
         valueHandler = mem.valueHandler_;
         specialNoOptionalDataState = mem.specialNoOptionalDataState_;
-        bbwi = mem.bbwi_;
+        byteBuffer = mem.byteBuffer_;
     }
 
     public int getPosition() {
@@ -2155,13 +2152,13 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                              CodeSetConversion.BTCConverter converter) {
 
 
-        if (bbwi.remaining() >= numBytes) {
+        if (byteBuffer.remaining() >= numBytes) {
             // If the entire string is in this buffer,
-            // just convert directly from the bbwi rather than
+            // just convert directly from the buffer rather than
             // allocating and copying.
-            int pos = bbwi.position();
-            char[] result = converter.getChars(bbwi.slice(), bbwi.position(), numBytes);
-            bbwi.position(pos + numBytes);
+            int pos = byteBuffer.position();
+            char[] result = converter.getChars(byteBuffer.slice(), 0, numBytes);
+            byteBuffer.position(pos + numBytes);
             return result;
         } else {
             // Stretches across buffers.  Unless we provide an
@@ -2205,11 +2202,11 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
      */
 
     void alignOnBoundary(int octetBoundary) {
-        int needed = computeAlignment(bbwi.position(), octetBoundary);
+        int needed = computeAlignment(byteBuffer.position(), octetBoundary);
 
-        if (bbwi.position() + needed <= bbwi.limit())
+        if (byteBuffer.position() + needed <= byteBuffer.limit())
         {
-            bbwi.position(bbwi.position() + needed);
+            byteBuffer.position(byteBuffer.position() + needed);
         }
     }
 
@@ -2288,22 +2285,19 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         start_block();
     }
 
-    @InfoMethod
-    private void bufferMessage( String head, int bbAddr, String tail ) { }
-
     @Override
     @CdrRead
     public void close() throws IOException {
 
         // tell BufferManagerRead to release any ByteBuffers
-        getBufferManager().close(bbwi);
+        getBufferManager().close(byteBuffer);
 
-        if (bbwi != null && bbwi.getByteBuffer() != null) {
+        if (byteBuffer != null) {
 
             // release this stream's ByteBuffer to the pool
             ByteBufferPool byteBufferPool = orb.getByteBufferPool();
-            byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
-            bbwi = null;
+            byteBufferPool.releaseByteBuffer(byteBuffer);
+            byteBuffer = null;
         }
     }
 }

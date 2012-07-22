@@ -41,7 +41,6 @@
 package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
-import com.sun.corba.ee.impl.encoding.ByteBufferWithInfo;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 
@@ -55,18 +54,18 @@ public interface BufferManagerRead
      *  in a fragment map (when collecting - GIOP 1.2 phase 1) or
      *  in an active server requests map (when streaming - GIOP 1.2 phase 2).
      *
-     *  As a model for implementation see IIOPInputStream's 
+     *  As a model for implementation see IIOPInputStream's
      *  constructor of the same name. There are going to be some variations.
      *
      */
 
-    public void processFragment ( ByteBuffer byteBuffer, 
+    public void processFragment ( ByteBuffer byteBuffer,
         FragmentMessage header);
 
 
     /**
      * Case: called from CDRInputStream constructor before unmarshaling.
-     * 
+     *
      * Does:
      *
      *  this.bufQ.get()
@@ -78,7 +77,7 @@ public interface BufferManagerRead
     /**
      * Invoked when we run out of data to read. Obtains more data from the stream.
      */
-    ByteBufferWithInfo underflow (ByteBufferWithInfo bbwi);
+    ByteBuffer underflow(ByteBuffer byteBuffer);
 
     /**
      * Returns true if this buffer manager reads fragments when it underflows.
@@ -104,5 +103,5 @@ public interface BufferManagerRead
     /*
      * Close BufferManagerRead and perform any oustanding cleanup.
      */
-    public void close(ByteBufferWithInfo bbwi);
+    public void close(ByteBuffer byteBuffer);
 }

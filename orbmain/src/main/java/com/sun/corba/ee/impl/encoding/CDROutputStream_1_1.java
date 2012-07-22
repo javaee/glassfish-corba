@@ -71,7 +71,7 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
 
         int alignment = computeAlignment(align);
 
-        if (bbwi.position() + n + alignment > bbwi.limit()) {
+        if (byteBuffer.position() + n + alignment > byteBuffer.limit()) {
             grow(align, n);
 
             // Must recompute the alignment after a grow.
@@ -84,17 +84,17 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
             alignment = computeAlignment(align);
         }
 
-        bbwi.position(bbwi.position() + alignment);
+        byteBuffer.position(byteBuffer.position() + alignment);
     }
 
     @Override
     protected void grow(int align, int n) {
         // Save the current size for possible post-fragmentation calculation
-        int oldSize = bbwi.position();
+        int oldSize = byteBuffer.position();
 
-        bbwi = bufferManagerWrite.overflow(bbwi, n);
+        byteBuffer = bufferManagerWrite.overflow(byteBuffer, n);
 
-        // At this point, if we fragmented, we should have a ByteBufferWithInfo
+        // At this point, if we fragmented, we should have a ByteBuffer
         // with the fragment header already marshalled.  The size and length fields
         // should be updated accordingly, and the fragmented flag should be set.
         if (bufferManagerWrite.isFragmentOnOverflow()) {
@@ -103,13 +103,13 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
             // At this point, oldSize is the entire length of the
             // previous buffer.  bbwi.position() is the length of the
             // fragment header of this buffer.
-            fragmentOffset += (oldSize - bbwi.position());
+            fragmentOffset += (oldSize - byteBuffer.position());
         }
     }
 
     @Override
     public int get_offset() {
-        return bbwi.position() + fragmentOffset;
+        return byteBuffer.position() + fragmentOffset;
     }
 
     @Override

@@ -63,7 +63,7 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
 
     @Override
     protected int get_offset() {
-        return bbwi.position() + fragmentOffset;
+        return byteBuffer.position() + fragmentOffset;
     }
 
     @Override
@@ -74,16 +74,16 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
 
         // WARNING: Must compute real alignment after calling
         // checkBlockLength since it may move the position
-        int alignment = computeAlignment(bbwi.position(), align);
+        int alignment = computeAlignment(byteBuffer.position(), align);
 
-        if (bbwi.position() + n + alignment  > bbwi.limit()) {
+        if (byteBuffer.position() + n + alignment  > byteBuffer.limit()) {
 
             // Some other ORBs may have found a way to send 1.1
             // fragments which put alignment bytes at the end
             // of a fragment
-            if (bbwi.position() + alignment == bbwi.limit())
+            if (byteBuffer.position() + alignment == byteBuffer.limit())
             {
-                bbwi.position(bbwi.position() + alignment);
+                byteBuffer.position(byteBuffer.position() + alignment);
             }
 
             grow(align, n);
@@ -92,10 +92,10 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
             // fragmentation since the new bbwi.position() (after the header)
             // may require a different alignment.
 
-            alignment = computeAlignment(bbwi.position(), align);
+            alignment = computeAlignment(byteBuffer.position(), align);
         }
 
-        bbwi.position(bbwi.position() + alignment);
+        byteBuffer.position(byteBuffer.position() + alignment);
     }
 
     //
@@ -106,9 +106,9 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
 
         // Save the size of the current buffer for
         // possible fragmentOffset calculation
-        int oldSize = bbwi.position();
+        int oldSize = byteBuffer.position();
 
-        bbwi = bufferManagerRead.underflow(bbwi);
+        byteBuffer = bufferManagerRead.underflow(byteBuffer);
 
         if (bufferManagerRead.isFragmentOnUnderflow()) {
             
@@ -116,9 +116,9 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
             // a new fragment whose header has already been
             // unmarshalled.  bbwi.position() should point to the
             // end of the header.
-            fragmentOffset += (oldSize - bbwi.position());
+            fragmentOffset += (oldSize - byteBuffer.position());
 
-            markAndResetHandler.fragmentationOccured(bbwi);
+            markAndResetHandler.fragmentationOccured(byteBuffer);
         }
     }
 

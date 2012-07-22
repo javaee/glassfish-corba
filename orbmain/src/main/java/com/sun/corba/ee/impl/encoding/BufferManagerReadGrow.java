@@ -41,7 +41,7 @@
 package com.sun.corba.ee.impl.encoding;
 
 import java.nio.ByteBuffer;
-import com.sun.corba.ee.spi.orb.ORB;
+
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
@@ -60,7 +60,7 @@ public class BufferManagerReadGrow
 
     public void init(Message msg) {}
 
-    public ByteBufferWithInfo underflow (ByteBufferWithInfo bbwi) {
+    public ByteBuffer underflow(ByteBuffer byteBuffer) {
         throw wrapper.unexpectedEof() ;
     }
 
@@ -88,7 +88,7 @@ public class BufferManagerReadGrow
     }
 
     // This will never happen
-    public void fragmentationOccured(ByteBufferWithInfo newFragment) {}
+    public void fragmentationOccured(ByteBuffer byteBuffer) {}
 
     public void reset() {
 
@@ -101,5 +101,5 @@ public class BufferManagerReadGrow
     }
 
     // Nothing to close and cleanup.
-    public void close(ByteBufferWithInfo bbwi) {}
+    public void close(ByteBuffer byteBuffer) {}
 }

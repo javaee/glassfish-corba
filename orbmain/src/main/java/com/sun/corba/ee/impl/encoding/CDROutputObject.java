@@ -84,8 +84,8 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
 
     // todo this is only used in a pair of legacy tests. Rewrite them as unit tests and remove this method.
     public void sendFirstFragment() {
-        ByteBufferWithInfo bbwi = getBufferManager().overflow(impl.getByteBufferWithInfo(), 0);
-        setPrivateFieldValue(impl, "bbwi", bbwi);
+        ByteBuffer buffer = getBufferManager().overflow(impl.getByteBuffer(), 0);
+        setPrivateFieldValue(impl, "byteBuffer", buffer);
     }
 
     protected void setPrivateFieldValue(Object obj, String fieldName, Object value) {
@@ -209,20 +209,20 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
         // Update the GIOP MessageHeader size field.
         //
 
-        ByteBufferWithInfo bbwi = impl.getByteBufferWithInfo();
+        ByteBuffer byteBuffer = impl.getByteBuffer();
 
-        getMessageHeader().setSize(bbwi.getByteBuffer(), bbwi.position());
+        getMessageHeader().setSize(byteBuffer, byteBuffer.position());
 
         ORB lorb = (ORB)orb() ;
         if (lorb != null) {
             TransportManager ctm = lorb.getTransportManager() ;
             MessageTraceManagerImpl mtm = (MessageTraceManagerImpl)ctm.getMessageTraceManager() ;
             if (mtm.isEnabled())
-                mtm.recordDataSent( bbwi.getByteBuffer()) ;
+                mtm.recordDataSent(byteBuffer) ;
         }
 
-        bbwi.flip();
-        connection.write(bbwi.getByteBuffer());
+        byteBuffer.flip();
+        connection.write(byteBuffer);
     }
 
     /** overrides create_input_stream from CDROutputStream */
@@ -241,7 +241,7 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
 
     // todo this is only used in a legacy test - rewrite the test as a unit test and remove this method
     public final int getBufferPosition() {
-        return impl.getByteBufferWithInfo().position();
+        return impl.getByteBuffer().position();
     }
 
     /*

@@ -88,14 +88,13 @@ public class BufferManagerReadStream
 
     @Transport
     public void processFragment(ByteBuffer byteBuffer, FragmentMessage msg) {
-        ByteBufferWithInfo bbwi = new ByteBufferWithInfo(byteBuffer);
-        bbwi.position(msg.getHeaderLength());
+        byteBuffer.position(msg.getHeaderLength());
 
         synchronized (fragmentQueue) {
             if (orb.transportDebugFlag) {
                 logBufferMessage("processFragment() - queuing ByteByffer id (", byteBuffer, ") to fragment queue.");
             }
-            fragmentQueue.enqueue(bbwi);
+            fragmentQueue.enqueue(byteBuffer);
             endOfStream = !msg.moreFragmentsToFollow();
             fragmentQueue.notify();
         }
@@ -106,9 +105,9 @@ public class BufferManagerReadStream
     }
 
     @Transport
-    public ByteBufferWithInfo underflow(ByteBufferWithInfo bbwi) {
+    public ByteBuffer underflow(ByteBuffer byteBuffer) {
 
-        ByteBufferWithInfo result;
+        ByteBuffer result;
 
         synchronized (fragmentQueue) {
 
@@ -143,10 +142,10 @@ public class BufferManagerReadStream
             result = fragmentQueue.dequeue();
 
             // VERY IMPORTANT
-            // Release bbwi.byteBuffer to the ByteBufferPool only if
+            // Release byteBuffer to the ByteBufferPool only if
             // this BufferManagerStream is not marked for potential restore.
-            if (!markEngaged && bbwi != null) {
-                getByteBufferPool().releaseByteBuffer(bbwi.getByteBuffer());
+            if (!markEngaged && byteBuffer != null) {
+                getByteBufferPool().releaseByteBuffer(byteBuffer);
             }
         }
         return result;
@@ -163,14 +162,13 @@ public class BufferManagerReadStream
         }
     }
 
-    // Release any queued ByteBufferWithInfo's byteBuffers to the
-    // ByteBufferPoool
+    // Release any queued byteBuffers to the ByteBufferPoool
     @Transport
-    public void close(ByteBufferWithInfo bbwi) {
+    public void close(ByteBuffer byteBuffer) {
         int inputBbAddress = 0;
 
-        if (bbwi != null) {
-            inputBbAddress = System.identityHashCode(bbwi.getByteBuffer());
+        if (byteBuffer != null) {
+            inputBbAddress = System.identityHashCode(byteBuffer);
         }
         ByteBufferPool byteBufferPool = getByteBufferPool();
 
@@ -184,11 +182,11 @@ public class BufferManagerReadStream
             //            on the stack. If one is found to equal, it will
             //            not be released to the ByteBufferPool.
 
-            ByteBufferWithInfo abbwi;
+            ByteBuffer aBuffer;
             while (fragmentQueue.size() != 0) {
-                abbwi = fragmentQueue.dequeue();
-                if (abbwi != null) {
-                    byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
+                aBuffer = fragmentQueue.dequeue();
+                if (aBuffer != null) {
+                    byteBufferPool.releaseByteBuffer(aBuffer);
                 }
             }
         }
@@ -204,10 +202,10 @@ public class BufferManagerReadStream
             //            on the stack. If one is found to equal, it will
             //            not be released to the ByteBufferPool.
 
-            for (ByteBufferWithInfo abbwi : fragmentStack) {
-                if (abbwi != null) {
-                    if (inputBbAddress != System.identityHashCode(abbwi.getByteBuffer())) {
-                        byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
+            for (ByteBuffer aBuffer : fragmentStack) {
+                if (aBuffer != null) {
+                    if (inputBbAddress != System.identityHashCode(aBuffer)) {
+                        byteBufferPool.releaseByteBuffer(aBuffer);
                     }
                 }
             }
@@ -230,7 +228,7 @@ public class BufferManagerReadStream
 
     // List of fragment ByteBufferWithInfos received since
     // the mark was engaged.
-    private LinkedList<ByteBufferWithInfo> fragmentStack = null;
+    private LinkedList<ByteBuffer> fragmentStack = null;
     private RestorableInputStream inputStream = null;
 
     // Original state of the stream
@@ -250,20 +248,16 @@ public class BufferManagerReadStream
     }
 
     // Collects fragments received since the mark was engaged.
-    public void fragmentationOccured(ByteBufferWithInfo newFragment) {
+    public void fragmentationOccured(ByteBuffer newFrament) {
         if (!markEngaged) {
             return;
         }
 
         if (fragmentStack == null) {
-            fragmentStack =
-                    new LinkedList<ByteBufferWithInfo>();
+            fragmentStack = new LinkedList<ByteBuffer>();
         }
 
-        ByteBufferWithInfo bbwi = newFragment.duplicate();
-        bbwi.limit(newFragment.limit());
-        bbwi.position(newFragment.position());
-        fragmentStack.addFirst(bbwi);
+        fragmentStack.addFirst(newFrament.duplicate());
     }
 
     public void reset() {
@@ -280,8 +274,8 @@ public class BufferManagerReadStream
         if (fragmentStack != null && fragmentStack.size() != 0) {
 
             synchronized (fragmentQueue) {
-                for (ByteBufferWithInfo bbwi : fragmentStack) {
-                    fragmentQueue.push(bbwi);
+                for (ByteBuffer aBuffer : fragmentStack) {
+                    fragmentQueue.push(aBuffer);
                 }
             }
 

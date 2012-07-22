@@ -138,7 +138,7 @@ public class CodeSetConversion
         // The same array may be used internally over multiple
         // calls.
         public abstract char[] getChars(byte[] bytes, int offset, int length);
-        public abstract char[] getChars(ByteBufferWithInfo buff, int offset, int length);
+        public abstract char[] getChars(ByteBuffer byteBuffer, int offset, int length);
 
     }
 
@@ -338,10 +338,10 @@ public class CodeSetConversion
             return resultingNumChars;
         }
 
-        public char[] getChars(ByteBufferWithInfo buff, int offset, int numBytes) {
+        public char[] getChars(ByteBuffer byteBuffer, int offset, int numBytes) {
             try {
-                buff.limit(numBytes);       // todo - the old implementation cached a clone of the buffer and results.  How do we do that with a Grizzly Buffer?
-                CharBuffer charBuf = decoder.decode(buff.toByteBuffer());
+                byteBuffer.limit(numBytes);
+                CharBuffer charBuf = decoder.decode(byteBuffer);
                 resultingNumChars = charBuf.limit();
                 char[] buffer = new char[resultingNumChars];
                 charBuf.get(buffer, 0, resultingNumChars).position(0);
@@ -466,17 +466,16 @@ public class CodeSetConversion
             this.defaultByteOrder = defaultByteOrder;
         }
 
-        @Override
-        public char[] getChars(ByteBufferWithInfo bytes, int offset, int numBytes) {
-            byte [] marker = { bytes.get(), bytes.get() };
-            bytes.position(0);
+        public char[] getChars(ByteBuffer byteBuffer, int offset, int numBytes) {
+            byte [] marker = {byteBuffer.get(), byteBuffer.get()};
+            byteBuffer.position(0);
 
             if (hasUTF16ByteOrderMarker(marker, 0, numBytes)) {
                 if (!converterUsesBOM)
                     switchToConverter(OSFCodeSetRegistry.UTF_16);
 
                 converterUsesBOM = true;
-                return super.getChars(bytes, offset, numBytes);
+                return super.getChars(byteBuffer, offset, numBytes);
             } else {
                 if (converterUsesBOM) {
                     if (defaultByteOrder == ByteOrder.LITTLE_ENDIAN)
@@ -486,7 +485,7 @@ public class CodeSetConversion
 
                     converterUsesBOM = false;
                 }
-                return super.getChars(bytes, offset, numBytes);
+                return super.getChars(byteBuffer, offset, numBytes);
             }
         }
 

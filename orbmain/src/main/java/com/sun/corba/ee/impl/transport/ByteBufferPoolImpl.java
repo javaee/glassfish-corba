@@ -74,14 +74,6 @@ public class ByteBufferPoolImpl implements ByteBufferPool {
         }
     }
 
-    /**
-     * Locations where ByteBuffers are gotten from the pool:
-     * 1. ContactInfoBase.createMessageMediator()
-     * 2. ByteBufferWithInfo.growBuffer()
-     * 3. ByteBufferWithInfo(ORB, BufferManagerWrite) - constructor
-     * 4. SocketOrChannelConnectionImpl.doMinimalReadStrategy()
-    */
-
     /** Return a ByteBuffer of the requested size. */
     public ByteBuffer getByteBuffer(int size) {
         if (useDirectBuffers) {
@@ -108,16 +100,6 @@ public class ByteBufferPoolImpl implements ByteBufferPool {
     }
 
 
-    /**
-     * Locations where ByteBuffers are released to the pool:
-     * 1. ByteBufferWithInfo.growBuffer()
-     * 2. CDROutputStream_1_0.close()
-     * 3. CDRInputStream_1_0.close()
-     * 4. BufferManagerReadStream.underflow()
-     * 5. BufferManagerWrite.close()
-     * 6. BufferManagerRead.close()
-     * 7. CorbaMessageMediatorImpl.releaseByteBufferToPool()
-    */
     public void releaseByteBuffer(ByteBuffer buffer) {
         // nothing to do here other than help the garbage collector
         // Remove this, as it is not useful, and gets flagged by findbugs.

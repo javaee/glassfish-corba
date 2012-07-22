@@ -114,7 +114,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     private static final boolean BIG_ENDIAN = false;
 
     protected BufferManagerWrite bufferManagerWrite;
-    ByteBufferWithInfo bbwi;
+    ByteBuffer byteBuffer;
 
     protected ORB orb;
     protected static final ORBUtilSystemException wrapper = ORBUtilSystemException.self;
@@ -184,8 +184,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
         this.orb = (ORB) orb;
 
         this.bufferManagerWrite = bufferManager;
-        this.bbwi = new ByteBufferWithInfo(allocateBuffer(orb, bufferManager, usePooledByteBuffers));
-        this.bbwi.position(0);
+        byteBuffer = allocateBuffer(orb, bufferManager, usePooledByteBuffers);
+        byteBuffer.position(0);
         this.streamFormatVersion = streamFormatVersion;
 
         createRepositoryIdHandlers();
@@ -223,10 +223,10 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     protected byte[] toByteArray(int start) {
         byte[] it;
 
-        it = new byte[bbwi.position() - start];
+        it = new byte[byteBuffer.position() - start];
 
-        bbwi.position(start);
-        bbwi.get(it);
+        byteBuffer.position(start);
+        byteBuffer.get(it);
 
         return it;
     }
@@ -253,7 +253,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
 
     protected final int computeAlignment(int align) {
         if (align > 1) {
-            int incr = bbwi.position() & (align - 1);
+            int incr = byteBuffer.position() & (align - 1);
             if (incr != 0) {
                 return align - incr;
             }
@@ -263,9 +263,9 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     }
 
     protected void alignAndReserve(int align, int n) {
-        bbwi.position(bbwi.position() + computeAlignment(align));
+        byteBuffer.position(byteBuffer.position() + computeAlignment(align));
 
-        if (bbwi.position() + n > bbwi.limit()) {
+        if (byteBuffer.position() + n > byteBuffer.limit()) {
             grow(align, n);
         }
     }
@@ -276,7 +276,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     // fragmentation policy for IIOP 1.1.
     //
     protected void grow(int align, int n) {
-        bbwi = bufferManagerWrite.overflow(bbwi, n);
+        byteBuffer = bufferManagerWrite.overflow(byteBuffer, n);
     }
 
     public final void putEndian() throws SystemException {
@@ -300,7 +300,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     @PrimitiveWrite
     public void write_octet(byte x) {
         alignAndReserve(1, 1);
-        bbwi.put(x);
+        byteBuffer.put(x);
     }
 
     public final void write_boolean(boolean x) {
@@ -323,8 +323,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     }
 
     private void writeBigEndianWchar(char x) {
-        bbwi.put((byte) ((x >>> 8) & 0xFF));
-        bbwi.put((byte) (x & 0xFF));
+        byteBuffer.put((byte) ((x >>> 8) & 0xFF));
+        byteBuffer.put((byte) (x & 0xFF));
     }
 
     @PrimitiveWrite
@@ -344,7 +344,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     @PrimitiveWrite
     public void write_short(short x) {
         alignAndReserve(2, 2);
-        bbwi.putShort(x);
+        byteBuffer.putShort(x);
     }
 
     public final void write_ushort(short x) {
@@ -354,7 +354,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     @PrimitiveWrite
     public void write_long(int x) {
         alignAndReserve(4, 4);
-        bbwi.putInt(x);
+        byteBuffer.putInt(x);
     }
 
     public final void write_ulong(int x) {
@@ -365,7 +365,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     public void write_longlong(long x) {
         alignAndReserve(8, 8);
 
-        bbwi.putLong(x);
+        byteBuffer.putLong(x);
     }
 
     public final void write_ulonglong(long x) {
@@ -451,10 +451,10 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
 
         int numWritten = 0;
         while (numWritten < length) {
-            if (!bbwi.hasRemaining()) alignAndReserve(1, 1);
+            if (!byteBuffer.hasRemaining()) alignAndReserve(1, 1);
 
-            int count = Math.min(length - numWritten, bbwi.remaining());
-            bbwi.put(value, offset + numWritten, count);
+            int count = Math.min(length - numWritten, byteBuffer.remaining());
+            byteBuffer.put(value, offset + numWritten, count);
             numWritten += count;
         }
     }
@@ -918,7 +918,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
      * @return
      */
     public int get_offset() {
-        return bbwi.position();
+        return byteBuffer.position();
     }
 
     @CdrWrite
@@ -934,7 +934,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
         // Note that get_offset is overridden in subclasses to handle fragmentation!
         // Thus blockSizePosition and blockSizeIndex are not always the same!
         blockSizePosition = get_offset();
-        blockSizeIndex = bbwi.position();
+        blockSizeIndex = byteBuffer.position();
     }
 
     // Utility method which will hopefully decrease chunking complexity
@@ -942,7 +942,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     // calling alignAndReserve.  Otherwise, it's possible to get into
     // recursive scenarios which lose the chunking state.
     protected void writeLongWithoutAlign(int x) {
-        bbwi.putInt(x);
+        byteBuffer.putInt(x);
     }
 
     @InfoMethod
@@ -978,18 +978,18 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
 
             // Need to assert that blockSizeIndex == bbwi.position()?  REVISIT
 
-            bbwi.position(bbwi.position() - 4);
+            byteBuffer.position(byteBuffer.position() - 4);
             blockSizeIndex = -1;
             blockSizePosition = -1;
             return;
         }
 
-        int oldSize = bbwi.position();
-        bbwi.position(blockSizeIndex - 4);
+        int oldSize = byteBuffer.position();
+        byteBuffer.position(blockSizeIndex - 4);
 
         writeLongWithoutAlign(oldSize - blockSizeIndex);
 
-        bbwi.position(oldSize);
+        byteBuffer.position(oldSize);
         blockSizeIndex = -1;
         blockSizePosition = -1;
     }
@@ -1160,38 +1160,30 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     //
 
     public void writeTo(java.io.OutputStream s) throws java.io.IOException {
-        byte[] tmpBuf = ORBUtility.getByteBufferArray(bbwi.toByteBuffer());
-        s.write(tmpBuf, 0, bbwi.position());
+        byte[] tmpBuf = ORBUtility.getByteBufferArray(byteBuffer);
+        s.write(tmpBuf, 0, byteBuffer.position());
     }
 
     public void writeOctetSequenceTo(org.omg.CORBA.portable.OutputStream s) {
-        byte[] buf = ORBUtility.getByteBufferArray(bbwi.toByteBuffer());
-        s.write_long(bbwi.position());
-        s.write_octet_array(buf, 0, bbwi.position());
+        byte[] buf = ORBUtility.getByteBufferArray(byteBuffer);
+        s.write_long(byteBuffer.position());
+        s.write_octet_array(buf, 0, byteBuffer.position());
     }
 
     public final int getSize() {
-        return bbwi.position();
+        return byteBuffer.position();
     }
 
     public int getIndex() {
-        return bbwi.position();
+        return byteBuffer.position();
     }
 
     public void setIndex(int value) {
-        bbwi.position(value);
-    }
-
-    public ByteBufferWithInfo getByteBufferWithInfo() {
-        return bbwi;
+        byteBuffer.position(value);
     }
 
     public ByteBuffer getByteBuffer() {
-        ByteBuffer result = null;
-        if (bbwi != null) {
-            result = bbwi.getByteBuffer();
-        }
-        return result;
+        return byteBuffer;
     }
 
     private void freeValueCache() {
@@ -1350,11 +1342,11 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     private void writeEndTag(boolean chunked) {
         if (chunked) {
             if (get_offset() == end_flag_position) {
-                if (bbwi.position() == end_flag_index) {
+                if (byteBuffer.position() == end_flag_index) {
                     // We are exactly at the same position and index as the
                     // end of the last end tag.  Thus, we can back up over it
                     // and compact the tags.
-                    bbwi.position(bbwi.position() - 4);
+                    byteBuffer.position(byteBuffer.position() - 4);
                 } else {                                            // reg - is this even possible any more?
                     // Special case in which we're at the beginning of a new
                     // fragment, but the position is the same.  We can't back up,
@@ -1369,7 +1361,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
 
             // Remember the last index and position.  
             // These are only used when chunking.
-            end_flag_index = bbwi.position();
+            end_flag_index = byteBuffer.position();
             end_flag_position = get_offset();
 
             chunkedValueNestingLevel++;
@@ -1663,7 +1655,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
 
     @CdrWrite
     public void start_value(String rep_id) {
-        startValueInfo(rep_id, get_offset(), bbwi.position());
+        startValueInfo(rep_id, get_offset(), byteBuffer.position());
 
         if (inBlock) {
             end_block();
@@ -1712,30 +1704,22 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
         }
     }
 
-    @InfoMethod
-    private void releasingByteBuffer(int addr) {
-    }
-
     @Override
     @CdrWrite
     public void close() throws IOException {
         // tell BufferManagerWrite to release any ByteBuffers
         getBufferManager().close();
 
-        if (getByteBufferWithInfo() != null && getByteBuffer() != null) {
+        if (byteBuffer != null) {
 
             // release this stream's ByteBuffer to the pool
             ByteBufferPool byteBufferPool = orb.getByteBufferPool();
-            byteBufferPool.releaseByteBuffer(getByteBuffer());
-            bbwi = null;
+            byteBufferPool.releaseByteBuffer(byteBuffer);
+            byteBuffer = null;
         }
     }
 
-    @InfoMethod
-    private void releaseByteBuffer(int bbAddress) {
-    }
-
     void dereferenceBuffer() {
-        bbwi = null;
+        byteBuffer = null;
     }
 }

@@ -115,14 +115,14 @@ public class CDRInputStream_1_2 extends CDRInputStream_1_1
         // NOTE: Change underlying ByteBuffer's position only if
         //       alignIncr is less than or equal to underlying
         //       ByteBuffer's limit.
-        int savedPosition = bbwi.position();
+        int savedPosition = byteBuffer.position();
         int alignIncr = computeAlignment(savedPosition,align);
         int bytesNeeded = alignIncr + n;
-        if (savedPosition + alignIncr <= bbwi.limit()) {
-            bbwi.position(savedPosition + alignIncr);
+        if (savedPosition + alignIncr <= byteBuffer.limit()) {
+            byteBuffer.position(savedPosition + alignIncr);
         }
 
-        if (savedPosition + bytesNeeded > bbwi.limit()) {
+        if (savedPosition + bytesNeeded > byteBuffer.limit()) {
             grow(1, n);
         }
     }

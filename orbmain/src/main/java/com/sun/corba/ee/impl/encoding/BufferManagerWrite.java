@@ -44,6 +44,8 @@ import com.sun.corba.ee.spi.orb.ORB;
 
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
+import java.nio.ByteBuffer;
+
 /**
  * Defines the contract between the BufferManager and
  * CDR stream on the writing side.  The CDR stream
@@ -85,7 +87,7 @@ public abstract class BufferManagerWrite
     /*
      * Invoked when we run out of room to write. Must either expand the buffer or send it as a fragment and clear it.
      */
-    public abstract ByteBufferWithInfo overflow(ByteBufferWithInfo bbwi, int numBytesNeeded);
+    protected abstract ByteBuffer overflow(ByteBuffer byteBuffer, int numBytesNeeded);
 
     /**
      * Returns true if this buffer manager fragments when an overflow occurs.
@@ -120,6 +122,7 @@ public abstract class BufferManagerWrite
 
     public abstract void sendMessage ();
 
+
     /**
      * A reference to the connection level stream will be required when
      * sending fragments.
@@ -127,7 +130,6 @@ public abstract class BufferManagerWrite
     public void setOutputObject(Object outputObject) {
         this.outputObject = outputObject;
     }
-
 
     /**
      * Close the BufferManagerWrite and do any outstanding cleanup.

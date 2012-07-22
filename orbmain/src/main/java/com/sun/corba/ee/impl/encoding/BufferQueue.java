@@ -39,24 +39,24 @@
  */
 package com.sun.corba.ee.impl.encoding;
 
+import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import java.util.LinkedList;
 
 /**
- * Simple unsynchronized queue implementation for ByteBufferWithInfos.
+ * Simple unsynchronized queue implementation for ByteBuffer.
  */
 public class BufferQueue
 {
-    private LinkedList<ByteBufferWithInfo> list = 
-        new LinkedList<ByteBufferWithInfo>();
+    private LinkedList<ByteBuffer> list =
+        new LinkedList<ByteBuffer>();
     
-    public void enqueue(ByteBufferWithInfo item)
+    public void enqueue(ByteBuffer item)
     {
         list.addLast(item);
     }
     
-    public ByteBufferWithInfo dequeue() throws NoSuchElementException
+    public ByteBuffer dequeue() throws NoSuchElementException
     {
         return list.removeFirst();
     }
@@ -66,9 +66,8 @@ public class BufferQueue
         return list.size();
     }
 
-    // Adds the given ByteBufferWithInfo to the front
-    // of the queue.
-    public void push(ByteBufferWithInfo item)
+    // Adds the given ByteBuffer to the front of the queue.
+    public void push(ByteBuffer item)
     {
         list.addFirst(item);
     }

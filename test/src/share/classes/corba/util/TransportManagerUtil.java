@@ -6,7 +6,7 @@ import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message_1_2;
-import com.sun.corba.ee.impl.transport.BufferConnectionImpl;
+import com.sun.corba.ee.impl.transport.ConnectionImpl;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.transport.Connection;
@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
 public class TransportManagerUtil {
 
     public static MessageData getMessageData(byte[][] data, ORB orb) {
-        Connection connection = new BufferConnectionImpl(orb) ;
+        Connection connection = new ConnectionImpl(orb) ;
         for (int ctr=0; ctr<data.length; ctr++) {
             byte[] message = data[ctr] ;
             ByteBuffer bb = ByteBuffer.allocate( message.length ) ;
@@ -73,7 +73,7 @@ public class TransportManagerUtil {
      * the result of this call will contain a valid request ID.
      */
     public static Message getMessage(byte[] data, ORB orb) {
-        Connection connection = new BufferConnectionImpl(orb) ;
+        Connection connection = new ConnectionImpl(orb) ;
         ByteBuffer bb = ByteBuffer.allocate( data.length ) ;
         bb.put( data ) ;
         bb.position( 0 ) ;

@@ -41,6 +41,43 @@
 package com.sun.corba.ee.impl.transport;
 
 
+import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.impl.encoding.CachedCodeBase;
+import com.sun.corba.ee.impl.encoding.CodeSetComponentInfo;
+import com.sun.corba.ee.impl.encoding.OSFCodeSetRegistry;
+import com.sun.corba.ee.impl.protocol.MessageMediatorImpl;
+import com.sun.corba.ee.impl.protocol.MessageParserImpl;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.protocol.MessageParser;
+import com.sun.corba.ee.spi.protocol.RequestId;
+import com.sun.corba.ee.spi.threadpool.NoSuchThreadPoolException;
+import com.sun.corba.ee.spi.threadpool.NoSuchWorkQueueException;
+import com.sun.corba.ee.spi.threadpool.Work;
+import com.sun.corba.ee.spi.trace.Transport;
+import com.sun.corba.ee.spi.transport.Acceptor;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.ConnectionCache;
+import com.sun.corba.ee.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.transport.EventHandler;
+import com.sun.corba.ee.spi.transport.InboundConnectionCache;
+import com.sun.corba.ee.spi.transport.OutboundConnectionCache;
+import com.sun.corba.ee.spi.transport.ResponseWaitingRoom;
+import com.sun.corba.ee.spi.transport.Selector;
+import com.sun.corba.ee.spi.transport.TcpTimeouts;
+import com.sun.org.omg.SendingContext.CodeBase;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
+import org.omg.CORBA.CompletionStatus;
+import org.omg.CORBA.INTERNAL;
+import org.omg.CORBA.SystemException;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -53,48 +90,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.SystemException;
-
-import com.sun.org.omg.SendingContext.CodeBase;
-import com.sun.corba.ee.impl.encoding.CDRInputObject;
-import com.sun.corba.ee.impl.encoding.CDROutputObject;
-import com.sun.corba.ee.spi.transport.Acceptor;
-import com.sun.corba.ee.spi.transport.ConnectionCache;
-import com.sun.corba.ee.spi.transport.EventHandler;
-import com.sun.corba.ee.spi.transport.InboundConnectionCache;
-import com.sun.corba.ee.spi.transport.OutboundConnectionCache;
-import com.sun.corba.ee.spi.transport.Selector;
-
-import com.sun.corba.ee.spi.ior.IOR;
-import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.ee.spi.orb.ORB ;
-import com.sun.corba.ee.spi.threadpool.NoSuchThreadPoolException;
-import com.sun.corba.ee.spi.threadpool.NoSuchWorkQueueException;
-import com.sun.corba.ee.spi.threadpool.Work;
-import com.sun.corba.ee.spi.protocol.MessageMediator;
-import com.sun.corba.ee.spi.protocol.RequestId;
-import com.sun.corba.ee.spi.protocol.MessageParser;
-import com.sun.corba.ee.spi.transport.ContactInfo;
-import com.sun.corba.ee.spi.transport.Connection;
-import com.sun.corba.ee.spi.transport.ResponseWaitingRoom;
-import com.sun.corba.ee.spi.transport.TcpTimeouts;
-
-import com.sun.corba.ee.impl.encoding.CachedCodeBase;
-import com.sun.corba.ee.impl.encoding.CodeSetComponentInfo;
-import com.sun.corba.ee.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
-import com.sun.corba.ee.spi.misc.ORBConstants;
-import com.sun.corba.ee.impl.protocol.MessageMediatorImpl;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
-import com.sun.corba.ee.impl.protocol.MessageParserImpl;
-import com.sun.corba.ee.spi.trace.Transport;
-import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Harold Carr
@@ -198,7 +195,7 @@ public class ConnectionImpl
     protected ConcurrentHashMap<RequestId, Queue> fragmentMap;
 
     // Used in genericRPCMSGFramework test.
-    protected ConnectionImpl(ORB orb)
+    public ConnectionImpl(ORB orb)
     {
         this.orb = orb;
 
@@ -311,11 +308,11 @@ public class ConnectionImpl
                                          Socket socket)
     {
         this(orb, acceptor, socket,
-             (socket.getChannel() == null 
-              ? false 
+             (socket.getChannel() == null
+              ? false
               : orb.getORBData().connectionSocketUseSelectThreadToWait()),
              (socket.getChannel() == null
-              ? false                
+              ? false
               : orb.getORBData().connectionSocketUseWorkerThreadForEvent()));
     }
 

@@ -1572,6 +1572,10 @@
 
     <target name="test-all" depends="clean-test-output, test-init, test-rmi-iiop, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
 
+    <target name="run-test-target-with-args" depends="test-init, build-tests">
+        <run-test args="${test-args}"/>
+    </target>
+
     <target name="archive-test-results" depends="test-init">
         <jar jarfile="${releaselib.dir}/test-results.jar">
             <fileset dir="${test.output}">

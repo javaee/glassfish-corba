@@ -105,6 +105,8 @@
                                 <include>activation/*.idl</include>
                                 <include>corba/legacybootstrapserver/*.idl</include>
                                 <include>corba/hcks/oldhcks.idl</include>
+                                <include>corba/exceptiondetailsc/oldidlI.idl</include>
+                                <include>corba/islocal/oldidlI.idl</include>
                             </includes>
                             <packagePrefixes>
                                 <packagePrefix><type>activation</type><prefix>com.sun.corba.ee.spi</prefix></packagePrefix>
@@ -115,6 +117,10 @@
                             <includes>
                                 <include>corba/connectintercept_1_4/*.idl</include>
                                 <include>corba/hcks/hcks.idl</include>
+                                <include>corba/folb_8_1/folb.idl</include>
+                                <include>corba/requestpartitioning/Tester.idl</include>
+                                <include>corba/exceptiondetailsc/idlI.idl</include>
+                                <include>corba/islocal/idlI.idl</include>
                             </includes>
                         </source>
                     </sources>
@@ -132,13 +138,13 @@
                         <source>
                             <poa>true</poa>
                             <includes>
-                                <include>**/*POA.class</include>
+                                <include>**/rmiiIServantPOA.class</include>
                             </includes>
                         </source>
                         <source>
-                            <excludes>
-                                <exclude>**/*POA.class</exclude>
-                            </excludes>
+                            <includes>
+                                <include>**/rmiiIServant.class</include>
+                            </includes>
                         </source>
                     </sources>
                     <includes>

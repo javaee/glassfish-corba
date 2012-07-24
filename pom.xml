@@ -70,6 +70,21 @@
         <pfl-version>3.2.0-b001</pfl-version>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.glassfish.simplestub</groupId>
+                <artifactId>simplestub</artifactId>
+                <version>0.1.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.7</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <plugins>
 
@@ -157,7 +172,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
     </build>
 
     <reporting>

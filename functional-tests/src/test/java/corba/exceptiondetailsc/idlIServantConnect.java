@@ -49,7 +49,7 @@ import corba.hcks.U;
 
 class idlIServantConnect
     extends 
-        _idlIImplBase 
+        _idlIImplBase
 {
     public static final String baseMsg = idlIServantConnect.class.getName();
 

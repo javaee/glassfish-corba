@@ -116,8 +116,7 @@ public class ConnectionImpl
     //
 
     protected SocketChannel socketChannel;
-    public SocketChannel getSocketChannel()
-    {
+    public SocketChannel getSocketChannel() {
         return socketChannel;
     }
 
@@ -175,11 +174,8 @@ public class ConnectionImpl
     protected TemporarySelector tmpReadSelector;
     // A lock used for lazily initializing tmpReadSelector
     protected final java.lang.Object tmpReadSelectorLock = new java.lang.Object();
-    // A temporary selector for writing to non-blocking SocketChannels
-    // when entire message is not written in one write().
-    protected TemporarySelector tmpWriteSelector;
-    // A lock used for lazily initializing tmpWriteSelector
-    protected final java.lang.Object tmpWriteSelectorLock = new java.lang.Object();
+
+    private NioBufferWriter bufferWriter;
 
     // Mapping of a fragmented messages by request id and its corresponding
     // fragmented messages stored in a queue. This mapping is used in the
@@ -551,7 +547,6 @@ public class ConnectionImpl
                     if (tmpSelector != null) {
                         tmpSelector.cancelAndFlushSelector(sk);
                     }
-                    doneWithTemporarySelector() ;
                 }
             } else {
                 n += bytecount;
@@ -646,49 +641,7 @@ public class ConnectionImpl
                 // IMPORTANT: For non-blocking SocketChannels, there's no guarantee
                 //            all bytes are written on first write attempt.
 
-                int nbytes = getSocketChannel().write(byteBuffer);
-                if (byteBuffer.hasRemaining()) {
-                    // Can only occur on non-blocking connections.
-                    // Using long for backoff_factor to avoid floating point
-                    // calculations.
-                    TcpTimeouts.Waiter waiter = tcpTimeouts.waiter() ;
-                    SelectionKey sk = null;
-                    TemporarySelector tmpSelector = null;
-                    try {
-                        tmpSelector = getTemporaryWriteSelector();
-                        sk = tmpSelector.registerChannel(getSocketChannel(),
-                                                        SelectionKey.OP_WRITE);
-                        while (byteBuffer.hasRemaining() && !waiter.isExpired()) {
-                            int nsel = tmpSelector.select(waiter.getTimeForSleep());
-                            if (nsel > 0) {
-                                tmpSelector.removeSelectedKey(sk);
-                                do {
-                                    // keep writing while bytes can be written
-                                    nbytes = getSocketChannel().write(byteBuffer);
-                                } while (nbytes > 0 && byteBuffer.hasRemaining());
-                            }
-                            // selector timed out or no bytes have been written
-                            if (nsel == 0 || nbytes == 0) {
-                                waiter.advance() ;
-                            }
-                        }
-                    } catch (IOException ioe) {
-                        throw wrapper.exceptionWhenWritingWithTemporarySelector(ioe,
-                            byteBuffer.position(), byteBuffer.limit(),
-                            waiter.timeWaiting(), tcpTimeouts.get_max_time_to_wait());
-                    } finally {
-                        if (tmpSelector != null) {
-                            tmpSelector.cancelAndFlushSelector(sk);
-                        }
-                        doneWithTemporarySelector();
-                    }
-                    // if message not fully written, throw exception
-                    if (byteBuffer.hasRemaining() && waiter.isExpired()) {
-                        // failed to write entire message
-                        throw wrapper.transportWriteTimeoutExceeded( 
-                            tcpTimeouts.get_max_time_to_wait(), waiter.timeWaiting());
-                    }
-                }
+                writeUsingNio(byteBuffer);
             } else {
                 if (! byteBuffer.hasArray()) {
                     throw wrapper.unexpectedDirectByteBufferWithNonChannelSocket();
@@ -716,6 +669,25 @@ public class ConnectionImpl
                 throw ioe;
             }
         } 
+    }
+
+    public void writeUsingNio(ByteBuffer byteBuffer) throws IOException {
+        getBufferWriter().write(byteBuffer);
+    }
+
+    private NioBufferWriter getBufferWriter() {
+        if (bufferWriter == null) {
+            ensureNotBlockingOnSocket();
+            bufferWriter = new NioBufferWriter(getSocketChannel(), tcpTimeouts);
+        }
+        return bufferWriter;
+    }
+
+    private void ensureNotBlockingOnSocket() {
+        // If one asks for a temporary write selector on a blocking connection, it is an error.
+        if (getSocketChannel() == null || getSocketChannel().isBlocking()) {
+            throw wrapper.temporaryWriteSelectorWithBlockingConnection(this);
+        }
     }
 
     /**
@@ -1275,8 +1247,8 @@ public class ConnectionImpl
      * Note that this should only ever be called by the Reader thread for
      * this connection.
      * 
-     * @param minor_code The minor code for the COMM_FAILURE major code.
      * @param die Kill the reader thread (this thread) before exiting.
+     * @param lockHeld true if this thread has the lock on the channel
      */
     @Transport
     public void purgeCalls(SystemException systemException, boolean die,
@@ -1808,25 +1780,10 @@ public class ConnectionImpl
         }
         synchronized (tmpReadSelectorLock) {
             if (tmpReadSelector == null) {
-                tmpReadSelector = new TemporarySelector(this.orb, getSocketChannel());
+                tmpReadSelector = new TemporarySelector(getSocketChannel());
             }
         }
         return tmpReadSelector;
-    }
-
-    @Transport
-    protected TemporarySelector getTemporaryWriteSelector() throws IOException {
-        // If one asks for a temporary write selector on a blocking connection,
-        // it is an error.
-        if (getSocketChannel() == null || getSocketChannel().isBlocking()) {
-            throw wrapper.temporaryWriteSelectorWithBlockingConnection(this);
-        }
-        synchronized (tmpWriteSelectorLock) {
-            if (tmpWriteSelector == null) {
-                tmpWriteSelector = new TemporarySelector(this.orb, getSocketChannel());
-            }
-        }
-        return tmpWriteSelector;
     }
 
     @Transport
@@ -1841,17 +1798,9 @@ public class ConnectionImpl
                 }
             }
         }
-        
-        synchronized (tmpWriteSelectorLock) {
-            if (tmpWriteSelector != null) {
-                closingWriteSelector( tmpWriteSelector ) ;
-                try {
-                    tmpWriteSelector.close();
-                } catch (IOException ex) {
-                    throw ex;
-                }
-            }
-        }
+
+        if (bufferWriter != null)
+            bufferWriter.closeTemporaryWriteSelector();
     }
 
     @Override
@@ -1889,9 +1838,6 @@ public class ConnectionImpl
     private void readBytesFromChannel(int bytecount) { }
 
     @InfoMethod
-    private void doneWithTemporarySelector() { }
-
-    @InfoMethod
     private void readFullySleeping(int time) { }
 
     @InfoMethod
@@ -1921,8 +1867,6 @@ public class ConnectionImpl
     @InfoMethod
     private void closingReadSelector(TemporarySelector tmpReadSelector) { }
 
-    @InfoMethod
-    private void closingWriteSelector(TemporarySelector tmpWriteSelector) { }
 }
 
 // End of file.

@@ -61,12 +61,8 @@ import com.sun.corba.ee.spi.trace.Transport;
 @Transport
 public class TemporarySelectorStateClosed implements TemporarySelectorState {
 
-    private TemporarySelectorStateClosed() {
-    }
-
     /** Creates a new instance of TemporarySelectorStateOpen */
-    public TemporarySelectorStateClosed(ORB theOrb) {
-        ORB itsOrb = theOrb;
+    public TemporarySelectorStateClosed() {
     }
 
     public int select(Selector theSelector, long theTimeout) throws IOException {

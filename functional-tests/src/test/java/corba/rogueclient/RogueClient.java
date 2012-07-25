@@ -100,7 +100,7 @@ public class RogueClient extends Thread
         if (useHelper)
             helper.start( name + ctr ) ;
 
-        U.sop( "RogueClient." + name + "()" ) ;
+        U.sop("RogueClient." + name + "()") ;
     }
 
     private void start( String name ) {
@@ -376,6 +376,8 @@ public class RogueClient extends Thread
             }
             Thread.sleep(5000);
         } catch (IOException ioe) {
+            System.out.println("received exception:");
+            ioe.printStackTrace();
             // We expect Server to complain with an IOException.
             // So, we must close the connection and re-open it.
             U.sop("\tReceived expected IOException: " + ioe.toString());

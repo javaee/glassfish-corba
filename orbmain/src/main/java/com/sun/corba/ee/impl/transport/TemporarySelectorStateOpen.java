@@ -67,19 +67,13 @@ public class TemporarySelectorStateOpen implements TemporarySelectorState {
         ORBUtilSystemException.self ;
 
     final static AtomicInteger tsCount = new AtomicInteger(0);
-    private ORB itsOrb;
 
     @Transport
     private void reportNumTemporarySelectors( int num ) {
     }
 
-    private TemporarySelectorStateOpen () {
-        reportNumTemporarySelectors( tsCount.incrementAndGet() ) ;
-    }
-
     /** Creates a new instance of TemporarySelectorStateOpen */
-    public TemporarySelectorStateOpen(ORB theOrb) {
-        itsOrb = theOrb;
+    public TemporarySelectorStateOpen() {
         reportNumTemporarySelectors( tsCount.incrementAndGet() ) ;
     }
 
@@ -137,7 +131,7 @@ public class TemporarySelectorStateOpen implements TemporarySelectorState {
     public TemporarySelectorState close(Selector theSelector) throws IOException {
         theSelector.close();
         reportNumTemporarySelectors( tsCount.decrementAndGet() );
-        return new TemporarySelectorStateClosed(itsOrb);
+        return new TemporarySelectorStateClosed();
     }
 
     @Transport

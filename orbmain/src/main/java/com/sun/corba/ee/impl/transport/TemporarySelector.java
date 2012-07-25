@@ -62,15 +62,13 @@ public class TemporarySelector {
     
     private TemporarySelectorState itsState;
     private Selector itsSelector;
-    private ORB itsOrb;
-    
+
     private TemporarySelector() {}
     
     /** Creates a new instance of TemporarySelector */
-    public TemporarySelector(ORB theOrb, SelectableChannel theSelectableChannel) throws IOException {
-        itsOrb = theOrb;
+    public TemporarySelector(SelectableChannel theSelectableChannel) throws IOException {
         itsSelector = theSelectableChannel.provider().openSelector();
-        itsState = new TemporarySelectorStateOpen(itsOrb);
+        itsState = new TemporarySelectorStateOpen();
     }
     
     /**

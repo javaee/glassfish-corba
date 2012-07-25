@@ -100,7 +100,7 @@ public class SocketFactoryConnectionImpl
                 ex, socketInfo.getType(), socketInfo.getHost(),
                 Integer.toString(socketInfo.getPort())) ;
         }
-        state = OPENING;
+        setState(OPENING);
     }
 
     public String toString()
@@ -110,7 +110,7 @@ public class SocketFactoryConnectionImpl
                 "SocketFactoryConnectionImpl[" + " "
                 + (socketChannel == null ?
                    socket.toString() : socketChannel.toString()) + " "
-                + getStateString( state ) + " "
+                + getStateString(getState()) + " "
                 + shouldUseSelectThreadToWait() + " "
                 + shouldUseWorkerThreadForEvent()
                 + "]" ;

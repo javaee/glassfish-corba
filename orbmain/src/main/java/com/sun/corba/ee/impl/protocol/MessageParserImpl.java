@@ -105,6 +105,7 @@ public class MessageParserImpl implements MessageParser {
 
     @Transport
     public Message parseBytes(ByteBuffer byteBuffer, Connection connection) {
+        expectingMoreData = false;
         Message message = null;
         int bytesInBuffer = byteBuffer.limit() - nextMsgStartPos;
         // is there enough bytes available for a message header?

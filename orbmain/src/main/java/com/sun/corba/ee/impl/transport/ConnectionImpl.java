@@ -142,7 +142,7 @@ public class ConnectionImpl
     // value in some protocols.
     protected AtomicInteger requestId = new AtomicInteger(5);
     protected ResponseWaitingRoom responseWaitingRoom;
-    protected int state;
+    private int state;
     protected final java.lang.Object stateEvent = new java.lang.Object();
     protected final java.lang.Object writeEvent = new java.lang.Object();
     protected boolean writeLocked;
@@ -189,7 +189,7 @@ public class ConnectionImpl
     // a different entry as a result of a different request id's final
     // message fragment having just been processed by a CorbaMessageMediator
     // via one of its handleInput methods.
-    protected ConcurrentHashMap<RequestId, Queue> fragmentMap;
+    protected ConcurrentHashMap<RequestId, Queue<MessageMediator>> fragmentMap;
 
     // Used in genericRPCMSGFramework test.
     public ConnectionImpl(ORB orb)
@@ -212,12 +212,9 @@ public class ConnectionImpl
         
         if (useSelectThreadToWait) {
             // initialize fragmentMap
-            fragmentMap = new ConcurrentHashMap<RequestId,Queue>();
+            fragmentMap = new ConcurrentHashMap<RequestId,Queue<MessageMediator>>();
         }
     }
-
-    @Transport
-    private void connectionCreated( Socket socket ) { }
 
     // Client constructor.
     public ConnectionImpl(ORB orb,
@@ -246,7 +243,6 @@ public class ConnectionImpl
                 // dedicated reader threads.
                 setUseSelectThreadToWait(false);
             }
-            connectionCreated( socket ) ;
         } catch (Throwable t) {
             throw wrapper.connectFailure(t, socketType, hostname, 
                                          Integer.toString(port));
@@ -305,12 +301,8 @@ public class ConnectionImpl
                                          Socket socket)
     {
         this(orb, acceptor, socket,
-             (socket.getChannel() == null
-              ? false
-              : orb.getORBData().connectionSocketUseSelectThreadToWait()),
-             (socket.getChannel() == null
-              ? false
-              : orb.getORBData().connectionSocketUseWorkerThreadForEvent()));
+             (socket.getChannel() != null && orb.getORBData().connectionSocketUseSelectThreadToWait()),
+             (socket.getChannel() != null && orb.getORBData().connectionSocketUseWorkerThreadForEvent()));
     }
 
     ////////////////////////////////////////////////////
@@ -331,12 +323,9 @@ public class ConnectionImpl
     @Transport
     public boolean read() {
         MessageMediator messageMediator = readBits();
-        if (messageMediator != null) {
-            // Null can happen when client closes stream
-            // causing purgecalls.
-            return messageMediator.dispatch();
-        }
-        return true;
+
+        // Null can happen when client closes stream causing purgecalls.
+        return messageMediator == null || messageMediator.dispatch();
     }
 
     private void unregisterForEventAndPurgeCalls(SystemException ex)
@@ -436,7 +425,7 @@ public class ConnectionImpl
             nbb.limit(size);
             return nbb;
         } catch (IOException ioe) {
-            if (state == CLOSE_RECVD) {
+            if (getState() == CLOSE_RECVD) {
                 throw wrapper.connectionRebind(ioe);
             } else {
                 throw ioe;
@@ -482,7 +471,7 @@ public class ConnectionImpl
                       offset, length);
             return ByteBuffer.wrap(buf);
         } catch (IOException ioe) {
-            if (state == CLOSE_RECVD) {
+            if (getState() == CLOSE_RECVD) {
                 throw wrapper.connectionRebind(ioe);
             } else {
                 throw ioe;
@@ -508,7 +497,6 @@ public class ConnectionImpl
 
         do {
             bytecount = getSocketChannel().read(byteBuffer);
-            readBytesFromChannel( bytecount ) ;
 
             if (bytecount < 0) {
                 throw new IOException("End-of-stream");
@@ -524,7 +512,6 @@ public class ConnectionImpl
                         if (nsel > 0) {
                             tmpSelector.removeSelectedKey(sk);
                             bytecount = getSocketChannel().read(byteBuffer);
-                            readBytesFromChannel(bytecount);
 
                             if (bytecount < 0) {
                                 throw new IOException("End-of-stream");
@@ -595,7 +582,6 @@ public class ConnectionImpl
 
         do {
             bytecount = is.read(buf, offset + n, size - n);
-            readBytesFromChannel(bytecount);
 
             if (bytecount < 0) {
                 throw new IOException("End-of-stream");
@@ -648,7 +634,7 @@ public class ConnectionImpl
             // now to be that of a IIOP packet.
             getConnectionCache().stampTime(this);
         } catch (IOException ioe) {
-            if (state == CLOSE_RECVD) {
+            if (getState() == CLOSE_RECVD) {
                 throw wrapper.connectionRebind(ioe);
             } else {
                 throw ioe;
@@ -757,14 +743,6 @@ public class ConnectionImpl
         return this;
     }
 
-    public CDROutputObject createOutputObject(MessageMediator messageMediator)
-    {
-        // REVISIT - remove this method from Connection and all it subclasses.
-        throw new RuntimeException(
-            "*****SocketOrChannelConnectionImpl.createOutputObject "
-            + "- should not be called.");
-    }
-
     // This is used by the GIOPOutputObject in order to
     // throw the correct error when handling code sets.
     // Can we determine if we are on the server side by
@@ -809,6 +787,14 @@ public class ConnectionImpl
         timeStamp = time;
     }
 
+    protected int getState() {
+        return state;
+    }
+
+    protected void setState(int state) {
+        this.state = state;
+    }
+
     public void setState(String stateString)
     {
         synchronized (stateEvent) {
@@ -834,7 +820,7 @@ public class ConnectionImpl
         while ( true ) {
             int localState;
             synchronized (stateEvent) {
-                localState = state;
+                localState = getState();
             }
 
             localStateInfo( localState ) ;
@@ -843,7 +829,7 @@ public class ConnectionImpl
                  
             case OPENING:
                 synchronized (stateEvent) {
-                    if (state != OPENING) {
+                    if (getState() != OPENING) {
                         // somebody has changed 'state' so be careful
                         break;
                     }
@@ -866,7 +852,7 @@ public class ConnectionImpl
                     try {
                         // do not stay here too long if state != ESTABLISHED
                         // Bug 4752117
-                        while (state == ESTABLISHED && writeLocked) {
+                        while (getState() == ESTABLISHED && writeLocked) {
                             writeEvent.wait(100);
                         }
                     } catch (InterruptedException ie) {
@@ -878,7 +864,7 @@ public class ConnectionImpl
             
             case ABORT:
                 synchronized ( stateEvent ){
-                    if (state != ABORT) {
+                    if (getState() != ABORT) {
                         break;
                     }
                     throw wrapper.writeErrorSend() ;
@@ -888,7 +874,7 @@ public class ConnectionImpl
                 // the connection has been closed or closing
                 // ==> throw rebind exception
                 synchronized ( stateEvent ){
-                    if (state != CLOSE_RECVD) {
+                    if (getState() != CLOSE_RECVD) {
                         break;
                     }
                     throw wrapper.connectionRebind() ;
@@ -937,7 +923,7 @@ public class ConnectionImpl
 
             // IIOPOutputStream will cleanup the connection info when it
             // sees this exception.
-            final SystemException sysexc = (state == CLOSE_RECVD) ?
+            final SystemException sysexc = (getState() == CLOSE_RECVD) ?
                 wrapper.connectionRebindMaybe( exc ) :
                 wrapper.writeErrorSend(exc ) ;
 
@@ -1230,8 +1216,8 @@ public class ConnectionImpl
         // If this invocation is a result of ThreadDeath caused
         // by a previous execution of this routine, just exit.
         synchronized ( stateEvent ){
-            localStateInfo(state);
-            if ((state == ABORT) || (state == CLOSE_RECVD)) {
+            localStateInfo(getState());
+            if ((getState() == ABORT) || (getState() == CLOSE_RECVD)) {
                 return;
             }
         }
@@ -1352,7 +1338,7 @@ public class ConnectionImpl
         try {
             sendCancelRequest(giopVersion, requestId);
         } catch (IOException ioe) {
-            if (state == CLOSE_RECVD) {
+            if (getState() == CLOSE_RECVD) {
                 throw wrapper.connectionRebind(ioe);
             } else {
                 throw ioe;
@@ -1417,11 +1403,8 @@ public class ConnectionImpl
 
             int bytesRead = 0;
             do {
-                startingMessagePosition( 
-                    messageParser.getNextMessageStartPosition() );
                 bytesRead = nonBlockingRead();
                 if (bytesRead > 0) {
-                    //byteBuffer.flip();
                     byteBuffer.limit(byteBuffer.position())
                               .position(messageParser.getNextMessageStartPosition());
                     parseBytesAndDispatchMessages(messageParser);
@@ -1437,8 +1420,7 @@ public class ConnectionImpl
             // if expecting more data or using 'always enter blocking read'
             // strategy (the default), then go to a blocking read using
             // a temporary selector.
-            if (orb.getORBData().alwaysEnterBlockingRead() || 
-                messageParser.isExpectingMoreData()) {
+            if (orb.getORBData().alwaysEnterBlockingRead() || messageParser.isExpectingMoreData()) {
                 blockingRead(messageParser);
             }
   
@@ -1447,7 +1429,6 @@ public class ConnectionImpl
             // the next message should begin
             byteBuffer.position(messageParser.getNextMessageStartPosition());
 
-            readEventHandlingDone( byteBuffer) ;
             // Conection is no longer expecting more data.
             // Re-enable read event handling on main selector
             resumeSelectOnMainSelector();
@@ -1506,7 +1487,6 @@ public class ConnectionImpl
                 if (nsel > 0) {
                     tmpSelector.removeSelectedKey(sk);
                     int bytesRead = getSocketChannel().read(byteBuffer);
-                    readBytesFromChannel(bytesRead);
                     if (bytesRead > 0) {
                         //byteBuffer.flip();
                         byteBuffer.limit(byteBuffer.position())
@@ -1567,7 +1547,7 @@ public class ConnectionImpl
                 boolean addToWorkerThreadQueue = true;
                 if (MessageBase.messageSupportsFragments(message)) {
                     // Is this the first fragment ?
-                    if (message.getType() != message.GIOPFragment) {
+                    if (message.getType() != Message.GIOPFragment) {
                         // NOTE: First message fragment will not be GIOPFragment
                         // type
                         if (message.moreFragmentsToFollow()) {
@@ -1575,8 +1555,7 @@ public class ConnectionImpl
                             // will be processed in order.
                             RequestId corbaRequestId =
                                  MessageBase.getRequestIdFromMessageBytes(message);
-                            fragmentMap.put(corbaRequestId, new LinkedList<
-                                                   MessageMediator>());
+                            fragmentMap.put(corbaRequestId, new LinkedList<MessageMediator>());
                             addedEntryToFragmentMap( corbaRequestId ) ;
                         }
                     } else {
@@ -1585,7 +1564,7 @@ public class ConnectionImpl
                         // processed in order.
                         RequestId corbaRequestId =
                              MessageBase.getRequestIdFromMessageBytes(message);
-                        Queue queue = fragmentMap.get(corbaRequestId);
+                        Queue<MessageMediator> queue = fragmentMap.get(corbaRequestId);
                         if (queue != null) {
                             // REVISIT - In the future, the synchronized(queue),
                             // wait()/notify() construct should be replaced
@@ -1640,10 +1619,9 @@ public class ConnectionImpl
             if (bytesRead < 0) {
                 throw new IOException("End-of-stream");
             }
-            readBytesFromChannel(bytesRead);
             getConnectionCache().stampTime(this);
         } catch (IOException ioe) {
-            if (state == CLOSE_RECVD) {
+            if (getState() == CLOSE_RECVD) {
                 throw wrapper.connectionRebind(ioe);
             } else {
                 throw wrapper.ioexceptionWhenReadingConnection( ioe, this ) ;
@@ -1712,8 +1690,7 @@ public class ConnectionImpl
         int poolToUse = -1 ;
         try {
             poolToUse = messageMediator.getThreadPoolToUse();
-            orb.getThreadPoolManager().getThreadPool(poolToUse)
-               .getWorkQueue(0).addWork(messageMediator);
+            orb.getThreadPoolManager().getThreadPool(poolToUse).getWorkQueue(0).addWork(messageMediator);
         } catch (NoSuchThreadPoolException e) {
             throwable = e;
         } catch (NoSuchWorkQueueException e) {
@@ -1771,7 +1748,8 @@ public class ConnectionImpl
             }
         }
 
-        bufferWriter.closeTemporaryWriteSelector();
+        if (bufferWriter != null)
+            bufferWriter.closeTemporaryWriteSelector();
     }
 
     @Override
@@ -1789,7 +1767,7 @@ public class ConnectionImpl
 
             return "SocketOrChannelConnectionImpl[ "
                 + str + " " 
-                + getStateString( state ) + " "
+                + getStateString(getState()) + " "
                 + shouldUseSelectThreadToWait() + " "
                 + shouldUseWorkerThreadForEvent()
                 + "]" ;
@@ -1806,28 +1784,13 @@ public class ConnectionImpl
     private void bbInfo(int bbAddress) { }
 
     @InfoMethod
-    private void readBytesFromChannel(int bytecount) { }
-
-    @InfoMethod
     private void readFullySleeping(int time) { }
 
     @InfoMethod
     private void doNotCloseBusyConnection() { }
 
     @InfoMethod
-    private void shuttingDownConnectionInputStream() { }
-
-    @InfoMethod
-    private void shuttingDownConnectionOutputStream() { }
-
-    @InfoMethod
     private void localStateInfo(int localState) { }
-
-    @InfoMethod
-    private void startingMessagePosition(int nextMessageStartPosition) { }
-
-    @InfoMethod
-    private void readEventHandlingDone(ByteBuffer byteBuffer) { }
 
     @InfoMethod
     private void addedEntryToFragmentMap(RequestId corbaRequestId) { }
@@ -1837,7 +1800,6 @@ public class ConnectionImpl
 
     @InfoMethod
     private void closingReadSelector(TemporarySelector tmpReadSelector) { }
-
 }
 
 // End of file.

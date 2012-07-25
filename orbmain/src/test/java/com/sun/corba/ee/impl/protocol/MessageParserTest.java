@@ -94,6 +94,22 @@ public class MessageParserTest {
     }
 
     @Test
+    public void whenBufferContainsRestOfMessage_consumeEntireBuffer() {
+        byte[] partMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1 };
+        byte[] wholeMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        ByteBuffer buffer = ByteBuffer.wrap(partMessage);
+        parser.parseBytes(buffer, connection);
+
+        buffer = ByteBuffer.wrap(wholeMessage);
+        Message message = parser.parseBytes(buffer, connection);
+
+        assertFalse(parser.hasMoreBytesToParse());
+        assertFalse(parser.isExpectingMoreData());
+        assertEquals(true, message instanceof RequestMessage_1_0);
+        assertEquals(wholeMessage.length, message.getByteBuffer().limit());
+    }
+
+    @Test
     public void whenBufferContainsWholeMessageNeedingFragments_consumeEntireBufferAndExpectMore() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
         ByteBuffer buffer = ByteBuffer.wrap(header);

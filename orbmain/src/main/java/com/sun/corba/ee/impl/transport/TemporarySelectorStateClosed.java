@@ -44,7 +44,6 @@ import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 
-import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.transport.TemporarySelectorState;
 
 import com.sun.corba.ee.spi.trace.Transport;
@@ -91,7 +90,6 @@ public class TemporarySelectorStateClosed implements TemporarySelectorState {
 
     @Transport
     public TemporarySelectorState close(Selector theSelector) throws IOException {
-        String selectorToString = getSelectorToString(theSelector);
         if (theSelector != null && theSelector.isOpen()) {
             theSelector.close();
         }

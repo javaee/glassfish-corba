@@ -154,7 +154,7 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
     }
 
     private static boolean usePooledBuffers(MessageMediator mediator) {
-        return (mediator != null && mediator.getConnection() != null) && mediator.getConnection().shouldUseDirectByteBuffers();
+        return (mediator != null && mediator.getConnection() != null) && mediator.getConnection().hasSocketChannel();
     }
 
     public CDROutputObject(ORB orb, MessageMediator messageMediator, Message header, byte streamFormatVersion) {

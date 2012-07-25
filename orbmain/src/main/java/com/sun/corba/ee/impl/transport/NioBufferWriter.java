@@ -8,6 +8,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 public class NioBufferWriter {
+    protected TemporarySelector tmpWriteSelector;
+    protected final java.lang.Object tmpWriteSelectorLock = new java.lang.Object();
 
     private SocketChannel socketChannel;
     private TcpTimeouts tcpTimeouts;
@@ -16,12 +18,6 @@ public class NioBufferWriter {
         this.socketChannel = socketChannel;
         this.tcpTimeouts = tcpTimeouts;
     }
-
-    // A temporary selector for writing to non-blocking SocketChannels
-    // when entire message is not written in one write().
-    private TemporarySelector tmpWriteSelector;
-    // A lock used for lazily initializing tmpWriteSelector
-    private final java.lang.Object tmpWriteSelectorLock = new java.lang.Object();
 
     void write(ByteBuffer byteBuffer) throws IOException {
         int nbytes = socketChannel.write(byteBuffer);
@@ -34,7 +30,8 @@ public class NioBufferWriter {
             TemporarySelector tmpSelector = null;
             try {
                 tmpSelector = getTemporaryWriteSelector(socketChannel);
-                tmpSelector.registerChannel(socketChannel, SelectionKey.OP_WRITE);
+                sk = tmpSelector.registerChannel(socketChannel,
+                                                SelectionKey.OP_WRITE);
                 while (byteBuffer.hasRemaining() && !waiter.isExpired()) {
                     int nsel = tmpSelector.select(waiter.getTimeForSleep());
                     if (nsel > 0) {
@@ -50,6 +47,7 @@ public class NioBufferWriter {
                     }
                 }
             } catch (IOException ioe) {
+                System.out.println( "REG-> Caught" + ioe + "; throwing new exception");
                 throw ConnectionImpl.wrapper.exceptionWhenWritingWithTemporarySelector(ioe,
                         byteBuffer.position(), byteBuffer.limit(),
                         waiter.timeWaiting(), tcpTimeouts.get_max_time_to_wait());
@@ -67,15 +65,6 @@ public class NioBufferWriter {
         }
     }
 
-    TemporarySelector getTemporaryWriteSelector(SocketChannel socketChannel) throws IOException {
-        synchronized (tmpWriteSelectorLock) {
-            if (tmpWriteSelector == null) {
-                tmpWriteSelector = new TemporarySelector(socketChannel);
-            }
-        }
-        return tmpWriteSelector;
-    }
-
     void closeTemporaryWriteSelector() throws IOException {
         synchronized (tmpWriteSelectorLock) {
             if (tmpWriteSelector != null) {
@@ -86,5 +75,14 @@ public class NioBufferWriter {
                 }
             }
         }
+    }
+
+    TemporarySelector getTemporaryWriteSelector(SocketChannel socketChannel1) throws IOException {
+        synchronized (tmpWriteSelectorLock) {
+            if (tmpWriteSelector == null) {
+                tmpWriteSelector = new TemporarySelector(socketChannel1);
+            }
+        }
+        return tmpWriteSelector;
     }
 }

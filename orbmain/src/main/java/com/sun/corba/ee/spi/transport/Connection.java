@@ -216,7 +216,7 @@ public interface Connection
     public void setConnectionCache(ConnectionCache connectionCache);
 
     public ConnectionCache getConnectionCache();
-    public boolean shouldUseDirectByteBuffers();
+    public boolean hasSocketChannel();
 
     // NOTE: This method can throw a connection rebind SystemException.
     public ByteBuffer read(int size, int offset, int length )

@@ -44,9 +44,7 @@ import java.io.IOException;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.transport.TemporarySelectorState;
 
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
@@ -66,20 +64,13 @@ public class TemporarySelectorStateOpen implements TemporarySelectorState {
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
 
-    final static AtomicInteger tsCount = new AtomicInteger(0);
-
-    @Transport
-    private void reportNumTemporarySelectors( int num ) {
-    }
-
     /** Creates a new instance of TemporarySelectorStateOpen */
     public TemporarySelectorStateOpen() {
-        reportNumTemporarySelectors( tsCount.incrementAndGet() ) ;
     }
 
     @Transport
     public int select(Selector theSelector, long theTimeout) throws IOException {
-        int result = 0;
+        int result;
         if (theSelector.isOpen()) {
             if (theTimeout > 0) {
                 result = theSelector.select(theTimeout);
@@ -99,7 +90,7 @@ public class TemporarySelectorStateOpen implements TemporarySelectorState {
     public SelectionKey registerChannel(Selector theSelector, 
         SelectableChannel theSelectableChannel, int theOps) throws IOException {
 
-        SelectionKey key = null;
+        SelectionKey key;
         if (theSelector.isOpen()) {
             key = theSelectableChannel.register(theSelector, theOps);
         } else {
@@ -130,7 +121,6 @@ public class TemporarySelectorStateOpen implements TemporarySelectorState {
     @Transport
     public TemporarySelectorState close(Selector theSelector) throws IOException {
         theSelector.close();
-        reportNumTemporarySelectors( tsCount.decrementAndGet() );
         return new TemporarySelectorStateClosed();
     }
 

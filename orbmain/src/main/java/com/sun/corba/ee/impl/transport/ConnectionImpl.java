@@ -116,7 +116,8 @@ public class ConnectionImpl
     //
 
     protected SocketChannel socketChannel;
-    public SocketChannel getSocketChannel() {
+    public SocketChannel getSocketChannel()
+    {
         return socketChannel;
     }
 
@@ -400,7 +401,7 @@ public class ConnectionImpl
         } 
     }
 
-    public boolean shouldUseDirectByteBuffers()
+    public boolean hasSocketChannel()
     {
         return getSocketChannel() != null;
     }
@@ -410,7 +411,7 @@ public class ConnectionImpl
     public ByteBuffer read(int size, int offset, int length )
         throws IOException {
         try {
-            if (shouldUseDirectByteBuffers()) {
+            if (hasSocketChannel()) {
                 ByteBuffer lbb = orb.getByteBufferPool().getByteBuffer(size);
 
                 if (orb.transportDebugFlag) {
@@ -452,7 +453,7 @@ public class ConnectionImpl
     {
         try {
             int size = offset + length;
-            if (shouldUseDirectByteBuffers()) {
+            if (hasSocketChannel()) {
                 if (size > byteBuffer.capacity()) {
                     if (orb.transportDebugFlag) {
                         // print address of ByteBuffer being released
@@ -626,21 +627,10 @@ public class ConnectionImpl
     @Transport
     public void write(ByteBuffer byteBuffer) throws IOException {
         try {
-            if (shouldUseDirectByteBuffers()) {
-
-                /**
-                 * NOTE: cannot perform this test.  If one ask for a
-                 * ByteBuffer from the pool which is bigger than the size
-                 * of ByteBuffers managed by the pool, then the pool will
-                 * return a HeapByteBuffer.
-                 * if (byteBuffer.hasArray()) {
-                 *     throw wrapper.unexpectedNonDirectByteBufferWithChannelSocket();
-                 * }
-                 */
-
-                // IMPORTANT: For non-blocking SocketChannels, there's no guarantee
-                //            all bytes are written on first write attempt.
-
+            if (hasSocketChannel()) {
+                if (getSocketChannel().isBlocking()) {
+                    throw wrapper.temporaryWriteSelectorWithBlockingConnection(this);
+                }
                 writeUsingNio(byteBuffer);
             } else {
                 if (! byteBuffer.hasArray()) {
@@ -648,12 +638,7 @@ public class ConnectionImpl
                 }
 
                 byte[] tmpBuf = new byte[byteBuffer.limit()];
-                System.arraycopy(byteBuffer.array(), byteBuffer.arrayOffset(),
-                                 tmpBuf, 0, tmpBuf.length);
-                // NOTE: Cannot simply use byteBuffer.array() since byteBuffer
-                // could be a view buffer / sliced ByteBuffer. View buffers /
-                // sliced ByteBuffers will return the entired backed array.
-                // Not a byte array beginning at view buffer position 0.
+                System.arraycopy(byteBuffer.array(), byteBuffer.arrayOffset(), tmpBuf, 0, tmpBuf.length);
                 getSocket().getOutputStream().write(tmpBuf, 0, tmpBuf.length);
                 getSocket().getOutputStream().flush();
             }
@@ -671,23 +656,10 @@ public class ConnectionImpl
         } 
     }
 
-    public void writeUsingNio(ByteBuffer byteBuffer) throws IOException {
-        getBufferWriter().write(byteBuffer);
-    }
-
-    private NioBufferWriter getBufferWriter() {
-        if (bufferWriter == null) {
-            ensureNotBlockingOnSocket();
+    private void writeUsingNio(ByteBuffer byteBuffer) throws IOException {
+        if (bufferWriter == null)
             bufferWriter = new NioBufferWriter(getSocketChannel(), tcpTimeouts);
-        }
-        return bufferWriter;
-    }
-
-    private void ensureNotBlockingOnSocket() {
-        // If one asks for a temporary write selector on a blocking connection, it is an error.
-        if (getSocketChannel() == null || getSocketChannel().isBlocking()) {
-            throw wrapper.temporaryWriteSelectorWithBlockingConnection(this);
-        }
+        bufferWriter.write(byteBuffer);
     }
 
     /**
@@ -1248,7 +1220,7 @@ public class ConnectionImpl
      * this connection.
      * 
      * @param die Kill the reader thread (this thread) before exiting.
-     * @param lockHeld true if this thread has the lock on the channel
+     * @param lockHeld true if the calling thread holds the lock on the connection
      */
     @Transport
     public void purgeCalls(SystemException systemException, boolean die,
@@ -1799,8 +1771,7 @@ public class ConnectionImpl
             }
         }
 
-        if (bufferWriter != null)
-            bufferWriter.closeTemporaryWriteSelector();
+        bufferWriter.closeTemporaryWriteSelector();
     }
 
     @Override

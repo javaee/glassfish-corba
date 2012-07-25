@@ -462,8 +462,8 @@ public class EncodingTestBase {
         }
 
         @Override
-        public boolean shouldUseDirectByteBuffers() {
-            return false;
+        public boolean hasSocketChannel() {
+            return true;
         }
 
         @Override

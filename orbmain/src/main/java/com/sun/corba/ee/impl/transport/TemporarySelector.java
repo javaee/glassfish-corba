@@ -44,10 +44,7 @@ import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 
-import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.transport.TemporarySelectorState;
-
-import com.sun.corba.ee.impl.misc.ORBUtility;
 
 /**
  *
@@ -63,8 +60,6 @@ public class TemporarySelector {
     private TemporarySelectorState itsState;
     private Selector itsSelector;
 
-    private TemporarySelector() {}
-    
     /** Creates a new instance of TemporarySelector */
     public TemporarySelector(SelectableChannel theSelectableChannel) throws IOException {
         itsSelector = theSelectableChannel.provider().openSelector();
@@ -145,7 +140,4 @@ public class TemporarySelector {
         itsState = itsState.cancelKeyAndFlushSelector(itsSelector, theSelectionKey);
     }
 
-    private void dprint(String theMsg) {
-        ORBUtility.dprint("TemporarySelector", theMsg);
-    }
 }

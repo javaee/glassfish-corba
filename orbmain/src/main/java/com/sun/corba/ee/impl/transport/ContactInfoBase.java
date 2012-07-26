@@ -40,8 +40,6 @@
 
 package com.sun.corba.ee.impl.transport;
 
-import java.nio.ByteBuffer;
-
 import com.sun.corba.ee.spi.protocol.ClientRequestDispatcher;
 import com.sun.corba.ee.spi.transport.OutboundConnectionCache;
 
@@ -58,8 +56,6 @@ import com.sun.corba.ee.spi.transport.ContactInfo;
 import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
 import com.sun.corba.ee.impl.protocol.MessageMediatorImpl;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.ee.spi.trace.Transport;
 
 /**
@@ -132,24 +128,6 @@ public abstract class ContactInfoBase
                 getAddressingDisposition(),
                 methodName,
                 isOneWay);
-
-        return messageMediator;
-    }
-
-    // Called when not using "useNIOToWait" configuration
-    @Transport
-    public MessageMediator createMessageMediator(ORB broker,Connection conn)
-    {
-        ORB lorb = (ORB) broker;
-        Connection connection = (Connection) conn;
-
-        // read giop message
-        Message msg = MessageBase.readGIOPMessage(lorb, connection);
-
-        ByteBuffer byteBuffer = msg.getByteBuffer();
-        msg.setByteBuffer(null);
-        MessageMediator messageMediator =
-            new MessageMediatorImpl(lorb, connection, msg, byteBuffer);
 
         return messageMediator;
     }

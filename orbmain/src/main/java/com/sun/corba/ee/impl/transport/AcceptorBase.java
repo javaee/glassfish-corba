@@ -58,7 +58,6 @@ import com.sun.corba.ee.spi.misc.ORBConstants;
 import com.sun.corba.ee.spi.threadpool.Work;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.transport.EventHandler;
-import com.sun.corba.ee.spi.transport.ContactInfo;
 import com.sun.corba.ee.spi.transport.Acceptor;
 import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.corba.ee.spi.transport.SocketInfo;
@@ -303,13 +302,6 @@ public abstract class AcceptorBase
     public CDRInputObject createInputObject(ORB broker, MessageMediator messageMediator) {
         return new CDRInputObject(broker, messageMediator.getConnection(), 
             messageMediator.getDispatchBuffer(), messageMediator.getDispatchHeader());
-    }
-
-    public MessageMediator createMessageMediator(ORB broker, Connection connection) {
-        // REVISIT - no factoring so cheat to avoid code dup right now.
-        // REVISIT **** COUPLING !!!!
-        ContactInfo contactInfo = new ContactInfoImpl();
-        return contactInfo.createMessageMediator(broker, connection);
     }
 
     public CDROutputObject createOutputObject(ORB broker, MessageMediator messageMediator) {

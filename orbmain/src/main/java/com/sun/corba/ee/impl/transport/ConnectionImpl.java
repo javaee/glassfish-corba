@@ -101,13 +101,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * SocketOrChannelConnectionImpl.1.106.sjava.
  */
 @Transport
-public class ConnectionImpl
-    extends
-        EventHandlerBase
-    implements
-        Connection,
-        Work
-{
+public class ConnectionImpl extends EventHandlerBase implements Connection, Work {
     protected static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
 
@@ -177,6 +171,19 @@ public class ConnectionImpl
     protected final java.lang.Object tmpReadSelectorLock = new java.lang.Object();
 
     private NioBufferWriter bufferWriter;
+    protected Dispatcher dispatcher = DISPATCHER;
+
+    interface Dispatcher {
+        boolean dispatch(MessageMediator messageMediator);
+    }
+
+    final static Dispatcher DISPATCHER = new Dispatcher() {
+        @Override
+        public boolean dispatch(MessageMediator messageMediator) {
+            return messageMediator.dispatch();
+        }
+    };
+
 
     // Mapping of a fragmented messages by request id and its corresponding
     // fragmented messages stored in a queue. This mapping is used in the
@@ -325,7 +332,11 @@ public class ConnectionImpl
         MessageMediator messageMediator = readBits();
 
         // Null can happen when client closes stream causing purgecalls.
-        return messageMediator == null || messageMediator.dispatch();
+        return messageMediator == null || dispatch(messageMediator);
+    }
+
+    private static boolean dispatch(MessageMediator messageMediator) {
+        return messageMediator.dispatch();
     }
 
     private void unregisterForEventAndPurgeCalls(SystemException ex)
@@ -339,19 +350,7 @@ public class ConnectionImpl
     @Transport
     protected MessageMediator readBits() {
         try {
-            MessageMediator messageMediator;
-            // REVISIT - use common factory base class.
-            if (contactInfo != null) {
-                messageMediator =
-                    contactInfo.createMessageMediator(orb, this);
-            } else if (acceptor != null) {
-                messageMediator = acceptor.createMessageMediator(orb, this);
-            } else {
-                throw 
-                    new RuntimeException("SocketOrChannelConnectionImpl.readBits");
-            }
-            return messageMediator;
-
+            return createMessageMediator();
         } catch (ThreadDeath td) {
             try {
                 purgeCalls(wrapper.connectionAbort(td), false, false);
@@ -389,6 +388,16 @@ public class ConnectionImpl
             throw wrapper.throwableInReadBits(ex);
         } 
     }
+
+    private MessageMediator createMessageMediator() {
+        Message msg = MessageBase.readGIOPMessage(orb, this);
+
+        ByteBuffer byteBuffer = msg.getByteBuffer();
+        msg.setByteBuffer(null);
+
+        return new MessageMediatorImpl(orb, this, msg, byteBuffer);
+    }
+
 
     public boolean hasSocketChannel()
     {

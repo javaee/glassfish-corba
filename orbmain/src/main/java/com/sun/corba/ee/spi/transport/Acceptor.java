@@ -136,8 +136,6 @@ public abstract interface Acceptor
 
     EventHandler getEventHandler();
 
-    MessageMediator createMessageMediator(ORB xbroker, Connection xconnection);
-
     CDRInputObject createInputObject(ORB broker, MessageMediator messageMediator);
 
     CDROutputObject createOutputObject(ORB broker, MessageMediator messageMediator);

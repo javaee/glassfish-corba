@@ -105,8 +105,6 @@ public abstract interface ContactInfo extends SocketInfo
         ContactInfo contactInfo, Connection connection,
         String methodName, boolean isOneWay);
 
-    public MessageMediator createMessageMediator(ORB broker, Connection connection);
-
     public CDRInputObject createInputObject(ORB broker, MessageMediator messageMediator);
 
     public CDROutputObject createOutputObject(MessageMediator messageMediator);

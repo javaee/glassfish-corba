@@ -61,7 +61,6 @@ import org.omg.PortableInterceptor.ORBInitInfo ;
 import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
-import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.corba.ee.spi.transport.ContactInfo;
 import com.sun.corba.ee.spi.transport.EventHandler;
 
@@ -1047,8 +1046,7 @@ public class ParserTable {
         public void processSocket( Socket socket ) { } 
         public void close() { }
         public EventHandler getEventHandler() { return null; }
-        public MessageMediator createMessageMediator(
-            ORB xbroker, Connection xconnection) { return null; }
+
         public CDRInputObject createInputObject(
             ORB broker, MessageMediator messageMediator) { return null; }
         public CDROutputObject createOutputObject(
@@ -1105,8 +1103,7 @@ public class ParserTable {
         public void processSocket( Socket socket ) { } 
         public void close() { }
         public EventHandler getEventHandler() { return null; }
-        public MessageMediator createMessageMediator(
-            ORB xbroker, Connection xconnection) { return null; }
+
         public CDRInputObject createInputObject(
             ORB broker, MessageMediator messageMediator) { return null; }
         public CDROutputObject createOutputObject(

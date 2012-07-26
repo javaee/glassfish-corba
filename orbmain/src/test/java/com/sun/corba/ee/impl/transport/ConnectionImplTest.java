@@ -6,7 +6,6 @@ import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.orb.ORBData;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
-import com.sun.corba.ee.spi.protocol.RequestId;
 import com.sun.corba.ee.spi.threadpool.NoSuchThreadPoolException;
 import com.sun.corba.ee.spi.threadpool.NoSuchWorkQueueException;
 import com.sun.corba.ee.spi.threadpool.ThreadPool;
@@ -23,9 +22,13 @@ import com.sun.corba.ee.spi.transport.TransportManager;
 import org.glassfish.simplestub.SimpleStub;
 import org.glassfish.simplestub.Stub;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -51,7 +54,7 @@ public class ConnectionImplTest {
     private OrbFake orb = Stub.create(OrbFake.class);
     private ORBDataFake orbData = Stub.create(ORBDataFake.class);
     private SelectorProviderFake selectorProvider = Stub.create(SelectorProviderFake.class);
-    private SocketChannelFake socketChannel = Stub.create(SocketChannelFake.class, selectorProvider);
+    private SocketChannelFake socketChannel = null;
     private TcpTimeoutsFake tcpTimeouts = Stub.create(TcpTimeoutsFake.class);
     private ConnectionCacheFake connectionCache = Stub.create(ConnectionCacheFake.class);
     private WaiterFake waiter = Stub.create(WaiterFake.class);
@@ -62,11 +65,21 @@ public class ConnectionImplTest {
     private ThreadPoolFake threadPool = Stub.create(ThreadPoolFake.class);
 
     private ConnectionImpl connection;
-    private Socket socket = new Socket() {
+    private SocketFake socket = new SocketFake();
+
+    private class SocketFake extends Socket {
+        private InputStream inputStream;
+        private OutputStream outputStream;
         public SocketChannel getChannel() {
             return socketChannel;
         }
-    };
+        public InputStream getInputStream() throws IOException {
+            return inputStream;
+        }
+        public OutputStream getOutputStream() throws IOException {
+            return outputStream;
+        }
+    }
 
     @Before
     public void setUp() throws IOException {
@@ -78,22 +91,28 @@ public class ConnectionImplTest {
         threadPool.workQueue = workQueue;
         transportManager.selector = selector;
         tcpTimeouts.waiter = waiter;
-        connection = new ConnectionImpl(orb, null, socket, true, true);
-        socketChannel.configureBlocking(false);
-        socketChannel.socket = socket;
-        connection.setConnectionCache(connectionCache);
     }
 
     @Test
-    public void whenFullBufferWritable_allDataIsWritten() throws IOException {
+    public void whenNioFullBufferWritable_allDataIsWritten() throws IOException {
+        useNio();
         connection.write(ByteBuffer.wrap(BYTE_DATA));
 
         assertArrayEquals(BYTE_DATA, socketChannel.dataWritten);
     }
 
+    private void useNio() throws IOException {
+        socketChannel = Stub.create(SocketChannelFake.class, selectorProvider);
+        connection = new ConnectionImpl(orb, null, socket, true, true);
+        connection.setConnectionCache(connectionCache);
+        socketChannel.configureBlocking(false);
+        socketChannel.socket = socket;
+    }
+
 
     @Test
-    public void whenChannelBusy_allDataIsWritten() throws IOException {
+    public void whenNioChannelMomentarilyBusy_allDataIsWritten() throws IOException {
+        useNio();
         socketChannel.setNumBytesToWrite(0);
         connection.write(ByteBuffer.wrap(BYTE_DATA));
 
@@ -101,16 +120,18 @@ public class ConnectionImplTest {
     }
 
     @Test
-    public void whenWholeMessageReceived_queueSingleEntry() {
-        socketChannel.enqueData(new byte[] {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6});
+    public void whenNioWholeMessageReceived_queueSingleEntry() throws IOException {
+        useNio();
+        socketChannel.enqueData(new byte[]{'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6});
         connection.doWork();
         assertEquals(1, workQueue.items.size());
         assertTrue(workQueue.items.remove() instanceof MessageMediator);
     }
 
     @Test
-    public void whenMessageReceivedInTwoReads_queueSingleEntryAfterSecond() {
-        socketChannel.enqueData(new byte[] { 'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6});
+    public void whenNioMessageReceivedInTwoReads_queueSingleEntryAfterSecond() throws IOException {
+        useNio();
+        socketChannel.enqueData(new byte[]{'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6});
         socketChannel.setNumBytesToRead(8);
         connection.doWork();
         assertEquals(1, workQueue.items.size());
@@ -118,7 +139,8 @@ public class ConnectionImplTest {
     }
 
     @Test
-    public void whenFragmentsIncluded_queueFirstMessageAndAddFragmentsToFragmentList() {
+    public void whenNioFragmentsIncluded_queueFirstMessageAndAddFragmentsToFragmentList() throws IOException {
+        useNio();
         byte[] messages = {'G', 'I', 'O', 'P', 1, 2, Message.MORE_FRAGMENTS_BIT, Message.GIOPRequest, 0, 0, 0, 6, 0, 0, 0, 3, 5, 6,
                           'G', 'I', 'O', 'P', 1, 2, Message.MORE_FRAGMENTS_BIT, Message.GIOPFragment, 0, 0, 0, 6, 0, 0, 0, 3, 5, 6,
                           'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment, 0, 0, 0, 4, 0, 0, 0, 3};
@@ -129,6 +151,20 @@ public class ConnectionImplTest {
         assertTrue(workItem instanceof MessageMediator);
         Queue<MessageMediator> fragmentList = connection.getFragmentList(new RequestIdImpl(3));
         assertEquals(2, fragmentList.size());
+    }
+
+    @Test @Ignore
+    public void whenWholeMessageReceivedFromSocket_queueSingleEntry() throws IOException {
+        readFromBlockingSocket(new byte[]{'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6});
+        connection.doWork();
+        assertEquals(1, workQueue.items.size());
+        assertTrue(workQueue.items.remove() instanceof MessageMediator);
+    }
+
+    private void readFromBlockingSocket(byte[] bytes) {
+        socket.inputStream = new ByteArrayInputStream( bytes );
+        connection = new ConnectionImpl(orb, null, socket, false, true);
+        connection.setConnectionCache(connectionCache);
     }
 
     @SimpleStub(strict = true)

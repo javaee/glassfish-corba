@@ -98,6 +98,10 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <includeDirs>
+                        <includeDir>../omgapi/src/main/idl</includeDir>
+                        <includeDir>../omgapi/src/main/idl-includes</includeDir>
+                    </includeDirs>
                     <sources>
                         <source>
                             <compatible>true</compatible>
@@ -109,6 +113,9 @@
                             </packagePrefixes>
                         </source>
                         <source>
+                            <packagePrefixes>
+                                <packagePrefix><type>PortableServer</type>     <prefix>org.omg</prefix></packagePrefix>
+                            </packagePrefixes>
                             <compatible>false</compatible>
                             <excludes>
                                 <exclude>legacy/*.idl</exclude>

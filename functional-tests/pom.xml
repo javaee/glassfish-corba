@@ -102,11 +102,7 @@
                         <source>
                             <compatible>true</compatible>
                             <includes>
-                                <include>activation/*.idl</include>
-                                <include>corba/legacybootstrapserver/*.idl</include>
-                                <include>corba/hcks/oldhcks.idl</include>
-                                <include>corba/exceptiondetailsc/oldidlI.idl</include>
-                                <include>corba/islocal/oldidlI.idl</include>
+                                <include>legacy/*.idl</include>
                             </includes>
                             <packagePrefixes>
                                 <packagePrefix><type>activation</type><prefix>com.sun.corba.ee.spi</prefix></packagePrefix>
@@ -114,15 +110,10 @@
                         </source>
                         <source>
                             <compatible>false</compatible>
-                            <includes>
-                                <include>corba/connectintercept_1_4/*.idl</include>
-                                <include>corba/hcks/hcks.idl</include>
-                                <include>corba/folb_8_1/folb.idl</include>
-                                <include>corba/requestpartitioning/Tester.idl</include>
-                                <include>corba/exceptiondetailsc/idlI.idl</include>
-                                <include>corba/islocal/idlI.idl</include>
-                            </includes>
-                        </source>
+                            <excludes>
+                                <exclude>legacy/*.idl</exclude>
+                            </excludes>
+                         </source>
                     </sources>
                 </configuration>
             </plugin>

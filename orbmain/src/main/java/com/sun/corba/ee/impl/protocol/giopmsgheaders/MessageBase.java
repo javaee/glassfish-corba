@@ -100,11 +100,6 @@ public abstract class MessageBase implements Message{
 
     // Static methods
 
-    public static String typeToString(int type)
-    {
-        return typeToString((byte)type);
-    }
-
     public static String typeToString(byte type)
     {
         String result = type + "/";
@@ -125,7 +120,7 @@ public abstract class MessageBase implements Message{
     public static MessageBase readGIOPMessage(ORB orb, Connection connection)
     {
         MessageBase msg = readGIOPHeader( orb, connection ) ;
-        msg = (MessageBase)readGIOPBody( orb, connection, (Message)msg ) ;
+        msg = (MessageBase)readGIOPBody( orb, connection, msg) ;
         return msg ;
     }
 
@@ -486,16 +481,7 @@ public abstract class MessageBase implements Message{
         msg.setByteBuffer(buf);
 
         if (mtm.isEnabled()) {
-            mtm.recordBodyReceived( buf ) ;
-        }
-
-        if (orb.giopDebugFlag) {
-            // For debugging purposes, create view buffer
-            ByteBuffer viewBuf = buf.asReadOnlyBuffer();
-            viewBuf.limit(buf.capacity()).position(buf.limit());
-            dprint(".readGIOPBody: received message:");
-            ORBUtility.printBuffer( "GIOP Message Body", 
-                viewBuf, System.out ) ;
+            mtm.recordBodyReceived(buf) ;
         }
 
         return msg;
@@ -816,7 +802,6 @@ public abstract class MessageBase implements Message{
         }
 
         try {
-            ObjectKeyCacheEntry result = null ;
             switch (reqAddrDisp) {
                 case KeyAddr.value :
                     byte[] objKey = target.object_key();
@@ -825,10 +810,9 @@ public abstract class MessageBase implements Message{
                     }
                     break;
                 case ProfileAddr.value :
-                    IIOPProfile iiopProfile = null;
                     TaggedProfile profile = target.profile();
                     if (profile != null) { // AddressingDisposition::ProfileAddr
-                        iiopProfile = IIOPFactories.makeIIOPProfile(orb, profile);
+                        IIOPProfile iiopProfile = IIOPFactories.makeIIOPProfile(orb, profile);
                         ObjectKey objectKey = iiopProfile.getObjectKey();
                         return new ObjectKeyCacheEntryNoObjectAdapterImpl( objectKey ) ;
                     }
@@ -837,7 +821,7 @@ public abstract class MessageBase implements Message{
                     IORAddressingInfo iorInfo = target.ior();
                     if (iorInfo != null) { // AddressingDisposition::IORAddr
                         profile = iorInfo.ior.profiles[iorInfo.selected_profile_index];
-                        iiopProfile = IIOPFactories.makeIIOPProfile(orb, profile);
+                        IIOPProfile iiopProfile = IIOPFactories.makeIIOPProfile(orb, profile);
                         ObjectKey objectKey = iiopProfile.getObjectKey();
                         return new ObjectKeyCacheEntryNoObjectAdapterImpl( objectKey ) ;
                     }

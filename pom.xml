@@ -75,7 +75,7 @@
             <dependency>
                 <groupId>org.glassfish.simplestub</groupId>
                 <artifactId>simplestub</artifactId>
-                <version>0.1.1-SNAPSHOT</version>
+                <version>0.1.2</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>

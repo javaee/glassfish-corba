@@ -374,8 +374,6 @@ public class MessageMediatorImpl
         if ((!sentFullMessage()) && sentFragment() && 
             (!cancelRequestAlreadySent) && !connection.isClosed()) {
 
-            operationAndId(getOperationName(), getRequestId() );
-
             try {
                 connection.sendCancelRequestWithLock(getGIOPVersion(),
                                                      getRequestId());
@@ -941,7 +939,7 @@ public class MessageMediatorImpl
         generalMessage( "GIOP Request 1.2") ;
         try {
             try {
-                messageHeader = requestHeader = (RequestMessage) header;
+                messageHeader = requestHeader = header;
 
                 header.unmarshalRequestID(dispatchByteBuffer);
                 requestIdInfo(header.getRequestId());
@@ -1504,16 +1502,12 @@ public class MessageMediatorImpl
     @Subcontract
     private void dispatchError(MessageMediator messageMediator,
                                String msg, Throwable t) {
-        operationAndId(messageMediator.getOperationName(), 
-            messageMediator.getRequestId());
         // REVISIT - this makes hcks sendTwoObjects fail
         // messageMediator.getConnection().close();
     }
 
     @Subcontract
     private void sendResponse(MessageMediator messageMediator) {
-        operationAndId(messageMediator.getOperationName(),
-            messageMediator.getRequestId());
 
         if (orb.orbIsShutdown()) {
             return;
@@ -1530,9 +1524,6 @@ public class MessageMediatorImpl
     @Subcontract
     private void endRequest(MessageMediator messageMediator) {
         ORB myOrb = messageMediator.getBroker();
-
-        operationAndId(messageMediator.getOperationName(),
-            messageMediator.getRequestId());
 
         if (myOrb.orbIsShutdown()) {
             return;
@@ -1559,16 +1550,10 @@ public class MessageMediatorImpl
         }
     }
 
-    @InfoMethod
-    private void dispatchingToSubcontractInfo( ServerRequestDispatcher sc ) { }
-
     @Subcontract
     protected void handleRequestRequest(MessageMediator messageMediator) {
         // Does nothing if already unmarshaled.
         messageMediator.getInputObject().unmarshalHeader();
-
-        operationAndId(messageMediator.getOperationName(),
-            messageMediator.getRequestId());
 
         ORB myOrb = messageMediator.getBroker();
         if (myOrb.orbIsShutdown()) {
@@ -1579,7 +1564,6 @@ public class MessageMediatorImpl
 
         ServerRequestDispatcher sc = okey.getServerRequestDispatcher();
 
-        dispatchingToSubcontractInfo(sc);
         if (sc == null) {
             throw wrapper.noServerScInDispatch() ;
         }
@@ -1710,9 +1694,6 @@ public class MessageMediatorImpl
         MessageMediator messageMediator,
         Throwable throwable,
         CompletionStatus completionStatus) {
-
-        operationAndId(messageMediator.getOperationName(),
-            messageMediator.getRequestId() );
 
         // If we haven't unmarshaled the header, we probably don't
         // have enough information to even send back a reply.
@@ -1969,8 +1950,6 @@ public class MessageMediatorImpl
         }
 
         if (ex != null) {
-            operationAndId(messageMediator.getOperationName(),
-                messageMediator.getRequestId() );
             reportException( "Creating system exception response for", ex ) ;
         }
 
@@ -2073,8 +2052,6 @@ public class MessageMediatorImpl
         runInterceptors(messageMediator, reply);
         runRemoveThreadInfo(messageMediator);
 
-        operationAndId(messageMediator.getOperationName(),
-            messageMediator.getRequestId() );
         createResponseHelperInfo(reply);
                       
         messageMediator.setReplyHeader(reply);
@@ -2183,9 +2160,6 @@ public class MessageMediatorImpl
     }
 
     @InfoMethod
-    private void operationAndId( String op, int rid ) { }
-
-    @InfoMethod
     private void generalMessage( String msg ) { }
 
     @Subcontract
@@ -2193,9 +2167,6 @@ public class MessageMediatorImpl
         MessageMediator messageMediator, ServiceContexts contexts) {
         Connection c = messageMediator.getConnection();
 
-        operationAndId(messageMediator.getOperationName(),
-            messageMediator.getRequestId() );
-        
         // NOTE : We only want to send the runtime context the first time,
         // only in the case where the encoding is set to CDR.
         if (contexts == null) {

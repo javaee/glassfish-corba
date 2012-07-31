@@ -75,21 +75,11 @@ public class SocketFactoryConnectionImpl
         // client and server for removing connections from cache?
         this.contactInfo = contactInfo;
 
-        boolean isBlocking = !useSelectThreadToWait;
-        SocketInfo socketInfo = 
+        SocketInfo socketInfo =
             // REVISIT - case - needs interface method
             ((SocketFactoryContactInfoImpl)contactInfo).socketInfo;
         try {
-            socket = 
-                orb.getORBData().getLegacySocketFactory().createSocket(socketInfo);
-            socketChannel = socket.getChannel();
-            if (socketChannel != null) {
-                socketChannel.configureBlocking(isBlocking);
-            } else {
-                // IMPORTANT: non-channel-backed sockets must use
-                // dedicated reader threads.
-                setUseSelectThreadToWait(false);
-            }
+            defineSocket(useSelectThreadToWait, orb.getORBData().getLegacySocketFactory().createSocket(socketInfo));
             connectionCreated( socket ) ;
         } catch (GetEndPointInfoAgainException ex) {
             throw wrapper.connectFailure(

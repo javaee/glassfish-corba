@@ -224,7 +224,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     }
 
     // Client constructor.
-    public ConnectionImpl(ORB orb,
+    private ConnectionImpl(ORB orb,
                                          ContactInfo contactInfo,
                                          boolean useSelectThreadToWait,
                                          boolean useWorkerThread,
@@ -237,24 +237,24 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         this.contactInfo = contactInfo;
 
         try {
-            socket = orb.getORBData().getSocketFactory()
-                .createSocket(socketType,
-                              new InetSocketAddress(hostname, port));
-            socketChannel = socket.getChannel();
-
-            if (socketChannel != null) {
-                boolean isBlocking = !useSelectThreadToWait;
-                socketChannel.configureBlocking(isBlocking);
-            } else {
-                // IMPORTANT: non-channel-backed sockets must use
-                // dedicated reader threads.
-                setUseSelectThreadToWait(false);
-            }
+            defineSocket(useSelectThreadToWait,
+                         orb.getORBData().getSocketFactory().createSocket(socketType, new InetSocketAddress(hostname, port)));
         } catch (Throwable t) {
             throw wrapper.connectFailure(t, socketType, hostname, 
                                          Integer.toString(port));
         }
         state = OPENING;
+    }
+
+    protected final void defineSocket(boolean useSelectThreadToWait, Socket socket) throws IOException {
+        this.socket = socket;
+        socketChannel = socket.getChannel();
+
+        if (socketChannel == null) {
+            setUseSelectThreadToWait(false);  // IMPORTANT: non-channel-backed sockets must use dedicated reader threads.
+        } else {
+            socketChannel.configureBlocking(!useSelectThreadToWait);
+        }
     }
 
     // Client-side convenience.
@@ -271,32 +271,20 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     }
 
     // Server-side constructor.
-    public ConnectionImpl(ORB orb,
-                                         Acceptor acceptor,
-                                         Socket socket,
-                                         boolean useSelectThreadToWait,
-                                         boolean useWorkerThread)
-    {
+    private ConnectionImpl(ORB orb, Acceptor acceptor, Socket socket,
+                           boolean useSelectThreadToWait, boolean useWorkerThread) {
         this(orb, useSelectThreadToWait, useWorkerThread);
 
-        this.socket = socket;
-        socketChannel = socket.getChannel();
-        if (socketChannel != null) {
-            // REVISIT
-            try {
-                boolean isBlocking = !useSelectThreadToWait;
-                socketChannel.configureBlocking(isBlocking);
-                
-            } catch (IOException e) {
-                RuntimeException rte = new RuntimeException();
-                rte.initCause(e);
-                throw rte;
-            }
+        try {
+            defineSocket(useSelectThreadToWait, socket);
+        } catch (IOException e) {
+            RuntimeException rte = new RuntimeException();
+            rte.initCause(e);
+            throw rte;
         }
-        this.acceptor = acceptor;
 
-        serverRequestMap = Collections.synchronizedMap(
-            new HashMap<Integer,MessageMediator>());
+        this.acceptor = acceptor;
+        serverRequestMap = Collections.synchronizedMap(new HashMap<Integer,MessageMediator>());
         isServer = true;
 
         state = ESTABLISHED;
@@ -332,11 +320,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         MessageMediator messageMediator = readBits();
 
         // Null can happen when client closes stream causing purgecalls.
-        return messageMediator == null || dispatch(messageMediator);
-    }
-
-    private static boolean dispatch(MessageMediator messageMediator) {
-        return messageMediator.dispatch();
+        return messageMediator == null || dispatcher.dispatch(messageMediator);
     }
 
     private void unregisterForEventAndPurgeCalls(SystemException ex)
@@ -411,12 +395,6 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         try {
             if (hasSocketChannel()) {
                 ByteBuffer lbb = orb.getByteBufferPool().getByteBuffer(size);
-
-                if (orb.transportDebugFlag) {
-                    int bbAddress = System.identityHashCode(lbb);
-                    bbInfo( bbAddress ) ;
-                }
-            
                 lbb.position(offset);
                 lbb.limit(size);
                 readFully(lbb, length );
@@ -428,8 +406,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
             // if the socket is closed. Hence, we check the connection
             // state CLOSE_RECVD if an IOException is thrown here 
             // instead of in readFully()
-            readFully(getSocket().getInputStream(), buf,
-                      offset, length );
+            readFully(getSocket().getInputStream(), buf, offset, length );
             ByteBuffer nbb = ByteBuffer.wrap(buf);
             nbb.limit(size);
             return nbb;
@@ -1242,7 +1219,6 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
 
         // Mark the state of the connection
         // and determine the request status
-        org.omg.CORBA.CompletionStatus completion_status;
         synchronized ( stateEvent ){
             if (minor_code == ORBUtilSystemException.CONNECTION_REBIND) {
                 state = CLOSE_RECVD;

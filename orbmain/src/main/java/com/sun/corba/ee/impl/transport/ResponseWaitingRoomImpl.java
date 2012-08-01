@@ -106,7 +106,7 @@ public class ResponseWaitingRoomImpl
         display( "messageMediator operation name",
             messageMediator.getOperationName() ) ;
 
-        Integer requestId = messageMediator.getRequestIdInteger();
+        Integer requestId = messageMediator.getRequestId();
         
         OutCallDesc call = new OutCallDesc();
         call.messageMediator = messageMediator;
@@ -122,13 +122,13 @@ public class ResponseWaitingRoomImpl
     @Transport
     public void unregisterWaiter(MessageMediator mediator)
     {
-        MessageMediator messageMediator = (MessageMediator) mediator;
+        MessageMediator messageMediator = mediator;
         display( "messageMediator request ID",
             messageMediator.getRequestId() ) ;
         display( "messageMediator operation name",
             messageMediator.getOperationName() ) ;
 
-        Integer requestId = messageMediator.getRequestIdInteger();
+        Integer requestId = messageMediator.getRequestId();
 
         out_calls.remove(requestId);
     }
@@ -142,7 +142,7 @@ public class ResponseWaitingRoomImpl
         display( "messageMediator operation name",
             messageMediator.getOperationName() ) ;
         
-        Integer requestId = messageMediator.getRequestIdInteger();
+        Integer requestId = messageMediator.getRequestId();
         
         if (messageMediator.isOneWay()) {
             // The waiter is removed in releaseReply in the same

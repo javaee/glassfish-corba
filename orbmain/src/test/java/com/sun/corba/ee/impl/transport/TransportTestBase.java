@@ -21,6 +21,7 @@ import com.sun.corba.ee.spi.threadpool.WorkQueue;
 import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.corba.ee.spi.transport.ConnectionCache;
 import com.sun.corba.ee.spi.transport.EventHandler;
+import com.sun.corba.ee.spi.transport.InboundConnectionCache;
 import com.sun.corba.ee.spi.transport.MessageTraceManager;
 import com.sun.corba.ee.spi.transport.Selector;
 import com.sun.corba.ee.spi.transport.TcpTimeouts;
@@ -76,6 +77,38 @@ public class TransportTestBase {
         }
     }
 
+    protected int getNumConnectionsRemoved() {
+        return connectionCache.numRemoveCalls;
+    }
+
+    class BackgroundProcessor extends Thread {
+        int numToProcess;
+
+        BackgroundProcessor(int numToProcess) {
+            this.numToProcess = numToProcess;
+            start();
+
+        }
+
+        protected void waitUntilDone() throws InterruptedException {
+            join(200);
+        }
+
+        @Override
+        public void run() {
+            while (numToProcess > 0) {
+                if (workQueue.items.isEmpty())
+                    Thread.yield();
+                else {
+                    numToProcess--;
+                    Work work = workQueue.items.remove();
+                    work.doWork();
+                }
+            }
+
+        }
+    }
+
     protected void readFromNio(byte[] data) throws IOException {
         useNio();
         socketChannel.enqueData(data);
@@ -96,6 +129,7 @@ public class TransportTestBase {
         threadPoolManager.threadPool = threadPool;
         threadPool.workQueue = workQueue;
         transportManager.selector = selector;
+        selector.workQueue = workQueue;
         tcpTimeouts.waiter = waiter;
         socketChannel.socket = socket;
         acceptor = Stub.create(AcceptorFake.class, orb, 0, "name", "type");
@@ -189,6 +223,11 @@ public class TransportTestBase {
         @Override
         public short getGIOPTargetAddressPreference() {
             return 3; // allow all types
+        }
+
+        @Override
+        public int fragmentReadTimeout() {
+            return 1000;
         }
     }
 
@@ -388,9 +427,16 @@ public class TransportTestBase {
     }
 
     @SimpleStub(strict = true)
-    static abstract class ConnectionCacheFake implements ConnectionCache {
+    static abstract class ConnectionCacheFake implements InboundConnectionCache {
+        private int numRemoveCalls;
+
         @Override
         public void stampTime(Connection connection) {
+        }
+
+        @Override
+        public void remove(Connection connection) {
+            numRemoveCalls++;
         }
     }
 
@@ -448,12 +494,16 @@ public class TransportTestBase {
 
     @SimpleStub(strict=true)
     static abstract class TransportSelectorFake implements Selector {
+        public WorkQueueFake workQueue;
+
         @Override
         public void unregisterForEvent(EventHandler eventHandler) {
         }
 
         @Override
-        public void registerForEvent(EventHandler eventHander) {
+        public void registerForEvent(EventHandler eventHandler) {
+            if (eventHandler instanceof Work)
+                workQueue.addWork((Work) eventHandler);
         }
 
         @Override

@@ -77,17 +77,12 @@ public abstract interface MessageMediator
     public GIOPVersion getGIOPVersion();
     public byte getEncodingVersion();
     public int getRequestId();
-    public Integer getRequestIdInteger();
     public boolean isOneWay();
-    public short getAddrDisposition();
     public String getOperationName();
     public ServiceContexts getRequestServiceContexts();
     public void setRequestServiceContexts(ServiceContexts sc);
     public ServiceContexts getReplyServiceContexts();
     public Message getDispatchHeader();
-    public void setDispatchHeader(Message msg);
-    public ByteBuffer getDispatchBuffer();
-    public void setDispatchBuffer(ByteBuffer byteBuffer);
     public int getThreadPoolToUse();
     public boolean dispatch();
     public byte getStreamFormatVersion(); // REVIST name ForRequest?
@@ -120,7 +115,6 @@ public abstract interface MessageMediator
     //
 
     public ObjectKeyCacheEntry getObjectKeyCacheEntry();
-    public void setProtocolHandler(ProtocolHandler protocolHandler);
     public ProtocolHandler getProtocolHandler();
 
     ////////////////////////////////////////////////////

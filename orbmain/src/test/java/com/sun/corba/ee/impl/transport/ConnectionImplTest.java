@@ -5,8 +5,8 @@ import com.sun.corba.ee.impl.protocol.RequestIdImpl;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.threadpool.Work;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.omg.CORBA.COMM_FAILURE;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -21,7 +21,7 @@ public class ConnectionImplTest extends TransportTestBase {
     private static final byte[] BYTE_DATA = {0,1,2,3,4,5,6,7,8,9,10};
 
     @Test
-    public void whenRequest1_0_receivedFromSocketInvokeObject() throws IOException {
+    public void whenRequest1_0_receivedFromSocket_dispatchRequest() throws IOException {
         final List<Short> params = new ArrayList<Short>();
         defineRequestDispatcher( new RequestDispatcher() {
             public void readParameters(CDRInputObject input) {
@@ -30,7 +30,7 @@ public class ConnectionImplTest extends TransportTestBase {
         });
         readFromSocketWithoutChannelAndDispatch(new byte[]{'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN,
                 Message.GIOPRequest, /* size */ 0, 0, 0, 38, /* no service contexts */ 0, 0, 0, 0,
-                /* request ID */ 0, 0, 0, 2, /* response expected */ 1, /* padding */ 0,0,0,
+                /* request ID */ 0, 0, 0, 2, /* response expected */ 1, /* padding */ 0, 0, 0,
                 /* object key */ 0, 0, 0, 4, 0, 0, 0, 6, /* operation */ 0, 0, 0, 5, 'd', 'o', 'I', 't', 0,
                 0, 0, 0, /* principal */ 0, 0, 0, 0, /* short param */ 1, 1});
         getConnection().doWork();
@@ -43,7 +43,7 @@ public class ConnectionImplTest extends TransportTestBase {
     }
 
     @Test
-    public void whenRequest1_0_receivedFromNioInvokeObject() throws IOException {
+    public void whenRequest1_0_receivedFromNio_dispatchRequest() throws IOException {
         final List<Short> params = new ArrayList<Short>();
         defineRequestDispatcher( new RequestDispatcher() {
             public void readParameters(CDRInputObject input) {
@@ -66,35 +66,8 @@ public class ConnectionImplTest extends TransportTestBase {
         assertEquals(257, (short) params.get(0));
     }
 
-    @Test @Ignore("The fragment needs to be processed asynchronously")
-    public void whenRequest1_1_receivedFromNioWithFragmentsInvokeObject() throws IOException {
-        final List<Short> params = new ArrayList<Short>();
-        defineRequestDispatcher( new RequestDispatcher() {
-            public void readParameters(CDRInputObject input) {
-                params.add(input.read_short());
-            }
-        });
-        readFromNio(new byte[]{'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT,
-                Message.GIOPRequest, /* size */ 0, 0, 0, 12, /* no service contexts */ 0, 0, 0, 0,
-                /* request ID */ 0, 0, 0, 2, /* response expected */ 1, /* padding */ 0, 0, 0,
-
-                'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment,
-                /* size */ 0, 0, 0, 30, /* request ID */ 0, 0, 0, 2, /* object key */ 0, 0, 0, 4, 0, 0, 0, 6,
-                /* operation */ 0, 0, 0, 5, 'd', 'o', 'I', 't', 0,
-                0, 0, 0, /* principal */ 0, 0, 0, 0, /* short param */ 1, 1});
-        getConnection().doWork();
-        processQueuedWork();
-
-        assertEquals(1, getMediators().size());
-        MessageMediator mediator = getMediators().remove(0);
-        assertEquals("doIt", mediator.getOperationName());
-        assertEquals(2, mediator.getRequestId());
-        assertFalse(mediator.isOneWay());
-        assertEquals(257, (short) params.get(0));
-    }
-
     @Test
-    public void whenRequest1_1_receivedFromNioInvokeObject() throws IOException {
+    public void whenRequest1_1_receivedFromNio_dispatchRequest() throws IOException {
         final List<Short> params = new ArrayList<Short>();
         defineRequestDispatcher( new RequestDispatcher() {
             public void readParameters(CDRInputObject input) {
@@ -118,7 +91,7 @@ public class ConnectionImplTest extends TransportTestBase {
     }
 
     @Test
-    public void whenRequest1_2_receivedFromNioInvokeObject() throws IOException {
+    public void whenRequest1_2_receivedFromNio_dispatchRequest() throws IOException {
         final List<Short> params = new ArrayList<Short>();
         defineRequestDispatcher( new RequestDispatcher() {
             public void readParameters(CDRInputObject input) {
@@ -127,7 +100,7 @@ public class ConnectionImplTest extends TransportTestBase {
         });
         readFromNio(new byte[]{'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN,
                 Message.GIOPRequest, /* size */ 0, 0, 0, 38,
-                /* request ID */ 0, 0, 0, 2, /* response expected */ 1, /* request reserved */ 0,0,0,
+                /* request ID */ 0, 0, 0, 2, /* response expected */ 1, /* request reserved */ 0, 0, 0,
                 /* use key */ 0, 0, /* padding */ 0, 0, /* object key */ 0, 0, 0, 4, 0, 0, 0, 6,
                 /* operation */ 0, 0, 0, 5, 'd', 'o', 'I', 't', 0,
                 /* padding */ 0, 0, 0, /* no service contexts */ 0, 0, 0, 0, /* short param */ 1, 1});
@@ -140,6 +113,107 @@ public class ConnectionImplTest extends TransportTestBase {
         assertEquals(2, mediator.getRequestId());
         assertFalse(mediator.isOneWay());
         assertEquals(257, (short) params.get(0));
+    }
+
+    @Test
+    public void whenRequest1_1_receivedFromSocketWithFragments_dispatchRequest() throws IOException, InterruptedException {
+        final List<Short> params = new ArrayList<Short>();
+        defineRequestDispatcher( new RequestDispatcher() {
+            public void readParameters(CDRInputObject input) {
+                params.add(input.read_short());
+            }
+        });
+        readFromSocketWithoutChannelAndDispatch(new byte[]{'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT,
+                Message.GIOPRequest, /* size */ 0, 0, 0, 36, /* no service contexts */ 0, 0, 0, 0,
+                /* request ID */ 0, 0, 0, 2, /* response expected */ 1, /* reserved */ 0, 0, 0,
+                /* object key */ 0, 0, 0, 4, 0, 0, 0, 6, /* operation */ 0, 0, 0, 5, 'd', 'o', 'I', 't', 0,
+                /* padding */ 0, 0, 0, /* principal */ 0, 0, 0, 0,
+
+                'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment,
+                /* size */ 0, 0, 0, 2, /* short param */ 1, 1});
+        processSocketMessageWithFragments(1);
+
+        assertEquals(1, getMediators().size());
+        MessageMediator mediator = getMediators().remove(0);
+        assertEquals("doIt", mediator.getOperationName());
+        assertEquals(2, mediator.getRequestId());
+        assertFalse(mediator.isOneWay());
+        assertEquals(257, (short) params.get(0));
+    }
+
+    private void processSocketMessageWithFragments(int numFragments) throws InterruptedException {
+        BackgroundProcessor backgroundProcessor = new BackgroundProcessor(numFragments);
+        getConnection().doWork();
+        backgroundProcessor.waitUntilDone();
+    }
+
+    @Test
+    public void whenRequest1_1ReceivedFromNioWithFragments_dispatchRequest() throws IOException, InterruptedException {
+        final List<Short> params = new ArrayList<Short>();
+        defineRequestDispatcher(new RequestDispatcher() {
+            public void readParameters(CDRInputObject input) {
+                params.add(input.read_short());
+            }
+        });
+        readFromNio(new byte[]{'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT,
+                Message.GIOPRequest, /* size */ 0, 0, 0, 36, /* no service contexts */ 0, 0, 0, 0,
+                /* request ID */ 0, 0, 0, 2, /* response expected */ 1, /* reserved */ 0, 0, 0,
+                /* object key */ 0, 0, 0, 4, 0, 0, 0, 6, /* operation */ 0, 0, 0, 5, 'd', 'o', 'I', 't', 0,
+                /* padding */ 0, 0, 0, /* principal */ 0, 0, 0, 0,
+
+                'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment,
+                /* size */ 0, 0, 0, 2, /* short param */ 1, 1});
+        processNioMessageWithFragments(1);
+
+        assertEquals(1, getMediators().size());
+        MessageMediator mediator = getMediators().remove(0);
+        assertEquals("doIt", mediator.getOperationName());
+        assertEquals(2, mediator.getRequestId());
+        assertFalse(mediator.isOneWay());
+        assertEquals(257, (short) params.get(0));
+    }
+
+    @Test
+    public void whenRequest1_2ReceivedFromNioWithFragments_dispatchRequest() throws IOException, InterruptedException {
+        final List<Short> params = new ArrayList<Short>();
+        defineRequestDispatcher(new RequestDispatcher() {
+            public void readParameters(CDRInputObject input) {
+                params.add(input.read_short());
+            }
+        });
+        readFromNio(new byte[]{'G', 'I', 'O', 'P', 1, 2, Message.MORE_FRAGMENTS_BIT,
+                Message.GIOPRequest, /* size */ 0, 0, 0, 36,
+                /* request ID */ 0, 0, 0, 2, /* response expected */ 1, /* reserved */ 0, 0, 0,
+                /* use key */ 0, 0, /* padding */ 0, 0, /* object key */ 0, 0, 0, 4, 0, 0, 0, 6,
+                /* operation */ 0, 0, 0, 8, 'g', 'o', 'A', 'g', 'a', 'i', 'n', 0,
+                /* no service contexts */ 0, 0, 0, 0,
+
+                'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment,
+                /* size */ 0, 0, 0, 6, /* request id */ 0, 0, 0, 2, /* short param */ 1, 1});
+        processNioMessageWithFragments(1);
+
+        assertEquals(1, getMediators().size());
+        MessageMediator mediator = getMediators().remove(0);
+        assertEquals("goAgain", mediator.getOperationName());
+        assertEquals(2, mediator.getRequestId());
+        assertFalse(mediator.isOneWay());
+        assertEquals(257, (short) params.get(0));
+    }
+
+    private void processNioMessageWithFragments(int numFragments) throws InterruptedException {
+        getConnection().doWork();
+        Work work = getWorkQueue().remove();
+        BackgroundProcessor backgroundProcessor = new BackgroundProcessor(numFragments);
+        work.doWork();
+        backgroundProcessor.waitUntilDone();
+    }
+
+    @Test
+    public void whenCloseConnectionReceivedFromSocket_shutdownConnection() {
+        readFromSocketWithoutChannelAndDispatch(new byte[]{'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN,
+                Message.GIOPCloseConnection, /* size */ 0, 0, 0, 0});
+        getConnection().doWork();
+        assertEquals(1, getNumConnectionsRemoved());
     }
 
     @Test(expected = RuntimeException.class)

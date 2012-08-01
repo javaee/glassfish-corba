@@ -136,8 +136,6 @@ public abstract interface Acceptor
 
     EventHandler getEventHandler();
 
-    CDRInputObject createInputObject(ORB broker, MessageMediator messageMediator);
-
     CDROutputObject createOutputObject(ORB broker, MessageMediator messageMediator);
     
     ServerSocket getServerSocket();

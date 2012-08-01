@@ -40,7 +40,6 @@
 
 package com.sun.corba.ee.impl.transport;
 
-import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 import com.sun.corba.ee.impl.oa.poa.Policies;
@@ -299,13 +298,8 @@ public abstract class AcceptorBase
         throw new RuntimeException("Should not happen.");
     }
 
-    public CDRInputObject createInputObject(ORB broker, MessageMediator messageMediator) {
-        return new CDRInputObject(broker, messageMediator.getConnection(), 
-            messageMediator.getDispatchBuffer(), messageMediator.getDispatchHeader());
-    }
-
     public CDROutputObject createOutputObject(ORB broker, MessageMediator messageMediator) {
-        return new CDROutputObject((ORB) broker, messageMediator, 
+        return new CDROutputObject(broker, messageMediator,
             messageMediator.getReplyHeader(), messageMediator.getStreamFormatVersion());
     }
 

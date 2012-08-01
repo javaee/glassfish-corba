@@ -58,7 +58,6 @@ import javax.management.ObjectName ;
 import org.omg.PortableInterceptor.ORBInitializer ;
 import org.omg.PortableInterceptor.ORBInitInfo ;
 
-import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.transport.ContactInfo;
@@ -1047,8 +1046,6 @@ public class ParserTable {
         public void close() { }
         public EventHandler getEventHandler() { return null; }
 
-        public CDRInputObject createInputObject(
-            ORB broker, MessageMediator messageMediator) { return null; }
         public CDROutputObject createOutputObject(
             ORB broker, MessageMediator messageMediator) { return null; }
         public String getObjectAdapterId() { return null ; }
@@ -1104,8 +1101,6 @@ public class ParserTable {
         public void close() { }
         public EventHandler getEventHandler() { return null; }
 
-        public CDRInputObject createInputObject(
-            ORB broker, MessageMediator messageMediator) { return null; }
         public CDROutputObject createOutputObject(
             ORB broker, MessageMediator messageMediator) { return null; }
         public String getObjectAdapterId() { return null ; }

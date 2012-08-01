@@ -45,6 +45,7 @@ import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 
+import org.omg.CORBA.COMM_FAILURE;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 import org.omg.IOP.TaggedProfile;
@@ -338,8 +339,9 @@ public abstract class MessageBase implements Message{
             if (orb.giopDebugFlag) {
                 dprint(".parseGIOPHeader: received CloseConnection message");
             }
-            connection.purgeCalls(wrapper.connectionRebind(), false, true);
-            throw wrapper.connectionRebind();
+            COMM_FAILURE comm_failure = wrapper.connectionRebind();
+            connection.purgeCalls(comm_failure, false, true);
+            throw comm_failure;
 
         case GIOPMessageError:
             if (orb.giopDebugFlag) {

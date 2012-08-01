@@ -53,7 +53,6 @@ import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.corba.ee.spi.transport.ContactInfoList;
 import com.sun.corba.ee.spi.transport.ContactInfo;
 
-import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
 import com.sun.corba.ee.impl.protocol.MessageMediatorImpl;
 import com.sun.corba.ee.spi.trace.Transport;
@@ -133,31 +132,15 @@ public abstract class ContactInfoBase
     }
 
     @Transport
-    public CDROutputObject createOutputObject(MessageMediator messageMediator)
-    {
-        MessageMediator corbaMessageMediator = (MessageMediator)
-            messageMediator;
-        
+    public CDROutputObject createOutputObject(MessageMediator messageMediator) {
+
         CDROutputObject outputObject =
             new CDROutputObject(orb, messageMediator, 
-                                corbaMessageMediator.getRequestHeader(),
-                                corbaMessageMediator.getStreamFormatVersion());
+                                messageMediator.getRequestHeader(),
+                                messageMediator.getStreamFormatVersion());
 
         messageMediator.setOutputObject(outputObject);
         return outputObject;
-    }
-
-    @Transport
-    public CDRInputObject createInputObject(ORB broker, 
-        MessageMediator messageMediator) {
-
-        // REVISIT: Duplicate of acceptor code.
-        MessageMediator corbaMessageMediator = (MessageMediator)
-            messageMediator;
-        return new CDRInputObject((ORB)broker,
-                                  (Connection)messageMediator.getConnection(),
-                                  corbaMessageMediator.getDispatchBuffer(),
-                                  corbaMessageMediator.getDispatchHeader());
     }
 
     ////////////////////////////////////////////////////

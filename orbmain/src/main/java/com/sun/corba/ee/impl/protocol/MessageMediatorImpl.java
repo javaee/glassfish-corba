@@ -329,20 +329,12 @@ public class MessageMediatorImpl
         return getRequestHeader().getRequestId();
     }
 
-    public Integer getRequestIdInteger() {
-        return Integer.valueOf( getRequestId() ) ;
-    }
-
     public boolean isOneWay() {
         if (getRequestHeader() == null) {
             return false ;
         }
 
         return ! getRequestHeader().isResponseExpected();
-    }
-
-    public short getAddrDisposition() {
-        return addrDisposition;
     }
 
     public String getOperationName() {
@@ -470,21 +462,9 @@ public class MessageMediatorImpl
         return dispatchHeader;
     }
 
-    public void setDispatchHeader(Message msg) {
-        dispatchHeader = msg;
-    }
-
-    public ByteBuffer getDispatchBuffer() {
-        return dispatchByteBuffer;
-    }
-
-    public void setDispatchBuffer(ByteBuffer byteBuffer) {
-        dispatchByteBuffer = byteBuffer;
-    }
-
     public int getThreadPoolToUse() {
         int poolToUse = 0;
-        Message msg = getDispatchHeader();
+        Message msg = dispatchHeader;
         // A null msg should never happen. But, we'll be
         // defensive just in case.
         if (msg != null) {
@@ -620,10 +600,6 @@ public class MessageMediatorImpl
         return getRequestHeader().getObjectKeyCacheEntry() ;
     }
 
-    public void setProtocolHandler(ProtocolHandler protocolHandler) {
-        throw wrapper.methodShouldNotBeCalled() ;
-    }
-
     public ProtocolHandler getProtocolHandler() {
         // REVISIT: should look up in orb registry.
         return this;
@@ -637,15 +613,15 @@ public class MessageMediatorImpl
     public org.omg.CORBA.portable.OutputStream createReply() {
         // Note: relies on side-effect of setting mediator output field.
         // REVISIT - cast - need interface
-        getProtocolHandler().createResponse(this, (ServiceContexts) null);
-        return (OutputStream) getOutputObject();
+        getProtocolHandler().createResponse(this, null);
+        return getOutputObject();
     }
 
     public org.omg.CORBA.portable.OutputStream createExceptionReply() {
         // Note: relies on side-effect of setting mediator output field.
         // REVISIT - cast - need interface
-        getProtocolHandler().createUserExceptionResponse(this, (ServiceContexts) null);
-        return (OutputStream) getOutputObject();
+        getProtocolHandler().createUserExceptionResponse(this, null);
+        return getOutputObject();
     }
 
     public boolean executeReturnServantInResponseConstructor() {
@@ -673,8 +649,7 @@ public class MessageMediatorImpl
     }
 
     @Transport
-    private byte getStreamFormatVersionForThisRequest(IOR ior, 
-        GIOPVersion giopVersion) {
+    private byte getStreamFormatVersionForThisRequest(IOR ior, GIOPVersion giopVersion) {
 
         IOR effectiveTargetIOR = 
             this.contactInfo.getEffectiveTargetIOR();
@@ -849,20 +824,8 @@ public class MessageMediatorImpl
     }
 
     private void setInputObject() {
-        // REVISIT: refactor createInputObject (and createMessageMediator)
-        // into base PlugInFactory.  Get via connection (either ContactInfo
-        // or Acceptor).
-        if (getConnection().getContactInfo() != null) {
-            inputObject = getConnection().getContactInfo().
-                createInputObject(orb, this);
-        } else if (getConnection().getAcceptor() != null) {
-            inputObject = getConnection().getAcceptor().
-                createInputObject(orb, this);
-        } else {
-            throw new RuntimeException("CorbaMessageMediatorImpl.setInputObject");
-        }
+        inputObject = new CDRInputObject(orb, getConnection(), dispatchByteBuffer, dispatchHeader);
         inputObject.setMessageMediator(this);
-        setInputObject(inputObject);
     }
 
     private void signalResponseReceived() {
@@ -936,12 +899,12 @@ public class MessageMediatorImpl
     // REVISIT: this is identical to 1_0 except for fragment part.
     @Transport
     public void handleInput(RequestMessage_1_2 header) throws IOException {
-        generalMessage( "GIOP Request 1.2") ;
+        generalMessage("GIOP Request 1.2") ;
         try {
             try {
                 messageHeader = requestHeader = header;
 
-                header.unmarshalRequestID(dispatchByteBuffer);
+                unmarshalRequestID(header);
                 requestIdInfo(header.getRequestId());
                 setInputObject();
 
@@ -968,6 +931,10 @@ public class MessageMediatorImpl
         } finally {
             connection.serverRequestMapRemove(header.getRequestId());
         }
+    }
+
+    private void unmarshalRequestID(Message_1_2 message) {
+        message.unmarshalRequestID(dispatchByteBuffer);
     }
 
     @Transport
@@ -1045,7 +1012,7 @@ public class MessageMediatorImpl
                 messageHeader = replyHeader = (ReplyMessage) header;
 
                 // We know that the request ID is in the first fragment
-                header.unmarshalRequestID(dispatchByteBuffer);
+                unmarshalRequestID(header);
                 requestIdInfo( header.getRequestId() ) ;
                 moreFragmentsInfo(header.moreFragmentsToFollow());
                 setInputObject();
@@ -1101,7 +1068,7 @@ public class MessageMediatorImpl
             try {
                 messageHeader = header;
 
-                header.unmarshalRequestID(dispatchByteBuffer);
+                unmarshalRequestID(header);
                 setInputObject();
 
                 requestIdInfo(header.getRequestId());
@@ -1165,7 +1132,7 @@ public class MessageMediatorImpl
                 messageHeader = header;
 
                 // No need to put in client reply map - already there.
-                header.unmarshalRequestID(dispatchByteBuffer);
+                unmarshalRequestID(header);
                 setInputObject();
 
                 requestIdInfo(header.getRequestId());
@@ -1212,8 +1179,7 @@ public class MessageMediatorImpl
                 // will eventually be discarded by the GC.
                 if (inObj == null) {
                     generalMessage( "No input stream: discarding fragment") ;
-                    // need to release dispatchByteBuffer to pool if
-                    // we are discarding
+                    // need to release dispatchByteBuffer to pool if we are discarding
                     releaseByteBufferToPool();
                     return;
                 }
@@ -1250,7 +1216,7 @@ public class MessageMediatorImpl
                 // request ID... but we need the request ID to get the
                 // IIOPInputStream instance. So we peek at the raw bytes.
 
-                header.unmarshalRequestID(dispatchByteBuffer);
+                unmarshalRequestID(header);
 
                 requestIdInfo(header.getRequestId());
                 moreFragmentsInfo(header.moreFragmentsToFollow());
@@ -1586,8 +1552,7 @@ public class MessageMediatorImpl
     @Subcontract
     protected void handleLocateRequest(MessageMediator messageMediator) {
         ORB myOrb = messageMediator.getBroker();
-        LocateRequestMessage msg = (LocateRequestMessage)
-            messageMediator.getDispatchHeader();
+        LocateRequestMessage msg = (LocateRequestMessage) messageMediator.getDispatchHeader();
         IOR ior = null;
         LocateReplyMessage reply = null;
         short addrDisp = -1; 
@@ -1650,8 +1615,7 @@ public class MessageMediatorImpl
                         LocateReplyMessage.UNKNOWN_OBJECT, null);
         }
 
-        CDROutputObject outObj = createAppropriateOutputObject(
-            messageMediator, msg, reply);
+        CDROutputObject outObj = createAppropriateOutputObject(messageMediator, msg, reply);
         messageMediator.setOutputObject(outObj);
         outObj.setMessageMediator(messageMediator);
 
@@ -2221,17 +2185,10 @@ public class MessageMediatorImpl
         return contexts;
     }
 
-    @InfoMethod
-    private void releasingByteBufferToPool( int bbid ) { }
-
     @Transport
     private void releaseByteBufferToPool() {
         if (dispatchByteBuffer != null) {
             orb.getByteBufferPool().releaseByteBuffer(dispatchByteBuffer);
-            if (orb.transportDebugFlag) {
-                int bbId = System.identityHashCode(dispatchByteBuffer);
-                releasingByteBufferToPool(bbId);
-            }
         }
     }
 

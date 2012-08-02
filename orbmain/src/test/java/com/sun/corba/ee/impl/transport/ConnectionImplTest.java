@@ -91,18 +91,18 @@ public class ConnectionImplTest extends TransportTestBase {
     }
 
     @Test
-    public void whenRequest1_2_receivedFromNio_dispatchRequest() throws IOException {
+    public void whenLittleEndianRequest1_2_receivedFromNio_dispatchRequest() throws IOException {
         final List<Short> params = new ArrayList<Short>();
         defineRequestDispatcher( new RequestDispatcher() {
             public void readParameters(CDRInputObject input) {
                 params.add(input.read_short());
             }
         });
-        readFromNio(new byte[]{'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN,
-                Message.GIOPRequest, /* size */ 0, 0, 0, 38,
-                /* request ID */ 0, 0, 0, 2, /* response expected */ 1, /* request reserved */ 0, 0, 0,
-                /* use key */ 0, 0, /* padding */ 0, 0, /* object key */ 0, 0, 0, 4, 0, 0, 0, 6,
-                /* operation */ 0, 0, 0, 5, 'd', 'o', 'I', 't', 0,
+        readFromNio(new byte[]{'G', 'I', 'O', 'P', 1, 2, Message.LITTLE_ENDIAN_BIT,
+                Message.GIOPRequest, /* size */ 38, 0, 0, 0,
+                /* request ID */ 2, 0, 0, 0, /* response expected */ 1, /* request reserved */ 0, 0, 0,
+                /* use key */ 0, 0, /* padding */ 0, 0, /* object key */ 4, 0, 0, 0, 0, 0, 0, 6,
+                /* operation */ 5, 0, 0, 0, 'd', 'o', 'I', 't', 0,
                 /* padding */ 0, 0, 0, /* no service contexts */ 0, 0, 0, 0, /* short param */ 1, 1});
         getConnection().doWork();
         processQueuedWork();
@@ -254,7 +254,7 @@ public class ConnectionImplTest extends TransportTestBase {
     public void whenNioMessageReceivedInTwoReads_queueSingleEntryAfterSecond() throws IOException {
         useNio();
         getSocketChannel().enqueData(new byte[]{'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6});
-        getSocketChannel().setNumBytesToRead(8);
+        getSocketChannel().setNumBytesToRead(8, 0);
         getConnection().doWork();
         assertEquals(1, getWorkQueue().size());
         assertTrue(getWorkQueue().remove() instanceof MessageMediator);

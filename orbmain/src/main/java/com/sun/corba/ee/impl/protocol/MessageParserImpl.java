@@ -53,7 +53,6 @@ import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.ee.spi.trace.Giop;
 import com.sun.corba.ee.spi.trace.Transport;
-import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 
 /**
@@ -127,45 +126,16 @@ public class MessageParserImpl implements MessageParser {
                 message.setByteBuffer(msgByteBuffer);
 
                 if (MessageBase.messageSupportsFragments(message)) {
-                    // are there more fragments to follow?
                     if (message.moreFragmentsToFollow()) {
-                        // Add to fragmentList if not already there
-                        RequestId requestId = MessageBase.getRequestIdFromMessageBytes(message);
-                        if (!fragmentList.contains(requestId)) {
-                            fragmentList.add(requestId);
-                        }
-                    } else {
-                        // no fragments to follow
-                        if (message.getType() == MessageBase.GIOPFragment ||
-                            message.getType() == MessageBase.GIOPCancelRequest) {
-                            // remove request id from fragmentList
-                            RequestId requestId =
-                                MessageBase.getRequestIdFromMessageBytes(message);
-                            if (fragmentList.size() > 0 &&
-                                fragmentList.remove(requestId)) {
-                            }
-                        }
+                        addRequestIdToFragmentList(message);
+                    } else if (isEndOfFragmentList(message)) {
+                        removeRequestIdFromFragmentList(message);
                     }
-                    // if request id's are outstanding, we're expect more data
-                    if (fragmentList.size() > 0) {
-                        expectingMoreData = true;
-                    } else {
-                        // not waiting for more fragments
-                        expectingMoreData = false;
-                    }
+                    expectingMoreData = stillLookingForFragments();
                 }
-                // set last remaining states,
-                // any bytes remaining to be parsed?
-                if (byteBuffer.hasRemaining()) {
-                    // more bytes to parse
-                    moreBytesToParse = true;
-                } else {
-                    // no more bytes to parse
-                    moreBytesToParse = false;
-                    // set byteBuffer limit to end of buffer so next
-                    // read will read up to capacity - position bytes
-                    byteBuffer.limit(byteBuffer.capacity());
-                }
+
+                moreBytesToParse = byteBuffer.hasRemaining();
+                if (!moreBytesToParse) byteBuffer.limit(byteBuffer.capacity());
                 sizeNeeded = orb.getORBData().getReadByteBufferSize();
             } else {
                 // set state for next parseBytes invocation
@@ -187,7 +157,32 @@ public class MessageParserImpl implements MessageParser {
         }
         return message;
     }
-    
+
+    private boolean stillLookingForFragments() {
+        return fragmentList.size() > 0;
+    }
+
+    private boolean isEndOfFragmentList(Message message) {
+        return message.getType() == MessageBase.GIOPFragment ||
+            message.getType() == MessageBase.GIOPCancelRequest;
+    }
+
+    private void removeRequestIdFromFragmentList(Message message) {
+        // remove request id from fragmentList
+        RequestId requestId = MessageBase.getRequestIdFromMessageBytes(message);
+        if (fragmentList.size() > 0 &&
+            fragmentList.remove(requestId)) {
+        }
+    }
+
+    private void addRequestIdToFragmentList(Message message) {
+        // Add to fragmentList if not already there
+        RequestId requestId = MessageBase.getRequestIdFromMessageBytes(message);
+        if (!fragmentList.contains(requestId)) {
+            fragmentList.add(requestId);
+        }
+    }
+
     /**
      * Are there more bytes to be parsed in the <code>ByteBuffer</code> given
      * to this MessageParser's <code>parseBytes</code> ?

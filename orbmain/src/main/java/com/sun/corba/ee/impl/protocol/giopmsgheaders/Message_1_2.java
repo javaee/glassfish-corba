@@ -41,6 +41,7 @@ package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.ee.spi.protocol.RequestId;
@@ -70,21 +71,8 @@ public class Message_1_2 extends Message_1_1
      * but the header doesn't have to be copied in.
      */
     public void unmarshalRequestID(ByteBuffer byteBuffer) {
-        int b1, b2, b3, b4;
-
-        if (!isLittleEndian()) {
-            b1 = (byteBuffer.get(GIOPMessageHeaderLength+0) << 24) & 0xFF000000;
-            b2 = (byteBuffer.get(GIOPMessageHeaderLength+1) << 16) & 0x00FF0000;
-            b3 = (byteBuffer.get(GIOPMessageHeaderLength+2) << 8)  & 0x0000FF00;
-            b4 = (byteBuffer.get(GIOPMessageHeaderLength+3) << 0)  & 0x000000FF;
-        } else {
-            b1 = (byteBuffer.get(GIOPMessageHeaderLength+3) << 24) & 0xFF000000;
-            b2 = (byteBuffer.get(GIOPMessageHeaderLength+2) << 16) & 0x00FF0000;
-            b3 = (byteBuffer.get(GIOPMessageHeaderLength+1) << 8)  & 0x0000FF00;
-            b4 = (byteBuffer.get(GIOPMessageHeaderLength+0) << 0)  & 0x000000FF;
-        }
-
-        this.request_id = (b1 | b2 | b3 | b4);
+        byteBuffer.order(isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+        request_id = byteBuffer.getInt(GIOPMessageHeaderLength);
     }
 
     public void write(org.omg.CORBA.portable.OutputStream ostream) {

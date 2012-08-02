@@ -40,7 +40,6 @@
 
 package com.sun.corba.ee.impl.protocol.giopmsgheaders;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -118,32 +117,7 @@ public abstract class MessageBase implements Message{
         return result;
     }
 
-    public static MessageBase readGIOPMessage(ORB orb, Connection connection)
-    {
-        MessageBase msg = readGIOPHeader( orb, connection ) ;
-        msg = (MessageBase)readGIOPBody( orb, connection, msg) ;
-        return msg ;
-    }
-
-    // NOTE: This method is used only when the ORB is configured with
-    //       "useNIOSelectToWait=false", aka use blocking Sockets/SocketChannels
-    public static MessageBase readGIOPHeader( ORB orb, Connection connection )
-    {
-        ByteBuffer buf = null;
-
-        try {
-            buf = connection.read(GIOPMessageHeaderLength,
-                          0, GIOPMessageHeaderLength );
-        } catch (IOException e) {
-            throw wrapper.ioexceptionWhenReadingConnection(e, connection );
-        }
-        
-        MessageBase msg = parseGiopHeader(orb, connection, buf, 0);
-        
-        return msg;
-    }
-
-    public static MessageBase parseGiopHeader(ORB orb, 
+    public static MessageBase parseGiopHeader(ORB orb,
                                               Connection connection,
                                               ByteBuffer buf,
                                               int startPosition) {
@@ -456,35 +430,6 @@ public abstract class MessageBase implements Message{
 
         msg.setByteBuffer(buf);
         msg.setEncodingVersion(requestEncodingVersion);
-
-        return msg;
-    }
-
-    public static Message readGIOPBody(ORB orb,
-                                       Connection connection,
-                                       Message msg)
-    {
-        TransportManager ctm = orb.getTransportManager() ;
-        MessageTraceManagerImpl mtm = 
-            (MessageTraceManagerImpl)ctm.getMessageTraceManager() ;
-
-        ByteBuffer buf = msg.getByteBuffer();
-
-        buf.position(MessageBase.GIOPMessageHeaderLength);
-        int msgSizeMinusHeader =
-            msg.getSize() - MessageBase.GIOPMessageHeaderLength;
-        try {
-            buf = connection.read(buf, 
-                          GIOPMessageHeaderLength, msgSizeMinusHeader ) ;
-        } catch (IOException e) {
-            throw wrapper.ioexceptionWhenReadingConnection(e, connection );
-        }
-
-        msg.setByteBuffer(buf);
-
-        if (mtm.isEnabled()) {
-            mtm.recordBodyReceived(buf) ;
-        }
 
         return msg;
     }
@@ -988,39 +933,14 @@ public abstract class MessageBase implements Message{
      *        undefined request id.
      */
     public static RequestId getRequestIdFromMessageBytes(Message message) {
-        ByteBuffer byteBuffer = message.getByteBuffer();
-        byte major = byteBuffer.get(4);
-        byte minor = byteBuffer.get(5);
-        if (major == 0x01 && minor == 0x02 &&
-                message.getSize() >= (Message.GIOPMessageHeaderLength + 4)) {
-            RequestId requestId = new
-                    RequestIdImpl(unmarshalRequestHeaderRequestId(message));
-            return requestId;
+        if (!(message instanceof Message_1_2)) {
+            return RequestIdImpl.UNKNOWN_CORBA_REQUEST_ID; // in older protocols the request ID is not so easily found
         } else {
-            // Its a Request / Reply 1.1 type of message for which the request id
-            // is not found in the 4 bytes following the 12 GIOP message header.
-            return RequestIdImpl.UNKNOWN_CORBA_REQUEST_ID;
+            ByteBuffer byteBuffer = message.getByteBuffer();
+            Message_1_2 message_1_2 = (Message_1_2) message;
+            message_1_2.unmarshalRequestID(byteBuffer);
+            return new RequestIdImpl(message_1_2.request_id);
         }
-    }
-
-    private static int unmarshalRequestHeaderRequestId(Message message) {
-        ByteBuffer byteBuffer = message.getByteBuffer();
-        int b1, b2, b3, b4;
-        final int offset = Message.GIOPMessageHeaderLength;
-        
-        if (!message.isLittleEndian()) {
-            b1 = (byteBuffer.get(offset+0) << 24) & 0xFF000000;
-            b2 = (byteBuffer.get(offset+1) << 16) & 0x00FF0000;
-            b3 = (byteBuffer.get(offset+2) << 8)  & 0x0000FF00;
-            b4 = (byteBuffer.get(offset + 3))  & 0x000000FF;
-        } else {
-            b1 = (byteBuffer.get(offset+3) << 24) & 0xFF000000;
-            b2 = (byteBuffer.get(offset+2) << 16) & 0x00FF0000;
-            b3 = (byteBuffer.get(offset+1) << 8)  & 0x0000FF00;
-            b4 = (byteBuffer.get(offset + 0))  & 0x000000FF;
-        }
-        
-        return (b1 | b2 | b3 | b4);
     }
 
     private static void dprint(String msg)

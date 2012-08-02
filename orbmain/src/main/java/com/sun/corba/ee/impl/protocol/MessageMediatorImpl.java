@@ -133,7 +133,6 @@ public class MessageMediatorImpl
     protected LocateReplyOrReplyMessage replyHeader;
     protected String replyExceptionDetailMessage;
     protected IOR replyIOR;
-    protected Integer requestIdInteger;
     protected Message dispatchHeader;
     protected ByteBuffer dispatchByteBuffer;
     protected byte streamFormatVersion;

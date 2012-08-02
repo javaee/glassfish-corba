@@ -43,6 +43,28 @@ public class ConnectionImplTest extends TransportTestBase {
     }
 
     @Test
+    public void whenRequest1_0_receivedFromSocketWithChannel_dispatchRequest() throws IOException {
+        final List<Short> params = new ArrayList<Short>();
+        defineRequestDispatcher( new RequestDispatcher() {
+            public void readParameters(CDRInputObject input) {
+                params.add(input.read_short());
+            }
+        });
+        readFromSocketWithChannelAndDispatch(new byte[]{'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN,
+                Message.GIOPRequest, /* size */ 0, 0, 0, 38, /* no service contexts */ 0, 0, 0, 0,
+                /* request ID */ 0, 0, 0, 2, /* response expected */ 1, /* padding */ 0, 0, 0,
+                /* object key */ 0, 0, 0, 4, 0, 0, 0, 6, /* operation */ 0, 0, 0, 5, 'd', 'o', 'I', 't', 0,
+                0, 0, 0, /* principal */ 0, 0, 0, 0, /* short param */ 1, 1});
+        getConnection().doWork();
+        assertEquals(1, getMediators().size());
+        MessageMediator mediator = getMediators().remove(0);
+        assertEquals("doIt", mediator.getOperationName());
+        assertEquals(2, mediator.getRequestId());
+        assertFalse(mediator.isOneWay());
+        assertEquals(257, (short) params.get(0));
+    }
+
+    @Test
     public void whenRequest1_0_receivedFromNio_dispatchRequest() throws IOException {
         final List<Short> params = new ArrayList<Short>();
         defineRequestDispatcher( new RequestDispatcher() {

@@ -54,7 +54,7 @@ import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.misc.ORBUtility;
 
-import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 /**
  * This implements the GIOP 1.2 LocateReply header.
@@ -67,7 +67,7 @@ public final class LocateReplyMessage_1_2 extends Message_1_2
         implements LocateReplyMessage {
 
     private static final ORBUtilSystemException wrapper =
-        ORBUtilSystemException.self ;
+            ORBUtilSystemException.self;
 
     // Instance variables
 
@@ -86,9 +86,9 @@ public final class LocateReplyMessage_1_2 extends Message_1_2
     }
 
     LocateReplyMessage_1_2(ORB orb, int _request_id,
-            int _reply_status, IOR _ior) {
+                           int _reply_status, IOR _ior) {
         super(Message.GIOPBigMagic, GIOPVersion.V1_2, FLAG_NO_FRAG_BIG_ENDIAN,
-            Message.GIOPLocateReply, 0);
+                Message.GIOPLocateReply, 0);
         this.orb = orb;
         request_id = _request_id;
         reply_status = _reply_status;
@@ -111,7 +111,7 @@ public final class LocateReplyMessage_1_2 extends Message_1_2
 
     public SystemException getSystemException(String message) {
         return MessageBase.getSystemException(
-            exClassName, minorCode, completionStatus, message, wrapper);
+                exClassName, minorCode, completionStatus, message, wrapper);
     }
 
     public IOR getIOR() {
@@ -140,23 +140,23 @@ public final class LocateReplyMessage_1_2 extends Message_1_2
             int status = istream.read_long();
 
             switch (status) {
-            case CompletionStatus._COMPLETED_YES:
-                this.completionStatus = CompletionStatus.COMPLETED_YES;
-                break;
-            case CompletionStatus._COMPLETED_NO:
-                this.completionStatus = CompletionStatus.COMPLETED_NO;
-                break;
-            case CompletionStatus._COMPLETED_MAYBE:
-                this.completionStatus = CompletionStatus.COMPLETED_MAYBE;
-                break;
-            default:
-                throw wrapper.badCompletionStatusInLocateReply( status ) ;
+                case CompletionStatus._COMPLETED_YES:
+                    this.completionStatus = CompletionStatus.COMPLETED_YES;
+                    break;
+                case CompletionStatus._COMPLETED_NO:
+                    this.completionStatus = CompletionStatus.COMPLETED_NO;
+                    break;
+                case CompletionStatus._COMPLETED_MAYBE:
+                    this.completionStatus = CompletionStatus.COMPLETED_MAYBE;
+                    break;
+                default:
+                    throw wrapper.badCompletionStatusInLocateReply(status);
             }
-        } else if ( (this.reply_status == OBJECT_FORWARD) ||
-                (this.reply_status == OBJECT_FORWARD_PERM) ){
+        } else if ((this.reply_status == OBJECT_FORWARD) ||
+                (this.reply_status == OBJECT_FORWARD_PERM)) {
             CDRInputObject cdr = (CDRInputObject) istream;
-            this.ior = IORFactories.makeIOR( orb, (InputStream)cdr ) ;
-        }  else if (this.reply_status == LOC_NEEDS_ADDRESSING_MODE) {
+            this.ior = IORFactories.makeIOR(orb, (InputStream) cdr);
+        } else if (this.reply_status == LOC_NEEDS_ADDRESSING_MODE) {
             // read GIOP::AddressingDisposition from body and resend the
             // original request using the requested addressing mode. The
             // resending is transparent to the caller.
@@ -182,22 +182,26 @@ public final class LocateReplyMessage_1_2 extends Message_1_2
 
     public static void isValidReplyStatus(int replyStatus) {
         switch (replyStatus) {
-        case UNKNOWN_OBJECT :
-        case OBJECT_HERE :
-        case OBJECT_FORWARD :
-        case OBJECT_FORWARD_PERM :
-        case LOC_SYSTEM_EXCEPTION :
-        case LOC_NEEDS_ADDRESSING_MODE :
-            break;
-        default :
-            throw wrapper.illegalReplyStatus();
+            case UNKNOWN_OBJECT:
+            case OBJECT_HERE:
+            case OBJECT_FORWARD:
+            case OBJECT_FORWARD_PERM:
+            case LOC_SYSTEM_EXCEPTION:
+            case LOC_NEEDS_ADDRESSING_MODE:
+                break;
+            default:
+                throw wrapper.illegalReplyStatus();
         }
     }
 
     @Override
     public void callback(MessageHandler handler)
-        throws java.io.IOException
-    {
+            throws java.io.IOException {
         handler.handleInput(this);
+    }
+
+    @Override
+    public boolean supportsFragments() {
+        return true;
     }
 } // class LocateReplyMessage_1_2

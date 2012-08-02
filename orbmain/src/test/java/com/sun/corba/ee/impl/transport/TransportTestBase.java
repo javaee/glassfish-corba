@@ -154,6 +154,14 @@ public class TransportTestBase {
         connection.setConnectionCache(connectionCache);
     }
 
+    protected void readFromSocketWithChannelAndDispatch(byte[] bytes) {
+        socketChannel.enqueData(bytes);
+        orbData.useSelectThread = false;
+        socket.inputStream = new ByteArrayInputStream( bytes );
+        connection = new ConnectionImpl(orb, acceptor, socket);
+        connection.setConnectionCache(connectionCache);
+    }
+
     protected SocketChannelFake getSocketChannel() {
         return socketChannel;
     }

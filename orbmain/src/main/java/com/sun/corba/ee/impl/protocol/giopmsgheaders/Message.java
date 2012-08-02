@@ -58,10 +58,7 @@ public interface Message {
     // Generic constants
 
     static final int defaultBufferSize = 1024;
-    static final int GIOPBigEndian = 0;
-    static final int GIOPLittleEndian = 1;
     static final int GIOPBigMagic =    0x47494F50;
-    static final int GIOPLittleMagic = 0x504F4947;
     static final int GIOPMessageHeaderLength = 12;
 
     // Other useful constants
@@ -83,6 +80,15 @@ public interface Message {
     static final byte GIOPMessageError = 6;
     static final byte GIOPFragment = 7; // 1.1 & 1.2:
 
+    /**
+     * Returns whether the Message supports message fragmenting.
+     *
+     * @return <code>true</code> if Message supports fragmenting or is
+     *         a message fragment. Otherwise <code>false</code> it does
+     *         not support message fragments.
+     */
+    boolean supportsFragments();
+
     // Accessor methods
 
     GIOPVersion getGIOPVersion();
@@ -91,7 +97,7 @@ public interface Message {
     boolean moreFragmentsToFollow();
     int getType();
     int getSize();
-    ByteBuffer getByteBuffer();
+
     int getThreadPoolToUse();
 
     // Mutator methods
@@ -104,8 +110,6 @@ public interface Message {
     FragmentMessage createFragmentMessage();
 
     void callback(MessageHandler handler) throws IOException;
-
-    void setByteBuffer(ByteBuffer byteBuffer);
     void setEncodingVersion(byte version);
     
     /**

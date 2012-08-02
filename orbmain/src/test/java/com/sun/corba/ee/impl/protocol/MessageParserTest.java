@@ -40,10 +40,11 @@ package com.sun.corba.ee.impl.protocol;
  */
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage_1_2;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateRequestMessage_1_0;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateRequestMessage_1_2;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage_1_1;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage_1_2;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.RequestMessage_1_0;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.RequestMessage_1_1;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.RequestMessage_1_2;
 import com.sun.corba.ee.impl.transport.MessageTraceManagerImpl;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
@@ -82,15 +83,15 @@ public class MessageParserTest {
 
     @Test
     public void whenBufferContainsWholeMessage_consumeEntireBuffer() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         Message message = parser.parseBytes(buffer, connection);
 
         assertFalse(parser.hasMoreBytesToParse());
         assertFalse(parser.isExpectingMoreData());
-        assertEquals(true, message instanceof RequestMessage_1_0);
-        assertEquals( header.length, message.getByteBuffer().limit() );
+        assertEquals(true, message instanceof ReplyMessage_1_2);
+        assertEquals( header.length, parser.getMsgByteBuffer().limit() );
     }
 
     @Test
@@ -106,20 +107,20 @@ public class MessageParserTest {
         assertFalse(parser.hasMoreBytesToParse());
         assertFalse(parser.isExpectingMoreData());
         assertEquals(true, message instanceof RequestMessage_1_0);
-        assertEquals(wholeMessage.length, message.getByteBuffer().limit());
+        assertEquals(wholeMessage.length, parser.getMsgByteBuffer().limit());
     }
 
     @Test
     public void whenBufferContainsWholeMessageNeedingFragments_consumeEntireBufferAndExpectMore() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         Message message = parser.parseBytes(buffer, connection);
 
         assertFalse(parser.hasMoreBytesToParse());
         assertTrue(parser.isExpectingMoreData());
-        assertTrue(message instanceof RequestMessage_1_1);
-        assertEquals(header.length, message.getByteBuffer().limit());
+        assertTrue(message instanceof ReplyMessage_1_1);
+        assertEquals(header.length, parser.getMsgByteBuffer().limit());
     }
 
     @Test
@@ -154,7 +155,7 @@ public class MessageParserTest {
 
     @Test
     public void whenStartPosititionNonZero_startReadingFromPosition() {
-        byte[] header = {0, 0, 'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPLocateRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6, 'G' };
+        byte[] header = {0, 0, 'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPLocateRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6, 'G' };
         ByteBuffer buffer = ByteBuffer.wrap(header);
         buffer.position(2);
         parser.setNextMessageStartPosition(2);
@@ -164,8 +165,8 @@ public class MessageParserTest {
         assertTrue(parser.hasMoreBytesToParse());
         assertEquals(20, parser.getNextMessageStartPosition());
         assertFalse(parser.isExpectingMoreData());
-        assertTrue(message instanceof LocateRequestMessage_1_0);
-        assertEquals(18, message.getByteBuffer().limit());
+        assertTrue(message instanceof LocateRequestMessage_1_2);
+        assertEquals(18, parser.getMsgByteBuffer().limit());
     }
 
     @Test
@@ -193,7 +194,7 @@ public class MessageParserTest {
         assertEquals(18, parser.getNextMessageStartPosition());
         assertFalse(parser.isExpectingMoreData());
         assertTrue(message instanceof ReplyMessage_1_1);
-        assertEquals(18, message.getByteBuffer().limit());
+        assertEquals(18, parser.getMsgByteBuffer().limit());
     }
 
     @Test

@@ -80,7 +80,8 @@ public class MessageParserImpl implements MessageParser {
      * List is expected to be rather small, (i.e. less than size 10).
      */
     private List<RequestId> fragmentList;
-    
+    private ByteBuffer msgByteBuffer;
+
     /** Creates a new instance of MessageParserImpl */
     public MessageParserImpl(ORB orb) {
         this.orb = orb;
@@ -101,6 +102,11 @@ public class MessageParserImpl implements MessageParser {
         return expectingMoreData;
     }
 
+    @Override
+    public ByteBuffer getMsgByteBuffer() {
+        return msgByteBuffer;
+    }
+
 
     @Transport
     public Message parseBytes(ByteBuffer byteBuffer, Connection connection) {
@@ -110,8 +116,7 @@ public class MessageParserImpl implements MessageParser {
         // is there enough bytes available for a message header?
         if (bytesInBuffer >= Message.GIOPMessageHeaderLength) {
             // get message header
-            message = MessageBase.parseGiopHeader(orb, connection,
-                                                  byteBuffer, nextMsgStartPos);
+            message = MessageBase.parseGiopHeader(orb, connection, byteBuffer, nextMsgStartPos);
             
             // is there enough bytes for a message body?
             if (bytesInBuffer >= message.getSize()) {
@@ -119,17 +124,16 @@ public class MessageParserImpl implements MessageParser {
                 int savedLimit = byteBuffer.limit();
                 byteBuffer.position(nextMsgStartPos).
                         limit(nextMsgStartPos + message.getSize());
-                ByteBuffer msgByteBuffer = byteBuffer.slice();
+                msgByteBuffer = byteBuffer.slice();
                 // update nextMsgStartPos and byteBuffer state
                 nextMsgStartPos = byteBuffer.limit();
                 byteBuffer.position(nextMsgStartPos).limit(savedLimit);
-                message.setByteBuffer(msgByteBuffer);
 
-                if (MessageBase.messageSupportsFragments(message)) {
+                if (message.supportsFragments()) {
                     if (message.moreFragmentsToFollow()) {
-                        addRequestIdToFragmentList(message);
+                        addRequestIdToFragmentList(message, msgByteBuffer);
                     } else if (isEndOfFragmentList(message)) {
-                        removeRequestIdFromFragmentList(message);
+                        removeRequestIdFromFragmentList(message, msgByteBuffer);
                     }
                     expectingMoreData = stillLookingForFragments();
                 }
@@ -167,17 +171,17 @@ public class MessageParserImpl implements MessageParser {
             message.getType() == MessageBase.GIOPCancelRequest;
     }
 
-    private void removeRequestIdFromFragmentList(Message message) {
+    private void removeRequestIdFromFragmentList(Message message, ByteBuffer byteBuffer) {
         // remove request id from fragmentList
-        RequestId requestId = MessageBase.getRequestIdFromMessageBytes(message);
+        RequestId requestId = MessageBase.getRequestIdFromMessageBytes(message, byteBuffer);
         if (fragmentList.size() > 0 &&
             fragmentList.remove(requestId)) {
         }
     }
 
-    private void addRequestIdToFragmentList(Message message) {
+    private void addRequestIdToFragmentList(Message message, ByteBuffer byteBuffer) {
         // Add to fragmentList if not already there
-        RequestId requestId = MessageBase.getRequestIdFromMessageBytes(message);
+        RequestId requestId = MessageBase.getRequestIdFromMessageBytes(message, byteBuffer);
         if (!fragmentList.contains(requestId)) {
             fragmentList.add(requestId);
         }

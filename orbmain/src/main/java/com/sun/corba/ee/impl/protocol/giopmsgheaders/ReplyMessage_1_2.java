@@ -235,4 +235,9 @@ public final class ReplyMessage_1_2 extends Message_1_2
     {
         handler.handleInput(this);
     }
+
+    @Override
+    public boolean supportsFragments() {
+        return true;
+    }
 } // class ReplyMessage_1_2

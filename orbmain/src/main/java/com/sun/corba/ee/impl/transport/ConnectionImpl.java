@@ -103,44 +103,6 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
 
     protected SocketChannel socketChannel;
 
-    private Message readGIOPMessage(ORB orb) {
-        Message msg = readGIOPHeader(orb);
-        return readGIOPBody(orb, msg);
-    }
-
-    // NOTE: This method is used only when the ORB is configured with
-    //       "useNIOSelectToWait=false", aka use blocking Sockets/SocketChannels
-    private Message readGIOPHeader(ORB orb) {
-        try {
-            ByteBuffer buf = read(Message.GIOPMessageHeaderLength, 0, Message.GIOPMessageHeaderLength);
-            return MessageBase.parseGiopHeader(orb, this, buf, 0);
-        } catch (IOException e) {
-            throw wrapper.ioexceptionWhenReadingConnection(e, this);
-        }
-    }
-
-    private Message readGIOPBody(ORB orb, Message msg) {
-        ByteBuffer buf = msg.getByteBuffer();
-
-        buf.position(Message.GIOPMessageHeaderLength);
-        int msgSizeMinusHeader = msg.getSize() - Message.GIOPMessageHeaderLength;
-        try {
-            buf = read(buf, Message.GIOPMessageHeaderLength, msgSizeMinusHeader);
-        } catch (IOException e) {
-            throw wrapper.ioexceptionWhenReadingConnection(e, this);
-        }
-
-        msg.setByteBuffer(buf);
-
-        TransportManager ctm = orb.getTransportManager();
-        MessageTraceManagerImpl mtm = (MessageTraceManagerImpl) ctm.getMessageTraceManager();
-        if (mtm.isEnabled()) {
-            mtm.recordBodyReceived(buf);
-        }
-
-        return msg;
-    }
-
     public SocketChannel getSocketChannel() {
         return socketChannel;
     }
@@ -395,15 +357,33 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         }
     }
 
+    // NOTE: This method is used only when the ORB is configured with
+    //       "useNIOSelectToWait=false", aka use blocking Sockets/SocketChannels
     private MessageMediator createMessageMediator() {
-        Message msg = readGIOPMessage(orb);
+        try {
+            ByteBuffer headerBuffer = read(Message.GIOPMessageHeaderLength, 0, Message.GIOPMessageHeaderLength);
+            Message header = MessageBase.parseGiopHeader(orb, this, headerBuffer, 0);
 
-        ByteBuffer byteBuffer = msg.getByteBuffer();
-        msg.setByteBuffer(null);
+            headerBuffer.position(Message.GIOPMessageHeaderLength);
+            int msgSizeMinusHeader = header.getSize() - Message.GIOPMessageHeaderLength;
+            ByteBuffer buffer = read(headerBuffer, Message.GIOPMessageHeaderLength, msgSizeMinusHeader);
 
-        return new MessageMediatorImpl(orb, this, msg, byteBuffer);
+            traceMessageBodyReceived(orb, buffer);
+
+            return new MessageMediatorImpl(orb, this, header, buffer);
+        } catch (IOException e) {
+            throw wrapper.ioexceptionWhenReadingConnection(e, this);
+        }
     }
 
+
+    private void traceMessageBodyReceived(ORB orb, ByteBuffer buf) {
+        TransportManager ctm = orb.getTransportManager();
+        MessageTraceManagerImpl mtm = (MessageTraceManagerImpl) ctm.getMessageTraceManager();
+        if (mtm.isEnabled()) {
+            mtm.recordBodyReceived(buf);
+        }
+    }
 
     public boolean hasSocketChannel() {
         return getSocketChannel() != null;
@@ -444,17 +424,11 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     //       "useNIOSelectToWait=false", aka use blocking Sockets/SocketChannels.
     // NOTE: This method can throw a connection rebind SystemException.
     @Transport
-    public ByteBuffer read(ByteBuffer byteBuffer, int offset, int length)
-            throws IOException {
+    public ByteBuffer read(ByteBuffer byteBuffer, int offset, int length) throws IOException {
         try {
             int size = offset + length;
             if (hasSocketChannel()) {
                 if (size > byteBuffer.capacity()) {
-                    if (orb.transportDebugFlag) {
-                        // print address of ByteBuffer being released
-                        int bbAddress = System.identityHashCode(byteBuffer);
-                        bbInfo(bbAddress);
-                    }
                     orb.getByteBufferPool().releaseByteBuffer(byteBuffer);
                     byteBuffer = orb.getByteBufferPool().getByteBuffer(size);
                 }
@@ -464,18 +438,15 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
                 byteBuffer.position(0);
                 byteBuffer.limit(size);
                 return byteBuffer;
+            } else {
+                byte[] buf = new byte[size];
+                // getSocket().getInputStream() can throw an IOException
+                // if the socket is closed. Hence, we check the connection
+                // state CLOSE_RECVD if an IOException is thrown here
+                // instead of in readFully()
+                readFully(getSocket().getInputStream(), buf, offset, length);
+                return ByteBuffer.wrap(buf);
             }
-            if (byteBuffer.isDirect()) {
-                throw wrapper.unexpectedDirectByteBufferWithNonChannelSocket();
-            }
-            byte[] buf = new byte[size];
-            // getSocket().getInputStream() can throw an IOException
-            // if the socket is closed. Hence, we check the connection
-            // state CLOSE_RECVD if an IOException is thrown here 
-            // instead of in readFully()
-            readFully(getSocket().getInputStream(), buf,
-                    offset, length);
-            return ByteBuffer.wrap(buf);
         } catch (IOException ioe) {
             if (getState() == CLOSE_RECVD) {
                 throw wrapper.connectionRebind(ioe);
@@ -491,8 +462,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     // NOTE: This method is used only when the ORB is configured with
     //       "useNIOSelectToWait=false", aka use blocking Sockets/SocketChannels
     @Transport
-    private void readFully(ByteBuffer byteBuffer, int size)
-            throws IOException {
+    private void readFully(ByteBuffer byteBuffer, int size) throws IOException {
         int n = 0;
         int bytecount = 0;
         TcpTimeouts.Waiter waiter = tcpTimeouts.waiter();
@@ -1506,13 +1476,13 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         do {
             Message message = messageParser.parseBytes(byteBuffer, this);
             if (message != null) {
-                ByteBuffer msgBuffer = message.getByteBuffer();
+                ByteBuffer msgBuffer = messageParser.getMsgByteBuffer();
                 MessageMediatorImpl messageMediator =
                         new MessageMediatorImpl(orb, this, message, msgBuffer);
 
                 // Special handling of messages which are fragmented
                 boolean addToWorkerThreadQueue = true;
-                if (MessageBase.messageSupportsFragments(message)) {
+                if (message.supportsFragments()) {
                     // Is this the first fragment ?
                     if (message.getType() != Message.GIOPFragment) {
                         // NOTE: First message fragment will not be GIOPFragment
@@ -1520,8 +1490,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
                         if (message.moreFragmentsToFollow()) {
                             // Create an entry in fragmentMap so fragments
                             // will be processed in order.
-                            RequestId corbaRequestId =
-                                    MessageBase.getRequestIdFromMessageBytes(message);
+                            RequestId corbaRequestId = MessageBase.getRequestIdFromMessageBytes(message, msgBuffer);
                             fragmentMap.put(corbaRequestId, new LinkedList<MessageMediator>());
                             addedEntryToFragmentMap(corbaRequestId);
                         }
@@ -1529,8 +1498,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
                         // Not the first fragment. Append to the request id's
                         // queue in the fragmentMap so fragments will be
                         // processed in order.
-                        RequestId corbaRequestId =
-                                MessageBase.getRequestIdFromMessageBytes(message);
+                        RequestId corbaRequestId = MessageBase.getRequestIdFromMessageBytes(message, msgBuffer);
                         Queue<MessageMediator> queue = fragmentMap.get(corbaRequestId);
                         if (queue != null) {
                             // REVISIT - In the future, the synchronized(queue),
@@ -1557,15 +1525,10 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
                             addToWorkerThreadQueue = false;
                         } else {
                             // Very, very unlikely. But, be defensive.
-                            wrapper.noFragmentQueueForRequestId(
-                                    corbaRequestId.toString());
+                            wrapper.noFragmentQueueForRequestId(corbaRequestId.toString());
                         }
                     }
                 }
-
-                // avoid memory leak,
-                // see CorbaContactInfoBase.createMessageMediator()
-                message.setByteBuffer(null);
 
                 if (addToWorkerThreadQueue) {
                     addMessageMediatorToWorkQueue(messageMediator);

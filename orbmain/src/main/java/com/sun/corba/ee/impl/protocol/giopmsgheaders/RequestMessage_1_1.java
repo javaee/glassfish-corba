@@ -46,7 +46,7 @@ import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.orb.ObjectKeyCacheEntry;
 
-import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 /**
  * This implements the GIOP 1.1 Request header.
@@ -59,7 +59,7 @@ public final class RequestMessage_1_1 extends Message_1_1
         implements RequestMessage {
 
     private static final ORBUtilSystemException wrapper =
-        ORBUtilSystemException.self ;
+            ORBUtilSystemException.self;
 
     // Instance variables
 
@@ -78,16 +78,16 @@ public final class RequestMessage_1_1 extends Message_1_1
 
     RequestMessage_1_1(ORB orb) {
         this.orb = orb;
-        this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
+        this.service_contexts = ServiceContextDefaults.makeServiceContexts(orb);
     }
 
     @SuppressWarnings({"deprecation"})
     RequestMessage_1_1(ORB orb, ServiceContexts _service_contexts,
-            int _request_id, boolean _response_expected, byte[] _reserved,
-            byte[] _object_key, String _operation,
-            org.omg.CORBA.Principal _requesting_principal) {
+                       int _request_id, boolean _response_expected, byte[] _reserved,
+                       byte[] _object_key, String _operation,
+                       org.omg.CORBA.Principal _requesting_principal) {
         super(Message.GIOPBigMagic, GIOPVersion.V1_1, FLAG_NO_FRAG_BIG_ENDIAN,
-            Message.GIOPRequest, 0);
+                Message.GIOPRequest, 0);
         this.orb = orb;
         service_contexts = _service_contexts;
         request_id = _request_id;
@@ -105,7 +105,7 @@ public final class RequestMessage_1_1 extends Message_1_1
     }
 
     public void setServiceContexts(ServiceContexts sc) {
-         this.service_contexts = sc;
+        this.service_contexts = sc;
     }
 
     public int getRequestId() {
@@ -140,16 +140,15 @@ public final class RequestMessage_1_1 extends Message_1_1
 
     // IO methods
 
-    public void read(org.omg.CORBA.portable.InputStream istream) 
-    {
+    public void read(org.omg.CORBA.portable.InputStream istream) {
         super.read(istream);
-        this.service_contexts 
-            = ServiceContextDefaults.makeServiceContexts(
+        this.service_contexts
+                = ServiceContextDefaults.makeServiceContexts(
                 (org.omg.CORBA_2_3.portable.InputStream) istream);
         this.request_id = istream.read_ulong();
         this.response_expected = istream.read_boolean();
         this.reserved = new byte[3];
-        for (int _o0 = 0;_o0 < (3); ++_o0) {
+        for (int _o0 = 0; _o0 < (3); ++_o0) {
             this.reserved[_o0] = istream.read_octet();
         }
         int _len1 = istream.read_long();
@@ -159,19 +158,18 @@ public final class RequestMessage_1_1 extends Message_1_1
         this.requesting_principal = istream.read_Principal();
     }
 
-    public void write(org.omg.CORBA.portable.OutputStream ostream) 
-    {
+    public void write(org.omg.CORBA.portable.OutputStream ostream) {
         super.write(ostream);
         service_contexts.write(
-            (org.omg.CORBA_2_3.portable.OutputStream) ostream,
-            GIOPVersion.V1_1);
+                (org.omg.CORBA_2_3.portable.OutputStream) ostream,
+                GIOPVersion.V1_1);
         ostream.write_ulong(this.request_id);
         ostream.write_boolean(this.response_expected);
         nullCheck(this.reserved);
         if (this.reserved.length != (3)) {
-            throw wrapper.badReservedLength( );
+            throw wrapper.badReservedLength();
         }
-        for (int _i0 = 0;_i0 < (3); ++_i0) {
+        for (int _i0 = 0; _i0 < (3); ++_i0) {
             ostream.write_octet(this.reserved[_i0]);
         }
         nullCheck(this.object_key);
@@ -186,8 +184,12 @@ public final class RequestMessage_1_1 extends Message_1_1
     }
 
     public void callback(MessageHandler handler)
-        throws java.io.IOException
-    {
+            throws java.io.IOException {
         handler.handleInput(this);
+    }
+
+    @Override
+    public boolean supportsFragments() {
+        return true;
     }
 } // class RequestMessage_1_1

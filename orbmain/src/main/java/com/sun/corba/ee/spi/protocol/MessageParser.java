@@ -126,4 +126,9 @@ public interface MessageParser {
      * to be parsed.
      */
     int getSizeNeeded();
+
+    /**
+     * Returns the byte buffer (if any) associated with the last message returned.
+     */
+    ByteBuffer getMsgByteBuffer();
 }

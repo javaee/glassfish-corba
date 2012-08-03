@@ -22,8 +22,9 @@ public class TransportManagerUtil {
         CDRInputObject inobj = null ;
 
         for (int ctr=0; ctr<data.length; ctr++) {
-            MessageParserImpl parser = new MessageParserImpl(orb);
-            Message message = parser.parseBytes(ByteBuffer.wrap(data[ctr]), null);
+            MessageParserImpl parser = new MessageParserImpl(orb, null);
+            parser.offerBuffer(ByteBuffer.wrap(data[ctr]));
+            Message message = parser.getMessageMediator().getDispatchHeader();
             ByteBuffer msgByteBuffer = parser.getMsgByteBuffer();
             if (message.getGIOPVersion().equals( GIOPVersion.V1_2 )) {
                 ((Message_1_2) message).unmarshalRequestID(msgByteBuffer) ;
@@ -60,8 +61,9 @@ public class TransportManagerUtil {
      * the result of this call will contain a valid request ID.
      */
     public static Message getMessage(byte[] data, ORB orb) {
-        MessageParserImpl parser = new MessageParserImpl(orb);
-        Message msg = parser.parseBytes(ByteBuffer.wrap(data), null);
+        MessageParserImpl parser = new MessageParserImpl(orb, null);
+        parser.offerBuffer(ByteBuffer.wrap(data));
+        Message msg = parser.getMessageMediator().getDispatchHeader();
         if (msg.getGIOPVersion().equals( GIOPVersion.V1_2 ))
             ((Message_1_2)msg).unmarshalRequestID( parser.getMsgByteBuffer() ) ;
 

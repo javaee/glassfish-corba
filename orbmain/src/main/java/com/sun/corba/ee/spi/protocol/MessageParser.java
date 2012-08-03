@@ -131,4 +131,25 @@ public interface MessageParser {
      * Returns the byte buffer (if any) associated with the last message returned.
      */
     ByteBuffer getMsgByteBuffer();
+
+    /**
+     * Offers an input buffer to the parser. Position must be set to 0, and the buffer must contain at least the start
+     * of a GIOP message. The parser will consume what it can and make the remainder available in {@link #getRemainderBuffer}
+     * @param buffer a buffer containing at least the start of a GIOP message.
+     */
+    void offerBuffer(ByteBuffer buffer);
+
+    /**
+     * Returns a buffer containing whatever is left after processing the buffer provided in {@link #offerBuffer(ByteBuffer)},
+     * which could be the same buffer. The buffer could also be null if all data has been consumed.
+     * @return a byte buffer representing data which still needs to be processed.
+     */
+    ByteBuffer getRemainderBuffer();
+
+    /**
+     * Returns the full message constructed by the last call to {@link #offerBuffer(ByteBuffer)}. Will be null if
+     * the last such call did not complete a message.
+     * @return a complete message, wrapped in a message mediator.
+     */
+    MessageMediator getMessageMediator();
 }

@@ -50,6 +50,7 @@ import com.sun.corba.ee.impl.transport.MessageTraceManagerImpl;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.orb.ORBData;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.protocol.MessageParser;
 import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.corba.ee.spi.transport.MessageTraceManager;
@@ -57,6 +58,7 @@ import com.sun.corba.ee.spi.transport.TransportManager;
 import org.glassfish.simplestub.SimpleStub;
 import org.glassfish.simplestub.Stub;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -78,11 +80,61 @@ public class MessageParserTest {
     public void setUp() throws Exception {
         orb.orbData = orbData;
         orb.transportManager = transportManager;
-        parser = new MessageParserImpl(orb);
+        parser = new MessageParserImpl(orb, connection);
     }
 
     @Test
-    public void whenBufferContainsWholeMessage_consumeEntireBuffer() {
+    public void oldwhenBufferDoesNotContainEntireHeader_requestMore() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 0 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        Message message = parser.parseBytes(buffer, connection);
+
+        assertFalse(parser.hasMoreBytesToParse());
+        assertTrue(parser.isExpectingMoreData());
+        assertEquals(BUFFER_SIZE, parser.getSizeNeeded());
+        assertEquals(0, parser.getNextMessageStartPosition());
+        assertNull(message);
+    }
+
+    @Test
+    public void whenBufferDoesNotContainEntireHeader_requestMoreAndDoNotCreateMediator() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 0 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+
+        assertSame(buffer, parser.getRemainderBuffer());
+        assertNull(parser.getMessageMediator());
+    }
+
+    @Test
+    public void oldwhenBufferContainsHeaderOnly_requestMore() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPCancelRequest, 0, 0, 0, 6, 1, 2 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        Message message = parser.parseBytes(buffer, connection);
+
+        assertFalse(parser.hasMoreBytesToParse());
+        assertTrue(parser.isExpectingMoreData());
+        assertEquals(18, parser.getSizeNeeded());
+        assertEquals(0, parser.getNextMessageStartPosition());
+        assertNull(message);
+    }
+
+    @Test
+    public void whenBufferContainsHeaderOnly_requestMoreAndDoNotCreateMediator() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPCancelRequest, 0, 0, 0, 6, 1, 2 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+
+        assertSame(buffer, parser.getRemainderBuffer());
+        assertNull(parser.getMessageMediator());
+    }
+
+    @Test
+    public void old_whenBufferContainsWholeMessage_consumeEntireBuffer() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
@@ -91,11 +143,23 @@ public class MessageParserTest {
         assertFalse(parser.hasMoreBytesToParse());
         assertFalse(parser.isExpectingMoreData());
         assertEquals(true, message instanceof ReplyMessage_1_2);
-        assertEquals( header.length, parser.getMsgByteBuffer().limit() );
+        assertEquals(header.length, parser.getMsgByteBuffer().limit());
     }
 
     @Test
-    public void whenBufferContainsRestOfMessage_consumeEntireBuffer() {
+    public void whenBufferContainsWholeMessage_consumeEntireBuffer() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+        assertNull(parser.getRemainderBuffer());
+        MessageMediator mediator = parser.getMessageMediator();
+        assertNotNull(mediator);
+        assertTrue(mediator.getDispatchHeader() instanceof ReplyMessage_1_2);
+    }
+
+    @Test
+    public void oldwhenBufferContainsRestOfMessage_consumeEntireBuffer() {
         byte[] partMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1 };
         byte[] wholeMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
         ByteBuffer buffer = ByteBuffer.wrap(partMessage);
@@ -111,7 +175,49 @@ public class MessageParserTest {
     }
 
     @Test
-    public void whenBufferContainsWholeMessageNeedingFragments_consumeEntireBufferAndExpectMore() {
+    public void whenBufferContainsRestOfMessage_consumeEntireBuffer() {
+        byte[] partMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1 };
+        byte[] wholeMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        parser.offerBuffer(ByteBuffer.wrap(partMessage));
+
+        parser.offerBuffer(ByteBuffer.wrap(wholeMessage));
+        assertNull(parser.getRemainderBuffer());
+        MessageMediator mediator = parser.getMessageMediator();
+        assertNotNull(mediator);
+        assertTrue(mediator.getDispatchHeader() instanceof RequestMessage_1_0);
+    }
+
+    @Test
+    public void oldwhenBufferContainsWholeMessagePlusMore_consumeMessageAndLeaveMore() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6, 'G' };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        Message message = parser.parseBytes(buffer, connection);
+
+        assertTrue(parser.hasMoreBytesToParse());
+        assertEquals(18, parser.getNextMessageStartPosition());
+        assertFalse(parser.isExpectingMoreData());
+        assertTrue(message instanceof ReplyMessage_1_1);
+        assertEquals(18, parser.getMsgByteBuffer().limit());
+    }
+
+    @Test
+    public void whenBufferContainsWholeMessageAndMore_consumeMessageBytesAndLeaveRemainder() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6,
+                          1, 2, 3, 4, 5, 6,
+                         'G', 'I', 'O' };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+        assertNotNull(parser.getRemainderBuffer());
+        assertEquals(3, parser.getRemainderBuffer().remaining());
+        MessageMediator mediator = parser.getMessageMediator();
+        assertNotNull(mediator);
+        assertTrue(mediator.getDispatchHeader() instanceof ReplyMessage_1_1);
+    }
+
+    @Test
+    public void oldwhenBufferContainsWholeMessageNeedingFragments_consumeEntireBufferAndExpectMore() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
@@ -124,7 +230,7 @@ public class MessageParserTest {
     }
 
     @Test
-    public void whenBufferContainsFinalFragment_consumeBuffer() {
+    public void oldwhenBufferContainsFinalFragment_consumeBuffer() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.MORE_FRAGMENTS_BIT, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6,
                          'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment, 0, 0, 0, 4, 1, 2, 3, 4, 5, 6};
         ByteBuffer buffer = ByteBuffer.wrap(header);
@@ -140,21 +246,7 @@ public class MessageParserTest {
     }
 
     @Test
-    public void whenBufferContainsHeaderOnly_requestMore() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPCancelRequest, 0, 0, 0, 6, 1, 2 };
-        ByteBuffer buffer = ByteBuffer.wrap(header);
-
-        Message message = parser.parseBytes(buffer, connection);
-
-        assertFalse(parser.hasMoreBytesToParse());
-        assertTrue(parser.isExpectingMoreData());
-        assertEquals(18, parser.getSizeNeeded());
-        assertEquals(0, parser.getNextMessageStartPosition());
-        assertNull(message);
-    }
-
-    @Test
-    public void whenStartPosititionNonZero_startReadingFromPosition() {
+    public void oldwhenStartPositionNonZero_startReadingFromPosition() {
         byte[] header = {0, 0, 'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPLocateRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6, 'G' };
         ByteBuffer buffer = ByteBuffer.wrap(header);
         buffer.position(2);
@@ -166,34 +258,6 @@ public class MessageParserTest {
         assertEquals(20, parser.getNextMessageStartPosition());
         assertFalse(parser.isExpectingMoreData());
         assertTrue(message instanceof LocateRequestMessage_1_2);
-        assertEquals(18, parser.getMsgByteBuffer().limit());
-    }
-
-    @Test
-    public void whenBufferDoesNotContainEntireHeader_requestMore() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 0 };
-        ByteBuffer buffer = ByteBuffer.wrap(header);
-
-        Message message = parser.parseBytes(buffer, connection);
-
-        assertFalse(parser.hasMoreBytesToParse());
-        assertTrue(parser.isExpectingMoreData());
-        assertEquals(BUFFER_SIZE, parser.getSizeNeeded());
-        assertEquals(0, parser.getNextMessageStartPosition());
-        assertNull(message);
-    }
-
-    @Test
-    public void whenBufferContainsWholeMessagePlusMore_consumeMessageAndLeaveMore() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6, 'G' };
-        ByteBuffer buffer = ByteBuffer.wrap(header);
-
-        Message message = parser.parseBytes(buffer, connection);
-
-        assertTrue(parser.hasMoreBytesToParse());
-        assertEquals(18, parser.getNextMessageStartPosition());
-        assertFalse(parser.isExpectingMoreData());
-        assertTrue(message instanceof ReplyMessage_1_1);
         assertEquals(18, parser.getMsgByteBuffer().limit());
     }
 

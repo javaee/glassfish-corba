@@ -45,6 +45,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.protocol.RequestId;
 import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.corba.ee.spi.protocol.MessageParser;
@@ -65,6 +66,9 @@ import com.sun.corba.ee.spi.trace.Transport;
 @Transport
 @Giop
 public class MessageParserImpl implements MessageParser {
+
+    private static final int NUM_BYTES_IN_INTEGER = 4;
+    private final static int MESSAGE_LENGTH_INDEX = Message.GIOPMessageHeaderLength - NUM_BYTES_IN_INTEGER;
     final private ORB orb;
     private boolean expectingMoreData;
     private boolean moreBytesToParse;
@@ -73,7 +77,7 @@ public class MessageParserImpl implements MessageParser {
     /**
      * A list of request ids awaiting final fragments.  When the size of
      * this list is larger than 0, we have received a fragmented message
-     * and expecting to recieve more message fragments for that given
+     * and expecting to receive more message fragments for that given
      * request id on this list.  Hence, if there are entries in this list
      * we are expecting more data to arrive.
      * We are using a List here rather than a Set since the size of the
@@ -81,6 +85,13 @@ public class MessageParserImpl implements MessageParser {
      */
     private List<RequestId> fragmentList;
     private ByteBuffer msgByteBuffer;
+
+    /** The buffer which will be returned for additional input. */
+    private ByteBuffer remainderBuffer;
+
+    /** wrapped message create by the last call to offerBuffer. **/
+    private MessageMediator messageMediator;
+    private Connection connection;
 
     /** Creates a new instance of MessageParserImpl */
     public MessageParserImpl(ORB orb) {
@@ -90,6 +101,11 @@ public class MessageParserImpl implements MessageParser {
         this.nextMsgStartPos = 0;
         this.fragmentList = new LinkedList<RequestId>();
         this.sizeNeeded = orb.getORBData().getReadByteBufferSize();
+    }
+
+    public MessageParserImpl(ORB orb, Connection connection) {
+        this(orb);
+        this.connection = connection;
     }
     
     /**
@@ -105,6 +121,68 @@ public class MessageParserImpl implements MessageParser {
     @Override
     public ByteBuffer getMsgByteBuffer() {
         return msgByteBuffer;
+    }
+
+    @Override
+    public void offerBuffer(ByteBuffer buffer) {
+        msgByteBuffer = null;
+        if (!containsFullHeader(buffer))
+            remainderBuffer = buffer;
+        else if (!containsFullMessage(buffer))
+            remainderBuffer = buffer;
+        else {
+            remainderBuffer = splitAndReturnRemainder(buffer, getTotalMessageLength(buffer));
+            MessageBase message = MessageBase.parseGiopHeader(orb, connection, buffer, 0);
+            messageMediator = new MessageMediatorImpl(orb, connection, message, buffer);
+            msgByteBuffer = buffer;
+        }
+
+    }
+
+    /**
+     * Splits the specified buffer at the specified position, returning the first part and
+     * setting {@link #remainderBuffer} to the second, or null if there is no data in the second.
+     * The split position must be no greater than the limit.
+     */
+    private ByteBuffer splitAndReturnRemainder(ByteBuffer buffer, int splitPosition) {
+        assert splitPosition <= buffer.limit();
+
+        if (buffer.limit() == splitPosition)
+            return null;
+        else {
+            final int oldPosition = buffer.position();
+            buffer.position(splitPosition);
+            ByteBuffer remainderBuffer = buffer.slice();
+            buffer.position(oldPosition);
+            buffer.limit(splitPosition);
+            return remainderBuffer;
+        }
+    }
+
+    private boolean containsFullHeader(ByteBuffer buffer) {
+        return buffer.remaining() >= Message.GIOPMessageHeaderLength;
+    }
+
+    private boolean containsFullMessage(ByteBuffer buffer) {
+        return buffer.remaining() >= getTotalMessageLength(buffer);
+    }
+
+    private int getTotalMessageLength(ByteBuffer buffer) {
+        return Message.GIOPMessageHeaderLength + getMessageBodyLength(buffer);
+    }
+
+    private int getMessageBodyLength(ByteBuffer buffer) {
+        return buffer.getInt(MESSAGE_LENGTH_INDEX);
+    }
+
+    @Override
+    public ByteBuffer getRemainderBuffer() {
+        return remainderBuffer;
+    }
+
+    @Override
+    public MessageMediator getMessageMediator() {
+        return messageMediator;
     }
 
 

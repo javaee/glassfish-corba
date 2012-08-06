@@ -107,7 +107,19 @@ public class MessageParserImpl implements MessageParser {
         this(orb);
         this.connection = connection;
     }
-    
+
+    @Transport
+    public ByteBuffer getNewBufferAndCopyOld(ByteBuffer byteBuffer) {
+        ByteBuffer newByteBuffer = null;
+        // Set byteBuffer position to the start position of data to be
+        // copied into the re-allocated ByteBuffer.
+        byteBuffer.position(getNextMessageStartPosition());
+        newByteBuffer = orb.getByteBufferPool().reAllocate(byteBuffer,
+                getSizeNeeded());
+        setNextMessageStartPosition(0);
+        return newByteBuffer;
+    }
+
     /**
      * Is this MessageParser expecting more data ?
      * @return - True if more bytes are needed to construct at least one
@@ -189,6 +201,7 @@ public class MessageParserImpl implements MessageParser {
     @Transport
     public Message parseBytes(ByteBuffer byteBuffer, Connection connection) {
         expectingMoreData = false;
+        remainderBuffer  = byteBuffer;
         Message message = null;
         int bytesInBuffer = byteBuffer.limit() - nextMsgStartPos;
         // is there enough bytes available for a message header?
@@ -198,6 +211,7 @@ public class MessageParserImpl implements MessageParser {
             
             // is there enough bytes for a message body?
             if (bytesInBuffer >= message.getSize()) {
+
                 // slice the ByteBuffer into a GIOP PDU
                 int savedLimit = byteBuffer.limit();
                 byteBuffer.position(nextMsgStartPos).

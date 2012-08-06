@@ -223,6 +223,10 @@ public class MessageMediatorImpl
         this.dispatchByteBuffer = byteBuffer;
     }
 
+    public RequestId getRequestIdFromRawBytes() {
+        return MessageBase.getRequestIdFromMessageBytes(getDispatchHeader(), dispatchByteBuffer);
+    }
+
     ////////////////////////////////////////////////////
     //
     // MessageMediator

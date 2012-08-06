@@ -95,6 +95,7 @@ public class MessageParserTest {
         assertEquals(BUFFER_SIZE, parser.getSizeNeeded());
         assertEquals(0, parser.getNextMessageStartPosition());
         assertNull(message);
+        assertSame(buffer, parser.getRemainderBuffer());
     }
 
     @Test
@@ -120,6 +121,7 @@ public class MessageParserTest {
         assertEquals(18, parser.getSizeNeeded());
         assertEquals(0, parser.getNextMessageStartPosition());
         assertNull(message);
+        assertSame(buffer, parser.getRemainderBuffer());
     }
 
     @Test
@@ -144,6 +146,7 @@ public class MessageParserTest {
         assertFalse(parser.isExpectingMoreData());
         assertEquals(true, message instanceof ReplyMessage_1_2);
         assertEquals(header.length, parser.getMsgByteBuffer().limit());
+        assertEquals(0, parser.getRemainderBuffer().remaining());
     }
 
     @Test
@@ -172,6 +175,7 @@ public class MessageParserTest {
         assertFalse(parser.isExpectingMoreData());
         assertEquals(true, message instanceof RequestMessage_1_0);
         assertEquals(wholeMessage.length, parser.getMsgByteBuffer().limit());
+        assertEquals(0, parser.getRemainderBuffer().remaining());
     }
 
     @Test
@@ -195,22 +199,25 @@ public class MessageParserTest {
         Message message = parser.parseBytes(buffer, connection);
 
         assertTrue(parser.hasMoreBytesToParse());
-        assertEquals(18, parser.getNextMessageStartPosition());
         assertFalse(parser.isExpectingMoreData());
         assertTrue(message instanceof ReplyMessage_1_1);
         assertEquals(18, parser.getMsgByteBuffer().limit());
+        assertEquals(1, parser.getRemainderBuffer().remaining());
+//        assertEquals(1, parser.getRemainderBuffer().limit());
+//        assertEquals(0, parser.getNextMessageStartPosition());
     }
 
     @Test
     public void whenBufferContainsWholeMessageAndMore_consumeMessageBytesAndLeaveRemainder() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6,
                           1, 2, 3, 4, 5, 6,
-                         'G', 'I', 'O' };
+                         'R', 'M', 'I' };
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
         assertNotNull(parser.getRemainderBuffer());
         assertEquals(3, parser.getRemainderBuffer().remaining());
+        assertEquals('R', parser.getRemainderBuffer().get(0));
         MessageMediator mediator = parser.getMessageMediator();
         assertNotNull(mediator);
         assertTrue(mediator.getDispatchHeader() instanceof ReplyMessage_1_1);

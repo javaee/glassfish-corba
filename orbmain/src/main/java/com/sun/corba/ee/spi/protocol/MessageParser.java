@@ -42,6 +42,8 @@ package com.sun.corba.ee.spi.protocol;
 
 import java.nio.ByteBuffer;
 
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.trace.Transport;
 import com.sun.corba.ee.spi.transport.Connection;
 
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
@@ -52,7 +54,10 @@ import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
  * An interface that knows how to parse bytes into a protocol data unit.
  */
 public interface MessageParser {
-    
+
+    @Transport
+    ByteBuffer getNewBufferAndCopyOld(ByteBuffer byteBuffer);
+
     /**
      * Is this MessageParser expecting more data ?
      *

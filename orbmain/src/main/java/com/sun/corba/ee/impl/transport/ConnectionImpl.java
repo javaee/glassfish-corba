@@ -102,6 +102,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     //
 
     protected SocketChannel socketChannel;
+    private MessageParser messageParser;
 
     public SocketChannel getSocketChannel() {
         return socketChannel;
@@ -193,7 +194,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     // Used in genericRPCMSGFramework test.
     public ConnectionImpl(ORB orb) {
         this.orb = orb;
-
+        messageParser = new MessageParserImpl(orb, this);
         setWork(this);
         responseWaitingRoom = new ResponseWaitingRoomImpl(orb, this);
         setTcpTimeouts(orb.getORBData().getTransportTcpTimeouts());
@@ -1321,7 +1322,6 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
 
     @Transport
     protected void doOptimizedReadStrategy() {
-        MessageParser messageParser;
         try {
             // get a new ByteBuffer from ByteBufferPool ?
             if (byteBuffer == null || !byteBuffer.hasRemaining()) {
@@ -1330,34 +1330,28 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
                                 orb.getORBData().getReadByteBufferSize());
             }
 
-            // Create a MessageParser. A MessageParser will exist until read 
-            // event handling is re-enabled on main SelectorThread.
-            messageParser = new MessageParserImpl(orb);
-
             // start of a message must begin at byteBuffer's current position
             messageParser.setNextMessageStartPosition(byteBuffer.position());
 
             int bytesRead = 0;
+            // When orb.getORBData().nonBlockingReadCheckMessageParser() is
+            // true, we check both conditions, messageParser.isExpectingMoreData() and
+            // bytesRead > 0.  If bytesRead > 0 is the only condition checked,
+            // i.e. orb.getORBData().nonBlockingReadCheckMessageParser() is false,
+            // then an additional read() would be done before exiting the while
+            // loop. The default is to check both conditions.
             do {
                 bytesRead = nonBlockingRead();
                 if (bytesRead > 0) {
-                    byteBuffer.limit(byteBuffer.position())
-                            .position(messageParser.getNextMessageStartPosition());
-                    parseBytesAndDispatchMessages(messageParser);
-                    if (messageParser.isExpectingMoreData()) {
-                        // End of data in byteBuffer ?
-                        if (byteBuffer.position() == byteBuffer.capacity()) {
-                            byteBuffer = getNewBufferAndCopyOld(messageParser);
-                        }
-                    }
+                    parseBytesAndDispatchMessages();
                 }
-            } while (nonBlockingReadWhileLoopConditionIsTrue(messageParser, bytesRead));
+            } while ((bytesRead > 0 && messageParser.isExpectingMoreData()));
 
             // if expecting more data or using 'always enter blocking read'
             // strategy (the default), then go to a blocking read using
             // a temporary selector.
             if (orb.getORBData().alwaysEnterBlockingRead() || messageParser.isExpectingMoreData()) {
-                blockingRead(messageParser);
+                blockingRead();
             }
 
             // Always ensure subsequent calls to this method has
@@ -1405,8 +1399,31 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         }
     }
 
+    private void parseBytesAndDispatchMessages() {
+        byteBuffer.limit(byteBuffer.position())
+                .position(messageParser.getNextMessageStartPosition());
+        do {
+            MessageMediator messageMediator = null;
+            Message message = messageParser.parseBytes(byteBuffer, this);
+            byteBuffer = messageParser.getRemainderBuffer();
+            if (message != null) {
+                messageMediator = new MessageMediatorImpl(orb, this, message, messageParser.getMsgByteBuffer());
+            }
+
+            if (messageMediator != null) {
+                queueUpWork(messageMediator);
+            }
+        } while (messageParser.hasMoreBytesToParse());
+        if (messageParser.isExpectingMoreData()) {
+            // End of data in byteBuffer ?
+            if (byteBuffer.position() == byteBuffer.capacity()) {
+                byteBuffer = messageParser.getNewBufferAndCopyOld(byteBuffer);
+            }
+        }
+    }
+
     @Transport
-    protected void blockingRead(MessageParser messageParser) {
+    protected void blockingRead() {
         // Precondition: byteBuffer's position must be pointing to where next 
         //               bit of data should be read and MessageParser's next 
         //               message start position must be set.
@@ -1417,24 +1434,14 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         try {
             getConnectionCache().stampTime(this);
             tmpSelector = getTemporaryReadSelector();
-            sk = tmpSelector.registerChannel(getSocketChannel(),
-                    SelectionKey.OP_READ);
+            sk = tmpSelector.registerChannel(getSocketChannel(), SelectionKey.OP_READ);
             do {
                 int nsel = tmpSelector.select(waiter.getTimeForSleep());
                 if (nsel > 0) {
                     tmpSelector.removeSelectedKey(sk);
                     int bytesRead = getSocketChannel().read(byteBuffer);
                     if (bytesRead > 0) {
-                        //byteBuffer.flip();
-                        byteBuffer.limit(byteBuffer.position())
-                                .position(messageParser.getNextMessageStartPosition());
-                        parseBytesAndDispatchMessages(messageParser);
-                        if (messageParser.isExpectingMoreData()) {
-                            // End of data in byteBuffer ?
-                            if (byteBuffer.position() == byteBuffer.capacity()) {
-                                byteBuffer = getNewBufferAndCopyOld(messageParser);
-                            }
-                        }
+                        parseBytesAndDispatchMessages();
                         // reset waiter because we got some data
                         waiter = tcpTimeouts.waiter();
                     } else if (bytesRead < 0) {
@@ -1447,7 +1454,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
                 } else { // select operation timed out
                     waiter.advance();
                 }
-            } while (blockingReadWhileLoopConditionIsTrue(messageParser, waiter));
+            } while (!waiter.isExpired());
 
             // If MessageParser is not expecting more data, then we leave this
             // blocking read. Otherwise, we have timed out waiting for some
@@ -1471,70 +1478,61 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         }
     }
 
-    @Transport
-    protected void parseBytesAndDispatchMessages(MessageParser messageParser) {
-        do {
-            Message message = messageParser.parseBytes(byteBuffer, this);
-            if (message != null) {
-                ByteBuffer msgBuffer = messageParser.getMsgByteBuffer();
-                MessageMediatorImpl messageMediator =
-                        new MessageMediatorImpl(orb, this, message, msgBuffer);
-
-                // Special handling of messages which are fragmented
-                boolean addToWorkerThreadQueue = true;
-                if (message.supportsFragments()) {
-                    // Is this the first fragment ?
-                    if (message.getType() != Message.GIOPFragment) {
-                        // NOTE: First message fragment will not be GIOPFragment
-                        // type
-                        if (message.moreFragmentsToFollow()) {
-                            // Create an entry in fragmentMap so fragments
-                            // will be processed in order.
-                            RequestId corbaRequestId = MessageBase.getRequestIdFromMessageBytes(message, msgBuffer);
-                            fragmentMap.put(corbaRequestId, new LinkedList<MessageMediator>());
-                            addedEntryToFragmentMap(corbaRequestId);
-                        }
-                    } else {
-                        // Not the first fragment. Append to the request id's
-                        // queue in the fragmentMap so fragments will be
-                        // processed in order.
-                        RequestId corbaRequestId = MessageBase.getRequestIdFromMessageBytes(message, msgBuffer);
-                        Queue<MessageMediator> queue = fragmentMap.get(corbaRequestId);
-                        if (queue != null) {
-                            // REVISIT - In the future, the synchronized(queue),
-                            // wait()/notify() construct should be replaced
-                            // with something like a LinkedBlockingQueue
-                            // from java.util.concurrent using its offer()
-                            // and poll() methods.  But, at the time of the
-                            // writing of this code, a LinkedBlockingQueue
-                            // implementation is not performing as well as
-                            // the synchronized(queue), wait(), notify()
-                            // implementation.
-                            synchronized (queue) {
-                                queue.add(messageMediator);
-                                queuedMessageFragment(corbaRequestId);
-                                // Notify anyone who might be waiting on a
-                                // fragment for this request id.
-                                queue.notifyAll();
-                            }
-                            // Only after the previous fragment is processed
-                            // in CorbaMessageMediatorImpl.handleInput() will
-                            // the fragment Message that's been queued to
-                            // the fragmentMap for a given request id be
-                            // put on a WorkerThreadQueue for processing.
-                            addToWorkerThreadQueue = false;
-                        } else {
-                            // Very, very unlikely. But, be defensive.
-                            wrapper.noFragmentQueueForRequestId(corbaRequestId.toString());
-                        }
-                    }
+    private void queueUpWork(MessageMediator messageMediator) {
+        // Special handling of messages which are fragmented
+        boolean addToWorkerThreadQueue = true;
+        Message message = messageMediator.getDispatchHeader();
+        if (message.supportsFragments()) {
+            // Is this the first fragment ?
+            if (message.getType() != Message.GIOPFragment) {
+                // NOTE: First message fragment will not be GIOPFragment
+                // type
+                if (message.moreFragmentsToFollow()) {
+                    // Create an entry in fragmentMap so fragments
+                    // will be processed in order.
+                    RequestId corbaRequestId = messageMediator.getRequestIdFromRawBytes();
+                    fragmentMap.put(corbaRequestId, new LinkedList<MessageMediator>());
+                    addedEntryToFragmentMap(corbaRequestId);
                 }
-
-                if (addToWorkerThreadQueue) {
-                    addMessageMediatorToWorkQueue(messageMediator);
+            } else {
+                // Not the first fragment. Append to the request id's
+                // queue in the fragmentMap so fragments will be
+                // processed in order.
+                RequestId corbaRequestId = messageMediator.getRequestIdFromRawBytes();
+                Queue<MessageMediator> queue = fragmentMap.get(corbaRequestId);
+                if (queue != null) {
+                    // REVISIT - In the future, the synchronized(queue),
+                    // wait()/notify() construct should be replaced
+                    // with something like a LinkedBlockingQueue
+                    // from java.util.concurrent using its offer()
+                    // and poll() methods.  But, at the time of the
+                    // writing of this code, a LinkedBlockingQueue
+                    // implementation is not performing as well as
+                    // the synchronized(queue), wait(), notify()
+                    // implementation.
+                    synchronized (queue) {
+                        queue.add(messageMediator);
+                        queuedMessageFragment(corbaRequestId);
+                        // Notify anyone who might be waiting on a
+                        // fragment for this request id.
+                        queue.notifyAll();
+                    }
+                    // Only after the previous fragment is processed
+                    // in CorbaMessageMediatorImpl.handleInput() will
+                    // the fragment Message that's been queued to
+                    // the fragmentMap for a given request id be
+                    // put on a WorkerThreadQueue for processing.
+                    addToWorkerThreadQueue = false;
+                } else {
+                    // Very, very unlikely. But, be defensive.
+                    wrapper.noFragmentQueueForRequestId(corbaRequestId.toString());
                 }
             }
-        } while (messageParser.hasMoreBytesToParse());
+        }
+
+        if (addToWorkerThreadQueue) {
+            addMessageMediatorToWorkQueue(messageMediator);
+        }
     }
 
     @Transport
@@ -1561,66 +1559,14 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         return bytesRead;
     }
 
-    private boolean blockingReadWhileLoopConditionIsTrue(
-            MessageParser messageParser, TcpTimeouts.Waiter waiter) {
-        // When orb.getORBData().blockingReadCheckMessageParser() is
-        // true, we check both conditions, messageParser.isExpectingMoreData() 
-        // and timeSpentWaiting < maxWaitTime. This is *NOT* the default.
-        // If the messageParser.isExpectingMoreData() condition is not checked
-        // the while loop will not exit until we have reached a timeout waiting
-        // for more data. This is *NOW* the default. This means that control 
-        // will be returned to the main Selector at a later time.  This has the
-        // effect of being more patient in determining when a Connection should 
-        // transition from being a "hot" Connnection to one that is not very 
-        // "busy" or has gone cold/idle.
-        final boolean checkMessageParser =
-                orb.getORBData().blockingReadCheckMessageParser();
-
-        if (checkMessageParser) {
-            return messageParser.isExpectingMoreData() && !waiter.isExpired();
-        } else {
-            return !waiter.isExpired();
-        }
-    }
-
-    private boolean nonBlockingReadWhileLoopConditionIsTrue(
-            MessageParser messageParser, int bytesRead) {
-        // When orb.getORBData().nonBlockingReadCheckMessageParser() is
-        // true, we check both conditions, messageParser.isExpectingMoreData() and
-        // bytesRead > 0.  If bytesRead > 0 is the only condition checked,
-        // i.e. orb.getORBData().nonBlockingReadCheckMessageParser() is false,
-        // then an additional read() would be done before exiting the while
-        // loop. The default is to check both conditions.
-        final boolean checkBothConditions =
-                orb.getORBData().nonBlockingReadCheckMessageParser();
-        if (checkBothConditions) {
-            return (bytesRead > 0 && messageParser.isExpectingMoreData());
-        } else {
-            return bytesRead > 0;
-        }
-    }
-
     @Transport
-    private ByteBuffer getNewBufferAndCopyOld(MessageParser messageParser) {
-        ByteBuffer newByteBuffer = null;
-        // Set byteBuffer position to the start position of data to be
-        // copied into the re-allocated ByteBuffer.
-        byteBuffer.position(messageParser.getNextMessageStartPosition());
-        newByteBuffer = orb.getByteBufferPool().reAllocate(byteBuffer,
-                messageParser.getSizeNeeded());
-        messageParser.setNextMessageStartPosition(0);
-        return newByteBuffer;
-    }
-
-    @Transport
-    private void addMessageMediatorToWorkQueue(
-            final MessageMediatorImpl messageMediator) {
+    private void addMessageMediatorToWorkQueue(final MessageMediator messageMediator) {
         // Add messageMediator to work queue
         Throwable throwable = null;
         int poolToUse = -1;
         try {
             poolToUse = messageMediator.getThreadPoolToUse();
-            orb.getThreadPoolManager().getThreadPool(poolToUse).getWorkQueue(0).addWork(messageMediator);
+            orb.getThreadPoolManager().getThreadPool(poolToUse).getWorkQueue(0).addWork((Work)messageMediator);
         } catch (NoSuchThreadPoolException e) {
             throwable = e;
         } catch (NoSuchWorkQueueException e) {

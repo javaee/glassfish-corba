@@ -41,6 +41,7 @@
 package com.sun.corba.ee.impl.protocol;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -69,6 +70,7 @@ public class MessageParserImpl implements MessageParser {
 
     private static final int NUM_BYTES_IN_INTEGER = 4;
     private final static int MESSAGE_LENGTH_INDEX = Message.GIOPMessageHeaderLength - NUM_BYTES_IN_INTEGER;
+    private final static int MESSAGE_FLAG_INDEX = 6;
     final private ORB orb;
     private boolean expectingMoreData;
     private boolean moreBytesToParse;
@@ -184,7 +186,12 @@ public class MessageParserImpl implements MessageParser {
     }
 
     private int getMessageBodyLength(ByteBuffer buffer) {
+        buffer.order(getByteOrder(buffer.get(MESSAGE_FLAG_INDEX)));
         return buffer.getInt(MESSAGE_LENGTH_INDEX);
+    }
+
+    private ByteOrder getByteOrder(byte messageFlag) {
+        return (messageFlag & Message.LITTLE_ENDIAN_BIT) == 0 ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
     }
 
     @Override

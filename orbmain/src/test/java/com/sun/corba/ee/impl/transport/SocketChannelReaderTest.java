@@ -1,0 +1,82 @@
+package com.sun.corba.ee.impl.transport;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
+import static org.junit.Assert.fail;
+
+public class SocketChannelReaderTest extends TransportTestBase {
+
+    private static final byte[] DATA_TO_BE_READ = new byte[]{0, 1, 2, 3, 4, 5, 6};
+    private SocketChannelReader reader;
+
+    @Before
+    public void setUpReaderTest() {
+        reader = new SocketChannelReader(getOrb());
+    }
+
+    @Test
+    public void whenCurrentBufferNull_allocateBufferAndRead() throws IOException {
+        enqueData(DATA_TO_BE_READ);
+        ByteBuffer buffer = reader.read(getSocketChannel(), null);
+        assertBufferContents(buffer, DATA_TO_BE_READ);
+    }
+
+    private void enqueData(byte[] dataToBeRead) {
+        getSocketChannel().enqueData(dataToBeRead);
+    }
+
+    @Test
+    public void whenCurrentBufferHasPartialData_readToAppendData() throws IOException {
+        ByteBuffer oldBuffer = ByteBuffer.allocate(100);
+        populateBuffer(oldBuffer, DATA_TO_BE_READ, 0, 3);
+        enqueData(DATA_TO_BE_READ, 3, DATA_TO_BE_READ.length - 3);
+        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer);
+        assertBufferContents(buffer, DATA_TO_BE_READ);
+    }
+
+    private void populateBuffer(ByteBuffer buffer, byte[] bytes, int offset, int length) {
+        buffer.put(bytes, offset, length);
+        buffer.flip();
+    }
+
+    private void enqueData(byte[] dataToBeRead, int offset, int length) {
+        byte[] data = new byte[Math.min(length, dataToBeRead.length-offset)];
+        System.arraycopy(dataToBeRead, offset, data, 0, data.length);
+        enqueData(data);
+    }
+
+    private void assertBufferContents(ByteBuffer buffer, byte... bytes) {
+        buffer.flip();
+        byte[] actual = new byte[buffer.limit()];
+        buffer.get(actual);
+        assertEqualData(bytes, actual);
+    }
+
+    private void assertEqualData( byte[] expected, byte[] actual) {
+        if (!Arrays.equals(expected, actual))
+            fail( "expected " + Arrays.toString(expected) + " but was " + Arrays.toString(actual));
+    }
+
+    @Test
+    public void whenCurrentBufferIsFull_readToAppendData() throws IOException {
+        ByteBuffer oldBuffer = ByteBuffer.allocate(3);
+        populateBuffer(oldBuffer, DATA_TO_BE_READ, 0, 3);
+        enqueData(DATA_TO_BE_READ, 3, DATA_TO_BE_READ.length - 3);
+        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer);
+        assertBufferContents(buffer, DATA_TO_BE_READ);
+    }
+
+    @Test
+    public void whenCurrentBufferTooSmallForIncomingData_reallocateAndAppend() throws IOException {
+        ByteBuffer oldBuffer = ByteBuffer.allocate(5);
+        populateBuffer(oldBuffer, DATA_TO_BE_READ, 0, 3);
+        enqueData(DATA_TO_BE_READ, 3, DATA_TO_BE_READ.length - 3);
+        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer);
+        assertBufferContents(buffer, DATA_TO_BE_READ);
+    }
+}

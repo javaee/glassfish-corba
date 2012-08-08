@@ -67,6 +67,10 @@ public class TransportTestBase {
     private ThreadPoolManagerFake threadPoolManager = Stub.create(ThreadPoolManagerFake.class);
     private ThreadPoolFake threadPool = Stub.create(ThreadPoolFake.class);
 
+    final protected ORB getOrb() {
+        return orb;
+    }
+
     protected void defineRequestDispatcher(RequestDispatcher requestDispatcher) {
         ObjectKeyFake.requestDispatcher = requestDispatcher;
     }
@@ -236,6 +240,11 @@ public class TransportTestBase {
         @Override
         public int fragmentReadTimeout() {
             return 1000;
+        }
+
+        @Override
+        public int getMaxReadByteBufferSizeThreshold() {
+            return 500;
         }
     }
 
@@ -458,6 +467,10 @@ public class TransportTestBase {
         @Override
         public int getTimeForSleep() {
             return 1;
+        }
+
+        @Override
+        public void advance() {
         }
     }
 

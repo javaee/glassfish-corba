@@ -6,7 +6,6 @@ import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.threadpool.Work;
 import org.junit.Test;
-import org.omg.CORBA.COMM_FAILURE;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -277,6 +276,7 @@ public class ConnectionImplTest extends TransportTestBase {
         useNio();
         getSocketChannel().enqueData(new byte[]{'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6});
         getSocketChannel().setNumBytesToRead(8, 0);
+        getConnection().doWork();
         getConnection().doWork();
         assertEquals(1, getWorkQueue().size());
         assertTrue(getWorkQueue().remove() instanceof MessageMediator);

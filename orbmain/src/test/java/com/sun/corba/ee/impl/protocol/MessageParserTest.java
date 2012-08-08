@@ -107,6 +107,7 @@ public class MessageParserTest {
 
         assertSame(buffer, parser.getRemainderBuffer());
         assertNull(parser.getMessageMediator());
+        assertEquals(0, buffer.position());
     }
 
     @Test
@@ -133,6 +134,19 @@ public class MessageParserTest {
 
         assertSame(buffer, parser.getRemainderBuffer());
         assertNull(parser.getMessageMediator());
+        assertEquals(0, buffer.position());
+    }
+
+    @Test
+    public void whenBufferIsLittleEndianAndContainsHeaderOnly_requestMoreAndDoNotCreateMediator() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.LITTLE_ENDIAN_BIT, Message.GIOPCancelRequest, 6, 0, 0, 0, 1, 2 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+
+        assertSame(buffer, parser.getRemainderBuffer());
+        assertNull(parser.getMessageMediator());
+        assertEquals(0, buffer.position());
     }
 
     @Test
@@ -152,6 +166,18 @@ public class MessageParserTest {
     @Test
     public void whenBufferContainsWholeMessage_consumeEntireBuffer() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+        assertNull(parser.getRemainderBuffer());
+        MessageMediator mediator = parser.getMessageMediator();
+        assertNotNull(mediator);
+        assertTrue(mediator.getDispatchHeader() instanceof ReplyMessage_1_2);
+    }
+
+    @Test
+    public void whenIsLittleEndianAndBufferContainsWholeMessage_consumeEntireBuffer() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.LITTLE_ENDIAN_BIT, Message.GIOPReply, 6, 0, 0, 0, 1, 2, 3, 4, 5, 6 };
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -203,8 +229,6 @@ public class MessageParserTest {
         assertTrue(message instanceof ReplyMessage_1_1);
         assertEquals(18, parser.getMsgByteBuffer().limit());
         assertEquals(1, parser.getRemainderBuffer().remaining());
-//        assertEquals(1, parser.getRemainderBuffer().limit());
-//        assertEquals(0, parser.getNextMessageStartPosition());
     }
 
     @Test
@@ -237,6 +261,18 @@ public class MessageParserTest {
     }
 
     @Test
+    public void whenBufferContainsWholeMessageNeedingFragments_consumeEntireBuffer() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+        MessageMediator messageMediator = parser.getMessageMediator();
+
+        assertNull(parser.getRemainderBuffer());
+        assertTrue(messageMediator.getDispatchHeader() instanceof ReplyMessage_1_1);
+    }
+
+    @Test
     public void oldwhenBufferContainsFinalFragment_consumeBuffer() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.MORE_FRAGMENTS_BIT, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6,
                          'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment, 0, 0, 0, 4, 1, 2, 3, 4, 5, 6};
@@ -250,6 +286,21 @@ public class MessageParserTest {
         assertEquals(34, parser.getNextMessageStartPosition());
         assertTrue(message1 instanceof RequestMessage_1_2);
         assertTrue(message2 instanceof FragmentMessage_1_2);
+    }
+
+    @Test
+    public void whenBufferContainsFinalFragment_consumeBuffer() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.MORE_FRAGMENTS_BIT, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6,
+                         'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment, 0, 0, 0, 4, 1, 2, 3, 4};
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+        parser.offerBuffer(buffer);
+        MessageMediator messageMediator1 = parser.getMessageMediator();
+        parser.offerBuffer(parser.getRemainderBuffer());
+        MessageMediator messageMediator2 = parser.getMessageMediator();
+
+        assertNull(parser.getRemainderBuffer());
+        assertTrue(messageMediator1.getDispatchHeader() instanceof RequestMessage_1_2);
+        assertTrue(messageMediator2.getDispatchHeader() instanceof FragmentMessage_1_2);
     }
 
     @Test

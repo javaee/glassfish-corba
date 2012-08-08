@@ -103,6 +103,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
 
     protected SocketChannel socketChannel;
     private MessageParser messageParser;
+    private SocketChannelReader socketChannelReader;
 
     public SocketChannel getSocketChannel() {
         return socketChannel;
@@ -195,6 +196,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     public ConnectionImpl(ORB orb) {
         this.orb = orb;
         messageParser = new MessageParserImpl(orb, this);
+        socketChannelReader = new SocketChannelReader(orb);
         setWork(this);
         responseWaitingRoom = new ResponseWaitingRoomImpl(orb, this);
         setTcpTimeouts(orb.getORBData().getTransportTcpTimeouts());
@@ -1323,6 +1325,18 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     @Transport
     protected void doOptimizedReadStrategy() {
         try {
+            /*/
+            ByteBuffer byteBuffer = socketChannelReader.read(getSocketChannel(), messageParser.getRemainderBuffer());
+            byteBuffer.flip();
+            messageParser.offerBuffer(byteBuffer);
+            MessageMediator messageMediator = messageParser.getMessageMediator();
+            while (messageMediator != null) {
+                queueUpWork(messageMediator);
+                byteBuffer = messageParser.getRemainderBuffer();
+                messageParser.offerBuffer(byteBuffer);
+                messageMediator = messageParser.getMessageMediator();
+            }
+            /*/
             // get a new ByteBuffer from ByteBufferPool ?
             if (byteBuffer == null || !byteBuffer.hasRemaining()) {
                 byteBuffer =
@@ -1358,6 +1372,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
             // byteBuffer.position() set to the location where
             // the next message should begin
             byteBuffer.position(messageParser.getNextMessageStartPosition());
+            /**/
 
             // Conection is no longer expecting more data.
             // Re-enable read event handling on main selector
@@ -1454,7 +1469,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
                 } else { // select operation timed out
                     waiter.advance();
                 }
-            } while (!waiter.isExpired());
+            } while (!waiter.isExpired() && messageParser.isExpectingMoreData());
 
             // If MessageParser is not expecting more data, then we leave this
             // blocking read. Otherwise, we have timed out waiting for some

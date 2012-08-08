@@ -149,6 +149,8 @@
                             <poa>true</poa>
                             <includes>
                                 <include>**/rmiiIServantPOA.class</include>
+                                <include>**/corba/preinvokepostinvoke/MyServant.class</include>
+                                <include>**/corba/rmipoacounter/counterImpl.class</include>
                             </includes>
                         </source>
                         <source>

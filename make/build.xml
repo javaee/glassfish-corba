@@ -432,7 +432,6 @@
             <src path="${test.src.dir}"/>
             <src path="${test-gensrc.dir}"/>
             <include name="${sourcefile-name}"/>
-            <compilerarg value="-Xbootclasspath/p:${classes.dir}"/>
         </javac>
     </target>
 
@@ -476,6 +475,7 @@
     <!-- Run all rmic invocations for the tests that use rmic and generate
          sources for them -->
     <target name="run-all-test-rmic">
+        <!--
         <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
             <param name="rmic-args-value" value=""/>
             <param name="output-dir-value" value="${test-gensrc.dir}"/>
@@ -596,6 +596,7 @@
             <param name="classfile-name" value="corba/ortremote/ORTEchoImpl.class"/>
             <param name="sourcefile-name" value="corba/ortremote/ORTEchoImpl.java"/>
         </antcall>
+        --> <!--
         <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
             <param name="rmic-args-value" value="-poa"/>
             <param name="output-dir-value" value="${test-gensrc.dir}"/>
@@ -608,6 +609,7 @@
             <param name="classfile-name" value="corba/rmipoacounter/counterImpl.class"/>
             <param name="sourcefile-name" value="corba/rmipoacounter/counterImpl.java"/>
         </antcall>
+        --> <!--
         <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
             <param name="rmic-args-value" value="-poa"/>
             <param name="output-dir-value" value="${test-gensrc.dir}"/>
@@ -644,14 +646,6 @@
             <param name="classfile-name" value="corba/rogueclient/TesterImpl.class"/>
             <param name="sourcefile-name" value="corba/rogueclient/TesterImpl.java"/>
         </antcall>
-        <!-- JSG not supported
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -nolocalstubs"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/jsg/rmiiIServantPOA.class"/>
-            <param name="sourcefile-name" value="corba/jsg/rmiiIServantPOA.java"/>
-        </antcall>
-        -->
         <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
             <param name="rmic-args-value" value="-poa -always"/>
             <param name="output-dir-value" value="${test-gensrc.dir}"/>
@@ -676,6 +670,7 @@
             <param name="classfile-name" value="performance/simpleperf2/counterImpl.class"/>
             <param name="sourcefile-name" value="performance/simpleperf2/counterImpl.java"/>
         </antcall>
+        -->
     </target>
 
     <!-- Macro used to run CTF tests.  

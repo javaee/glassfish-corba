@@ -129,7 +129,7 @@
 
     <!-- ========================= COMPILE-TESTS ========================= -->
     <!-- This target compiles all the ORB unit tests -->
-    <target name="build-tests" depends="init, run-all-test-idl, run-all-test-rmic, compile-tests"/>
+    <target name="build-tests" depends="init, run-all-test-rmic, compile-tests"/>
 
     <target name="compile-tests" depends="init, compile-tests-main, compile-tests-values"/>
 
@@ -409,58 +409,6 @@
     <!-- Run all idl invocations for the tests that use idl and generate
          sources for them -->
     <target name="run-all-test-idl" depends="init">
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value="-i ${omgapi.idl.dir} -i ${omgapi.include.dir}"/>
-            <param name="corba-value" value="-corba 3.0"/>
-            <param name="fall-value" value="-fallTIE"/>
-            <param name="D-value" value="-D CORBA3"/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix PortableInterceptor org.omg -pkgPrefix IOP org.omg -pkgPrefix Messaging org.omg"/>
-            <param name="idl-value" value="${test.src.dir}/pi/serverinterceptor/serverinterceptor.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/serverinterceptor"/>
-            <param name="generated-files" value="*POATie.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/poapolicies/Hello.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/poapolicies"/>
-            <param name="generated-files" value="*POATie.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value="-oldImplBase"/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/invocation/hello.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/invocation"/>
-            <param name="generated-files" value="*POATie.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value="-oldImplBase"/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/tcpreadtimeout/idlI.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/tcpreadtimeout"/>
-            <param name="generated-files" value="*POATie.java"/>
-        </antcall>
     </target>
 
 

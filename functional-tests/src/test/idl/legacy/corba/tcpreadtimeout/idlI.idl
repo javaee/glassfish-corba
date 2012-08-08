@@ -37,49 +37,17 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
-//
-// Created       : 2003 Apr 09 (Wed) 16:54:21 by Harold Carr.
-// Last Modified : 2003 Sep 02 (Tue) 10:47:19 by Harold Carr.
-//
-
-package corba.tcpreadtimeout;
-
-import org.omg.CORBA.ORB;
-
-import corba.framework.Controller;
-import corba.hcks.U;
-
-public class Client 
+module corba 
 {
-    public static final String baseMsg = Client.class.getName();
-    public static final String main = baseMsg + ".main";
-    
-    public static ORB orb;
-    public static idlI idlIPOA;
-    public static String idlIPOAArgO = Server.idlIPOA + "O";
-    public static String idlIPOAArgN = Server.idlIPOA + "N";
-
-    public static void main(String[] av)
+    module tcpreadtimeout
     {
-        try {
-            U.sop(main + " starting");
+        interface idlI
+        {
+            string o(in string x);
 
-            orb = ORB.init(av, null);
-            idlIPOA     = idlIHelper.narrow(U.resolve(Server.idlIPOA,    orb));
-
-            U.sop(idlIPOA.o(idlIPOAArgO));
-            U.sop(idlIPOA.return_after_client_gives_up(idlIPOAArgN));
-
-            orb.shutdown(true);
-        } catch (Exception e) {
-            U.sopUnexpectedException(main + " : ", e);
-            System.exit(1);
-        }
-        U.sop(main + " ending successfully");
-        System.exit(Controller.SUCCESS);
-    }
-}
+            string return_after_client_gives_up(in string x);
+        };
+    };
+};
 
 // End of file.
-

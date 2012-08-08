@@ -106,7 +106,7 @@
                         <source>
                             <compatible>true</compatible>
                             <includes>
-                                <include>legacy/*.idl</include>
+                                <include>legacy/**/*.idl</include>
                             </includes>
                             <packagePrefixes>
                                 <packagePrefix><type>activation</type><prefix>com.sun.corba.ee.spi</prefix></packagePrefix>
@@ -114,11 +114,23 @@
                         </source>
                         <source>
                             <packagePrefixes>
+                                <packagePrefix><type>IOP</type>                <prefix>org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>Messaging</type>          <prefix>org.omg</prefix></packagePrefix>
                                 <packagePrefix><type>PortableServer</type>     <prefix>org.omg</prefix></packagePrefix>
+                                <packagePrefix><type>PortableInterceptor</type><prefix>org.omg</prefix></packagePrefix>
                             </packagePrefixes>
                             <compatible>false</compatible>
+                            <defines>
+                                <define>
+                                    <symbol>CORBA3</symbol>
+                                </define>
+                            </defines>
+                            <additionalArguments>
+                                <additionalArgument>-corba</additionalArgument>
+                                <additionalArgument>3.0</additionalArgument>
+                            </additionalArguments>
                             <excludes>
-                                <exclude>legacy/*.idl</exclude>
+                                <exclude>legacy/**</exclude>
                             </excludes>
                          </source>
                     </sources>

@@ -1385,7 +1385,7 @@ public class Client extends TestCase
             TestTransport transport = new TestTransport( orb ) ;
 
             PresentationManager pm = ORB.getPresentationManager() ;
-            PresentationManager.StubFactoryFactory sff = pm.getStubFactoryFactory( true ) ;
+            PresentationManager.StubFactoryFactory sff = pm.getDynamicStubFactoryFactory() ;
 
             impl = new TieTestImpl() ;
             Tie tie = pm.getTie() ;

@@ -184,20 +184,37 @@ public final class PresentationManagerImpl implements PresentationManager
         boolean isDynamic ) 
     {
         if (isDynamic) {
-            return dynamicStubFactoryFactory;
+            return getDynamicStubFactoryFactory();
         } else {
-            return staticStubFactoryFactory;
+            return getStaticStubFactoryFactory();
         }
     }
 
-    public void setStubFactoryFactory( boolean isDynamic, 
-        PresentationManager.StubFactoryFactory sff ) 
-    {
-        if (isDynamic) {
-            dynamicStubFactoryFactory = sff;
-        } else {
-            staticStubFactoryFactory = sff;
-        }
+    @Override
+    public StubFactoryFactory getStaticStubFactoryFactory() {
+        return staticStubFactoryFactory;
+    }
+
+    @Override
+    public StubFactoryFactory getDynamicStubFactoryFactory() {
+        return dynamicStubFactoryFactory;
+    }
+
+
+    /** Register the dynamic StubFactoryFactory.  Note that
+     * a dynamic StubFactoryFactory is optional.
+     * @param sff
+     */
+    public void setStaticStubFactoryFactory(StubFactoryFactory sff) {
+        staticStubFactoryFactory = sff;
+    }
+
+    /** Register the static StubFactoryFactory.  Note that
+     * a static StubFactoryFactory is always required for IDL.
+     * @param sff
+     */
+    public void setDynamicStubFactoryFactory(StubFactoryFactory sff) {
+        dynamicStubFactoryFactory = sff;
     }
 
     public Tie getTie()
@@ -388,6 +405,10 @@ public final class PresentationManagerImpl implements PresentationManager
         }
     }
 
+    /** Turn on internal debugging flags, which dump information
+     * about stub code generation to the PrintStream.
+     * @param ps Output stream.
+     */
     public void enableDebug( PrintStream ps ) {
         this.debug = true ;
         this.ps = ps ;

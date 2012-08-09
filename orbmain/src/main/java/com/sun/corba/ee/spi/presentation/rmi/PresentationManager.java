@@ -189,16 +189,19 @@ public interface PresentationManager
     /** Return the registered StubFactoryFactory.
      * @param isDynamic true iff we want the dynamic stub factory
      * @return static or dynamic stub factory.
+     * @deprecated use {@link #getDynamicStubFactoryFactory()} or {@link #getStaticStubFactoryFactory()}
      */
     StubFactoryFactory getStubFactoryFactory( boolean isDynamic ) ;
 
-    /** Register the StubFactoryFactory.  Note that
-     * a static StubFactoryFactory is always required for IDL.  The
-     * dynamic stubFactoryFactory is optional.
-     * @param isDynamic
-     * @param sff
+    /** Return the registered static StubFactoryFactory.
+     * @return static stub factory.
      */
-    void setStubFactoryFactory( boolean isDynamic, StubFactoryFactory sff ) ;
+    StubFactoryFactory getStaticStubFactoryFactory();
+
+    /** Return the registered dynamic StubFactoryFactory.
+     * @return dynamic stub factory.
+     */
+    StubFactoryFactory getDynamicStubFactoryFactory();
 
     /** Equivalent to getStubFactoryFactory( true ).getTie( null ).
      * Provided for compatibility with earlier versions of PresentationManager
@@ -220,23 +223,6 @@ public interface PresentationManager
      * @return whether to use dynamic stubs.
      */
     boolean useDynamicStubs() ;
-
-    /** Remove all internal references to Class cls from the 
-     *  PresentationManager. This allows ClassLoaders to
-     *  be garbage collected when they are no longer needed.
-     * @param cls Class to flush
-     */
-    void flushClass( Class<?> cls ) ;
-
-    /** Turn on internal debugging flags, which dump information
-     * about stub code generation to the PrintStream.
-     * @param ps Output stream.
-     */
-    void enableDebug( PrintStream ps ) ;
-
-    /** Turn off internal debugging.
-     */
-    void disableDebug() ;
 
     boolean getDebug() ;
 

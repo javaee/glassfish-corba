@@ -51,6 +51,7 @@ import java.security.PrivilegedAction ;
 
 import javax.management.ObjectName ;
 
+import com.sun.corba.ee.impl.presentation.rmi.PresentationManagerImpl;
 import org.omg.CORBA.TCKind ;
 import org.omg.PortableServer.Servant ;
 
@@ -393,7 +394,7 @@ public abstract class ORB extends com.sun.corba.ee.org.omg.CORBA.ORB
     // because RMI-IIOP requires the PresentationManager in
     // places where no ORB is available, so the PresentationManager
     // must be global.  It is initialized here as well.
-    private static final PresentationManager globalPM = 
+    private static final PresentationManagerImpl globalPM =
         PresentationDefaults.makeOrbPresentationManager() ;
 
     private UnaryFunction<String,Class<?>> classNameResolver = defaultClassNameResolver ;
@@ -425,8 +426,11 @@ public abstract class ORB extends com.sun.corba.ee.org.omg.CORBA.ORB
     public static PresentationManager.StubFactoryFactory 
         getStubFactoryFactory()
     {
-        boolean useDynamicStubs = globalPM.useDynamicStubs() ;
-        return globalPM.getStubFactoryFactory( useDynamicStubs ) ;
+        if (globalPM.useDynamicStubs()) {
+            return globalPM.getDynamicStubFactoryFactory();
+        } else {
+            return globalPM.getStaticStubFactoryFactory();
+        }
     }
 
     /** Obtain the InvocationInterceptor for this ORB instance.

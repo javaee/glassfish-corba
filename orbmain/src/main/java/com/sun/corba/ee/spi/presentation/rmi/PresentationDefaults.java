@@ -120,18 +120,16 @@ public abstract class PresentationDefaults
         return Boolean.valueOf( value ) ;
     }
 
-    public static PresentationManager makeOrbPresentationManager() {
+    public static PresentationManagerImpl makeOrbPresentationManager() {
         final boolean useDynamicStub = getBooleanPropertyValue( 
             ORBConstants.USE_DYNAMIC_STUB_PROPERTY, inAppServer() ) ;
 
         final boolean debug = getBooleanPropertyValue( 
             ORBConstants.DEBUG_DYNAMIC_STUB, false ) ;
 
-        final PresentationManager result = new PresentationManagerImpl( useDynamicStub ) ;
-        result.setStubFactoryFactory( false, 
-            PresentationDefaults.getStaticStubFactoryFactory() ) ;
-        result.setStubFactoryFactory( true, 
-            PresentationDefaults.getDynamicStubFactoryFactory() ) ;
+        final PresentationManagerImpl result = new PresentationManagerImpl( useDynamicStub ) ;
+        result.setStaticStubFactoryFactory(PresentationDefaults.getStaticStubFactoryFactory());
+        result.setDynamicStubFactoryFactory(PresentationDefaults.getDynamicStubFactoryFactory());
         if (debug) {
             result.enableDebug( System.out ) ;
         }

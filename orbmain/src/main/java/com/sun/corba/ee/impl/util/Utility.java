@@ -826,10 +826,8 @@ public final class Utility {
                 // This can be either static or dynamic
                 sff = com.sun.corba.ee.spi.orb.ORB.getStubFactoryFactory() ;
             } else {
-                PresentationManager pm = 
-                    com.sun.corba.ee.spi.orb.ORB.getPresentationManager() ;
-                // This is the static version
-                sff = pm.getStubFactoryFactory(false) ; 
+                PresentationManager pm = com.sun.corba.ee.spi.orb.ORB.getPresentationManager() ;
+                sff = pm.getStaticStubFactoryFactory() ;
             }
 
             PresentationManager.StubFactory sf = sff.createStubFactory( 

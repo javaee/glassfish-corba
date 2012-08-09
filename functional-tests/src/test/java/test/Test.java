@@ -928,7 +928,7 @@ public abstract class Test implements java.lang.Runnable
         System.out.println("Running with serialization encoding: " +
                            (useJavaSerialization() ? "JSG" : "CDR"));
         System.out.println( "Dynamic StubFactoryFactory: " +
-            ORB.getPresentationManager().getStubFactoryFactory(true) ) ;
+            ORB.getPresentationManager().getDynamicStubFactoryFactory() ) ;
         System.out.println("Encoding is " +
             (useJavaSerialization() ? "JSG" : "CDR"));
         System.out.println("ORB initialization debugging is " +

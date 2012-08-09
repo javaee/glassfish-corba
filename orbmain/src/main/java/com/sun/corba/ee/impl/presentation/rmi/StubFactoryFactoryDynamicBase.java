@@ -76,17 +76,13 @@ public abstract class StubFactoryFactoryDynamicBase extends
             throw wrapper.classNotFound3( exc, className ) ;
         }
 
-        ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
+        ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get(cls) ;
         PresentationManager pm = ORB.getPresentationManager() ;
 
         if (cinfo.isAIDLEntity(cls) && !cinfo.isARemote(cls)) {
             // IDL stubs must always use static factories.
-            PresentationManager.StubFactoryFactory sff = 
-                pm.getStubFactoryFactory( false ) ; 
-            PresentationManager.StubFactory sf = 
-                sff.createStubFactory( className, true, remoteCodeBase, 
-                    expectedClass, classLoader ) ;
-            return sf ;
+            PresentationManager.StubFactoryFactory sff = pm.getStaticStubFactoryFactory();
+            return sff.createStubFactory( className, true, remoteCodeBase, expectedClass, classLoader );
         } else {
             PresentationManager.ClassData classData = pm.getClassData( cls ) ;
             return makeDynamicStubFactory( pm, classData, classLoader ) ;

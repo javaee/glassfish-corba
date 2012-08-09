@@ -82,8 +82,7 @@ public class CodegenStubBase extends Stub
         // the IOR is set, because a deserialized stub is not connected
         // to an ORB.
         PresentationManager pm = ORB.getPresentationManager() ;
-        PresentationManager.StubFactoryFactory sff =
-            pm.getStubFactoryFactory( true ) ;
+        PresentationManager.StubFactoryFactory sff = pm.getDynamicStubFactoryFactory();
         PresentationManager.StubFactory sf = sff.createStubFactory(
             classData.getMyClass().getName(), false, null, null, null ) ;
         org.omg.CORBA.Object stub = sf.makeStub() ;

@@ -68,6 +68,7 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.SystemException;
+import sun.misc.HexDumpEncoder;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -104,6 +105,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     protected SocketChannel socketChannel;
     private MessageParser messageParser;
     private SocketChannelReader socketChannelReader;
+    private Throwable discardedThrowable;
 
     public SocketChannel getSocketChannel() {
         return socketChannel;
@@ -166,6 +168,22 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
 
     private NioBufferWriter bufferWriter;
     protected Dispatcher dispatcher = DISPATCHER;
+
+    /**
+     * Returns the throwable, if any, that occurred during the latest {@link #doWork} call.
+     * Currently used only by unit tests.
+     */
+    Throwable getDiscardedThrowable() {
+        return discardedThrowable;
+    }
+
+    /**
+     * Clears the throwable, if any, that occurred during the latest {@link #doWork} call.
+     * Currently used only by unit tests.
+     */
+    void clearDiscardedThrowable() {
+        discardedThrowable = null;
+    }
 
     interface Dispatcher {
         boolean dispatch(MessageMediator messageMediator);
@@ -952,6 +970,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
 
     @Transport
     public void doWork() {
+        discardedThrowable = null;
         try {
             // IMPORTANT: Sanity checks on SelectionKeys such as
             //            SelectorKey.isValid() should not be done
@@ -965,6 +984,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
                 doOptimizedReadStrategy();
             }
         } catch (Throwable t) {
+            discardedThrowable = t;
             exceptionInfo(t);
         }
     }
@@ -1328,6 +1348,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
             /*/
             ByteBuffer byteBuffer = socketChannelReader.read(getSocketChannel(), messageParser.getRemainderBuffer());
             byteBuffer.flip();
+//            System.out.println( "REG-> received buffer\n" + toHexDump(byteBuffer));
             messageParser.offerBuffer(byteBuffer);
             MessageMediator messageMediator = messageParser.getMessageMediator();
             while (messageMediator != null) {
@@ -1412,6 +1433,15 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
             //close();
             throw wrapper.throwableInDoOptimizedReadStrategy(ex);
         }
+    }
+
+    private static String toHexDump(ByteBuffer byteBuffer) {
+        StringBuilder sb = new StringBuilder();
+        byteBuffer.mark();
+        HexDumpEncoder encoder = new HexDumpEncoder();
+        sb.append(encoder.encodeBuffer(byteBuffer));
+        byteBuffer.reset();
+        return sb.toString();
     }
 
     private void parseBytesAndDispatchMessages() {

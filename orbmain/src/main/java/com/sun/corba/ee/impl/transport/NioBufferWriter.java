@@ -47,7 +47,7 @@ public class NioBufferWriter {
                     }
                 }
             } catch (IOException ioe) {
-                System.out.println( "REG-> Caught" + ioe + "; throwing new exception");
+                ioe.printStackTrace();
                 throw ConnectionImpl.wrapper.exceptionWhenWritingWithTemporarySelector(ioe,
                         byteBuffer.position(), byteBuffer.limit(),
                         waiter.timeWaiting(), tcpTimeouts.get_max_time_to_wait());

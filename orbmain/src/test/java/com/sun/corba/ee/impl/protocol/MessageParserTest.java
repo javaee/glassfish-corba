@@ -176,6 +176,16 @@ public class MessageParserTest {
     }
 
     @Test
+    public void afterConsumingEntireBuffer_offerOfNullBufferClearsMessageMediator() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+        parser.offerBuffer(null);
+        assertNull(parser.getMessageMediator());
+    }
+
+    @Test
     public void whenIsLittleEndianAndBufferContainsWholeMessage_consumeEntireBuffer() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.LITTLE_ENDIAN_BIT, Message.GIOPReply, 6, 0, 0, 0, 1, 2, 3, 4, 5, 6 };
         ByteBuffer buffer = ByteBuffer.wrap(header);
@@ -245,6 +255,18 @@ public class MessageParserTest {
         MessageMediator mediator = parser.getMessageMediator();
         assertNotNull(mediator);
         assertTrue(mediator.getDispatchHeader() instanceof ReplyMessage_1_1);
+    }
+
+    @Test
+    public void afterConsumingMessage_offerOfPartialBufferClearsMessageMediator() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6,
+                          1, 2, 3, 4, 5, 6,
+                         'R', 'M', 'I' };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+        parser.offerBuffer(parser.getRemainderBuffer());
+        assertNull(parser.getMessageMediator());
     }
 
     @Test

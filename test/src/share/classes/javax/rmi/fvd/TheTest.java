@@ -51,6 +51,7 @@ package javax.rmi.fvd;
 
 import org.omg.CORBA.ORB;
 
+import java.io.IOException;
 import java.util.Properties;
 import javax.naming.InitialContext;
 import javax.naming.Context;
@@ -69,11 +70,12 @@ public class TheTest extends test.Test {
 
     public void setup() {
         try {
-            // Now we need to start the NameServer and
-            // our test server. The test server will register
-            // with the NameServer.
-            
             nameServer  = Util.startNameServer("1050",true);
+        } catch (IOException e) {
+            System.out.println("Failed to start the name server: " + e);
+        }
+        try {
+            // Now we need to start our test server. The test server will register with the NameServer.
             compileClasses();
         } catch(Throwable t) { 
             System.out.println("Compiling classes failed : "+t.toString());
@@ -81,7 +83,7 @@ public class TheTest extends test.Test {
     }
 
     public  void run() {
-        String testName     = new TheTest().getClass().getName();
+        String testName     = TheTest.class.getName();
         JUnitReportHelper helper = new JUnitReportHelper( testName ) ;
         helper.start( "test1" ) ;
         boolean testPassed  = true;
@@ -104,8 +106,9 @@ public class TheTest extends test.Test {
                         
                         
             // Start it
-            server = Util.startServer("javax.rmi.fvd.TheServer", 
-                                      properties, getClassesDirectory("values"));
+            String valueClasses = getClassesDirectory("values");
+            server = Util.startServer("javax.rmi.fvd.TheServer",
+                                      properties, valueClasses);
             
             // Lets setup some properties that we are using
             // for this test and then create the ORB Object...

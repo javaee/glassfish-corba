@@ -260,8 +260,7 @@ public class Util {
                 String host = args[2];
                 if (host.equals("-nullHost")) host = null;
 
-                if (startSingleServant( args[0], args[1], host,
-                                        Integer.parseInt(args[3]), iiop, null ) == false) {
+                if (!startSingleServant( args[0], args[1], host, Integer.parseInt(args[3]), iiop, null )) {
                     System.exit(1);
                 }
             }
@@ -526,7 +525,7 @@ public class Util {
      * @param additionalArgs Additional arguments. May be null.
      * @param classes Classes to compile. If null or empty, this method
      * does nothing.
-     * @param launchExternal If true, rmic will be run in an external process;
+     * @param externalProcess If true, rmic will be run in an external process;
      * if false, rmic will be run in the current process.
      * @throws Exception if compile fails.
      */
@@ -544,7 +543,7 @@ public class Util {
      * @param additionalArgs Additional arguments. May be null.
      * @param classes Classes to compile. If null or empty, this method
      * does nothing.
-     * @param launchExternal If true, rmic will be run in an external process;
+     * @param externalProcess If true, rmic will be run in an external process;
      * if false, rmic will be run in the current process.
      * @param out Where to write output.
      * @throws Exception if compile fails.

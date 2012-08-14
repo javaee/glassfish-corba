@@ -140,9 +140,10 @@ public class MessageParserImpl implements MessageParser {
     @Override
     public void offerBuffer(ByteBuffer buffer) {
         msgByteBuffer = null;
-        if (!containsFullHeader(buffer))
-            remainderBuffer = buffer;
-        else if (!containsFullMessage(buffer))
+        messageMediator = null;
+        if (buffer == null) return;
+
+        if (!containsFullHeader(buffer) || !containsFullMessage(buffer))
             remainderBuffer = buffer;
         else {
             remainderBuffer = splitAndReturnRemainder(buffer, getTotalMessageLength(buffer));

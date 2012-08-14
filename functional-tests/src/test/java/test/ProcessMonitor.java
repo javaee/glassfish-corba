@@ -132,11 +132,7 @@ public class ProcessMonitor {
         errReader.start();
     }
 
-    public void waitForHandshake() throws InterruptedException, Exception {
-        outReader.waitForHandshake();
-    }
-
-    public void waitForHandshake(long timeout) throws InterruptedException, Exception {
+    public void waitForHandshake(long timeout) throws Exception {
         outReader.waitForHandshake(timeout);
     }
 

@@ -5,6 +5,7 @@ import com.sun.corba.ee.impl.protocol.RequestIdImpl;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.threadpool.Work;
+import org.junit.After;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -18,6 +19,12 @@ import static org.junit.Assert.*;
 public class ConnectionImplTest extends TransportTestBase {
 
     private static final byte[] BYTE_DATA = {0,1,2,3,4,5,6,7,8,9,10};
+
+    @After
+    public void tearDown() {
+        if (getConnection() != null)
+            assertNull(getConnection().getDiscardedThrowable());
+    }
 
     @Test
     public void whenRequest1_0_receivedFromSocket_dispatchRequest() throws IOException {
@@ -235,6 +242,7 @@ public class ConnectionImplTest extends TransportTestBase {
                 Message.GIOPCloseConnection, /* size */ 0, 0, 0, 0});
         getConnection().doWork();
         assertEquals(1, getNumConnectionsRemoved());
+        getConnection().clearDiscardedThrowable();
     }
 
     @Test(expected = RuntimeException.class)

@@ -80,7 +80,7 @@ import com.sun.corba.ee.spi.orb.ORB ;
  * A typical invocation :
  *      java test.Test -test javax.rmi.CORBA.io.BaseIOTest -wait -verbose -iterate 5
  *
- * @See UsageAndExit
+ * @see #UsageAndExit
  **/
 public abstract class Test implements java.lang.Runnable
 {
@@ -154,7 +154,7 @@ public abstract class Test implements java.lang.Runnable
     protected boolean verbose = false;
     protected boolean demure = false;
 
-    private Hashtable results[];
+    private Hashtable<String, Object> results[];
     private static File testPackageDir = null;
     private static File outputDir = null;
     private static int mainResult = 0;
@@ -197,15 +197,14 @@ public abstract class Test implements java.lang.Runnable
      * the Hashtable { key = '-one' value = ''; key = '-two' value = 'Value2';
      * key = '-three' value = 'Value3'} is the output.
      *
-     * @param args[] An array of strings.
+     * @param args An array of strings.
      * @return The hashtable created from the array
-     * @exception ConsolePairArrayException Bad key position or format
      **/
-    public static Hashtable createFromConsolePairs(String  args[])
+    public static Hashtable<String, String> createFromConsolePairs(String args[])
     {
         int i = 0;
-        Hashtable table = new Hashtable();
-        String key = null, value = null;
+        Hashtable<String, String> table = new Hashtable<String, String>();
+        String key, value;
 
         while(i < args.length){
             key = args[i].toLowerCase();
@@ -215,12 +214,12 @@ public abstract class Test implements java.lang.Runnable
 
             i++;
             if (i == args.length)
-                value = new String();
+                value = "";
             else {
                 value = args[i];
 
                 if (value.charAt(0) == '-') {
-                    value = new String();
+                    value = "";
                 } else
                     i++;
             }
@@ -287,34 +286,9 @@ public abstract class Test implements java.lang.Runnable
         return sArgs;
     }
 
-    /**
-     * Return the Hashtable array with the results. Each hashtable has
-     * a key test.Test.DURATION with a Long value object.  This is the
-     * length of one iteration of run().  The hashtable may also have a
-     * test.Test.STATUS key with a Error value object.  This, if present,
-     * indicates the particular iteration failed and gives an Error for it.
-     **/
-    public Hashtable[] getResults()
-    {
-        return results;
-    }
-
-    public void createResultsTable( int num ) 
+    public void createResultsTable( int num )
     {
         results = new Hashtable[num] ;
-    }
-
-    public static void checkSunTools() {
-        String className = "sun.tools.java.Constants" ;
-        try {
-            Class cls = Class.forName( className ) ;
-            System.out.println( "Successfully loaded " + className ) ;
-            System.out.println( className + " ClassLoader is " + cls.getClassLoader() ) ;
-            System.out.println( "My ClassLoader = " + Test.class.getClassLoader() ) ;
-        } catch (Exception exc) {
-            System.out.println( "Could not load " + className ) ;
-            System.out.println( "classpath = " + System.getProperty( "java.class.path" )) ;
-        }
     }
 
     public static void main(String args[])
@@ -436,7 +410,7 @@ public abstract class Test implements java.lang.Runnable
         }
 
         try {
-            Vector list = new Vector();
+            Vector<String> list = new Vector<String>();
             BufferedReader in = new BufferedReader(inStream);
 
             while (true) {
@@ -514,11 +488,11 @@ public abstract class Test implements java.lang.Runnable
                 boolean ignoreTarget = false;
                 
                 if (ignorePrefix != null) {
-                    for (int j = 0; j < ignorePrefix.length; j++) {
-                        if (source[i].startsWith(ignorePrefix[j])) {
+                    for (String anIgnorePrefix : ignorePrefix) {
+                        if (source[i].startsWith(anIgnorePrefix)) {
                             ignoreSource = true;
                         }
-                        if (target[i].startsWith(ignorePrefix[j])) {
+                        if (target[i].startsWith(anIgnorePrefix)) {
                             ignoreTarget = true;
                         }
                     }
@@ -680,11 +654,13 @@ public abstract class Test implements java.lang.Runnable
         ClassFile cls = classPath.getFile(className.replace('.',File.separatorChar) + ".class");
         try {
             classPath.close();
-        } catch (IOException e) {}
+        } catch (IOException e) {
+            // ignore
+        }
                 
         if (cls != null) {
                         
-            File pathDir = null;
+            File pathDir;
                         
             // Ok, we have a ClassFile for com.sun.corba.ee.impl.orb.ORBImpl.class. Is it in 
             // a zip file?
@@ -726,7 +702,7 @@ public abstract class Test implements java.lang.Runnable
                         
             // If we have a directory, update the Hashtable...
                         
-            if (pathDir != null && pathDir.exists() && pathDir.isDirectory()) {
+            if (pathDir.exists() && pathDir.isDirectory()) {
                 return pathDir.getPath();
             }
             else return null;
@@ -734,8 +710,8 @@ public abstract class Test implements java.lang.Runnable
         else return null;
     }
         
-    private static void setDefaultOutputDir (Hashtable flags) {
-        String outputDir = (String) flags.get(OUTPUT_DIRECTORY);
+    private static void setDefaultOutputDir(Hashtable<String, String> flags) {
+        String outputDir = flags.get(OUTPUT_DIRECTORY);
         if (outputDir == null) {
         
             // No output dir, so set to gen if present...
@@ -745,7 +721,9 @@ public abstract class Test implements java.lang.Runnable
             ClassFile cls = classPath.getFile(className.replace('.',File.separatorChar) + ".class");
             try {
                 classPath.close();
-            } catch (IOException e) {}
+            } catch (IOException e) {
+                // discard any exception
+            }
 
             if (cls != null) {
 
@@ -790,10 +768,10 @@ public abstract class Test implements java.lang.Runnable
         }
     }
     
-    private static boolean expandMagicDirectoryFor(String key, Hashtable flags) {
+    private static boolean expandMagicDirectoryFor(String key, Hashtable<String, String> flags) {
 
         boolean result = false;
-        String value = (String) flags.get(key);
+        String value = flags.get(key);
 
         // Do we need to expand our magic directory?
 
@@ -819,7 +797,7 @@ public abstract class Test implements java.lang.Runnable
 
             // Make a new value...
 
-            String magicValue = null;
+            String magicValue;
 
             if (key.equals(OUTPUT_DIRECTORY)) {
                 magicValue = outputDir.getPath();
@@ -862,14 +840,14 @@ public abstract class Test implements java.lang.Runnable
 
     public static boolean run( String args[])
     {
-        Hashtable flags = createFromConsolePairs(args);
+        Hashtable<String, String> flags = createFromConsolePairs(args);
 
         // Expand our 'magic' directories, if need be...
         expandMagicDirectoryFor(TEST_FILE_NAME_FLAG,flags);
         expandMagicDirectoryFor(OUTPUT_DIRECTORY,flags);
         setDefaultOutputDir(flags);
 
-        String testClassName = (String)flags.get(TEST_CLASS_NAME_FLAG);
+        String testClassName = flags.get(TEST_CLASS_NAME_FLAG);
 
         // Are we running a single test class?
 
@@ -878,7 +856,7 @@ public abstract class Test implements java.lang.Runnable
             runTestClass(testClassName,flags,args);
         } else {
             // No, are we running a test file?
-            String testFileName = (String)flags.get(TEST_FILE_NAME_FLAG);
+            String testFileName = flags.get(TEST_FILE_NAME_FLAG);
 
             if (testFileName != null) {
                 // Yes, so do it...
@@ -951,7 +929,7 @@ public abstract class Test implements java.lang.Runnable
             UsageAndExit();
 
         // Open up the file...
-        Vector lines = new Vector();
+        Vector<String> lines = new Vector<String>();
         DataInputStream stream = null;
 
         try {
@@ -973,7 +951,7 @@ public abstract class Test implements java.lang.Runnable
             while (line != null) {
                 line = line.trim();
 
-                if (line.startsWith("//") == false && line.equals("") == false) {
+                if (!line.startsWith("//") && !line.equals("")) {
                     lines.addElement(line);
                 }
 
@@ -990,7 +968,7 @@ public abstract class Test implements java.lang.Runnable
             // Run all tests...
             int testCount = lines.size();
             for (int i = 0; i < testCount; i++) {
-                line = (String) lines.elementAt(i);
+                line = lines.elementAt(i);
 
                 // Parse the line -- format is same as for main...
                 StringTokenizer parser = new StringTokenizer(line,
@@ -1009,8 +987,8 @@ public abstract class Test implements java.lang.Runnable
 
                 // See if we have -separateprocess flag...
                 boolean ownProcess = false;
-                for (int j = 0; j < testArgs.length; j++) {
-                    if (testArgs[j].equalsIgnoreCase(SEPARATE_PROCESS_FLAG)) {
+                for (String testArg : testArgs) {
+                    if (testArg.equalsIgnoreCase(SEPARATE_PROCESS_FLAG)) {
                         ownProcess = true;
                         break;
                     }
@@ -1018,7 +996,7 @@ public abstract class Test implements java.lang.Runnable
 
                 // Now run it...
                 if (ownProcess) {
-                    Vector command = new Vector();
+                    Vector<String> command = new Vector<String>();
                     command.addElement(System.getProperty("java.home") + "/bin/java");
                     command.addElement("-classpath");
                     command.addElement(System.getProperty("java.class.path"));
@@ -1036,9 +1014,9 @@ public abstract class Test implements java.lang.Runnable
                     Util.inheritProperties( command ) ;
 
                     command.addElement("test.Test");
-                    
-                    for (int j = 0; j < testArgs.length; j++) {
-                        command.addElement(testArgs[j]);
+
+                    for (String testArg : testArgs) {
+                        command.addElement(testArg);
                     }
        
                     for (int j = 0; j < args.length; j++) {
@@ -1070,8 +1048,10 @@ public abstract class Test implements java.lang.Runnable
             }
         } catch (IOException e1) {
             try {
-                stream.close();
-            } catch (IOException e2) {}
+                if (stream != null) stream.close();
+            } catch (IOException e2) {
+                // ignore exception
+            }
         }
     }
 
@@ -1087,8 +1067,7 @@ public abstract class Test implements java.lang.Runnable
         }
     }
 
-    public static void runTestClass(String testClassName, Hashtable flags, 
-                                    String args[]) {
+    public static void runTestClass(String testClassName, Hashtable<String, String> flags, String args[]) {
         dprint( "Running test " + testClassName ) ;
 
         if (testClassName == null) 
@@ -1124,8 +1103,7 @@ public abstract class Test implements java.lang.Runnable
         long sum = 0;
         boolean noIterate = flags.containsKey(NO_ITERATE_FLAG);
         if (!noIterate && flags.containsKey(NUMBER_OF_ITERATIONS_FLAG))
-            iterations = Integer.parseInt(
-                (String)flags.get( NUMBER_OF_ITERATIONS_FLAG));
+            iterations = Integer.parseInt(flags.get( NUMBER_OF_ITERATIONS_FLAG));
         testObj.createResultsTable( iterations ) ;
 
         try {
@@ -1167,9 +1145,9 @@ public abstract class Test implements java.lang.Runnable
                 long duration = System.currentTimeMillis() - start;
                 sum = sum + duration;
                 dprint( "finishAnIteration called" ) ;
-                Error status = testObj.finishAnIteration(i+1, duration);
-                testObj.results[i] = new Hashtable();
-                testObj.results[i].put(DURATION, Long.valueOf(duration));
+                Error status = testObj.finishAnIteration();
+                testObj.results[i] = new Hashtable<String, Object>();
+                testObj.results[i].put(DURATION, duration);
                 if (status != null) {
                     testObj.results[i].put(STATUS, status);
                     mainResult = 1;
@@ -1237,12 +1215,9 @@ public abstract class Test implements java.lang.Runnable
     /**
      * This is called after the run() method finishes to collect status.
      *
-     * @param iteration The iteration number of this test.
-     * @param duration The length of time in milliseconds that the iteration has
-     * taken.
      * @return The status(An Error upon failure or null if success)
      **/
-    public Error finishAnIteration(int iteration, long duration)
+    public Error finishAnIteration()
     {
         return status;
     }

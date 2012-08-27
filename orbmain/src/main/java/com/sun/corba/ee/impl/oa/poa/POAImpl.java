@@ -372,32 +372,10 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
     @Poa
     // Be paranoid about lost wakeup problems like 6822370
+    // GLASSFISH_CORBA-11, GLASSFISH-16217, Bug #14247062, Bug #14390811 :
+    // - 6822370 is resolved in JDK 6u21, hence simply call lock()
     private void acquireLock( Lock lock ) {
-        final long timeout = 1 ; // 1 second delay
-        boolean locked = false ;
-        boolean interrupted = false ;
-        int count = 0 ;
-        int reportingThreshhold = 1 ;
-        while (!locked) {
-            if (count >= reportingThreshhold) {
-                acquireLockWaiting( count ) ;
-                if (reportingThreshhold < Integer.MAX_VALUE/2) {
-                    reportingThreshhold *= 2 ;
-                } // assume that no one will wait for 2^31 SECONDS.
-            }
-
-            try {
-                locked = lock.tryLock( timeout, TimeUnit.SECONDS ) ;
-                count++ ;
-            } catch (InterruptedException exc) {
-                interrupted = true ;
-            }
-
-            if (interrupted) {
-                // restore thread interrupted status
-                Thread.currentThread().interrupt() ;
-            }
-        }
+        lock.lock();
     }
 
     // package private so that POAPolicyMediator can access it.

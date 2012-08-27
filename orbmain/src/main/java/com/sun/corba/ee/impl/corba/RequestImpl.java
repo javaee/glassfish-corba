@@ -328,6 +328,7 @@ public class RequestImpl
                     case ARG_INOUT.value:
                         nv.value().write_value($out);
                         break;
+                    default:
                     }
                 }
             } catch ( org.omg.CORBA.Bounds ex ) {
@@ -376,6 +377,7 @@ public class RequestImpl
                     Any any = nv.value();       
                     any.read_value(is, any.type());
                     break;
+                default:
                 }
             }
         } catch ( org.omg.CORBA.Bounds ex ) {

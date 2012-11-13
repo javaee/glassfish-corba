@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,7 +40,7 @@
 /*
  * Licensed Materials - Property of IBM
  * RMI-IIOP v1.0
- * Copyright IBM Corp. 1998 1999  All Rights Reserved
+ * Copyright IBM Corp. 1998 2012  All Rights Reserved
  *
  * US Government Users Restricted Rights - Use, duplication or
  * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -70,7 +70,8 @@ import java.io.Externalizable;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.Map;
 
 import com.sun.corba.ee.impl.util.RepositoryId;
@@ -100,8 +101,6 @@ public class ObjectStreamClass implements java.io.Serializable {
     private static final boolean DEBUG_SVUID = false ;
 
     public static final long kDefaultUID = -1;
-
-    private static Map<java.io.ObjectStreamField[], ObjectStreamField[]> translatedFields;
 
     // True if this is an Enum type (6877056)
     private boolean isEnum ;
@@ -405,6 +404,57 @@ public class ObjectStreamClass implements java.io.Serializable {
         descriptorFor.put( cl, this ) ;
     }
 
+    private static final class PersistentFieldsValue {
+        private final ConcurrentMap map = new ConcurrentHashMap();
+        private static final Object NULL_VALUE =
+                (PersistentFieldsValue.class.getName() + ".NULL_VALUE");
+
+        PersistentFieldsValue() { }
+
+        ObjectStreamField[] get(Class type) {
+            Object value = map.get(type);
+            if (value == null) {
+                value = computeValue(type);
+                Object oldValue = map.putIfAbsent(type, value);
+                if (oldValue != null) {
+                    value = oldValue;
+                }
+            }
+            return ((value == NULL_VALUE) ? null : (ObjectStreamField[])value);
+        }
+
+        private static Object computeValue(Class<?> type) {
+            try {
+                Field pf = type.getDeclaredField("serialPersistentFields");
+                int mods = pf.getModifiers();
+                if (Modifier.isPrivate(mods) && Modifier.isStatic(mods) &&
+                        Modifier.isFinal(mods)) {
+                    pf.setAccessible(true);
+                    java.io.ObjectStreamField[] fields =
+                            (java.io.ObjectStreamField[])pf.get(type);
+                    return translateFields(fields);
+                }
+            } catch (NoSuchFieldException e1) {
+            } catch (IllegalAccessException e2) {
+            } catch (IllegalArgumentException e3) {
+            } catch (ClassCastException e4) { }
+            return NULL_VALUE;
+        }
+
+        private static ObjectStreamField[] translateFields(
+                java.io.ObjectStreamField[] fields) {
+            ObjectStreamField[] translation =
+                    new ObjectStreamField[fields.length];
+            for (int i = 0; i < fields.length; i++) {
+                translation[i] = new ObjectStreamField(fields[i].getName(),
+                        fields[i].getType());
+            }
+            return translation;
+        }
+    }
+
+    private static final PersistentFieldsValue persistentFieldsValue =
+            new PersistentFieldsValue();
     /*
      * Initialize class descriptor.  This method is only invoked on class
      * descriptors created via calls to lookupInternal().  This method was kept
@@ -437,26 +487,7 @@ public class ObjectStreamClass implements java.io.Serializable {
                          * If it is declared, use the declared serialPersistentFields.
                          * Otherwise, extract the fields from the class itself.
                          */
-                        try {
-                            Field pf = cl.getDeclaredField("serialPersistentFields");
-                            // serial bug 7; the serialPersistentFields were not
-                            // being read and stored as Accessible bit was not set
-                            pf.setAccessible(true);
-                            // serial bug 7; need to find if the field is of type
-                            // java.io.ObjectStreamField
-                            java.io.ObjectStreamField[] f =
-                                   (java.io.ObjectStreamField[])pf.get(cl);
-                            int mods = pf.getModifiers();
-                            if ((Modifier.isPrivate(mods)) 
-                                && (Modifier.isStatic(mods)) 
-                                && (Modifier.isFinal(mods))) {
-
-                                fields = translateFields( f ) ;
-                            }
-                        } catch (Exception e) {
-                            Exceptions.self.couldNotAccessSerialPersistentFields(
-                                e, cl.getName() ) ;
-                        }
+                        fields = persistentFieldsValue.get(cl);
 
                         if (fields == null) {
                             /* Get all of the declared fields for this
@@ -664,29 +695,9 @@ public class ObjectStreamClass implements java.io.Serializable {
         superclass = null;
     }
 
-    public static synchronized ObjectStreamField[] translateFields(
-        java.io.ObjectStreamField fields[]) {
-
-        ObjectStreamField[] translation = null;
-                   
-        if (translatedFields == null)
-            translatedFields = new HashMap<java.io.ObjectStreamField[],
-                ObjectStreamField[]>();
-                   
-        translation = translatedFields.get(fields);
-                   
-        if (translation == null) {
-            translation = new ObjectStreamField[fields.length] ;
-            for (int ctr = 0; ctr<fields.length; ctr++) {
-                Class cls = (Class)fields[ctr].getType() ;
-                translation[ctr] = new com.sun.corba.ee.impl.io.ObjectStreamField( 
-                    fields[ctr].getName(), cls ) ;
-            }
-
-            translatedFields.put(fields, translation);
-        }
-
-        return translation;
+    public static final synchronized ObjectStreamField[] translateFields(
+            java.io.ObjectStreamField fields[]) {
+        return PersistentFieldsValue.translateFields(fields);
     }
 
     /* Compare the base class names of streamName and localName.

@@ -476,13 +476,16 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="compile" if="is.server.weblogic" name="library-inclusion-in-archive">
         <basename file="${file.reference.javaee.jar}" property="manifest.file.reference.javaee.jar"/>
+        <basename file="${file.reference.gmbal.jar}" property="manifest.file.reference.gmbal.jar"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Extension-List" value="jar-1 "/>
+            <attribute name="Extension-List" value="jar-1 jar-2 "/>
             <attribute name="jar-1-Extension-Name" value="${manifest.file.reference.javaee.jar}"/>
+            <attribute name="jar-2-Extension-Name" value="${manifest.file.reference.gmbal.jar}"/>
         </manifest>
     </target>
     <target depends="compile" name="library-inclusion-in-manifest">
-        <copyfiles files="${file.reference.javaee.jar}" todir="${dist.ear.dir}/lib"/>
+        <copy file="${file.reference.javaee.jar}" todir="${dist.ear.dir}/lib"/>
+        <copy file="${file.reference.gmbal.jar}" todir="${dist.ear.dir}/lib"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update"/>
     </target>
     <target name="-copy-meta-inf">

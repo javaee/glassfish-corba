@@ -42,7 +42,6 @@ package com.sun.corba.ee.impl.oa.poa ;
 
 import java.util.Set ;
 import java.util.HashSet ;
-import java.util.Collections ;
 import java.util.Iterator ;
 import java.util.List ;
 import java.util.ArrayList ;
@@ -92,7 +91,8 @@ public class POAFactory implements ObjectAdapterFactory
     // Maintained by POAs activate_object and deactivate_object.
     private Map<Servant,POA> exportedServantsToPOA = new WeakHashMap<Servant,POA>();
 
-    private Set<POAManager> poaManagers ;
+    private java.util.concurrent.ConcurrentHashMap<POAManager,Boolean> poaManagers ;
+
     private int poaManagerId ;
     private int poaId ;
     private POAImpl rootPOA ;
@@ -110,7 +110,7 @@ public class POAFactory implements ObjectAdapterFactory
     */
     public POAFactory( )
     {
-        poaManagers = Collections.synchronizedSet(new HashSet<POAManager>(4));
+        poaManagers = new java.util.concurrent.ConcurrentHashMap<POAManager,Boolean>(4);
         poaManagerId = 0 ;
         poaId = 0 ;
         rootPOA = null ;
@@ -152,7 +152,7 @@ public class POAFactory implements ObjectAdapterFactory
     @ManagedAttribute
     @Description( "The POAManagers")
     private synchronized Set<POAManager> getPOAManagers() {
-        return new HashSet<POAManager>( poaManagers ) ;
+        return new HashSet<POAManager>( poaManagers.keySet() ) ;
     }
 
     @ManagedAttribute
@@ -247,7 +247,7 @@ public class POAFactory implements ObjectAdapterFactory
         Iterator<POAManager> managers = null ;
         synchronized (this) {
             isShuttingDown = true ;
-            managers = (new HashSet<POAManager>(poaManagers)).iterator();
+            managers = poaManagers.keySet().iterator();
         }
 
         while ( managers.hasNext() ) {
@@ -265,9 +265,9 @@ public class POAFactory implements ObjectAdapterFactory
         mom.unregister( manager ) ;
     }
 
-    public synchronized void addPoaManager( POAManager manager ) 
+    public void addPoaManager( POAManager manager )
     {
-        poaManagers.add(manager);
+        poaManagers.putIfAbsent(manager, Boolean.TRUE); // Store the key. Value is dummy
     }
 
     synchronized public int newPOAManagerId()

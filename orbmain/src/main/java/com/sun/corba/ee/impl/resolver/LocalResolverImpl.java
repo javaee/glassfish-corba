@@ -41,28 +41,44 @@
 package com.sun.corba.ee.impl.resolver ;
 
 import com.sun.corba.ee.spi.resolver.LocalResolver ;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.TimeUnit;
 import org.glassfish.pfl.basic.func.NullaryFunction;
 
 public class LocalResolverImpl implements LocalResolver {
-    Map<String,NullaryFunction<org.omg.CORBA.Object>> nameToClosure =
-        new HashMap<String,NullaryFunction<org.omg.CORBA.Object>>() ;
+    ConcurrentHashMap<String,NullaryFunction<org.omg.CORBA.Object>> nameToClosure =
+        new ConcurrentHashMap<String,NullaryFunction<org.omg.CORBA.Object>>() ;
+    final Lock lock = new ReentrantLock();
 
-    public synchronized org.omg.CORBA.Object resolve( String name ) {
-        NullaryFunction<org.omg.CORBA.Object> cl = nameToClosure.get( name ) ;
-        if (cl == null)
-            return null ;
-
-        return cl.evaluate() ;
+    public org.omg.CORBA.Object resolve(String name) {
+        do {
+            try {
+                if (lock.tryLock(500, TimeUnit.MILLISECONDS)) {
+                    try {
+                        NullaryFunction<org.omg.CORBA.Object> cl = nameToClosure.get(name);
+                        if (cl == null) {
+                            return null;
+                        }
+                        return (org.omg.CORBA.Object) (cl.evaluate());
+                    } finally {
+                        lock.unlock();
+                    }
+                } else {
+                    // continue, try again
+                }
+            } catch (InterruptedException e) {
+                // do nothing
+            }
+        } while (true);
     }
 
-    public synchronized Set<String> list() {
+    public java.util.Set<String> list() {
         return nameToClosure.keySet() ;
     }
 
-    public synchronized void register( String name, 
+    public void register( String name,
         NullaryFunction<org.omg.CORBA.Object> closure ) {
         nameToClosure.put( name, closure ) ;
     }

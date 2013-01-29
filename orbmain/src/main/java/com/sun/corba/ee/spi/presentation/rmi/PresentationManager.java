@@ -224,6 +224,13 @@ public interface PresentationManager
      */
     boolean useDynamicStubs() ;
 
+    /** Remove all internal references to Class cls from the
+     *  PresentationManager. This allows ClassLoaders to
+     *  be garbage collected when they are no longer needed.
+     * @param cls Class to flush
+     */
+    void flushClass( Class<?> cls ) ;
+
     boolean getDebug() ;
 
     PrintStream getPrintStream() ;

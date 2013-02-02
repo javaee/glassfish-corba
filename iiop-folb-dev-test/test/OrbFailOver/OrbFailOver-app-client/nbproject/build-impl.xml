@@ -422,17 +422,6 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         </macrodef>
     </target>
     <target name="-init-taskdefs">
-        <fail unless="libs.CopyLibs.classpath">
-The libs.CopyLibs.classpath property is not set up.
-This property must point to 
-org-netbeans-modules-java-j2seproject-copylibstask.jar file which is part
-of NetBeans IDE installation and is usually located at 
-&lt;netbeans_installation&gt;/java&lt;version&gt;/ant/extra folder.
-Either open the project in the IDE and make sure CopyLibs library
-exists or setup the property manually. For example like this:
- ant -Dlibs.CopyLibs.classpath=a/path/to/org-netbeans-modules-java-j2seproject-copylibstask.jar
-                </fail>
-        <taskdef classpath="${libs.CopyLibs.classpath}" resource="org/netbeans/modules/java/j2seproject/copylibstask/antlib.xml"/>
     </target>
     <target name="-init-ap-cmdline-properties">
         <property name="annotation.processing.enabled" value="true"/>
@@ -514,14 +503,11 @@ exists or setup the property manually. For example like this:
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <copy file="${file.reference.gmbal.jar}" todir="${dist.ear.dir}/lib"/>
         <copy file="${file.reference.javaee.jar}" todir="${dist.ear.dir}/lib"/>
-        <copy file="${file.reference.glassfish-corba-asm.jar}" todir="${dist.ear.dir}/lib"/>
-        <copy file="${file.reference.glassfish-corba-codegen.jar}" todir="${dist.ear.dir}/lib"/>
-        <copy file="${file.reference.glassfish-corba-csiv2-idl.jar}" todir="${dist.ear.dir}/lib"/>
-        <copy file="${file.reference.glassfish-corba-internal-api.jar}" todir="${dist.ear.dir}/lib"/>
-        <copy file="${file.reference.glassfish-corba-newtimer.jar}" todir="${dist.ear.dir}/lib"/>
-        <copy file="${file.reference.glassfish-corba-omgapi.jar}" todir="${dist.ear.dir}/lib"/>
-        <copy file="${file.reference.glassfish-corba-orb.jar}" todir="${dist.ear.dir}/lib"/>
-        <copy file="${file.reference.glassfish-corba-orbgeneric.jar}" todir="${dist.ear.dir}/lib"/>
+        <copy todir="${dist.ear.dir}/lib">
+            <fileset dir="../../../${j2ee.server.home}/modules"> 
+                <filename name="${file.reference.glassfish-corba-*.jar}"/>
+            </fileset>
+        </copy>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
             <attribute name="Class-Path" value="${manifest.file.reference.gmbal.jar} lib/${manifest.file.reference.gmbal.jar} ${manifest.file.reference.javaee.jar} lib/${manifest.file.reference.javaee.jar} ${manifest.file.reference.glassfish-corba-asm.jar} lib/${manifest.file.reference.glassfish-corba-asm.jar} ${manifest.file.reference.glassfish-corba-codegen.jar} lib/${manifest.file.reference.glassfish-corba-codegen.jar} ${manifest.file.reference.glassfish-corba-csiv2-idl.jar} lib/${manifest.file.reference.glassfish-corba-csiv2-idl.jar} ${manifest.file.reference.glassfish-corba-internal-api.jar} lib/${manifest.file.reference.glassfish-corba-internal-api.jar} ${manifest.file.reference.glassfish-corba-newtimer.jar} lib/${manifest.file.reference.glassfish-corba-newtimer.jar} ${manifest.file.reference.glassfish-corba-omgapi.jar} lib/${manifest.file.reference.glassfish-corba-omgapi.jar} ${manifest.file.reference.glassfish-corba-orb.jar} lib/${manifest.file.reference.glassfish-corba-orb.jar} ${manifest.file.reference.glassfish-corba-orbgeneric.jar} lib/${manifest.file.reference.glassfish-corba-orbgeneric.jar} "/>
         </manifest>

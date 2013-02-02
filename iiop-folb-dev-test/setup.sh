@@ -12,11 +12,11 @@ unzip -qo ./glassfish.zip
 export GFV3_WORK=`pwd`
 export S1AS_HOME=${GFV3_WORK}/glassfish3/glassfish
 cd test/OrbFailOver
-ant -Dj2ee.server.home=${S1AS_HOME}/glassfish3/glassfish  clean
-#ant -Dj2ee.server.home=${S1AS_HOME}/glassfish3/glassfish  
+ant -Dj2ee.server.home=${S1AS_HOME}  clean
+#ant -Dj2ee.server.home=${S1AS_HOME}  
 cd OrbFailOver-app-client 
-ant 
+ant -Dj2ee.server.home=${S1AS_HOME}
 cd ../OrbFailOver-ejb/
-ant
+ant -Dj2ee.server.home=${S1AS_HOME}
 cd ../../..
 

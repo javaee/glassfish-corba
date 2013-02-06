@@ -898,7 +898,7 @@ public class Main extends Base {
         gfCluster.startInstance( gfInstance3 );
         final String endpoints = getIIOPEndpointList() ;
 
-        final int COUNT = 100 ;
+        final int COUNT = 1000 ;
         instances = gfCluster.runningInstances() ;
         note( "Running instances = " + instances ) ;
         final String[] flags = { /* "subcontract", "transport", "folb" */ } ;
@@ -925,7 +925,7 @@ public class Main extends Base {
             setORBDebug( flags ) ;
             instances = gfCluster.runningInstances() ;
             note( "Running instances = " + instances ) ;
-            doLoadBalance( instances, 10*COUNT, endpoints ) ;
+            doLoadBalance( instances, COUNT, endpoints ) ;
         } finally {
             clearORBDebug( flags ) ;
         }

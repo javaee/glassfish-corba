@@ -484,7 +484,7 @@ public class Main extends Base {
 
     @Test( "loadbalance" )
     public void testLoadBalance( ) throws NamingException {
-        doLoadBalance( gfCluster.runningInstances(), 100 )  ;
+        doLoadBalance( gfCluster.runningInstances(), 1000 )  ;
     }
 
     @Test( "15768" )
@@ -619,7 +619,7 @@ public class Main extends Base {
 
     @Test( "lbfail" )
     public void testLBFail() throws NamingException {
-        final int numCalls = 50 ;
+        final int numCalls = 200 ;
         doLoadBalance( gfCluster.runningInstances(), numCalls )  ;
 
         final String inst1 = pick( gfCluster.runningInstances() ) ;
@@ -632,7 +632,7 @@ public class Main extends Base {
         final String inst3 = pick( gfCluster.runningInstances() ) ;
 
         gfCluster.startInstance(inst1);
-        gfCluster.sleep( 2 ) ;  // Seems to take a while to wake up?
+        gfCluster.sleep( 5 ) ;  // Seems to take a while to wake up?
         doLoadBalance( gfCluster.runningInstances(), numCalls )  ;
 
         gfCluster.stopInstance(inst3);
@@ -1069,10 +1069,11 @@ public class Main extends Base {
         
         String inst1 = invokeMethod(slsb) ;
         gfCluster.stopInstance(inst1);
-
+        gfCluster.sleep(2);
         Location sfsb = lookup( ic, BeanType.SFSB ) ;
         String inst2 = invokeMethod(sfsb) ;
         gfCluster.stopInstance(inst2);
+        gfCluster.sleep(2);
         String inst3 = invokeMethod(sfsb) ;
     }
    

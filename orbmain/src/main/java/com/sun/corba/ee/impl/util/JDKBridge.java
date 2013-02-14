@@ -58,6 +58,8 @@ import java.net.MalformedURLException;
 import java.util.Map ;
 import java.util.HashMap ;
 import java.util.WeakHashMap ;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import java.lang.ref.SoftReference ;
 import java.lang.ref.ReferenceQueue ;
@@ -72,6 +74,7 @@ import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 public class JDKBridge {
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
+    private static Logger logger = Logger.getLogger(JDKBridge.class.getName()) ;
 
     /**
      * Get local codebase System property (java.rmi.server.codebase).
@@ -235,8 +238,11 @@ public class JDKBridge {
                 try {
                     cls = loadClassM(className,remoteCodebase,useCodebaseOnly);
                 } catch (ClassNotFoundException e) {
-                    wrapper.classNotFoundInCodebase( className,
-                        remoteCodebase ) ;
+                    //  GLASSFISH-18986   [PERF] Failed ClassLoading consuming too much logging time
+                    //  limit the logger calls to finest level only
+                    if (logger.isLoggable(Level.FINEST)) {
+                        wrapper.classNotFoundInCodebase( className, remoteCodebase ) ;
+                    }
                     cls = loader.loadClass(className);
                 }
             }

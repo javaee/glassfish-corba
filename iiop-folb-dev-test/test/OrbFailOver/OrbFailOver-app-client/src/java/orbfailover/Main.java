@@ -654,7 +654,7 @@ public class Main extends Base {
 
         String newLocation = "" ;
         for (int i = 1; i <= numCalls ; i++) {
-            InitialContext = makeIC( endpoints ) ;
+            InitialContext ctx = makeIC( endpoints ) ;
             current = lookup( ctx ) ;
             newLocation = invokeMethod( current );
             note( "result[" + i + "]= " + newLocation);

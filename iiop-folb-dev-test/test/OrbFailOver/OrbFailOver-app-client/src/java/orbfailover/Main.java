@@ -566,7 +566,7 @@ public class Main extends Base {
     //    should be sticky)
     @Test( "14755" )
     public void test14755() throws NamingException {
-        InitialContext ic = makeIC(null) ;
+        InitialContext ic = makeIC() ;
         Location lb = lookup( ic ) ;
         String first = invokeMethod( lb ) ;
         ac.stopInstance(first);
@@ -595,7 +595,7 @@ public class Main extends Base {
     // 12 do one request - ensure it works
     @Test( "14766")
     public void test14766() throws NamingException {
-        InitialContext ctx = makeIC(null) ;
+        InitialContext ctx = makeIC() ;
         Location locBean = lookup( ctx ) ;
 
         String loc1 = invokeMethod( locBean );
@@ -654,12 +654,7 @@ public class Main extends Base {
 
         String newLocation = "" ;
         for (int i = 1; i <= numCalls ; i++) {
-            InitialContext ctx ;
-            if (i == 1) {
-                ctx = makeIC( endpoints ) ;
-            } else {
-                ctx = makeIC(null) ;
-            }
+            InitialContext = makeIC( endpoints ) ;
             current = lookup( ctx ) ;
             newLocation = invokeMethod( current );
             note( "result[" + i + "]= " + newLocation);
@@ -690,12 +685,7 @@ public class Main extends Base {
 
         String newLocation = "" ;
         for (int i = 1; i <= numCalls ; i++) {
-            InitialContext ctx ;
-            if (i == 1) {
-                ctx = makeIC( endpoints ) ;
-            } else {
-                ctx = makeIC(null) ;
-            }
+            InitialContext ctx = makeIC( endpoints ) ;
             current = lookupUsingJavaCmp( ctx, BeanType.SLSB ) ;
             newLocation = invokeMethod( current );
             note( "result[" + i + "]= " + newLocation);
@@ -964,7 +954,7 @@ public class Main extends Base {
         gfCluster.stopInstance( inst ) ;
         instances.remove( inst ) ;
 
-        doLoadBalance( gfCluster.runningInstances(), NUM_IC-1, null ) ;
+        doLoadBalance( gfCluster.runningInstances(), NUM_IC-1, getIIOPEndpointList() ) ;
     }
 
     // Test scenario for issue 15637 (Gopal's email 1/27/11 4:46 PM)
@@ -988,7 +978,7 @@ public class Main extends Base {
         doLoadBalance(gfCluster.runningInstances(), 10, initalEndpoints );
         gfCluster.startCluster();
         gfCluster.stopInstance(selected);
-        doLoadBalance(gfCluster.runningInstances(), 100, null );
+        doLoadBalance(gfCluster.runningInstances(), 100, initalEndpoints );
     }
 
     // Test scenario:
@@ -1233,12 +1223,7 @@ public class Main extends Base {
         Set<InitialContext> chosen = new HashSet<InitialContext>() ;
 
         for (int ctr=0; ctr<NUM_IC; ctr++ ) {
-            InitialContext ic = null ;
-            if (ctr==0) {
-                ic = makeIC() ;
-            } else {
-                ic = makeIC(null) ;
-            }
+            InitialContext ic = makeIC() ;
             Location locBean = lookup(ic) ;
             String runningInstance = invokeMethod( locBean ) ;
             if (runningInstance.equals( shutdownInst )) {

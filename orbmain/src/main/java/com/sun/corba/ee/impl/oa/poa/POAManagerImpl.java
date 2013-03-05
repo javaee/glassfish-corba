@@ -269,7 +269,8 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
             numWaitersStart( num ) ;
 
             // 6878245: I can see some sense in the timeout, but why this value?
-            stateCV.await(num*1000L, TimeUnit.MILLISECONDS);
+            // Fix 15960769 - GLASSFISH CLUSTER HANGS DUE TO RMI COMMUNICATION FAILURES/POAMANAGER DEADLOCK 
+            stateCV.await(num+1000L, TimeUnit.MILLISECONDS);
         } catch ( java.lang.InterruptedException ex ) {
             // NOP
         } finally {

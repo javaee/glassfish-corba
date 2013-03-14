@@ -76,7 +76,7 @@
     <property name="orb.version"                value="${release.version}-${build.version}"/>
     <property name="management-api.version"     value="3.1.0-b001"/>
     <property name="gmbal.version"              value="3.2.0-b003"/>
-    <property name="pfl.version"                value="3.2.0-b001"/>
+    <property name="pfl.version"                value="4.0.0-b003"/>
     <echo message="Version is ${release.version}-${build.version}"/>
 
     <target name="init">

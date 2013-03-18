@@ -240,7 +240,7 @@ public class JDKBridge {
                 } catch (ClassNotFoundException e) {
                     //  GLASSFISH-18986   [PERF] Failed ClassLoading consuming too much logging time
                     //  limit the logger calls to finest level only
-                    if (logger.isLoggable(Level.FINEST)) {
+                    if (logger.isLoggable(Level.FINE)) {
                         wrapper.classNotFoundInCodebase( className, remoteCodebase ) ;
                     }
                     cls = loader.loadClass(className);
@@ -320,7 +320,11 @@ public class JDKBridge {
         try {
             return JDKClassLoader.loadClass(null,className);
         } catch (ClassNotFoundException e) {
-            wrapper.classNotFoundInJDKClassLoader( className, e ) ;
+            //  GLASSFISH-18986   [PERF] Failed ClassLoading consuming too much logging time
+            //  limit the logger calls to finest level only
+            if (logger.isLoggable(Level.FINE)) {
+                wrapper.classNotFoundInJDKClassLoader( className, e ) ;
+            }
         }
 
         try {

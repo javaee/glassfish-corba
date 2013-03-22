@@ -112,7 +112,7 @@
 
 
         <property name="m2.repo"          value="${user.home}/.m2/repository"/>
-        <property name="m2-orb.version"   value="4.0.0-b001"/>
+        <property name="m2-orb.version"   value="4.0.0-b006"/>
         <property name="idlc.jar"         value="${m2.repo}/com/sun/corba/idlc/${m2-orb.version}/idlc-${m2-orb.version}.jar"/>
         <property name="internal-api.jar" value="${m2.repo}/org/glassfish/corba/glassfish-corba-internal-api/${m2-orb.version}/glassfish-corba-internal-api-${m2-orb.version}.jar"/>
         <property name="omgapi.jar"       value="${m2.repo}/org/glassfish/corba/glassfish-corba-omgapi/${m2-orb.version}/glassfish-corba-omgapi-${m2-orb.version}.jar"/>

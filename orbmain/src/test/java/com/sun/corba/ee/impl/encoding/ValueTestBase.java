@@ -1,6 +1,7 @@
 package com.sun.corba.ee.impl.encoding;
 
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import org.glassfish.corba.testutils.HexBuffer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -41,19 +42,19 @@ public class ValueTestBase extends EncodingTestBase {
     }
 
     protected void dumpBuffer() {
-        System.out.println(com.sun.org.apache.xerces.internal.impl.dv.util.HexBin.encode( getGeneratedBody() ));
+        HexBuffer.dumpBuffer(getGeneratedBody());
     }
 
     protected void writeWchar_1_1(char aChar) throws IOException {
-        out.write(FF & (aChar >> 8));
-        out.write(FF & aChar);
+        out.write((aChar >> 8));
+        out.write(aChar);
     }
 
     protected void writeWchar_1_2(char aChar) throws IOException {
         out.write(4);
         writeBigEndianMarker();
-        out.write(FF & (aChar >> 8));
-        out.write(FF & aChar);
+        out.write((aChar >> 8));
+        out.write(aChar);
     }
 
     protected void writeEndTag(int chunkLevel) throws IOException {

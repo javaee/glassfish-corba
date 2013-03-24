@@ -2,7 +2,7 @@ package com.sun.corba.ee.impl.encoding;
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -50,10 +50,14 @@ import org.omg.CORBA.VM_TRUNCATABLE;
 import org.omg.CORBA.portable.IndirectionException;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class CDROutputValueTest extends ValueTestBase {
+
+    static final String ARRAY_LIST_REPID = "RMI:java.util.ArrayList:F655154F32815380:7881D21D99C7619D";
 
     Value1Helper value1Helper = Stub.create(Value1Helper.class);
 
@@ -77,6 +81,87 @@ public class CDROutputValueTest extends ValueTestBase {
 
         Value1 value1 = new Value1('x', 3);
         getOutputObject().write_value(value1);
+
+        setMessageBody(getGeneratedBody());
+        expectByteArray(getGeneratedBody());
+    }
+
+    /**
+     * ArrayLists always use chunking because they have custom marshalling. The Value1 type does not, normally.
+     * When a Value1 instance is contained in an ArrayList, it must use chunking to comply with the CORBA spec.
+     * @throws IOException
+     */
+    @Test
+    public void valuesNestedUnderChunkedValuesAreChunked() throws IOException {
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
+        writeRepId(ARRAY_LIST_REPID);
+
+        startChunk();
+        writeByte(1);   // array header
+        writeByte(1);
+        writeInt(1);
+        writeInt(10);
+        writeByte(0);
+        endChunk();
+
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
+        writeRepId(Value1.REPID);
+
+        startChunk();
+        writeWchar_1_2('x');
+        writeInt(3);
+        endChunk();
+        writeEndTag(-1);
+
+        ArrayList<Value1> value = new ArrayList<Value1>();
+        value.add(new Value1('x', 3));
+        getOutputObject().write_value(value);
+
+        setMessageBody(getGeneratedBody());
+        expectByteArray(getGeneratedBody());
+    }
+
+    /**
+     * A ComplexValue does not need chunking; however, it contains an ArrayList which does. The next field is a Value1,
+     * which should not use chunking.
+     * @throws IOException
+     */
+    @Test
+    public void valuesFollowingChunkedValuesNeedNotBeChunked() throws IOException {
+        setFragmentSize(500);
+        writeValueTag(ONE_REPID_ID);
+        writeRepId(ComplexValue.REPID);
+        writeInt(3);   // anInt
+
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
+        writeRepId(ARRAY_LIST_REPID);
+
+        startChunk();
+        writeByte(1);   // array header
+        writeByte(1);
+        writeInt(1);
+        writeInt(10);
+        writeByte(0);
+        endChunk();
+
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);
+        int valueRepIdLocation = getCurrentLocation();
+        writeRepId(Value1.REPID);
+
+        startChunk();
+        writeWchar_1_2('x');
+        writeInt(3);
+        endChunk();
+        writeEndTag(-1);
+
+        writeValueTag(ONE_REPID_ID);
+        writeIndirectionTo(valueRepIdLocation);
+
+        writeWchar_1_2('X');
+        writeInt(4);
+
+        ComplexValue value = new ComplexValue('x', 3);
+        getOutputObject().write_value(value);
 
         setMessageBody(getGeneratedBody());
         expectByteArray(getGeneratedBody());

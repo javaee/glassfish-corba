@@ -676,7 +676,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
             clazz = object.getClass();
         }
 
-        mustChunk = valueHandler.isCustomMarshaled(clazz);
+        mustChunk |= valueHandler.isCustomMarshaled(clazz);
 
         // Write value_tag
         int indirection = writeValueTag(mustChunk, true, getCodebase(clazz));

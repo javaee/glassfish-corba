@@ -42,7 +42,6 @@ package com.sun.corba.ee.impl.encoding;
 import com.sun.corba.ee.impl.orb.ORBImpl;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.ee.impl.transport.MessageTraceManagerImpl;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.ee.spi.misc.ORBConstants;
@@ -51,13 +50,13 @@ import com.sun.corba.ee.spi.orb.ORBData;
 import com.sun.corba.ee.spi.orb.ORBVersion;
 import com.sun.corba.ee.spi.orb.ORBVersionFactory;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
-import com.sun.corba.ee.spi.protocol.RequestId;
 import com.sun.corba.ee.spi.transport.ByteBufferPool;
 import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.corba.ee.spi.transport.MessageTraceManager;
 import com.sun.corba.ee.spi.transport.TransportManager;
 import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import com.sun.org.omg.SendingContext.CodeBase;
+import org.glassfish.corba.testutils.HexBuffer;
 import org.glassfish.simplestub.SimpleStub;
 import org.glassfish.simplestub.Stub;
 import org.junit.Before;
@@ -262,13 +261,20 @@ public class EncodingTestBase {
         expectFragment(0, expected);
     }
 
+    protected final void dumpActual() {
+        getOutputObject().finishSendingMessage();
+        HexBuffer.dumpBuffers(fragments);
+    }
+
     private void expectFragment(int index, byte[] expected) {
         byte[] actual = subBuffer(fragments.get(index), Message.GIOPMessageHeaderLength);
         try {
             assertArrayEquals(expected, actual);
         } catch (AssertionError e) {
-            System.out.println("expected: " + HexBin.encode(expected));
-            System.out.println("  actual: " + HexBin.encode(actual));
+            System.out.println("buffer" + index + " expected:");
+            HexBuffer.dumpBuffer(expected);
+            System.out.println("actual:");
+            HexBuffer.dumpBuffer(actual);
             throw e;
         }
     }
@@ -285,6 +291,7 @@ public class EncodingTestBase {
         System.arraycopy(input, start, result, 0, result.length);
         return result;
     }
+
 
     protected final void expectByteArray(int... expected) {
         byte[] bytes = new byte[expected.length];

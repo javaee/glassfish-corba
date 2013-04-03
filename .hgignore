@@ -30,4 +30,5 @@ make/bnd/bnd.properties
 nbproject/private/**
 .idea/**
 *.iml
-
+iiop-folb-dev-test/**/dist
+iiop-folb-dev-test/glassfish4

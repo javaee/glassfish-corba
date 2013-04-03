@@ -1059,11 +1059,12 @@ public class Main extends Base {
         
         String inst1 = invokeMethod(slsb) ;
         gfCluster.stopInstance(inst1);
-        gfCluster.sleep(2);
+
+	gfCluster.sleep(2);
         Location sfsb = lookup( ic, BeanType.SFSB ) ;
         String inst2 = invokeMethod(sfsb) ;
         gfCluster.stopInstance(inst2);
-        gfCluster.sleep(2);
+	gfCluster.sleep(2);
         String inst3 = invokeMethod(sfsb) ;
     }
    

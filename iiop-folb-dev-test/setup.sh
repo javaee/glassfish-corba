@@ -1,16 +1,18 @@
 #!/bin/bash -x
-# sample local test setup script
+# sample local test setup script for U*x
 ./scripts/killgf
 sleep 5
-if [ -d glassfish3 ] 
+if [ -d glassfish4 ] 
 then
-  \rm -rf glassfish3.old
-  mv glassfish3 glassfish3.old
+  \rm -rf glassfish4.old
+  mv glassfish4 glassfish4.old
 fi
+#point to appripriate glassfish.zip bundle
+#wget http://hudson.glassfish.org/job/gf-trunk-build-continuous/lastSuccessfulBuild/artifact/bundles/glassfish.zip
 unzip -qo ./glassfish.zip
-#cp /tmp/orb-iiop.jar glassfish3/glassfish/modules/orb-iiop.jar
+#cp /tmp/orb-iiop.jar glassfish4/glassfish/modules/orb-iiop.jar
 export GFV3_WORK=`pwd`
-export S1AS_HOME=${GFV3_WORK}/glassfish3/glassfish
+export S1AS_HOME=${GFV3_WORK}/glassfish4/glassfish
 cd test/OrbFailOver
 ant -Dj2ee.server.home=${S1AS_HOME}  clean
 #ant -Dj2ee.server.home=${S1AS_HOME}  

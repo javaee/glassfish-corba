@@ -7,7 +7,7 @@ else
 endif
 
 rm ${RUN}/glassfish.zip
-rm -rf ${RUN}/glassfish3
+rm -rf ${RUN}/glassfish4
 cp ${BUILD}/distributions/glassfish/target/glassfish.zip ${RUN}
 cd ${RUN}
 unzip -q glassfish.zip

@@ -3,7 +3,7 @@ setenv BUILD ${GFV3_WS}
 setenv RUN ${GFV3_WORK}
 setenv MAVEN ~/.m2/repository
 setenv GROUPID org/glassfish/common
-setenv DEST ${RUN}/glassfish3/glassfish/modules
+setenv DEST ${RUN}/glassfish4/glassfish/modules
 setenv VERSION 3.1-SNAPSHOT
 
 cd ${MAVEN}/${GROUPID}

@@ -67,7 +67,7 @@ TARGET_ARGS="-targetserver ${ENDPOINTS}"
 TARGET_DEF="-Dcom.sun.appserv.iiop.endpoints=${ENDPOINTS}"
 DEBUG_ARGS="-agentlib:jdwp=transport=dt_socket,address=8228,server=y,suspend=y"
 SETUP_ARGS="-Djava.util.logging.config.file=${PROPS_FILE}"
-TEST_ARGS="-installDir ${GFV3_WORK}/glassfish3 -dasNode ${DAS_HOST} -availableNodes ${AVAILABLE_NODES} -testEjb ${EJB_NAME} -doCleanup false -skipSetup ${SKIP_SETUP}"
+TEST_ARGS="-installDir ${GFV3_WORK}/glassfish4 -dasNode ${DAS_HOST} -availableNodes ${AVAILABLE_NODES} -testEjb ${EJB_NAME} -doCleanup false -skipSetup ${SKIP_SETUP}"
 CLIENT_ARGS="-client ${CLIENT_NAME} -name OrbFailOver-app-client -serverORBDebug folb"
 
 set -x
@@ -78,9 +78,9 @@ if [ "${DEBUGGER}" = "1" ];
 then 
     CMD="${APPCLIENT} ${DEBUG_ARGS} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ "    
 else 
-    CMD="${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ "
+#    CMD="${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ "
+    CMD="${APPCLIENT} ${SETUP_ARGS} -Djava.rmi.server.useCodebaseOnly=true ${CLIENT_ARGS} ${TEST_ARGS} $@ "
 fi
-
 echo $CMD
 $CMD
 exitStatus=$?

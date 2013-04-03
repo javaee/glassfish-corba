@@ -1,0 +1,13 @@
+#! /bin/csh
+foreach f (`jps | grep ASMain | gawk '{print $1}'`)
+    # echo $f
+    kill -9 $f
+end
+foreach f (`jps | grep Broker | gawk '{print $1}'`)
+    # echo $f
+    kill -9 $f
+end
+foreach f (`jps | grep DerbyControl | gawk '{print $1}'`)
+    # echo $f
+    kill -9 $f
+end

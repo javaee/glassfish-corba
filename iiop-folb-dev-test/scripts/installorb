@@ -1,0 +1,7 @@
+#! /bin/csh -x
+setenv ORB ${CORBA_WS}/build/rename/ee/build/release/lib/bundles-archive.zip
+setenv DEST ${GFV3_WORK}/glassfish3
+
+cd ${DEST}
+unzip -o ${ORB}
+

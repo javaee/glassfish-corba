@@ -1,0 +1,26 @@
+#!/bin/sh -x
+
+#JAVA_HOME=$1
+JPS=$JAVA_HOME/bin/jps
+PROC_NAME=$1
+OSNAME=`uname -a | awk '{ print $1 }'`
+echo "$OSNAME"
+
+kill_processes() {
+    PROCESS_NAME=$1
+    case $OSNAME in
+	AIX*) PIDS=`ps -ef | grep $PROCESS_NAME |grep glassfish.jar| awk '{ print $2 }' | xargs`;;
+        *) PIDS=`$JAVA_HOME/bin/jps -mlVv | grep $PROCESS_NAME | awk '{ print $1 }' | xargs`;;
+    esac
+
+    for PID in $PIDS ;
+        do
+        case $OSNAME in
+           CYGWIN*) taskkill /F /T /PID $PID;;
+           *) kill -9 $PID;;
+        esac
+    done
+}
+
+kill_processes $PROC_NAME
+

@@ -1,0 +1,9 @@
+Test Execution Quick Start:
+
+- Copy the glassfish build to the current directory:  ./glassfish.zip
+- To run the tests: "source setup.sh ; run.sh"
+- samplerun.sh shows how to run a subset of tests of interest.
+- README.html has more details about the test suite. 
+
+Dependencies: ant 1.8.2 +, gawk 3.1.8 +
+

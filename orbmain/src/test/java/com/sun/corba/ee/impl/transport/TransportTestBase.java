@@ -356,6 +356,7 @@ public class TransportTestBase {
         private ArrayList<Integer> numBytesToRead = new ArrayList<Integer>();
         private Socket socket;
         private boolean failConfigureBlocking;
+        private boolean endOfInput;
 
         protected void setFailToConfigureBlocking() {
             failConfigureBlocking = true;
@@ -414,7 +415,10 @@ public class TransportTestBase {
 
         @Override
         public int read(ByteBuffer dst) throws IOException {
+            if (endOfInput) return -1;
             int numBytesToRead = Math.min(getNumBytesToRead(), Math.min(dataSize(), bufferCapacity(dst)));
+            if (numBytesToRead == 0) return 0;
+
             dst.put(readableData, readPos, numBytesToRead);
             readPos += numBytesToRead;
             return numBytesToRead;
@@ -425,11 +429,16 @@ public class TransportTestBase {
         }
 
         private int dataSize() {
-            return this.readableData.length - readPos;
+            return this.readableData == null ? 0 : this.readableData.length - readPos;
         }
 
         protected byte[] getDataWritten() {
             return dataWritten;
+        }
+
+
+        public void setEndOfInput() {
+            endOfInput = true;
         }
     }
 

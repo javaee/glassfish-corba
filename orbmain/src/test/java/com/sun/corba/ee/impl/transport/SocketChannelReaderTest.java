@@ -3,10 +3,12 @@ package com.sun.corba.ee.impl.transport;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class SocketChannelReaderTest extends TransportTestBase {
@@ -22,7 +24,7 @@ public class SocketChannelReaderTest extends TransportTestBase {
     @Test
     public void whenCurrentBufferNull_allocateBufferAndRead() throws IOException {
         enqueData(DATA_TO_BE_READ);
-        ByteBuffer buffer = reader.read(getSocketChannel(), null);
+        ByteBuffer buffer = reader.read(getSocketChannel(), null, 0);
         assertBufferContents(buffer, DATA_TO_BE_READ);
     }
 
@@ -35,7 +37,7 @@ public class SocketChannelReaderTest extends TransportTestBase {
         ByteBuffer oldBuffer = ByteBuffer.allocate(100);
         populateBuffer(oldBuffer, DATA_TO_BE_READ, 0, 3);
         enqueData(DATA_TO_BE_READ, 3, DATA_TO_BE_READ.length - 3);
-        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer);
+        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer, 0);
         assertBufferContents(buffer, DATA_TO_BE_READ);
     }
 
@@ -45,13 +47,21 @@ public class SocketChannelReaderTest extends TransportTestBase {
     }
 
     private void enqueData(byte[] dataToBeRead, int offset, int length) {
+        enqueData(getSubarray(dataToBeRead, offset, length));
+    }
+
+    private byte[] getSubarray(byte[] dataToBeRead, int offset, int length) {
         byte[] data = new byte[Math.min(length, dataToBeRead.length-offset)];
         System.arraycopy(dataToBeRead, offset, data, 0, data.length);
-        enqueData(data);
+        return data;
     }
 
     private void assertBufferContents(ByteBuffer buffer, byte... bytes) {
         buffer.flip();
+        assertPopulatedBufferContents(buffer, bytes);
+    }
+
+    private void assertPopulatedBufferContents(ByteBuffer buffer, byte[] bytes) {
         byte[] actual = new byte[buffer.limit()];
         buffer.get(actual);
         assertEqualData(bytes, actual);
@@ -67,7 +77,7 @@ public class SocketChannelReaderTest extends TransportTestBase {
         ByteBuffer oldBuffer = ByteBuffer.allocate(3);
         populateBuffer(oldBuffer, DATA_TO_BE_READ, 0, 3);
         enqueData(DATA_TO_BE_READ, 3, DATA_TO_BE_READ.length - 3);
-        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer);
+        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer, 0);
         assertBufferContents(buffer, DATA_TO_BE_READ);
     }
 
@@ -76,7 +86,41 @@ public class SocketChannelReaderTest extends TransportTestBase {
         ByteBuffer oldBuffer = ByteBuffer.allocate(5);
         populateBuffer(oldBuffer, DATA_TO_BE_READ, 0, 3);
         enqueData(DATA_TO_BE_READ, 3, DATA_TO_BE_READ.length - 3);
-        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer);
+        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer, DATA_TO_BE_READ.length);
         assertBufferContents(buffer, DATA_TO_BE_READ);
+    }
+
+    @Test
+    public void whenMoreDataAvailableThanNeeded_ignoreIt() throws IOException {
+        ByteBuffer oldBuffer = ByteBuffer.allocate(10);
+        oldBuffer.flip();
+        enqueData(DATA_TO_BE_READ);
+        getSocketChannel().setNumBytesToRead(3, 3);
+        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer, 2);
+        assertBufferContents(buffer, getSubarray(DATA_TO_BE_READ, 0, 3));
+    }
+
+    @Test(expected = EOFException.class)
+    public void whenEOFDetectedThrowException() throws IOException {
+        getSocketChannel().setEndOfInput();
+        ByteBuffer oldBuffer = ByteBuffer.allocate(5);
+        reader.read(getSocketChannel(), oldBuffer, 0);
+    }
+
+    @Test
+    public void whenNoDataRemains_returnNull() throws IOException {
+        ByteBuffer oldBuffer = ByteBuffer.allocate(10);
+        populateBuffer(oldBuffer, DATA_TO_BE_READ, 0, DATA_TO_BE_READ.length);
+        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer, 10);
+        assertNull(buffer);
+        assertPopulatedBufferContents(oldBuffer, DATA_TO_BE_READ);
+    }
+
+    @Test
+    public void whenAtCapacityAndNoDataRemains_returnNullAndPreserveOldBuffer() throws IOException {
+        ByteBuffer oldBuffer = ByteBuffer.wrap(DATA_TO_BE_READ);
+        ByteBuffer buffer = reader.read(getSocketChannel(), oldBuffer, 10);
+        assertNull(buffer);
+        assertPopulatedBufferContents(oldBuffer, DATA_TO_BE_READ);
     }
 }

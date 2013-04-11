@@ -60,6 +60,7 @@ import org.glassfish.simplestub.Stub;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.omg.CORBA.COMM_FAILURE;
 
 import java.nio.ByteBuffer;
 
@@ -292,6 +293,7 @@ public class MessageParserTest {
 
         assertNull(parser.getRemainderBuffer());
         assertTrue(messageMediator.getDispatchHeader() instanceof ReplyMessage_1_1);
+        assertTrue(parser.isExpectingFragments());
     }
 
     @Test
@@ -339,6 +341,61 @@ public class MessageParserTest {
         assertFalse(parser.isExpectingMoreData());
         assertTrue(message instanceof LocateRequestMessage_1_2);
         assertEquals(18, parser.getMsgByteBuffer().limit());
+    }
+
+
+    @Test
+    public void whenTimedOutBetweenMessages_doNothing() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+        parser.offerBuffer(null);
+
+        parser.checkTimeout(Integer.MAX_VALUE);
+    }
+
+    @Test
+    public void whenMidBodyButNotTimedOut_doNothing() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+        parser.offerBuffer(null);
+
+        parser.checkTimeout(10);
+    }
+
+    @Test(expected = COMM_FAILURE.class)
+    public void whenTimedOutMidHeader_throwAnException() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2};
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+
+        parser.checkTimeout(Integer.MAX_VALUE);
+    }
+
+    @Test(expected = COMM_FAILURE.class)
+    public void whenTimedOutMidBody_throwAnException() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+        parser.offerBuffer(null);
+
+        parser.checkTimeout(Integer.MAX_VALUE);
+    }
+
+    @Test(expected = COMM_FAILURE.class)
+    public void whenTimedOutWhileWaitingForFragment_throwAnException() {
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        ByteBuffer buffer = ByteBuffer.wrap(header);
+
+        parser.offerBuffer(buffer);
+        parser.offerBuffer(null);
+
+        parser.checkTimeout(Integer.MAX_VALUE);
     }
 
     @Test

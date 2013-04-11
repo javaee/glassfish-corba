@@ -1345,18 +1345,17 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     @Transport
     protected void doOptimizedReadStrategy() {
         try {
-            /*/
-            ByteBuffer byteBuffer = socketChannelReader.read(getSocketChannel(), messageParser.getRemainderBuffer());
-            byteBuffer.flip();
-//            System.out.println( "REG-> received buffer\n" + toHexDump(byteBuffer));
-            messageParser.offerBuffer(byteBuffer);
-            MessageMediator messageMediator = messageParser.getMessageMediator();
-            while (messageMediator != null) {
-                queueUpWork(messageMediator);
-                byteBuffer = messageParser.getRemainderBuffer();
-                messageParser.offerBuffer(byteBuffer);
-                messageMediator = messageParser.getMessageMediator();
-            }
+            /**/
+            int minimumToRead = 0;
+            ByteBuffer byteBuffer;
+            do {
+                byteBuffer = socketChannelReader.read(getSocketChannel(), messageParser.getRemainderBuffer(), minimumToRead);
+                if (byteBuffer != null) {
+                    byteBuffer.flip();
+                    byteBuffer = extractAndProcessMessages(byteBuffer);
+                    minimumToRead = messageParser.getSizeNeeded();
+                }
+            } while (byteBuffer != null);
             /*/
             // get a new ByteBuffer from ByteBufferPool ?
             if (byteBuffer == null || !byteBuffer.hasRemaining()) {
@@ -1433,6 +1432,18 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
             //close();
             throw wrapper.throwableInDoOptimizedReadStrategy(ex);
         }
+    }
+
+    public ByteBuffer extractAndProcessMessages(ByteBuffer byteBuffer) {
+        messageParser.offerBuffer(byteBuffer);
+        MessageMediator messageMediator = messageParser.getMessageMediator();
+        while (messageMediator != null) {
+            queueUpWork(messageMediator);
+            byteBuffer = messageParser.getRemainderBuffer();
+            messageParser.offerBuffer(byteBuffer);
+            messageMediator = messageParser.getMessageMediator();
+        }
+        return byteBuffer;
     }
 
     private static String toHexDump(ByteBuffer byteBuffer) {

@@ -45,6 +45,7 @@ import java.nio.ByteOrder;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.protocol.MessageMediator;
 import com.sun.corba.ee.spi.protocol.RequestId;
@@ -55,6 +56,7 @@ import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.ee.spi.trace.Giop;
 import com.sun.corba.ee.spi.trace.Transport;
+import org.omg.CORBA.COMM_FAILURE;
 
 
 /**
@@ -94,6 +96,7 @@ public class MessageParserImpl implements MessageParser {
     /** wrapped message create by the last call to offerBuffer. **/
     private MessageMediator messageMediator;
     private Connection connection;
+    private boolean expectingFragments;
 
     /** Creates a new instance of MessageParserImpl */
     public MessageParserImpl(ORB orb) {
@@ -133,6 +136,11 @@ public class MessageParserImpl implements MessageParser {
     }
 
     @Override
+    public boolean isExpectingFragments() {
+        return expectingFragments;
+    }
+
+    @Override
     public ByteBuffer getMsgByteBuffer() {
         return msgByteBuffer;
     }
@@ -150,6 +158,7 @@ public class MessageParserImpl implements MessageParser {
             MessageBase message = MessageBase.parseGiopHeader(orb, connection, buffer, 0);
             messageMediator = new MessageMediatorImpl(orb, connection, message, buffer);
             msgByteBuffer = buffer;
+            expectingFragments = message.moreFragmentsToFollow();
         }
 
     }
@@ -179,7 +188,7 @@ public class MessageParserImpl implements MessageParser {
     }
 
     private boolean containsFullMessage(ByteBuffer buffer) {
-        return buffer.remaining() >= getTotalMessageLength(buffer);
+        return containsFullHeader(buffer) && buffer.remaining() >= getTotalMessageLength(buffer);
     }
 
     private int getTotalMessageLength(ByteBuffer buffer) {
@@ -205,6 +214,18 @@ public class MessageParserImpl implements MessageParser {
         return messageMediator;
     }
 
+    @Override
+    public void checkTimeout(long timeSinceLastInput) {
+        if (isMidMessage() && timeLimitExceeded(timeSinceLastInput)) throw new COMM_FAILURE();
+    }
+
+    private boolean timeLimitExceeded(long timeSinceLastInput) {
+        return timeSinceLastInput > ORBConstants.TRANSPORT_TCP_MAX_TIME_TO_WAIT;
+    }
+
+    private boolean isMidMessage() {
+        return expectingFragments || (remainderBuffer != null && !containsFullMessage(remainderBuffer));
+    }
 
     @Transport
     public Message parseBytes(ByteBuffer byteBuffer, Connection connection) {

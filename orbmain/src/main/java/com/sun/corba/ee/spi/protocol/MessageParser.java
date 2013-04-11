@@ -157,4 +157,13 @@ public interface MessageParser {
      * @return a complete message, wrapped in a message mediator.
      */
     MessageMediator getMessageMediator();
+
+    /**
+     * Checks for a stalled or rogue client. If in the middle of receiving a message and the time exceeds the limit,
+     * will throw a communications failure exception.
+     * @param timeSinceLastInput the number of milliseconds since the last input was received.
+     */
+    void checkTimeout(long timeSinceLastInput);
+
+    boolean isExpectingFragments();
 }

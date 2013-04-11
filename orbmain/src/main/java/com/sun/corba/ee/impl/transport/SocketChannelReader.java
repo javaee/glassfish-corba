@@ -2,6 +2,7 @@ package com.sun.corba.ee.impl.transport;
 
 import com.sun.corba.ee.spi.orb.ORB;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -18,14 +19,22 @@ public class SocketChannelReader {
      * from a previous read.
      * @param channel the channel from which to read
      * @param previouslyReadData the old data to read; note: all data up to the limit is considered valid.
+     * @param minNeeded the minimum number of bytes that should be present in the buffer before returning
      * @return a buffer containing all old data, with all newly available data appended to it.
      * @throws IOException if an error occurs while reading from the channel.
      */
-    public ByteBuffer read(SocketChannel channel, ByteBuffer previouslyReadData) throws IOException {
+    public ByteBuffer read(SocketChannel channel, ByteBuffer previouslyReadData, int minNeeded) throws IOException {
         ByteBuffer byteBuffer = prepareToAppendTo(previouslyReadData);
 
         int numBytesRead = channel.read(byteBuffer);
-        while (numBytesRead > 0) {
+        if (numBytesRead < 0) {
+            throw new EOFException("End of input detected");
+        } else if (numBytesRead == 0) {
+            byteBuffer.flip();
+            return null;
+        }
+
+        while (numBytesRead > 0 && byteBuffer.position() < minNeeded) {
             if (haveFilledBuffer(byteBuffer))
                 byteBuffer = expandBuffer(byteBuffer);
             numBytesRead = channel.read(byteBuffer);
@@ -56,7 +65,11 @@ public class SocketChannelReader {
     }
 
     private ByteBuffer reallocateBuffer(ByteBuffer byteBuffer) {
-        return orb.getByteBufferPool().reAllocate(byteBuffer, 2*byteBuffer.capacity());
+        try {
+            return orb.getByteBufferPool().reAllocate(byteBuffer, 2*byteBuffer.capacity());
+        } finally {
+            byteBuffer.position(0); // reAllocate call above moves the position; move it back now in case we need it
+        }
     }
 
     private ByteBuffer allocateBuffer() {

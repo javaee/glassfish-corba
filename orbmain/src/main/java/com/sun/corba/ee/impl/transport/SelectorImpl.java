@@ -87,6 +87,7 @@ public class SelectorImpl
         ORBUtilSystemException.self ;
 
     private ORB orb;
+    private Timer timer;
     private Selector selector;
     private long timeout;
     private final List<EventHandler> deferredRegistrations;
@@ -95,27 +96,25 @@ public class SelectorImpl
     private final Map<EventHandler,ReaderThread>  readerThreads;
     private boolean selectorStarted;
     private volatile boolean closed;
+    private Map<EventHandler, Long> lastActivityTimers = new HashMap<EventHandler, Long>();
 
-    // XXX This needs more work on statistics:
-    // - how many registered events of different types?
-    // - how many events received?
-    @ManagedAttribute
-    @Description( "List of listener threads dedicated to listening "
-        + "for new connections on an acceptor")
-    private synchronized List<ListenerThread> getListenerThreads() {
-        return new ArrayList<ListenerThread>( listenerThreads.values()) ;
+    interface Timer {
+        long getCurrentTime();
     }
 
-    @ManagedAttribute
-    @Description( "List of reader threads dedicated to listening "
-        + "for new messages on a connection" )
-    private synchronized List<ReaderThread> getReaderThreads() {
-        return new ArrayList<ReaderThread>( readerThreads.values()) ;
+    private static final Timer SYSTEM_TIMER = new Timer() {
+        public long getCurrentTime() {
+            return System.currentTimeMillis();
+        }
+    };
+
+    public SelectorImpl(ORB orb) {
+        this(orb, SYSTEM_TIMER);
     }
 
-    public SelectorImpl(ORB orb)
-    {
+    SelectorImpl(ORB orb, Timer timer) {
         this.orb = orb;
+        this.timer = timer;
         selector = null;
         selectorStarted = false;
         timeout = 60000;
@@ -294,62 +293,72 @@ public class SelectorImpl
 
         while (!closed) {
             try {
-                beginSelect();
-
-                int n = 0;
-                handleDeferredRegistrations();
-                enableInterestOps();
-                try {
-                    n = selector.select(timeout);
-                } catch (IOException  e) {
-                    display( "Exception in select:", e ) ;
-                }
-                if (closed) {
-                    selector.close();
-                    selectorClosed();
-                    return;
-                }
-                Iterator<SelectionKey> iterator =
-                    selector.selectedKeys().iterator();
-                selectResult(iterator.hasNext(), n);
-                while (iterator.hasNext()) {
-                    SelectionKey selectionKey = iterator.next();
-                    iterator.remove();
-                    
-                    // It is possible that a different thread (other than the 
-                    // thread that is executing this code has cancelled the
-                    // SelectionKey as a result of it inititiating a Connection 
-                    // close and cleanup of its temporary Selectors. Hence, 
-                    // the check for a valid SelectionKey.
-                    // IMPORTANT: Further assuming the thread that has cancelled
-                    // the SelectionKey is releasing other Connection resources
-                    // such as cleaning any temporary Selectors which may be
-                    // been active in addition to closing the Connection.
-
-                    if (selectionKey.isValid()) {
-                        EventHandler eventHandler = 
-                                (EventHandler)selectionKey.attachment();
-                        try {
-                            eventHandler.handleEvent();
-                        } catch (Throwable t) {
-                            wrapper.exceptionInSelector( t, eventHandler ) ;
-                        }
-                    } else {
-                        wrapper.canceledSelectionKey( selectionKey ) ;
-                        skippingEventForCancelledKey();
-                        // skipping event since this EventHandler's
-                        // SelectionKey has been found to be cancelled.
-                        // It will be removed from this Selector on the
-                        // next select() operation.
-                    }
-                }
-                endSelect();
+                runSelectionLoopOnce();
             } catch (Throwable t) {
                 // IMPORTANT: ignore all errors so the select thread keeps running.
                 // Otherwise a guaranteed hang.
                 display( "Ignoring exception", t ) ;
             }
         }
+    }
+
+    void runSelectionLoopOnce() throws IOException {
+        beginSelect();
+
+        int n = 0;
+        handleDeferredRegistrations();
+        enableInterestOps();
+        try {
+            n = selector.select(timeout);
+        } catch (IOException  e) {
+            display( "Exception in select:", e ) ;
+        }
+        if (closed) {
+            selector.close();
+            selectorClosed();
+            return;
+        }
+        Iterator<SelectionKey> iterator =
+            selector.selectedKeys().iterator();
+        selectResult(iterator.hasNext(), n);
+        while (iterator.hasNext()) {
+            SelectionKey selectionKey = iterator.next();
+            iterator.remove();
+
+            // It is possible that a different thread (other than the
+            // thread that is executing this code has cancelled the
+            // SelectionKey as a result of it inititiating a Connection
+            // close and cleanup of its temporary Selectors. Hence,
+            // the check for a valid SelectionKey.
+            // IMPORTANT: Further assuming the thread that has cancelled
+            // the SelectionKey is releasing other Connection resources
+            // such as cleaning any temporary Selectors which may be
+            // been active in addition to closing the Connection.
+
+            if (selectionKey.isValid()) {
+                EventHandler eventHandler = (EventHandler)selectionKey.attachment();
+                try {
+                    eventHandler.handleEvent();
+                    if (lastActivityTimers.containsKey(eventHandler))
+                        lastActivityTimers.put(eventHandler, timer.getCurrentTime());
+                } catch (Throwable t) {
+                    wrapper.exceptionInSelector( t, eventHandler ) ;
+                }
+            } else {
+                wrapper.canceledSelectionKey( selectionKey ) ;
+                skippingEventForCancelledKey();
+                // skipping event since this EventHandler's
+                // SelectionKey has been found to be cancelled.
+                // It will be removed from this Selector on the
+                // next select() operation.
+            }
+        }
+        long currentTime = timer.getCurrentTime();
+        for (EventHandler handler : lastActivityTimers.keySet()) {
+            long elapsedTime = currentTime - lastActivityTimers.get(handler);
+            ((Timeoutable) handler).checkForTimeout(elapsedTime);
+        }
+        endSelect();
     }
 
 
@@ -382,8 +391,7 @@ public class SelectorImpl
             try {
                 selector = Selector.open();
             } catch (IOException e) {
-                throw new RuntimeException(
-                    ".startSelector: Selector.open exception", e);
+                throw new RuntimeException( ".startSelector: Selector.open exception", e);
             }
             setDaemon(true);
             start();
@@ -402,12 +410,13 @@ public class SelectorImpl
                 SelectableChannel channel = eventHandler.getChannel();
                 SelectionKey selectionKey = null;
                 try {
-                    selectionKey = channel.register(selector,
-                        eventHandler.getInterestOps(), eventHandler );
+                    selectionKey = channel.register(selector, eventHandler.getInterestOps(), eventHandler);
                 } catch (ClosedChannelException e) {
                     display( "Exception", e ) ;
                 }
                 eventHandler.setSelectionKey(selectionKey);
+                if (eventHandler instanceof Timeoutable)
+                    lastActivityTimers.put(eventHandler, timer.getCurrentTime());
             }
             deferredRegistrations.clear();
         }

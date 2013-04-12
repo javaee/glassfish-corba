@@ -321,7 +321,6 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         return true;
     }
 
-    @Transport
     public boolean read() {
         MessageMediator messageMediator = readBits();
 
@@ -336,8 +335,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         purgeCalls(ex, true, false);
     }
 
-    @Transport
-    protected MessageMediator readBits() {
+    private MessageMediator readBits() {
         try {
             return createMessageMediator();
         } catch (ThreadDeath td) {
@@ -415,14 +413,6 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     public ByteBuffer read(int size, int offset, int length)
             throws IOException {
         try {
-            if (hasSocketChannel()) {
-                ByteBuffer lbb = orb.getByteBufferPool().getByteBuffer(size);
-                lbb.position(offset);
-                lbb.limit(size);
-                readFully(lbb, length);
-                return lbb;
-            }
-
             byte[] buf = new byte[size];
             // getSocket().getInputStream() can throw an IOException
             // if the socket is closed. Hence, we check the connection
@@ -448,26 +438,13 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     public ByteBuffer read(ByteBuffer byteBuffer, int offset, int length) throws IOException {
         try {
             int size = offset + length;
-            if (hasSocketChannel()) {
-                if (size > byteBuffer.capacity()) {
-                    orb.getByteBufferPool().releaseByteBuffer(byteBuffer);
-                    byteBuffer = orb.getByteBufferPool().getByteBuffer(size);
-                }
-                byteBuffer.position(offset);
-                byteBuffer.limit(size);
-                readFully(byteBuffer, length);
-                byteBuffer.position(0);
-                byteBuffer.limit(size);
-                return byteBuffer;
-            } else {
-                byte[] buf = new byte[size];
-                // getSocket().getInputStream() can throw an IOException
-                // if the socket is closed. Hence, we check the connection
-                // state CLOSE_RECVD if an IOException is thrown here
-                // instead of in readFully()
-                readFully(getSocket().getInputStream(), buf, offset, length);
-                return ByteBuffer.wrap(buf);
-            }
+            byte[] buf = new byte[size];
+            // getSocket().getInputStream() can throw an IOException
+            // if the socket is closed. Hence, we check the connection
+            // state CLOSE_RECVD if an IOException is thrown here
+            // instead of in readFully()
+            readFully(getSocket().getInputStream(), buf, offset, length);
+            return ByteBuffer.wrap(buf);
         } catch (IOException ioe) {
             if (getState() == CLOSE_RECVD) {
                 throw wrapper.connectionRebind(ioe);
@@ -485,7 +462,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     @Transport
     private void readFully(ByteBuffer byteBuffer, int size) throws IOException {
         int n = 0;
-        int bytecount = 0;
+        int bytecount;
         TcpTimeouts.Waiter waiter = tcpTimeouts.waiter();
 
         // The reading of data incorporates a strategy to detect a
@@ -555,7 +532,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
                           int offset, int size)
             throws IOException {
         int n = 0;
-        int bytecount = 0;
+        int bytecount;
         TcpTimeouts.Waiter waiter = tcpTimeouts.waiter();
 
         // The reading of data incorporates a strategy to detect a
@@ -977,11 +954,10 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
             //            here.
             //
 
-            if (!shouldUseSelectThreadToWait()) {
-                read();
-            } else {
-                // use optimized read strategy
+            if (hasSocketChannel()) {
                 doOptimizedReadStrategy();
+            } else {
+                read();
             }
         } catch (Throwable t) {
             discardedThrowable = t;
@@ -1710,10 +1686,6 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
 
     @InfoMethod
     private void exceptionInfo(String string, Throwable t) {
-    }
-
-    @InfoMethod
-    private void bbInfo(int bbAddress) {
     }
 
     @InfoMethod

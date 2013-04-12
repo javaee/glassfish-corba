@@ -113,17 +113,6 @@ public class TransportTestBase {
         }
     }
 
-    protected void readFromNio(byte[] data) throws IOException {
-        useNio();
-        socketChannel.enqueData(data);
-    }
-
-    protected void useNio() throws IOException {
-        orbData.useSelectThread = true;
-        connection = new ConnectionImpl(orb, acceptor, socket);
-        connection.setConnectionCache(connectionCache);
-    }
-
     @Before
     public void setUp() throws IOException {
         orb.data = orbData;
@@ -139,8 +128,18 @@ public class TransportTestBase {
         acceptor = Stub.create(AcceptorFake.class, orb, 0, "name", "type");
     }
 
-    protected void readFromSocketWithoutChannel(byte[] bytes) {
-        readFromSocketWithoutChannelAndDispatch(bytes);
+    protected void readFromNio(byte[] data) throws IOException {
+        useNio();
+        socketChannel.enqueData(data);
+    }
+
+    protected void useNio() throws IOException {
+        orbData.useSelectThread = true;
+        connection = new ConnectionImpl(orb, acceptor, socket);
+        connection.setConnectionCache(connectionCache);
+    }
+
+    protected void collectMediatorsAsDispatched() {
         connection.dispatcher = new ConnectionImpl.Dispatcher() {
             @Override
             public boolean dispatch(MessageMediator messageMediator) {
@@ -152,14 +151,6 @@ public class TransportTestBase {
 
     protected void readFromSocketWithoutChannelAndDispatch(byte[] bytes) {
         socketChannel = null;
-        orbData.useSelectThread = false;
-        socket.inputStream = new ByteArrayInputStream( bytes );
-        connection = new ConnectionImpl(orb, acceptor, socket);
-        connection.setConnectionCache(connectionCache);
-    }
-
-    protected void readFromSocketWithChannelAndDispatch(byte[] bytes) {
-        socketChannel.enqueData(bytes);
         orbData.useSelectThread = false;
         socket.inputStream = new ByteArrayInputStream( bytes );
         connection = new ConnectionImpl(orb, acceptor, socket);

@@ -328,13 +328,6 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         return messageMediator == null || dispatcher.dispatch(messageMediator);
     }
 
-    private void unregisterForEventAndPurgeCalls(SystemException ex) {
-        // REVISIT - make sure reader thread is killed.
-        orb.getTransportManager().getSelector(0).unregisterForEvent(this);
-        // Notify anyone waiting.
-        purgeCalls(ex, true, false);
-    }
-
     private MessageMediator readBits() {
         try {
             return createMessageMediator();
@@ -376,16 +369,23 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         }
     }
 
+    private void unregisterForEventAndPurgeCalls(SystemException ex) {
+        // REVISIT - make sure reader thread is killed.
+        orb.getTransportManager().getSelector(0).unregisterForEvent(this);
+        // Notify anyone waiting.
+        purgeCalls(ex, true, false);
+    }
+
     // NOTE: This method is used only when the ORB is configured with
     //       "useNIOSelectToWait=false", aka use blocking Sockets/SocketChannels
     private MessageMediator createMessageMediator() {
         try {
-            ByteBuffer headerBuffer = read(Message.GIOPMessageHeaderLength, 0, Message.GIOPMessageHeaderLength);
+            ByteBuffer headerBuffer = read(0, Message.GIOPMessageHeaderLength);
             Message header = MessageBase.parseGiopHeader(orb, this, headerBuffer, 0);
 
             headerBuffer.position(Message.GIOPMessageHeaderLength);
             int msgSizeMinusHeader = header.getSize() - Message.GIOPMessageHeaderLength;
-            ByteBuffer buffer = read(headerBuffer, Message.GIOPMessageHeaderLength, msgSizeMinusHeader);
+            ByteBuffer buffer = read(Message.GIOPMessageHeaderLength, msgSizeMinusHeader);
 
             traceMessageBodyReceived(orb, buffer);
 
@@ -408,34 +408,10 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         return getSocketChannel() != null;
     }
 
-    // NOTE: This method can throw a connection rebind SystemException.
-    @Transport
-    public ByteBuffer read(int size, int offset, int length)
-            throws IOException {
-        try {
-            byte[] buf = new byte[size];
-            // getSocket().getInputStream() can throw an IOException
-            // if the socket is closed. Hence, we check the connection
-            // state CLOSE_RECVD if an IOException is thrown here 
-            // instead of in readFully()
-            readFully(getSocket().getInputStream(), buf, offset, length);
-            ByteBuffer nbb = ByteBuffer.wrap(buf);
-            nbb.limit(size);
-            return nbb;
-        } catch (IOException ioe) {
-            if (getState() == CLOSE_RECVD) {
-                throw wrapper.connectionRebind(ioe);
-            } else {
-                throw ioe;
-            }
-        }
-    }
-
     // NOTE: This method is used only when the ORB is configured with
     //       "useNIOSelectToWait=false", aka use blocking Sockets/SocketChannels.
     // NOTE: This method can throw a connection rebind SystemException.
-    @Transport
-    public ByteBuffer read(ByteBuffer byteBuffer, int offset, int length) throws IOException {
+    private ByteBuffer read(int offset, int length) throws IOException {
         try {
             int size = offset + length;
             byte[] buf = new byte[size];
@@ -454,131 +430,43 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
         }
     }
 
-    // REVISIT - Logic in this method that utilizes TCP timeouts can be removed
-    //           removed since this method is used only when 
-    //           'useNIOSelectToWait=false', aka blocking SocketChannels/Sockets.
-    // NOTE: This method is used only when the ORB is configured with
-    //       "useNIOSelectToWait=false", aka use blocking Sockets/SocketChannels
-    @Transport
-    private void readFully(ByteBuffer byteBuffer, int size) throws IOException {
-        int n = 0;
-        int bytecount;
-        TcpTimeouts.Waiter waiter = tcpTimeouts.waiter();
-
-        // The reading of data incorporates a strategy to detect a
-        // rogue client.
-
-        do {
-            bytecount = getSocketChannel().read(byteBuffer);
-
-            if (bytecount < 0) {
-                throw new IOException("End-of-stream");
-            } else if (bytecount == 0) {
-                TemporarySelector tmpSelector = null;
-                SelectionKey sk = null;
-                try {
-                    tmpSelector = getTemporaryReadSelector();
-                    sk = tmpSelector.registerChannel(getSocketChannel(),
-                            SelectionKey.OP_READ);
-                    do {
-                        int nsel = tmpSelector.select(waiter.getTimeForSleep());
-                        if (nsel > 0) {
-                            tmpSelector.removeSelectedKey(sk);
-                            bytecount = getSocketChannel().read(byteBuffer);
-
-                            if (bytecount < 0) {
-                                throw new IOException("End-of-stream");
-                            } else {
-                                n += bytecount;
-                            }
-                        }
-
-                        if (n < size) {
-                            // not all bytes read, increase select timeout
-                            // REVISIT - Should we only increase wait timeout if
-                            //           an actual timeout occurred?
-                            waiter.advance();
-                        }
-                    } while (n < size && !waiter.isExpired());
-                } catch (IOException ioe) {
-                    throw wrapper.exceptionWhenReadingWithTemporarySelector(ioe,
-                            n, size, waiter.timeWaiting(),
-                            tcpTimeouts.get_max_time_to_wait());
-                } finally {
-                    if (tmpSelector != null) {
-                        tmpSelector.cancelAndFlushSelector(sk);
-                    }
-                }
-            } else {
-                n += bytecount;
-            }
-        } while (n < size && !waiter.isExpired());
-
-        if (n < size && waiter.isExpired()) {
-            // failed to read entire message
-            throw wrapper.transportReadTimeoutExceeded(size, n,
-                    tcpTimeouts.get_max_time_to_wait(),
-                    waiter.timeWaiting());
-        }
-    }
-
     // NOTE: This method is used only when the ORB is configured with
     //       "useNIOSelectToWait=false", aka use blocking java.net.Socket
-    // REVISIT - Logic in this method that utilizes TCP timeouts can be removed
-    //           removed since this method use is for blocking java.net.Sockets.
     // To support non-channel connections.
-    @Transport
-    public void readFully(java.io.InputStream is, byte[] buf,
-                          int offset, int size)
+
+
+
+    // case 1: asked for full header and received it:
+    //     -> ask for full body
+    // case 2: asked for full header and did not receive it:
+    //     -> read more later
+    // case 3: asked for full body and received it:
+    //     -> enqueue
+    // case 4: asked for full body and did not receive it:
+    //     -> read more later
+    /**
+     * Reads data from the input stream, adding it the end of the existing buffer.
+     * At least one byte will always be read.
+     * @param is the input stream from which to read
+     * @param buf the buffer into which to read
+     * @param offset the first position in the buffer into which to read
+     * @param length
+     * @throws IOException
+     */
+    private void readFully(java.io.InputStream is, byte[] buf, int offset, int length)
             throws IOException {
         int n = 0;
         int bytecount;
-        TcpTimeouts.Waiter waiter = tcpTimeouts.waiter();
-
-        // The reading of data incorporates a strategy to detect a
-        // rogue client. The strategy is implemented as follows. As
-        // long as data is being read, at least 1 byte or more, we
-        // assume we have a well behaved client. If no data is read,
-        // then we sleep for a time to wait, re-calculate a new time to
-        // wait which is lengthier than the previous time spent waiting.
-        // Then, if the total time spent waiting does not exceed a
-        // maximum time we are willing to wait, we attempt another
-        // read. If the maximum amount of time we are willing to
-        // spend waiting for more data is exceeded, we throw an
-        // IOException.
-
-        // NOTE: Reading of GIOP headers are treated with a smaller
-        //       maximum time to wait threshold. Based on extensive
-        //       performance testing, all GIOP headers are being
-        //       read in 1 read access.
 
         do {
-            bytecount = is.read(buf, offset + n, size - n);
+            bytecount = is.read(buf, offset + n, length - n);
 
             if (bytecount < 0) {
                 throw new IOException("End-of-stream");
-            } else if (bytecount == 0) {
-                // REVISIT - This entire if (bytecount == 0)
-                //           block of code can be removed
-                //           since is.read() is a blocking
-                //           read and it is not possible
-                //           to read 0 bytes without
-                //           throwing an IOException.
-                readFullySleeping(waiter.getTime());
-
-                waiter.sleepTime();
-                waiter.advance();
             } else {
                 n += bytecount;
             }
-        } while (n < size && !waiter.isExpired());
-
-        if (n < size && waiter.isExpired()) {
-            // failed to read entire message
-            throw wrapper.transportReadTimeoutExceeded(
-                    size, n, tcpTimeouts.get_max_time_to_wait(),
-                    waiter.timeWaiting());
-        }
+        } while (n < length);
     }
 
     // NOTE: This method can throw a connection rebind SystemException.

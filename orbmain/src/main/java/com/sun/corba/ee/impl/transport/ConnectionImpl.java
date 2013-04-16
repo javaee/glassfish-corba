@@ -1345,7 +1345,7 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
     @Transport
     protected void doOptimizedReadStrategy() {
         try {
-            /**/
+            /*/
             int minimumToRead = 0;
             ByteBuffer byteBuffer;
             do {

@@ -100,7 +100,7 @@ public final class CodeSetComponentInfo {
             if (conversionCodeSets == null)
                 this.conversionCodeSets = new int[0];
             else 
-                this.conversionCodeSets = conversionCodeSets;
+                this.conversionCodeSets = conversionCodeSets.clone();
         }
 
         public void read(MarshalInputStream in) {

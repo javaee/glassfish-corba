@@ -197,7 +197,6 @@ public class ClientRequestDispatcherImpl
     public CDROutputObject beginRequest(Object self, String opName,
         boolean isOneWay, ContactInfo contactInfo) {
 
-        final ContactInfo corbaContactInfo = contactInfo;
         final ORB orb = contactInfo.getBroker();
 
         enter_totalRequest() ;
@@ -887,9 +886,7 @@ public class ClientRequestDispatcherImpl
             throw wrapper.badExceptionDetailMessageServiceContextType();
         }
         byte[] data = ((UnknownServiceContext)sc).getData();
-        EncapsInputStream in = 
-            new EncapsInputStream(messageMediator.getBroker(),
-                data, data.length);
+        EncapsInputStream in = new EncapsInputStream(messageMediator.getBroker(), data, data.length);
         in.consumeEndian();
 
         String msg =

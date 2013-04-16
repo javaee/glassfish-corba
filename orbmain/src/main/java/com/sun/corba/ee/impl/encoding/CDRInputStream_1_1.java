@@ -183,11 +183,8 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
         // Workaround for ORBs which send string lengths of
         // zero to mean empty string.
         //
-        // IMPORTANT: Do not replace 'new String("")' with "", it may result
-        // in a Serialization bug (See serialization.zerolengthstring) and
-        // bug id: 4728756 for details
         if (len == 0)
-            return new String("");
+            return EMPTY_STRING;
 
         checkForNegativeLength(len);
 

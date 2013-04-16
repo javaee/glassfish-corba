@@ -78,7 +78,7 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
 
     private transient CDROutputStreamBase impl;
 
-    private Message header;
+    private transient Message header;
     private transient MessageMediator corbaMessageMediator;
     private transient Connection connection;
 
@@ -267,7 +267,7 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
             = OSFCodeSetRegistry.lookupEntry(codesets.getCharCodeSet());
 
         if (charSet == null) {
-            throw wrapper.unknownCodeset(charSet);
+            throw wrapper.unknownCodeset(null);
         }
 
         return CodeSetConversion.impl().getCTBConverter(charSet, false, false);
@@ -292,7 +292,7 @@ public class CDROutputObject extends org.omg.CORBA_2_3.portable.OutputStream
             = OSFCodeSetRegistry.lookupEntry(codesets.getWCharCodeSet());
 
         if (wcharSet == null) {
-            throw wrapper.unknownCodeset(wcharSet);
+            throw wrapper.unknownCodeset(null);
         }
 
         boolean useByteOrderMarkers

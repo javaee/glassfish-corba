@@ -171,8 +171,6 @@ public class ClientDelegateImpl extends ClientDelegate
                                 String operation, 
                                 boolean responseExpected) 
     {
-        final IIOPAddress primaryAddress = getPrimaryAddress(
-            contactInfoList.getTargetIOR() ) ;
 
         targetIOR( contactInfoList.getTargetIOR() ) ;
         effectiveTargetIOR( contactInfoList.getEffectiveTargetIOR() );
@@ -190,8 +188,7 @@ public class ClientDelegateImpl extends ClientDelegate
 
                 try {
                     invocationInfo = orb.createOrIncrementInvocationInfo();
-                    contactInfoListIterator =
-                        invocationInfo.getContactInfoListIterator();
+                    contactInfoListIterator = invocationInfo.getContactInfoListIterator();
                     if (contactInfoListIterator == null) {
                         contactInfoListIterator = contactInfoList.iterator();
                         invocationInfo.setContactInfoListIterator(contactInfoListIterator);
@@ -204,39 +201,28 @@ public class ClientDelegateImpl extends ClientDelegate
                             // REVISIT: When we unwind the retry stack
                             // these are necessary.
                             orb.getPIHandler().initiateClientPIRequest(false);
-                            ORBUtility.pushEncVersionToThreadLocalState(
-                                                 ORBConstants.JAVA_ENC_VERSION);
-                            throw ((ContactInfoListIterator)contactInfoListIterator)
-                                .getFailureException();
+                            ORBUtility.pushEncVersionToThreadLocalState(ORBConstants.JAVA_ENC_VERSION);
+                            throw ((ContactInfoListIterator)contactInfoListIterator).getFailureException();
                         }
-                        contactInfo = (ContactInfo)
-                            contactInfoListIterator.next();
+                        contactInfo = (ContactInfo) contactInfoListIterator.next();
                         requestInfo( operation, contactInfo ) ;
                     } finally {
                         exit_hasNextNext() ;
                     }
 
-                    ClientRequestDispatcher subcontract =
-                        contactInfo.getClientRequestDispatcher();
+                    ClientRequestDispatcher subcontract = contactInfo.getClientRequestDispatcher();
                     // Remember chosen subcontract for invoke and releaseReply.
                     // 
                     // NOTE: This is necessary since a stream is not available
                     // in releaseReply if there is a client marshaling error
                     // or an error in _invoke.
                     invocationInfo.setClientRequestDispatcher(subcontract);
-                    result = (OutputStream)
-                        subcontract.beginRequest(self, operation,
-                                                 !responseExpected,
-                                                 contactInfo);
+                    result = subcontract.beginRequest(self, operation, !responseExpected, contactInfo);
                 } catch (RuntimeException e) {
                     // REVISIT: 
                     // this part similar to BufferManagerWriteStream.overflow()
-                    if (contactInfoListIterator == null) {
-                        retry = false ;
-                    } else {
-                        retry = ((ContactInfoListIterator)
-                             contactInfoListIterator).reportException(contactInfo, e);
-                    }
+                    retry = contactInfoListIterator != null
+                            && ((ContactInfoListIterator) contactInfoListIterator).reportException(contactInfo, e);
 
                     if (retry) {
                         retryingRequest(e);

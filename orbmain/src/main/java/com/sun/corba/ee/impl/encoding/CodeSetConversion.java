@@ -175,8 +175,6 @@ public class CodeSetConversion
         private ByteBuffer buffer;
 
         WeakHashMap<String, ByteBuffer> cacheEncoder = new WeakHashMap<String, ByteBuffer>();
-        // What code set are we using?
-        private OSFCodeSetRegistry.Entry codeset;
 
         public JavaCTBConverter(OSFCodeSetRegistry.Entry codeset,
                                 int alignmentForEncoding) {
@@ -200,7 +198,6 @@ public class CodeSetConversion
                 throw wrapper.invalidCtbConverterName(ucne,codeset.getName());
             }
 
-            this.codeset = codeset;
             alignment = alignmentForEncoding;
         }
 

@@ -159,12 +159,8 @@ public class CDRInputStream_1_2 extends CDRInputStream_1_1
 
         int len = read_long();
 
-        //
-        // IMPORTANT: Do not replace 'new String("")' with "", it may result
-        // in a Serialization bug (See serialization.zerolengthstring) and
-        // bug id: 4728756 for details
         if (len == 0)
-            return new String("");
+            return EMPTY_STRING;
 
         checkForNegativeLength(len);
 

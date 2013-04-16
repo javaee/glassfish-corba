@@ -144,6 +144,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     private static final OMGSystemException omgWrapper = OMGSystemException.self;
     private static final String K_READ_METHOD = "read";
     private static final int MAX_BLOCK_LENGTH = 0x7fffff00;
+    protected static final String EMPTY_STRING = "";
 
     protected BufferManagerRead bufferManagerRead;
     protected ByteBuffer byteBuffer;
@@ -495,11 +496,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // Workaround for ORBs which send string lengths of
         // zero to mean empty string.
         //
-        // IMPORTANT: Do not replace 'new String("")' with "", it may result
-        // in a Serialization bug (See serialization.zerolengthstring) and
-        // bug id: 4728756 for details
         if (len == 0) {
-            return new String("");
+            return EMPTY_STRING;
         }
 
         char[] result = getConvertedChars(len - 1, getCharConverter());
@@ -517,12 +515,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // Workaround for ORBs which send string lengths of
         // zero to mean empty string.
         //
-        //
-        // IMPORTANT: Do not replace 'new String("")' with "", it may result
-        // in a Serialization bug (See serialization.zerolengthstring) and
-        // bug id: 4728756 for details
         if (len == 0) {
-            return new String("");
+            return EMPTY_STRING;
         }
 
         len--;
@@ -572,12 +566,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // Workaround for ORBs which send string lengths of
         // zero to mean empty string.
         //
-        //
-        // IMPORTANT: Do not replace 'new String("")' with "", it may result
-        // in a Serialization bug (See serialization.zerolengthstring) and
-        // bug id: 4728756 for details
         if (len == 0) {
-            return new String("");
+            return EMPTY_STRING;
         }
 
         checkForNegativeLength(len);

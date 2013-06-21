@@ -168,7 +168,7 @@ public class TcpTimeoutsImpl implements TcpTimeouts
             }
 
             public boolean isExpired() {
-                return total_time > max_time_to_wait ;
+                return total_time >= max_time_to_wait ;
             }
         } ;
     }

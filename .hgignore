@@ -32,3 +32,4 @@ nbproject/private/**
 *.iml
 iiop-folb-dev-test/**/dist
 iiop-folb-dev-test/glassfish4
+iiop-folb-dev-test/glassfish4.old

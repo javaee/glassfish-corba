@@ -43,17 +43,11 @@ import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.util.RepositoryId;
 import com.sun.corba.ee.spi.orb.ORBVersionFactory;
 import org.glassfish.simplestub.Stub;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.VM_TRUNCATABLE;
-import org.omg.CORBA.portable.IndirectionException;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class CDROutputValueTest extends ValueTestBase {
 
@@ -98,9 +92,9 @@ public class CDROutputValueTest extends ValueTestBase {
 
         startChunk();
         writeByte(1);   // array header
-        writeByte(1);
+        writeByte(1);   // true: overriding write object
         writeInt(1);
-        writeInt(10);
+        writeInt(1);    // size of array list
         writeByte(0);
         endChunk();
 
@@ -113,7 +107,7 @@ public class CDROutputValueTest extends ValueTestBase {
         endChunk();
         writeEndTag(-1);
 
-        ArrayList<Value1> value = new ArrayList<Value1>();
+        ArrayList<Value1> value = new ArrayList<Value1>(1);
         value.add(new Value1('x', 3));
         getOutputObject().write_value(value);
 
@@ -140,7 +134,7 @@ public class CDROutputValueTest extends ValueTestBase {
         writeByte(1);   // array header
         writeByte(1);
         writeInt(1);
-        writeInt(10);
+        writeInt(1);    // ArrayList size
         writeByte(0);
         endChunk();
 

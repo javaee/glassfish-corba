@@ -28,6 +28,13 @@
         <connection>scm:hg:https://hg.java.net/hg/glassfish-corba~hg</connection>
     </scm>
 
+    <distributionManagement>
+        <site>
+            <id>java_net</id>
+            <url>dav:https://website.java.net/website/glassfish-corba</url>
+        </site>
+    </distributionManagement>
+
     <developers>
         <developer>
             <name>Harshad Vilekar</name>
@@ -75,7 +82,7 @@
             <dependency>
                 <groupId>org.glassfish.simplestub</groupId>
                 <artifactId>simplestub</artifactId>
-                <version>0.1.2</version>
+                <version>0.7</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -172,6 +179,14 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav-jackrabbit</artifactId>
+                <version>2.4</version>
+            </extension>
+        </extensions>
     </build>
 
     <reporting>

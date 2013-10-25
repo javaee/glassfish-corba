@@ -218,14 +218,6 @@ public interface Connection
     public ConnectionCache getConnectionCache();
     public boolean hasSocketChannel();
 
-    // NOTE: This method can throw a connection rebind SystemException.
-    public ByteBuffer read(int size, int offset, int length )
-        throws IOException;
-
-    // NOTE: This method can throw a connection rebind SystemException.
-    public ByteBuffer read(ByteBuffer byteBuffer, int offset,
-                          int length) throws IOException;
-
     public void write(ByteBuffer byteBuffer)
         throws IOException;
 

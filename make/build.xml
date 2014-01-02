@@ -50,18 +50,6 @@
     <target name="init" depends="corba-src.init">
         <property name="test.src.dir"                   value="${root.dir}/test/src/share/classes"/>
 
-        <!-- cobertura related -->
-        <property name="cobertura.dir"                  value="${root.dir}/build/cobertura"/>
-        <property name="cobertura.classes.dir"          value="${cobertura.dir}/classes"/>
-        <property name="cobertura.instrument.datafile"  value="${cobertura.dir}/cobertura.instrument.ser"/>
-        <property name="cobertura.datafile"             value="${cobertura.dir}/cobertura.data.ser"/>
-        <property name="cobertura.merge.datafile"       value="${cobertura.dir}/cobertura.merge.ser"/>
-
-        <!-- Emma related -->
-        <property name="emma.dir"                       value="${root.dir}/build/coverage"/>
-        <property name="emma.classes.dir"               location="${emma.dir}/classes"/>
-        <property name="emma.metadata.file"             location="${emma.dir}/coverage.em"/>
-
         <!-- ORB Test directories -->
 
         <property name="test"                           value="*JUnitTest"/>
@@ -79,11 +67,6 @@
         <mkdir dir="${test-values2.dir}"/>
         <mkdir dir="${test-gensrc.dir}"/>
 
-        <!-- Findbugs related -->
-        <property name="findbugs.dir"                   location="${root.dir}/build/findbugs"/>
-        <property name="findbugs.home"                  value="${root.dir}/lib/findbugs-1.3.9"/>
-        <property name="findbugs.exclude.file"          value="${root.dir}/make/findbugs-filter.xml"/>
-        
         <property name="jdo-jar"                        value="${root.dir}/lib/jdo2-api-2.3-SNAPSHOT.jar"/>
         <property name="jscheme-jar"                    value="${root.dir}/jscheme/lib/jscheme.jar"/>
         <property name="ejb-jar"                        value="${root.dir}/lib/ejb-2_1-api.jar"/>
@@ -95,12 +78,8 @@
         <property name="japex-jar"                      value="${root.dir}/lib/japex.jar"/>
 
         <path id="test-classpath.master">
-            <pathelement location="${emma.classes.dir}"/>
-            <pathelement location="${cobertura.classes.dir}"/>
-
             <path refid="classpath.master"/>
             <pathelement location="${mavenized.test.classes}"/>
-            <pathelement location="${emma-jar}"/>
             <pathelement location="${jdo-jar}"/>
             <pathelement location="${ant-junit-jar}"/>
             <pathelement location="${junit-jar}"/>
@@ -114,8 +93,6 @@
             <pathelement location="${test.output}"/>
             <pathelement location="${test-values1.dir}"/>
             <pathelement location="${test.src.dir}"/>
-
-            <path refid="cobertura.classpath"/>
         </path>
 
         <pathconvert property="test.source.path">
@@ -129,7 +106,7 @@
 
     <!-- ========================= COMPILE-TESTS ========================= -->
     <!-- This target compiles all the ORB unit tests -->
-    <target name="build-tests" depends="init, run-all-test-rmic, compile-tests"/>
+    <target name="build-tests" depends="init, compile-tests"/>
 
     <target name="compile-tests" depends="init, compile-tests-main, compile-tests-values"/>
 
@@ -272,406 +249,6 @@
         </javac>
     </target>
 
-    <!-- ======================== findbugs integration ========= 
-
-         This uses the findbugs command instead of the findbugs ant task because it
-         is easier to use the command than to arrange that findbugs-ant.jar is properly
-         installed where it is needed.
-
-      -->
-
-    <!-- <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/> -->
-   
-    <target name="prepare-findbugs" depends="init">
-        <chmod perm="+x" type="file">
-            <fileset dir="${findbugs.home}/bin">
-                <include name="**"/>
-            </fileset>
-        </chmod>
-    </target>
-
-    <target name="findbugs" depends="init, prepare-findbugs"> 
-        <mkdir dir="${findbugs.dir}"/>
-        <exec executable="${findbugs.home}/bin/findbugs">
-            <arg value="-textui"/>
-            <arg value="-html"/>
-            <arg value="-outputFile"/>
-            <arg file="${findbugs.dir}/orb-fb.html"/>
-            <arg value="-exclude"/>
-            <arg file="${findbugs.exclude.file}"/>
-            <arg value="-sourcepath"/>
-            <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
-            <arg file="${gmbal-jar}"/>
-            <arg file="${management-api-jar}"/>
-            <arg file="${gmbal-jar}"/>
-            <arg file="${libcache.dir}/org.osgi.core.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-asm.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-internal-api.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>
-            <!-- <arg file="${test-classes.dir}"/> -->
-        </exec>
-    </target>
-
-    <target name="findbugs-xml" depends="init, prepare-findbugs"> 
-        <mkdir dir="${findbugs.dir}"/>
-        <exec executable="${findbugs.home}/bin/findbugs">
-            <arg value="-textui"/>
-            <arg value="-xml"/>
-            <arg value="-outputFile"/>
-            <arg file="${findbugs.dir}/orb-fb.xml"/>
-            <arg value="-exclude"/>
-            <arg file="${findbugs.exclude.file}"/>
-            <arg value="-sourcepath"/>
-            <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
-            <arg file="${gmbal-jar}"/>
-            <arg file="${management-api-jar}"/>
-            <arg file="${gmbal-jar}"/>
-            <arg file="${libcache.dir}/org.osgi.core.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-asm.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-internal-api.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
-            <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>
-            <!-- <arg file="${test-classes.dir}"/> -->
-        </exec>
-    </target>
-
-    <target name="increment-build-version" depends="init">
-        <propertyfile file="${root.dir}/make/build.properties">
-            <entry key="corba.major.version" value="3"/>
-            <entry key="corba.minor.version" value="2"/>
-            <entry key="corba.update.version" value="0"/>
-            <entry key="build.int" type="int" value="1" pattern="000" operation="+"/>
-        </propertyfile>
-    </target>
-
-    <target name="update-build" depends="increment-build-version"/>
-  
-    <taskdef name="java2html"
-        classname="de.java2html.anttasks.Java2HtmlTask"
-        classpath="${root.dir}/lib/java2html.jar"
-    />
-
-    <target name="copy-idl" depends="init">
-        <copy todir="www/sources/orb">
-            <fileset dir="${src.dir}">
-                <include name="**/*.idl"/>
-            </fileset>
-        </copy>
-    </target>
-
-    <target name="source-to-html" depends="init,copy-idl">
-        <mkdir dir="${root.dir}/www/sources"/>
-        <java2html
-            srcdir="${src.dir}"
-            destdir="${root.dir}/www/sources/orb"
-            includes="**/*.java"
-            showLineNumbers="true"
-            style="kawa"
-            outputFormat="html"
-            overwrite="true"
-        />
-        <java2html
-            srcdir="${orblib.src.dir}"
-            destdir="${root.dir}/www/sources/orblib"
-            includes="**/*.java"
-            showLineNumbers="true"
-            style="kawa"
-            outputFormat="html"
-            overwrite="true"
-        />
-        <java2html
-            srcdir="${gensrc.dir}"
-            destdir="www/sources/generated"
-            includes="**/*.java"
-            showLineNumbers="true"
-            style="kawa"
-            outputFormat="html"
-            overwrite="true"
-        />
-        <java2html
-            srcdir="${test.src.dir}"
-            destdir="www/sources/test"
-            includes="**/*.java"
-            showLineNumbers="true"
-            style="kawa"
-            outputFormat="html"
-            overwrite="true"
-        />
-    </target>
-
-    <!-- Run all idl invocations for the tests that use idl and generate
-         sources for them -->
-    <target name="run-all-test-idl" depends="init">
-    </target>
-
-
-    <!--
-        Generate test stubs and ties based on the input java file.
-        This should work as follows:
-        1. Check that the .class file is older than the .java file.
-           If so:
-           2. Compile the .java file into the .class file
-           3. Run rmic on the class 
-    -->
-
-    <target name="compile-rmic-class">
-        <echo message="Compiling sources ${sourcefile-name}"/>
-        <javac destdir="${output-dir-value}" 
-                classpathref="test-classpath.master"
-                deprecation="${deprecation}"
-                debug="${javac.debug}" 
-                optimize="${javac.optimize}"
-                failonerror="true">
-            <src path="${test.src.dir}"/>
-            <src path="${test-gensrc.dir}"/>
-            <include name="${sourcefile-name}"/>
-        </javac>
-    </target>
-
-    <!-- Checks to see if the destination directory for the rmic invocation exists
-         and if it does exist then has the class file been changed in reference to 
-         the generated files  -->
-    <target name="check-rmic-class-file-changed" depends="compile-rmic-class">
-        <basename property="cls-name" suffix=".java" file="${sourcefile-name}"/>
-        <dirname property="dir-name" file="${output-dir-value}/${sourcefile-name}"/>
-        <property name="rmic-class" value="${dir-name}/${cls-name}.class"/>
-        <echo message="The rmic class = ${rmic-class}"/>
-        <condition property="rmic-class-file-changed">
-            <or>
-            <!--
-                <uptodate property="rmic-class-file-changed" targetfile="${rmic-class}">
-                    <srcfiles dir="${output-dir-value}" includes="_*_Stub.java"/>
-                </uptodate>
-            -->
-                <uptodate property="rmic-class-file-changed" targetfile="${rmic-class}">
-                    <srcfiles dir="${output-dir-value}" includes="_${cls-name}_Tie.java"/>
-                </uptodate>
-            </or>
-        </condition>
-    </target>
-
-
-    <!-- This target is called repeatedly for each rmic invocation -->
-    <!-- target name="call-rmic" depends="check-rmic-class-file-changed" if="rmic-class-file-changed" -->
-    <target name="call-rmic" depends="compile-rmic-class">
-        <echo message="Running RMI compiler ${classfile-name}"/>
-        <rmic base="${output-dir-value}" debug="${javac.debug}" 
-                    classpathref="test-classpath.master"
-                    includeAntRuntime="no"
-                    iiop="yes">
-            <compilerarg line="-keep ${rmic-args-value}"/>
-            <include name="${classfile-name}"/>
-        </rmic>
-    </target>
-
-
-    <!-- Run all rmic invocations for the tests that use rmic and generate
-         sources for them -->
-    <target name="run-all-test-rmic">
-        <!--
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value=""/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/connections/RemoteService.class"/>
-            <param name="sourcefile-name" value="corba/connections/RemoteService.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value=""/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/exceptiondetailsc/rmiiIServantConnect.class"/>
-            <param name="sourcefile-name" value="corba/exceptiondetailsc/rmiiIServantConnect.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/exceptiondetailsc/rmiiIServantPOA.class"/>
-            <param name="sourcefile-name" value="corba/exceptiondetailsc/rmiiIServantPOA.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value=""/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/genericRPCMSGFramework/BasePortServant.class"/>
-            <param name="sourcefile-name" value="corba/genericRPCMSGFramework/BasePortServant.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value=""/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/islocal/rmiiIServantConnect.class"/>
-            <param name="sourcefile-name" value="corba/islocal/rmiiIServantConnect.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/islocal/rmiiIServantPOA.class"/>
-            <param name="sourcefile-name" value="corba/islocal/rmiiIServantPOA.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/misc/EchoImpl.class"/>
-            <param name="sourcefile-name" value="corba/misc/EchoImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="pi/serverinterceptor/helloRMIIIOP.class"/>
-            <param name="sourcefile-name" value="pi/serverinterceptor/helloRMIIIOP.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="pi/clientinterceptor/helloRMIIIOP.class"/>
-            <param name="sourcefile-name" value="pi/clientinterceptor/helloRMIIIOP.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="pi/clientrequestinfo/helloRMIIIOP.class"/>
-            <param name="sourcefile-name" value="pi/clientrequestinfo/helloRMIIIOP.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="pi/serverrequestinfo/helloRMIIIOP.class"/>
-            <param name="sourcefile-name" value="pi/serverrequestinfo/helloRMIIIOP.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -nolocalstubs"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/cdrstreams/GraphProcessorImpl.class"/>
-            <param name="sourcefile-name" value="corba/cdrstreams/GraphProcessorImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -nolocalstubs"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/cdrext/Server.class"/>
-            <param name="sourcefile-name" value="corba/cdrext/Server.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -nolocalstubs"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/cmvt/GIOPComboImpl.class"/>
-            <param name="sourcefile-name" value="corba/cmvt/GIOPComboImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/copyobjectpolicy/EchoImpl.class"/>
-            <param name="sourcefile-name" value="corba/copyobjectpolicy/EchoImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/driinvocation/Echo.class"/>
-            <param name="sourcefile-name" value="corba/driinvocation/Echo.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -nolocalstubs"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/fragment/FragmentTesterImpl.class"/>
-            <param name="sourcefile-name" value="corba/fragment/FragmentTesterImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -nolocalstubs"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/fragment2/FragmentTesterImpl.class"/>
-            <param name="sourcefile-name" value="corba/fragment2/FragmentTesterImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -nolocalstubs"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/msgtypes/FragmentTesterImpl.class"/>
-            <param name="sourcefile-name" value="corba/msgtypes/FragmentTesterImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -nolocalstubs"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/ortremote/ORTEchoImpl.class"/>
-            <param name="sourcefile-name" value="corba/ortremote/ORTEchoImpl.java"/>
-        </antcall>
-        --> <!--
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/preinvokepostinvoke/MyServant.class"/>
-            <param name="sourcefile-name" value="corba/preinvokepostinvoke/MyServant.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -nolocalstubs"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/rmipoacounter/counterImpl.class"/>
-            <param name="sourcefile-name" value="corba/rmipoacounter/counterImpl.java"/>
-        </antcall>
-        --> <!--
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/stubserialization/HelloServant.class"/>
-            <param name="sourcefile-name" value="corba/stubserialization/HelloServant.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/stubserialization/EchoServant.class"/>
-            <param name="sourcefile-name" value="corba/stubserialization/EchoServant.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/enuminterop/EchoServant.class"/>
-            <param name="sourcefile-name" value="corba/enuminterop/EchoServant.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -nolocalstubs"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/giopheaderpadding/rmiiIServantPOA.class"/>
-            <param name="sourcefile-name" value="corba/giopheaderpadding/rmiiIServantPOA.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -nolocalstubs"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/systemexceptions/rmiiIServantPOA.class"/>
-            <param name="sourcefile-name" value="corba/systemexceptions/Server.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value=""/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/rogueclient/TesterImpl.class"/>
-            <param name="sourcefile-name" value="corba/rogueclient/TesterImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -always"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/rmic/CImpl.class"/>
-            <param name="sourcefile-name" value="corba/rmic/CImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -always"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/mixedorb/EchoImpl.class"/>
-            <param name="sourcefile-name" value="corba/mixedorb/EchoImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -keep"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="performance/simpleperf/counterImpl.class"/>
-            <param name="sourcefile-name" value="performance/simpleperf/counterImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa -keep"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="performance/simpleperf2/counterImpl.class"/>
-            <param name="sourcefile-name" value="performance/simpleperf2/counterImpl.java"/>
-        </antcall>
-        -->
-    </target>
 
     <!-- Macro used to run CTF tests.  
          Some of these are also junit tests, but cannot be run directly under the junit ant task. -->
@@ -708,15 +285,6 @@
                 <jvmarg value="-Dcom.sun.corba.ee.ORBDebugForkedProcess=${debug.forked.process}"/>
                 <jvmarg value="-Dcom.sun.corba.ee.ORBDebugStubGeneration=false"/>
                 <jvmarg value="-Djunit.report.dir=junitreports"/>
-                <jvmarg value="-Demma.coverage.out.file=../../${emma.dir}/orb_coverage.ec"/>
-                <jvmarg value="-Demma.coverage.out.merge=true"/>
-                <jvmarg value="-Demma.rt.control=false"/>
-                <jvmarg value="-Dnet.sourceforge.cobertura.datafile=../../${cobertura.datafile}"/>
-
-                <!--
-                <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${tools-jar}:${emma-jar}:${gmbal-jar}:${management-api-jar}"/>
-                <jvmarg value="-Xbootclasspath/p:${toString:test-classpath.master}"/>
-                -->
 
                 <jvmarg line="${debug.args}"/>
                 <jvmarg value="-Xmx200m"/>
@@ -766,17 +334,9 @@
                 <sysproperty key="com.sun.corba.ee.ORBDebugForkedProcess" value="${debug.forked.process}"/>
                 <sysproperty key="com.sun.corba.ee.ORBDebugStubGeneration" value="false"/>
                 <sysproperty key="junit.report.dir" value="junitreports"/>
-                <sysproperty key="emma.coverage.out.file" value="../../${emma.dir}/orb_coverage.ec"/>
-                <sysproperty key="emma.coverage.out.merge" value="true"/>
-                <sysproperty key="emma.rt.control" value="false"/>
-                <sysproperty key="net.sourceforge.cobertura.datafile" value="../../${cobertura.datafile}"/>
                 <classpath>
                     <path refid="test-classpath.master"/>
                 </classpath> 
-                <!--
-                <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${boot.dir}/lib/tools.jar:${emma-jar}:${gmbal-jar}:${management-api-jar}"/> 
-                <jvmarg value="-Xbootclasspath/p:${toString:test-classpath.master}"/> 
-                -->
                 <jvmarg line="${debug.args}"/>
                 <formatter type="xml"/>
                 <test-cases/>
@@ -908,19 +468,6 @@
         <run-test args="-file ../src/share/classes/performance/Tests.tdesc -verbose"/>
     </target>
 
-    <!-- Running cobertura on the ORB (similar to emma)
-    -->
-    <property name="cobertura.lib.dir" value="${root.dir}/lib/cobertura-1.9.4.1"/>
-
-    <path id="cobertura.classpath">
-        <fileset dir="${cobertura.lib.dir}">
-            <include name="cobertura.jar"/>
-            <include name="lib/**/*.jar"/>
-        </fileset>
-    </path>
-
-    <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
-
     <!-- TODO: derive these from the ORB patternsets in src-build.xml.
          This will require more fun with JavaScript.
     -->
@@ -997,71 +544,6 @@
         <include name="javax/rmi/CORBA/**/*.java"/>
         <include name="org/omg/**/*.java"/>
     </patternset>
-    
-    <target name="instrument-cobertura" depends="init">
-        <mkdir dir="${cobertura.classes.dir}"/>
-        <mkdir dir="${classes.dir}"/>
-        <cobertura-instrument todir="${cobertura.classes.dir}" datafile="${cobertura.instrument.datafile}">
-            <fileset dir="${classes.dir}">
-                <patternset refid="gf.orb.all.classes"/>
-            </fileset>            
-        </cobertura-instrument>
-    </target>
-    
-    <target name="merge-cobertura" depends="init">
-        <copy file="${cobertura.instrument.datafile}" tofile="${cobertura.merge.datafile}" overwrite="true" verbose="true"/>
-        <cobertura-merge datafile="${cobertura.merge.datafile}">
-            <fileset dir="${basedir}">
-                <include name="${cobertura.datafile}"/>
-            </fileset>
-        </cobertura-merge>
-    </target>
 
-    <target name="report-cobertura" depends="init, merge-cobertura">
-        <cobertura-report format="html" destdir="${cobertura.dir}" datafile="${cobertura.merge.datafile}">
-            <fileset dir="${src.dir}">
-                <patternset refid="gf.orb.all.sources"/>
-            </fileset>
-        </cobertura-report>
-        <cobertura-report format="xml" destdir="${cobertura.dir}" datafile="${cobertura.merge.datafile}">
-            <fileset dir="${src.dir}">
-                <patternset refid="gf.orb.all.sources"/>
-            </fileset>
-        </cobertura-report>
-    </target>
-
-    <!-- TODO: Should we switch from Emma to Cobertura for coverage analysis?
-         +: Having one is easier to maintain
-         +: GlassFish now uses Cobertura
-         -: Cobertura requires the noenhance build (bug in Cobertura)
-    -->
-
-    <!-- 
-    Running emma on the ORB
-    All emma files will end up in <ws>/build/coverage as follows:
-    build/coverage/classes              contains the instrumented ORB classes
-    build/coverage/report                       contains the generated reports
-    build/coverage/orb_coverage.ec      contains the collected coverage data from running the tests
-
-    The emma target must be run after the build target.  The emma target will:
-    - call init, to set up the properties
-    - call emma-instr, to instrument the appropriate ORB classes
-    - call test, to run all tests against the instrumented code
-    - call emma-report, to finish things up and generate the coverage reports
-    --> 
-
-    <!-- directory that contains emma.jar and emma_ant.jar: -->
-    <property name="emma.lib.dir" value="${basedir}/lib"/>
-
-    <!-- path element used by EMMA taskdef below: -->
-    <path id="emma.lib" >
-    <pathelement location="${emma.lib.dir}/emma.jar"/>
-    <pathelement location="${emma.lib.dir}/emma_ant.jar"/>
-    </path>
-
-
-    <target name="do-rename" depends="clean, rename"/>
-
-<!--    <target name="do-cobertura-test" depends="clean, build-no-enhance, instrument-cobertura, build-tests, test-all, report-cobertura"/>    -->
 </project>
 

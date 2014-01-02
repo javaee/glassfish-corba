@@ -40,31 +40,6 @@
   holder.
 -->
 
-<!--
-    main (src dir, build dir):
-        Contents: The core of the ORB.
-        Delivery: as OSGi bundles:
-            glassfish-corba-orb
-            glassfish-corba-omgapi
-            glassfish-corba-csiv2-idl
-            glassfish-corba-internal-api
-            glassfish-osgi-test (testing osgi only; not delivered)
-
-    Runtime dependencies:
-        Standard for source build:
-            - JDK 5 or later
-            - ant 1.7.1 or later
-        Non-standard (must be available in source build environment)
-            - hg
-        Other maven projects (from local maven repo in source build):
-            - gmbal
-            - management-api
-            - wagon-svn
-            - bnd
-            - maven-ant-tasks
-            - felix
-            - the PFL bundles
--->
 
 <project name="corba-src" basedir="..">
     <description>
@@ -73,11 +48,6 @@
 
     <property name="root.dir"                   value="${basedir}"/>
     <property file="make/build.properties"/>
-    <property name="orb.version"                value="${release.version}-${build.version}"/>
-    <property name="management-api.version"     value="3.1.0-b001"/>
-    <property name="gmbal.version"              value="3.2.0-b003"/>
-    <property name="pfl.version"                value="4.0.0-b003"/>
-    <echo message="Version is ${release.version}-${build.version}"/>
 
     <target name="init">
         <property name="repo.url"
@@ -91,33 +61,15 @@
 
         <!-- Required JAR files -->
         <property name="tools-jar"              value="${java.home}/../lib/tools.jar"/>
-        <property name="emma-jar"               value="${root.dir}/lib/emma.jar"/>
 
         <!-- Places where the build puts things -->
         <property name="build.dir"              location="${root.dir}/build"/>
         <property name="lib.dir"                location="${build.dir}/lib"/>
         <property name="gensrc.dir"             location="${build.dir}/gensrc"/>
         <property name="classes.dir"            location="${build.dir}/classes"/>
-        <property name="orblib.classes.dir"     value="${classes.dir}"/>
-        <property name="releaselib.dir"         location="${build.dir}/release/lib"/>   
-        <property name="libcache.dir"           location="${build.dir}/libcache"/>
 
         <!-- Main ORB build directories -->
         <property name="src.dir"                value="${root.dir}/src/share/classes"/>
-        <property name="orblib.src.dir"         value="${src.dir}"/>
-        <property name="javadoc.dir"            value="${root.dir}/www/javadoc"/>
-        <property name="build.sysclasspath"     value="ignore"/>
-        <property name="omgapi.idl.dir"         value="${root.dir}/omgapi/src/main/idl"/>
-        <property name="omgapi.include.dir"     value="${root.dir}/omgapi/src/main/idl-includes"/>
-
-
-        <property name="m2.repo"          value="${user.home}/.m2/repository"/>
-        <property name="m2-orb.version"   value="4.0.0-b006"/>
-        <property name="idlc.jar"         value="${m2.repo}/com/sun/corba/idlc/${m2-orb.version}/idlc-${m2-orb.version}.jar"/>
-        <property name="internal-api.jar" value="${m2.repo}/org/glassfish/corba/glassfish-corba-internal-api/${m2-orb.version}/glassfish-corba-internal-api-${m2-orb.version}.jar"/>
-        <property name="omgapi.jar"       value="${m2.repo}/org/glassfish/corba/glassfish-corba-omgapi/${m2-orb.version}/glassfish-corba-omgapi-${m2-orb.version}.jar"/>
-        <property name="csiv2-idl.jar"    value="${m2.repo}/org/glassfish/corba/glassfish-corba-csiv2-idl/${m2-orb.version}/glassfish-corba-csiv2-idl-${m2-orb.version}.jar"/>
-        <property name="orb.jar"          value="${m2.repo}/org/glassfish/corba/glassfish-corba-orb/${m2-orb.version}/glassfish-corba-orb-${m2-orb.version}.jar"/>
 
         <property name="mavenized.test.classes" value="${root.dir}/functional-tests/target/test-classes"/>
 
@@ -141,365 +93,24 @@
         <property name="copyright.skip"
             value=".hg,.DS_Store,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom,felix-cache"/>
 
-        <property name="gmbal-jar"           location="${m2.repo}/org/glassfish/gmbal/gmbal/${gmbal.version}/gmbal-${gmbal.version}.jar"/>
-        <property name="management-api-jar"
-                  location="${m2.repo}/org/glassfish/external/management-api/${management-api.version}/management-api-${management-api.version}.jar"/>
-        <property name="org-osgi-core-jar"   location="${m2.repo}/org/apache/felix/org.osgi.core/1.2.0/org.osgi.core-1.2.0.jar"/>
-        <property name="pfl-asm-jar"         location="${m2.repo}/org/glassfish/pfl/pfl-asm/${pfl.version}/pfl-asm-${pfl.version}.jar"/>
-        <property name="pfl-basic-jar"       location="${m2.repo}/org/glassfish/pfl/pfl-basic/${pfl.version}/pfl-basic-${pfl.version}.jar"/>
-        <property name="pfl-basic-tools-jar" location="${m2.repo}/org/glassfish/pfl/pfl-basic-tools/${pfl.version}/pfl-basic-tools-${pfl.version}.jar"/>
-        <property name="pfl-dynamic-jar"     location="${m2.repo}/org/glassfish/pfl/pfl-dynamic/${pfl.version}/pfl-dynamic-${pfl.version}.jar"/>
-        <property name="pfl-tf-jar"          location="${m2.repo}/org/glassfish/pfl/pfl-tf/${pfl.version}/pfl-tf-${pfl.version}.jar"/>
-        <property name="pfl-tf-tools-jar"    location="${m2.repo}/org/glassfish/pfl/pfl-tf-tools/${pfl.version}/pfl-tf-tools-${pfl.version}.jar"/>
-        <property name="pfl-test-jar"        location="${m2.repo}/org/glassfish/pfl/pfl-test/${pfl.version}/pfl-test-${pfl.version}.jar"/>
-
-
-        <path id="dependency.classpath">
-            <pathelement location="${gmbal-jar}"/>
-            <pathelement location="${management-api-jar}"/>
-            <pathelement location="${org-osgi-core-jar}"/>
-            <pathelement location="${pfl-asm-jar}"/>
-            <pathelement location="${pfl-basic-jar}"/>
-            <pathelement location="${pfl-basic-tools-jar}"/>
-            <pathelement location="${pfl-dynamic-jar}"/>
-            <pathelement location="${pfl-tf-jar}"/>
-            <pathelement location="${pfl-tf-tools-jar}"/>
-            <pathelement location="${pfl-test-jar}"/>
-        </path>
 
         <path id="classpath.master">
-            <path refid="dependency.classpath"/>
-
-            <pathelement location="${orb.jar}"/>
-            <pathelement location="${csiv2-idl.jar}"/>
-            <pathelement location="${internal-api.jar}"/>
-            <pathelement location="${omgapi.jar}"/>
             <pathelement location="${classes.dir}"/>
-            <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
+            <pathelement path="${maven.test.classpath}"/>
         </path>
 
-    </target>
-
-
-    <!-- Enhance the ORB for the tracing facility -->
-
-    <target name="compile-enhancer" depends="init">
-        <mkdir dir="${classes.dir}"/>
-        <echo message="Compiling enhancer"/>
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" 
-                classpathref="classpath.master" 
-                deprecation="${deprecation}"
-                debug="${javac.debug}" 
-                optimize="${javac.optimize}"
-                failonerror="true">
-            <include name="com/sun/tools/corba/se/enhancer/**"/>
-        </javac>
-    </target>
-
-
-    <macrodef name="run-enhance">
-        <attribute name="mode"/>
-        <sequential>
-            <java classname="org.glassfish.pfl.tf.tools.enhancer.EnhanceTool"
-                classpathref="test-classpath.master" fork="true" dir="${classes.dir}">
-                <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-                <arg value="-dir"/>
-                <arg value="com/sun/corba/ee/"/>
-                <arg value="-debug"/>
-                <arg value="false"/>
-                <arg value="-verbose"/>
-                <arg value="1"/>
-                <arg value="-rf"/>
-                <arg value="com/sun/corba/ee/spi/tfannotations.properties"/>
-                <arg value="-mode"/>
-                <arg value="@{mode}"/>
-                <arg value="-timingPointClass"/>
-                <arg value="com.sun.corba.ee.impl.orbutil.newtimer.generated.TimingPoints"/>
-                <arg value="-timingPointDir"/>
-                <arg value="${gensrc.dir}"/>
-            </java>
-        </sequential>
-    </macrodef>
-
-    <target name="enhance-orb" depends="init">
-        <!-- Run the tracing enhancer on the class files for corba.tf -->
-        <run-enhance mode="TraceEnhance"/>
-    </target>
-
-    <target name="generate-timing-points" depends="init">
-        <!-- Run the tracing enhancer on the class files for corba.tf -->
-        <run-enhance mode="TimingPoints"/>
-    </target>
-
-
-
-
-
-    <!-- ========================= Build the ORB library ====================  
-        Note that this must work either renamed or not renamed, so both 
-        the relocated directory and the non-relocated directory for
-        ASM are included here.
-
-        There are some classes in the ORB library that are not used at
-        all at runtime.  These classes are excluded from the delivered
-        OSGi bundles for GFv3.
-     -->
-
-    <!-- =================== Copyright header mainenance ================== -->
-
-    <target name="update-copyright-headers" depends="init">
-        <!--
-                This target is used when it is necessary to update the 
-                copyright headers.  See
-                com.sun.corba.ee.spi.orbutil.file.CopyrightProcessor
-                for all of the details.
-                Notes:
-                    - Certain directories are ignored, mainly Mercurial
-                      and CodeManager related directories.
-                    - Files are classified as follows:
-                        - Java-like; uses /* ... */ style block comments
-                        - JavaLine-like; uses // ... style line comments
-                        - XML-like; uses <- -! ... - -> style block comments
-                        - Scheme-like; uses ; ... line comments
-                        - Shell-like; uses # ... line comments
-                        - Binary-like; can not be modified by this tool
-                    - The classification is done as follows, in the order listed:
-                        1. Some files are recognized by exact name (primarily
-                           makefiles)
-                        2. Most files are classified by suffix
-                        3. If a file starts with "#!", it is a shell script.
-                        4. Otherwise we stop and complain, because we need to
-                           be correct for all files.
-                    - The current copyright text lives in
-                      make/headers/copyright.txt.  This is just
-                      the text: it must be formatted appropriately based on
-                      the file type.
-                    - CopyrightProcessor supports a verbose flag, and a 
-                      dryrun flag.  Turning both of these on gives the details
-                      of what will happen, without actually changing anything.
-                    - DO NOT INTERRUPT THIS TARGET!  It can destroy files,
-                      which is hardly catastrophic,
-                      because the file is still in the version control system.
-                    - Do NOT mix header comment changes with other changes!
-
-                Arguments to command:
-                    -verbose: normally set to false, except when debugging this
-                    -dryrun: normally set to false, except when debugging this
-                    -root: set to the root directories to process: 
-                        make, nbproject, src, test, tools, www
-                    -skipdirs: set to the directories to skip:
-                        .hg, Codemgr_wsdata, deleted_files, headers, freezepoint
-                    -copyright: this is set to the copyright template, currently
-                     in make/headers/copyrights.txt
-                    -startYear: set to the default start year for the header
-                     (1997)
-                        
-                The tool is flexible enough to remove old Sun or Oracle
-                copyright headers, leave non-Sun/Oracle copyright headers in
-                place, ignore copyright info that is not in comments, and
-                insert the correct start year into the new copyright header.
-        -->
-        <java classname="com.sun.corba.ee.spi.orbutil.file.CopyrightProcessor"
-            fork="true"
-            dir="${root.dir}">
-            <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-            <classpathref refid="classpath.master"/>
-            <arg value="-validate"/>
-            <arg value="false"/>
-            <arg value="-verbose"/>
-            <arg value="0"/>
-            <arg value="-dryrun"/>
-            <arg value="false"/>
-            <arg value="-root"/>
-            <arg value="."/>
-            <arg value="-skipdirs"/>
-            <arg value="${copyright.skip}"/>
-            <arg value="-copyright"/>
-            <arg value="${copyright.file}"/>
-            <arg value="-startyear"/>
-            <arg value="1997"/>
-        </java>
-    </target>
-
-    <target name="validate-copyright-headers" depends="init">
-        <!--
-            This target is similar to update-copyright-headers,
-            but instead it validates that all files have the correct headers.
-
-        -->
-        <java classname="com.sun.corba.ee.spi.orbutil.file.CopyrightProcessor"
-            fork="true"
-            dir="${root.dir}">
-            <!--
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Xnoagent"/>
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=42365"/>
-            -->
-            <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-            <classpathref refid="classpath.master"/>
-            <arg value="-validate"/>
-            <arg value="true"/>
-            <arg value="-verbose"/>
-            <arg value="0"/>
-            <arg value="-dryrun"/>
-            <arg value="false"/>
-            <arg value="-root"/>
-            <arg value="."/>
-            <arg value="-skipdirs"/>
-            <arg value="${copyright.skip}"/>
-            <arg value="-copyright"/>
-            <arg value="${copyright.file}"/>
-            <arg value="-startyear"/>
-            <arg value="1997"/>
-        </java>
-    </target>
-
-    <!-- ================= Timing points file generation ================ -->
-
-    <target name="check-timing-file-changed" depends="init">
-        <property name="tsrcfile"
-            value="${src.dir}/com/sun/tools/corba/se/timer/timing.xml"/>
-        <property name="tjavafile"
-            value="${gensrc.dir}/com/sun/corba/ee/impl/orbutil/newtimer/generated/TimingPoints.java"/>
-        <condition property="timing-file-changed">
-            <or>
-                <not>
-                    <available file="${tjavafile}"/>
-                </not>
-                <not>
-                    <uptodate targetfile="${tjavafile}" srcfile="${tsrcfile}"/>
-                </not>
-            </or>
-        </condition>
-    </target>
-
-    <target name="compile-timing-points" depends="init">
-        <echo message="Compiling TimingPoints class"/>
-        <javac destdir="${classes.dir}" 
-                classpathref="classpath.master"
-                deprecation="${deprecation}"
-                debug="${javac.debug}" 
-                optimize="${javac.optimize}"
-                failonerror="true"
-                fork="true"
-                memoryMaximumSize="512m"> 
-            <src path="${gensrc.dir}"/>
-            <include name="com/sun/corba/ee/impl/orbutil/newtimer/generated/*"/>
-            <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-            <compilerarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-        </javac>
     </target>
 
     <!-- ========================= CLEAN ========================= -->
 
     <target name="clean"
-        depends="init,clean-cobertura,clean-emma,clean-tests">
+        depends="init,clean-tests">
         <delete dir="${build.dir}"/>
         <delete dir="${test-build.dir}"/>
-        <delete dir="${javadoc.dir}"/>
-    </target>
-
-    <target name="clean-cobertura" depends="init">
-        <delete dir="${cobertura.dir}"/>
-    </target>
-
-    <target name="clean-emma" depends="init">
-        <delete dir="${emma.dir}"/>
     </target>
 
     <target name="clean-tests" depends="init">
         <delete dir="${test.run.base}"/>
     </target>
-
-    <!-- ========================= Renaming ========================= -->
-
-    <target name="rename" depends="init">
-        <mkdir dir="build/rename/ee"/>
-        <java classname="org.glassfish.pfl.basic.tools.file.WorkspaceRename"
-         fork="true" classpathref="classpath.master"
-            dir="${root.dir}" failonerror="true">
-            <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-            <arg value="-verbose"/>
-            <arg value="1"/>
-            <arg value="-dryrun"/>
-            <arg value="false"/>
-            <arg value="-source"/>
-            <arg value="."/>
-            <arg value="-destination"/>
-            <arg value="build/rename/ee"/>
-            <arg value="-version"/>
-            <arg value="ee"/>
-            <arg value="-patterns"/>
-            <arg value="com.sun.corba.ee:com.sun.corba.VERSION"/>
-        </java>
-    </target>
-
-    <target name="rename-quiet" depends="init">
-        <mkdir dir="build/rename/ee"/>
-        <java classname="org.glassfish.pfl.basic.tools.file.WorkspaceRename"
-         fork="true" classpathref="classpath.master"
-            dir="${root.dir}" failonerror="true">
-            <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-            <arg value="-verbose"/>
-            <arg value="0"/>
-            <arg value="-dryrun"/>
-            <arg value="false"/>
-            <arg value="-source"/>
-            <arg value="."/>
-            <arg value="-destination"/>
-            <arg value="build/rename/ee"/>
-            <arg value="-version"/>
-            <arg value="ee"/>
-            <arg value="-patterns"/>
-            <arg value="com.sun.corba.ee:com.sun.corba.VERSION"/>
-        </java>
-    </target>
-
-    
-    <!-- ========================= IDL ========================= -->
-
-
-    <path id="idlc.classpath">
-        <pathelement location="${idlc.jar}"/>
-        <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
-    </path>
-
-
-    <!-- Checks to see if the destination directory for the IDL invocation exists
-         and if it does exist then has the idl file been changed in reference to 
-         the generated files  -->
-    <target name="check-idl-file-changed">
-        <condition property="idl-file-changed">
-            <or>
-                <not>
-                    <available file="${idl-gensrc-dir}"/>
-                </not>
-                <uptodate property="idl-file-changed" targetfile="${idl-value}">
-                    <srcfiles dir="${idl-gensrc-dir}"
-                     includes="${generated-files}"/>
-                </uptodate>
-            </or>
-        </condition>
-    </target>
-
-    <!-- This target is called repeatedly for each IDL invocation -->
-    <target name="call-idl" depends="check-idl-file-changed"
-     if="idl-file-changed">
-        <echo message="Running IDL compiler ${idl-value}"/>
-        <java classname="com.sun.tools.corba.se.idl.toJavaPortable.Compile"
-         classpathref="idlc.classpath" fork="true">
-            <arg line="${td-value}"/>
-            <arg line="${includes-value}"/>
-            <arg line="${corba-value}"/>
-            <arg line="${fall-value}"/>
-            <arg line="${D-value}"/>
-            <arg line="${oldImplBase-value}"/>
-            <arg line="${pkg-translate}"/>
-            <arg line="${pkg-prefixes}"/>
-            <arg value="${idl-value}"/>
-        </java>
-    </target>
-
-    <!-- ============================== main targets ================================== -->
 
 </project>

@@ -190,8 +190,7 @@
                                 <ant antfile="../make/build.xml" target="build-tests">
                                     <property name="test-build.dir" value="${project.build.directory}/test" />
                                     <property name="root.dir" value=".." />
-                                    <property name="m2.repo" value="${settings.localRepository}" />
-                                    <property name="m2-orb.version" value="${project.version}" />
+                                    <property name="maven.test.classpath" refid="maven.test.classpath"/>
                                 </ant>
                             </target>
                         </configuration>
@@ -258,14 +257,12 @@
                                         <ant antfile="../make/build.xml" target="build-tests">
                                             <property name="test-build.dir" value="${project.build.directory}/test" />
                                             <property name="root.dir" value=".." />
-                                            <property name="m2.repo" value="${settings.localRepository}" />
-                                            <property name="m2-orb.version" value="${project.version}" />
+                                            <property name="maven.test.classpath" refid="maven.test.classpath"/>
                                         </ant>
                                         <ant antfile="../make/build.xml" target="test-all">
                                             <property name="test-build.dir" value="${project.build.directory}/test" />
                                             <property name="root.dir" value=".." />
-                                            <property name="m2.repo" value="${settings.localRepository}" />
-                                            <property name="m2-orb.version" value="${project.version}" />
+                                            <property name="maven.test.classpath" refid="maven.test.classpath"/>
                                         </ant>
                                     </target>
                                 </configuration>

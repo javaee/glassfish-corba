@@ -28,23 +28,25 @@
         <connection>scm:hg:https://hg.java.net/hg/glassfish-corba~hg</connection>
     </scm>
 
+<!-- for now, we are using a Wiki page. Should build the site properly before re-enabling. - REG
     <distributionManagement>
         <site>
             <id>java_net</id>
             <url>dav:https://website.java.net/website/glassfish-corba</url>
         </site>
     </distributionManagement>
+-->
 
     <developers>
-        <developer>
-            <name>Harshad Vilekar</name>
-            <email>harshad.vilekar@oracle.com</email>
-            <id>hvilekar</id>
-        </developer>
         <developer>
             <name>Russell Gold</name>
             <email>russell.gold@oracle.com</email>
             <id>russgold</id>
+        </developer>
+        <developer>
+            <name>Harshad Vilekar</name>
+            <email>harshad.vilekar@oracle.com</email>
+            <id>hvilekar</id>
         </developer>
     </developers>
 

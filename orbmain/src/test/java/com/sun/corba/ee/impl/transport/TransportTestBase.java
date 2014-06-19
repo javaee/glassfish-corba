@@ -1,5 +1,43 @@
 package com.sun.corba.ee.impl.transport;
-
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2012-2014 Oracle and/or its affiliates. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License.  You can
+ * obtain a copy of the License at
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+ * or packager/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ *
+ * GPL Classpath Exception:
+ * Oracle designates this particular file as subject to the "Classpath"
+ * exception as provided by Oracle in the GPL Version 2 section of the License
+ * file that accompanied this code.
+ *
+ * Modifications:
+ * If applicable, add the following below the License Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyright [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
+ */
 import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.orb.ORBVersionImpl;
 import com.sun.corba.ee.impl.orb.ObjectKeyCacheEntryImpl;
@@ -19,15 +57,12 @@ import com.sun.corba.ee.spi.threadpool.ThreadPoolManager;
 import com.sun.corba.ee.spi.threadpool.Work;
 import com.sun.corba.ee.spi.threadpool.WorkQueue;
 import com.sun.corba.ee.spi.transport.Connection;
-import com.sun.corba.ee.spi.transport.ConnectionCache;
 import com.sun.corba.ee.spi.transport.EventHandler;
 import com.sun.corba.ee.spi.transport.InboundConnectionCache;
 import com.sun.corba.ee.spi.transport.MessageTraceManager;
 import com.sun.corba.ee.spi.transport.Selector;
 import com.sun.corba.ee.spi.transport.TcpTimeouts;
 import com.sun.corba.ee.spi.transport.TransportManager;
-import org.glassfish.simplestub.SimpleStub;
-import org.glassfish.simplestub.Stub;
 import org.junit.Before;
 
 import java.io.ByteArrayInputStream;
@@ -49,23 +84,26 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import static com.meterware.simplestub.Stub.createStrictStub;
+import static com.meterware.simplestub.Stub.createStub;
+
 public class TransportTestBase {
-    private OrbFake orb = Stub.create(OrbFake.class);
-    private ORBDataFake orbData = Stub.create(ORBDataFake.class);
-    private SelectorProviderFake selectorProvider = Stub.create(SelectorProviderFake.class);
-    private SocketChannelFake socketChannel = Stub.create(SocketChannelFake.class, selectorProvider);
-    private ConnectionCacheFake connectionCache = Stub.create(ConnectionCacheFake.class);
-    private WorkQueueFake workQueue = Stub.create(WorkQueueFake.class);
+    private OrbFake orb = createStrictStub(OrbFake.class);
+    private ORBDataFake orbData = createStrictStub(ORBDataFake.class);
+    private SelectorProviderFake selectorProvider = createStrictStub(SelectorProviderFake.class);
+    private SocketChannelFake socketChannel = createStrictStub(SocketChannelFake.class, selectorProvider);
+    private ConnectionCacheFake connectionCache = createStrictStub(ConnectionCacheFake.class);
+    private WorkQueueFake workQueue = createStrictStub(WorkQueueFake.class);
     private AcceptorFake acceptor;
     private ConnectionImpl connection;
     private SocketFake socket = new SocketFake();
     private List<MessageMediator> mediators = new ArrayList<MessageMediator>();
-    private TcpTimeoutsFake tcpTimeouts = Stub.create(TcpTimeoutsFake.class);
-    private WaiterFake waiter = Stub.create(WaiterFake.class);
-    private TransportManagerFake transportManager = Stub.create(TransportManagerFake.class);
-    private TransportSelectorFake selector = Stub.create(TransportSelectorFake.class);
-    private ThreadPoolManagerFake threadPoolManager = Stub.create(ThreadPoolManagerFake.class);
-    private ThreadPoolFake threadPool = Stub.create(ThreadPoolFake.class);
+    private TcpTimeoutsFake tcpTimeouts = createStrictStub(TcpTimeoutsFake.class);
+    private WaiterFake waiter = createStrictStub(WaiterFake.class);
+    private TransportManagerFake transportManager = createStrictStub(TransportManagerFake.class);
+    private TransportSelectorFake selector = createStrictStub(TransportSelectorFake.class);
+    private ThreadPoolManagerFake threadPoolManager = createStrictStub(ThreadPoolManagerFake.class);
+    private ThreadPoolFake threadPool = createStrictStub(ThreadPoolFake.class);
 
     final protected ORB getOrb() {
         return orb;
@@ -125,7 +163,7 @@ public class TransportTestBase {
         selector.workQueue = workQueue;
         tcpTimeouts.waiter = waiter;
         socketChannel.socket = socket;
-        acceptor = Stub.create(AcceptorFake.class, orb, 0, "name", "type");
+        acceptor = createStub(AcceptorFake.class, orb, 0, "name", "type");
     }
 
     protected void readFromNio(byte[] data) throws IOException {
@@ -173,7 +211,6 @@ public class TransportTestBase {
         return mediators;
     }
 
-    @SimpleStub(strict = true)
     static abstract class ORBDataFake implements ORBData {
         private TcpTimeouts transportTcpTimeouts;
         private boolean useSelectThread = true;
@@ -239,7 +276,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict = true)
     static abstract class OrbFake extends ORB {
 
         private ORBDataFake data;
@@ -273,7 +309,7 @@ public class TransportTestBase {
 
         @Override
         public ObjectKeyCacheEntry extractObjectKeyCacheEntry(byte[] objKey) {
-            return new ObjectKeyCacheEntryImpl(Stub.create(ObjectKeyFake.class));
+            return new ObjectKeyCacheEntryImpl(createStub(ObjectKeyFake.class));
         }
 
         @Override
@@ -285,7 +321,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub
     static abstract class ObjectKeyFake implements ObjectKey {
         private static RequestDispatcher requestDispatcher;
 
@@ -295,7 +330,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict = true)
     static abstract class SelectorFake extends AbstractSelector {
         private Set<SelectionKey> selectedKeys = new HashSet<SelectionKey>();
 
@@ -310,7 +344,7 @@ public class TransportTestBase {
 
         @Override
         protected SelectionKey register(AbstractSelectableChannel ch, int ops, Object att) {
-            SelectionKeyFake selectionKey = Stub.create(SelectionKeyFake.class, this);
+            SelectionKeyFake selectionKey = createStrictStub(SelectionKeyFake.class, this);
             selectedKeys.add(selectionKey);
             return selectionKey;
         }
@@ -330,15 +364,13 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict = true)
     static abstract class SelectorProviderFake extends SelectorProvider {
         @Override
         public AbstractSelector openSelector() throws IOException {
-            return Stub.create(SelectorFake.class, this);
+            return createStrictStub(SelectorFake.class, this);
         }
     }
 
-    @SimpleStub(strict = true)
     static abstract class SocketChannelFake extends SocketChannel {
         private byte[] dataWritten = new byte[0];
         private byte[] readableData;
@@ -433,7 +465,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict = true)
     static abstract class TcpTimeoutsFake implements TcpTimeouts {
         private Waiter waiter;
 
@@ -443,7 +474,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict = true)
     static abstract class ConnectionCacheFake implements InboundConnectionCache {
         private int numRemoveCalls;
 
@@ -457,7 +487,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict = true)
     static abstract class WaiterFake implements TcpTimeouts.Waiter {
         @Override
         public boolean isExpired() {
@@ -474,7 +503,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict=true)
     static abstract class SelectionKeyFake extends AbstractSelectionKey {
         private SelectorFake selector;
 
@@ -487,7 +515,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict = true)
     static abstract class WorkQueueFake implements WorkQueue {
         private Queue<Work> items = new ArrayDeque<Work>();
 
@@ -497,7 +524,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict=true)
     static abstract class TransportManagerFake implements TransportManager {
         private MessageTraceManager mtm = new MessageTraceManagerImpl();
         public TransportSelectorFake selector;
@@ -513,7 +539,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict=true)
     static abstract class TransportSelectorFake implements Selector {
         public WorkQueueFake workQueue;
 
@@ -532,7 +557,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict=true)
     static abstract class ThreadPoolManagerFake implements ThreadPoolManager {
         private ThreadPool threadPool;
 
@@ -542,7 +566,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub(strict=true)
     static abstract class ThreadPoolFake implements ThreadPool {
         private WorkQueue workQueue;
 
@@ -552,7 +575,6 @@ public class TransportTestBase {
         }
     }
 
-    @SimpleStub
     static abstract class AcceptorFake extends AcceptorBase {
         protected AcceptorFake(ORB orb, int port, String name, String type) {
             super(orb, port, name, type);
@@ -560,8 +582,8 @@ public class TransportTestBase {
     }
 
     private class SocketFake extends Socket {
-        private InputStream inputStream;
-        private OutputStream outputStream;
+        private InputStream inputStream = null;
+        private OutputStream outputStream = null;
 
         public SocketChannel getChannel() {
             return socketChannel;

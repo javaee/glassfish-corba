@@ -2,7 +2,7 @@ package com.sun.corba.ee.impl.encoding;
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,18 +42,19 @@ package com.sun.corba.ee.impl.encoding;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.util.RepositoryId;
 import com.sun.corba.ee.spi.orb.ORBVersionFactory;
-import org.glassfish.simplestub.Stub;
 import org.junit.Test;
 import org.omg.CORBA.VM_TRUNCATABLE;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static com.meterware.simplestub.Stub.createStrictStub;
+
 public class CDROutputValueTest extends ValueTestBase {
 
     static final String ARRAY_LIST_REPID = "RMI:java.util.ArrayList:F655154F32815380:7881D21D99C7619D";
 
-    Value1Helper value1Helper = Stub.create(Value1Helper.class);
+    Value1Helper value1Helper = createStrictStub(Value1Helper.class);
 
     @Test
     public void canWriteStringValue() throws IOException {

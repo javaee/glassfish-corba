@@ -2,7 +2,7 @@ package com.sun.corba.ee.impl.encoding;
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,6 +39,7 @@ package com.sun.corba.ee.impl.encoding;
  * holder.
  */
 
+import com.meterware.simplestub.Stub;
 import com.sun.corba.ee.impl.orb.ORBImpl;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
@@ -54,11 +55,8 @@ import com.sun.corba.ee.spi.transport.ByteBufferPool;
 import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.corba.ee.spi.transport.MessageTraceManager;
 import com.sun.corba.ee.spi.transport.TransportManager;
-import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import com.sun.org.omg.SendingContext.CodeBase;
 import org.glassfish.corba.testutils.HexBuffer;
-import org.glassfish.simplestub.SimpleStub;
-import org.glassfish.simplestub.Stub;
 import org.junit.Before;
 import org.omg.CORBA.portable.OutputStream;
 import org.omg.CORBA.portable.ValueFactory;
@@ -69,11 +67,12 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sun.corba.ee.impl.encoding.EncodingTestBase.Endian.*;
-import static com.sun.corba.ee.impl.encoding.EncodingTestBase.Fragments.*;
-import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_0;
-import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_1;
-import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.V1_2;
+import static com.meterware.simplestub.Stub.createStrictStub;
+import static com.sun.corba.ee.impl.encoding.EncodingTestBase.Endian.big_endian;
+import static com.sun.corba.ee.impl.encoding.EncodingTestBase.Endian.little_endian;
+import static com.sun.corba.ee.impl.encoding.EncodingTestBase.Fragments.more_fragments;
+import static com.sun.corba.ee.impl.encoding.EncodingTestBase.Fragments.no_more_fragments;
+import static com.sun.corba.ee.spi.ior.iiop.GIOPVersion.*;
 import static org.junit.Assert.*;
 
 public class EncodingTestBase {
@@ -85,14 +84,14 @@ public class EncodingTestBase {
     protected static final byte FF = -1;
     protected static final int PAD = 0;  // use for output tests only, to make comparison possible
 
-    private ORBDataFake orbData = Stub.create(ORBDataFake.class);
-    private ORBFake orb = Stub.create(ORBFake.class);
-    private ConnectionFake connection = Stub.create(ConnectionFake.class);
-    private MessageFake message = Stub.create(MessageFake.class);
-    private MessageFake fragment = Stub.create(MessageFake.class);
-    private ByteBufferPoolFake pool = Stub.create(ByteBufferPoolFake.class);
-    private MessageMediatorFake mediator = Stub.create(MessageMediatorFake.class);
-    private TransportManagerFake transportManager = Stub.create(TransportManagerFake.class);
+    private ORBDataFake orbData = createStrictStub(ORBDataFake.class);
+    private ORBFake orb = createStrictStub(ORBFake.class);
+    private ConnectionFake connection = createStrictStub(ConnectionFake.class);
+    private MessageFake message = createStrictStub(MessageFake.class);
+    private MessageFake fragment = createStrictStub(MessageFake.class);
+    private ByteBufferPoolFake pool = createStrictStub(ByteBufferPoolFake.class);
+    private MessageMediatorFake mediator = createStrictStub(MessageMediatorFake.class);
+    private TransportManagerFake transportManager = createStrictStub(TransportManagerFake.class);
 
     private CDRInputObject inputObject;
     private CDROutputObject outputObject;
@@ -311,7 +310,6 @@ public class EncodingTestBase {
 
     //--------------------------------- fake implementation of a TransportManager --------------------------------------
 
-    @SimpleStub(strict=true)
     static abstract class TransportManagerFake implements TransportManager {
         @Override
         public MessageTraceManager getMessageTraceManager() {
@@ -321,7 +319,6 @@ public class EncodingTestBase {
 
     //-------------------------------------- fake implementation of an ORBData -----------------------------------------
 
-    @SimpleStub(strict=true)
     static abstract class ORBDataFake implements ORBData {
         private AsynchronousAction asynchronousAction;
         private int giopBufferSize = 250;
@@ -368,7 +365,6 @@ public class EncodingTestBase {
 
     //----------------------------------- fake implementation of a ByteBufferPool --------------------------------------
 
-    @SimpleStub(strict=true)
     static abstract class ByteBufferPoolFake implements ByteBufferPool {
         private List<ByteBuffer> buffers = new ArrayList<ByteBuffer>();
 
@@ -389,7 +385,6 @@ public class EncodingTestBase {
 
     //---------------------------------------- fake implementation of the ORB ------------------------------------------
 
-    @SimpleStub(strict = true)
     static abstract class ORBFake extends ORBImpl {
         private ORBDataFake orbData;
         private ORBVersion version = ORBVersionFactory.getFOREIGN();
@@ -440,7 +435,6 @@ public class EncodingTestBase {
 
     //------------------------------------- fake implementation of a Connection ----------------------------------------
 
-    @SimpleStub(strict = true)
     static abstract class ConnectionFake implements Connection {
         int char_encoding = ISO_8859_1;
         int wchar_encoding = UTF_16;
@@ -505,7 +499,6 @@ public class EncodingTestBase {
 
     //---------------------------------- fake implementation of a Message Mediator -------------------------------------
 
-    @SimpleStub(strict = true)
     static abstract class MessageMediatorFake implements MessageMediator {
 
         private Connection connection;
@@ -544,7 +537,6 @@ public class EncodingTestBase {
 
     //--------------------------------------- fake implementation of a Message -----------------------------------------
 
-    @SimpleStub(strict = true)
     static abstract class MessageFake implements FragmentMessage {
         Endian endian = big_endian;
         Fragments fragments = no_more_fragments;

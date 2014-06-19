@@ -1,25 +1,33 @@
 package org.glassfish.corba.annotation.processing;
 
+import com.meterware.simplestub.Stub;
 import org.glassfish.pfl.basic.logex.ExceptionWrapper;
 import org.glassfish.pfl.basic.logex.Message;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.*;
-import javax.lang.model.type.TypeMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.Name;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
-import javax.xml.stream.util.StreamReaderDelegate;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.util.*;
 
+import static com.meterware.simplestub.Stub.createStub;
 import static org.junit.Assert.*;
 
 /**
@@ -31,21 +39,18 @@ public class ExceptionWrapperProcessorTestCase {
 
     private TestRoundEnvironment roundEnvironment;
     private ExceptionWrapperProcessor processor;
-    private TestProcessingEnvironment processingEnvironment;
-    private List<FileObject> files = new ArrayList<FileObject>();
+  private List<FileObject> files = new ArrayList<FileObject>();
     private Set<TypeElement> typeElements;
     private FileGenerator fileGenerator;
     private Date creationDate = new Date();
     private TestElement annotatedClassElement;
     private Map<Class<? extends Annotation>,Set<Element>> annotations = new HashMap<Class<? extends Annotation>, Set<Element>>();
-    private Map<URI, Writer> writers = new HashMap<URI, Writer>();
 
     @Before
     public void setUp() throws Exception {
         roundEnvironment = new TestRoundEnvironment();
-        processingEnvironment = new TestProcessingEnvironment();
         processor = new ExceptionWrapperProcessor();
-        processor.init(processingEnvironment);
+        processor.init(new TestProcessingEnvironment());
         typeElements = new HashSet<TypeElement>();
         annotatedClassElement = createAnnotatedClass("org.glassfish.corba.AnException", "SF");
         fileGenerator = new FileGenerator(annotatedClassElement, creationDate);
@@ -178,7 +183,7 @@ public class ExceptionWrapperProcessorTestCase {
     }
 
     private TestElement createAnnotatedMethod(String methodName, String message) {
-        TestElement methodElement = new TestElement(methodName, annotatedClassElement);
+        TestElement methodElement = createStub(TestElement.class, methodName, annotatedClassElement);
         org.glassfish.pfl.basic.logex.Message annotation = new TestMessage(message);
         methodElement.addAnnotation(annotation);
         getAnnotatedElements(Message.class).add(methodElement);
@@ -205,7 +210,7 @@ public class ExceptionWrapperProcessorTestCase {
     private static TestElement createElement(String fullName) {
         TestElement leaf = null;
         for (String component : fullName.split("\\.")) {
-            leaf = new TestElement(component, leaf);
+            leaf = Stub.createStub(TestElement.class, component, leaf);
         }
         return leaf;
     }
@@ -390,9 +395,7 @@ public class ExceptionWrapperProcessorTestCase {
 
         @Override
         public Writer openWriter() throws IOException {
-            Writer writer = new StringWriter();
-            writers.put(uri,writer);
-            return writer;
+          return new StringWriter();
         }
 
         @Override
@@ -408,7 +411,7 @@ public class ExceptionWrapperProcessorTestCase {
 
     }
 
-    static class TestElement implements TypeElement {
+    abstract static class TestElement implements TypeElement {
         private Element enclosingElement;
         private Name simpleName;
 
@@ -423,62 +426,23 @@ public class ExceptionWrapperProcessorTestCase {
             annotations.add(annotation);
         }
 
-        public TypeMirror asType() {
-            return null;
-        }
-
-        public ElementKind getKind() {
-            return null;
-        }
-
-        public List<? extends AnnotationMirror> getAnnotationMirrors() {
-            return null;
-        }
-
         public <A extends Annotation> A getAnnotation(Class<A> aClass) {
             for (Annotation annotation : annotations)
-                if (aClass.isInstance(annotation)) return (A) annotation;
+                if (aClass.isInstance(annotation)) return castTo(annotation);
             return null;
         }
 
-        public Set<Modifier> getModifiers() {
-            return null;
-        }
+      @SuppressWarnings("unchecked")
+      private <A extends Annotation> A castTo(Annotation annotation) {
+        return (A) annotation;
+      }
 
-        public Name getSimpleName() {
+      public Name getSimpleName() {
             return simpleName;
         }
 
         public Element getEnclosingElement() {
             return enclosingElement;
-        }
-
-        public List<? extends Element> getEnclosedElements() {
-            return null;
-        }
-
-        public <R, P> R accept(ElementVisitor<R, P> rpElementVisitor, P p) {
-            return null;
-        }
-
-        public NestingKind getNestingKind() {
-            return null;
-        }
-
-        public Name getQualifiedName() {
-            return null;
-        }
-
-        public TypeMirror getSuperclass() {
-            return null;
-        }
-
-        public List<? extends TypeMirror> getInterfaces() {
-            return null;
-        }
-
-        public List<? extends TypeParameterElement> getTypeParameters() {
-            return null;
         }
 
         @Override

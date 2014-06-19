@@ -48,46 +48,33 @@
 
 package com.sun.corba.ee.impl.io;
 
-import java.io.IOException;
-import java.io.StreamCorruptedException;
-import java.io.ObjectInputValidation;
-import java.io.NotActiveException;
-import java.io.InvalidObjectException;
-import java.io.InvalidClassException;
-import java.io.OptionalDataException;
-import java.io.Externalizable;
-import java.io.EOFException;
-
-import sun.corba.Bridge ;
-
-import org.omg.CORBA.portable.ValueInputStream;
-
+import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
+import com.sun.corba.ee.impl.misc.ClassInfoCache;
+import com.sun.corba.ee.impl.util.Utility;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
+import com.sun.corba.ee.spi.trace.ValueHandlerRead;
+import com.sun.org.omg.CORBA.AttributeDescription;
+import com.sun.org.omg.CORBA.ExceptionDescription;
+import com.sun.org.omg.CORBA.OperationDescription;
+import com.sun.org.omg.CORBA.ParameterDescription;
+import com.sun.org.omg.CORBA.ValueDefPackage.FullValueDescription;
+import com.sun.org.omg.SendingContext.CodeBase;
+import org.glassfish.pfl.basic.algorithm.ObjectUtility;
+import org.glassfish.pfl.basic.logex.OperationTracer;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
+import org.omg.CORBA.MARSHAL;
+import org.omg.CORBA.ORB;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TCKind;
-import org.omg.CORBA.ORB; 
-import org.omg.CORBA.portable.IndirectionException;
-import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.ValueMember;
-
-import com.sun.org.omg.CORBA.ValueDefPackage.FullValueDescription;
-import com.sun.org.omg.CORBA.AttributeDescription ;
-import com.sun.org.omg.CORBA.OperationDescription ;
-import com.sun.org.omg.CORBA.ParameterDescription ;
-import com.sun.org.omg.CORBA.ExceptionDescription ;
-
-import com.sun.org.omg.SendingContext.CodeBase;  
+import org.omg.CORBA.portable.IndirectionException;
+import org.omg.CORBA.portable.ValueInputStream;
+import sun.corba.Bridge;
 
 import javax.rmi.CORBA.ValueHandler;
-
-import com.sun.corba.ee.spi.logging.OMGSystemException ;
-
-import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
-
-import com.sun.corba.ee.impl.misc.ClassInfoCache ;
-
-import com.sun.corba.ee.impl.util.Utility ;
-import com.sun.corba.ee.spi.trace.ValueHandlerRead;
+import java.io.*;
+import java.io.OptionalDataException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -99,9 +86,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.glassfish.pfl.basic.algorithm.ObjectUtility;
-import org.glassfish.pfl.basic.logex.OperationTracer;
-import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
  * IIOPInputStream is used by the ValueHandlerImpl to handle Java serialization
@@ -531,7 +515,6 @@ public class IIOPInputStream
      *
      * @return the Object read from the stream.
      *
-     * @see #ObjectInputStream()
      * @see #readObject
      * @since JDK 1.2
      */

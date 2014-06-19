@@ -19,10 +19,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.4</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.meterware.simplestub</groupId>
+            <artifactId>simplestub</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

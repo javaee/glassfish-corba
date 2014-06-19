@@ -2,7 +2,7 @@ package com.sun.corba.ee.impl.transport;
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,11 +38,10 @@ package com.sun.corba.ee.impl.transport;
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+
 import com.sun.corba.ee.spi.threadpool.Work;
 import com.sun.corba.ee.spi.transport.Acceptor;
 import com.sun.corba.ee.spi.transport.Connection;
-import org.glassfish.simplestub.SimpleStub;
-import org.glassfish.simplestub.Stub;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,17 +56,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static com.meterware.simplestub.Stub.createStub;
+import static org.junit.Assert.*;
 
 public class SelectorImplTest extends TransportTestBase {
 
     private TimerFake timer = new TimerFake();
     private SelectorImpl selector = new SelectorImpl(getOrb(), timer);
     private EventHandlerFake eventHandler = new EventHandlerFake();
-    private NioSelectorFake selectorStub = Stub.create(NioSelectorFake.class);
-    private SelectableChannelFake channel = Stub.create(SelectableChannelFake.class);
+    private NioSelectorFake selectorStub = createStub(NioSelectorFake.class);
+    private SelectableChannelFake channel = createStub(SelectableChannelFake.class);
 
     @Before
     public void setUpTest() throws Exception {
@@ -242,7 +240,6 @@ public class SelectorImplTest extends TransportTestBase {
         }
     }
 
-    @SimpleStub
     static abstract class NioSelectorFake extends Selector {
         boolean wakeupCalled;
         boolean open;
@@ -293,7 +290,6 @@ public class SelectorImplTest extends TransportTestBase {
         }
     }
 
-    @SimpleStub
     static abstract class SelectableChannelFake extends SelectableChannel {
         private Set<SelectionKeyFake> keys = new HashSet<SelectionKeyFake>();
 

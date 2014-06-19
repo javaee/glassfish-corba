@@ -2,7 +2,7 @@ package com.sun.corba.ee.impl.protocol;
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,8 +38,8 @@ package com.sun.corba.ee.impl.protocol;
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage_1_2;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateRequestMessage_1_0;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.LocateRequestMessage_1_2;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage_1_1;
@@ -55,25 +55,23 @@ import com.sun.corba.ee.spi.protocol.MessageParser;
 import com.sun.corba.ee.spi.transport.Connection;
 import com.sun.corba.ee.spi.transport.MessageTraceManager;
 import com.sun.corba.ee.spi.transport.TransportManager;
-import org.glassfish.simplestub.SimpleStub;
-import org.glassfish.simplestub.Stub;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.omg.CORBA.COMM_FAILURE;
 
 import java.nio.ByteBuffer;
 
+import static com.meterware.simplestub.Stub.createStrictStub;
 import static org.junit.Assert.*;
 
 public class MessageParserTest {
 
     private static final int BUFFER_SIZE = 1357;  // pick a bizarre number that should not occur randomly
 
-    private ORBDataFake orbData = Stub.create(ORBDataFake.class);
-    private ORBFake orb = Stub.create(ORBFake.class);
-    private ConnectionFake connection = Stub.create(ConnectionFake.class);
-    private TransportManagerFake transportManager = Stub.create(TransportManagerFake.class);
+    private ORBDataFake orbData = createStrictStub(ORBDataFake.class);
+    private ORBFake orb = createStrictStub(ORBFake.class);
+    private ConnectionFake connection = createStrictStub(ConnectionFake.class);
+    private TransportManagerFake transportManager = createStrictStub(TransportManagerFake.class);
 
     private MessageParser parser;
 
@@ -86,7 +84,7 @@ public class MessageParserTest {
 
     @Test
     public void oldwhenBufferDoesNotContainEntireHeader_requestMore() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 0 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 0};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         Message message = parser.parseBytes(buffer, connection);
@@ -101,7 +99,7 @@ public class MessageParserTest {
 
     @Test
     public void whenBufferDoesNotContainEntireHeader_requestMoreAndDoNotCreateMediator() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 0 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 0};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -113,7 +111,7 @@ public class MessageParserTest {
 
     @Test
     public void oldwhenBufferContainsHeaderOnly_requestMore() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPCancelRequest, 0, 0, 0, 6, 1, 2 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPCancelRequest, 0, 0, 0, 6, 1, 2};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         Message message = parser.parseBytes(buffer, connection);
@@ -128,7 +126,7 @@ public class MessageParserTest {
 
     @Test
     public void whenBufferContainsHeaderOnly_requestMoreAndDoNotCreateMediator() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPCancelRequest, 0, 0, 0, 6, 1, 2 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPCancelRequest, 0, 0, 0, 6, 1, 2};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -140,7 +138,7 @@ public class MessageParserTest {
 
     @Test
     public void whenBufferIsLittleEndianAndContainsHeaderOnly_requestMoreAndDoNotCreateMediator() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.LITTLE_ENDIAN_BIT, Message.GIOPCancelRequest, 6, 0, 0, 0, 1, 2 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.LITTLE_ENDIAN_BIT, Message.GIOPCancelRequest, 6, 0, 0, 0, 1, 2};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -152,7 +150,7 @@ public class MessageParserTest {
 
     @Test
     public void old_whenBufferContainsWholeMessage_consumeEntireBuffer() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         Message message = parser.parseBytes(buffer, connection);
@@ -166,7 +164,7 @@ public class MessageParserTest {
 
     @Test
     public void whenBufferContainsWholeMessage_consumeEntireBuffer() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -178,7 +176,7 @@ public class MessageParserTest {
 
     @Test
     public void afterConsumingEntireBuffer_offerOfNullBufferClearsMessageMediator() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -188,7 +186,7 @@ public class MessageParserTest {
 
     @Test
     public void whenIsLittleEndianAndBufferContainsWholeMessage_consumeEntireBuffer() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.LITTLE_ENDIAN_BIT, Message.GIOPReply, 6, 0, 0, 0, 1, 2, 3, 4, 5, 6 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.LITTLE_ENDIAN_BIT, Message.GIOPReply, 6, 0, 0, 0, 1, 2, 3, 4, 5, 6};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -200,8 +198,8 @@ public class MessageParserTest {
 
     @Test
     public void oldwhenBufferContainsRestOfMessage_consumeEntireBuffer() {
-        byte[] partMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1 };
-        byte[] wholeMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        byte[] partMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1};
+        byte[] wholeMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6};
         ByteBuffer buffer = ByteBuffer.wrap(partMessage);
         parser.parseBytes(buffer, connection);
 
@@ -217,8 +215,8 @@ public class MessageParserTest {
 
     @Test
     public void whenBufferContainsRestOfMessage_consumeEntireBuffer() {
-        byte[] partMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1 };
-        byte[] wholeMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        byte[] partMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1};
+        byte[] wholeMessage = {'G', 'I', 'O', 'P', 1, 0, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6};
         parser.offerBuffer(ByteBuffer.wrap(partMessage));
 
         parser.offerBuffer(ByteBuffer.wrap(wholeMessage));
@@ -230,7 +228,7 @@ public class MessageParserTest {
 
     @Test
     public void oldwhenBufferContainsWholeMessagePlusMore_consumeMessageAndLeaveMore() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6, 'G' };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6, 'G'};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         Message message = parser.parseBytes(buffer, connection);
@@ -245,8 +243,8 @@ public class MessageParserTest {
     @Test
     public void whenBufferContainsWholeMessageAndMore_consumeMessageBytesAndLeaveRemainder() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6,
-                          1, 2, 3, 4, 5, 6,
-                         'R', 'M', 'I' };
+                1, 2, 3, 4, 5, 6,
+                'R', 'M', 'I'};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -261,8 +259,8 @@ public class MessageParserTest {
     @Test
     public void afterConsumingMessage_offerOfPartialBufferClearsMessageMediator() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6,
-                          1, 2, 3, 4, 5, 6,
-                         'R', 'M', 'I' };
+                1, 2, 3, 4, 5, 6,
+                'R', 'M', 'I'};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -272,7 +270,7 @@ public class MessageParserTest {
 
     @Test
     public void oldwhenBufferContainsWholeMessageNeedingFragments_consumeEntireBufferAndExpectMore() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         Message message = parser.parseBytes(buffer, connection);
@@ -285,7 +283,7 @@ public class MessageParserTest {
 
     @Test
     public void whenBufferContainsWholeMessageNeedingFragments_consumeEntireBuffer() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -299,7 +297,7 @@ public class MessageParserTest {
     @Test
     public void oldwhenBufferContainsFinalFragment_consumeBuffer() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.MORE_FRAGMENTS_BIT, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6,
-                         'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment, 0, 0, 0, 4, 1, 2, 3, 4, 5, 6};
+                'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment, 0, 0, 0, 4, 1, 2, 3, 4, 5, 6};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         Message message1 = parser.parseBytes(buffer, connection);
@@ -315,7 +313,7 @@ public class MessageParserTest {
     @Test
     public void whenBufferContainsFinalFragment_consumeBuffer() {
         byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.MORE_FRAGMENTS_BIT, Message.GIOPRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6,
-                         'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment, 0, 0, 0, 4, 1, 2, 3, 4};
+                'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPFragment, 0, 0, 0, 4, 1, 2, 3, 4};
         ByteBuffer buffer = ByteBuffer.wrap(header);
         parser.offerBuffer(buffer);
         MessageMediator messageMediator1 = parser.getMessageMediator();
@@ -329,7 +327,7 @@ public class MessageParserTest {
 
     @Test
     public void oldwhenStartPositionNonZero_startReadingFromPosition() {
-        byte[] header = {0, 0, 'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPLocateRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6, 'G' };
+        byte[] header = {0, 0, 'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPLocateRequest, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6, 'G'};
         ByteBuffer buffer = ByteBuffer.wrap(header);
         buffer.position(2);
         parser.setNextMessageStartPosition(2);
@@ -346,7 +344,7 @@ public class MessageParserTest {
 
     @Test
     public void whenTimedOutBetweenMessages_doNothing() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -357,7 +355,7 @@ public class MessageParserTest {
 
     @Test
     public void whenMidBodyButNotTimedOut_doNothing() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -378,7 +376,7 @@ public class MessageParserTest {
 
     @Test(expected = COMM_FAILURE.class)
     public void whenTimedOutMidBody_throwAnException() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 2, Message.FLAG_NO_FRAG_BIG_ENDIAN, Message.GIOPReply, 0, 0, 0, 6, 1};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -389,7 +387,7 @@ public class MessageParserTest {
 
     @Test(expected = COMM_FAILURE.class)
     public void whenTimedOutWhileWaitingForFragment_throwAnException() {
-        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6 };
+        byte[] header = {'G', 'I', 'O', 'P', 1, 1, Message.MORE_FRAGMENTS_BIT, Message.GIOPReply, 0, 0, 0, 6, 1, 2, 3, 4, 5, 6};
         ByteBuffer buffer = ByteBuffer.wrap(header);
 
         parser.offerBuffer(buffer);
@@ -400,10 +398,9 @@ public class MessageParserTest {
 
     @Test
     public void whenToStringInvoked_stateIsReported() {
-        assertTrue( parser.toString().contains("expectingMoreData=false"));
+        assertTrue(parser.toString().contains("expectingMoreData=false"));
     }
 
-    @SimpleStub(strict=true)
     static abstract class ORBDataFake implements ORBData {
         private GIOPVersion giopVersion = GIOPVersion.V1_2;
 
@@ -418,7 +415,6 @@ public class MessageParserTest {
         }
     }
 
-    @SimpleStub(strict=true)
     static abstract class ORBFake extends ORB {
         private ORBData orbData;
         private TransportManager transportManager;
@@ -434,13 +430,12 @@ public class MessageParserTest {
         }
     }
 
-    @SimpleStub(strict=true)
     static abstract class ConnectionFake implements Connection {
     }
 
-    @SimpleStub(strict=true)
     static abstract class TransportManagerFake implements TransportManager {
         private MessageTraceManager mtm = new MessageTraceManagerImpl();
+
         @Override
         public MessageTraceManager getMessageTraceManager() {
             return mtm;

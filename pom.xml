@@ -82,9 +82,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.glassfish.simplestub</groupId>
+                <groupId>com.meterware.simplestub</groupId>
                 <artifactId>simplestub</artifactId>
-                <version>0.7</version>
+                <version>1.0.4</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>

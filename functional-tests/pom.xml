@@ -12,6 +12,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.glassfish.gmbal</groupId>
+            <artifactId>gmbal</artifactId>
+            <version>3.2.0-b003</version>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>glassfish-corba-csiv2-idl</artifactId>
             <version>${project.version}</version>
@@ -64,11 +69,6 @@
             <artifactId>pfl-test</artifactId>
             <version>${pfl-version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.gmbal</groupId>
-            <artifactId>gmbal</artifactId>
-            <version>3.2.0-b003</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.external</groupId>

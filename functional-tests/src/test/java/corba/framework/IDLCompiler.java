@@ -56,7 +56,7 @@ public class IDLCompiler extends Compiler
      * Default IDL compiler class name
      */
     protected static final String DEFAULT_IDL_COMPILER_CLASS 
-        = "com.sun.tools.corba.se.idl.toJavaPortable.Compile";
+        = "com.sun.tools.corba.ee.idl.toJavaPortable.Compile";
     
     /**
      * Returns the class name of the compiler.

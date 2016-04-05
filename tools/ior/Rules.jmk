@@ -42,7 +42,7 @@ include $(BUILDDIR)/common/Defs.gmk
 
 TOOLS_OUTPUTDIR=./build
 
-IDLJ_CLASS=com.sun.tools.corba.se.idl.toJavaPortable.Compile
+IDLJ_CLASS=Compile
 
 ORB_CLASS=com.sun.corba.ee.impl.orb.ORBImpl
 ORBSINGLETON_CLASS=com.sun.corba.ee.impl.orb.ORBSingleton

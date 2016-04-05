@@ -116,7 +116,7 @@
         <Package name="~sun.rmi.*"/>
     </Match>
     <Match>
-        <Package name="~com.sun.tools.corba.se.idl.*"/>
+        <Package name="~com.sun.tools.corba.ee.idl.*"/>
     </Match>
     <Match>
         <Package name="~com.sun.corba.ee.org.omg.*"/>

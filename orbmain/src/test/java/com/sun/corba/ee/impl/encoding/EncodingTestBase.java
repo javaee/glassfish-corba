@@ -433,6 +433,15 @@ public class EncodingTestBase {
         }
     }
 
+    //-------------------------------------- fake implementation of a Codebase -----------------------------------------
+
+    static abstract class CodeBaseFake implements CodeBase {
+        @Override
+        public String implementation(String s) {
+            return null;
+        }
+    }
+
     //------------------------------------- fake implementation of a Connection ----------------------------------------
 
     static abstract class ConnectionFake implements Connection {
@@ -441,6 +450,7 @@ public class EncodingTestBase {
         boolean locked;
         private CodeSetComponentInfo.CodeSetContext codeSets;
         List<byte[]> fragments;
+        CodeBase codeBase = createStrictStub(CodeBaseFake.class);
 
         void setCharEncoding(int char_encoding) {
             this.char_encoding = char_encoding;
@@ -461,7 +471,7 @@ public class EncodingTestBase {
 
         @Override
         public CodeBase getCodeBase() {
-            return null;
+            return codeBase;
         }
 
         @Override

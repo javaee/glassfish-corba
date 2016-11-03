@@ -219,7 +219,7 @@ class MemberDefinition implements Constants {
      * Get arguments (a vector of LocalMember)
      */
     public Vector<MemberDefinition> getArguments() {
-        return isMethod() ? new Vector<>() : null;
+        return isMethod() ? new Vector<MemberDefinition>() : null;
     }
 
     /**

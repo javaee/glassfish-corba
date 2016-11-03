@@ -139,19 +139,6 @@ public class Main implements sun.rmi.rmic.Constants {
      */
     public synchronized boolean compile(String argv[]) {
 
-        /*
-         * Handle internal option to use the new (and incomplete) rmic
-         * implementation.  This option is handled here, rather than
-         * in parseArgs, so that none of the arguments will be nulled
-         * before delegating to the new implementation.
-         */
-        for (int i = 0; i < argv.length; i++) {
-            if (argv[i].equals("-Xnew")) {
-                return (new sun.rmi.rmic.newrmic.Main(out,
-                                                      program)).compile(argv);
-            }
-        }
-
         if (!parseArgs(argv)) {
             return false;
         }

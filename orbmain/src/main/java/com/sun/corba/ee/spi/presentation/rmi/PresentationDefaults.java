@@ -40,44 +40,35 @@
 
 package com.sun.corba.ee.spi.presentation.rmi;
 
-import java.security.AccessController ;
-import java.security.PrivilegedAction ;
-
-import com.sun.corba.ee.spi.misc.ORBConstants ;
-
+import com.sun.corba.ee.impl.presentation.rmi.PresentationManagerImpl;
 import com.sun.corba.ee.impl.presentation.rmi.StubFactoryFactoryStaticImpl;
 import com.sun.corba.ee.impl.presentation.rmi.StubFactoryStaticImpl;
-import com.sun.corba.ee.impl.presentation.rmi.PresentationManagerImpl ;
+import com.sun.corba.ee.impl.presentation.rmi.codegen.StubFactoryFactoryCodegenImpl;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 
-import com.sun.corba.ee.impl.presentation.rmi.codegen.StubFactoryFactoryCodegenImpl ;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
+/**
+ * @author Copyright (c) 2007-2012,2016 Oracle and/or its affiliates. All rights reserved.
+ */
 public abstract class PresentationDefaults
 {
-    private static PresentationManager.StubFactoryFactory staticImpl = null ;
-    private static PresentationManager.StubFactoryFactory dynamicImpl = null ;
+    private static PresentationManager.StubFactoryFactory staticImpl = null;
+    private static PresentationManager.StubFactoryFactory dynamicImpl = null;
 
     private PresentationDefaults() {}
 
-    public synchronized static PresentationManager.StubFactoryFactory 
-        getDynamicStubFactoryFactory()
-    {
-        if (dynamicImpl == null) {
-            dynamicImpl =
-                new StubFactoryFactoryCodegenImpl();
-        }
+    synchronized static PresentationManager.StubFactoryFactory getDynamicStubFactoryFactory() {
+        if (dynamicImpl == null) dynamicImpl = new StubFactoryFactoryCodegenImpl();
 
         return dynamicImpl ;
     }
 
-    public synchronized static PresentationManager.StubFactoryFactory 
-        getStaticStubFactoryFactory()
-    {
-        if (staticImpl == null) {
-            staticImpl =
-                new StubFactoryFactoryStaticImpl();
-        }
+    public synchronized static PresentationManager.StubFactoryFactory getStaticStubFactoryFactory() {
+        if (staticImpl == null) staticImpl = new StubFactoryFactoryStaticImpl();
 
-        return staticImpl ;
+        return staticImpl;
     }
 
     public static PresentationManager.StubFactory makeStaticStubFactory( 

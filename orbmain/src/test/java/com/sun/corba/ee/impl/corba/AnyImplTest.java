@@ -38,7 +38,11 @@ package com.sun.corba.ee.impl.corba;
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+
 import com.sun.corba.ee.spi.orb.ORB;
+
+import java.io.Serializable;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.omg.CORBA.Any;
@@ -46,7 +50,12 @@ import org.omg.CORBA.BAD_OPERATION;
 import org.omg.CORBA.TCKind;
 
 import static com.meterware.simplestub.Stub.createStrictStub;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class AnyImplTest {
 
@@ -71,7 +80,7 @@ public class AnyImplTest {
     @Test(expected = BAD_OPERATION.class)
     public void whenTryingToReadWrongType_throwException() {
         any.insert_octet((byte) 3);
-        assertEquals(3, any.extract_double());
+        assertThat(any.extract_double(), equalTo(3.0));
     }
 
     @Test
@@ -169,6 +178,14 @@ public class AnyImplTest {
         any.insert_string("This is a test");
         assertEquals(TCKind.tk_string, any.type().kind());
         assertEquals("This is a test", any.extract_string());
+    }
+
+    @Test
+    public void whenStringInsertedAsValue_canReadBackValue() throws Exception {
+        any.insert_Value("This is another test");
+
+        assertThat(any.type().kind(), is(TCKind.tk_value_box));
+        assertThat(any.extract_Value(), equalTo((Serializable) "This is another test"));
     }
 
     abstract static class ORBFake extends ORB {

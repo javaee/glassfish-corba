@@ -54,17 +54,17 @@ package com.sun.tools.corba.ee.idl.toJavaPortable;
 // NOTES:
 // -D62023  <klr> Update for Java 2.4 RTF
 
-import java.io.PrintWriter;
-import java.util.Vector;
-
-import com.sun.tools.corba.ee.idl.SymtabEntry;
-import com.sun.tools.corba.ee.idl.TypedefEntry;
-import com.sun.tools.corba.ee.idl.ValueEntry;
-import com.sun.tools.corba.ee.idl.ValueBoxEntry;
 import com.sun.tools.corba.ee.idl.InterfaceState;
 import com.sun.tools.corba.ee.idl.PrimitiveEntry;
 import com.sun.tools.corba.ee.idl.SequenceEntry;
 import com.sun.tools.corba.ee.idl.StringEntry;
+import com.sun.tools.corba.ee.idl.SymtabEntry;
+import com.sun.tools.corba.ee.idl.TypedefEntry;
+import com.sun.tools.corba.ee.idl.ValueBoxEntry;
+import com.sun.tools.corba.ee.idl.ValueEntry;
+
+import java.io.PrintWriter;
+import java.util.Vector;
 
 /**
  *
@@ -78,9 +78,6 @@ public class ValueBoxGen24 extends ValueBoxGen
   {
   } // ctor
 
-  /**
-   * <d62023> - Move from helper to mapped class
-   **/
   protected void writeTruncatable () // <d60929>
   {
       stream.print   ("  private static String[] _truncatable_ids = {");
@@ -93,9 +90,6 @@ public class ValueBoxGen24 extends ValueBoxGen
   } // writeTruncatable
 
  
-  /**
-   * <d62023>  
-   **/
   public void helperRead (String entryName, SymtabEntry entry, PrintWriter stream)
   {
     stream.println ("    if (!(istream instanceof org.omg.CORBA_2_3.portable.InputStream)) {");
@@ -130,9 +124,6 @@ public class ValueBoxGen24 extends ValueBoxGen
       stream.println (indent + "return (java.io.Serializable) tmp;");
   } // helperRead
 
-  /**
-   * <d62023>  
-   **/
   public void helperWrite (SymtabEntry entry, PrintWriter stream)
   {
     stream.println ("    if (!(ostream instanceof org.omg.CORBA_2_3.portable.OutputStream)) {");
@@ -153,9 +144,6 @@ public class ValueBoxGen24 extends ValueBoxGen
     write (0, "    ", "valueType", entry, stream);
   } // helperWrite
 
-  /**
-   * <d62023>  
-   **/
   public int write (int index, String indent, String name, SymtabEntry entry, PrintWriter stream)
   {
     Vector vMembers = ( (ValueEntry) entry ).state ();

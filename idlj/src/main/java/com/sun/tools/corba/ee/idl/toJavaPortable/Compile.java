@@ -124,7 +124,7 @@ import java.util.Vector;
  * the includes line is:
  *
  * <pre>
- * includes=<path1>;<path2>;...;<pathN>
+ * includes=&lt;path1&gt;;&lt;path2&gt;;...;&lt;pathN&gt;
  * </pre>
  *
  * Note that the path separator character, here shown as a semicolon,

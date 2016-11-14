@@ -60,28 +60,20 @@ import java.util.Vector;
  * of what it may contain:
  * <dl>
  * <dt>
- * <pre>
  * case 1: short x;
- * </pre>
- * <dd><short x, &lt;1&gt;, false&gt;
+ * <dd>&lt;short x, &lt;1&gt;, false&gt;
  * <dt>
- * <pre>
  * case 0:
  * case 8:
  * case 2: long x;
- * </pre>
  * <dd>&lt;long x, &lt;0, 8, 2&gt;, false&gt;
  * <dt>
- * <pre>
  * default: long x;
- * </pre>
- * <dd><long x, &lt;>, true&gt;
+ * <dd>&lt;long x, &lt;&gt;, true&gt;
  * <dt>
- * <pre>
  * case 0:
  * case 2:
  * default: char c;
- * </pre>
  * <dd>&lt;char c, &lt;0, 2&gt;, true&gt;
  * </dl>
  **/

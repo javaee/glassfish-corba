@@ -56,22 +56,22 @@ package com.sun.tools.corba.ee.idl.toJavaPortable;
 // -D62794.1 <klr> Don't include operations inherited from abstract valuetypes
 // -D62794.1 <scn> Don't include operations inherited from supported interfaces
 
-import java.io.PrintWriter;
-import java.util.Hashtable;
-import java.util.Enumeration;
-import java.util.Vector;
-
+import com.sun.tools.corba.ee.idl.AttributeEntry;
 import com.sun.tools.corba.ee.idl.GenFileStream;
 import com.sun.tools.corba.ee.idl.InterfaceEntry;
-import com.sun.tools.corba.ee.idl.SymtabEntry;
-import com.sun.tools.corba.ee.idl.TypedefEntry;
-import com.sun.tools.corba.ee.idl.ValueEntry;
 import com.sun.tools.corba.ee.idl.InterfaceState;
 import com.sun.tools.corba.ee.idl.MethodEntry;
-import com.sun.tools.corba.ee.idl.AttributeEntry;
 import com.sun.tools.corba.ee.idl.PrimitiveEntry;
 import com.sun.tools.corba.ee.idl.SequenceEntry;
 import com.sun.tools.corba.ee.idl.StringEntry;
+import com.sun.tools.corba.ee.idl.SymtabEntry;
+import com.sun.tools.corba.ee.idl.TypedefEntry;
+import com.sun.tools.corba.ee.idl.ValueEntry;
+
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  *
@@ -85,17 +85,10 @@ public class ValueGen24 extends ValueGen
   {
   } // ctor
 
-  /**
-   * <d62023> - delete constructor; helper is abstract
-   **/
   protected void writeConstructor ()
   {
   } // writeConstructor
 
-  /**
-   * <d62023> - delete write_value from non-boxed helpers
-   *          - delete _write from non-boxed helpers
-   **/
   public void helperWrite (SymtabEntry entry, PrintWriter stream)
   {
     // REVISIT: Abstract/Custom??
@@ -103,9 +96,6 @@ public class ValueGen24 extends ValueGen
     stream.println ("    ((org.omg.CORBA_2_3.portable.OutputStream) ostream).write_value (value, id ());");
   } // helperWrite
 
-  /**
-   * <d62023> 
-   **/
   public void helperRead (String entryName, SymtabEntry entry, PrintWriter stream)
   {
     // REVISIT: Abstract/Custom??
@@ -113,18 +103,11 @@ public class ValueGen24 extends ValueGen
     stream.println ("    return (" + entryName + ")((org.omg.CORBA_2_3.portable.InputStream) istream).read_value (id ());");
   } // helperRead
 
-  /**
-   * <d62023> - suppress initializers from mapped value; now generated in
-   *    the Helper class and Factory class
-   **/
   protected void writeInitializers ()
   {
         // override to do nothing 
   } // writeInitializers
 
-  /**
-   * <d62023> - Goes in mapped class, not Helper
-   **/
   protected void writeTruncatable () // <d60929>
   {
     if (!v.isAbstract ()) {
@@ -167,10 +150,6 @@ public class ValueGen24 extends ValueGen
     }
   }
 
-  /**
-   * <d62023> CustomMarshal -> CustomValue for custom valuetypes
-   *          mapped class is abstract
-   **/
   protected void writeHeading ()
   {
     ImplStreamWriter isw = new ImplStreamWriter() ;
@@ -229,9 +208,6 @@ public class ValueGen24 extends ValueGen
     stream.println ("{");
   } // writeHeading
 
-  /**
-   * <d62023> - private state maps to protected, not default
-   **/
   protected void writeMembers ()
   {
     // if the value type contains no data members, a null return is expected
@@ -257,10 +233,6 @@ public class ValueGen24 extends ValueGen
     stream.println();
   } // writeMembers
 
-  /**
-   * <d62023> Methods need to be abstract
-   *          writeStreamable
-   **/
   protected void writeMethods ()
   {
     // contained vector contains methods, attributes, const, enums, exceptions,
@@ -306,9 +278,6 @@ public class ValueGen24 extends ValueGen
       writeStreamableMethods ();
   } // writeMethods
 
-  /**
-   * <d62023> Call super._read()
-   **/
   public int read (int index, String indent, String name, SymtabEntry entry, PrintWriter stream)
   {
     // First do the state members from concrete parent hierarchy
@@ -347,9 +316,6 @@ public class ValueGen24 extends ValueGen
     return index;
   } // read
 
-  /**
-   * <d62023> Call super._write()
-   **/
   public int write (int index, String indent, String name, SymtabEntry entry, PrintWriter stream)
   {
     // First do the state members from concrete parent hierarchy
@@ -386,9 +352,6 @@ public class ValueGen24 extends ValueGen
     return index;
   } // write
 
-  /**
-   * <62023> - generate factory interface and default factory
-   **/
   public void generate (Hashtable symbolTable, ValueEntry v, PrintWriter str)
   {
     this.symbolTable = symbolTable;

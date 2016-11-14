@@ -81,21 +81,12 @@ package com.sun.tools.corba.ee.idl.toJavaPortable;
 // -D62023<klr> Don't import ValueBase*
 // -D62023<klr> Add corbaLevel
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Locale;
-import java.util.Vector;
-
 import com.sun.tools.corba.ee.idl.ConstEntry;
 import com.sun.tools.corba.ee.idl.EnumEntry;
 import com.sun.tools.corba.ee.idl.ExceptionEntry;
 import com.sun.tools.corba.ee.idl.GenFileStream;
 import com.sun.tools.corba.ee.idl.InterfaceEntry;
+import com.sun.tools.corba.ee.idl.InterfaceState;
 import com.sun.tools.corba.ee.idl.MethodEntry;
 import com.sun.tools.corba.ee.idl.NativeEntry;
 import com.sun.tools.corba.ee.idl.ParameterEntry;
@@ -107,9 +98,18 @@ import com.sun.tools.corba.ee.idl.SymtabEntry;
 import com.sun.tools.corba.ee.idl.TypedefEntry;
 import com.sun.tools.corba.ee.idl.UnionBranch;
 import com.sun.tools.corba.ee.idl.UnionEntry;
-import com.sun.tools.corba.ee.idl.ValueEntry;
 import com.sun.tools.corba.ee.idl.ValueBoxEntry;
-import com.sun.tools.corba.ee.idl.InterfaceState;
+import com.sun.tools.corba.ee.idl.ValueEntry;
+
+import java.io.File;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Locale;
+import java.util.Vector;
 
 /**
  * Class Util is a repository of static members available for general
@@ -547,9 +547,6 @@ public class Util extends com.sun.tools.corba.ee.idl.Util
     return name;
   } // holderName
 
-  /**
-   * <d61056>
-   **/
   public static String helperName (SymtabEntry entry, boolean qualifiedName)
   {
     if (entry instanceof ValueEntry)
@@ -562,7 +559,7 @@ public class Util extends com.sun.tools.corba.ee.idl.Util
       return javaName (entry) + "Helper";
   } // helperName
 
-  public static final short
+  static final short
       TypeFile   = 0,
       StubFile   = 1,
       HelperFile = 2,
@@ -1426,7 +1423,7 @@ public class Util extends com.sun.tools.corba.ee.idl.Util
   // <d62023>
   /**
    * @return true if the current setting of corbaLevel is within delta of 
-   *    the range min <= corbaLevel <= max
+   *    the range min &lt;= corbaLevel &lt;= max
    **/
   public static boolean corbaLevel (float min, float max)
   {
@@ -1439,6 +1436,6 @@ public class Util extends com.sun.tools.corba.ee.idl.Util
   } // corbaLevel
 
   static Hashtable symbolTable = new Hashtable ();
-  static Hashtable packageTranslation = new Hashtable() ;
+  private static Hashtable packageTranslation = new Hashtable() ;
 } // class Util
 

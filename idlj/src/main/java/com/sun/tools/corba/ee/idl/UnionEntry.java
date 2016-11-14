@@ -53,12 +53,12 @@ package com.sun.tools.corba.ee.idl;
 
 // NOTES:
 
+import com.sun.tools.corba.ee.idl.constExpr.Expression;
+
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import com.sun.tools.corba.ee.idl.constExpr.Expression;
 
 /**
  * This is the symbol table entry for unions.
@@ -109,14 +109,14 @@ public class UnionEntry extends com.sun.tools.corba.ee.idl.SymtabEntry
   } // generate
 
   /** Access the union generator.
-      @returns an object which implements the UnionGen interface.
+      @return an object which implements the UnionGen interface.
       @see com.sun.tools.corba.ee.idl.UnionGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {
     return unionGen;
   } // generator
 
-  public void addBranch (com.sun.tools.corba.ee.idl.UnionBranch branch)
+  void addBranch(com.sun.tools.corba.ee.idl.UnionBranch branch)
   {
     _branches.addElement (branch);
   } // addBranch

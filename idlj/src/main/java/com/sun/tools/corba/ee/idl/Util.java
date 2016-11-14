@@ -57,17 +57,16 @@ package com.sun.tools.corba.ee.idl;
 // -D58319<daz> Add version() method.
 // -D62023<daz> Add absDelta() method to support float computations.
 
+import com.sun.tools.corba.ee.idl.som.cff.FileLocator;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
-
-import com.sun.tools.corba.ee.idl.som.cff.FileLocator;
 
 public class Util
 {
@@ -346,7 +345,7 @@ public class Util
       @return Absolute file name of a given short filename
       @throws FileNotFoundException The file does not exist in the
        current user or specified directories.
-      @see java.io.File.getAbsolutePath */
+      @see java.io.File#getAbsolutePath */
   public static String getAbsolutePath (String filename, Vector includePaths) throws FileNotFoundException
   {
     String filepath = null;

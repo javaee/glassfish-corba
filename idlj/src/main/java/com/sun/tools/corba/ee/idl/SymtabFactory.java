@@ -113,7 +113,7 @@ public interface SymtabFactory
       char, octet, short, long, etc.  The reason it is not limited to
       these is that, as an extender, you may wish to override these names.
       For instance, when generating Java code, octet translates to byte,
-      so there is an entry in Compile.overrideNames:  <"octet", "byte">
+      so there is an entry in Compile.overrideNames:  &lt;"octet", "byte"&gt;
       and a PrimitiveEntry in the symbol table for "byte". */
   com.sun.tools.corba.ee.idl.PrimitiveEntry primitiveEntry (String name);
 

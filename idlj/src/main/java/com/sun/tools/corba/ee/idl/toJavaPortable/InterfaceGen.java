@@ -61,15 +61,15 @@ package com.sun.tools.corba.ee.idl.toJavaPortable;
 // -D62310   <klr> Fix declaration of interfaces extending abstract intf.
 // -D62023   <klr> Move const definitions back from operations to signature.
 
-import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
-import com.sun.tools.corba.ee.idl.GenFileStream;
 import com.sun.tools.corba.ee.idl.ConstEntry;
+import com.sun.tools.corba.ee.idl.GenFileStream;
 import com.sun.tools.corba.ee.idl.InterfaceEntry;
 import com.sun.tools.corba.ee.idl.MethodEntry;
 import com.sun.tools.corba.ee.idl.SymtabEntry;
+
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  *
@@ -210,9 +210,9 @@ public class InterfaceGen implements com.sun.tools.corba.ee.idl.InterfaceGen, Ja
    * For CORBA 2.3, interfaces are mapped to Operations and Signature
    * interfaces. The Operations interface contains the method definitions.
    * The Signature interface extends the Operations interface and adds
-   * CORBA::Object. <klr>
+   * CORBA::Object.
    **/
-  protected void generateInterface ()
+  private void generateInterface()
   {
     init ();
     openStream ();

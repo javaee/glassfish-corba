@@ -54,11 +54,11 @@ package com.sun.tools.corba.ee.idl.toJavaPortable;
 // NOTES:
 // -D62023   <klr> New file to implement CORBA 2.4 RTF
 
-import java.util.Vector;
-
 import com.sun.tools.corba.ee.idl.MethodEntry;
-import com.sun.tools.corba.ee.idl.ValueEntry;
 import com.sun.tools.corba.ee.idl.ValueBoxEntry;
+import com.sun.tools.corba.ee.idl.ValueEntry;
+
+import java.util.Vector;
 
 /**
  *
@@ -75,7 +75,6 @@ public class Helper24 extends Helper
   /**
    * Generate the heading, including package, imports, class statements,
    * and open curly.
-   * <d62023> - don't implement ValueHelper, make non-boxed helpers abstract
    **/
   protected void writeHeading ()
   {
@@ -97,8 +96,6 @@ public class Helper24 extends Helper
 
   /**
    * Generate the instance variables.
-   * <d62023> - no helper instance except for boxed valuetypes.
-   *          - move truncatable_ids to mapped class.
    **/
   protected void writeInstVars ()
   {
@@ -114,12 +111,6 @@ public class Helper24 extends Helper
     stream.println ();
   } // writeInstVars
 
-  /**
-   * <d62023> generate members of BoxedValueHelper interface if boxed
-   *
-   * <d62023> Hook in here to write factory methods for non-boxed ValueTypes 
-   *          into Helper.
-   **/
   protected void writeValueHelperInterface ()
   {
     if (entry instanceof ValueBoxEntry) {
@@ -147,10 +138,6 @@ public class Helper24 extends Helper
     }
   } // writeHelperFactories
 
-  /**
-   * <d62023> Generate constructors only for boxed valuetype helpers
-   *            All other helpers are abstract.
-   **/
   protected void writeCtors ()
   {
     if (entry instanceof ValueBoxEntry) {

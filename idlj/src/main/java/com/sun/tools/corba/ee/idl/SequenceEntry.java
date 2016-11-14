@@ -53,11 +53,11 @@ package com.sun.tools.corba.ee.idl;
 
 // NOTES:
 
+import com.sun.tools.corba.ee.idl.constExpr.Expression;
+
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import com.sun.tools.corba.ee.idl.constExpr.Expression;
 
 /**
  * This is the symbol table entry for sequences.
@@ -117,7 +117,7 @@ public class SequenceEntry extends com.sun.tools.corba.ee.idl.SymtabEntry
   } // generate
 
   /** Access the sequence generator.
-      @returns an object which implements the SequenceGen interface.
+      @return an object which implements the SequenceGen interface.
       @see com.sun.tools.corba.ee.idl.SequenceGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

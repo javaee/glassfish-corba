@@ -93,7 +93,7 @@ public class ValueBoxEntry extends ValueEntry
   } // generate
 
   /** Access the value generator.
-      @returns an object which implements the ValueGen interface.
+      @return an object which implements the ValueGen interface.
       @see com.sun.tools.corba.ee.idl.ValueGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

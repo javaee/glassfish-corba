@@ -88,7 +88,7 @@ public class NativeEntry extends com.sun.tools.corba.ee.idl.SymtabEntry
   } // generate
 
   /** Access the constant generator.
-      @returns an object which implements the ConstGen interface.
+      @return an object which implements the ConstGen interface.
       @see com.sun.tools.corba.ee.idl.ConstGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

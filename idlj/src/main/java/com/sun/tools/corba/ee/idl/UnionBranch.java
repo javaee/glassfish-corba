@@ -63,26 +63,26 @@ import java.util.Vector;
  * <pre>
  * case 1: short x;
  * </pre>
- * <dd><short x, <1>, false>
+ * <dd><short x, &lt;1&gt;, false&gt;
  * <dt>
  * <pre>
  * case 0:
  * case 8:
  * case 2: long x;
  * </pre>
- * <dd><long x, <0, 8, 2>, false>
+ * <dd>&lt;long x, &lt;0, 8, 2&gt;, false&gt;
  * <dt>
  * <pre>
  * default: long x;
  * </pre>
- * <dd><long x, <>, true>
+ * <dd><long x, &lt;>, true&gt;
  * <dt>
  * <pre>
  * case 0:
  * case 2:
  * default: char c;
  * </pre>
- * <dd><char c, <0, 2>, true>
+ * <dd>&lt;char c, &lt;0, 2&gt;, true&gt;
  * </dl>
  **/
 public class UnionBranch

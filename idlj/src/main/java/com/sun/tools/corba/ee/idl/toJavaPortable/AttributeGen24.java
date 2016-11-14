@@ -55,12 +55,11 @@ package com.sun.tools.corba.ee.idl.toJavaPortable;
 // -D62023   <klr> New file to implement CORBA 2.4 RTF
 //      REVISIT: These changes should be folded into AttributeGen.
 
-import java.io.PrintWriter;
-
-import java.util.Hashtable;
-
-import com.sun.tools.corba.ee.idl.MethodEntry;
 import com.sun.tools.corba.ee.idl.AttributeEntry;
+import com.sun.tools.corba.ee.idl.MethodEntry;
+
+import java.io.PrintWriter;
+import java.util.Hashtable;
 
 /**
  *
@@ -75,7 +74,7 @@ public class AttributeGen24 extends MethodGenClone24
   } // ctor
 
   /**
-   * <d62023-klr> Added for 2.4 RTF
+   * (d62023-klr) Added for 2.4 RTF
    **/
   protected void abstractMethod (Hashtable symbolTable, MethodEntry m, PrintWriter stream)
   {
@@ -94,7 +93,7 @@ public class AttributeGen24 extends MethodGenClone24
   } // abstractMethod
 
   /**
-   * <d62023-klr> Added for 2.4 RTF
+   * (d62023-klr) Added for 2.4 RTF
    **/
   protected void interfaceMethod (Hashtable symbolTable, MethodEntry m, PrintWriter stream)
   {

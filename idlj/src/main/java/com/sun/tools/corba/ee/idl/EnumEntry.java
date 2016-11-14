@@ -100,7 +100,7 @@ public class EnumEntry extends com.sun.tools.corba.ee.idl.SymtabEntry
   } // generate
 
   /** Access the enumerator generator.
-      @returns an object which implements the EnumGen interface.
+      @return an object which implements the EnumGen interface.
       @see com.sun.tools.corba.ee.idl.EnumGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

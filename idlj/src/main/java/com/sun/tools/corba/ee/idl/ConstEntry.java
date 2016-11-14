@@ -53,10 +53,10 @@ package com.sun.tools.corba.ee.idl;
 
 // NOTES:
 
+import com.sun.tools.corba.ee.idl.constExpr.Expression;
+
 import java.io.PrintWriter;
 import java.util.Hashtable;
-
-import com.sun.tools.corba.ee.idl.constExpr.Expression;
 
 /**
  * This is the symbol table entry for constants.
@@ -106,7 +106,7 @@ public class ConstEntry extends com.sun.tools.corba.ee.idl.SymtabEntry
   } // generate
 
   /** Access the constant generator.
-      @returns an object which implements the ConstGen interface.
+      @return an object which implements the ConstGen interface.
       @see com.sun.tools.corba.ee.idl.ConstGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

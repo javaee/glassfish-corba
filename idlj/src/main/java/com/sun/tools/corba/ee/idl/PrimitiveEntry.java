@@ -97,7 +97,7 @@ public class PrimitiveEntry extends com.sun.tools.corba.ee.idl.SymtabEntry
   } // generate
 
   /** Access the primitive type generator.
-      @returns an object which implements the PrimitiveGen interface.
+      @return an object which implements the PrimitiveGen interface.
       @see com.sun.tools.corba.ee.idl.PrimitiveGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

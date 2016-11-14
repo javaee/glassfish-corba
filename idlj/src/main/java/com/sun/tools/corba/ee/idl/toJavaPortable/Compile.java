@@ -91,8 +91,8 @@ import java.util.Vector;
  *   <dd>This is equivalent to the following line in an IDL file:
  *   #define &lt;symbol&gt;
  *
- *   <dt>-f<side>
- *   <dd>Defines what bindings to emit.  <side> is one of client, server, all,
+ *   <dt>-f&lt;side&gt;
+ *   <dd>Defines what bindings to emit.  &lt;side&gt; is one of client, server, all,
  *   serverTIE, allTIE.  serverTIE and allTIE cause delegate model skeletons
  *   to be emitted. If this flag is not used, -fclient is assumed.
  *   allPOA has the same effect as all, except for generation POA type skeletons.
@@ -101,9 +101,9 @@ import java.util.Vector;
  *   <dd>If a file to be generated already exists, do not overwrite it. By
  *   default it is overwritten.
  *
- *   <dt>-sep <string>
+ *   <dt>-sep &lt;string&gt;
  *   <dd>Only valid with -m.  Replace the file separator character with
- *     <string> in the file names listed in the .u file.
+ *     &lt;string&gt; in the file names listed in the .u file.
  *
  *   <dt>-emitAll
  *   <dd>Emit all types, including those found in #included files.
@@ -111,8 +111,8 @@ import java.util.Vector;
  *   <dt>-v
  *   <dd>Verbose mode.
  *
- *   <dt>-pkgPrefix <type> <package>
- *   <dd>Whereever <type> is encountered, make sure it resides within
+ *   <dt>-pkgPrefix &lt;type&gt; &lt;package&gt;
+ *   <dd>Whereever &lt;type&gt; is encountered, make sure it resides within
  *   &lt;package&gt; in all generated files.  &lt;type&gt; is a fully
  *   qualified, java-style name.
  * </dl>
@@ -169,11 +169,7 @@ public class Compile extends com.sun.tools.corba.ee.idl.Compile
         }
       }
     }
-    catch (InvalidArgument e)
-    {
-      System.err.println (e);
-    }
-    catch (IOException e)
+    catch (InvalidArgument | IOException e)
     {
       System.err.println (e);
     }
@@ -197,7 +193,7 @@ public class Compile extends com.sun.tools.corba.ee.idl.Compile
   //  return _factories;
   //} // factories
 
-  public Factories _factories = new Factories();  // 58974 - changed for quicktest
+  private Factories _factories = new Factories();  // 58974 - changed for quicktest
   protected com.sun.tools.corba.ee.idl.Factories factories ()
   {
     return _factories;
@@ -212,7 +208,7 @@ public class Compile extends com.sun.tools.corba.ee.idl.Compile
   /**
    *
    **/
-  protected void preParse ()
+  private void preParse()
   {
     com.sun.tools.corba.ee.idl.toJavaPortable.Util.setSymbolTable(symbolTable);
     com.sun.tools.corba.ee.idl.toJavaPortable.Util.setPackageTranslation(((com.sun.tools.corba.ee.idl.toJavaPortable.Arguments) arguments).packageTranslation) ;

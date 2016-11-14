@@ -55,14 +55,13 @@ package com.sun.tools.corba.ee.idl.toJavaPortable;
 // -D62023   <klr> New file to implement CORBA 2.4 RTF
 // -D62794   <klr> Fix problem with no-arg create functions
 
-import java.io.PrintWriter;
-
-import java.util.Enumeration;
-import java.util.Hashtable;
-
 import com.sun.tools.corba.ee.idl.MethodEntry;
 import com.sun.tools.corba.ee.idl.ParameterEntry;
 import com.sun.tools.corba.ee.idl.SymtabEntry;
+
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  *
@@ -102,12 +101,7 @@ public class MethodGen24 extends MethodGen
     }
   }
 
-  /**
-   * <d62023> Write the methodEntry for a valuetype factory method into
-   *          the Value Helper class. Contents from email from Simon,
-   *          4/25/99.
-   **/
-  protected void helperFactoryMethod (Hashtable symbolTable, MethodEntry m, SymtabEntry t, PrintWriter stream)
+  void helperFactoryMethod(Hashtable symbolTable, MethodEntry m, SymtabEntry t, PrintWriter stream)
   {
     this.symbolTable = symbolTable;
     this.m = m;
@@ -141,10 +135,7 @@ public class MethodGen24 extends MethodGen
     stream.println ();
   } // helperFactoryMethod
 
-  /**
-   * <d62023> - write an abstract method definition
-   **/
-  protected void abstractMethod (Hashtable symbolTable, MethodEntry m, PrintWriter stream)
+  void abstractMethod(Hashtable symbolTable, MethodEntry m, PrintWriter stream)
   {
     this.symbolTable = symbolTable;
     this.m           = m;
@@ -158,12 +149,7 @@ public class MethodGen24 extends MethodGen
     stream.println ();
   } // abstractMethod
 
-  /**
-   * <d62023> - write a default factory method implementation for the
-   *            <value>DefaultFactory. m is a methodEntry for a factory
-   *            method contained in a non-abstract ValueEntry.
-   **/
-  protected void defaultFactoryMethod (Hashtable symbolTable, MethodEntry m, PrintWriter stream)
+  void defaultFactoryMethod(Hashtable symbolTable, MethodEntry m, PrintWriter stream)
   {
     this.symbolTable = symbolTable;
     this.m           = m;
@@ -182,9 +168,6 @@ public class MethodGen24 extends MethodGen
     stream.println ("  }");
   } // defaultFactoryMethod
 
-  /**
-   * <d62023> - remove all valueInitializer junk
-   **/
   protected void writeMethodSignature ()
   {
     // Step 0.  Print the return type and name.
@@ -248,9 +231,6 @@ public class MethodGen24 extends MethodGen
       stream.print (')');
   } // writeMethodSignature
 
-  /**
-   * <d62023> - delete method templates for valuetypes
-   **/
   protected void interfaceMethod (Hashtable symbolTable, MethodEntry m, PrintWriter stream)
   {
     this.symbolTable = symbolTable;

@@ -104,7 +104,7 @@ public class ParameterEntry extends com.sun.tools.corba.ee.idl.SymtabEntry
   } // generate
 
   /** Access the parameter generator.
-      @returns an object which implements the ParameterGen interface.
+      @return an object which implements the ParameterGen interface.
       @see com.sun.tools.corba.ee.idl.ParameterGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

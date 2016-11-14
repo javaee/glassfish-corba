@@ -96,7 +96,7 @@ public class PragmaEntry extends com.sun.tools.corba.ee.idl.SymtabEntry
   } // generate
 
   /** Access the Include type generator.
-      @returns an object which implements the IncludeGen interface.
+      @return an object which implements the IncludeGen interface.
       @see com.sun.tools.corba.ee.idl.IncludeGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

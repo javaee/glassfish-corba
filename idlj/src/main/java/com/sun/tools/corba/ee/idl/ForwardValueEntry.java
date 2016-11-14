@@ -93,7 +93,7 @@ public class ForwardValueEntry extends ForwardEntry
   } // generate
 
   /** Access the interface generator.
-      @returns an object which implements the ForwardValueGen interface.
+      @return an object which implements the ForwardValueGen interface.
       @see com.sun.tools.corba.ee.idl.ValueGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

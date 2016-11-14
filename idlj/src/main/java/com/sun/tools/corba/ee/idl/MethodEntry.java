@@ -104,7 +104,7 @@ public class MethodEntry extends com.sun.tools.corba.ee.idl.SymtabEntry
   } // generate
 
   /** Access the method generator.
-      @returns an object which implements the MethodGen interface.
+      @return an object which implements the MethodGen interface.
       @see com.sun.tools.corba.ee.idl.MethodGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

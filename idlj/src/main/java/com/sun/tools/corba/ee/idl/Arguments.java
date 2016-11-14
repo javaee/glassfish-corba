@@ -59,16 +59,16 @@ package com.sun.tools.corba.ee.idl;
 //  behave in a "proprietary manner" otherwise.
 // -D62023<daz> Add -noWarn option to supress warnings.
 
+import com.sun.tools.corba.ee.idl.som.cff.FileLocator;
+
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Hashtable;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.StringTokenizer;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Field;
-
-import com.sun.tools.corba.ee.idl.som.cff.FileLocator;
+import java.util.Vector;
 
 /**
  * This class is responsible for parsing the command line arguments to the
@@ -84,13 +84,13 @@ public class Arguments
    * must check the arguments passed to it for validity and process the
    * arguments appropriately.  If it detects an invalid argument, it should
    * throw an InvalidArgument exception.  Arguments MUST be of the form
-   * `/<arg> [<qualifiers>]' or `-<arg> [<qualifiers>]' where <qualifiers>
+   * `/&lt;arg&gt; [&lt;qualifiers&gt;]' or `-&lt;arg&gt; [&lt;qualifiers&gt;]' where &lt;qualifiers&gt;
    * is optional (for example, -iC:\includes, `C:\includes' is the qualifier
    * for the argument `i').
    * @param args The arguments which are unknown by the framework.
    * @param properties Environment-style properties collected from the
    * file idl.config.
-   * @exception idl.InvalidArgument if the argument is unknown.
+   * @exception InvalidArgument if the argument is unknown.
    **/
   protected void parseOtherArgs (String[] args, Properties properties) throws InvalidArgument
   {
@@ -302,7 +302,7 @@ public class Arguments
   public Hashtable definedSymbols = new Hashtable ();
 
   /**
-   * <f46082.46.01> True if new module entries are created for each
+   * &lt;f46082.46.01&gt; True if new module entries are created for each
    * re-opened module.
    **/
   public boolean cppModule = false;

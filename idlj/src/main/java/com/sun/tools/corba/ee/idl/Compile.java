@@ -61,13 +61,14 @@ import com.sun.tools.corba.ee.idl.constExpr.ExprFactory;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Stack;
 import java.util.Vector;
 
 /**
  * Compiler usage:
  * <br><br>
  *
- * java com.sun.tools.corba.ee.idl.toJava.compile [options] <idl file>
+ * java com.sun.tools.corba.ee.idl.toJava.compile [options] &lt;idl file&gt;
  * <br><br>
  *
  * where &lt;idl file&gt; is the name of a file containing IDL definitions,
@@ -97,7 +98,7 @@ import java.util.Vector;
  * This file must be in the CLASSPATH.  The format of the includes line is:
  *
  * <pre>
- * includes=<path1>;<path2>;...;<pathN>
+ * includes=&lt;path1&gt;&lt;path2&gt;;...;&lt;pathN&gt;
  * </pre>
  *
  * Note that the path separator character, here shown as a semicolon, is
@@ -226,17 +227,19 @@ import java.util.Vector;
  * checked before executing that code.
  * <br><br>
  **/
+@SuppressWarnings("unchecked")
 public class Compile
 {
   public Compile ()
   {
+    NoPragma noPragma = new NoPragma();
     noPragma.init (preprocessor);
     preprocessor.registerPragma (noPragma);
 
     // <d41197> Reset static variables to allow parsing multiple sources.
     // DO NOT reset SymtabEntry.maxKey because it crashes IDLC.
     com.sun.tools.corba.ee.idl.ParseException.detected  = false;
-    com.sun.tools.corba.ee.idl.SymtabEntry.includeStack = new java.util.Stack ();
+    com.sun.tools.corba.ee.idl.SymtabEntry.includeStack = (Stack<Boolean>) new java.util.Stack ();
     com.sun.tools.corba.ee.idl.SymtabEntry.setEmit      = true;
     //SymtabEntry.maxKey     = -1;
     com.sun.tools.corba.ee.idl.Parser.repIDStack        = new java.util.Stack (); // <d56351>
@@ -251,12 +254,6 @@ public class Compile
   {
     return new com.sun.tools.corba.ee.idl.Factories();
   } // genFactoryName
-
-  protected void registerPragma (PragmaHandler handler)
-  {
-    handler.init (preprocessor);
-    preprocessor.registerPragma (handler);
-  } // registerPragma
 
   /**
    * Initialize the framework.
@@ -299,7 +296,7 @@ public class Compile
     }
     else
     {
-      symbolTable = parser.symbolTable;
+      symbolTable = Parser.symbolTable;
       emitList    = parser.emitList.elements ();
     }
     return emitList;
@@ -308,6 +305,7 @@ public class Compile
   /**
    * Invoke the generators.
    **/
+  @SuppressWarnings("StatementWithEmptyBody")
   protected void generate () throws IOException
   {
     /*
@@ -366,11 +364,7 @@ public class Compile
         generate ();
       }
     }
-    catch (com.sun.tools.corba.ee.idl.InvalidArgument e)
-    {
-      System.err.println (e);
-    }
-    catch (IOException e)
+    catch (InvalidArgument | IOException e)
     {
       System.err.println (e);
     }
@@ -496,10 +490,10 @@ public class Compile
    **/
   public com.sun.tools.corba.ee.idl.Arguments arguments           = null;
   /**
-   * This hashtable contains <real name, alias> pairs.  It is filled in by
+   * This hashtable contains &lt;real name, alias&gt; pairs.  It is filled in by
    * extenders in cases where they wish to override an IDL type name with
    * some other name.  For instance, when mapping to Java, there could be
-   * an overrideNames entry of <"TRUE", "true">.  NOTE:  Do NOT change this
+   * an overrideNames entry of &lt;"TRUE", "true"&gt;.  NOTE:  Do NOT change this
    * variable to a new Hash table.  Just add elements to it.
    **/
   protected Hashtable overrideNames    = new Hashtable ();
@@ -508,9 +502,9 @@ public class Compile
    * executes.  If errors are encountered, the state of the symbol table
    * is undefined.
    **/
-  protected Hashtable symbolTable      = new Hashtable ();
+  protected Hashtable<String,SymtabEntry> symbolTable      = new Hashtable<>();
   /**
-   * This is a vector of strings of the form "IDLfile" or <IDLfile>.  It is
+   * This is a vector of strings of the form "IDLfile" or &lt;IDLfile&gt;.  It is
    * a list of the files included in the given IDL file.  It will be empty
    * until the parse method executes.  If errors are encountered, the state
    * of this vector is undefined.
@@ -522,14 +516,13 @@ public class Compile
    * until the parse method executes.  If errors are encountered, the state of
    * this vector is undefined.
    **/
-  protected Vector includeEntries      = new Vector ();
-  static com.sun.tools.corba.ee.idl.Noop noop           = new com.sun.tools.corba.ee.idl.Noop();
+  private Vector includeEntries      = new Vector ();
+  private static com.sun.tools.corba.ee.idl.Noop noop           = new com.sun.tools.corba.ee.idl.Noop();
   private com.sun.tools.corba.ee.idl.GenFactory genFactory     = null;
   private com.sun.tools.corba.ee.idl.SymtabFactory symtabFactory  = null;
   private ExprFactory   exprFactory    = null;
   private com.sun.tools.corba.ee.idl.Parser parser         = null;
-          com.sun.tools.corba.ee.idl.Preprocessor preprocessor   = new com.sun.tools.corba.ee.idl.Preprocessor();
-  private com.sun.tools.corba.ee.idl.NoPragma noPragma       = new com.sun.tools.corba.ee.idl.NoPragma();
+  private com.sun.tools.corba.ee.idl.Preprocessor preprocessor   = new com.sun.tools.corba.ee.idl.Preprocessor();
   private Enumeration   emitList       = null;
   private String[]      keywords       = null;
 } // class Compile

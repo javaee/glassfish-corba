@@ -139,7 +139,7 @@ public abstract class Expression
 
   /**
    * Coerces a number to the target type of this expression.
-   * @param  number  The number to coerce.
+   * @param obj  The number to coerce.
    * @return  the value of number coerced to the (target) type of
    *  this expression.
    **/
@@ -147,7 +147,7 @@ public abstract class Expression
   {
     if (obj instanceof BigInteger)
     {
-      if (type ().indexOf ("unsigned") >= 0)
+      if (type().contains("unsigned"))
         return toUnsignedTarget ((BigInteger)obj);
       else
         return toSignedTarget ((BigInteger)obj);

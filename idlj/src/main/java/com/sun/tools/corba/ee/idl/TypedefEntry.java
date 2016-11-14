@@ -53,11 +53,11 @@ package com.sun.tools.corba.ee.idl;
 
 // NOTES:
 
+import com.sun.tools.corba.ee.idl.constExpr.Expression;
+
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import com.sun.tools.corba.ee.idl.constExpr.Expression;
 
 /**
  * This is the symbol table entry for typedefs.
@@ -126,7 +126,7 @@ public class TypedefEntry extends com.sun.tools.corba.ee.idl.SymtabEntry
   }
 
   /** Access the typedef generator.
-      @returns an object which implements the TypedefGen interface.
+      @return an object which implements the TypedefGen interface.
       @see com.sun.tools.corba.ee.idl.TypedefGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

@@ -84,8 +84,8 @@ public class RepositoryID
   /**
    * Determine is a supplied string meets the minimal format requirement
    * for a Repository ID.
-   * @return true iff supplied string has form '<format>:<string>', where
-   * <format> is any non-empty string not containing ':'.
+   * @return true iff supplied string has form '&lt;format&gt;:&lt;string&gt;', where
+   * &lt;format&gt; is any non-empty string not containing ':'.
    **/
   public static boolean hasValidForm (String string)
   {

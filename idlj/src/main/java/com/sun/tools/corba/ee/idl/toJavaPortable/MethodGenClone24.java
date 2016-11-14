@@ -59,11 +59,10 @@ package com.sun.tools.corba.ee.idl.toJavaPortable;
 // and AttributeGen24. When the AttributeGen24 changes are merged, this
 // class should be deleted.
 
-import java.io.PrintWriter;
-
-import java.util.Hashtable;
-
 import com.sun.tools.corba.ee.idl.MethodEntry;
+
+import java.io.PrintWriter;
+import java.util.Hashtable;
 
 /**
  *
@@ -78,7 +77,7 @@ public class MethodGenClone24 extends AttributeGen
   } // ctor
 
   /**
-   * <d62023> - write an abstract method definition
+   * write an abstract method definition
    **/
   protected void abstractMethod (Hashtable symbolTable, MethodEntry m, PrintWriter stream)
   {
@@ -95,7 +94,7 @@ public class MethodGenClone24 extends AttributeGen
   } // abstractMethod
 
   /**
-   * <d62023> - delete method templates for valuetypes
+   * delete method templates for valuetypes
    **/
   protected void interfaceMethod (Hashtable symbolTable, MethodEntry m, PrintWriter stream)
   {

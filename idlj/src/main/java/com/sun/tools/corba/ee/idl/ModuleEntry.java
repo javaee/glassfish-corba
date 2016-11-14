@@ -100,7 +100,7 @@ public class ModuleEntry extends com.sun.tools.corba.ee.idl.SymtabEntry
   } // generate
 
   /** Access the module generator.
-      @returns an object which implements the ModuleGen interface.
+      @return an object which implements the ModuleGen interface.
       @see com.sun.tools.corba.ee.idl.ModuleGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

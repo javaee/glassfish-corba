@@ -143,7 +143,7 @@ public class SymtabEntry
 
   /** Get the name of this entry's module.  If there are modules within
       modules, each module name is separated by '/'.
-      @returns this entry's module name. */
+      @return this entry's module name. */
   public String module ()
   {
     return _module;
@@ -281,7 +281,7 @@ public class SymtabEntry
     _isReferencable = value ;
   }
 
-  static Stack<Boolean> includeStack = new Stack<Boolean> ();
+  static Stack<Boolean> includeStack = new Stack<>();
 
   static void enteringInclude ()
   {
@@ -291,7 +291,7 @@ public class SymtabEntry
 
   static void exitingInclude ()
   {
-    setEmit = includeStack.pop ().booleanValue ();
+    setEmit = includeStack.pop();
   } // exitingInclude
 
   /** Other variables besides the default ones can be dynamically placed

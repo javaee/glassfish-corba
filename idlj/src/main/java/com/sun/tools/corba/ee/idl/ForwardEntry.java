@@ -99,7 +99,7 @@ public class ForwardEntry extends com.sun.tools.corba.ee.idl.SymtabEntry impleme
   } // generate
 
   /** Access the interface generator.
-      @returns an object which implements the InterfaceGen interface.
+      @return an object which implements the InterfaceGen interface.
       @see com.sun.tools.corba.ee.idl.InterfaceGen */
   public com.sun.tools.corba.ee.idl.Generator generator ()
   {

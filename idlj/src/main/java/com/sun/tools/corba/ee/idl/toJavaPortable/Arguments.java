@@ -273,15 +273,15 @@ public class Arguments extends com.sun.tools.corba.ee.idl.Arguments
   } // packageFromProps
 
   /**
-   * d57482 <klr> method added so default emitter check could be overriden.
+   * d57482 (klr) method added so default emitter check could be overriden.
    **/
-  protected void setDefaultEmitter () {
+  private void setDefaultEmitter() {
       // If the flag -fclient was not found, assume it.
       if (emit == None) emit = Client;
   }
 
-  protected void setNameModifiers( String skeletonPattern, 
-    String tiePattern ) {
+  private void setNameModifiers(String skeletonPattern,
+                                String tiePattern) {
     if (emit>Client) {
         String tp ;
         String sp ;

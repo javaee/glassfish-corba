@@ -62,6 +62,7 @@ import javax.rmi.CORBA.Tie;
 import java.rmi.Remote;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.SerializablePermission;
 import java.net.MalformedURLException ;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -215,6 +216,8 @@ Tie#deactivate}
      * @return a class which implements the ValueHandler interface.
      */
     public static ValueHandler createValueHandler() {
+        isCustomSerializationPermitted();
+
         if (utilDelegate != null) {
             return utilDelegate.createValueHandler();
         }
@@ -408,5 +411,16 @@ Tie#deactivate}
         return (Properties) AccessController.doPrivileged(
             new GetORBPropertiesFileAction());
     }
+
+    private static void isCustomSerializationPermitted() {
+        SecurityManager sm = System.getSecurityManager();
+        if ( sm != null) {
+            // check that a serialization permission has been
+            // set to allow the loading of the Util delegate
+            // which provides access to custom ValueHandler
+            sm.checkPermission(new SerializablePermission(
+              "enableCustomValueHandler"));
+        }
+    }   
 
 }

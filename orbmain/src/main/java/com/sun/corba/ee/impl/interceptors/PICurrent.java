@@ -40,12 +40,12 @@
 
 package com.sun.corba.ee.impl.interceptors;
 
+import com.sun.corba.ee.spi.logging.OMGSystemException;
 import com.sun.corba.ee.spi.orb.ORB;
+
+import org.omg.CORBA.Any;
 import org.omg.PortableInterceptor.Current;
 import org.omg.PortableInterceptor.InvalidSlot;
-import org.omg.CORBA.Any;
-
-import com.sun.corba.ee.spi.logging.OMGSystemException ;
 
 /**
  * PICurrent is the implementation of Current as specified in the Portable
@@ -88,6 +88,11 @@ public class PICurrent extends org.omg.CORBA.LocalObject
         this.myORB = myORB;
         this.orbInitializing = true;
         slotCounter = 0;
+    }
+
+    @Override
+    public org.omg.CORBA.ORB _orb() {
+        return myORB;
     }
 
     synchronized int getTableSize() {

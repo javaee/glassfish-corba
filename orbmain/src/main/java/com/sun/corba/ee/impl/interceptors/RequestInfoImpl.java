@@ -39,59 +39,45 @@
  */
 package com.sun.corba.ee.impl.interceptors;
 
-import java.io.IOException ;
+import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.util.RepositoryId;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.legacy.connection.Connection;
+import com.sun.corba.ee.spi.legacy.interceptor.RequestInfoExt;
+import com.sun.corba.ee.spi.logging.InterceptorsSystemException;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
+import com.sun.corba.ee.spi.misc.ORBClassLoader;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextDefaults;
+import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
+import com.sun.corba.ee.spi.servicecontext.UnknownServiceContext;
 
-import java.lang.reflect.Method ;
-import java.lang.reflect.InvocationTargetException ;
-
-import java.util.Map ;
-
-import org.omg.PortableInterceptor.ForwardRequest;
-import org.omg.PortableInterceptor.InvalidSlot;
-import org.omg.PortableInterceptor.RequestInfo;
-import org.omg.IOP.ServiceContextHelper;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
-import org.omg.CORBA.ParameterMode;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Map;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_INV_ORDER;
 import org.omg.CORBA.LocalObject;
-import org.omg.CORBA.NamedValue;
 import org.omg.CORBA.NVList;
+import org.omg.CORBA.NamedValue;
 import org.omg.CORBA.Object;
+import org.omg.CORBA.ParameterMode;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.UNKNOWN;
 import org.omg.CORBA.UserException;
 import org.omg.CORBA.portable.ApplicationException;
 import org.omg.CORBA.portable.InputStream;
-             
 import org.omg.Dynamic.Parameter;
-
-import com.sun.corba.ee.spi.legacy.connection.Connection;
-
-import com.sun.corba.ee.spi.legacy.interceptor.RequestInfoExt;
-
-import com.sun.corba.ee.spi.ior.IOR;
-
-import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
-
-import com.sun.corba.ee.spi.orb.ORB;
-
-import com.sun.corba.ee.spi.servicecontext.ServiceContextDefaults;
-import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
-import com.sun.corba.ee.spi.servicecontext.UnknownServiceContext;
-
-import com.sun.corba.ee.spi.misc.ORBClassLoader;
-
-import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
-
-import com.sun.corba.ee.impl.misc.ORBUtility;
-
-import com.sun.corba.ee.impl.util.RepositoryId;
-
-import com.sun.corba.ee.spi.logging.InterceptorsSystemException;
-import com.sun.corba.ee.spi.logging.OMGSystemException;
+import org.omg.IOP.ServiceContextHelper;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
+import org.omg.PortableInterceptor.ForwardRequest;
+import org.omg.PortableInterceptor.InvalidSlot;
+import org.omg.PortableInterceptor.RequestInfo;
 
 /**
  * Implementation of the RequestInfo interface as specified in
@@ -103,7 +89,7 @@ public abstract class RequestInfoImpl
 {
     protected static final InterceptorsSystemException wrapper =
         InterceptorsSystemException.self ;
-    protected static final OMGSystemException stdWrapper =
+    static final OMGSystemException stdWrapper =
         OMGSystemException.self ;
 
     //////////////////////////////////////////////////////////////////////
@@ -117,69 +103,73 @@ public abstract class RequestInfoImpl
 
     // The number of interceptors actually invoked for this client request.
     // See setFlowStackIndex for a detailed description.
-    protected int flowStackIndex = 0;
+    private int flowStackIndex = 0;
 
     // The type of starting point call to make to the interceptors
     // See ClientRequestInfoImpl and ServerRequestInfoImpl for a list of 
     // appropriate constants.
-    protected int startingPointCall;
+    int startingPointCall;
     
     // The type of intermediate point call to make to the interceptors
     // See ServerRequestInfoImpl for a list of appropriate constants.
     // This does not currently apply to client request interceptors but is
     // here in case intermediate points are introduced in the future.
-    protected int intermediatePointCall;
+    int intermediatePointCall;
     
     // The type of ending point call to make to the interceptors
     // See ClientRequestInfoImpl and ServerRequestInfoImpl for a list of 
     // appropriate constants.
-    protected int endingPointCall;
+    int endingPointCall;
     
     // The reply status to return in reply_status.  This is initialized
     // to UNINITIALIZED so that we can tell if this has been set or not.
     protected short replyStatus = UNINITIALIZED;
     
     // Constant for an uninitizlied reply status.
-    protected static final short UNINITIALIZED = -1;
+    static final short UNINITIALIZED = -1;
     
     // Which points we are currently executing (so we can implement the
     // validity table).  
-    protected int currentExecutionPoint;
-    protected static final int EXECUTION_POINT_STARTING = 0;
-    protected static final int EXECUTION_POINT_INTERMEDIATE = 1;
-    protected static final int EXECUTION_POINT_ENDING = 2;
+    int currentExecutionPoint;
+    static final int EXECUTION_POINT_STARTING = 0;
+    static final int EXECUTION_POINT_INTERMEDIATE = 1;
+    static final int EXECUTION_POINT_ENDING = 2;
     
     // Set to true if all interceptors have had all their points
     // executed.
-    protected boolean alreadyExecuted;
+    private boolean alreadyExecuted;
     
     // Sources of request information
     protected Connection     connection;
-    protected ServiceContexts serviceContexts;
-    
+
     // The ForwardRequest object if this request is being forwarded.
     // Either the forwardRequest or the forwardRequestIOR field is set.
     // When set, the other field is set to null initially.  If the other
     // field is queried, it is lazily calculated and cached.  These
     // two attributes are always kept in sync.
-    protected ForwardRequest forwardRequest;
-    protected IOR forwardRequestIOR;
+    private ForwardRequest forwardRequest;
+    private IOR forwardRequestIOR;
 
     // PICurrent's  SlotTable
-    protected SlotTable slotTable;
+    SlotTable slotTable;
 
     // The exception to be returned by received_exception and 
     // received_exception_id
     protected Exception exception;
    
-    protected boolean interceptorsEnabledForThisRequest ;
+    boolean interceptorsEnabledForThisRequest ;
 
     //////////////////////////////////////////////////////////////////////
     //
     // NOTE: IF AN ATTRIBUTE IS ADDED, PLEASE UPDATE RESET();
     //
     //////////////////////////////////////////////////////////////////////
-    
+
+    @Override
+    public org.omg.CORBA.ORB _orb() {
+        return myORB;
+    }
+
     /**
      * Reset the info object so that it can be reused for a retry,
      * for example.
@@ -197,7 +187,7 @@ public abstract class RequestInfoImpl
         currentExecutionPoint = EXECUTION_POINT_STARTING;
         alreadyExecuted = false;
         connection = null;
-        serviceContexts = null;
+        ServiceContexts serviceContexts = null;
         forwardRequest = null;
         forwardRequestIOR = null;
         exception = null;

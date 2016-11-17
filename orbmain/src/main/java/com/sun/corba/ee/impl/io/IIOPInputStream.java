@@ -551,6 +551,11 @@ public class IIOPInputStream
             if (currentObject == null || currentClassDesc == null) {
                 throw new NotActiveException("defaultReadObjectDelegate");
             }
+            
+            if (!currentClassDesc.forClass().isAssignableFrom(
+            		currentObject.getClass())) {
+                throw new IOException("Object Type mismatch");
+            }
 
             if (defaultReadObjectFVDMembers != null &&  defaultReadObjectFVDMembers.length > 0) {
                 // Clear this here so that a recursion back to another
@@ -2395,6 +2400,35 @@ public class IIOPInputStream
                 }
 
                 try {
+                	Class<?> fieldCl = fields[i].getClazz();
+                    if ((objectValue != null)
+                            && (!fieldCl.isAssignableFrom(
+                                    objectValue.getClass()))) {
+                        throw new IllegalArgumentException("Field mismatch");
+                    }
+
+                    Field classField = null;
+                    try {
+                        classField = cl.getDeclaredField(fields[i].getName());
+                    } catch (NoSuchFieldException nsfEx) {
+                        throw new IllegalArgumentException(nsfEx);
+                    } catch (SecurityException secEx) {
+                        throw new IllegalArgumentException(secEx.getCause());
+                    }
+
+                    Class<?> declaredFieldClass = classField.getType();
+
+                    // check input field type is a declared field type
+                    // input field is a subclass of the declared field
+                    if (!declaredFieldClass.isAssignableFrom(fieldCl)) {
+                        throw new IllegalArgumentException(
+                                "Field Type mismatch");
+                    }
+
+                    if (objectValue != null && !fieldCl.isInstance(objectValue)) {
+                        throw new IllegalArgumentException();
+                    }
+                    
                     bridge.putObject( o, fields[i].getFieldID(), objectValue ) ;
                     // reflective code: fields[i].getField().set( o, objectValue ) ;
                 } catch (IllegalArgumentException e) {

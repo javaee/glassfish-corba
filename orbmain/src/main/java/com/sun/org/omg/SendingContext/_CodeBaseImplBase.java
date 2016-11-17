@@ -149,13 +149,13 @@ public abstract class _CodeBaseImplBase extends org.omg.CORBA.portable.ObjectImp
     } // _invoke
 
     // Type-specific CORBA::Object operations
-    private static String[] __ids = {
+    private final static String[] __ids = {
         "IDL:omg.org/SendingContext/CodeBase:1.0", 
         "IDL:omg.org/SendingContext/RunTime:1.0"};
 
     public String[] _ids ()
     {
-        return __ids;
+        return __ids.clone();
     }
 
 

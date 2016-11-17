@@ -202,9 +202,9 @@ abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
 
     // Needed for org.omg.CORBA.Object
 
-    private String[] __ids = { "IDL:omg.org/DynamicAny/DynAny:1.0" };
+    private final String[] __ids = { "IDL:omg.org/DynamicAny/DynAny:1.0" };
 
     public String[] _ids() {
-        return __ids;
+        return __ids.clone();
     }
 }

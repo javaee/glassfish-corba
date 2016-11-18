@@ -2745,10 +2745,24 @@ public class IIOPInputStream
 
         try {
             Field fld = c.getDeclaredField( fieldName ) ;
+            Class fieldCl = fld.getType();
+            if(v != null && !fieldCl.isInstance(v)) {
+                throw new Exception();
+            }
             long key = bridge.objectFieldOffset( fld ) ;
             bridge.putObject( o, key, v ) ;
         } catch (Exception e) {
-            throw utilWrapper.errorSetObjectField( e, fieldName, o, v ) ;
+        	if (o != null) {
+                throw utilWrapper.errorSetObjectField( e, fieldName,
+                    o.toString(),
+                    v.toString() ) ;
+
+            } else {
+                throw utilWrapper.errorSetObjectField( e, fieldName,
+                    "null " + c.getName() + " object",
+                    v.toString() ) ;
+            }
+            
         }
     }
 
@@ -2758,10 +2772,22 @@ public class IIOPInputStream
     {
         try {
             Field fld = c.getDeclaredField( fieldName ) ;
-            long key = bridge.objectFieldOffset( fld ) ;
-            bridge.putBoolean( o, key, v ) ;
+            if ((fld != null) && (fld.getType() == Boolean.TYPE)) {
+                long key = bridge.objectFieldOffset( fld ) ;
+                bridge.putBoolean( o, key, v ) ;
+            } else {
+                throw new InvalidObjectException("Field Type mismatch");
+            }
         } catch (Exception e) {
-            throw utilWrapper.errorSetBooleanField( e, fieldName, o, v ) ;
+            if (o != null) {
+                throw utilWrapper.errorSetBooleanField( e, fieldName,
+                    o.toString(),
+                    new Boolean(v) ) ;
+                } else {
+                    throw utilWrapper.errorSetBooleanField( e, fieldName,
+                        "null " + c.getName() + " object",
+                        new Boolean(v) ) ;
+                }
         }
     }
 
@@ -2771,10 +2797,22 @@ public class IIOPInputStream
     {
         try {
             Field fld = c.getDeclaredField( fieldName ) ;
-            long key = bridge.objectFieldOffset( fld ) ;
-            bridge.putByte( o, key, v ) ;
+            if ((fld != null) && (fld.getType() == Byte.TYPE)) {
+                long key = bridge.objectFieldOffset( fld ) ;
+                bridge.putByte( o, key, v ) ;
+            } else {
+                throw new InvalidObjectException("Field Type mismatch");
+            }
         } catch (Exception e) {
-            throw utilWrapper.errorSetByteField( e, fieldName, o, v ) ;
+            if (o != null) {
+                throw utilWrapper.errorSetByteField( e, fieldName,
+                    o.toString(),
+                    new Byte(v) ) ;
+            } else {
+                throw utilWrapper.errorSetByteField( e, fieldName,
+                    "null " + c.getName() + " object",
+                    new Byte(v) ) ;
+            }
         }
     }
 
@@ -2784,11 +2822,22 @@ public class IIOPInputStream
     {
         try {
             Field fld = c.getDeclaredField( fieldName ) ;
-            long key = bridge.objectFieldOffset( fld ) ;
-            bridge.putChar( o, key, v ) ;
+            if ((fld != null) && (fld.getType() == Character.TYPE)) {
+                long key = bridge.objectFieldOffset( fld ) ;
+                bridge.putChar( o, key, v ) ;
+            } else {
+                throw new InvalidObjectException("Field Type mismatch");
+            }
         } catch (Exception e) {
-            throw utilWrapper.errorSetCharField( e, fieldName, 
-                o, v ) ;
+            if (o != null) {
+                throw utilWrapper.errorSetCharField( e, fieldName,
+                    o.toString(),
+                    new Character(v) ) ;
+            } else {
+                throw utilWrapper.errorSetCharField( e, fieldName,
+                    "null " + c.getName() + " object",
+                    new Character(v) ) ;
+            }
         }
     }
 
@@ -2798,11 +2847,22 @@ public class IIOPInputStream
     {
         try {
             Field fld = c.getDeclaredField( fieldName ) ;
-            long key = bridge.objectFieldOffset( fld ) ;
-            bridge.putShort( o, key, v ) ;
+            if ((fld != null) && (fld.getType() == Short.TYPE)) {
+                long key = bridge.objectFieldOffset( fld ) ;
+                bridge.putShort( o, key, v ) ;
+            } else {
+                throw new InvalidObjectException("Field Type mismatch");
+            }
         } catch (Exception e) {
-            throw utilWrapper.errorSetShortField( e, fieldName, 
-                ObjectUtility.compactObjectToString( o ), v ) ;
+            if (o != null) {
+                throw utilWrapper.errorSetShortField( e, fieldName,
+                    o.toString(),
+                    new Short(v) ) ;
+            } else {
+                 throw utilWrapper.errorSetShortField( e, fieldName,
+                    "null " + c.getName() + " object",
+                    new Short(v) ) ;
+            }
         }
     }
 
@@ -2812,10 +2872,22 @@ public class IIOPInputStream
     {
         try {
             Field fld = c.getDeclaredField( fieldName ) ;
-            long key = bridge.objectFieldOffset( fld ) ;
-            bridge.putInt( o, key, v ) ;
+            if ((fld != null) && (fld.getType() == Integer.TYPE)) {
+                long key = bridge.objectFieldOffset( fld ) ;
+                bridge.putInt( o, key, v ) ;
+            } else {
+                throw new InvalidObjectException("Field Type mismatch");
+            }
         } catch (Exception e) {
-            throw utilWrapper.errorSetIntField( e, fieldName, o, v ) ;
+        	if (o != null) {
+                throw utilWrapper.errorSetIntField( e, fieldName,
+                    o.toString(),
+                    new Integer(v) ) ;
+            } else {
+                throw utilWrapper.errorSetIntField( e, fieldName,
+                    "null " + c.getName() + " object",
+                    new Integer(v) ) ;
+            }
         }
     }
 
@@ -2825,10 +2897,22 @@ public class IIOPInputStream
     {
         try {
             Field fld = c.getDeclaredField( fieldName ) ;
-            long key = bridge.objectFieldOffset( fld ) ;
-            bridge.putLong( o, key, v ) ;
+            if ((fld != null) && (fld.getType() == Long.TYPE)) {
+                long key = bridge.objectFieldOffset( fld ) ;
+                bridge.putLong( o, key, v ) ;
+            } else {
+                throw new InvalidObjectException("Field Type mismatch");
+            }
         } catch (Exception e) {
-            throw utilWrapper.errorSetLongField( e, fieldName, o, v ) ;
+        	if (o != null) {
+                throw utilWrapper.errorSetLongField( e, fieldName,
+                    o.toString(),
+                    new Long(v) ) ;
+            } else {
+                throw utilWrapper.errorSetLongField( e, fieldName,
+                    "null " + c.getName() + " object",
+                    new Long(v) ) ;
+            }
         }
     }
 
@@ -2838,11 +2922,22 @@ public class IIOPInputStream
     {
         try {
             Field fld = c.getDeclaredField( fieldName ) ;
-            long key = bridge.objectFieldOffset( fld ) ;
-            bridge.putFloat( o, key, v ) ;
+            if ((fld != null) && (fld.getType() == Float.TYPE)) {
+                long key = bridge.objectFieldOffset( fld ) ;
+                bridge.putFloat( o, key, v ) ;
+            } else {
+                throw new InvalidObjectException("Field Type mismatch");
+            }
         } catch (Exception e) {
-            throw utilWrapper.errorSetFloatField( e, fieldName, 
-                o, v ) ;
+        	if (o != null) {
+                throw utilWrapper.errorSetFloatField( e, fieldName,
+                    o.toString(),
+                    new Float(v) ) ;
+            } else {
+                throw utilWrapper.errorSetFloatField( e, fieldName,
+                    "null " + c.getName() + " object",
+                    new Float(v) ) ;
+            }
         }
     }
 
@@ -2852,10 +2947,22 @@ public class IIOPInputStream
     {
         try {
             Field fld = c.getDeclaredField( fieldName ) ;
-            long key = bridge.objectFieldOffset( fld ) ;
-            bridge.putDouble( o, key, v ) ;
+            if ((fld != null) && (fld.getType() == Double.TYPE)) {
+                long key = bridge.objectFieldOffset( fld ) ;
+                bridge.putDouble( o, key, v ) ;
+            } else {
+                throw new InvalidObjectException("Field Type mismatch");
+            }
         } catch (Exception e) {
-            throw utilWrapper.errorSetDoubleField( e, fieldName, o, v ) ;
+        	if (o != null) {
+                throw utilWrapper.errorSetDoubleField( e, fieldName,
+                    o.toString(),
+                    new Double(v) ) ;
+            } else {
+                throw utilWrapper.errorSetDoubleField( e, fieldName,
+                    "null " + c.getName() + " object",
+                    new Double(v) ) ;
+            }
         }
     }
 

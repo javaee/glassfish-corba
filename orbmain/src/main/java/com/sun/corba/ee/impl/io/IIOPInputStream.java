@@ -1090,6 +1090,9 @@ public class IIOPInputStream
                 // MS: cstack.mark() ;
                 spBase = spClass;       // current top of stack
 
+                if (currentClass.getName().equals("java.lang.String")) {
+                    return this.readUTF();
+                }                
                 for (currdesc = currentClassDesc, currclass = currentClass;
                      currdesc != null && currdesc.isSerializable();   
                      currdesc = currdesc.getSuperclass()) {

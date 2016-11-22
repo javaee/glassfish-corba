@@ -318,9 +318,9 @@ class ServerCallback extends
     com.sun.corba.ee.spi.activation._ServerImplBase
 {
     private ORB orb;
-    private Method installMethod ;
-    private Method uninstallMethod ;
-    private Method shutdownMethod ;
+    private transient Method installMethod ;
+    private transient Method uninstallMethod ;
+    private transient Method shutdownMethod ;
 
     ServerCallback(ORB orb, Method installMethod, Method uninstallMethod,
         Method shutdownMethod ) 

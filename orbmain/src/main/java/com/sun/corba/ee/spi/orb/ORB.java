@@ -155,6 +155,8 @@ import org.glassfish.pfl.tf.spi.annotation.MethodMonitorGroup;
 import org.glassfish.pfl.tf.timer.spi.TimerFactory;
 import org.glassfish.pfl.tf.timer.spi.TimerManager;
 
+import sun.awt.AppContext;
+
 @OrbLifeCycle
 @ManagedObject
 @Description( "The Main ORB Implementation object" ) 
@@ -389,13 +391,7 @@ public abstract class ORB extends com.sun.corba.ee.org.omg.CORBA.ORB
 
     public abstract LegacyServerSocketManager getLegacyServerSocketManager();
 
-    // There is only one instance of the PresentationManager
-    // that is shared between all ORBs.  This is necessary
-    // because RMI-IIOP requires the PresentationManager in
-    // places where no ORB is available, so the PresentationManager
-    // must be global.  It is initialized here as well.
-    private static final PresentationManagerImpl globalPM =
-        PresentationDefaults.makeOrbPresentationManager() ;
+        
 
     private UnaryFunction<String,Class<?>> classNameResolver = defaultClassNameResolver ;
     private ClassCodeBaseHandler ccbHandler = null ;
@@ -408,14 +404,23 @@ public abstract class ORB extends com.sun.corba.ee.org.omg.CORBA.ORB
         wireObjectKeyTemplate = null ;
     }
 
-    /** Get the single instance of the PresentationManager
+    /**
+     * Returns the Presentation Manager for the current thread group, using the ThreadGroup-specific
+     * AppContext to hold it. Creates and records one if needed.
      * @return The PresentationManager.
      */
     @ManagedAttribute
     @Description( "The presentation manager, which handles stub creation" ) 
     public static PresentationManager getPresentationManager() 
     {
-        return globalPM ;
+    	AppContext ac = AppContext.getAppContext();
+        PresentationManager pm = (PresentationManager) ac.get(PresentationManager.class);
+        if (pm == null) {
+            pm = PresentationDefaults.makeOrbPresentationManager() ;
+            ac.put(PresentationManager.class, pm);
+        }
+
+        return pm;
     }
 
     /** Get the appropriate StubFactoryFactory.  This 
@@ -426,11 +431,9 @@ public abstract class ORB extends com.sun.corba.ee.org.omg.CORBA.ORB
     public static PresentationManager.StubFactoryFactory 
         getStubFactoryFactory()
     {
-        if (globalPM.useDynamicStubs()) {
-            return globalPM.getDynamicStubFactoryFactory();
-        } else {
-            return globalPM.getStaticStubFactoryFactory();
-        }
+    	PresentationManager gPM = getPresentationManager();
+        boolean useDynamicStubs = gPM.useDynamicStubs() ;
+        return gPM.getStubFactoryFactory( useDynamicStubs );
     }
 
     /** Obtain the InvocationInterceptor for this ORB instance.

@@ -54,6 +54,7 @@ import com.sun.corba.ee.spi.orb.ORB ;
 import com.sun.corba.ee.impl.encoding.CDROutputObject ;
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
 import com.sun.corba.ee.impl.encoding.EncapsInputStream ;
+import com.sun.corba.ee.impl.encoding.EncapsInputStreamFactory;
 
 /**
  * This static utility class contains various utility methods for reading and
@@ -116,7 +117,7 @@ public final class EncapsulationUtility
     public static InputStream getEncapsulationStream( ORB orb, InputStream is )
     {
         byte[] data = readOctets( is ) ;
-        EncapsInputStream result = new EncapsInputStream( orb, data, 
+        EncapsInputStream result = EncapsInputStreamFactory.newEncapsInputStream( orb, data, 
             data.length ) ;
         result.consumeEndian() ;
         return result ;

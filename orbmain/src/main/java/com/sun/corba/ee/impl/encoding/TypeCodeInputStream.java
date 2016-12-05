@@ -129,11 +129,11 @@ public class TypeCodeInputStream extends EncapsInputStream implements TypeCodeRe
 
         // create an encapsulation using the marshal buffer
         if (is instanceof CDRInputObject) {
-            encap = new TypeCodeInputStream(_orb, encapBuffer, encapBuffer.length,
+            encap = EncapsInputStreamFactory.newTypeCodeInputStream(_orb, encapBuffer, encapBuffer.length,
                                             ((CDRInputObject)is).getByteOrder(),
                                             ((CDRInputObject)is).getGIOPVersion());
         } else {
-            encap = new TypeCodeInputStream(_orb, encapBuffer, encapBuffer.length);
+            encap = EncapsInputStreamFactory.newTypeCodeInputStream(_orb, encapBuffer, encapBuffer.length);
         }
         encap.setEnclosingInputStream(is);
         encap.makeEncapsulation();

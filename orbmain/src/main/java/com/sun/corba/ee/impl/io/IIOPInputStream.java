@@ -365,7 +365,7 @@ public class IIOPInputStream
      * @since     JDK1.1
      */
     @ValueHandlerRead
-    public final Object readObjectDelegate() throws IOException
+    public final synchronized Object readObjectDelegate() throws IOException
     {
         try {
             readObjectState.readData(this);
@@ -383,7 +383,7 @@ public class IIOPInputStream
     }
 
     @ValueHandlerRead
-    final Object simpleReadObject(Class clz, ClassInfoCache.ClassInfo cinfo,
+    final synchronized Object simpleReadObject(Class clz, ClassInfoCache.ClassInfo cinfo,
         String repositoryID, com.sun.org.omg.SendingContext.CodeBase sender, 
         int offset) {
         /* Save the current state and get ready to read an object. */
@@ -450,7 +450,7 @@ public class IIOPInputStream
     }
 
     @ValueHandlerRead
-    public final void simpleSkipObject( String repositoryID, 
+    public final synchronized void simpleSkipObject( String repositoryID, 
         com.sun.org.omg.SendingContext.CodeBase sender)
     {
         /* Save the current state and get ready to read an object. */
@@ -546,7 +546,7 @@ public class IIOPInputStream
      * @since     JDK1.1
      */
     @ValueHandlerRead
-    public final void defaultReadObjectDelegate() {
+    public final synchronized void defaultReadObjectDelegate() {
         try {
             if (currentObject == null || currentClassDesc == null) {
                 throw new NotActiveException("defaultReadObjectDelegate");
@@ -1030,7 +1030,7 @@ public class IIOPInputStream
     }
 
     @ValueHandlerRead
-    private Object inputObject(Class clz, ClassInfoCache.ClassInfo cinfo,
+    private synchronized Object inputObject(Class clz, ClassInfoCache.ClassInfo cinfo,
         String repositoryID, com.sun.org.omg.SendingContext.CodeBase sender, 
         int offset) throws IOException, ClassNotFoundException {
 
@@ -1446,7 +1446,7 @@ public class IIOPInputStream
      *
      */
     @ValueHandlerRead
-    private Object inputObjectUsingFVD(final Class clz, 
+    private synchronized Object inputObjectUsingFVD(final Class clz, 
         final ClassInfoCache.ClassInfo cinfo,
         final String repositoryID,
         final com.sun.org.omg.SendingContext.CodeBase sender,

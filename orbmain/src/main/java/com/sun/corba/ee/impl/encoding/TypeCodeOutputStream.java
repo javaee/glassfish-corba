@@ -71,7 +71,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream {
     private static class TypeCodeInputStreamFactory implements InputObjectFactory {
         @Override
         public CDRInputObject createInputObject(CDROutputObject outputObject, ORB orb, ByteBuffer byteBuffer, int size, GIOPVersion giopVersion) {
-            return new TypeCodeInputStream(outputObject.orb(), byteBuffer, size, ByteOrder.BIG_ENDIAN, giopVersion);
+            return EncapsInputStreamFactory.newTypeCodeInputStream(outputObject.orb(), byteBuffer, size, ByteOrder.BIG_ENDIAN, giopVersion);
         }
     }
 

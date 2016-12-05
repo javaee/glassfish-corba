@@ -56,6 +56,7 @@ import com.sun.corba.ee.spi.misc.ORBConstants ;
 import com.sun.corba.ee.spi.logging.IORSystemException ;
 
 import com.sun.corba.ee.impl.encoding.EncapsInputStream ;
+import com.sun.corba.ee.impl.encoding.EncapsInputStreamFactory;
 
 /** Based on the magic and scid, return the appropriate 
 * ObjectKeyTemplate.  Expects to be called with a valid
@@ -224,7 +225,7 @@ public class ObjectKeyFactoryImpl implements ObjectKeyFactory
     public ObjectKey create(byte[] key) {
         
         OctetSeqHolder osh = new OctetSeqHolder();
-        EncapsInputStream is = new EncapsInputStream(orb, key, key.length);
+        EncapsInputStream is = EncapsInputStreamFactory.newEncapsInputStream(orb, key, key.length);
 
         ObjectKeyTemplate oktemp;
         try {

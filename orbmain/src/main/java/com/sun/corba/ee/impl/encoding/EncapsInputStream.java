@@ -137,7 +137,7 @@ public class EncapsInputStream extends CDRInputObject
 
     @Override
     public CDRInputObject dup() {
-        return new EncapsInputStream(this);
+        return EncapsInputStreamFactory.newEncapsInputStream(this);
     }
 
     @Override

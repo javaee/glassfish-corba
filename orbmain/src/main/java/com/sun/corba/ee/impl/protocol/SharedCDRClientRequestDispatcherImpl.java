@@ -50,6 +50,8 @@
 package com.sun.corba.ee.impl.protocol;
 
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.omg.CORBA.portable.ApplicationException;
 
@@ -91,23 +93,30 @@ public class SharedCDRClientRequestDispatcherImpl
             ApplicationException, 
             org.omg.CORBA.portable.RemarshalException
     {
-        ORB orb = null;
         MessageMediator messageMediator = null;
         messageMediator = (MessageMediator)
             outputObject.getMessageMediator();
         operationAndId( messageMediator.getOperationName(),
             messageMediator.getRequestId() ) ;
-        orb = (ORB) messageMediator.getBroker();
+        final ORB orb = (ORB) messageMediator.getBroker();
         operationAndId(messageMediator.getOperationName(), 
             messageMediator.getRequestId());
 
         CDROutputObject cdrOutputObject = outputObject;
+        final CDROutputObject fCDROutputObject = cdrOutputObject;
 
         //
         // Create server-side input object.
         //
 
-        CDRInputObject cdrInputObject = cdrOutputObject.createInputObject(orb);
+        CDRInputObject cdrInputObject = AccessController.doPrivileged(
+        		new PrivilegedAction<CDRInputObject>() {
+					@Override
+					public CDRInputObject run() {
+						return fCDROutputObject.createInputObject(orb);
+					}
+        		});
+        		
         messageMediator.setInputObject(cdrInputObject);
         cdrInputObject.setMessageMediator(messageMediator);
 
@@ -136,7 +145,17 @@ public class SharedCDRClientRequestDispatcherImpl
         //
 
         cdrOutputObject = messageMediator.getOutputObject();
-        cdrInputObject = cdrOutputObject.createInputObject(orb);
+        final CDROutputObject fCDROutputObject2 = cdrOutputObject;
+        cdrInputObject = AccessController.doPrivileged(
+        		new PrivilegedAction<CDRInputObject>() {
+
+					@Override
+					public CDRInputObject run() {
+						// TODO Auto-generated method stub
+						return fCDROutputObject2.createInputObject(orb);
+					}
+        			
+        		});
         messageMediator.setInputObject(cdrInputObject);
         cdrInputObject.setMessageMediator(messageMediator);
 

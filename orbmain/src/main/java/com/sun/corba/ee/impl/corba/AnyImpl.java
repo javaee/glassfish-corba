@@ -66,6 +66,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,9 +107,19 @@ public class AnyImpl extends Any {
         @Override
         public org.omg.CORBA.portable.InputStream create_input_stream() 
         {
-            return new AnyInputStream(
-                (com.sun.corba.ee.impl.encoding.EncapsInputStream)
-                    super.create_input_stream());
+        	final org.omg.CORBA.portable.InputStream is = super
+                    .create_input_stream();
+            AnyInputStream aIS = AccessController
+                    .doPrivileged(new PrivilegedAction<AnyInputStream>() {
+                        @Override
+                        public AnyInputStream run() {
+                            return new AnyInputStream(
+                                    (com.sun.corba.ee.impl.encoding.EncapsInputStream) is);
+                        }
+
+                    });
+
+            return aIS;
         }
     }
 

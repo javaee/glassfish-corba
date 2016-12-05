@@ -108,7 +108,8 @@ public class EncapsOutputStream extends CDROutputObject
     private static class EncapsInputStreamFactory implements InputObjectFactory {
         @Override
         public CDRInputObject createInputObject(CDROutputObject outputObject, ORB orb, ByteBuffer byteBuffer, int size, GIOPVersion giopVersion) {
-            return new EncapsInputStream(outputObject.orb(), byteBuffer, size, ByteOrder.BIG_ENDIAN, giopVersion);
+            return com.sun.corba.ee.impl.encoding.EncapsInputStreamFactory.newEncapsInputStream(outputObject.orb(),
+            		byteBuffer, size, ByteOrder.BIG_ENDIAN, giopVersion);
         }
     }
     

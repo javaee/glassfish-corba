@@ -65,6 +65,7 @@ import com.sun.corba.ee.spi.orb.Operation;
 import com.sun.corba.ee.spi.orb.ORB;
 
 import com.sun.corba.ee.impl.encoding.EncapsInputStream;
+import com.sun.corba.ee.impl.encoding.EncapsInputStreamFactory;
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.ee.spi.logging.OMGSystemException ;
 import com.sun.corba.ee.impl.naming.namingutil.INSURLHandler;
@@ -123,7 +124,7 @@ public class INSURLOperationImpl implements Operation
              buf[j] = (byte)((ORBUtility.hexOf(str.charAt(i)) << UN_SHIFT) & 0xF0);
              buf[j] |= (byte)(ORBUtility.hexOf(str.charAt(i+1)) & 0x0F);
         }
-        EncapsInputStream s = new EncapsInputStream(orb, buf, buf.length, 
+        EncapsInputStream s = EncapsInputStreamFactory.newEncapsInputStream(orb, buf, buf.length, 
             orb.getORBData().getGIOPVersion());
         s.consumeEndian();
         return s.read_Object() ;

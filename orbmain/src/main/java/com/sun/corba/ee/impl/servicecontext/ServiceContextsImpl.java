@@ -62,6 +62,7 @@ import com.sun.corba.ee.spi.servicecontext.UEInfoServiceContext ;
 
 import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.encoding.EncapsInputStream ;
+import com.sun.corba.ee.impl.encoding.EncapsInputStreamFactory;
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.ee.spi.trace.TraceServiceContext;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
@@ -214,7 +215,7 @@ public class ServiceContextsImpl implements ServiceContexts
             //
             // Note:  As of Jan 2001, no standard OMG or Sun service contexts
             // ship wchar data or are defined as using anything but GIOP 1.0 CDR.
-            EncapsInputStream eis = new EncapsInputStream(orb, data, data.length, 
+            EncapsInputStream eis = EncapsInputStreamFactory.newEncapsInputStream(orb, data, data.length, 
                 giopVersion, codeBase);
 
             try {

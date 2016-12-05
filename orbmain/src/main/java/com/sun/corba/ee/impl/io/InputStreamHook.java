@@ -235,7 +235,7 @@ public abstract class InputStreamHook extends ObjectInputStream
         readObjectState.endDefaultReadObject(this);
     }
 
-    public abstract void defaultReadObjectDelegate();
+    abstract void defaultReadObjectDelegate();
 
     abstract void readFields(java.util.Map<String,Object> fieldToValueMap)
         throws java.io.InvalidClassException, java.io.StreamCorruptedException,

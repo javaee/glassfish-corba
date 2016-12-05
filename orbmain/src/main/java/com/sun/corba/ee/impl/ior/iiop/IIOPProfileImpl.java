@@ -41,6 +41,7 @@
 package com.sun.corba.ee.impl.ior.iiop;
 
 import com.sun.corba.ee.impl.encoding.EncapsInputStream;
+import com.sun.corba.ee.impl.encoding.EncapsInputStreamFactory;
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
 import com.sun.corba.ee.impl.ior.EncapsulationUtility;
 import com.sun.corba.ee.impl.orb.ORBVersionImpl;
@@ -188,7 +189,7 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
             throw wrapper.invalidTaggedProfile() ;
         }
 
-        EncapsInputStream istr = new EncapsInputStream(orb, profile.profile_data, 
+        EncapsInputStream istr = EncapsInputStreamFactory.newEncapsInputStream(orb, profile.profile_data, 
             profile.profile_data.length);
         istr.consumeEndian();
         init( istr ) ;

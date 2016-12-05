@@ -48,6 +48,7 @@ import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 
 import com.sun.corba.ee.impl.corba.AnyImpl;
 import com.sun.corba.ee.impl.encoding.EncapsInputStream;
+import com.sun.corba.ee.impl.encoding.EncapsInputStreamFactory;
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
 import com.sun.corba.ee.impl.misc.ORBUtility;
 import com.sun.corba.ee.spi.misc.ORBConstants;
@@ -243,7 +244,7 @@ public final class CDREncapsCodec
 
         try {
 
-            EncapsInputStream cdrIn = new EncapsInputStream( orb, data, 
+            EncapsInputStream cdrIn = EncapsInputStreamFactory.newEncapsInputStream( orb, data, 
                 data.length, giopVersion );
 
             cdrIn.consumeEndian();

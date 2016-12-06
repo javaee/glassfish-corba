@@ -210,12 +210,11 @@ abstract public class ORB {
 
     // Get System property
     private static String getSystemProperty(final String name) {
-
         // This will not throw a SecurityException because this
         // class was loaded from rt.jar using the bootstrap classloader.
-        String propValue = (String)AccessController.doPrivileged(
-            new PrivilegedAction() {
-                public java.lang.Object run() {
+        String propValue = AccessController.doPrivileged(
+            new PrivilegedAction<String>() {
+                public String run() {
                     return System.getProperty(name);
                 }
             }
@@ -313,19 +312,39 @@ abstract public class ORB {
             if (className == null)
                 className = defaultORBSingleton;
 
-            singleton = create_impl(className);
+            singleton = create_impl_with_systemclassloader(className);
         }
         return singleton;
+    }
+    
+    private static ORB create_impl_with_systemclassloader(String className) {
+        try {
+            checkPackageAccess(className);
+            ClassLoader cl = ClassLoader.getSystemClassLoader();
+            Class<org.omg.CORBA.ORB> orbBaseClass = org.omg.CORBA.ORB.class;
+            Class<?> singletonOrbClass = Class.forName(className, true, cl).asSubclass(orbBaseClass);
+            return (ORB)singletonOrbClass.newInstance();
+        } catch (Throwable ex) {
+            SystemException systemException = new INITIALIZE(
+                "can't instantiate default ORB implementation " + className);
+            systemException.initCause(ex);
+            throw systemException;
+        }
+
     }
 
     private static ORB create_impl(String className) {
         
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        if (cl == null)
+        if (cl == null) {
             cl = ClassLoader.getSystemClassLoader();
+        }
 
         try {
-            return (ORB) Class.forName(className, true, cl).newInstance();
+        	checkPackageAccess(className);
+        	Class<org.omg.CORBA.ORB> orbBaseClass = org.omg.CORBA.ORB.class;
+        	Class<?> orbClass = Class.forName(className, true, cl).asSubclass(orbBaseClass);
+            return (ORB) orbClass.newInstance();
         } catch (Throwable ex) {
             SystemException systemException = new INITIALIZE(
                "can't instantiate default ORB implementation " + className);
@@ -1334,5 +1353,22 @@ abstract public class ORB {
     {
         // Currently not implemented until PIORB.
         throw new org.omg.CORBA.NO_IMPLEMENT();
+    }
+    
+    private final static void checkPackageAccess(String name) {
+        SecurityManager s = System.getSecurityManager();
+        if (s == null) return;
+        
+        String cname = name.replace('/', '.');
+        if (cname.startsWith("[")) {
+            int b = cname.lastIndexOf('[') + 2;
+            if (b > 1 && b < cname.length()) {
+                cname = cname.substring(b);
+            }
+        }
+    	int i = cname.lastIndexOf('.');
+    	if (i != -1) {
+    	    s.checkPackageAccess(cname.substring(0, i));
+    	}
     }
 }

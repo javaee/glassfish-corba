@@ -53,6 +53,7 @@ import com.sun.corba.ee.spi.orb.ORB ;
 
 import com.sun.corba.ee.impl.encoding.CDROutputObject ;
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.impl.encoding.EncapsInputStream ;
 import com.sun.corba.ee.impl.encoding.EncapsInputStreamFactory;
 
@@ -137,7 +138,7 @@ public final class EncapsulationUtility
     public static void writeEncapsulation( WriteContents obj,
         OutputStream os )
     {
-        EncapsOutputStream out = new EncapsOutputStream( (ORB)os.orb() ) ;
+        EncapsOutputStream out = OutputStreamFactory.newEncapsOutputStream( (ORB)os.orb() ) ;
 
         out.putEndian() ;
 

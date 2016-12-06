@@ -534,7 +534,16 @@ public class AnyImpl extends Any {
     public org.omg.CORBA.portable.OutputStream create_output_stream()
     {
         //debug.log ("create_output_stream");
-        return new AnyOutputStream(orb);
+    	final ORB finalOrb = this.orb;
+    	
+        return AccessController.doPrivileged(new PrivilegedAction<org.omg.CORBA.portable.OutputStream>() {
+
+			@Override
+			public OutputStream run() {
+				return new AnyOutputStream(finalOrb);
+			}
+        	
+        });
     }
 
     /**

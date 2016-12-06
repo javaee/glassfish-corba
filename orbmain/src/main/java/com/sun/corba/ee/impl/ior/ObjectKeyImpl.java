@@ -51,7 +51,7 @@ import com.sun.corba.ee.spi.ior.ObjectKey ;
 import com.sun.corba.ee.spi.ior.ObjectKeyTemplate ;
 
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
-
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.spi.logging.IORSystemException;
 
 /**
@@ -112,7 +112,7 @@ public class ObjectKeyImpl implements ObjectKey
     public synchronized byte[] getBytes(org.omg.CORBA.ORB orb) 
     {
         if (array == null) {        
-            EncapsOutputStream os = new EncapsOutputStream((ORB)orb);
+            EncapsOutputStream os = OutputStreamFactory.newEncapsOutputStream((ORB)orb);
             try {
                 write(os);
                 array = os.toByteArray();

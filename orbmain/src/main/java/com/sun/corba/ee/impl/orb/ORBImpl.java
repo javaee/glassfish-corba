@@ -132,7 +132,7 @@ import com.sun.corba.ee.impl.corba.NamedValueImpl;
 import com.sun.corba.ee.impl.corba.EnvironmentImpl;
 import com.sun.corba.ee.impl.corba.AsynchInvoke;
 import com.sun.corba.ee.impl.corba.AnyImpl;
-import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.impl.encoding.CachedCodeBase;
 import com.sun.corba.ee.impl.interceptors.PIHandlerImpl;
 import com.sun.corba.ee.impl.ior.TaggedComponentFactoryFinderImpl;
@@ -703,7 +703,7 @@ public class ORBImpl extends com.sun.corba.ee.spi.orb.ORB
 
     public synchronized org.omg.CORBA.portable.OutputStream create_output_stream()
     {
-        return new EncapsOutputStream(this);
+        return OutputStreamFactory.newEncapsOutputStream(this);
     }
 
     /**

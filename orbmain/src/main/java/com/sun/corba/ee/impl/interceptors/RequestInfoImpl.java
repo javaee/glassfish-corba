@@ -40,6 +40,7 @@
 package com.sun.corba.ee.impl.interceptors;
 
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.impl.misc.ORBUtility;
 import com.sun.corba.ee.impl.util.RepositoryId;
 import com.sun.corba.ee.spi.ior.IOR;
@@ -648,7 +649,7 @@ public abstract class RequestInfoImpl
             // Convert the "core" service context to an 
             // "IOP" ServiceContext by writing it to a 
             // CDROutputStream and reading it back.
-            EncapsOutputStream out = new EncapsOutputStream(myORB);
+            EncapsOutputStream out = OutputStreamFactory.newEncapsOutputStream(myORB);
 
             context.write( out, GIOPVersion.V1_2 );
             InputStream inputStream = out.create_input_stream();
@@ -684,7 +685,7 @@ public abstract class RequestInfoImpl
     {
         int id = 0 ;
         // Convert IOP.service_context to core.ServiceContext:
-        EncapsOutputStream outputStream = new EncapsOutputStream(
+        EncapsOutputStream outputStream = OutputStreamFactory.newEncapsOutputStream(
             myORB );
         InputStream inputStream = null;
         UnknownServiceContext coreServiceContext = null;

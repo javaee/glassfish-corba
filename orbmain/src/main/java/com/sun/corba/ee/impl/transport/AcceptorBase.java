@@ -41,6 +41,7 @@
 package com.sun.corba.ee.impl.transport;
 
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 import com.sun.corba.ee.impl.oa.poa.Policies;
 import com.sun.corba.ee.spi.extension.RequestPartitioningPolicy;
@@ -299,7 +300,7 @@ public abstract class AcceptorBase
     }
 
     public CDROutputObject createOutputObject(ORB broker, MessageMediator messageMediator) {
-        return new CDROutputObject(broker, messageMediator,
+        return OutputStreamFactory.newCDROutputObject(broker, messageMediator,
             messageMediator.getReplyHeader(), messageMediator.getStreamFormatVersion());
     }
 

@@ -54,6 +54,7 @@ import com.sun.corba.ee.spi.transport.ContactInfoList;
 import com.sun.corba.ee.spi.transport.ContactInfo;
 
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.impl.protocol.MessageMediatorImpl;
 import com.sun.corba.ee.spi.trace.Transport;
 
@@ -135,7 +136,7 @@ public abstract class ContactInfoBase
     public CDROutputObject createOutputObject(MessageMediator messageMediator) {
 
         CDROutputObject outputObject =
-            new CDROutputObject(orb, messageMediator, 
+            OutputStreamFactory.newCDROutputObject(orb, messageMediator, 
                                 messageMediator.getRequestHeader(),
                                 messageMediator.getStreamFormatVersion());
 

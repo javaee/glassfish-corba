@@ -116,7 +116,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream {
     }
 
     public TypeCodeOutputStream createEncapsulation(org.omg.CORBA.ORB _orb) {
-        TypeCodeOutputStream encap = new TypeCodeOutputStream((ORB)_orb);
+        TypeCodeOutputStream encap = OutputStreamFactory.newTypeCodeOutputStream((ORB)_orb);
         encap.setEnclosingOutputStream(this);
         encap.makeEncapsulation();
         return encap;
@@ -129,7 +129,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream {
     }
 
     public static TypeCodeOutputStream wrapOutputStream(OutputStream os) {
-        TypeCodeOutputStream tos = new TypeCodeOutputStream((ORB)os.orb());
+        TypeCodeOutputStream tos = OutputStreamFactory.newTypeCodeOutputStream((ORB)os.orb());
         tos.setEnclosingOutputStream(os);
         return tos;
     }

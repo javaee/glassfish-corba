@@ -50,6 +50,7 @@ import com.sun.corba.ee.impl.corba.AnyImpl;
 import com.sun.corba.ee.impl.encoding.EncapsInputStream;
 import com.sun.corba.ee.impl.encoding.EncapsInputStreamFactory;
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.impl.misc.ORBUtility;
 import com.sun.corba.ee.spi.misc.ORBConstants;
 
@@ -187,7 +188,7 @@ public final class CDREncapsCodec
 
             // Create output stream with default endianness.
             EncapsOutputStream cdrOut =
-                new EncapsOutputStream((com.sun.corba.ee.spi.orb.ORB)orb,
+                OutputStreamFactory.newEncapsOutputStream((com.sun.corba.ee.spi.orb.ORB)orb,
                                        giopVersion);
 
             // This is an encapsulation, so put out the endian:

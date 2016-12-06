@@ -45,7 +45,7 @@ import com.sun.corba.ee.spi.ior.TaggedComponentFactoryFinder ;
 
 
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
-
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.spi.orb.ORB ;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
@@ -69,7 +69,7 @@ public class TaggedComponentFactoryFinderImpl
     public TaggedComponent create( org.omg.CORBA.ORB orb,
         org.omg.IOP.TaggedComponent comp )
     {
-        EncapsOutputStream os = new EncapsOutputStream( (ORB)orb ) ;
+        EncapsOutputStream os = OutputStreamFactory.newEncapsOutputStream( (ORB)orb ) ;
         org.omg.IOP.TaggedComponentHelper.write( os, comp ) ;
         InputStream is = (InputStream)(os.create_input_stream() ) ;
         // Skip the component ID: we just wrote it out above

@@ -97,6 +97,7 @@ import com.sun.corba.ee.impl.encoding.BufferManagerWrite;
 import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 import com.sun.corba.ee.spi.logging.InterceptorsSystemException;
 import com.sun.corba.ee.spi.misc.ORBConstants;
@@ -1641,7 +1642,7 @@ public class MessageMediatorImpl
         if (msg.getGIOPVersion().lessThan(GIOPVersion.V1_2)) {
             // locate msgs 1.0 & 1.1 :=> grow, 
             // REVISIT - build from factory
-            outObj = new CDROutputObject( messageMediator.getBroker(), this,
+            outObj = OutputStreamFactory.newCDROutputObject( messageMediator.getBroker(), this,
                              GIOPVersion.V1_0,
                              messageMediator.getConnection(),
                              reply,
@@ -1649,7 +1650,7 @@ public class MessageMediatorImpl
         } else {
             // 1.2 :=> stream
             // REVISIT - build from factory
-            outObj = new CDROutputObject( messageMediator.getBroker(), messageMediator,
+            outObj = OutputStreamFactory.newCDROutputObject( messageMediator.getBroker(), messageMediator,
                              reply,
                              ORBConstants.STREAM_FORMAT_VERSION_1);
         }
@@ -1787,7 +1788,7 @@ public class MessageMediatorImpl
                 ServiceContextDefaults.makeServiceContexts(myOrb), null);
             
             // REVISIT: via acceptor factory.
-            CDROutputObject outObj = new CDROutputObject(
+            CDROutputObject outObj = OutputStreamFactory.newCDROutputObject(
                 messageMediator.getBroker(),
                 this,
                 messageMediator.getGIOPVersion(),
@@ -1951,7 +1952,7 @@ public class MessageMediatorImpl
         ex.printStackTrace(pw);
         pw.flush(); // NOTE: you must flush or baos will be empty.
         EncapsOutputStream encapsOutputStream = 
-            new EncapsOutputStream(mediator.getBroker());
+            OutputStreamFactory.newEncapsOutputStream(mediator.getBroker());
         encapsOutputStream.putEndian();
         encapsOutputStream.write_wstring(baos.toString());
         UnknownServiceContext serviceContext =
@@ -2029,7 +2030,7 @@ public class MessageMediatorImpl
         if (messageMediator.getConnection() == null) {
             // REVISIT - needs factory
             replyOutputObject = 
-                new CDROutputObject(orb, messageMediator,
+                OutputStreamFactory.newCDROutputObject(orb, messageMediator,
                                     messageMediator.getReplyHeader(),
                                     messageMediator.getStreamFormatVersion(),
                                     BufferManagerFactory.GROW);

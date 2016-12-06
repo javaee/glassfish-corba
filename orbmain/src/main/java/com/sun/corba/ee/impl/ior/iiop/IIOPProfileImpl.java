@@ -43,6 +43,7 @@ package com.sun.corba.ee.impl.ior.iiop;
 import com.sun.corba.ee.impl.encoding.EncapsInputStream;
 import com.sun.corba.ee.impl.encoding.EncapsInputStreamFactory;
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.impl.ior.EncapsulationUtility;
 import com.sun.corba.ee.impl.orb.ORBVersionImpl;
 import com.sun.corba.ee.impl.util.JDKBridge;
@@ -271,7 +272,7 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 
     public org.omg.IOP.TaggedProfile getIOPProfile()
     {
-        EncapsOutputStream os = new EncapsOutputStream( orb ) ;
+        EncapsOutputStream os = OutputStreamFactory.newEncapsOutputStream( orb ) ;
         os.write_long( getId() ) ;
         write( os ) ;
         InputStream is = (InputStream)(os.create_input_stream()) ;

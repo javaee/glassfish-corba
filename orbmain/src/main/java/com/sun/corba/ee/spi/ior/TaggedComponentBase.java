@@ -43,7 +43,7 @@ package com.sun.corba.ee.spi.ior;
 import org.omg.CORBA_2_3.portable.InputStream ;
 
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
-
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.spi.orb.ORB ;
 
 
@@ -57,7 +57,7 @@ public abstract class TaggedComponentBase extends IdentifiableBase
     public org.omg.IOP.TaggedComponent getIOPComponent( 
         org.omg.CORBA.ORB orb )
     {
-        EncapsOutputStream os = new EncapsOutputStream( (ORB)orb ) ;
+        EncapsOutputStream os = OutputStreamFactory.newEncapsOutputStream( (ORB)orb ) ;
         os.write_ulong( getId() ) ; // Fix for 6158378
         write( os ) ;
         InputStream is = (InputStream)(os.create_input_stream() ) ;

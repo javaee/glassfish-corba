@@ -57,6 +57,7 @@ import com.sun.corba.ee.spi.orb.ORB;
 
 import com.sun.corba.ee.impl.encoding.CDRInputObject;
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.impl.encoding.TypeCodeInputStream;
 import com.sun.corba.ee.impl.encoding.TypeCodeOutputStream;
 import com.sun.corba.ee.impl.encoding.TypeCodeReader;
@@ -615,7 +616,7 @@ public final class TypeCodeImpl extends TypeCode {
     }
 
     public static CDROutputObject newOutputStream(ORB orb) {
-        TypeCodeOutputStream tcos = new TypeCodeOutputStream(orb);
+        TypeCodeOutputStream tcos = OutputStreamFactory.newTypeCodeOutputStream(orb);
         //if (debug) System.out.println("Created TypeCodeOutputStream " + tcos + 
         // " with no parent");
         return tcos;

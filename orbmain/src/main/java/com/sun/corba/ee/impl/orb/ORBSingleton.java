@@ -116,7 +116,7 @@ import com.sun.corba.ee.impl.corba.EnvironmentImpl;
 import com.sun.corba.ee.impl.corba.AnyImpl;
 import com.sun.corba.ee.impl.encoding.BufferManagerFactory;
 import com.sun.corba.ee.impl.encoding.CodeSetComponentInfo;
-import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.impl.oa.poa.BadServerIdHandler;
 import com.sun.corba.ee.spi.misc.ORBConstants;
 import com.sun.corba.ee.spi.legacy.connection.LegacyServerSocketEndPointInfo;
@@ -160,7 +160,7 @@ public class ORBSingleton extends ORB
     }
 
     public OutputStream create_output_stream() {
-        return new EncapsOutputStream(this);
+        return OutputStreamFactory.newEncapsOutputStream(this);
     }
 
     public TypeCode create_struct_tc(String id,

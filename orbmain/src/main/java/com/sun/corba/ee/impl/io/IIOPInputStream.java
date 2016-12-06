@@ -286,11 +286,11 @@ public class IIOPInputStream
         resetStream();
     }
         
-    public final void setOrbStream(org.omg.CORBA_2_3.portable.InputStream os) {
+    final void setOrbStream(org.omg.CORBA_2_3.portable.InputStream os) {
         orbStream = os;
     }
 
-    public final org.omg.CORBA_2_3.portable.InputStream getOrbStream() {
+    final org.omg.CORBA_2_3.portable.InputStream getOrbStream() {
         return orbStream;
     }
 
@@ -317,13 +317,13 @@ public class IIOPInputStream
     private void recursionDepthInfo( int rd ) {}
 
     @ValueHandlerRead
-    public final void increaseRecursionDepth(){
+    final void increaseRecursionDepth(){
         recursionDepth++;
         recursionDepthInfo(recursionDepth);
     }
 
     @ValueHandlerRead
-    public final int decreaseRecursionDepth(){
+    final int decreaseRecursionDepth(){
         --recursionDepth;
         recursionDepthInfo(recursionDepth);
         return recursionDepth ;

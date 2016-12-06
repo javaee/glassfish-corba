@@ -46,7 +46,7 @@ import org.omg.CORBA_2_3.portable.OutputStream ;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.ee.spi.orb.ORB ;
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
-
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 
 /** Base class for all ServiceContext classes.
@@ -106,7 +106,7 @@ public abstract class ServiceContextBase {
      */
     public synchronized void write(OutputStream s, GIOPVersion gv) throws SystemException {
         if (data == null) {
-            EncapsOutputStream os = new EncapsOutputStream((ORB)(s.orb()), gv);   
+            EncapsOutputStream os = OutputStreamFactory.newEncapsOutputStream((ORB)(s.orb()), gv);   
             try {
                 os.putEndian();
                 writeData(os);

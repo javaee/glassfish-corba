@@ -53,6 +53,7 @@ import com.sun.corba.ee.spi.orb.ORB ;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion ;
 
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream ;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 
 /**
  * @author 
@@ -110,7 +111,7 @@ public class GenericTaggedProfile extends GenericIdentifiable implements TaggedP
     
     public org.omg.IOP.TaggedProfile getIOPProfile() 
     {
-        EncapsOutputStream os = new EncapsOutputStream( orb ) ;
+        EncapsOutputStream os = OutputStreamFactory.newEncapsOutputStream( orb ) ;
         write( os ) ;
         InputStream is = (InputStream)(os.create_input_stream()) ;
         return org.omg.IOP.TaggedProfileHelper.read( is ) ;

@@ -66,7 +66,7 @@ import com.sun.corba.ee.spi.ior.IORFactories ;
 import com.sun.corba.ee.spi.orb.ORB;
 
 import com.sun.corba.ee.impl.encoding.MarshalOutputStream;
-
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.impl.encoding.EncapsOutputStream;
 
 import com.sun.corba.ee.impl.misc.HexOutputStream;
@@ -233,7 +233,7 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
     {
         StringWriter bs;
 
-        MarshalOutputStream s = new EncapsOutputStream(factory);
+        MarshalOutputStream s = OutputStreamFactory.newEncapsOutputStream(factory);
         s.putEndian();
         write( (OutputStream)s );
         bs = new StringWriter();
@@ -259,7 +259,7 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
     }
     
     public org.omg.IOP.IOR getIOPIOR() {    
-        EncapsOutputStream os = new EncapsOutputStream(factory);
+        EncapsOutputStream os = OutputStreamFactory.newEncapsOutputStream(factory);
         write(os);
         InputStream is = (InputStream) (os.create_input_stream());
         return org.omg.IOP.IORHelper.read(is);

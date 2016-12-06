@@ -53,6 +53,7 @@ import com.sun.corba.ee.spi.transport.SocketInfo;
 
 import com.sun.corba.ee.impl.encoding.BufferManagerFactory;
 import com.sun.corba.ee.impl.encoding.CDROutputObject;
+import com.sun.corba.ee.impl.encoding.OutputStreamFactory;
 import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 import com.sun.corba.ee.impl.protocol.MessageMediatorImpl;
 import com.sun.corba.ee.impl.protocol.SharedCDRClientRequestDispatcherImpl;
@@ -156,7 +157,7 @@ public class SharedCDRContactInfoImpl
             messageMediator;
         // NOTE: GROW.
         CDROutputObject outputObject =
-            new CDROutputObject(orb, messageMediator, 
+            OutputStreamFactory.newCDROutputObject(orb, messageMediator, 
                                 corbaMessageMediator.getRequestHeader(),
                                 corbaMessageMediator.getStreamFormatVersion(),
                                 BufferManagerFactory.GROW);

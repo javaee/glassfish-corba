@@ -38,7 +38,7 @@
  * holder.
  */
 
-package sun.corba ;
+package sun.corba;
 
 import java.lang.reflect.Field ;
 import java.lang.reflect.Method ;
@@ -365,9 +365,7 @@ public final class Bridge
      * of the Serializable class.
      */
     @SuppressWarnings("unchecked")
-    public final <T> Constructor<T> newConstructorForSerialization( Class<T> cl,
-        Constructor<?> cons )
-    {
-        return reflectionFactory.newConstructorForSerialization( cl, cons ) ;
+    public final <T> Constructor<T> newConstructorForSerialization(Class<T> cl, Constructor<?> cons) {
+        return (Constructor<T>) reflectionFactory.newConstructorForSerialization( cl, cons ) ;
     }
 }

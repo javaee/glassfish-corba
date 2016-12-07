@@ -38,7 +38,7 @@
  * holder.
  */
 
-package sun.corba ;
+package sun.corba;
 
 import java.security.BasicPermission ;
 

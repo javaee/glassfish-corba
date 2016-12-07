@@ -111,6 +111,15 @@ public class ValueUtility {
         null,       // tk_native       31
         null,       // tk_abstract_interface 32
     };
+    
+    static {
+        SharedSecrets.setJavaCorbaAccess(new JavaCorbaAccess() {
+			@Override
+			public ValueHandlerImpl newValueHandlerImpl() {
+				return ValueHandlerImpl.getInstance();
+			}
+        });
+    }
 
     public static String getSignature(ValueMember member)
         throws ClassNotFoundException {

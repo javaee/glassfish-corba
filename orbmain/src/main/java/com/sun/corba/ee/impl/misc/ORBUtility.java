@@ -283,13 +283,18 @@ public final class ORBUtility {
     }
 
     private static ValueHandler vhandler = 
-        new ValueHandlerImpl() ;
+    		Util.getInstance().createValueHandler();
+    
+    /**
+     * Gets the ValueHandler from Util.createValueHandler.
+     */
+    public static ValueHandler createValueHandler() {
+        return vhandler;
+    }
 
     /**
-     * Creates the correct ValueHandler for the given ORB, 
-     * querying ORBVersion information.  If the ORB or
-     * ORBVersion is null, gets the ValueHandler from
-     * Util.createValueHandler.
+     * Creates the correct ValueHandler.  The parameter
+     * is ignored
      */
     public static ValueHandler createValueHandler(ORB orb) {
         return vhandler;

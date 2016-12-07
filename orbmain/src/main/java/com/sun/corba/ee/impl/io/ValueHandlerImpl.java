@@ -77,7 +77,7 @@ import org.glassfish.pfl.basic.logex.OperationTracer;
 
 @ValueHandlerRead
 @ValueHandlerWrite
-public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat {
+public final class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat {
     private static final OMGSystemException omgWrapper =
         OMGSystemException.self ;
     protected static final UtilSystemException utilWrapper =
@@ -179,7 +179,11 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         writeValueWithVersion( out, value, streamFormatVersion);
     }
 
-    public ValueHandlerImpl(){}
+    private ValueHandlerImpl(){}
+    
+    static ValueHandlerImpl getInstance() {
+    	return new ValueHandlerImpl();
+    }
 
     /**
      * Writes the value to the stream using java semantics.
@@ -430,7 +434,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * is a fix for bug 4367783.
      */
     @ValueHandlerWrite
-    protected void writeCharArray(org.omg.CORBA_2_3.portable.OutputStream out,
+    private void writeCharArray(org.omg.CORBA_2_3.portable.OutputStream out,
                                 char[] array,
                                 int offset,
                                 int length)
@@ -551,7 +555,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * is a fix for bug 4367783.
      */
     @ValueHandlerRead
-    protected void readCharArray(org.omg.CORBA_2_3.portable.InputStream in,
+    private void readCharArray(org.omg.CORBA_2_3.portable.InputStream in,
                                  char[] array,
                                  int offset,
                                  int length)
@@ -778,7 +782,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         return RepositoryId.cache.getId(repId).isSequence();
     }
 
-    protected IIOPOutputStream createOutputStream() {
+    private IIOPOutputStream createOutputStream() {
         if (System.getSecurityManager() != null) {
             return AccessController.doPrivileged( 
                 new PrivilegedAction<IIOPOutputStream>() {
@@ -801,7 +805,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         }
     }
 
-    protected IIOPInputStream createInputStream() {
+    private IIOPInputStream createInputStream() {
         if (System.getSecurityManager() != null) {
             return AccessController.doPrivileged( 
                 new PrivilegedAction<IIOPInputStream>() { 
@@ -829,7 +833,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * The correct behavior is for a Java char to map to a CORBA wchar,
      * but our older code mapped it to a CORBA char.
      */
-    protected TCKind getJavaCharTCKind() {
+    TCKind getJavaCharTCKind() {
         return TCKind.tk_wchar;
     }
 }

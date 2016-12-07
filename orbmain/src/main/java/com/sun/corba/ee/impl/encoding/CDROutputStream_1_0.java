@@ -612,7 +612,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     @CdrWrite
     private void writeArray(Serializable array, Class clazz) {
         if (valueHandler == null) {
-            valueHandler = ORBUtility.createValueHandler(orb);
+            valueHandler = ORBUtility.createValueHandler();
         }
 
         // Write value_tag
@@ -652,7 +652,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
                                        ClassInfoCache.ClassInfo cinfo) {
 
         if (valueHandler == null) {
-            valueHandler = ORBUtility.createValueHandler(orb);
+            valueHandler = ORBUtility.createValueHandler();
         }
 
         Serializable key = object;
@@ -700,7 +700,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase {
     private void callWriteValue(org.omg.CORBA.portable.OutputStream parent,
                                 java.io.Serializable object, byte streamFormatVersion) {
         if (valueHandler == null) {
-            valueHandler = ORBUtility.createValueHandler(orb);
+            valueHandler = ORBUtility.createValueHandler();
         }
 
         boolean currentMustChunk = mustChunk;

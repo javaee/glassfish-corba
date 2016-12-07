@@ -113,6 +113,7 @@ import com.sun.corba.ee.spi.protocol.ClientDelegate;
 import com.sun.corba.ee.spi.transport.ContactInfoList ;
 import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcher ;
 import com.sun.corba.ee.spi.copyobject.CopierManager ;
+import com.sun.corba.ee.impl.io.SharedSecrets;
 import com.sun.corba.ee.impl.io.ValueHandlerImpl;
 import com.sun.corba.ee.spi.misc.ORBConstants;
 import com.sun.corba.ee.impl.misc.ORBUtility;
@@ -160,7 +161,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     static {
         // Note: there uses to be code here to use the JDK value handler for embedded
         // web logic.  I removed it after 3.1.0-b008.
-        valueHandlerSingleton = new ValueHandlerImpl();
+        valueHandlerSingleton = SharedSecrets.getJavaCorbaAccess().newValueHandlerImpl();
     }
 
     // This constructor MUST be public, or Util.createDelegateIfSpecified will fail!

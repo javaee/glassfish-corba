@@ -251,8 +251,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     private void createRepositoryIdHandlers()
     {
-        repIdUtil = RepositoryIdFactory.getRepIdUtility(orb);
-        repIdStrs = RepositoryIdFactory.getRepIdStringsFactory(orb);
+        repIdUtil = RepositoryIdFactory.getRepIdUtility();
+        repIdStrs = RepositoryIdFactory.getRepIdStringsFactory();
     }
 
     public GIOPVersion getGIOPVersion() {
@@ -887,7 +887,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
         try {
             if (valueHandler == null) {
-                valueHandler = ORBUtility.createValueHandler(orb);
+                valueHandler = ORBUtility.createValueHandler();
             }
 
             return valueHandler.readValue(parent, indirection, valueClass, 

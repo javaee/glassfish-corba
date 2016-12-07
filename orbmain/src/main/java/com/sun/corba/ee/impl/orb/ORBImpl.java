@@ -976,7 +976,7 @@ public class ORBImpl extends com.sun.corba.ee.spi.orb.ORB
     public synchronized IOR getFVDCodeBaseIOR()
     {
         if (codeBaseIOR == null) {
-            ValueHandler vh = ORBUtility.createValueHandler(this);
+            ValueHandler vh = ORBUtility.createValueHandler();
             codeBase = (CodeBase)vh.getRunTimeCodeBase();
             codeBaseIOR = getIOR( codeBase, true ) ;
         }

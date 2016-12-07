@@ -1260,7 +1260,7 @@ public class AnyImpl extends Any {
         // See bug 4391648 for more info about the tcORB in this
         // case.
         RepositoryIdStrings repStrs 
-            = RepositoryIdFactory.getRepIdStringsFactory(tcORB);
+            = RepositoryIdFactory.getRepIdStringsFactory();
 
 
         // Assertion: c instanceof Serializable?
@@ -1292,7 +1292,7 @@ public class AnyImpl extends Any {
 
         // Anything else
         // We know that this is a TypeCodeImpl since it is our ORB
-        classTC = (TypeCodeImpl)ValueUtility.createTypeCodeForClass(tcORB, c, ORBUtility.createValueHandler(tcORB));
+        classTC = (TypeCodeImpl)ValueUtility.createTypeCodeForClass(tcORB, c, ORBUtility.createValueHandler());
         // Intruct classTC to store its buffer
         classTC.setCaching(true);
         // Update the cache

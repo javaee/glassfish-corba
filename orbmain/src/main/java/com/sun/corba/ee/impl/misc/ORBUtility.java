@@ -301,21 +301,6 @@ public final class ORBUtility {
     }
 
     /**
-     * Returns true if the given ORB could accurately be determined to be a
-     * Kestrel or earlier ORB.  Note: If passed the ORBSingleton, this will return
-     * false.
-     */
-    public static boolean isLegacyORB(ORB orb) 
-    {
-        try {
-            ORBVersion currentORB = orb.getORBVersion();
-            return currentORB.equals( ORBVersionFactory.getOLD() ) ;
-        } catch (SecurityException se) {
-            return false;
-        }
-    }
-
-    /**
      * Returns true if it was accurately determined that the remote ORB is
      * a foreign (non-JavaSoft) ORB.  Note:  If passed the ORBSingleton, this
      * will return false.

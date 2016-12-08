@@ -482,11 +482,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
         checkForNegativeLength(len);
 
-        if (orb != null && ORBUtility.isLegacyORB(orb)) {
-            result = legacyReadString(len);
-        } else {
-            result = internalReadString(len);
-        }
+        result = internalReadString(len);
 
         return result ;
     }
@@ -506,46 +502,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         read_octet();
 
         return new String(result, 0, getCharConverter().getNumChars());
-    }
-
-    @CdrRead
-    private String legacyReadString(int len) {
-
-        //
-        // Workaround for ORBs which send string lengths of
-        // zero to mean empty string.
-        //
-        if (len == 0) {
-            return EMPTY_STRING;
-        }
-
-        len--;
-        char[] c = new char[len];
-
-        int numRead = 0;
-        while (numRead < len) {
-
-            if (!byteBuffer.hasRemaining()) grow(1, 1);
-            int avail = byteBuffer.remaining();
-            int wanted = len - numRead;
-            int bytes = (wanted < avail) ? wanted : avail;
-            // Microbenchmarks are showing a loop of ByteBuffer.get(int) being
-            // faster than ByteBuffer.get(byte[], int, int).
-            for (int i=0; i<bytes; i++) {
-                c[numRead+i] = (char) (byteBuffer.get() & 0xFF);
-            }
-            numRead += bytes;
-        }
-
-        //
-        // Skip past terminating null byte
-        //
-        if (byteBuffer.position() + 1 > byteBuffer.limit()) {
-            alignAndCheck(1, 1);
-        }
-        byteBuffer.get();
-
-        return new String(c);
     }
 
     public final String read_string() {

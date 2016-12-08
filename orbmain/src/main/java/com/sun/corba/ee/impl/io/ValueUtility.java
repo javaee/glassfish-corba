@@ -52,7 +52,7 @@ import com.sun.org.omg.CORBA.ValueDefPackage.FullValueDescription;
 import com.sun.org.omg.CORBA.OperationDescription;
 import com.sun.org.omg.CORBA.AttributeDescription;
 import com.sun.org.omg.CORBA.Initializer;
-import com.sun.org.omg.CORBA._IDLTypeStub;
+import org.glassfish.corba.org.omg.CORBA._IDLTypeStub;
 
 import com.sun.corba.ee.impl.util.RepositoryId;
 import org.omg.CORBA.ValueMember;

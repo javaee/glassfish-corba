@@ -93,7 +93,7 @@ public final class IDLTypeHelper
     //public static com.sun.org.omg.CORBA.IDLType read (org.omg.CORBA.portable.InputStream istream)
     public static org.omg.CORBA.IDLType read (org.omg.CORBA.portable.InputStream istream)
     {
-        return narrow (istream.read_Object (_IDLTypeStub.class));
+        return narrow (istream.read_Object (org.glassfish.corba.org.omg.CORBA._IDLTypeStub.class));
     }
 
     // _CHANGED_
@@ -120,7 +120,7 @@ public final class IDLTypeHelper
         else
             {
                 org.omg.CORBA.portable.Delegate delegate = ((org.omg.CORBA.portable.ObjectImpl)obj)._get_delegate ();
-                return new com.sun.org.omg.CORBA._IDLTypeStub (delegate);
+                return new org.glassfish.corba.org.omg.CORBA._IDLTypeStub(delegate);
             }
     }
 

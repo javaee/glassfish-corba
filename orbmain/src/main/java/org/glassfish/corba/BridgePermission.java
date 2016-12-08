@@ -38,7 +38,7 @@
  * holder.
  */
 
-package sun.corba ;
+package org.glassfish.corba;
 
 import java.security.BasicPermission ;
 

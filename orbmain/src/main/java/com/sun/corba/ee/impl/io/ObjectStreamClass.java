@@ -76,7 +76,7 @@ import com.sun.corba.ee.impl.util.RepositoryId;
 
 import org.omg.CORBA.ValueMember;
 
-import sun.corba.Bridge;
+import org.glassfish.corba.Bridge;
 
 import com.sun.corba.ee.impl.misc.ClassInfoCache ;
 import com.sun.corba.ee.spi.trace.TraceValueHandler;

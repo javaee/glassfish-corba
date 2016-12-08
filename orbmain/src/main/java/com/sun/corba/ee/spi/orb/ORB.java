@@ -40,113 +40,48 @@
 
 package com.sun.corba.ee.spi.orb;
 
-import java.util.Map ;
-import java.util.HashMap ;
-import java.util.Properties ;
-
-import java.util.logging.Logger ;
-
-import java.security.AccessController ;
-import java.security.PrivilegedAction ;
-
-import javax.management.ObjectName ;
-
-import com.sun.corba.ee.impl.presentation.rmi.PresentationManagerImpl;
-import org.omg.CORBA.TCKind ;
-import org.omg.PortableServer.Servant ;
-
-import org.omg.CORBA.portable.ObjectImpl;
-
-import com.sun.corba.ee.spi.transport.ByteBufferPool;
-
-import com.sun.corba.ee.spi.protocol.RequestDispatcherRegistry ;
-import com.sun.corba.ee.spi.protocol.ClientDelegateFactory ;
-import com.sun.corba.ee.spi.protocol.ClientDelegate;
-import com.sun.corba.ee.spi.protocol.ServerRequestDispatcher ;
-import com.sun.corba.ee.spi.protocol.PIHandler ;
-import com.sun.corba.ee.spi.resolver.LocalResolver ;
-import com.sun.corba.ee.spi.resolver.Resolver ;
-import com.sun.corba.ee.spi.transport.ContactInfoListFactory ;
-import com.sun.corba.ee.spi.legacy.connection.LegacyServerSocketManager;
-
-import com.sun.corba.ee.spi.ior.IdentifiableFactoryFinder ;
-import com.sun.corba.ee.spi.ior.TaggedComponentFactoryFinder ;
-import com.sun.corba.ee.spi.ior.ObjectKey ;
-import com.sun.corba.ee.spi.ior.ObjectKeyFactory ;
-import com.sun.corba.ee.spi.ior.IOR ;
-import com.sun.corba.ee.spi.ior.IORFactories ;
-import com.sun.corba.ee.spi.ior.TaggedProfile ;
-import com.sun.corba.ee.spi.ior.TaggedProfileTemplate ;
-
-import com.sun.corba.ee.spi.threadpool.ThreadPoolManager;
-
-import com.sun.corba.ee.spi.oa.OAInvocationInfo ;
-import com.sun.corba.ee.spi.transport.TransportManager;
-
-import com.sun.corba.ee.spi.copyobject.CopierManager ;
-
-import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
-import com.sun.corba.ee.spi.presentation.rmi.PresentationDefaults ;
-import com.sun.corba.ee.spi.presentation.rmi.InvocationInterceptor ;
-import com.sun.corba.ee.spi.presentation.rmi.StubAdapter ;
-
-import com.sun.corba.ee.spi.servicecontext.ServiceContextFactoryRegistry ;
-import com.sun.corba.ee.spi.servicecontext.ServiceContextsCache;
-
-import com.sun.corba.ee.spi.transport.ContactInfoList;
-
-import com.sun.corba.ee.impl.corba.TypeCodeImpl ;
-import com.sun.corba.ee.impl.corba.TypeCodeFactory ;
-
-import com.sun.corba.ee.spi.misc.ORBConstants ;
-
-import com.sun.corba.ee.impl.oa.poa.BadServerIdHandler ;
-
+import com.sun.corba.ee.impl.corba.TypeCodeFactory;
+import com.sun.corba.ee.impl.corba.TypeCodeImpl;
 import com.sun.corba.ee.impl.ior.WireObjectKeyTemplate;
-
+import com.sun.corba.ee.impl.oa.poa.BadServerIdHandler;
 import com.sun.corba.ee.impl.transport.ByteBufferPoolImpl;
-
-import com.sun.corba.ee.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.ee.spi.logging.OMGSystemException ;
-
+import com.sun.corba.ee.spi.copyobject.CopierManager;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.IORFactories;
+import com.sun.corba.ee.spi.ior.IdentifiableFactoryFinder;
+import com.sun.corba.ee.spi.ior.ObjectKey;
+import com.sun.corba.ee.spi.ior.ObjectKeyFactory;
+import com.sun.corba.ee.spi.ior.TaggedComponentFactoryFinder;
+import com.sun.corba.ee.spi.ior.TaggedProfile;
+import com.sun.corba.ee.spi.ior.TaggedProfileTemplate;
+import com.sun.corba.ee.spi.legacy.connection.LegacyServerSocketManager;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 import com.sun.corba.ee.spi.misc.ORBClassLoader;
-
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.oa.OAInvocationInfo;
+import com.sun.corba.ee.spi.presentation.rmi.InvocationInterceptor;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationDefaults;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter;
+import com.sun.corba.ee.spi.protocol.ClientDelegate;
+import com.sun.corba.ee.spi.protocol.ClientDelegateFactory;
 import com.sun.corba.ee.spi.protocol.ClientInvocationInfo;
-import com.sun.corba.ee.spi.trace.Cdr;
-
-import com.sun.corba.ee.spi.trace.Folb;
-import com.sun.corba.ee.spi.trace.Giop;
-import com.sun.corba.ee.spi.trace.TraceInterceptor;
-import com.sun.corba.ee.spi.trace.Naming;
-import com.sun.corba.ee.spi.trace.OrbLifeCycle;
-import com.sun.corba.ee.spi.trace.DynamicType ;
-import com.sun.corba.ee.spi.trace.IsLocal;
-import com.sun.corba.ee.spi.trace.Orbd;
-import com.sun.corba.ee.spi.trace.Osgi;
-import com.sun.corba.ee.spi.trace.Poa;
-import com.sun.corba.ee.spi.trace.PoaFSM;
-import com.sun.corba.ee.spi.trace.TraceServiceContext;
+import com.sun.corba.ee.spi.protocol.PIHandler;
+import com.sun.corba.ee.spi.protocol.RequestDispatcherRegistry;
+import com.sun.corba.ee.spi.protocol.ServerRequestDispatcher;
+import com.sun.corba.ee.spi.resolver.LocalResolver;
+import com.sun.corba.ee.spi.resolver.Resolver;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextFactoryRegistry;
+import com.sun.corba.ee.spi.servicecontext.ServiceContextsCache;
+import com.sun.corba.ee.spi.threadpool.ThreadPoolManager;
+import com.sun.corba.ee.spi.trace.*;
 import com.sun.corba.ee.spi.trace.Shutdown;
-import com.sun.corba.ee.spi.trace.StreamFormatVersion;
-import com.sun.corba.ee.spi.trace.Subcontract;
-import com.sun.corba.ee.spi.trace.TraceValueHandler;
-import com.sun.corba.ee.spi.trace.TransientObjectManager;
-import com.sun.corba.ee.spi.trace.Transport;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-
-import java.lang.reflect.Field;
-import org.glassfish.gmbal.ManagedObjectManager ;
-import org.glassfish.gmbal.ManagedObjectManagerFactory ;
-import org.glassfish.gmbal.ManagedObject ;
-import org.glassfish.gmbal.ManagedData ;
-import org.glassfish.gmbal.InheritedAttributes ;
-import org.glassfish.gmbal.InheritedAttribute ;
-import org.glassfish.gmbal.ManagedAttribute ;
-import org.glassfish.gmbal.ManagedOperation ;
-import org.glassfish.gmbal.AMXMetadata ;
-import org.glassfish.gmbal.Description ;
-import org.glassfish.gmbal.NameValue ;
+import com.sun.corba.ee.spi.transport.ByteBufferPool;
+import com.sun.corba.ee.spi.transport.ContactInfoList;
+import com.sun.corba.ee.spi.transport.ContactInfoListFactory;
+import com.sun.corba.ee.spi.transport.TransportManager;
+import org.glassfish.gmbal.*;
 import org.glassfish.pfl.basic.func.UnaryFunction;
 import org.glassfish.pfl.tf.spi.MethodMonitorFactoryDefaults;
 import org.glassfish.pfl.tf.spi.MethodMonitorRegistry;
@@ -154,8 +89,21 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 import org.glassfish.pfl.tf.spi.annotation.MethodMonitorGroup;
 import org.glassfish.pfl.tf.timer.spi.TimerFactory;
 import org.glassfish.pfl.tf.timer.spi.TimerManager;
+import org.omg.CORBA.SystemException;
+import org.omg.CORBA.TCKind;
+import org.omg.CORBA.portable.ObjectImpl;
+import org.omg.PortableServer.Servant;
 
-import sun.awt.AppContext;
+import javax.management.ObjectName;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 @OrbLifeCycle
 @ManagedObject
@@ -391,7 +339,7 @@ public abstract class ORB extends com.sun.corba.ee.org.omg.CORBA.ORB
 
     public abstract LegacyServerSocketManager getLegacyServerSocketManager();
 
-        
+    private static PresentationManager presentationManager = PresentationDefaults.makeOrbPresentationManager();
 
     private UnaryFunction<String,Class<?>> classNameResolver = defaultClassNameResolver ;
     private ClassCodeBaseHandler ccbHandler = null ;
@@ -413,6 +361,9 @@ public abstract class ORB extends com.sun.corba.ee.org.omg.CORBA.ORB
     @Description( "The presentation manager, which handles stub creation" ) 
     public static PresentationManager getPresentationManager() 
     {
+        /**/
+        return presentationManager;
+        /*/
     	AppContext ac = AppContext.getAppContext();
         PresentationManager pm = (PresentationManager) ac.get(PresentationManager.class);
         if (pm == null) {
@@ -421,6 +372,7 @@ public abstract class ORB extends com.sun.corba.ee.org.omg.CORBA.ORB
         }
 
         return pm;
+        /**/
     }
 
     /** Get the appropriate StubFactoryFactory.  This 
@@ -433,7 +385,7 @@ public abstract class ORB extends com.sun.corba.ee.org.omg.CORBA.ORB
     {
     	PresentationManager gPM = getPresentationManager();
         boolean useDynamicStubs = gPM.useDynamicStubs() ;
-        return gPM.getStubFactoryFactory( useDynamicStubs );
+        return useDynamicStubs ? gPM.getDynamicStubFactoryFactory() : gPM.getStaticStubFactoryFactory();
     }
 
     /** Obtain the InvocationInterceptor for this ORB instance.

@@ -59,7 +59,6 @@ import com.sun.org.omg.CORBA.OperationDescription;
 import com.sun.org.omg.CORBA.ParameterDescription;
 import com.sun.org.omg.CORBA.ValueDefPackage.FullValueDescription;
 import com.sun.org.omg.SendingContext.CodeBase;
-import org.glassfish.pfl.basic.algorithm.ObjectUtility;
 import org.glassfish.pfl.basic.logex.OperationTracer;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 import org.omg.CORBA.MARSHAL;
@@ -70,7 +69,7 @@ import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.ValueMember;
 import org.omg.CORBA.portable.IndirectionException;
 import org.omg.CORBA.portable.ValueInputStream;
-import sun.corba.Bridge;
+import org.glassfish.corba.Bridge;
 
 import javax.rmi.CORBA.ValueHandler;
 import java.io.*;

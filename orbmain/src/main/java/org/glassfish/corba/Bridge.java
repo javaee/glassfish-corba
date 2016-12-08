@@ -38,7 +38,7 @@
  * holder.
  */
 
-package sun.corba;
+package org.glassfish.corba;
 
 import java.lang.reflect.Field ;
 import java.lang.reflect.Method ;
@@ -153,14 +153,7 @@ public final class Bridge
     private Bridge() {
         latestUserDefinedLoaderMethod = getLatestUserDefinedLoaderMethod();
         unsafe = getUnsafe() ;
-        reflectionFactory = AccessController.doPrivileged(
-
-        // This generates a warning because GetReflectionFactoryAction
-        // does not have the correct type: I can't fix that.
-        // Because the required type is a generic, I can't fix the
-        // warning either (with Class.cast).
-        (PrivilegedAction<ReflectionFactory>)
-            new ReflectionFactory.GetReflectionFactoryAction()) ;
+        reflectionFactory = ReflectionFactory.getReflectionFactory();
     }
 
     /** Fetch the Bridge singleton.  This requires the following

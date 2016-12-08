@@ -56,14 +56,13 @@ import java.security.PrivilegedAction ;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.Externalizable;
-import java.io.NotSerializableException;
 import java.io.NotActiveException;
 
 import java.lang.reflect.InvocationTargetException;
 
 import java.util.Stack;
 
-import sun.corba.Bridge ;
+import org.glassfish.corba.Bridge;
 
 import com.sun.corba.ee.impl.util.Utility;
 import com.sun.corba.ee.impl.util.RepositoryId;

@@ -48,7 +48,7 @@
 
 package com.sun.corba.ee.impl.util;
 
-import sun.corba.Bridge ;
+import org.glassfish.corba.Bridge;
 
 import java.util.Map ;
 import java.util.WeakHashMap ;

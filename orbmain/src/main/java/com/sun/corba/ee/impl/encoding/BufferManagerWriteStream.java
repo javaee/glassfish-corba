@@ -42,7 +42,7 @@ package com.sun.corba.ee.impl.encoding;
 import java.nio.ByteBuffer;
 import java.util.EmptyStackException;
 
-import sun.corba.Bridge;
+import org.glassfish.corba.Bridge;
 
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.portable.RemarshalException;

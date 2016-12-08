@@ -51,9 +51,8 @@ package com.sun.corba.ee.impl.io;
 
 import java.lang.reflect.Field;
 import java.lang.Comparable;
-import java.util.Hashtable;
 
-import sun.corba.Bridge ;
+import org.glassfish.corba.Bridge;
 import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 

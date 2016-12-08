@@ -75,7 +75,7 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 
 
-import sun.corba.Bridge; 
+import org.glassfish.corba.Bridge;
 
 import com.sun.corba.ee.impl.util.Utility;
 

@@ -70,6 +70,7 @@ import java.util.Vector;
 
 public class Util
 {
+  private static final String DEFAULT_MESSAGE_FILE = "com/sun/tools/corba/ee/idl/idl.prp";
   // <d58319>
   /**
    * Fetch the version number of this build of the IDL Parser Framework
@@ -79,25 +80,25 @@ public class Util
    **/
   public static String getVersion ()
   {
-    return getVersion ("com/sun/tools/corba/se/idl/idl.prp");
+    return getVersion (DEFAULT_MESSAGE_FILE);
   } // getVersion
 
   /**
    * Fetch the version number of this build of the IDL Parser Framework.
    * This method may be called before or after the framework has been
-   * initialized. If the framework is inititialized, the version information
+   * initialized. If the framework is initialized, the version information
    * is extracted from the message properties object; otherwise, it is extracted
    * from the indicated messages file.
    * @return the version number.
    **/
-  public static String getVersion (String filename)
+  protected static String getVersion(String filename)
   {
     String version = "";
     if (messages == null)  // Use supplied file
     {
       Vector oldMsgFiles = msgFiles;
       if (filename == null || filename.equals (""))
-        filename = "com/sun/tools/corba/se/idl/idl.prp";
+        filename = DEFAULT_MESSAGE_FILE;
       filename = filename.replace ('/', File.separatorChar);
       registerMessageFile (filename);
       version = getMessage ("Version.product", getMessage ("Version.number"));
@@ -321,10 +322,10 @@ public class Util
 
   private static Properties messages   = null;
   private static String     defaultKey = "default";
-  private static Vector     msgFiles = new Vector ();
+  private static Vector<String> msgFiles = new Vector<>();
   static
   {
-    msgFiles.addElement ("com/sun/tools/corba/se/idl/idl.prp");
+    msgFiles.addElement (DEFAULT_MESSAGE_FILE);
   }
 
   // Message-related methods

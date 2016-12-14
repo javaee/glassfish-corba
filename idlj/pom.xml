@@ -8,4 +8,19 @@
 
     <artifactId>idlj</artifactId>
     <name>IDL compiler</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.meterware.simplestub</groupId>
+            <artifactId>simplestub</artifactId>
+        </dependency>
+    </dependencies>
 </project>

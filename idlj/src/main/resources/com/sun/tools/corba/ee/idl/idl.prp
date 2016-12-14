@@ -181,7 +181,7 @@ Token.endOfFile=EOF
 Token.unknown=?
 Util.cantCreatePkg=Cannot create the package %0.
 Version.product=IDL Parser Framework, version "%0"
-Version.number=3.2
+Version.number=4.02
 default=Error!  A message was requested which does not exist.  The messages file does not contain the key: %0.
 
 # Translator: In the list of options below, do not translate:

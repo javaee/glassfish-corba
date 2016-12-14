@@ -50,12 +50,12 @@
  */
 
 package com.sun.tools.corba.ee.idl.som.idlemit;
-import java.util.Vector;
-
 import com.sun.tools.corba.ee.idl.ForwardEntry;
 import com.sun.tools.corba.ee.idl.PragmaHandler;
 import com.sun.tools.corba.ee.idl.SymtabEntry;
 import com.sun.tools.corba.ee.idl.som.cff.Messages;
+
+import java.util.Vector;
 /**
  * This is an implementation that handles 
  * #pragma meta scoped_name string
@@ -228,7 +228,7 @@ public class MetaPragma extends PragmaHandler {
                          index++;
                      } else isText = true;
                  } 
-                 else if ( Character.isSpace(ch) || (ch == ',') // 59601
+                 else if ( Character.isSpaceChar(ch) || (ch == ',') // 59601
                               || (ch == ';') ) // 59683
                      isWhiteSpace = true;
                  else isText = true;

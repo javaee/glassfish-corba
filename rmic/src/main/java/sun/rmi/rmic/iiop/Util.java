@@ -32,10 +32,10 @@
 
 package sun.rmi.rmic.iiop;
 
-import java.io.File;
+import com.sun.corba.ee.impl.util.PackagePrefixChecker;
 import sun.tools.java.Identifier;
 
-import com.sun.corba.se.impl.util.PackagePrefixChecker;
+import java.io.File;
 
 /**
  * Util provides static utility methods used by other rmic classes.

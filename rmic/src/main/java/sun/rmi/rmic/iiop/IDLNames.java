@@ -32,13 +32,8 @@
 
 package sun.rmi.rmic.iiop;
 
-import java.util.Hashtable;
-import java.util.Locale;
-import sun.tools.java.Identifier;
-import sun.tools.java.CompilerError;
-import sun.tools.java.ClassDefinition;
 import sun.tools.java.ClassNotFound;
-import com.sun.corba.se.impl.util.RepositoryId;
+import sun.tools.java.Identifier;
 
 /**
  * IDLNames provides static utility methods to perform the IDL

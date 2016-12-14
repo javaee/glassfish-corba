@@ -8,4 +8,12 @@
 
     <artifactId>rmic</artifactId>
     <name>RMIC compiler</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>glassfish-corba-orb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

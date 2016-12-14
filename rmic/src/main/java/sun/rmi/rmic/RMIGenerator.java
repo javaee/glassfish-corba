@@ -32,21 +32,22 @@
 
 package sun.rmi.rmic;
 
+import com.sun.corba.ee.impl.util.Utility;
+import sun.tools.java.ClassDeclaration;
+import sun.tools.java.ClassDefinition;
+import sun.tools.java.ClassFile;
+import sun.tools.java.ClassNotFound;
+import sun.tools.java.Identifier;
+import sun.tools.java.MemberDefinition;
+import sun.tools.java.Type;
+
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-import sun.tools.java.Type;
-import sun.tools.java.Identifier;
-import sun.tools.java.ClassDefinition;
-import sun.tools.java.ClassDeclaration;
-import sun.tools.java.ClassNotFound;
-import sun.tools.java.ClassFile;
-import sun.tools.java.MemberDefinition;
-import com.sun.corba.se.impl.util.Utility;
 
 /**
  * A Generator object will generate the Java source code of the stub

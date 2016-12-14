@@ -32,25 +32,21 @@
 
 package sun.rmi.rmic.iiop;
 
+import com.sun.corba.ee.impl.util.PackagePrefixChecker;
+import com.sun.corba.ee.impl.util.Utility;
+import sun.rmi.rmic.IndentingWriter;
+import sun.rmi.rmic.Main;
+import sun.tools.java.ClassDefinition;
+import sun.tools.java.CompilerError;
+import sun.tools.java.Identifier;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.SerializablePermission;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Vector;
-import java.util.Hashtable;
-import java.util.Enumeration;
-import sun.tools.java.Identifier;
-import sun.tools.java.ClassNotFound;
-import sun.tools.java.ClassDefinition;
-import sun.tools.java.ClassDeclaration;
-import sun.tools.java.CompilerError;
-import sun.rmi.rmic.IndentingWriter;
-import java.util.HashSet;
 import java.util.Arrays;
-import com.sun.corba.se.impl.util.Utility;
-import com.sun.corba.se.impl.util.PackagePrefixChecker;
-import sun.rmi.rmic.Main;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Vector;
 
 
 /**
@@ -162,7 +158,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
      * Examine and consume command line arguments.
      * @param argv The command line arguments. Ignore null
      * and unknown arguments. Set each consumed argument to null.
-     * @param error Report any errors using the main.error() methods.
+     * @param main Report any errors using the main.error() methods.
      * @return true if no errors, false otherwise.
      */
     public boolean parseArgs(String argv[], Main main) {
@@ -343,7 +339,7 @@ public class StubGenerator extends sun.rmi.rmic.iiop.Generator {
 
     /**
      * Write the output for the given OutputFileName into the output stream.
-     * @param name One of the items returned by getOutputTypesFor(...)
+     * @param outputType One of the items returned by getOutputTypesFor(...)
      * @param alreadyChecked A set of Types which have already been checked.
      *  Intended to be passed to Type.collectMatching(filter,alreadyChecked).
      * @param writer The output stream.

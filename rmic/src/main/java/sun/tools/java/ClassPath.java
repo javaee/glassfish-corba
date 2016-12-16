@@ -27,22 +27,20 @@ package sun.tools.java;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.zip.*;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Set;
-import java.util.LinkedHashSet;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.ProviderNotFoundException;
-import java.nio.file.spi.FileSystemProvider;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 /**
  * This class is used to represent a class path, which can contain both
@@ -458,7 +456,7 @@ final class JrtClassPathEntry extends ClassPathEntry {
             Path cp = getClassPath(name);
             return cp == null? null : ClassFile.newClassFile(cp);
         } catch (IOException ioExp) {
-            throw new UncheckedIOException(ioExp);
+            throw new RmicUncheckedIOException(ioExp);
         }
     }
 
@@ -470,7 +468,7 @@ final class JrtClassPathEntry extends ClassPathEntry {
                 return;
             }
         } catch (IOException ioExp) {
-            throw new UncheckedIOException(ioExp);
+            throw new RmicUncheckedIOException(ioExp);
         }
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
@@ -482,7 +480,7 @@ final class JrtClassPathEntry extends ClassPathEntry {
                 }
             }
         } catch (IOException ioExp) {
-            throw new UncheckedIOException(ioExp);
+            throw new RmicUncheckedIOException(ioExp);
         }
     }
 }

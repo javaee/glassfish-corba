@@ -25,12 +25,11 @@
 
 package sun.tools.java;
 
-import java.io.InputStream;
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * This class is used to represent a file loaded from the class path, and
@@ -53,7 +52,7 @@ class PathClassFile extends ClassFile {
         try {
             this.attrs = Files.readAttributes(path, BasicFileAttributes.class);
         } catch (IOException ioExp) {
-            throw new UncheckedIOException(ioExp);
+            throw new RmicUncheckedIOException(ioExp);
         }
     }
 

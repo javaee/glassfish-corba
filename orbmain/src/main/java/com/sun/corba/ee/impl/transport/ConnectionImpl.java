@@ -68,7 +68,6 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.SystemException;
-import sun.misc.HexDumpEncoder;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -1308,15 +1307,6 @@ public class ConnectionImpl extends EventHandlerBase implements Connection, Work
             messageMediator = messageParser.getMessageMediator();
         }
         return byteBuffer;
-    }
-
-    private static String toHexDump(ByteBuffer byteBuffer) {
-        StringBuilder sb = new StringBuilder();
-        byteBuffer.mark();
-        HexDumpEncoder encoder = new HexDumpEncoder();
-        sb.append(encoder.encodeBuffer(byteBuffer));
-        byteBuffer.reset();
-        return sb.toString();
     }
 
     private void parseBytesAndDispatchMessages() {

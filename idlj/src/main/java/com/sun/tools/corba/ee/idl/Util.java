@@ -57,20 +57,18 @@ package com.sun.tools.corba.ee.idl;
 // -D58319<daz> Add version() method.
 // -D62023<daz> Add absDelta() method to support float computations.
 
-import com.sun.tools.corba.ee.idl.som.cff.FileLocator;
-
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.MissingResourceException;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.Vector;
 
 public class Util
 {
-  private static final String DEFAULT_MESSAGE_FILE = "com/sun/tools/corba/ee/idl/idl.prp";
+  private static final String DEFAULT_MESSAGE_RESOURCE = "com/sun/tools/corba/ee/idl/idl";
   // <d58319>
   /**
    * Fetch the version number of this build of the IDL Parser Framework
@@ -80,8 +78,8 @@ public class Util
    **/
   public static String getVersion ()
   {
-    return getVersion (DEFAULT_MESSAGE_FILE);
-  } // getVersion
+    return getVersion (DEFAULT_MESSAGE_RESOURCE);
+  }
 
   /**
    * Fetch the version number of this build of the IDL Parser Framework.
@@ -96,13 +94,13 @@ public class Util
     String version = "";
     if (messages == null)  // Use supplied file
     {
-      Vector oldMsgFiles = msgFiles;
+      Vector<String> oldMsgFiles = msgResources;
       if (filename == null || filename.equals (""))
-        filename = DEFAULT_MESSAGE_FILE;
+        filename = DEFAULT_MESSAGE_RESOURCE;
       filename = filename.replace ('/', File.separatorChar);
-      registerMessageFile (filename);
+      registerMessageResource(filename);
       version = getMessage ("Version.product", getMessage ("Version.number"));
-      msgFiles = oldMsgFiles;
+      msgResources = oldMsgFiles;
       messages = null;
     }
     else
@@ -262,81 +260,50 @@ public class Util
     return message;
   } // getDefaultMessage
 
-  /*
-  findFile is no longer used now that FileLocator has been provided
-  by Larry Raper of the Shasta team.
 
-  static File findFile (String name) throws FileNotFoundException
-  {
-    String classpath = System.getProperty ("java.class.path");
-    String separator = System.getProperty ("path.separator");
-    int end = -separator.length (); // so the first pass classpath == original classpath
-    File file;
-    do
-    {
-      classpath = classpath.substring (end + separator.length ());
-      end = classpath.indexOf (separator);
-      if (end < 0) end = classpath.length ();
-      file = new File (classpath.substring (0, end) + File.separator + "com" + File.separator + "ibm" + File.separator + "idl" + File.separator + name);
-    } while (!file.exists () && end != classpath.length ());
-    if (!file.exists ()) throw new FileNotFoundException ();
-    return file;
-  } // findFile
-  */
+  private static void readMessages() {
+    messages = new Properties();
+    for (String msgResource : msgResources)
+      loadMessages(msgResource);
 
-  private static void readMessages ()
-  {
-    messages = new Properties ();
-    Enumeration fileList = msgFiles.elements ();
-    DataInputStream stream;
-    while (fileList.hasMoreElements ())
-      try
-      {
-        stream = FileLocator.locateLocaleSpecificFileInClassPath ((String)fileList.nextElement ());
-        messages.load (stream);
-      }
-      catch (IOException e)
-      {
-      }
-    if (messages.size () == 0)
-      messages.put (defaultKey, "Error reading Messages File.");
-  } // readMessages
+    if (messages.size() == 0)
+      messages.put(defaultKey, "Error reading Messages File.");
+  }
 
-  /** Register a message file.  This file will be searched for
-      in the CLASSPATH. */
-  public static void registerMessageFile (String filename)
-  {
-    if (filename != null)
+  private static void loadMessages(String msgResource) {
+    try {
+      ResourceBundle newMessages = ResourceBundle.getBundle(msgResource);
+      for (String key : newMessages.keySet())
+        messages.setProperty(key, newMessages.getString(key));
+    } catch (MissingResourceException ignore) {
+    }
+  }
+
+  /** Register a message resource.  This resource will be searched for in the CLASSPATH. */
+  public static void registerMessageResource(String resourceName) {
+    if (resourceName != null)
       if (messages == null)
-        msgFiles.addElement (filename);
+        msgResources.addElement(resourceName);
       else
-        try
-        {
-          DataInputStream stream = FileLocator.locateLocaleSpecificFileInClassPath (filename);
-          messages.load (stream);
-        }
-        catch (IOException e)
-        {
-        }
-  } // registerMessageFile
+        loadMessages(resourceName);
+  }
 
   private static Properties messages   = null;
   private static String     defaultKey = "default";
-  private static Vector<String> msgFiles = new Vector<>();
+  private static Vector<String> msgResources = new Vector<>();
   static
   {
-    msgFiles.addElement (DEFAULT_MESSAGE_FILE);
+    msgResources.addElement (DEFAULT_MESSAGE_RESOURCE);
   }
 
   // Message-related methods
   ///////////////
 
-  public static String capitalize (String lc)
-  {
-    String first = new String (lc.substring (0, 1));
-    first = first.toUpperCase ();
+  public static String capitalize (String lc) {
+    String first = lc.substring(0, 1);
+    first = first.toUpperCase();
     return first + lc.substring (1);
-  } // capitalize
+  }
 
   ///////////////
   // General file methods

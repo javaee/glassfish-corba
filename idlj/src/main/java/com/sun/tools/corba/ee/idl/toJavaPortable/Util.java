@@ -125,7 +125,7 @@ public class Util extends com.sun.tools.corba.ee.idl.Util
    **/
   public static String getVersion ()
   {
-    return com.sun.tools.corba.ee.idl.Util.getVersion("com/sun/tools/corba/se/idl/toJavaPortable/toJavaPortable.prp");
+    return com.sun.tools.corba.ee.idl.Util.getVersion("com/sun/tools/corba/se/idl/toJavaPortable/toJavaPortable");
   } // getVersion
 
   /**

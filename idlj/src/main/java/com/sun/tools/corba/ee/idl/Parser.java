@@ -1611,6 +1611,7 @@ class Parser
   /**
    *
    **/
+  @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
   com.sun.tools.corba.ee.idl.constExpr.Expression literal (com.sun.tools.corba.ee.idl.SymtabEntry entry) throws IOException, com.sun.tools.corba.ee.idl.ParseException
   {
     String     string  = token.name;
@@ -1633,8 +1634,7 @@ class Parser
       case com.sun.tools.corba.ee.idl.Token.CharacterLiteral:
         boolean isWide = token.isWide();
         match (com.sun.tools.corba.ee.idl.Token.CharacterLiteral);
-        literal = exprFactory.terminal ("'" + string.substring (1) + "'",
-            new Character (string.charAt (0)), isWide );
+        literal = exprFactory.terminal ("'" + string.substring (1) + "'", string.charAt( 0 ), isWide );
         break;
       case com.sun.tools.corba.ee.idl.Token.FloatingPointLiteral:
         match (com.sun.tools.corba.ee.idl.Token.FloatingPointLiteral);
@@ -1678,25 +1678,25 @@ class Parser
     return new BigInteger (string, radix);
   } // parseString
 
-  /**
-   *
-   **/
-  private com.sun.tools.corba.ee.idl.constExpr.Terminal booleanLiteral () throws IOException, com.sun.tools.corba.ee.idl.ParseException
-  {
-    boolean bool;
-    if (token.name.equals ("TRUE"))
-      bool = true;
-    else if (token.name.equals ("FALSE"))
-      bool = false;
-    else
-    {
-      com.sun.tools.corba.ee.idl.ParseException.invalidConst(scanner, token.name);
-      bool = false;
+  @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+  private com.sun.tools.corba.ee.idl.constExpr.Terminal booleanLiteral() throws IOException, com.sun.tools.corba.ee.idl.ParseException {
+    Boolean bool;
+    switch ( token.name ) {
+      case "TRUE":
+        bool = true;
+        break;
+      case "FALSE":
+        bool = false;
+        break;
+      default:
+        ParseException.invalidConst( scanner, token.name );
+        bool = false;
+        break;
     }
     String name = token.name;
     match (com.sun.tools.corba.ee.idl.Token.BooleanLiteral);
     return exprFactory.terminal (name, bool);
-  } // booleanLiteral
+  }
 
   /**
    *

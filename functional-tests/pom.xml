@@ -143,10 +143,11 @@
                 <artifactId>rmic-maven-plugin</artifactId>
                 <configuration>
                     <testOutputDirectory>${project.build.testOutputDirectory}</testOutputDirectory>
-                    <keep>true</keep>
                     <sources>
                         <source>
+                            <iiop>true</iiop>
                             <poa>true</poa>
+                            <keep>true</keep>
                             <includes>
                                 <include>**/rmiiIServantPOA.class</include>
                                 <include>**/corba/preinvokepostinvoke/MyServant.class</include>
@@ -154,13 +155,13 @@
                             </includes>
                         </source>
                         <source>
+                            <keep>true</keep>
+                            <iiop>true</iiop>
                             <includes>
                                 <include>**/rmiiIServant.class</include>
                             </includes>
                         </source>
                     </sources>
-                    <includes>
-                    </includes>
                 </configuration>
             </plugin>
 

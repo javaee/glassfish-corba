@@ -38,23 +38,23 @@
  * holder.
  */
 
-package anytest;
+package com.sun.corba.ee.impl.corba;
 
-public class enum1Helper {
+public class Enum1Helper {
     // It is useless to have instances of this class
-    private enum1Helper() { }
+    private Enum1Helper() { }
 
-    public static void write(org.omg.CORBA.portable.OutputStream out, enum1 that)  {
+    public static void write(org.omg.CORBA.portable.OutputStream out, Enum1 that)  {
         out.write_long(that.value());
     }
-    public static enum1 read(org.omg.CORBA.portable.InputStream in)  {
-        return enum1.from_int(in.read_long());
+    public static Enum1 read(org.omg.CORBA.portable.InputStream in)  {
+        return Enum1.from_int(in.read_long());
     }
-    public static enum1 extract(org.omg.CORBA.Any a) {
+    public static Enum1 extract(org.omg.CORBA.Any a) {
         org.omg.CORBA.portable.InputStream in = a.create_input_stream();
         return read(in);
     }
-    public static void insert(org.omg.CORBA.Any a, enum1 that) {
+    public static void insert(org.omg.CORBA.Any a, Enum1 that) {
         org.omg.CORBA.portable.OutputStream out = a.create_output_stream();
         write(out, that);
         a.read_value(out.create_input_stream(), type());

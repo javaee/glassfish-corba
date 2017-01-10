@@ -40,22 +40,18 @@ package com.sun.corba.ee.impl.corba;
  */
 
 import com.sun.corba.ee.spi.orb.ORB;
-
-import java.io.Serializable;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_OPERATION;
 import org.omg.CORBA.TCKind;
 
+import java.io.Serializable;
+
 import static com.meterware.simplestub.Stub.createStrictStub;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class AnyImplTest {
 

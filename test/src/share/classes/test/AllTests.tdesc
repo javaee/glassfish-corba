@@ -41,7 +41,6 @@
 
 -test javax.rmi.CORBA.serialization.SerializationTest
 -test test12.SerializationTest -vm 1.2
--test anytest.AnyTest
 
 // This has to be run in a separate process because it
 // clobbers environment variables like java.rmi.server.codebase

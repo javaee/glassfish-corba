@@ -122,7 +122,6 @@
                 optimize="${javac.optimize}"
                 fork="true"
                 memoryMaximumSize="512m"> 
-            <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
             <src path="${test-gensrc.dir}"/>
             <include name="**"/>
 
@@ -179,7 +178,6 @@
                 optimize="${javac.optimize}"
                 fork="true"
                 memoryMaximumSize="512m"> 
-            <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
             <src path="${test-gensrc.dir}"/>
             <src path="${test.src.dir}"/>
             <include name="**"/>
@@ -232,7 +230,6 @@
                 debug="${javac.debug}" 
                 optimize="${javac.optimize}"
                 failonerror="true">
-            <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
             <src path="${test.src.dir}/values1"/>
             <include name="**"/>
         </javac>
@@ -243,7 +240,6 @@
                 debug="${javac.debug}" 
                 optimize="${javac.optimize}"
                 failonerror="true">
-            <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
             <src path="${test.src.dir}/values2"/>
             <include name="**"/>
         </javac>

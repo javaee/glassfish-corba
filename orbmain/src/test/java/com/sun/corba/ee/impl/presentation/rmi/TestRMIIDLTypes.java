@@ -37,15 +37,20 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package corba.dynamicrmiiiop;
+package com.sun.corba.ee.impl.presentation.rmi;
 
-import junit.framework.TestCase;
+import corba.dynamicrmiiiop.testclasses.InvalidEntities;
+import corba.dynamicrmiiiop.testclasses.InvalidExceptions;
+import corba.dynamicrmiiiop.testclasses.InvalidObjRefs;
+import corba.dynamicrmiiiop.testclasses.InvalidValues;
+import corba.dynamicrmiiiop.testclasses.ValidEntities;
+import corba.dynamicrmiiiop.testclasses.ValidExceptions;
+import corba.dynamicrmiiiop.testclasses.ValidObjRefs;
+import corba.dynamicrmiiiop.testclasses.ValidRemotes;
+import corba.dynamicrmiiiop.testclasses.ValidValues;
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import junit.framework.Assert;
-
-import corba.dynamicrmiiiop.testclasses.*;
-import com.sun.corba.ee.impl.presentation.rmi.IDLTypesUtil ;
 
 public class TestRMIIDLTypes extends TestCase {
 
@@ -75,13 +80,13 @@ public class TestRMIIDLTypes extends TestCase {
         for(int i = 0; i < primitives.length; i++) {
             Class primitive = primitives[i];
             String msg = primitive.getName();
-            Assert.assertTrue(msg, idlTypesUtil.isPrimitive(primitive));
-            Assert.assertFalse(msg,idlTypesUtil.isRemoteInterface(primitive));
-            Assert.assertFalse(msg,idlTypesUtil.isValue(primitive));
-            Assert.assertFalse(msg,idlTypesUtil.isArray(primitive));
-            Assert.assertFalse(msg,idlTypesUtil.isException(primitive));
-            Assert.assertFalse(msg,idlTypesUtil.isObjectReference(primitive));
-            Assert.assertFalse(msg,idlTypesUtil.isEntity(primitive));
+            assertTrue(msg, idlTypesUtil.isPrimitive(primitive));
+            assertFalse(msg,idlTypesUtil.isRemoteInterface(primitive));
+            assertFalse(msg,idlTypesUtil.isValue(primitive));
+            assertFalse(msg,idlTypesUtil.isArray(primitive));
+            assertFalse(msg,idlTypesUtil.isException(primitive));
+            assertFalse(msg,idlTypesUtil.isObjectReference(primitive));
+            assertFalse(msg,idlTypesUtil.isEntity(primitive));
         }
 
         Class[] nonPrimitives = {
@@ -92,7 +97,7 @@ public class TestRMIIDLTypes extends TestCase {
         for(int i = 0; i < nonPrimitives.length; i++) {
             Class nonPrimitive = nonPrimitives[i];
             String msg = nonPrimitive.getName();
-            Assert.assertFalse(msg, idlTypesUtil.isPrimitive(nonPrimitive));
+            assertFalse(msg, idlTypesUtil.isPrimitive(nonPrimitive));
         }
         
     }
@@ -106,14 +111,14 @@ public class TestRMIIDLTypes extends TestCase {
             Class remoteIntf = remoteInterfaces[i];
             String msg = remoteIntf.getName();
 
-            Assert.assertTrue(msg, idlTypesUtil.isRemoteInterface(remoteIntf));
+            assertTrue(msg, idlTypesUtil.isRemoteInterface(remoteIntf));
 
-            Assert.assertFalse(msg,idlTypesUtil.isPrimitive(remoteIntf));
-            Assert.assertFalse(msg,idlTypesUtil.isValue(remoteIntf));
-            Assert.assertFalse(msg,idlTypesUtil.isArray(remoteIntf));
-            Assert.assertFalse(msg,idlTypesUtil.isException(remoteIntf));
-            Assert.assertFalse(msg,idlTypesUtil.isObjectReference(remoteIntf));
-            Assert.assertFalse(msg,idlTypesUtil.isEntity(remoteIntf));
+            assertFalse(msg,idlTypesUtil.isPrimitive(remoteIntf));
+            assertFalse(msg,idlTypesUtil.isValue(remoteIntf));
+            assertFalse(msg,idlTypesUtil.isArray(remoteIntf));
+            assertFalse(msg,idlTypesUtil.isException(remoteIntf));
+            assertFalse(msg,idlTypesUtil.isObjectReference(remoteIntf));
+            assertFalse(msg,idlTypesUtil.isEntity(remoteIntf));
         }
 
         // NOTE invalid remote interfaces are tested in TestIDLNameTranslator
@@ -128,14 +133,14 @@ public class TestRMIIDLTypes extends TestCase {
             Class value = values[i];
             String msg = value.getName();
 
-            Assert.assertTrue(msg,idlTypesUtil.isValue(value));
+            assertTrue(msg,idlTypesUtil.isValue(value));
 
-            Assert.assertFalse(msg, idlTypesUtil.isPrimitive(value));
-            Assert.assertFalse(msg,idlTypesUtil.isRemoteInterface(value));
-            Assert.assertFalse(msg,idlTypesUtil.isArray(value));
-            Assert.assertFalse(msg,idlTypesUtil.isException(value));
-            Assert.assertFalse(msg,idlTypesUtil.isObjectReference(value));
-            Assert.assertFalse(msg,idlTypesUtil.isEntity(value));
+            assertFalse(msg, idlTypesUtil.isPrimitive(value));
+            assertFalse(msg,idlTypesUtil.isRemoteInterface(value));
+            assertFalse(msg,idlTypesUtil.isArray(value));
+            assertFalse(msg,idlTypesUtil.isException(value));
+            assertFalse(msg,idlTypesUtil.isObjectReference(value));
+            assertFalse(msg,idlTypesUtil.isEntity(value));
         }
 
         Class[] nonValues = InvalidValues.CLASSES;
@@ -143,7 +148,7 @@ public class TestRMIIDLTypes extends TestCase {
         for(int i = 0; i < nonValues.length; i++) {
             Class nonValue = nonValues[i];
             String msg = nonValue.getName();
-            Assert.assertFalse(msg, idlTypesUtil.isValue(nonValue));
+            assertFalse(msg, idlTypesUtil.isValue(nonValue));
         }
         
     }
@@ -157,15 +162,15 @@ public class TestRMIIDLTypes extends TestCase {
             Class excep = exceptions[i];
             String msg = excep.getName();
 
-            Assert.assertTrue(msg,idlTypesUtil.isException(excep));
+            assertTrue(msg,idlTypesUtil.isException(excep));
             // a valid exception is always a valid value type !
-            Assert.assertTrue(msg,idlTypesUtil.isValue(excep));
+            assertTrue(msg,idlTypesUtil.isValue(excep));
 
-            Assert.assertFalse(msg, idlTypesUtil.isPrimitive(excep));
-            Assert.assertFalse(msg,idlTypesUtil.isRemoteInterface(excep));
-            Assert.assertFalse(msg,idlTypesUtil.isArray(excep));
-            Assert.assertFalse(msg,idlTypesUtil.isObjectReference(excep));
-            Assert.assertFalse(msg,idlTypesUtil.isEntity(excep));
+            assertFalse(msg, idlTypesUtil.isPrimitive(excep));
+            assertFalse(msg,idlTypesUtil.isRemoteInterface(excep));
+            assertFalse(msg,idlTypesUtil.isArray(excep));
+            assertFalse(msg,idlTypesUtil.isObjectReference(excep));
+            assertFalse(msg,idlTypesUtil.isEntity(excep));
         }
 
         Class[] nonExceptions = InvalidExceptions.CLASSES;
@@ -173,7 +178,7 @@ public class TestRMIIDLTypes extends TestCase {
         for(int i = 0; i < nonExceptions.length; i++) {
             Class nonException = nonExceptions[i];
             String msg = nonException.getName();
-            Assert.assertFalse(msg, idlTypesUtil.isException(nonException));
+            assertFalse(msg, idlTypesUtil.isException(nonException));
         }        
     }
 
@@ -186,14 +191,14 @@ public class TestRMIIDLTypes extends TestCase {
             Class objRef = objRefs[i];
             String msg = objRef.getName();
 
-            Assert.assertTrue(msg,idlTypesUtil.isObjectReference(objRef));
+            assertTrue(msg,idlTypesUtil.isObjectReference(objRef));
 
-            Assert.assertFalse(msg, idlTypesUtil.isPrimitive(objRef));
-            Assert.assertFalse(msg,idlTypesUtil.isRemoteInterface(objRef));
-            Assert.assertFalse(msg,idlTypesUtil.isValue(objRef));
-            Assert.assertFalse(msg,idlTypesUtil.isArray(objRef));
-            Assert.assertFalse(msg,idlTypesUtil.isException(objRef));
-            Assert.assertFalse(msg,idlTypesUtil.isEntity(objRef));
+            assertFalse(msg, idlTypesUtil.isPrimitive(objRef));
+            assertFalse(msg,idlTypesUtil.isRemoteInterface(objRef));
+            assertFalse(msg,idlTypesUtil.isValue(objRef));
+            assertFalse(msg,idlTypesUtil.isArray(objRef));
+            assertFalse(msg,idlTypesUtil.isException(objRef));
+            assertFalse(msg,idlTypesUtil.isEntity(objRef));
         }
 
         Class[] nonObjRefs = InvalidObjRefs.CLASSES;
@@ -201,7 +206,7 @@ public class TestRMIIDLTypes extends TestCase {
         for(int i = 0; i < nonObjRefs.length; i++) {
             Class nonObjRef = nonObjRefs[i];
             String msg = nonObjRef.getName();
-            Assert.assertFalse(msg, idlTypesUtil.isObjectReference(nonObjRef));
+            assertFalse(msg, idlTypesUtil.isObjectReference(nonObjRef));
         }        
 
     }
@@ -215,15 +220,15 @@ public class TestRMIIDLTypes extends TestCase {
             Class entity = entities[i];
             String msg = entity.getName();
 
-            Assert.assertTrue(msg,idlTypesUtil.isEntity(entity));
+            assertTrue(msg,idlTypesUtil.isEntity(entity));
             // An entity type is always a value type
-            Assert.assertTrue(msg,idlTypesUtil.isValue(entity));
+            assertTrue(msg,idlTypesUtil.isValue(entity));
 
-            Assert.assertFalse(msg, idlTypesUtil.isPrimitive(entity));
-            Assert.assertFalse(msg,idlTypesUtil.isRemoteInterface(entity));
-            Assert.assertFalse(msg,idlTypesUtil.isArray(entity));
-            Assert.assertFalse(msg,idlTypesUtil.isException(entity));
-            Assert.assertFalse(msg,idlTypesUtil.isObjectReference(entity));
+            assertFalse(msg, idlTypesUtil.isPrimitive(entity));
+            assertFalse(msg,idlTypesUtil.isRemoteInterface(entity));
+            assertFalse(msg,idlTypesUtil.isArray(entity));
+            assertFalse(msg,idlTypesUtil.isException(entity));
+            assertFalse(msg,idlTypesUtil.isObjectReference(entity));
 
         }
 
@@ -232,7 +237,7 @@ public class TestRMIIDLTypes extends TestCase {
         for(int i = 0; i < nonEntities.length; i++) {
             Class nonEntity = nonEntities[i];
             String msg = nonEntity.getName();
-            Assert.assertFalse(msg, idlTypesUtil.isEntity(nonEntity));
+            assertFalse(msg, idlTypesUtil.isEntity(nonEntity));
         }        
 
     }

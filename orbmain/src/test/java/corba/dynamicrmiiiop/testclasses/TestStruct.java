@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package corba.dynamicrmiiiop.testclasses ;
+package corba.dynamicrmiiiop.testclasses;
 
 public final class TestStruct implements org.omg.CORBA.portable.IDLEntity
 {

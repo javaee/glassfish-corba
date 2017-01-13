@@ -150,8 +150,6 @@ public class Client extends TestCase
         ) ;
 
         TestSuite ts = (TestSuite)TestCaseTools.makeTestSuite( Client.class ) ;
-        ts.addTest( new TestSuite( TestIDLNameTranslator.class ) ) ;
-        ts.addTest( new TestSuite( TestRMIIDLTypes.class ) ) ;
 
         // Add the Codegen ProxyCreator test suite if it is available.
         // It is part of the optional ORB build.

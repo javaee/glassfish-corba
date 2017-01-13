@@ -37,36 +37,18 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package corba.dynamicrmiiiop;
+package com.sun.corba.ee.impl.presentation.rmi;
 
+import com.sun.corba.ee.spi.presentation.rmi.IDLNameTranslator;
+import corba.dynamicrmiiiop.testclasses.*;
 import junit.framework.TestCase;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import junit.framework.Assert;
 
 import java.lang.reflect.Method;
-
-import java.util.Iterator;
+import java.math.BigInteger;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import java.math.BigInteger;
-
-import corba.dynamicrmiiiop.testclasses.*;
-
-import com.sun.corba.ee.spi.presentation.rmi.IDLNameTranslator ;
-import com.sun.corba.ee.impl.presentation.rmi.IDLNameTranslatorImpl ;
-import com.sun.corba.ee.impl.presentation.rmi.IDLTypesUtil ;
-
 public class TestIDLNameTranslator extends TestCase {
-
-    public static Test suite() 
-    {
-        TestSuite testSuite = new TestSuite();
-        testSuite.addTest( new TestSuite(TestIDLNameTranslator.class) );
-        testSuite.addTest( new TestSuite(TestRMIIDLTypes.class) );
-        return testSuite;
-    }
 
     private static final Class[] nonRemoteInterfaces = {
         InvalidRemotes.InvalidRemote1.class, 
@@ -165,7 +147,7 @@ public class TestIDLNameTranslator extends TestCase {
             testInterface = Class.forName("corba.dynamicrmiiiop.testclasses.IDLDefaultTest$IDLDefault");
         } catch(Exception e) {
             e.printStackTrace();
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
         doIDLNameTranslationTest(testClass, testInterface);
     }
@@ -180,7 +162,7 @@ public class TestIDLNameTranslator extends TestCase {
             try {
                 IDLNameTranslator translator = 
                     IDLNameTranslatorImpl.get(nonRemote);
-                Assert.assertTrue(msg, false);
+                assertTrue(msg, false);
             } catch(IllegalStateException ise) {
                 // System.out.println(ise.getMessage());
             }
@@ -210,7 +192,7 @@ public class TestIDLNameTranslator extends TestCase {
                 idlNamesMethod.invoke(null, new Object[] {});
         } catch(Exception e) {
             e.printStackTrace();
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
 
         return expectedIdlNames ;
@@ -258,8 +240,8 @@ public class TestIDLNameTranslator extends TestCase {
             String msg = "expected '" + expected + "'" +
                 " got '" + translatedName + "' " + ":" + m;
 
-            Assert.assertEquals(msg, expected, translatedName);
-            Assert.assertEquals(msg, m, 
+            assertEquals(msg, expected, translatedName);
+            assertEquals(msg, m,
                                 nameTranslator.getMethod(expected));           
         }
     }
@@ -278,13 +260,13 @@ public class TestIDLNameTranslator extends TestCase {
 
             // Make sure result is 5 characters long : 1 character for
             // the "U", plus four for the hex representation.
-            Assert.assertEquals(msg, 5, unicode.length());
+            assertEquals(msg, 5, unicode.length());
 
             BigInteger bigInt = new BigInteger(unicode.substring(1), 16);
             int hexValue = bigInt.intValue();
             msg = msg + ":" + hexValue;
             // Convert the hex back into a value and compare with original.
-            Assert.assertEquals(msg, i, hexValue);
+            assertEquals(msg, i, hexValue);
         }
 
     }

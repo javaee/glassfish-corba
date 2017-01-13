@@ -48,7 +48,7 @@
 
 #ifdef _PRE_3_0_COMPILER_
 #pragma prefix "omg.org"
-#include <CORBA.idl>
+#include <corba.idl>
 #include <Dynamic.idl>
 #include <IOP.idl>
 #include <TimeBase.idl>

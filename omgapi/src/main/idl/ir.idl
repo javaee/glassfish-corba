@@ -630,7 +630,6 @@ module CORBA {
               RepositoryId      id;
               boolean   is_abstract;
               boolean   is_custom;
-              octet             flags; // always 0
               RepositoryId      defined_in;
               VersionSpec       version;
               OpDescriptionSeq operations;

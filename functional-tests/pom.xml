@@ -33,12 +33,6 @@
         </dependency>
         <dependency>
             <groupId>org.glassfish.pfl</groupId>
-            <artifactId>pfl-asm</artifactId>
-            <version>${pfl-version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.pfl</groupId>
             <artifactId>pfl-basic</artifactId>
             <version>${pfl-version}</version>
         </dependency>

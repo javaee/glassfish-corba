@@ -15,8 +15,8 @@
     <dependencies>
         <dependency>
           <groupId>org.glassfish.gmbal</groupId>
-          <artifactId>gmbal</artifactId>
-          <version>3.2.0-b003</version>
+          <artifactId>gmbal-api-only</artifactId>
+          <version>${gmbal-version}</version>
         </dependency>
         <dependency>
           <groupId>org.glassfish.pfl</groupId>

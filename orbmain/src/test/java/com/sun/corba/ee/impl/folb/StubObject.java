@@ -5,7 +5,7 @@ import com.sun.corba.ee.spi.protocol.ClientDelegate;
 import com.sun.corba.ee.spi.transport.ContactInfoList;
 import org.omg.CORBA.portable.ObjectImpl;
 
-import static org.glassfish.corba.testutils.EasyStub.stub;
+import static com.meterware.simplestub.Stub.createStrictStub;
 
 public class StubObject extends ObjectImpl {
     static org.omg.CORBA.Object createObjectWithIOR(IOR ior) {
@@ -15,13 +15,13 @@ public class StubObject extends ObjectImpl {
     }
 
     private static TestClientDelegate createDelegateWithIOR(IOR ior) {
-        TestClientDelegate delegate = stub(TestClientDelegate.class);
+        TestClientDelegate delegate = createStrictStub(TestClientDelegate.class);
         delegate.setContactInfoList(createInfoListWithIOR(ior));
         return delegate;
     }
 
     private static TestContactInfoList createInfoListWithIOR(IOR ior) {
-        TestContactInfoList infoList = stub(TestContactInfoList.class);
+        TestContactInfoList infoList = createStrictStub(TestContactInfoList.class);
         infoList.setTargetIOR(ior);
         return infoList;
     }

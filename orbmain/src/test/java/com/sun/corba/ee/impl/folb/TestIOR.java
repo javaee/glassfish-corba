@@ -8,14 +8,18 @@ import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA_2_3.portable.OutputStream;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import static org.glassfish.corba.testutils.EasyStub.stub;
+import static com.meterware.simplestub.Stub.createStrictStub;
 
 abstract class TestIOR implements IOR {
 
     static TestIOR createIORWithTaggedComponents(int id, org.omg.IOP.TaggedComponent... components) {
-        TestIOR ior = stub(TestIOR.class);
+        TestIOR ior = createStrictStub(TestIOR.class);
         ior.setProfile(createIIOPProfileWithTaggedComponents(id, components));
         return ior;
     }
@@ -31,7 +35,7 @@ abstract class TestIOR implements IOR {
     }
 
     static TestIIOPProfile createIIOPProfileWithTaggedComponents(int id, org.omg.IOP.TaggedComponent... components) {
-        TestIIOPProfile profile = stub(TestIIOPProfile.class);
+        TestIIOPProfile profile = createStrictStub(TestIIOPProfile.class);
         profile.setProfileTemplate(createIIOPProfileTemplateWithTaggedComponents(id, components));
         return profile;
     }
@@ -51,7 +55,7 @@ abstract class TestIOR implements IOR {
     }
 
     static TestIIOPProfileTemplate createIIOPProfileTemplateWithTaggedComponents(int id, org.omg.IOP.TaggedComponent... components) {
-        TestIIOPProfileTemplate template = stub(TestIIOPProfileTemplate.class);
+        TestIIOPProfileTemplate template = createStrictStub(TestIIOPProfileTemplate.class);
         for (org.omg.IOP.TaggedComponent component : components)
             template.addTaggedComponent(id, component);
         return template;

@@ -14,28 +14,34 @@ import org.junit.Before;
 import org.junit.Test;
 import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CORBA.Object;
-import org.omg.IOP.*;
 import org.omg.IOP.CodecFactoryPackage.UnknownEncoding;
 import org.omg.IOP.CodecPackage.InvalidTypeForEncoding;
+import org.omg.IOP.ServiceContext;
 import org.omg.IOP.TaggedComponent;
-import org.omg.PortableInterceptor.*;
+import org.omg.PortableInterceptor.ClientRequestInfo;
+import org.omg.PortableInterceptor.ClientRequestInterceptor;
+import org.omg.PortableInterceptor.ForwardRequest;
+import org.omg.PortableInterceptor.ORBInitInfo;
 import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
+import org.omg.PortableInterceptor.ORBInitializer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.glassfish.corba.testutils.EasyStub.stub;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static com.meterware.simplestub.Stub.createStrictStub;
+import static org.junit.Assert.*;
 
 public class GroupManagerServiceInterceptorsTest implements GroupInfoServiceObserver {
 
     private final TestClientGroupManager clientGroupManager = new TestClientGroupManager();
-    private final TestORB orb = stub(TestORB.class);
-    private final TestORBData orbData = stub(TestORBData.class);
-    private final TestORBInitInfo orbInitInfo = stub(TestORBInitInfo.class);
-    private final TestClientRequestInfo clientRequestInfo = stub(TestClientRequestInfo.class);
-    private final TestContactInfo contactInfo = stub(TestContactInfo.class);
+    private final TestORB orb = createStrictStub(TestORB.class);
+    private final TestORBData orbData = createStrictStub(TestORBData.class);
+    private final TestORBInitInfo orbInitInfo = createStrictStub(TestORBInitInfo.class);
+    private final TestClientRequestInfo clientRequestInfo = createStrictStub(TestClientRequestInfo.class);
+    private final TestContactInfo contactInfo = createStrictStub(TestContactInfo.class);
 
     private static final byte[] COMPONENT_DATA_1 = new byte[]{0, 1, 2, 5, 6};
     private static final byte[] COMPONENT_DATA_2 = new byte[]{9, 3, 3};

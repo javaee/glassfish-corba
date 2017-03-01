@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -49,14 +49,12 @@
 
 package com.sun.corba.ee.impl.io;
 
+import com.sun.corba.ee.impl.misc.ClassInfoCache;
+import org.glassfish.pfl.basic.reflection.Bridge;
+
 import java.lang.reflect.Field;
-import java.lang.Comparable;
-
-import org.glassfish.corba.Bridge;
-import java.security.AccessController ;
-import java.security.PrivilegedAction ;
-
-import com.sun.corba.ee.impl.misc.ClassInfoCache ;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * A description of a field in a serializable class.

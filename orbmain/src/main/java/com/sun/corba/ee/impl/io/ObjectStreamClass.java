@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,39 +48,34 @@
 
 package com.sun.corba.ee.impl.io;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.DigestOutputStream;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import com.sun.corba.ee.impl.misc.ClassInfoCache;
+import com.sun.corba.ee.impl.util.RepositoryId;
+import com.sun.corba.ee.spi.trace.TraceValueHandler;
+import org.glassfish.pfl.basic.concurrent.SoftCache;
+import org.glassfish.pfl.basic.reflection.Bridge;
+import org.omg.CORBA.ValueMember;
 
-import java.lang.reflect.Modifier;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.InvocationTargetException;
-
-import java.io.IOException;
-import java.io.DataOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Serializable;
-
+import java.security.AccessController;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import com.sun.corba.ee.impl.util.RepositoryId;
-
-import org.omg.CORBA.ValueMember;
-
-import org.glassfish.corba.Bridge;
-
-import com.sun.corba.ee.impl.misc.ClassInfoCache ;
-import com.sun.corba.ee.spi.trace.TraceValueHandler;
-import org.glassfish.pfl.basic.concurrent.SoftCache;
 
 /**
  * A ObjectStreamClass describes a class that can be serialized to a stream
@@ -402,6 +397,14 @@ public class ObjectStreamClass implements java.io.Serializable {
         descriptorFor.put( cl, this ) ;
     }
 
+    MethodHandle getWriteObjectMethod() {
+        return writeObjectMethod;
+    }
+
+    MethodHandle getReadObjectMethod() {
+        return readObjectMethod;
+    }
+
     private static final class PersistentFieldsValue {
         private final ConcurrentMap<Class<?>, Object> map = new ConcurrentHashMap<Class<?>, Object>();
         private static final Object NULL_VALUE =
@@ -506,7 +509,7 @@ public class ObjectStreamClass implements java.io.Serializable {
                                 int modifiers = fld.getModifiers();
                                 if (!Modifier.isStatic(modifiers) &&
                                     !Modifier.isTransient(modifiers)) {
-                                    fld.setAccessible(true) ;
+                //                    fld.setAccessible(true) ;
                                     tempFields[numFields++] = new ObjectStreamField(fld);
                                 }
                             }
@@ -571,8 +574,8 @@ public class ObjectStreamClass implements java.io.Serializable {
                                 int mods = f.getModifiers();
                                 // SerialBug 5:  static final SUID should be read
                                 if (Modifier.isStatic(mods) && Modifier.isFinal(mods) ) {
-                                    f.setAccessible(true);
-                                    suid = f.getLong(cl);
+                                    long offset = bridge.staticFieldOffset(f);
+                                    suid = bridge.getLong(cl, offset);
                                     // SerialBug 2: should be computed after writeObject
                                     // actualSuid = computeStructuralUID(cl);
                                 } else {
@@ -584,8 +587,6 @@ public class ObjectStreamClass implements java.io.Serializable {
                                 suid = _computeSerialVersionUID(cl);
                                 // SerialBug 2: should be computed after writeObject
                                 // actualSuid = computeStructuralUID(cl);
-                            } catch (IllegalAccessException ex) {
-                                suid = _computeSerialVersionUID(cl);
                             }
                         }
 
@@ -598,17 +599,12 @@ public class ObjectStreamClass implements java.io.Serializable {
                         if (externalizable) 
                             cons = getExternalizableConstructor(cl) ;
                         else
-                            cons = getSerializableConstructor(cl) ;
+                            cons = bridge.newConstructorForSerialization(cl) ;
 
                         if (serializable && !forProxyClass) {
-                            /* Look for the writeObject method
-                             * Set the accessible flag on it here. ObjectOutputStream
-                             * will call it as necessary.
-                             */
-                            writeObjectMethod = getPrivateMethod( cl, "writeObject",
-                                Void.TYPE, java.io.ObjectOutputStream.class ) ;
-                            readObjectMethod = getPrivateMethod( cl, "readObject",
-                                Void.TYPE, java.io.ObjectInputStream.class ) ;
+                            /* Look for the readObject and writeObject methods. ObjectOutputStream will call them as necessary. */
+                            writeObjectMethod = bridge.writeObjectForSerialization(cl);
+                            readObjectMethod = bridge.readObjectForSerialization(cl);
                         }
                         return null;
                     }
@@ -631,28 +627,6 @@ public class ObjectStreamClass implements java.io.Serializable {
         }
     }
 
-    /**
-     * Returns non-static private method with given signature defined by given
-     * class, or null if none found.  Access checks are disabled on the
-     * returned method (if any).
-     */
-    private static Method getPrivateMethod(Class<?> cl, String name, 
-                                           Class<?> returnType,
-                                           Class<?>... argTypes ) 
-    {
-        try {
-            Method meth = cl.getDeclaredMethod(name, argTypes);
-            meth.setAccessible(true);
-            int mods = meth.getModifiers();
-            return ((meth.getReturnType() == returnType) &&
-                    ((mods & Modifier.STATIC) == 0) &&
-                    ((mods & Modifier.PRIVATE) != 0)) ? meth : null;
-        } catch (NoSuchMethodException ex) {
-            return null;
-        }
-    }
-
-    // Specific to RMI-IIOP
     /**
      * Java to IDL ptc-02-01-12 1.5.1
      *
@@ -828,7 +802,7 @@ public class ObjectStreamClass implements java.io.Serializable {
             throw new UnsupportedOperationException();
         }
     }
-    
+
     /**
      * Returns public no-arg constructor of given class, or null if none found.
      * Access checks are disabled on the returned constructor (if any), since
@@ -838,47 +812,11 @@ public class ObjectStreamClass implements java.io.Serializable {
         try {
             Constructor<?> cons = cl.getDeclaredConstructor(new Class<?>[0]);
             cons.setAccessible(true);
-            return ((cons.getModifiers() & Modifier.PUBLIC) != 0) ? 
+            return ((cons.getModifiers() & Modifier.PUBLIC) != 0) ?
                 cons : null;
         } catch (NoSuchMethodException ex) {
             return null;
         }
-    }
-
-    /**
-     * Returns subclass-accessible no-arg constructor of first non-serializable
-     * superclass, or null if none found.  Access checks are disabled on the
-     * returned constructor (if any).
-     */
-    private static Constructor<?> getSerializableConstructor(Class<?> cl) {
-        Class<?> initCl = cl;
-        while (ClassInfoCache.get( initCl ).isASerializable( initCl )) {
-            if ((initCl = initCl.getSuperclass()) == null) {
-                return null;
-            }
-        }
-        try {
-            Constructor<?> cons = initCl.getDeclaredConstructor(new Class<?>[0]);
-            int mods = cons.getModifiers();
-            if ((mods & Modifier.PRIVATE) != 0 ||
-                ((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) == 0 &&
-                 !packageEquals(cl, initCl)))
-            {
-                return null;
-            }
-            cons = bridge.newConstructorForSerialization(cl, cons);
-            cons.setAccessible(true);
-            return cons;
-        } catch (NoSuchMethodException ex) {
-            return null;
-        }
-    }
-
-    /*
-     * Return the ObjectStreamClass of the local class this one is based on.
-     */
-    final ObjectStreamClass localClassDescriptor() {
-        return localClassDesc;
     }
 
     /*
@@ -1059,7 +997,7 @@ public class ObjectStreamClass implements java.io.Serializable {
                 data.writeUTF(getSignature(f.getType()));
             }
 
-            if (hasStaticInitializer(cl)) {
+            if (bridge.hasStaticInitializerForSerialization(cl)) {
                 if (DEBUG_SVUID)
                     msg( "\twriteUTF( \"<clinit>\" ) " ) ;
                 data.writeUTF("<clinit>");
@@ -1374,8 +1312,9 @@ public class ObjectStreamClass implements java.io.Serializable {
      * @since JDK 1.2
      */
     private boolean hasExternalizableBlockData;
-    Method writeObjectMethod;
-    Method readObjectMethod;
+
+    private MethodHandle writeObjectMethod;
+    private MethodHandle readObjectMethod;
     private transient Method writeReplaceObjectMethod;
     private transient Method readResolveObjectMethod;
     private Constructor<?> cons ;
@@ -1389,47 +1328,6 @@ public class ObjectStreamClass implements java.io.Serializable {
      * storing here.
      */
     private String rmiiiopOptionalDataRepId = null;
-
-    /*
-     * ObjectStreamClass that this one was built from.
-     */
-    private ObjectStreamClass localClassDesc;
-
-    /* Find out if the class has a static class initializer <clinit> */
-    private static Method hasStaticInitializerMethod = null;
-    /**
-     * Returns true if the given class defines a static initializer method,
-     * false otherwise.
-     */
-    private static boolean hasStaticInitializer(Class<?> cl) {
-        if (hasStaticInitializerMethod == null) {
-            Class<?> classWithThisMethod = 
-                java.io.ObjectStreamClass.class ;
-            
-            try {
-                hasStaticInitializerMethod =
-                    classWithThisMethod.getDeclaredMethod(
-                        "hasStaticInitializer", Class.class );
-            } catch (NoSuchMethodException ex) {
-                // NOP: reported below
-            }
-            
-            if (hasStaticInitializerMethod == null) {
-                throw Exceptions.self.cantFindHasStaticInitializer(
-                    classWithThisMethod.getName());
-            }
-
-            hasStaticInitializerMethod.setAccessible(true);
-        }
-
-        try {
-            Boolean retval = (Boolean)
-                hasStaticInitializerMethod.invoke(null, cl );
-            return retval.booleanValue();
-        } catch (Exception ex) {
-            throw Exceptions.self.errorInvokingHasStaticInitializer( ex ) ;
-        }
-    }
 
     /** use serialVersionUID from JDK 1.1. for interoperability */
     private static final long serialVersionUID = -6120832682080437368L;

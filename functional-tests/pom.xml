@@ -163,6 +163,13 @@
                         </source>
                     </sources>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.glassfish.corba</groupId>
+                        <artifactId>rmic</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <!-- compile tests -->

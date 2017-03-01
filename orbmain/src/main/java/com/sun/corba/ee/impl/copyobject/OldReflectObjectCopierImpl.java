@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -52,36 +52,29 @@
 
 package com.sun.corba.ee.impl.copyobject ;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
+import com.sun.corba.ee.impl.util.Utility;
+import com.sun.corba.ee.spi.orb.ORB;
+import org.glassfish.pfl.basic.reflection.Bridge;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-
-import java.io.Serializable;
 import java.io.Externalizable;
-
+import java.io.Serializable;
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-
+import java.lang.reflect.Modifier;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
-
-
-import org.glassfish.corba.Bridge;
-
-import com.sun.corba.ee.impl.util.Utility;
-
-import com.sun.corba.ee.spi.orb.ORB ;
-import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Provides the functionality of copying objects using reflection.
@@ -237,7 +230,6 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
      * populates the cache
      * @param cls the class whose attributes are needed
      * @return the attributes needed for reflection
-     * @exception none
      *
      * This method must be synchronized so that reflectCache.put can
      * safely update the reflectCache.

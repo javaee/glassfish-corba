@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,23 +39,19 @@
  */
 package com.sun.corba.ee.impl.encoding;
 
-import java.nio.ByteBuffer;
-import java.util.EmptyStackException;
-
-import org.glassfish.corba.Bridge;
-
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
+import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.ContactInfoListIterator;
+import org.glassfish.pfl.basic.reflection.Bridge;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.portable.RemarshalException;
 
-import com.sun.corba.ee.spi.transport.Connection;
-
-import com.sun.corba.ee.spi.orb.ORB;
-import com.sun.corba.ee.spi.transport.ContactInfoListIterator;
-
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.MessageBase;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.FragmentMessage;
-import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage;
+import java.nio.ByteBuffer;
+import java.util.EmptyStackException;
 
 /**
  * Streaming buffer manager.

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,31 +48,22 @@
 
 package com.sun.corba.ee.impl.io;
 
+import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
+import com.sun.corba.ee.impl.misc.ClassInfoCache;
+import com.sun.corba.ee.impl.util.RepositoryId;
+import com.sun.corba.ee.impl.util.Utility;
+import com.sun.corba.ee.spi.trace.ValueHandlerWrite;
+import org.glassfish.pfl.basic.reflection.Bridge;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 import org.omg.CORBA.portable.OutputStream;
 
-import java.security.AccessController ;
-import java.security.PrivilegedAction ;
-
+import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InvalidClassException;
-import java.io.Externalizable;
 import java.io.NotActiveException;
-
-import java.lang.reflect.InvocationTargetException;
-
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Stack;
-
-import org.glassfish.corba.Bridge;
-
-import com.sun.corba.ee.impl.util.Utility;
-import com.sun.corba.ee.impl.util.RepositoryId;
-
-import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
-
-import com.sun.corba.ee.impl.misc.ClassInfoCache ;
-import com.sun.corba.ee.spi.trace.ValueHandlerWrite;
-
-import org.glassfish.pfl.tf.spi.annotation.InfoMethod ;
 
 
 /**
@@ -646,13 +637,11 @@ public class IIOPOutputStream
             writeObjectState.enterWriteObject(this);
 
             try {
-                // writeObject(obj, c, this);
-                osc.writeObjectMethod.invoke( obj, this ) ;
+                osc.getWriteObjectMethod().invoke( obj, this ) ;
             } finally {
                 writeObjectState.exitWriteObject(this);
             }
-        } catch (InvocationTargetException e) {
-            Throwable t = e.getTargetException();
+        } catch (Throwable t) {
             if (t instanceof IOException) {
                 throw (IOException) t;
             } else if (t instanceof RuntimeException) {
@@ -660,10 +649,8 @@ public class IIOPOutputStream
             } else if (t instanceof Error) {
                 throw (Error) t;
             } else {
-                throw new Error("invokeObjectWriter internal error", e);
+                throw new Error("invokeObjectWriter internal error", t);
             }
-        } catch (IllegalAccessException e) {
-            // cannot happen
         }
     }
 

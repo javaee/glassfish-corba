@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -60,6 +60,7 @@ import com.sun.org.omg.CORBA.ParameterDescription;
 import com.sun.org.omg.CORBA.ValueDefPackage.FullValueDescription;
 import com.sun.org.omg.SendingContext.CodeBase;
 import org.glassfish.pfl.basic.logex.OperationTracer;
+import org.glassfish.pfl.basic.reflection.Bridge;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.ORB;
@@ -69,17 +70,21 @@ import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.ValueMember;
 import org.omg.CORBA.portable.IndirectionException;
 import org.omg.CORBA.portable.ValueInputStream;
-import org.glassfish.corba.Bridge;
 
 import javax.rmi.CORBA.ValueHandler;
-import java.io.*;
+import java.io.EOFException;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.InvalidClassException;
+import java.io.InvalidObjectException;
+import java.io.NotActiveException;
+import java.io.ObjectInputValidation;
 import java.io.OptionalDataException;
-import java.lang.reflect.Constructor;
+import java.io.StreamCorruptedException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -177,67 +182,6 @@ public class IIOPInputStream
     private static final boolean useFVDOnly = false;
 
     private byte streamFormatVersion;
-
-    // Since java.io.OptionalDataException's constructors are
-    // package private, but we need to throw it in some special
-    // cases, we try to do it by reflection.
-    private static final Constructor OPT_DATA_EXCEPTION_CTOR;
-   
-    static {
-        OPT_DATA_EXCEPTION_CTOR = getOptDataExceptionCtor();
-    }
-
-    // Grab the OptionalDataException boolean ctor and make
-    // it accessible.  Note that any exceptions 
-    // will be wrapped in ExceptionInInitializerErrors.
-    private static Constructor getOptDataExceptionCtor() {
-        try {
-            Constructor result = AccessController.doPrivileged(
-                new PrivilegedExceptionAction<Constructor>() {
-                    public Constructor run() 
-                        throws NoSuchMethodException, SecurityException {
-                        
-                        Constructor boolCtor 
-                            = OptionalDataException.class.getDeclaredConstructor(
-                                Boolean.TYPE );
-                        
-                        boolCtor.setAccessible(true);
-                        
-                        return boolCtor;
-                    }
-                }
-            );
-            
-            if (result == null) {
-                throw new Error("Unable to find OptionalDataException constructor");
-            }
-        
-            return result;
-
-        } catch (Exception ex) {
-            throw Exceptions.self.noOptionalDataExceptionConstructor(ex);
-        }
-    }
-
-    // Create a new OptionalDataException with the EOF marker
-    // set to true.  See handleOptionalDataMarshalException.
-    private OptionalDataException createOptionalDataException() {
-        try {
-            OptionalDataException result
-                = (OptionalDataException)
-                   OPT_DATA_EXCEPTION_CTOR.newInstance(new Object[] { 
-                       Boolean.TRUE });
-
-            if (result == null) {
-                throw new Error("Created null OptionalDataException");
-            }
-
-            return result;
-
-        } catch (Exception ex) {
-            throw Exceptions.self.cantCreateOptionalDataException( ex ) ;
-        }
-    }
 
     // Return the stream format version currently being used
     // to deserialize an object
@@ -926,7 +870,7 @@ public class IIOPInputStream
             if (!objectRead) {
                 result = new EOFException("No more optional data");
             } else {
-                result = createOptionalDataException();
+                result = bridge.newOptionalDataExceptionForSerialization(true);
             }
 
             result.initCause(marshalException);
@@ -1190,7 +1134,7 @@ public class IIOPInputStream
 
                                 readObjectState.beginUnmarshalCustomValue( this, 
                                     calledDefaultWriteObject, 
-                                    (currentClassDesc.readObjectMethod != null));
+                                    (currentClassDesc.getReadObjectMethod() != null));
                             } else {
                                 classHasWriteObject( false ) ;
 
@@ -1662,7 +1606,7 @@ public class IIOPInputStream
                                 boolean calledDefaultWriteObject = readBoolean();
                                 readObjectState.beginUnmarshalCustomValue( this, 
                                     calledDefaultWriteObject, 
-                                    (currentClassDesc.readObjectMethod != null));
+                                    (currentClassDesc.getReadObjectMethod() != null));
                             }
 
                             boolean usedReadObject = false;
@@ -1814,13 +1758,12 @@ public class IIOPInputStream
 
         boolean result = false ;
 
-        if (osc.readObjectMethod != null) {
+        if (osc.getReadObjectMethod() != null) {
             try {
                 defaultReadObjectFVDMembers = valueMembers ;
-                osc.readObjectMethod.invoke( obj, this ) ;
+                osc.getReadObjectMethod().invoke( obj, this ) ;
                 result = true ;
-            } catch (InvocationTargetException e) {
-                Throwable t = e.getTargetException();
+            } catch (Throwable t) {
                 if (t instanceof ClassNotFoundException) {
                     throw (ClassNotFoundException) t;
                 } else if (t instanceof IOException) {
@@ -1832,8 +1775,6 @@ public class IIOPInputStream
                 } else {
                     throw new Error("internal error");
                 }
-            } catch (IllegalAccessException e) {
-                Exceptions.self.illegalAccessInvokingObjectRead( e ) ;
             } finally {
                 // Make sure this is cleared no matter what
                 // the readObject method does.  If the readObject

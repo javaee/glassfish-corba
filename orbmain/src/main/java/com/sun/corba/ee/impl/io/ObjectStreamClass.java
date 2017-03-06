@@ -428,17 +428,12 @@ public class ObjectStreamClass implements java.io.Serializable {
             try {
                 Field pf = type.getDeclaredField("serialPersistentFields");
                 int mods = pf.getModifiers();
-                if (Modifier.isPrivate(mods) && Modifier.isStatic(mods) &&
-                        Modifier.isFinal(mods)) {
-                    pf.setAccessible(true);
-                    java.io.ObjectStreamField[] fields =
-                            (java.io.ObjectStreamField[])pf.get(type);
+                if (Modifier.isPrivate(mods) && Modifier.isStatic(mods) && Modifier.isFinal(mods)) {
+                    java.io.ObjectStreamField[] fields = bridge.getObject(type, bridge.staticFieldOffset(pf));
                     return translateFields(fields);
                 }
-            } catch (NoSuchFieldException e1) {
-            } catch (IllegalAccessException e2) {
-            } catch (IllegalArgumentException e3) {
-            } catch (ClassCastException e4) { }
+            } catch (NoSuchFieldException | IllegalArgumentException | ClassCastException ignored) {
+            }
             return NULL_VALUE;
         }
 
@@ -590,14 +585,11 @@ public class ObjectStreamClass implements java.io.Serializable {
                             }
                         }
 
-                        writeReplaceObjectMethod = ObjectStreamClass.getInheritableMethod(cl, 
-                            "writeReplace", Object.class );
-
-                        readResolveObjectMethod = ObjectStreamClass.getInheritableMethod(cl, 
-                            "readResolve", Object.class );
+                        writeReplaceObjectMethod = bridge.writeReplaceForSerialization(cl);
+                        readResolveObjectMethod = bridge.readResolveForSerialization(cl);
 
                         if (externalizable) 
-                            cons = getExternalizableConstructor(cl) ;
+                            cons = bridge.newConstructorForExternalization(cl) ;
                         else
                             cons = bridge.newConstructorForSerialization(cl) ;
 
@@ -800,22 +792,6 @@ public class ObjectStreamClass implements java.io.Serializable {
             }
         } else {
             throw new UnsupportedOperationException();
-        }
-    }
-
-    /**
-     * Returns public no-arg constructor of given class, or null if none found.
-     * Access checks are disabled on the returned constructor (if any), since
-     * the defining class may still be non-public.
-     */
-    private static Constructor<?> getExternalizableConstructor(Class<?> cl) {
-        try {
-            Constructor<?> cons = cl.getDeclaredConstructor(new Class<?>[0]);
-            cons.setAccessible(true);
-            return ((cons.getModifiers() & Modifier.PUBLIC) != 0) ?
-                cons : null;
-        } catch (NoSuchMethodException ex) {
-            return null;
         }
     }
 
@@ -1315,8 +1291,8 @@ public class ObjectStreamClass implements java.io.Serializable {
 
     private MethodHandle writeObjectMethod;
     private MethodHandle readObjectMethod;
-    private transient Method writeReplaceObjectMethod;
-    private transient Method readResolveObjectMethod;
+    private transient MethodHandle writeReplaceObjectMethod;
+    private transient MethodHandle readResolveObjectMethod;
     private Constructor<?> cons ;
 
     /**
@@ -1441,7 +1417,7 @@ public class ObjectStreamClass implements java.io.Serializable {
             return result;
         }
 
-        final private boolean isConstructor() {
+        private boolean isConstructor() {
             return member instanceof Constructor;
         }
 
@@ -1455,51 +1431,4 @@ public class ObjectStreamClass implements java.io.Serializable {
         }
     }
 
-    /**
-     * Returns non-static, non-abstract method with given signature provided it
-     * is defined by or accessible (via inheritance) by the given class, or
-     * null if no match found.  Access checks are disabled on the returned
-     * method (if any).
-     *
-     * Copied from the Merlin java.io.ObjectStreamClass.
-     */
-    private static Method getInheritableMethod(Class<?> cl, String name,
-                                               Class<?> returnType,
-                                               Class<?>... argTypes )
-    {
-        Method meth = null;
-        Class<?> defCl = cl;
-        while (defCl != null) {
-            try {
-                meth = defCl.getDeclaredMethod(name, argTypes);
-                break;
-            } catch (NoSuchMethodException ex) {
-                defCl = defCl.getSuperclass();
-            }
-        }
-
-        if ((meth == null) || (meth.getReturnType() != returnType)) {
-            return null;
-        }
-        meth.setAccessible(true);
-        int mods = meth.getModifiers();
-        if ((mods & (Modifier.STATIC | Modifier.ABSTRACT)) != 0) {
-            return null;
-        } else if ((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) != 0) {
-            return meth;
-        } else if ((mods & Modifier.PRIVATE) != 0) {
-            return (cl == defCl) ? meth : null;
-        } else {
-            return packageEquals(cl, defCl) ? meth : null;
-        }
-    }
-
-    /**
-     * Returns true if classes are defined in the same package, false
-     * Copied from the Merlin java.io.ObjectStreamClass.
-     */
-    private static boolean packageEquals(Class<?> cl1, Class<?> cl2) {
-        Package pkg1 = cl1.getPackage(), pkg2 = cl2.getPackage();
-        return ((pkg1 == pkg2) || ((pkg1 != null) && (pkg1.equals(pkg2))));
-    }
 }

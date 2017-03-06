@@ -46,7 +46,12 @@ import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.portable.IndirectionException;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.net.InetAddress;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.*;
 
 public class CDRInputValueTest extends ValueTestBase {
@@ -393,4 +398,57 @@ public class CDRInputValueTest extends ValueTestBase {
     }
 
 
+    @Test
+    public void whenObjectImplementsReadResolve_resultingValueMatchesOriginal() throws Exception {
+        writeValueTag(ONE_REPID_ID);
+        writeRepId(Gender.REPID);
+        writeInt(0);  // the serialized form of the MALE constant, produced by writeReplace
+        setMessageBody(getGeneratedBody());
+
+        assertThat(getInputObject().read_value(), sameInstance((Serializable) Gender.MALE));
+    }
+
+    @Test
+    public void whenInaccessibleObjectImplementsReadResolve_resultingValueEqualToOriginal() throws Exception {
+        String InetAddressRepId = "RMI:java.net.InetAddress:C156A93A2ABC4FAF:2D9B57AF9FE3EBDB";
+
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);  // custom marshalling requires a chunk
+        writeRepId(InetAddressRepId);
+
+        startChunk();
+        writeInt(0x01010000);
+        writeInt(0x7F000001);  // 127.0.0.1
+        writeInt(0x00000002);
+        endChunk();
+
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);  // custom marshalling requires a chunk
+        writeRepId("IDL:omg.org/CORBA/WStringValue:1.0");
+        startChunk();
+        writeStringValue_1_2("localhost");
+        endChunk();
+        writeEndTag(-1);
+
+        setMessageBody(getGeneratedBody());
+
+        assertThat(getInputObject().read_value(), equalTo((Serializable) InetAddress.getLoopbackAddress()));
+    }
+
+    @Test
+    public void whenObjectExternalizable_callReadExternal() throws Exception {
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);  // custom marshalling requires a chunk
+        writeRepId(Profession.REPID);
+
+        startChunk();
+        writeByte(1);    // serial format version
+        writeInt(5);
+        endChunk();
+        writeEndTag(-1);
+
+        setMessageBody(getGeneratedBody());
+        Serializable value = getInputObject().read_value();
+
+        assertThat(value, instanceOf(Profession.class));
+        Profession profession = (Profession) value;
+        assertThat(profession.getProfession(), equalTo("Lawyer"));
+    }
 }

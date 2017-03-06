@@ -46,6 +46,7 @@ import org.junit.Test;
 import org.omg.CORBA.VM_TRUNCATABLE;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 
 import static com.meterware.simplestub.Stub.createStrictStub;
@@ -329,6 +330,63 @@ public class CDROutputValueTest extends ValueTestBase {
         expectByteArrays(new byte[] {0,0,0,20, 0,0,0,1, 0,0,0,2, 0,0,0,3}, new byte[] {0,0,0,5, 0,0,0,6, 0,0,0,4, 0,0,0,9});
     }
 
+    @Test
+    public void whenObjectImplementsWriteReplace_outputStreamContainsReplacementValue() throws Exception {
+        writeValueTag(ONE_REPID_ID);
+        writeRepId(Gender.REPID);
+
+        writeInt(0);  // the serialized form of the MALE constant, produced by writeReplace
+
+        getOutputObject().write_value(Gender.MALE);
+
+        setMessageBody(getGeneratedBody());
+        expectByteArray(getGeneratedBody());
+    }
+
+    @Test
+    public void whenInaccessibleObjectImplementsWriteReplace_outputStreamContainsReplacementValue() throws Exception {
+        String InetAddressRepId = "RMI:java.net.InetAddress:C156A93A2ABC4FAF:2D9B57AF9FE3EBDB";
+
+        InetAddress loopbackAddress = InetAddress.getLoopbackAddress();
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);  // custom marshalling requires a chunk
+        writeRepId(InetAddressRepId);
+
+        startChunk();
+        writeInt(0x01010000);
+        writeInt(0x7F000001);  // 127.0.0.1
+        writeInt(0x00000002);
+        endChunk();
+
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);  // custom marshalling requires a chunk
+        writeRepId("IDL:omg.org/CORBA/WStringValue:1.0");
+        startChunk();
+        writeStringValue_1_2("localhost");
+        endChunk();
+        writeEndTag(-1);
+
+        getOutputObject().write_value(loopbackAddress);
+
+        setMessageBody(getGeneratedBody());
+        expectByteArray(getGeneratedBody());
+    }
+
+    @Test
+    public void whenExternalizableObjectWritten_invokeWriteExternalMethod() throws Exception {
+        Profession profession = Profession.DOCTOR;
+        getOutputObject().write_value(profession);
+        
+        writeValueTag(ONE_REPID_ID | USE_CHUNKING);  // custom marshalling requires a chunk
+        writeRepId(Profession.REPID);
+
+        startChunk();
+        writeByte(1);    // serial format version
+        writeInt(4);
+        endChunk();
+        writeEndTag(-1);
+
+        setMessageBody(getGeneratedBody());
+        expectByteArray(getGeneratedBody());
+    }
 /*
 
 // write codebase

@@ -8,7 +8,7 @@
 
     <groupId>org.glassfish.corba</groupId>
     <artifactId>glassfish-corba</artifactId>
-    <version>4.0.2-b009-SNAPSHOT</version>
+    <version>4.0.2-b009</version>
     <name>ORB Implementation</name>
     <packaging>pom</packaging>
     <description>A CORBA ORB for Glassfish</description>
@@ -26,7 +26,8 @@
         <url>http://java.net/projects/glassfish-corba/sources/hg/show</url>
         <developerConnection>scm:hg:https://hg.java.net/hg/glassfish-corba~hg</developerConnection>
         <connection>scm:hg:https://hg.java.net/hg/glassfish-corba~hg</connection>
-    </scm>
+      <tag>glassfish-corba-4.0.2-b009</tag>
+  </scm>
 
 <!-- for now, we are using a Wiki page. Should build the site properly before re-enabling. - REG
     <distributionManagement>
@@ -228,7 +229,7 @@
 
     <profiles>
 
-        <!-- ignore javadoc lint checks, enabled by default in JDK 1.8 -->
+        <!-- ignore javadoc lint checks, enabled by default in JDK 1.8 (really want to run based on toolchain selection)
         <profile>
             <id>disable-java8-doclint</id>
             <activation>
@@ -238,6 +239,7 @@
                 <additionalparam>-Xdoclint:none</additionalparam>
             </properties>
         </profile>
+        -->
 
         <!-- During release, always build with specified JDK -->
         <profile>

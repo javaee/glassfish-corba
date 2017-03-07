@@ -8,7 +8,7 @@
 
     <groupId>org.glassfish.corba</groupId>
     <artifactId>glassfish-corba</artifactId>
-    <version>4.0.2-b009</version>
+    <version>4.0.2-b010-SNAPSHOT</version>
     <name>ORB Implementation</name>
     <packaging>pom</packaging>
     <description>A CORBA ORB for Glassfish</description>
@@ -26,7 +26,7 @@
         <url>http://java.net/projects/glassfish-corba/sources/hg/show</url>
         <developerConnection>scm:hg:https://hg.java.net/hg/glassfish-corba~hg</developerConnection>
         <connection>scm:hg:https://hg.java.net/hg/glassfish-corba~hg</connection>
-      <tag>glassfish-corba-4.0.2-b009</tag>
+      <tag>HEAD</tag>
   </scm>
 
 <!-- for now, we are using a Wiki page. Should build the site properly before re-enabling. - REG

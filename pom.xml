@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
     <description>A CORBA ORB for Glassfish</description>
 
-    <url>http://glassfish-corba.java.net</url>
+    <url>https://javaee.github.io/glassfish-corba</url>
 
     <licenses>
         <license>
@@ -23,20 +23,18 @@
     </licenses>
 
     <scm>
-        <url>http://java.net/projects/glassfish-corba/sources/hg/show</url>
-        <developerConnection>scm:hg:https://hg.java.net/hg/glassfish-corba~hg</developerConnection>
-        <connection>scm:hg:https://hg.java.net/hg/glassfish-corba~hg</connection>
-      <tag>HEAD</tag>
-  </scm>
+        <connection>scm:git:https://github.com/javaee/glassfish-corba.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/javaee/glassfish-corba.git</developerConnection>
+        <url>https://github.com/javaee/glassfish-corba</url>
+        <tag>HEAD</tag>
+    </scm>
 
-<!-- for now, we are using a Wiki page. Should build the site properly before re-enabling. - REG
     <distributionManagement>
         <site>
-            <id>java_net</id>
-            <url>dav:https://website.java.net/website/glassfish-corba</url>
+            <id>github</id>
+            <url>scm:git:https://github.com/javaee/glassfish-corba.git</url>
         </site>
     </distributionManagement>
--->
 
     <developers>
         <developer>
@@ -52,16 +50,11 @@
     </developers>
 
     <issueManagement>
-        <system>JIRA</system>
-        <url>http://java.net/jira/browse/GLASSFISH_CORBA</url>
+        <system>github</system>
+        <url>https://github.com/javaee/glassfish-corba/issues/</url>
     </issueManagement>
 
     <mailingLists>
-        <mailingList>
-            <name>CORBA Developer</name>
-            <post>dev@glassfish-corba.java.net</post>
-            <archive>http://java.net/projects/glassfish-corba/lists/dev/archive</archive>
-        </mailingList>
     </mailingLists>
 
     <modules>

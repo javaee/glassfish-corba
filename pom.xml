@@ -149,7 +149,7 @@
                 <version>1.1</version>
                 <configuration>
                     <scmBranch>gh-pages</scmBranch>
-                    <pubScmUrl>scm:git:https://github.com/javaee/gmbal.git</pubScmUrl>
+                    <pubScmUrl>scm:git:https://github.com/javaee/glassfish-corba.git</pubScmUrl>
                 </configuration>
             </plugin>
         </plugins>

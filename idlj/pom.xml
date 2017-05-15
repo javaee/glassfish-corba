@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.glassfish.corba</groupId>
         <artifactId>glassfish-corba</artifactId>
-        <version>4.0.2-b011</version>
+        <version>4.0.2-b012-SNAPSHOT</version>
     </parent>
 
     <artifactId>idlj</artifactId>

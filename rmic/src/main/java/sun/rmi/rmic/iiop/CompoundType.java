@@ -32,23 +32,23 @@
 
 package sun.rmi.rmic.iiop;
 
-import java.util.Arrays;
-import java.util.Vector;
-import sun.tools.java.Identifier;
-import sun.tools.java.ClassNotFound;
-import sun.tools.java.ClassDefinition;
-import sun.tools.java.ClassDeclaration;
-import sun.tools.java.MemberDefinition;
-import sun.tools.java.CompilerError;
-import sun.tools.tree.Node;
-import sun.tools.tree.LocalMember;
-import sun.tools.tree.CharExpression;
-import sun.tools.tree.IntegerExpression;
 import sun.rmi.rmic.IndentingWriter;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Enumeration;
+import sun.tools.java.ClassDeclaration;
+import sun.tools.java.ClassDefinition;
+import sun.tools.java.ClassNotFound;
+import sun.tools.java.CompilerError;
+import sun.tools.java.Identifier;
+import sun.tools.java.MemberDefinition;
+import sun.tools.tree.IntegerExpression;
+import sun.tools.tree.LocalMember;
+import sun.tools.tree.Node;
+
 import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Vector;
 
 /**
  * A CompoundType is an abstract base class for all IIOP class and
@@ -1093,7 +1093,7 @@ public abstract class CompoundType extends Type {
             // Walk all interfaces and check them...
 
             //if (interfaces == null) System.out.println("NULL for " +getQualifiedName() + " interfaces");
-            for (int i = 0; i < interfaces.length; i++) {
+            for (int i = 0; interfaces != null && i < interfaces.length; i++) {
 
                 // Now recurse and add it and any referenced types...
 
@@ -1104,7 +1104,7 @@ public abstract class CompoundType extends Type {
             // Walk all methods and check arguments...
 
             //if (methods == null) System.out.println("NULL for " +getQualifiedName() + " methods");
-            for (int i = 0; i < methods.length; i++) {
+            for (int i = 0; methods != null && i < methods.length; i++) {
 
                 // Add return type...
                 //if (methods[i] == null) System.out.println("NULL for " +getQualifiedName() + " methods[" + i + "]");
@@ -1131,7 +1131,7 @@ public abstract class CompoundType extends Type {
                 ClassType[] exceptions = methods[i].getExceptions();
                 //if (exceptions == null) System.out.println("NULL for " + getQualifiedName() + " exceptions");
 
-                for (int j = 0; j < exceptions.length; j++) {
+                for (int j = 0; exceptions != null && j < exceptions.length; j++) {
 
                     ClassType ex = exceptions[j];
 
@@ -1144,7 +1144,7 @@ public abstract class CompoundType extends Type {
             // Walk all members and add em...
 
             //if (members == null) System.out.println("NULL for " +getQualifiedName() + " members");
-            for (int i = 0; i < members.length; i++) {
+            for (int i = 0; members != null && i < members.length; i++) {
                 //if (members[i] == null) System.out.println("NULL for " +getQualifiedName() + " members[" + i + "]");
                 Type cType = members[i].getType();
                 //if (cType == null) System.out.println("NULL for " + getQualifiedName() + " cType");

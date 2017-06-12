@@ -49,57 +49,43 @@
 
 package com.sun.corba.ee.impl.protocol;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.concurrent.ConcurrentMap ;
-import java.util.concurrent.ConcurrentHashMap ;
-
-import org.omg.CORBA.SystemException;
-import org.omg.CORBA.portable.RemarshalException;
-import org.omg.CORBA_2_3.portable.InputStream;
-import org.omg.CORBA.portable.ApplicationException;
-import org.omg.CORBA.portable.UnknownException;
-import org.omg.IOP.ExceptionDetailMessage;
-import org.omg.IOP.TAG_CODE_SETS;
-
-import com.sun.corba.ee.impl.encoding.CDROutputObject;
-import com.sun.corba.ee.spi.protocol.ClientRequestDispatcher;
-import com.sun.corba.ee.spi.transport.OutboundConnectionCache;
-
-import com.sun.corba.ee.spi.ior.IOR;
-import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate;
-import com.sun.corba.ee.spi.ior.iiop.CodeSetsComponent;
-import com.sun.corba.ee.spi.orb.ORB;
-import com.sun.corba.ee.spi.orb.ORBVersion;
-import com.sun.corba.ee.spi.protocol.MessageMediator;
-import com.sun.corba.ee.spi.transport.ContactInfo ;
-import com.sun.corba.ee.spi.transport.ContactInfoListIterator ;
-import com.sun.corba.ee.spi.transport.Connection;
-
-import com.sun.corba.ee.spi.servicecontext.ServiceContextDefaults;
-import com.sun.corba.ee.spi.servicecontext.ServiceContext;
-import com.sun.corba.ee.spi.servicecontext.ServiceContexts;
-import com.sun.corba.ee.spi.servicecontext.UEInfoServiceContext;
-import com.sun.corba.ee.spi.servicecontext.CodeSetServiceContext;
-import com.sun.corba.ee.spi.servicecontext.SendingContextServiceContext;
-import com.sun.corba.ee.spi.servicecontext.ORBVersionServiceContext;
-import com.sun.corba.ee.spi.servicecontext.MaxStreamFormatVersionServiceContext;
-import com.sun.corba.ee.spi.servicecontext.UnknownServiceContext;
-import com.sun.corba.ee.spi.servicecontext.ServiceContextsCache;
-
 import com.sun.corba.ee.impl.encoding.CDRInputObject;
+import com.sun.corba.ee.impl.encoding.CDROutputObject;
 import com.sun.corba.ee.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.ee.impl.encoding.CodeSetConversion;
 import com.sun.corba.ee.impl.encoding.EncapsInputStream;
-import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
 import com.sun.corba.ee.impl.misc.ORBUtility;
-import com.sun.corba.ee.spi.misc.ORBConstants;
-
 import com.sun.corba.ee.impl.protocol.giopmsgheaders.ReplyMessage;
+import com.sun.corba.ee.spi.ior.IOR;
+import com.sun.corba.ee.spi.ior.iiop.CodeSetsComponent;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.orb.ORBVersion;
+import com.sun.corba.ee.spi.protocol.ClientRequestDispatcher;
+import com.sun.corba.ee.spi.protocol.MessageMediator;
+import com.sun.corba.ee.spi.servicecontext.*;
 import com.sun.corba.ee.spi.trace.Subcontract;
+import com.sun.corba.ee.spi.transport.Connection;
+import com.sun.corba.ee.spi.transport.ContactInfo;
+import com.sun.corba.ee.spi.transport.ContactInfoListIterator;
+import com.sun.corba.ee.spi.transport.OutboundConnectionCache;
 import org.glassfish.pfl.tf.spi.TimingPointType;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
+import org.omg.CORBA.SystemException;
+import org.omg.CORBA.portable.ApplicationException;
+import org.omg.CORBA.portable.RemarshalException;
+import org.omg.CORBA.portable.UnknownException;
+import org.omg.CORBA_2_3.portable.InputStream;
+import org.omg.IOP.ExceptionDetailMessage;
+import org.omg.IOP.TAG_CODE_SETS;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * ClientDelegate is the RMI client-side subcontract or representation
@@ -410,7 +396,7 @@ public class ClientRequestDispatcherImpl
     public CDRInputObject marshalingComplete1(
             ORB orb, MessageMediator messageMediator)
         throws
-            ApplicationException, 
+            ApplicationException,
             org.omg.CORBA.portable.RemarshalException
     {
         operationAndId(messageMediator.getOperationName(),
@@ -421,7 +407,7 @@ public class ClientRequestDispatcherImpl
 
             // TODO NEW CACHE: call release( conn, numResponse ) here
             // Get connection from MessageMediator
-            // Get numResponse from messageMediator.isOneWay: 0 or 1 expected. 
+            // Get numResponse from messageMediator.isOneWay: 0 or 1 expected.
 
             return messageMediator.waitForResponse();
         } catch (RuntimeException e) {
@@ -433,7 +419,7 @@ public class ClientRequestDispatcherImpl
 
             // Bug 6382377: must not lose exception in PI
             // Must run interceptor end point before retrying.
-            Exception newException = 
+            Exception newException =
                 orb.getPIHandler().invokeClientPIEndingPoint(
                     ReplyMessage.SYSTEM_EXCEPTION, e);
 
@@ -452,11 +438,13 @@ public class ClientRequestDispatcherImpl
                 if (newException instanceof RuntimeException) {
                     retryMessage( "Retry false; RuntimeException" ) ;
                     throw (RuntimeException)newException ;
+                } else if (newException instanceof RemarshalException) {
+                     throw (RemarshalException) newException;
                 } else {
                     retryMessage( "Retry false; other exception" ) ;
                     throw e ;
                 }
-            } 
+            }
 
             return null; // for compiler
         }
@@ -738,9 +726,7 @@ public class ClientRequestDispatcherImpl
     }
 
     protected ContactInfoListIterator  getContactInfoListIterator(ORB orb) {
-        return (ContactInfoListIterator)
-            ((InvocationInfo)orb.getInvocationInfo())
-                .getContactInfoListIterator();
+        return (ContactInfoListIterator) orb.getInvocationInfo().getContactInfoListIterator();
     }
 
     @Subcontract

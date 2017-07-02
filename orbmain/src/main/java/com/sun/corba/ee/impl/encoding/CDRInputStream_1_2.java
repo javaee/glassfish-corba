@@ -160,7 +160,7 @@ public class CDRInputStream_1_2 extends CDRInputStream_1_1
         int len = read_long();
 
         if (len == 0)
-            return EMPTY_STRING;
+            return newEmptyString();
 
         checkForNegativeLength(len);
 

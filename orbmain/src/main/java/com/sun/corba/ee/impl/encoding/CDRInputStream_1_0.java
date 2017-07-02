@@ -49,91 +49,55 @@
 
 package com.sun.corba.ee.impl.encoding;
 
-import java.io.Serializable;
-import java.io.IOException;
-
-import java.nio.ByteOrder;
-import java.util.Arrays;
-import java.util.List;
-
-import java.net.MalformedURLException;
-
-import java.nio.ByteBuffer;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import java.math.BigDecimal;
-
-
-import java.security.AccessController;
-import java.security.PrivilegedExceptionAction;
-import java.security.PrivilegedActionException;
-
-import org.omg.CORBA.SystemException;
-import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.Any;
-import org.omg.CORBA.TCKind;
-import org.omg.CORBA.TypeCodePackage.BadKind;
-import org.omg.CORBA.CustomMarshal;
-import org.omg.CORBA.MARSHAL;
-
-import org.omg.CORBA.portable.IndirectionException;
-import org.omg.CORBA.portable.BoxedValueHelper;
-import org.omg.CORBA.portable.ValueFactory;
-import org.omg.CORBA.portable.CustomValue;
-import org.omg.CORBA.portable.StreamableValue;
-import org.omg.CORBA_2_3.portable.InputStream;
-
-
-import javax.rmi.CORBA.EnumDesc;
-import javax.rmi.CORBA.ProxyDesc;
-import java.rmi.server.RMIClassLoader;
-import java.lang.reflect.Proxy;
-
-import javax.rmi.CORBA.Tie;
-import javax.rmi.CORBA.ValueHandler;
-
-import com.sun.corba.ee.spi.transport.ByteBufferPool;
-
-import com.sun.corba.ee.spi.protocol.ClientDelegate;
-
+import com.sun.corba.ee.impl.corba.CORBAObjectImpl;
+import com.sun.corba.ee.impl.corba.PrincipalImpl;
+import com.sun.corba.ee.impl.corba.TypeCodeImpl;
+import com.sun.corba.ee.impl.misc.*;
+import com.sun.corba.ee.impl.util.JDKBridge;
+import com.sun.corba.ee.impl.util.RepositoryId;
+import com.sun.corba.ee.impl.util.Utility;
 import com.sun.corba.ee.spi.ior.IOR;
 import com.sun.corba.ee.spi.ior.IORFactories;
 import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
-
+import com.sun.corba.ee.spi.logging.OMGSystemException;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.orb.ClassCodeBaseHandler;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.orb.ORBVersionFactory;
-import com.sun.corba.ee.spi.orb.ClassCodeBaseHandler;
-
-
+import com.sun.corba.ee.spi.presentation.rmi.PresentationDefaults;
 import com.sun.corba.ee.spi.presentation.rmi.PresentationManager;
 import com.sun.corba.ee.spi.presentation.rmi.StubAdapter;
-import com.sun.corba.ee.spi.presentation.rmi.PresentationDefaults;
-
-import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
-import com.sun.corba.ee.spi.logging.OMGSystemException;
-
-import com.sun.corba.ee.impl.corba.PrincipalImpl;
-import com.sun.corba.ee.impl.corba.TypeCodeImpl;
-import com.sun.corba.ee.impl.corba.CORBAObjectImpl;
-
-import com.sun.corba.ee.impl.util.JDKBridge;
-import com.sun.corba.ee.impl.util.Utility;
-import com.sun.corba.ee.impl.util.RepositoryId;
-
-import com.sun.corba.ee.impl.misc.RepositoryIdStrings;
-import com.sun.corba.ee.impl.misc.RepositoryIdInterface;
-import com.sun.corba.ee.impl.misc.RepositoryIdUtility;
-import com.sun.corba.ee.impl.misc.RepositoryIdFactory;
-import com.sun.corba.ee.impl.misc.ORBUtility;
-import com.sun.corba.ee.impl.misc.CacheTable;
+import com.sun.corba.ee.spi.protocol.ClientDelegate;
+import com.sun.corba.ee.spi.trace.CdrRead;
+import com.sun.corba.ee.spi.trace.PrimitiveRead;
+import com.sun.corba.ee.spi.transport.ByteBufferPool;
 import com.sun.org.omg.SendingContext.CodeBase;
-
-import com.sun.corba.ee.impl.misc.ClassInfoCache ;
-
-import com.sun.corba.ee.spi.trace.* ;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
+import org.omg.CORBA.*;
+import org.omg.CORBA.TypeCodePackage.BadKind;
+import org.omg.CORBA.portable.*;
+import org.omg.CORBA_2_3.portable.InputStream;
+
+import javax.rmi.CORBA.EnumDesc;
+import javax.rmi.CORBA.ProxyDesc;
+import javax.rmi.CORBA.Tie;
+import javax.rmi.CORBA.ValueHandler;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.rmi.server.RMIClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.util.Arrays;
+import java.util.List;
+import java.lang.Object;
 
 @CdrRead
 @PrimitiveRead
@@ -144,7 +108,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     private static final OMGSystemException omgWrapper = OMGSystemException.self;
     private static final String K_READ_METHOD = "read";
     private static final int MAX_BLOCK_LENGTH = 0x7fffff00;
-    protected static final String EMPTY_STRING = "";
 
     protected BufferManagerRead bufferManagerRead;
     protected ByteBuffer byteBuffer;
@@ -213,6 +176,14 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     // to readObject.  The state is cleared when the ValueHandler
     // calls end_value after the readObject method exits.
     private boolean specialNoOptionalDataState = false;
+
+    // IMPORTANT: Do not replace 'new String("")' with "", it may result
+    // in a Serialization bug (See serialization.zerolengthstring) and
+    // bug id: 4728756 for details
+    @SuppressWarnings("RedundantStringConstructorCall")
+    final String newEmptyString() {
+        return new String("");
+    }
     
     // Template method
     public CDRInputStreamBase dup() 
@@ -493,7 +464,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // zero to mean empty string.
         //
         if (len == 0) {
-            return EMPTY_STRING;
+            return newEmptyString();
         }
 
         char[] result = getConvertedChars(len - 1, getCharConverter());
@@ -523,7 +494,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // zero to mean empty string.
         //
         if (len == 0) {
-            return EMPTY_STRING;
+            return newEmptyString();
         }
 
         checkForNegativeLength(len);

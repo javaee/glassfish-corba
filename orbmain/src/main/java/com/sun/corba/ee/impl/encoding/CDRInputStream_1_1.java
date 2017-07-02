@@ -184,7 +184,7 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
         // zero to mean empty string.
         //
         if (len == 0)
-            return EMPTY_STRING;
+            return newEmptyString();
 
         checkForNegativeLength(len);
 

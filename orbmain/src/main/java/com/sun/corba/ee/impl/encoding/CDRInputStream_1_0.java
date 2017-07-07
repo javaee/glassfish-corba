@@ -178,8 +178,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     private boolean specialNoOptionalDataState = false;
 
     // IMPORTANT: Do not replace 'new String("")' with "", it may result
-    // in a Serialization bug (See serialization.zerolengthstring) and
-    // bug id: 4728756 for details
+    // in a Serialization bug. See http://bugs.java.com/view_bug.do?bug_id=4728756 for details
     @SuppressWarnings("RedundantStringConstructorCall")
     final String newEmptyString() {
         return new String("");

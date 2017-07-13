@@ -40,41 +40,31 @@
 
 package com.sun.corba.ee.impl.presentation.rmi ;
 
+import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.presentation.rmi.DynamicMethodMarshaller;
+import com.sun.corba.ee.spi.presentation.rmi.InvocationInterceptor;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationDefaults;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter;
+import com.sun.corba.ee.spi.protocol.ClientDelegate;
+import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcher;
+import com.sun.corba.ee.spi.trace.IsLocal;
+import com.sun.corba.ee.spi.transport.ContactInfoList;
+import org.glassfish.pfl.basic.proxy.DynamicAccessPermission;
+import org.glassfish.pfl.basic.proxy.LinkedInvocationHandler;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
+import org.omg.CORBA.SystemException;
+import org.omg.CORBA.portable.ApplicationException;
+import org.omg.CORBA.portable.Delegate;
+import org.omg.CORBA.portable.RemarshalException;
+import org.omg.CORBA.portable.ServantObject;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
-import java.lang.reflect.Method ;
-import java.lang.reflect.Proxy ;
-import java.lang.reflect.InvocationTargetException ;
-
-
-
-import org.omg.CORBA.portable.Delegate ;
-import org.omg.CORBA.portable.ServantObject ;
-import org.omg.CORBA.portable.ApplicationException ;
-import org.omg.CORBA.portable.RemarshalException ;
-
-import org.omg.CORBA.SystemException ;
-
-import com.sun.corba.ee.spi.orb.ORB ;
-
-
-import com.sun.corba.ee.spi.transport.ContactInfoList ;
-
-import com.sun.corba.ee.spi.protocol.ClientDelegate ;
-import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcher ;
-
-import com.sun.corba.ee.spi.presentation.rmi.InvocationInterceptor ;
-import com.sun.corba.ee.spi.presentation.rmi.DynamicMethodMarshaller ;
-import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
-import com.sun.corba.ee.spi.presentation.rmi.PresentationDefaults ;
-import com.sun.corba.ee.spi.presentation.rmi.StubAdapter ;
-
-import com.sun.corba.ee.impl.javax.rmi.CORBA.Util ;
-import com.sun.corba.ee.spi.trace.IsLocal;
-import org.glassfish.pfl.basic.proxy.LinkedInvocationHandler;
-import org.glassfish.pfl.basic.proxy.DynamicAccessPermission ;
-import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @IsLocal
 public final class StubInvocationHandlerImpl implements LinkedInvocationHandler  
@@ -242,14 +232,13 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
                 } catch (InvocationTargetException ex) {
                     Throwable mex = ex.getCause() ;
                     // mex should never be null, as null cannot be thrown
-                    Throwable exCopy = (Throwable)Util.getInstance().copyObject(mex,orb);
-                    if (dmm.isDeclaredException( exCopy ))
-                        throw exCopy ;
+                    if (dmm.isDeclaredException( mex ))
+                        throw mex ;
                     else
-                        throw Util.getInstance().wrapException(exCopy);
+                        throw Util.getInstance().wrapException(mex);
                 } catch (Throwable thr) {
                     if (thr instanceof ThreadDeath)
-                        throw (ThreadDeath)thr ;
+                        throw thr;
 
                     // This is not a user thrown exception from the
                     // method call, so don't copy it.  This is either

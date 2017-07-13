@@ -36,7 +36,6 @@
                                 <packagePrefix><type>SendingContext</type>     <prefix>org.omg</prefix></packagePrefix>
                                 <packagePrefix><type>TimeBase</type>           <prefix>org.omg</prefix></packagePrefix>
                             </packagePrefixes>
-                            <compatible>true</compatible>
                         </source>
                     </sources>
                 </configuration>

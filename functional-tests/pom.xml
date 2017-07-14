@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.glassfish.corba</groupId>
         <artifactId>glassfish-corba</artifactId>
-        <version>4.0.2-b013-SNAPSHOT</version>
+        <version>4.1.0</version>
     </parent>
 
     <artifactId>glassfish-corba-tests</artifactId>

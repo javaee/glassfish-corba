@@ -426,6 +426,7 @@ public class ObjectStreamClass implements java.io.Serializable {
 
         private static Object computeValue(Class<?> type) {
             try {
+                bridge.ensureClassInitialized(type);
                 Field pf = type.getDeclaredField("serialPersistentFields");
                 int mods = pf.getModifiers();
                 if (Modifier.isPrivate(mods) && Modifier.isStatic(mods) && Modifier.isFinal(mods)) {
@@ -437,14 +438,10 @@ public class ObjectStreamClass implements java.io.Serializable {
             return NULL_VALUE;
         }
 
-        private static ObjectStreamField[] translateFields(
-                java.io.ObjectStreamField[] fields) {
-            ObjectStreamField[] translation =
-                    new ObjectStreamField[fields.length];
-            for (int i = 0; i < fields.length; i++) {
-                translation[i] = new ObjectStreamField(fields[i].getName(),
-                        fields[i].getType());
-            }
+        private static ObjectStreamField[] translateFields(java.io.ObjectStreamField[] fields) {
+            ObjectStreamField[] translation = new ObjectStreamField[fields.length];
+            for (int i = 0; i < fields.length; i++)
+                translation[i] = new ObjectStreamField(fields[i].getName(), fields[i].getType());
             return translation;
         }
     }

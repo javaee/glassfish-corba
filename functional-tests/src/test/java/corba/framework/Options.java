@@ -39,12 +39,16 @@
  */
 package corba.framework;
 
-import test.Test;
-import test.Util;
-import java.io.*;
-import java.util.*;
 import com.sun.corba.ee.spi.misc.ORBConstants;
-import com.sun.corba.ee.spi.ior.iiop.GIOPVersion ;
+import com.sun.corba.ee.spi.JndiConstants;
+import test.Util;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /** Static library class to provide access to test configuration data.
  * This thing need to be further re-written to a class that is instantiated,
@@ -127,7 +131,7 @@ public class Options {
         emmaFile = props.getProperty("emma.coverage.out.file", "") ;
         orbClass = props.getProperty("org.omg.CORBA.ORBClass", "com.sun.corba.ee.impl.orb.ORBImpl" );
 
-        props.setProperty( "java.naming.factory.initial", "com.sun.jndi.cosnaming.CNCtxFactory" ) ;
+        props.setProperty( "java.naming.factory.initial", JndiConstants.COSNAMING_CONTEXT_FACTORY ) ;
     }
 
     private static String getPackageAsDir( CORBATest parent ) {

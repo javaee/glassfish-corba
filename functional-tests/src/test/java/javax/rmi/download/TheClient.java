@@ -49,15 +49,16 @@
 
 package javax.rmi.download;
 
+import com.sun.corba.ee.spi.JndiConstants;
 import org.omg.CORBA.ORB;
 
-import java.util.Properties;
-import java.io.*;
-import javax.rmi.CORBA.Tie;
-import javax.rmi.PortableRemoteObject;
-import javax.naming.InitialContext;
 import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.rmi.PortableRemoteObject;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Hashtable;
+import java.util.Properties;
 
 public class TheClient {
 
@@ -86,7 +87,7 @@ public class TheClient {
             Properties props = System.getProperties();
             
             props.put(  "java.naming.factory.initial",
-                        "com.sun.jndi.cosnaming.CNCtxFactory");
+                        JndiConstants.COSNAMING_CONTEXT_FACTORY);
             
             props.put(  "org.omg.CORBA.ORBClass", 
                         "com.sun.corba.ee.impl.orb.ORBImpl");

@@ -43,15 +43,14 @@ package corba.mixedorb;
 import java.util.Properties ;
 import java.util.Hashtable ;
 
-import java.rmi.Remote ;
 import java.rmi.RemoteException ;
 
-import javax.rmi.PortableRemoteObject ;
 import javax.rmi.CORBA.Util ;
 import javax.rmi.CORBA.Tie ;
 
 import javax.naming.InitialContext ;
 
+import com.sun.corba.ee.spi.JndiConstants;
 import org.omg.CORBA.ORB ;
 
 import org.testng.TestNG ;
@@ -101,7 +100,7 @@ public class Client {
 
         // Use the J2SE ic provider
         System.setProperty( "java.naming.factory.initial", 
-            "com.sun.jndi.cosnaming.CNCtxFactory" ) ;
+            JndiConstants.COSNAMING_CONTEXT_FACTORY ) ;
     }
 
     // We need to set up the client and server ORBs, and start a transient

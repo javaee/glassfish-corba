@@ -51,6 +51,7 @@ import javax.rmi.CORBA.Tie ;
 import javax.naming.InitialContext ;
 import javax.naming.NamingException ;
 
+import com.sun.corba.ee.spi.JndiConstants;
 import org.testng.TestNG ;
 import org.testng.annotations.Configuration ;
 
@@ -87,7 +88,7 @@ public abstract class Framework {
 
         // Use the J2SE ic provider
         System.setProperty( "java.naming.factory.initial", 
-            "com.sun.jndi.cosnaming.CNCtxFactory" ) ;
+            JndiConstants.COSNAMING_CONTEXT_FACTORY ) ;
     }
 
     // We need to set up the client and server ORBs, and start a transient

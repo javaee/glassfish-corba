@@ -49,25 +49,25 @@
 
 package javax.rmi;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.util.Properties;
+import com.sun.corba.ee.impl.util.Utility;
+import com.sun.corba.ee.spi.JndiConstants;
 import org.omg.CORBA.ORB;
+import sun.rmi.registry.RegistryImpl;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.util.Hashtable;
-import java.util.Vector;
-import java.rmi.server.UnicastRemoteObject;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import sun.rmi.registry.RegistryImpl;
-import java.rmi.registry.Registry;
-import java.rmi.RMISecurityManager;
-import com.sun.corba.ee.impl.util.Utility;
 import javax.rmi.CORBA.Tie;
 import javax.rmi.CORBA.Util;
+import java.io.IOException;
+import java.rmi.RMISecurityManager;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
 
 /**
  * PortableContext is a convenience class for rmi-iiop programs which simplifies
@@ -743,7 +743,7 @@ public class PortableContext {
             // Now setup the name server environment...
 
             nameEnv.put("java.naming.corba.orb", orb);
-            nameEnv.put("java.naming.factory.initial","com.sun.jndi.cosnaming.CNCtxFactory");
+            nameEnv.put("java.naming.factory.initial", JndiConstants.COSNAMING_CONTEXT_FACTORY);
 
         } else if (runtime == RMI_RUNTIME) {
 

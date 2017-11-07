@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
- * 
+ *
+ * Copyright (c) 2017 Oracle and/or its affiliates. All rights reserved.
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,20 +11,20 @@
  * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
  * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
- * 
+ *
  * GPL Classpath Exception:
  * Oracle designates this particular file as subject to the "Classpath"
  * exception as provided by Oracle in the GPL Version 2 section of the License
  * file that accompanied this code.
- * 
+ *
  * Modifications:
  * If applicable, add the following below the License Header, with the fields
  * enclosed by brackets [] replaced by your own identifying information:
  * "Portions Copyright [year] [name of copyright owner]"
- * 
+ *
  * Contributor(s):
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
@@ -37,65 +37,12 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.corba.ee.spi;
 
-/*
- * Licensed Materials - Property of IBM
- * RMI-IIOP v1.0
- * Copyright IBM Corp. 1998 1999  All Rights Reserved
- *
- * US Government Users Restricted Rights - Use, duplication or
- * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+/**
+ * Public constants for interaction with the Glassfish JNDI implementation.
  */
+public interface JndiConstants {
 
-package javax.rmi;
-
-import com.sun.corba.ee.spi.JndiConstants;
-
-import javax.naming.InitialContext;
-import java.rmi.RemoteException;
-
-public class PROImpl extends PortableRemoteObject implements PROHello {
-    
-    public PROImpl () throws RemoteException {
-        super();
-    }
-    
-    public String sayHello () throws RemoteException {
-        return HELLO;
-    }
-    
-    public Dog getDogValue () throws RemoteException {
-        return new DogImpl ("Bow wow!");
-    }
-
-    public Dog getDogServer () throws RemoteException {
-        return new DogServer ("Yip Yip Yip!");
-    }
-
-    public void unexport () throws RemoteException {
-        PortableRemoteObject.unexportObject(this);
-    }
-    
-    private static InitialContext context ;
-
-    public static void main (String[] args) {
-        
-        // args[0] == 'iiop' || 'jrmp'
-        // args[1] == publishName
-        
-        try {
-          
-            if (args[0].equalsIgnoreCase("iiop")) {
-                System.getProperties().put("java.naming.factory.initial", JndiConstants.COSNAMING_CONTEXT_FACTORY);
-            } else if (args[0].equalsIgnoreCase("jrmp")) {
-                System.getProperties().put("java.naming.factory.initial","com.sun.jndi.registry.RegistryContextFactory");
-            }
-            
-            context = new InitialContext ();
-            context.rebind (args[1], new PROImpl());
-          
-        } catch (Exception e) {
-            System.out.println ("Caught: " + e.getMessage());
-        }
-    }
+    public static final String COSNAMING_CONTEXT_FACTORY = "com.sun.jndi.cosnaming.CNCtxFactory";
 }

@@ -47,27 +47,22 @@
 
 package test;
 
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.OutputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.rmi.Remote;
-import javax.rmi.CORBA.Tie;
-import javax.rmi.PortableRemoteObject;
-import javax.naming.InitialContext;
+import com.sun.corba.ee.impl.util.JDKBridge;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.JndiConstants;
+import org.omg.CORBA.ORB;
+import sun.rmi.rmic.Main;
+
 import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.rmi.PortableRemoteObject;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.rmi.Remote;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
-import org.omg.CORBA.ORB;
-import javax.naming.NamingException;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import sun.rmi.rmic.Main;
-import com.sun.corba.ee.impl.util.JDKBridge;
-import com.sun.corba.ee.spi.misc.ORBConstants;
-import java.net.InetAddress;
 
 public class Util {
 
@@ -145,7 +140,7 @@ public class Util {
         if (iiop) {
 
             env.put("java.naming.corba.orb", orb);
-            env.put("java.naming.factory.initial","com.sun.jndi.cosnaming.CNCtxFactory");
+            env.put("java.naming.factory.initial", JndiConstants.COSNAMING_CONTEXT_FACTORY);
 
         } else {
 

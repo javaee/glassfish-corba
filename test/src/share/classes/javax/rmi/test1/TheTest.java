@@ -49,6 +49,7 @@
 
 package javax.rmi.test1;
 
+import com.sun.corba.ee.spi.JndiConstants;
 import org.omg.CORBA.ORB;
 
 import java.util.Properties;
@@ -92,7 +93,7 @@ public class TheTest extends test.Test {
             Properties props = System.getProperties();
             
             props.put(  "java.naming.factory.initial",
-                        "com.sun.jndi.cosnaming.CNCtxFactory");
+                        JndiConstants.COSNAMING_CONTEXT_FACTORY);
             
             props.put(  "org.omg.CORBA.ORBClass", 
                         "com.sun.corba.ee.impl.orb.ORBImpl");

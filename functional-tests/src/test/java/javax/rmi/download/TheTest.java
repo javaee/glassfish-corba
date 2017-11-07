@@ -49,18 +49,19 @@
 
 package javax.rmi.download;
 
-import org.omg.CORBA.ORB;
-
-import java.util.Properties;
-import java.io.File;
-import javax.rmi.PortableRemoteObject;
-import javax.naming.InitialContext;
-import javax.naming.Context;
-import test.Util;
-import java.util.Hashtable;
-import java.util.Vector;
+import com.sun.corba.ee.spi.JndiConstants;
 import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CORBA.ORB;
+import test.Util;
 import test.WebServer;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.rmi.PortableRemoteObject;
+import java.io.File;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
 
 /*
  * @test
@@ -128,7 +129,7 @@ public class TheTest extends test.Test {
             Properties props = System.getProperties();
             
             props.put(  "java.naming.factory.initial",
-                        "com.sun.jndi.cosnaming.CNCtxFactory");
+                        JndiConstants.COSNAMING_CONTEXT_FACTORY);
             
             props.put(  "org.omg.CORBA.ORBClass", 
                         "com.sun.corba.ee.impl.orb.ORBImpl");

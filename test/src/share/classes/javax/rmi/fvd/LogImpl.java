@@ -48,17 +48,15 @@
  */
 
 package javax.rmi.fvd;
-import java.awt.*;
+import com.sun.corba.ee.spi.JndiConstants;
 import org.omg.CORBA.ORB;
 
-import java.util.Properties;
-import java.io.*;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.rmi.CORBA.Tie;
 import javax.rmi.PortableRemoteObject;
-import javax.naming.InitialContext;
-import javax.naming.Context;
 import java.util.Hashtable;
-import java.awt.event.*;
+import java.util.Properties;
 
 public class LogImpl implements Log/*, java.awt.event.ActionListener*/ {
     private static String[] myArgs = new String[]{"-ORBInitialPort" , "1050" };
@@ -118,7 +116,7 @@ public class LogImpl implements Log/*, java.awt.event.ActionListener*/ {
             Properties props = System.getProperties();
         
             props.put(  "java.naming.factory.initial",
-                        "com.sun.jndi.cosnaming.CNCtxFactory");
+                        JndiConstants.COSNAMING_CONTEXT_FACTORY);
             
             props.put(  "org.omg.CORBA.ORBClass", 
                         "com.sun.corba.ee.impl.orb.ORBImpl");
@@ -179,7 +177,7 @@ public class LogImpl implements Log/*, java.awt.event.ActionListener*/ {
             Properties props = System.getProperties();
             
             props.put(  "java.naming.factory.initial",
-                        "com.sun.jndi.cosnaming.CNCtxFactory");
+                        JndiConstants.COSNAMING_CONTEXT_FACTORY);
             
             props.put(  "org.omg.CORBA.ORBClass", 
                         "com.sun.corba.ee.impl.orb.ORBImpl");

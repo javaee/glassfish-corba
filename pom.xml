@@ -69,7 +69,9 @@
     </modules>
 
     <properties>
-        <jdkVersion>1.7</jdkVersion>
+        <jdkVersion>1.8</jdkVersion>
+        <maven.compiler.source>${jdkVersion}</maven.compiler.source>
+        <maven.compiler.target>${jdkVersion}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
         <pfl-version>4.0.0-b008</pfl-version>
@@ -103,12 +105,8 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
-                <configuration>
-                    <source>${jdkVersion}</source>
-                    <target>${jdkVersion}</target>
-                </configuration>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.20</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

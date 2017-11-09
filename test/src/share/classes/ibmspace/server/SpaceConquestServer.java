@@ -65,18 +65,16 @@
 
 package ibmspace.server;
 
-import ibmspace.common.SpaceConquest;
 import ibmspace.common.GameView;
 import ibmspace.common.Planet;
-import java.rmi.RemoteException;
-import java.util.Properties;
-import java.util.Vector;
-import java.lang.reflect.Array;
-import javax.rmi.PortableRemoteObject;
-import javax.naming.InitialContext;
-import java.rmi.RMISecurityManager;
+import ibmspace.common.SpaceConquest;
 
-import ibmspace.common.*;
+import javax.naming.InitialContext;
+import javax.rmi.PortableRemoteObject;
+import java.lang.reflect.Array;
+import java.rmi.RMISecurityManager;
+import java.rmi.RemoteException;
+import java.util.Vector;
 
 public class SpaceConquestServer extends PortableRemoteObject implements SpaceConquest
 {
@@ -188,7 +186,7 @@ public class SpaceConquestServer extends PortableRemoteObject implements SpaceCo
                 SpaceConquestServer obj = new SpaceConquestServer (numPlayers);
 
                 // Pass system properties with -D option of java command, e.g.
-                // -Djava.naming.factory.initial=com.sun.jndi.cosnaming.CNCtxFactory
+                // -Djava.naming.factory.initial=< name of factory to use>
 
                 context = new InitialContext ();
                 context.rebind ("SpaceConquest", obj);

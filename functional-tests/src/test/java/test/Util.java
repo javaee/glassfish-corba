@@ -152,7 +152,7 @@ public class Util {
 
             serverUrl += ":" + Integer.toString(nameServerPort);
 
-            env.put("java.naming.factory.initial","com.sun.jndi.rmi.registry.RegistryContextFactory");
+            env.put("java.naming.factory.initial", JndiConstants.REGISTRY_CONTEXT_FACTORY);
             env.put("java.naming.provider.url",serverUrl);
         }
 

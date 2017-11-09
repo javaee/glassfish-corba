@@ -61,18 +61,16 @@
 
 package ibmspace.client;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.lang.reflect.Array;
 import ibmspace.common.*;
-import javax.swing.*;
-import java.rmi.RemoteException;
-import java.util.Properties;
-import java.rmi.RMISecurityManager;
+
 import javax.naming.InitialContext;
 import javax.rmi.PortableRemoteObject;
-import ibmspace.server.SpaceConquestServer;
+import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
+import java.rmi.RMISecurityManager;
+import java.rmi.RemoteException;
+import java.util.Hashtable;
+import java.util.Vector;
 
 public class GameSurrogate
 {
@@ -112,7 +110,7 @@ public class GameSurrogate
         SpaceConquest server = null;
 
         // Pass system properties with -D option of java command, e.g.
-        // -Djava.naming.factory.initial=com.sun.jndi.cosnaming.CNCtxFactory
+        // -Djava.naming.factory.initial=<name of factory to use>
         // -Djava.naming.provider.url=iiop://<hostname>
 
         try

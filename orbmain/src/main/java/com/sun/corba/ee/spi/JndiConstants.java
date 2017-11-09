@@ -45,4 +45,5 @@ package com.sun.corba.ee.spi;
 public interface JndiConstants {
 
     public static final String COSNAMING_CONTEXT_FACTORY = "com.sun.jndi.cosnaming.CNCtxFactory";
+    public static final String REGISTRY_CONTEXT_FACTORY = "com.sun.jndi.rmi.registry.RegistryContextFactory";
 }

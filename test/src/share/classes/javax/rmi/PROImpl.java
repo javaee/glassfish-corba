@@ -88,7 +88,7 @@ public class PROImpl extends PortableRemoteObject implements PROHello {
             if (args[0].equalsIgnoreCase("iiop")) {
                 System.getProperties().put("java.naming.factory.initial", JndiConstants.COSNAMING_CONTEXT_FACTORY);
             } else if (args[0].equalsIgnoreCase("jrmp")) {
-                System.getProperties().put("java.naming.factory.initial","com.sun.jndi.registry.RegistryContextFactory");
+                System.getProperties().put("java.naming.factory.initial", JndiConstants.REGISTRY_CONTEXT_FACTORY);
             }
             
             context = new InitialContext ();

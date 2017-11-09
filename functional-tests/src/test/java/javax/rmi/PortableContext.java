@@ -757,7 +757,7 @@ public class PortableContext {
 
             serverUrl += ":" + Integer.toString(nameServerPort);
 
-            nameEnv.put("java.naming.factory.initial","com.sun.jndi.rmi.registry.RegistryContextFactory");
+            nameEnv.put("java.naming.factory.initial",JndiConstants.REGISTRY_CONTEXT_FACTORY);
             nameEnv.put("java.naming.provider.url",serverUrl);
 
         } else {

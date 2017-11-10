@@ -44,6 +44,15 @@ package com.sun.corba.ee.spi;
  */
 public interface JndiConstants {
 
-    public static final String COSNAMING_CONTEXT_FACTORY = "com.sun.jndi.cosnaming.CNCtxFactory";
-    public static final String REGISTRY_CONTEXT_FACTORY = "com.sun.jndi.rmi.registry.RegistryContextFactory";
+    /** The name of the class used to create context factories for COSNaming. */
+    String COSNAMING_CONTEXT_FACTORY = "com.sun.jndi.cosnaming.CNCtxFactory";
+
+    /** The JDK's registry context factory. */
+    String REGISTRY_CONTEXT_FACTORY = "com.sun.jndi.rmi.registry.RegistryContextFactory";
+
+    /** A System Property which may be defined as equal to a trusted classpath URL. */
+    String TRUST_URLCODEBASE = "com.sun.jndi.cosnaming.object.trustURLCodebase";
+
+    /** A system property which can be set to true to enable JNDI federation */
+    String ENABLE_FEDERATION = "com.sun.jndi.cosnaming.federation";
 }

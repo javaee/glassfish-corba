@@ -40,61 +40,37 @@
 
 package com.sun.corba.ee.impl.presentation.rmi ;
 
-import java.lang.reflect.Field ;
-
-import java.util.Hashtable;
-
-import javax.naming.*;
-import javax.naming.spi.StateFactory;
-
-import java.security.AccessController ;
-import java.security.PrivilegedAction ;
-
-import javax.rmi.PortableRemoteObject ;
-
 import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.presentation.rmi.StubAdapter;
 
+import javax.naming.ConfigurationException;
+import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.NamingException;
+import javax.naming.spi.StateFactory;
+import javax.rmi.PortableRemoteObject;
+import java.lang.reflect.Field;
 import java.rmi.Remote;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 // This creates a dependendcy on the implementation
 // of the CosNaming service provider.
-import com.sun.jndi.cosnaming.CNCtx ;
-
-import com.sun.corba.ee.spi.presentation.rmi.StubAdapter ;
 
 /**
   * StateFactory that turns java.rmi.Remote objects to org.omg.CORBA.Object.
   * This version works either with standard RMI-IIOP or Dynamic RMI-IIOP.
-  * Based on the original com.sun.jndi.cosnaming.RemoteToCorba and
-  * com.sun.jndi.toolkit.corba.CorbaUtils.
   *
   * @author Ken Cavanaugh 
   */
 
-public class JNDIStateFactoryImpl implements StateFactory 
-{
-    private static final Field orbField ;
+public class JNDIStateFactoryImpl implements StateFactory {
 
-    static {
-        orbField = AccessController.doPrivileged(
-            new PrivilegedAction<Field>() {
-
-            public Field run() {
-                Field fld = null;
-                try {
-                    Class cls = CNCtx.class;
-                    fld = cls.getDeclaredField("_orb");
-                    fld.setAccessible(true);
-                } catch (Exception exc) {
-                }
-                return fld;
-            }
-        }) ;
-    }
-
-    public JNDIStateFactoryImpl() 
-    {
-    }
+    @SuppressWarnings("WeakerAccess")
+    public JNDIStateFactoryImpl() { }
 
     /**
      * Returns the CORBA object for a Remote object.
@@ -130,7 +106,7 @@ public class JNDIStateFactoryImpl implements StateFactory
             return null ;
         }
 
-        Remote stub = null;
+        Remote stub;
 
         try {
             stub = PortableRemoteObject.toStub( (Remote)orig ) ;
@@ -168,19 +144,37 @@ public class JNDIStateFactoryImpl implements StateFactory
     // to use the StubAdapter.  But this has problems as well, because
     // other vendors may use the CosNaming provider with a different ORB
     // entirely.
-    private ORB getORB( Context ctx ) 
-    {
-        ORB orb = null ;
-
+    private ORB getORB( Context ctx ) {
         try {
-            orb = (ORB)orbField.get( ctx ) ;
+            return (ORB) getOrbField(ctx).get( ctx ) ;
         } catch (Exception exc) {
-            Exceptions.self.couldNotGetORB( exc, ctx ) ;
-            // ignore the exception and return null.
-            // Note that the exception may be because ctx
-            // is not a CosNaming context.
+            Exceptions.self.couldNotGetORB( exc, ctx );
+            return null;
         }
+    }
 
-        return orb ;
+    private ConcurrentMap<Class<?>, Field> orbFields = new ConcurrentHashMap<>();
+
+    private Field getOrbField(Context ctx) {
+        Field orbField = orbFields.get(ctx.getClass());
+        if (orbField != null) return orbField;
+
+        orbField = AccessController.doPrivileged((PrivilegedAction<Field>) () -> getField(ctx.getClass(), "_orb"));
+
+        orbFields.put(ctx.getClass(), orbField);
+        return orbField;
+    }
+
+    private Field getField(Class<?> aClass, String fieldName) {
+        try {
+            Field field = aClass.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field;
+        } catch (NoSuchFieldException e) {
+            if (aClass.getSuperclass() == null)
+                return null;
+            else
+                return getField(aClass.getSuperclass(), fieldName);
+        }
     }
 }

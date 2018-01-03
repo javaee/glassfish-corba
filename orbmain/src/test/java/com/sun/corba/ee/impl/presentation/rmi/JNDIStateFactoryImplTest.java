@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2018 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -41,8 +41,8 @@ package com.sun.corba.ee.impl.presentation.rmi;
 
 import com.meterware.simplestub.Memento;
 import com.meterware.simplestub.StaticStubSupport;
+import com.meterware.simplestub.Stub;
 import com.sun.corba.ee.spi.orb.ORB;
-import com.sun.jndi.cosnaming.CNCtx;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +50,6 @@ import org.omg.CosNaming.NamingContext;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.naming.spi.ResolveResult;
 import javax.rmi.CORBA.PortableRemoteObjectDelegate;
 import javax.rmi.PortableRemoteObject;
 import java.rmi.NoSuchObjectException;
@@ -86,10 +85,16 @@ public class JNDIStateFactoryImplTest {
         corbaStub = createStrictStub(CorbaStub.class);
     }
 
+    abstract static class OrbContext implements Context {
+        private ORB _orb;
+
+        OrbContext(ORB _orb) {
+            this._orb = _orb;
+        }
+    }
+
     private Context createContextWithOrb() throws NamingException {
-        env.put("java.naming.corba.orb", orb);
-        ResolveResult result = CNCtx.createUsingURL("iiop://nohost", env);
-        return (Context) result.getResolvedObj();
+        return Stub.createStrictStub(OrbContext.class, orb);
     }
 
     @Test

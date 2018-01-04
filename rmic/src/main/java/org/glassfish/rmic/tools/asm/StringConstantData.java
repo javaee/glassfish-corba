@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996, 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1994, 2003, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,34 +23,49 @@
  * questions.
  */
 
-/*
- * Licensed Materials - Property of IBM
- * RMI-IIOP v1.0
- * Copyright IBM Corp. 1998 1999  All Rights Reserved
- *
- */
+package org.glassfish.rmic.tools.asm;
 
-package sun.rmi.rmic;
-
-import java.io.OutputStream;
+import org.glassfish.rmic.tools.java.*;
+import java.io.IOException;
+import java.io.DataOutputStream;
 
 /**
- * Legacy main class for "rmic" program, allowing the old class name to be used to run it.
+ * This is a string constant pool data item.
+ *
+ * WARNING: The contents of this source file are not part of any
+ * supported API.  Code that depends on them does so at its own risk:
+ * they are subject to change or removal without notice.
  */
-public class Main extends org.glassfish.rmic.Main {
+final
+class StringConstantData extends ConstantPoolData {
+    String str;
 
     /**
-     * Constructor.
+     * Constructor
      */
-    public Main(OutputStream out, String program) {
-        super(out, program);
+    StringConstantData(ConstantPool tab, String str) {
+        this.str = str;
     }
 
     /**
-     * Main program
+     * Write the constant to the output stream
      */
-    public static void main(String argv[]) {
-        Main compiler = new Main(System.out, "rmic");
-        System.exit(compiler.compile(argv) ? 0 : 1);
+    void write(Environment env, DataOutputStream out, ConstantPool tab) throws IOException {
+        out.writeByte(CONSTANT_UTF8);
+        out.writeUTF(str);
+    }
+
+    /**
+     * Return the order of the constant
+     */
+    int order() {
+        return 4;
+    }
+
+    /**
+     * toString
+     */
+    public String toString() {
+        return "StringConstantData[" + str + "]=" + str.hashCode();
     }
 }

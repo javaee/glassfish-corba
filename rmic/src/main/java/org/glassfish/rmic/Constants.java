@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996, 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2003, 2018 Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,34 +23,22 @@
  * questions.
  */
 
-/*
- * Licensed Materials - Property of IBM
- * RMI-IIOP v1.0
- * Copyright IBM Corp. 1998 1999  All Rights Reserved
- *
- */
+package org.glassfish.rmic;
 
-package sun.rmi.rmic;
-
-import java.io.OutputStream;
+import org.glassfish.rmic.tools.java.Identifier;
 
 /**
- * Legacy main class for "rmic" program, allowing the old class name to be used to run it.
+ * WARNING: The contents of this source file are not part of any
+ * supported API.  Code that depends on them does so at its own risk:
+ * they are subject to change or removal without notice.
  */
-public class Main extends org.glassfish.rmic.Main {
+public interface Constants extends org.glassfish.rmic.tools.java.Constants {
 
-    /**
-     * Constructor.
+    /*
+     * Identifiers potentially useful for all Generators
      */
-    public Main(OutputStream out, String program) {
-        super(out, program);
-    }
-
-    /**
-     * Main program
-     */
-    public static void main(String argv[]) {
-        Main compiler = new Main(System.out, "rmic");
-        System.exit(compiler.compile(argv) ? 0 : 1);
-    }
+    public static final Identifier idRemote =
+        Identifier.lookup("java.rmi.Remote");
+    public static final Identifier idRemoteException =
+        Identifier.lookup("java.rmi.RemoteException");
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996, 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1994, 2003, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,34 +23,47 @@
  * questions.
  */
 
-/*
- * Licensed Materials - Property of IBM
- * RMI-IIOP v1.0
- * Copyright IBM Corp. 1998 1999  All Rights Reserved
- *
- */
+package org.glassfish.rmic.tools.asm;
 
-package sun.rmi.rmic;
-
-import java.io.OutputStream;
+import org.glassfish.rmic.tools.java.*;
+import java.io.IOException;
+import java.io.DataOutputStream;
 
 /**
- * Legacy main class for "rmic" program, allowing the old class name to be used to run it.
+ * This is a name and type constant pool data item
+ *
+ * WARNING: The contents of this source file are not part of any
+ * supported API.  Code that depends on them does so at its own risk:
+ * they are subject to change or removal without notice.
  */
-public class Main extends org.glassfish.rmic.Main {
+final
+class NameAndTypeConstantData extends ConstantPoolData {
+    String name;
+    String type;
 
     /**
-     * Constructor.
+     * Constructor
      */
-    public Main(OutputStream out, String program) {
-        super(out, program);
+    NameAndTypeConstantData(ConstantPool tab, NameAndTypeData nt) {
+        name = nt.field.getName().toString();
+        type = nt.field.getType().getTypeSignature();
+        tab.put(name);
+        tab.put(type);
     }
 
     /**
-     * Main program
+     * Write the constant to the output stream
      */
-    public static void main(String argv[]) {
-        Main compiler = new Main(System.out, "rmic");
-        System.exit(compiler.compile(argv) ? 0 : 1);
+    void write(Environment env, DataOutputStream out, ConstantPool tab) throws IOException {
+        out.writeByte(CONSTANT_NAMEANDTYPE);
+        out.writeShort(tab.index(name));
+        out.writeShort(tab.index(type));
+    }
+
+    /**
+     * Return the order of the constant
+     */
+    int order() {
+        return 3;
     }
 }

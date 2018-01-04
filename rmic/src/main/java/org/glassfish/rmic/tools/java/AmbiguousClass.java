@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996, 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1994, 2014, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,34 +23,32 @@
  * questions.
  */
 
-/*
- * Licensed Materials - Property of IBM
- * RMI-IIOP v1.0
- * Copyright IBM Corp. 1998 1999  All Rights Reserved
- *
- */
-
-package sun.rmi.rmic;
-
-import java.io.OutputStream;
+package org.glassfish.rmic.tools.java;
 
 /**
- * Legacy main class for "rmic" program, allowing the old class name to be used to run it.
+ * This exception is thrown when an unqualified class name
+ * is used that can be resolved in more than one way.
+ *
+ * WARNING: The contents of this source file are not part of any
+ * supported API.  Code that depends on them does so at its own risk:
+ * they are subject to change or removal without notice.
  */
-public class Main extends org.glassfish.rmic.Main {
+
+@SuppressWarnings("serial") // JDK implementation class
+public
+class AmbiguousClass extends ClassNotFound {
+    /**
+     * The class that was not found
+     */
+    public Identifier name1;
+    public Identifier name2;
 
     /**
-     * Constructor.
+     * Constructor
      */
-    public Main(OutputStream out, String program) {
-        super(out, program);
-    }
-
-    /**
-     * Main program
-     */
-    public static void main(String argv[]) {
-        Main compiler = new Main(System.out, "rmic");
-        System.exit(compiler.compile(argv) ? 0 : 1);
+    public AmbiguousClass(Identifier name1, Identifier name2) {
+        super(name1.getName());
+        this.name1 = name1;
+        this.name2 = name2;
     }
 }

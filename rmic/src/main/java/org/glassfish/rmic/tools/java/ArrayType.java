@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996, 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1994, 2003, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,34 +23,43 @@
  * questions.
  */
 
-/*
- * Licensed Materials - Property of IBM
- * RMI-IIOP v1.0
- * Copyright IBM Corp. 1998 1999  All Rights Reserved
- *
- */
-
-package sun.rmi.rmic;
-
-import java.io.OutputStream;
+package org.glassfish.rmic.tools.java;
 
 /**
- * Legacy main class for "rmic" program, allowing the old class name to be used to run it.
+ * This class represents an Java array type.
+ * It overrides the relevant methods in class Type.
+ *
+ * WARNING: The contents of this source file are not part of any
+ * supported API.  Code that depends on them does so at its own risk:
+ * they are subject to change or removal without notice.
+ *
+ * @author      Arthur van Hoff
  */
-public class Main extends org.glassfish.rmic.Main {
+public final
+class ArrayType extends Type {
+    /**
+     * The type of the element.
+     */
+    Type elemType;
 
     /**
-     * Constructor.
+     * Construct an array type. Use Type.tArray to create
+     * a new array type.
      */
-    public Main(OutputStream out, String program) {
-        super(out, program);
+    ArrayType(String typeSig, Type elemType) {
+        super(TC_ARRAY, typeSig);
+        this.elemType = elemType;
     }
 
-    /**
-     * Main program
-     */
-    public static void main(String argv[]) {
-        Main compiler = new Main(System.out, "rmic");
-        System.exit(compiler.compile(argv) ? 0 : 1);
+    public Type getElementType() {
+        return elemType;
+    }
+
+    public int getArrayDimension() {
+        return elemType.getArrayDimension() + 1;
+    }
+
+    public String typeString(String id, boolean abbrev, boolean ret) {
+        return getElementType().typeString(id, abbrev, ret) + "[]";
     }
 }

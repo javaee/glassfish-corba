@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996, 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1994, 2004, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,34 +23,45 @@
  * questions.
  */
 
-/*
- * Licensed Materials - Property of IBM
- * RMI-IIOP v1.0
- * Copyright IBM Corp. 1998 1999  All Rights Reserved
- *
- */
+package org.glassfish.rmic.tools.javac;
 
-package sun.rmi.rmic;
-
-import java.io.OutputStream;
+import org.glassfish.rmic.tools.java.*;
+import org.glassfish.rmic.tools.asm.Assembler;
 
 /**
- * Legacy main class for "rmic" program, allowing the old class name to be used to run it.
+ * This class is used to represents fields while they are
+ * being compiled
+ *
+ * WARNING: The contents of this source file are not part of any
+ * supported API.  Code that depends on them does so at its own risk:
+ * they are subject to change or removal without notice.
  */
-public class Main extends org.glassfish.rmic.Main {
+@Deprecated
+final
+class CompilerMember implements Comparable<Object> {
+    MemberDefinition field;
+    Assembler asm;
+    Object value;
+    String name;
+    String sig;
+    String key;
 
-    /**
-     * Constructor.
-     */
-    public Main(OutputStream out, String program) {
-        super(out, program);
+    CompilerMember(MemberDefinition field, Assembler asm) {
+        this.field = field;
+        this.asm = asm;
+        name = field.getName().toString();
+        sig = field.getType().getTypeSignature();
     }
 
-    /**
-     * Main program
-     */
-    public static void main(String argv[]) {
-        Main compiler = new Main(System.out, "rmic");
-        System.exit(compiler.compile(argv) ? 0 : 1);
+    public int compareTo(Object o) {
+        CompilerMember cm = (CompilerMember) o;
+        return getKey().compareTo(cm.getKey());
     }
+
+    String getKey() {
+        if (key==null)
+            key = name+sig;
+        return key;
+    }
+
 }

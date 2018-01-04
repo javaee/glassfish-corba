@@ -102,9 +102,7 @@ public class Main implements org.glassfish.rmic.Constants {
      * Output a message.
      */
     public void output(String msg) {
-        PrintStream out =
-            this.out instanceof PrintStream ? (PrintStream)this.out
-            : new PrintStream(this.out, true);
+        PrintStream out = this.out instanceof PrintStream ? (PrintStream) this.out : new PrintStream(this.out, true);
         out.println(msg);
     }
 
@@ -143,15 +141,6 @@ public class Main implements org.glassfish.rmic.Constants {
         if (classes.size() == 0) {
             usage();
             return false;
-        }
-
-        if ((flags & F_WARNINGS) != 0) {
-            for (Generator g : generators) {
-                if (g instanceof RMIGenerator) {
-                    output(getText("rmic.jrmp.stubs.deprecated", program));
-                    break;
-                }
-            }
         }
 
         return doCompile();
@@ -848,8 +837,7 @@ public class Main implements org.glassfish.rmic.Constants {
     {
         String format = getString(key);
         if (format == null) {
-            format = "no text found: key = \"" + key + "\", " +
-                "arguments = \"{0}\", \"{1}\", \"{2}\"";
+            format = "no text found: key = \"" + key + "\", " + "arguments = \"{0}\", \"{1}\", \"{2}\"";
         }
 
         String[] args = new String[3];

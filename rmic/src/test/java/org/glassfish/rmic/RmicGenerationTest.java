@@ -47,6 +47,7 @@ import org.glassfish.rmic.classes.islocal.MessageBuilderServantPOA;
 import org.glassfish.rmic.classes.preinvokepostinvoke.MyServant;
 import org.glassfish.rmic.classes.rmipoacounter.CounterImpl;
 import org.glassfish.rmic.classes.systemexceptions.ServerInvokerServantPOA;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -57,12 +58,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.fail;
 
 /**
@@ -71,10 +73,31 @@ import static org.junit.Assert.fail;
 public class RmicGenerationTest {
 
     private static int testNum = 0;
+    private static File rootDir;
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @BeforeClass
+    public static void clearRootDir() throws IOException {
+        rootDir = Files.createTempDirectory("rmic").toFile();
+    }
+
+    @Test
+    public void whenDefaultGeneratorSpecified_reportJRMPNoLongerSupported() throws Exception {
+        GenerationControl generator = new GenerationControl(FooServantPOA.class);
+
+        try {
+            generator.generate();
+            fail("Should have reported JRMP no longer supported");
+        } catch (AssertionError e) {
+            assertThat(e.getMessage(), containsString("no longer supported"));
+        }
+     }
 
     @Test
     public void generateIiopStubsWithoutPoa() throws Exception {
         GenerationControl generator = new GenerationControl(RmiIIServant.class);
+        generator.addArgs("-iiop", "-keep");
+
         generator.generate();
 
         checkGeneratedFiles(generator, "without_poas");
@@ -85,7 +108,7 @@ public class RmicGenerationTest {
         GenerationControl generator = new GenerationControl(
                 ExceptionSourceServantPOA.class, MyServant.class, MessageBuilderServantPOA.class, CounterImpl.class,
                 ServerInvokerServantPOA.class, RmiIIServantPOA.class, FooServantPOA.class);
-        generator.addArgs("-poa");
+        generator.addArgs("-iiop", "-keep", "-poa");
         generator.generate();
 
         checkGeneratedFiles(generator, "with_poas");
@@ -98,7 +121,7 @@ public class RmicGenerationTest {
         String[] generatedFilePaths = getJavaFilePaths(generator.getDestDir());
         String[] expectedFilePaths = getJavaFilePaths(masterDir);
 
-        assertThat(generatedFilePaths, arrayContaining(expectedFilePaths));
+        assertThat("In " + generator.getDestDir(), generatedFilePaths, arrayContaining(expectedFilePaths));
         compareGeneratedFiles(masterDir, generator.getDestDir(), expectedFilePaths);
     }
 
@@ -159,7 +182,14 @@ public class RmicGenerationTest {
 
     }
 
-    private String toPath(String className) {
+    @SuppressWarnings("ConstantConditions")
+    private static String getClassPath() {
+        String classFileName = toPath(RmicGenerationTest.class.getName());
+        String filePath = RmicGenerationTest.class.getClassLoader().getResource(classFileName).getPath();
+        return filePath.substring(0, filePath.indexOf(classFileName));
+    }
+
+    private static String toPath(String className) {
         return className.replace('.', '/') + ".class";
     }
 
@@ -168,32 +198,28 @@ public class RmicGenerationTest {
         private ArrayList<String> argList = new ArrayList<>();
         private Class<?>[] classes;
         private File destDir;
+        private String warning;
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
         private GenerationControl(Class<?>... classes) {
             this.classes = classes;
 
-            String classPath = getClassPath(classes[0]);
-            destDir = new File(new File(classPath).getParentFile(), "rmic-generated-sources" + (++testNum));
-            destDir.delete();
+            String classPath = getClassPath();
+            destDir = new File(rootDir + "/" + (++testNum));
             destDir.mkdirs();
             addArgs("-classpath", classPath, "-d", destDir.getAbsolutePath());
-            addArgs("-iiop", "-keep");
         }
 
         private void addArgs(String... args) {
             argList.addAll(Arrays.asList(args));
         }
 
-        @SuppressWarnings("ConstantConditions")
-        private String getClassPath(Class<?> aClass) {
-            String classFileName = toPath(aClass.getName());
-            String filePath = getClass().getClassLoader().getResource(classFileName).getPath();
-            return filePath.substring(0, filePath.indexOf(classFileName));
-        }
-
         File getDestDir() {
             return destDir;
+        }
+
+        String getWarning() {
+            return warning;
         }
 
         private void generate() throws IOException {
@@ -204,22 +230,31 @@ public class RmicGenerationTest {
             String[] argv = argList.toArray(new String[argList.size()]);
             if (!compiler.compile(argv))
                 throw createException(out);
+            else
+                warning = toMessage(out);
         }
 
         private AssertionError createException(ByteArrayOutputStream out) throws IOException {
+            String message = toMessage(out);
+            if (message == null) message = "No error message reported";
+            return new AssertionError(message);
+        }
+
+        private String toMessage(ByteArrayOutputStream out) throws IOException {
             out.close();
             ByteArrayInputStream bais = new ByteArrayInputStream(out.toByteArray());
             BufferedReader reader = new BufferedReader(new InputStreamReader(bais));
 
+            StringBuilder sb;
             String line = reader.readLine();
-            if (line == null) return new AssertionError("No error message reported");
-
-            StringBuilder sb = new StringBuilder(line);
-            while ((line = reader.readLine()) != null && !line.startsWith("Usage:")) {
-                sb.append("/n").append(line);
+            if (line == null)
+                return null;
+            else {
+                sb = new StringBuilder(line);
+                while ((line = reader.readLine()) != null && !line.startsWith("Usage:"))
+                    sb.append("/n").append(line);
+                return sb.toString();
             }
-
-            return new AssertionError(sb.toString());
         }
     }
 }

@@ -2007,7 +2007,7 @@ public class IDLGenerator extends org.glassfish.rmic.iiop.Generator {
      * @param t The given Type.
      * @param dim The dimension required if t is an ArrayType.
      * @param isException true if writing an exception.
-     * @param isForward. No #define needed if it's a forward declare
+     * @param isForward No #define needed if it's a forward declare
      * @param p The output stream.
      */
     protected void writeIfndef(

@@ -43,6 +43,7 @@ import org.glassfish.rmic.classes.exceptiondetailsc.ExceptionSourceServantPOA;
 import org.glassfish.rmic.classes.giopheaderpadding.FooServantPOA;
 import org.glassfish.rmic.classes.hcks.RmiIIServant;
 import org.glassfish.rmic.classes.hcks.RmiIIServantPOA;
+import org.glassfish.rmic.classes.inneraccess.Rainbow;
 import org.glassfish.rmic.classes.islocal.MessageBuilderServantPOA;
 import org.glassfish.rmic.classes.preinvokepostinvoke.MyServant;
 import org.glassfish.rmic.classes.rmipoacounter.CounterImpl;
@@ -100,7 +101,7 @@ public class RmicGenerationTest {
 
         generator.generate();
 
-        checkGeneratedFiles(generator, "without_poas");
+        checkGeneratedFiles(generator, "without_poas", ".java");
     }
 
     @Test
@@ -111,34 +112,52 @@ public class RmicGenerationTest {
         generator.addArgs("-iiop", "-keep", "-poa");
         generator.generate();
 
-        checkGeneratedFiles(generator, "with_poas");
+        checkGeneratedFiles(generator, "with_poas", ".java");
+    }
+
+    @Test
+    public void generateIdlForInnerClass() throws Exception {
+        GenerationControl generator = new GenerationControl(Rainbow.getInterfaceCheckerClass());
+        generator.addArgs("-idl", "-keep");
+        generator.generate();
+
+        checkGeneratedFiles(generator, "idl", ".idl");
+    }
+
+    @Test
+    public void generateIdlForInnerClassUsingDotNotation() throws Exception {
+        GenerationControl generator = new GenerationControl(Rainbow.getQualifiedCheckerClassName());
+        generator.addArgs("-idl", "-keep");
+        generator.generate();
+
+        checkGeneratedFiles(generator, "idl", ".idl");
     }
 
     // Confirms that the generated files match those in the specified directory of master files
-    private void checkGeneratedFiles(GenerationControl generator, String mastersSubDir) throws IOException {
+    private void checkGeneratedFiles(GenerationControl generator, String mastersSubDir, String suffix) throws IOException {
         File masterDir = new File("src/test/masters/" + mastersSubDir);
 
-        String[] generatedFilePaths = getJavaFilePaths(generator.getDestDir());
-        String[] expectedFilePaths = getJavaFilePaths(masterDir);
+        String[] generatedFilePaths = getFilePaths(generator.getDestDir(), suffix);
+        String[] expectedFilePaths = getFilePaths(masterDir, suffix);
 
         assertThat("In " + generator.getDestDir(), generatedFilePaths, arrayContaining(expectedFilePaths));
         compareGeneratedFiles(masterDir, generator.getDestDir(), expectedFilePaths);
     }
 
-    // Returns a sorted array of .java file paths under the specified directory, relative to that directory
-    private String[] getJavaFilePaths(File rootDir) {
+    // Returns a sorted array of paths to files with the specified suffix under the specified directory, relative to that directory
+    private String[] getFilePaths(File rootDir, String suffix) {
         ArrayList<String> files = new ArrayList<>();
-        appendJavaFiles(files, rootDir, rootDir.getAbsolutePath().length() + 1);
+        appendFiles(files, rootDir, rootDir.getAbsolutePath().length() + 1, suffix);
         Collections.sort(files);
         return files.toArray(new String[files.size()]);
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void appendJavaFiles(ArrayList<String> files, File currentDir, int rootDirLength) {
+    private void appendFiles(ArrayList<String> files, File currentDir, int rootDirLength, String suffix) {
         for (File file : currentDir.listFiles())
             if (file.isDirectory())
-                appendJavaFiles(files, file, rootDirLength);
-            else if (file.getName().endsWith(".java"))
+                appendFiles(files, file, rootDirLength, suffix);
+            else if (file.getName().endsWith(suffix))
                 files.add(getRelativePath(file, rootDirLength));
     }
 
@@ -175,7 +194,7 @@ public class RmicGenerationTest {
             fail("Unexpected line in generated file at " + actual.getLineNumber() + ": " + actualLine);
         else if (actualLine == null)
             fail("Actual file ends unexpectedly at line " + expected.getLineNumber());
-        else
+        else if (!expectedLine.trim().startsWith("* IGNORE"))
             fail("Generated file mismatch at line " + actual.getLineNumber() +
                     "\nshould be <" + expectedLine + "> " +
                     "\nbut found <" + actualLine + ">");
@@ -196,18 +215,23 @@ public class RmicGenerationTest {
 
     private class GenerationControl {
         private ArrayList<String> argList = new ArrayList<>();
-        private Class<?>[] classes;
+        private String[] classNames;
         private File destDir;
         private String warning;
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
-        private GenerationControl(Class<?>... classes) {
-            this.classes = classes;
+        GenerationControl(String... classNames) {
+            this.classNames = classNames;
 
             String classPath = getClassPath();
             destDir = new File(rootDir + "/" + (++testNum));
             destDir.mkdirs();
             addArgs("-classpath", classPath, "-d", destDir.getAbsolutePath());
+        }
+
+        @SuppressWarnings("ResultOfMethodCallIgnored")
+        private GenerationControl(Class<?>... classes) {
+            this(toNameList(classes));
         }
 
         private void addArgs(String... args) {
@@ -223,8 +247,8 @@ public class RmicGenerationTest {
         }
 
         private void generate() throws IOException {
-            for (Class<?> aClass : classes)
-                addArgs(aClass.getName());
+            for (String name : classNames)
+                addArgs(name);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             Main compiler = new Main(out, "rmic");
             String[] argv = argList.toArray(new String[argList.size()]);
@@ -256,5 +280,12 @@ public class RmicGenerationTest {
                 return sb.toString();
             }
         }
+    }
+
+    private static String[] toNameList(Class<?>[] classes) {
+        String[] nameList = new String[classes.length];
+        for (int i = 0; i < classes.length; i++)
+            nameList[i] = classes[i].getName();
+        return nameList;
     }
 }

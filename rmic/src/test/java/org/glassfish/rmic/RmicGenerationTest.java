@@ -41,6 +41,7 @@ package org.glassfish.rmic;
 
 import org.glassfish.rmic.classes.exceptiondetailsc.ExceptionSourceServantPOA;
 import org.glassfish.rmic.classes.giopheaderpadding.FooServantPOA;
+import org.glassfish.rmic.classes.hcks.RmiII;
 import org.glassfish.rmic.classes.hcks.RmiIIServant;
 import org.glassfish.rmic.classes.hcks.RmiIIServantPOA;
 import org.glassfish.rmic.classes.inneraccess.Rainbow;
@@ -65,7 +66,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.fail;
 
 /**
@@ -102,6 +104,17 @@ public class RmicGenerationTest {
         generator.generate();
 
         checkGeneratedFiles(generator, "without_poas", ".java");
+    }
+
+
+    @Test
+    public void generateIiopStubsFromInterface() throws Exception {
+        GenerationControl generator = new GenerationControl(RmiII.class);
+        generator.addArgs("-iiop", "-keep");
+
+        generator.generate();
+
+        checkGeneratedFiles(generator, "stub_from_interface", ".java");
     }
 
     @Test

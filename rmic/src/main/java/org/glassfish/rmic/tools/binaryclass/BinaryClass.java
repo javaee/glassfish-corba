@@ -23,14 +23,23 @@
  * questions.
  */
 
-package org.glassfish.rmic.tools.java;
+package org.glassfish.rmic.tools.binaryclass;
+
+import org.glassfish.rmic.tools.java.ClassDeclaration;
+import org.glassfish.rmic.tools.java.ClassDefinition;
+import org.glassfish.rmic.tools.java.ClassNotFound;
+import org.glassfish.rmic.tools.java.Constants;
+import org.glassfish.rmic.tools.java.Environment;
+import org.glassfish.rmic.tools.java.Identifier;
+import org.glassfish.rmic.tools.java.MemberDefinition;
+import org.glassfish.rmic.tools.java.Type;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Vector;
 
 /**
@@ -221,11 +230,12 @@ class BinaryClass extends ClassDefinition implements Constants {
      * At this point, auxiliary definitions may be loaded.
      */
 
+    @Override
     public void loadNested(Environment env) {
         loadNested(env, 0);
     }
 
-    public void loadNested(Environment env, int flags) {
+    private void loadNested(Environment env, int flags) {
         // Sanity check.
         if (haveLoadedNested) {
             // Duplicate calls most likely should not occur, but they do
@@ -497,11 +507,9 @@ class BinaryClass extends ClassDefinition implements Constants {
         data.flush();
     }
 
-    /**
-     * Get the dependencies
-     */
-    public Enumeration<ClassDeclaration> getDependencies() {
-        return dependencies.elements();
+    @Override
+    public Iterator<ClassDeclaration> getDependencies() {
+        return dependencies.iterator();
     }
 
     /**

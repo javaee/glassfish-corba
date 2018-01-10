@@ -23,7 +23,16 @@
  * questions.
  */
 
-package org.glassfish.rmic.tools.java;
+package org.glassfish.rmic.tools.binaryclass;
+
+import org.glassfish.rmic.tools.java.ClassDeclaration;
+import org.glassfish.rmic.tools.java.ClassDefinition;
+import org.glassfish.rmic.tools.java.ClassNotFound;
+import org.glassfish.rmic.tools.java.Constants;
+import org.glassfish.rmic.tools.java.Environment;
+import org.glassfish.rmic.tools.java.Identifier;
+import org.glassfish.rmic.tools.java.MemberDefinition;
+import org.glassfish.rmic.tools.java.Type;
 
 import java.io.IOException;
 import java.io.DataInputStream;

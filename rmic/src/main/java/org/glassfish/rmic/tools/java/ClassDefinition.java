@@ -45,8 +45,7 @@ import java.util.List;
  * they are subject to change or removal without notice.
  */
 @SuppressWarnings("deprecation")
-public
-class ClassDefinition implements Constants {
+public abstract class ClassDefinition implements Constants {
 
     protected Object source;
     protected long where;
@@ -69,7 +68,6 @@ class ClassDefinition implements Constants {
     protected UplevelReference references;
     protected boolean referencesFrozen;
     private Hashtable<Identifier, MemberDefinition> fieldHash = new Hashtable<>(31);
-    private int abstr;
 
     // Table of local and anonymous classes whose internal names are constructed
     // using the current class as a prefix.  This is part of a fix for
@@ -299,16 +297,6 @@ class ClassDefinition implements Constants {
     }
 
     /**
-     * Tell if the class is local or anonymous class, or inside
-     * such a class, which means it cannot be mentioned outside of
-     * its file.
-     */
-    public final boolean isInsideLocalOrAnonymous() {
-        return isLocal() || isAnonymous () ||
-            (outerClass != null && outerClass.isInsideLocalOrAnonymous());
-    }
-
-    /**
      * Return a simple identifier for this class (idNull if anonymous).
      */
     public Identifier getLocalName() {
@@ -322,7 +310,7 @@ class ClassDefinition implements Constants {
     /**
      * Set the local name of a class.  Must be a local class.
      */
-    public void setLocalName(Identifier name) {
+    protected void setLocalName(Identifier name) {
         if (isLocal()) {
             localName = name;
         }
@@ -400,13 +388,6 @@ class ClassDefinition implements Constants {
     }
 
     /**
-     * Get the class' documentation
-     */
-    public String getDocumentation() {
-        return documentation;
-    }
-
-    /**
      * Return true if the given documentation string contains a deprecation
      * paragraph.  This is true if the string contains the tag @deprecated
      * is the first word in a line.
@@ -455,7 +436,7 @@ class ClassDefinition implements Constants {
         return inSamePackage(c.getName().getQualifier());
     }
 
-    public final boolean inSamePackage(Identifier packageName) {
+    private final boolean inSamePackage(Identifier packageName) {
         return (getName().getQualifier().equals(packageName));
     }
 
@@ -606,7 +587,7 @@ class ClassDefinition implements Constants {
      * This method should only be called on a class after it has been
      * basicCheck()'ed.
      */
-    public boolean couldImplement(ClassDefinition intDef) {
+    boolean couldImplement(ClassDefinition intDef) {
         // Check to see if we could have done the necessary checks.
         if (!doInheritanceChecks) {
             throw new CompilerError("couldImplement: no checks");
@@ -657,7 +638,7 @@ class ClassDefinition implements Constants {
      * Check if another class can be accessed from the 'extends' or 'implements'
      * clause of this class.
      */
-    public boolean extendsCanAccess(Environment env, ClassDeclaration c) throws ClassNotFound {
+    protected boolean extendsCanAccess(Environment env, ClassDeclaration c) throws ClassNotFound {
 
         // Names in the 'extends' or 'implements' clause of an inner class
         // are checked as if they appeared in the body of the surrounding class.
@@ -931,9 +912,6 @@ class ClassDefinition implements Constants {
      * inside a loop to resolve lone names like "K" or the "K" in "K.L".)
      *
      * Called from 'Context' and 'FieldExpression' as well as this class.
-     *
-     * @see FieldExpression.checkCommon
-     * @see resolveName
      */
     public MemberDefinition getInnerClass(Environment env, Identifier nm)
                                                         throws ClassNotFound {
@@ -1765,7 +1743,6 @@ class ClassDefinition implements Constants {
      * Follow inheritance links, as in:
      *  class C { class N { } }  class D extends C { }  ... new D.N() ...
      * Ignore outer scopes and packages.
-     * @see resolveName
      */
     public Identifier resolveInnerClass(Environment env, Identifier nm) {
         if (nm.isInner())  throw new CompilerError("inner");
@@ -1803,7 +1780,7 @@ class ClassDefinition implements Constants {
      * (Thus, an import directive must always spell a class
      * name exactly.)
      */
-    public boolean innerClassExists(Identifier nm) {
+    boolean innerClassExists(Identifier nm) {
         for (MemberDefinition field = getFirstMatch(nm.getHead()) ; field != null ; field = field.getNextMatch()) {
             if (field.isInnerClass()) {
                 if (field.getInnerClass().isLocal()) {
@@ -1915,7 +1892,7 @@ class ClassDefinition implements Constants {
     /**
      * Add a field (no checks)
      */
-    public void addMember(MemberDefinition field) {
+    protected void addMember(MemberDefinition field) {
         //System.out.println("ADD = " + field);
         if (firstMember == null) {
             firstMember = lastMember = field;
@@ -1956,7 +1933,7 @@ class ClassDefinition implements Constants {
         return addReference(target);
     }
 
-    protected UplevelReference addReference(LocalMember target) {
+    private UplevelReference addReference(LocalMember target) {
         if (target.getClassDefinition() == this) {
             throw new CompilerError("addReference "+target);
         }
@@ -1997,6 +1974,14 @@ class ClassDefinition implements Constants {
      */
     public MemberDefinition getClassLiteralLookup(long fwhere) {
         throw new CompilerError("binary class");
+    }
+
+    public void loadNested(Environment env) {
+        throw new CompilerError("loadNested");
+    }
+
+    public Iterator<ClassDeclaration> getDependencies() {
+        throw new CompilerError("getDependencies");
     }
 
     /**

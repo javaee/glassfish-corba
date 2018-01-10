@@ -23,8 +23,15 @@
  * questions.
  */
 
-package org.glassfish.rmic.tools.java;
+package org.glassfish.rmic.tools.binaryclass;
 
+import org.glassfish.rmic.tools.java.ClassDeclaration;
+import org.glassfish.rmic.tools.java.ClassDefinition;
+import org.glassfish.rmic.tools.java.CompilerError;
+import org.glassfish.rmic.tools.java.Environment;
+import org.glassfish.rmic.tools.java.Identifier;
+import org.glassfish.rmic.tools.java.MemberDefinition;
+import org.glassfish.rmic.tools.java.Type;
 import org.glassfish.rmic.tools.tree.BooleanExpression;
 import org.glassfish.rmic.tools.tree.DoubleExpression;
 import org.glassfish.rmic.tools.tree.Expression;
@@ -56,7 +63,7 @@ class BinaryMember extends MemberDefinition {
      * Constructor
      */
     public BinaryMember(ClassDefinition clazz, int modifiers, Type type,
-                       Identifier name, BinaryAttribute atts) {
+                        Identifier name, BinaryAttribute atts) {
         super(0, clazz, modifiers, type, name, null, null);
         this.atts = atts;
 

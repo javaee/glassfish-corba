@@ -26,7 +26,6 @@
 package org.glassfish.rmic.tools.java;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * This class is used to represent the classes in a package.
@@ -56,9 +55,7 @@ class Package {
      * Create a package given a source path, binary path, and package
      * name.
      */
-    public Package(ClassPath binaryPath,
-                   Identifier pkg)
-    throws IOException {
+    public Package(ClassPath binaryPath, Identifier pkg) {
         if (pkg.isInner())
             pkg = Identifier.lookup(pkg.getQualifier(), pkg.getFlatName());
         this.binaryPath = binaryPath;

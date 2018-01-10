@@ -128,7 +128,7 @@ public abstract class ClassDefinition implements Constants {
     /**
      * Check if there were any errors in our class nest.
      */
-    public final boolean getNestError() {
+    protected final boolean getNestError() {
         // Check to see if our error value is set, or if any of our
         // outer classes' error values are set.  This will work in
         // conjunction with setError(), which sets the error value
@@ -143,7 +143,7 @@ public abstract class ClassDefinition implements Constants {
      * Mark this class, and all siblings in its class nest, to be
      * erroneous.
      */
-    public final void setNestError() {
+    private void setNestError() {
         this.nestError = true;
         if (outerClass != null) {
             // If we have an outer class, set it to be erroneous as well.

@@ -65,17 +65,15 @@ import java.util.jar.Manifest;
 @SuppressWarnings("deprecation")
 public class BatchEnvironment extends org.glassfish.rmic.tools.javac.BatchEnvironment {
 
-    /** instance of Main which created this environment */
-    private Main main;
+    /** The directory to which class files are being written. */
+    private File destinationDir;
 
     /**
      * Create a ClassPath object for rmic from the relevant command line
      * options for class path and boot class path.
      */
-    public static ClassPath createClassPath(String classPathString,
-                                            String sysClassPathString)
-    {
-        /**
+    public static ClassPath createClassPath(String classPathString, String sysClassPathString) {
+        /*
          * Previously, this method delegated to the
          * org.glassfish.rmic.tools.javac.BatchEnvironment.classPaths method in order
          * to supply default values for paths not specified on the
@@ -123,18 +121,19 @@ public class BatchEnvironment extends org.glassfish.rmic.tools.javac.BatchEnviro
 
     /**
      * Create a BatchEnvironment for rmic with the given class path,
-     * stream for messages and Main.
+     * stream for messages and destination directory.
      */
-    public BatchEnvironment(OutputStream out, ClassPath path, Main main) {
+    public BatchEnvironment(OutputStream out, ClassPath path, File destinationDir) {
         super(out, path);
-        this.main = main;
+        this.destinationDir = destinationDir;
     }
 
     /**
-     * Get the instance of Main which created this environment.
+     * Returns the directory to which generated classes will be written.
+     * @return the destination directory specified by the "-d" flag
      */
-    public Main getMain() {
-        return main;
+    public File getDestinationDir() {
+        return destinationDir;
     }
 
     /**
@@ -160,7 +159,7 @@ public class BatchEnvironment extends org.glassfish.rmic.tools.javac.BatchEnviro
      * of this environment (those that have been registered with the
      * "addGeneratedFile" method).
      */
-    public void deleteGeneratedFiles() {
+    void deleteGeneratedFiles() {
         synchronized(generatedFiles) {
             Enumeration<File> enumeration = generatedFiles.elements();
             while (enumeration.hasMoreElements()) {
@@ -175,7 +174,6 @@ public class BatchEnvironment extends org.glassfish.rmic.tools.javac.BatchEnviro
      * Release resources, if any.
      */
     public void shutdown() {
-        main = null;
         generatedFiles = null;
         super.shutdown();
     }

@@ -458,8 +458,8 @@ public class Main implements org.glassfish.rmic.Constants {
                                              sysClassPathArg);
         BatchEnvironment result = null;
         try {
-            Class<?>[] ctorArgTypes = {OutputStream.class,ClassPath.class,Main.class};
-            Object[] ctorArgs = {out,classPath,this};
+            Class<?>[] ctorArgTypes = {OutputStream.class,ClassPath.class,File.class};
+            Object[] ctorArgs = {out,classPath,getDestinationDir()};
             Constructor<? extends BatchEnvironment> constructor =
                 environmentClass.getConstructor(ctorArgTypes);
             result =  constructor.newInstance(ctorArgs);
@@ -475,7 +475,7 @@ public class Main implements org.glassfish.rmic.Constants {
     /**
      * Do the compile with the switches and files already supplied
      */
-    public boolean doCompile() {
+    private boolean doCompile() {
         // Create batch environment
         BatchEnvironment env = getEnv();
         env.flags |= flags;
@@ -491,34 +491,12 @@ public class Main implements org.glassfish.rmic.Constants {
         String stackOverflowErrorString = getText("rmic.stack.overflow");
 
         try {
-            /** Load the classes on the command line
+            /* Load the classes on the command line
              * Replace the entries in classes with the ClassDefinition for the class
              */
             for (int i = classes.size()-1; i >= 0; i-- ) {
-                Identifier implClassName =
-                    Identifier.lookup(classes.elementAt(i));
-
-                /*
-                 * Fix bugid 4049354: support using '.' as an inner class
-                 * qualifier on the command line (previously, only mangled
-                 * inner class names were understood, like "pkg.Outer$Inner").
-                 *
-                 * The following method, also used by "javap", resolves the
-                 * given unmangled inner class name to the appropriate
-                 * internal identifier.  For example, it translates
-                 * "pkg.Outer.Inner" to "pkg.Outer. Inner".
-                 */
-                implClassName = env.resolvePackageQualifiedName(implClassName);
-                /*
-                 * But if we use such an internal inner class name identifier
-                 * to load the class definition, the Java compiler will notice
-                 * if the impl class is a "private" inner class and then deny
-                 * skeletons (needed unless "-v1.2" is used) the ability to
-                 * cast to it.  To work around this problem, we mangle inner
-                 * class name identifiers to their binary "outer" class name:
-                 * "pkg.Outer. Inner" becomes "pkg.Outer$Inner".
-                 */
-                implClassName = Names.mangleClass(implClassName);
+                String className = classes.elementAt(i);
+                Identifier implClassName = getClassIdentifier(env, className);
 
                 ClassDeclaration decl = env.getClassDeclaration(implClassName);
                 try {
@@ -624,6 +602,33 @@ public class Main implements org.glassfish.rmic.Constants {
         out = null;
 
         return status;
+    }
+
+    private static Identifier getClassIdentifier(BatchEnvironment env, String className) {
+        Identifier implClassName = Identifier.lookup(className);
+
+                /*
+                 * Fix bugid 4049354: support using '.' as an inner class
+                 * qualifier on the command line (previously, only mangled
+                 * inner class names were understood, like "pkg.Outer$Inner").
+                 *
+                 * The following method, also used by "javap", resolves the
+                 * given unmangled inner class name to the appropriate
+                 * internal identifier.  For example, it translates
+                 * "pkg.Outer.Inner" to "pkg.Outer. Inner".
+                 */
+        implClassName = env.resolvePackageQualifiedName(implClassName);
+                /*
+                 * But if we use such an internal inner class name identifier
+                 * to load the class definition, the Java compiler will notice
+                 * if the impl class is a "private" inner class and then deny
+                 * skeletons (needed unless "-v1.2" is used) the ability to
+                 * cast to it.  To work around this problem, we mangle inner
+                 * class name identifiers to their binary "outer" class name:
+                 * "pkg.Outer. Inner" becomes "pkg.Outer$Inner".
+                 */
+        implClassName = Names.mangleClass(implClassName);
+        return implClassName;
     }
 
     /*

@@ -58,9 +58,9 @@ class BinaryClass extends ClassDefinition implements Constants {
     /**
      * Constructor
      */
-    public BinaryClass(Object source, ClassDeclaration declaration, int modifiers,
-                           ClassDeclaration superClass, ClassDeclaration interfaces[],
-                           Vector<ClassDeclaration> dependencies) {
+    private BinaryClass(Object source, ClassDeclaration declaration, int modifiers,
+                        ClassDeclaration superClass, ClassDeclaration interfaces[],
+                        Vector<ClassDeclaration> dependencies) {
         super(source, 0, declaration, modifiers, null, null);
         this.dependencies = dependencies;
         this.superClass = superClass;
@@ -107,13 +107,6 @@ class BinaryClass extends ClassDefinition implements Constants {
         basicCheckDone = true;
         basicChecking = false;
         if (tracing) env.dtExit("BinaryClass.basicCheck: " + getName());
-    }
-
-    /**
-     * Load a binary class
-     */
-    public static BinaryClass load(Environment env, DataInputStream in) throws IOException {
-        return load(env, in, ~(ATT_CODE|ATT_ALLCLASSES));
     }
 
     public static BinaryClass load(Environment env,

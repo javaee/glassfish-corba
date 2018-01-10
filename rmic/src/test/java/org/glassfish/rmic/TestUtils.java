@@ -1,4 +1,4 @@
-package org.glassfish.rmic.tools.binaryclass;
+package org.glassfish.rmic;
 /*
  * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -23,19 +23,17 @@ package org.glassfish.rmic.tools.binaryclass;
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-import org.glassfish.rmic.tools.java.ClassDefinition;
-import org.glassfish.rmic.tools.java.ClassDefinitionFactory;
-import org.glassfish.rmic.tools.java.Environment;
+import java.io.File;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+public class TestUtils {
+    @SuppressWarnings("ConstantConditions")
+    public static String getClassPathString() {
+        String classFileName = toPath(TestUtils.class.getName());
+        String filePath = TestUtils.class.getClassLoader().getResource(classFileName).getPath();
+        return filePath.substring(0, filePath.indexOf(classFileName));
+    }
 
-public class BinaryClassFactory implements ClassDefinitionFactory {
-    @Override
-    public ClassDefinition loadDefinition(InputStream is, Environment env) throws IOException {
-        DataInputStream dis = new DataInputStream(new BufferedInputStream(is));
-        return BinaryClass.load(env, dis, 0);
+    private static String toPath(String className) {
+        return className.replace('.', File.separatorChar) + ".class";
     }
 }

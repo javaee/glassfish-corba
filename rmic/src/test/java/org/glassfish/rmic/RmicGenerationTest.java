@@ -183,7 +183,7 @@ public class RmicGenerationTest {
 
     @Test
     public void whenBinaryIsMissing_dontCompileSources() throws Exception {
-        File generatedFile = new File(getClassPath() + "Interface.java");
+        File generatedFile = new File(TestUtils.getClassPathString() + "Interface.java");
         BufferedWriter writer = new BufferedWriter(new FileWriter(generatedFile));
         writer.write("public class Interface implements java.rmi.Remote { }");
         writer.close();
@@ -291,17 +291,6 @@ public class RmicGenerationTest {
 
     }
 
-    @SuppressWarnings("ConstantConditions")
-    private static String getClassPath() {
-        String classFileName = toPath(RmicGenerationTest.class.getName());
-        String filePath = RmicGenerationTest.class.getClassLoader().getResource(classFileName).getPath();
-        return filePath.substring(0, filePath.indexOf(classFileName));
-    }
-
-    private static String toPath(String className) {
-        return className.replace('.', File.separatorChar) + ".class";
-    }
-
 
     private class GenerationControl {
         private ArrayList<String> argList = new ArrayList<>();
@@ -313,7 +302,7 @@ public class RmicGenerationTest {
         GenerationControl(String... classNames) {
             this.classNames = classNames;
 
-            String classPath = getClassPath();
+            String classPath = TestUtils.getClassPathString();
             destDir = new File(rootDir + "/" + (++testNum));
             destDir.mkdirs();
             addArgs("-classpath", classPath, "-d", destDir.getAbsolutePath());

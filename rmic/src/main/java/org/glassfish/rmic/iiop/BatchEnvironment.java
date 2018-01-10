@@ -32,11 +32,11 @@
 
 package org.glassfish.rmic.iiop;
 
-import org.glassfish.rmic.Main;
 import org.glassfish.rmic.tools.java.ClassDefinition;
 import org.glassfish.rmic.tools.java.ClassNotFound;
 import org.glassfish.rmic.tools.java.ClassPath;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -94,11 +94,11 @@ public class BatchEnvironment extends org.glassfish.rmic.BatchEnvironment implem
 
     /**
      * Create a BatchEnvironment for rmic with the given class path,
-     * stream for messages and Main.
+     * stream for messages and the destination directory.
      */
-    public BatchEnvironment(OutputStream out, ClassPath path, Main main) {
+    public BatchEnvironment(OutputStream out, ClassPath path, File destinationDir) {
 
-        super(out,path,main);
+        super(out, path, destinationDir);
 
         // Make sure we have our definitions...
 

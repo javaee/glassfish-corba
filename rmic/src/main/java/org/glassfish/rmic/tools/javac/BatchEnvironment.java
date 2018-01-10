@@ -236,16 +236,9 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
             // Add java.lang to the set of exempt packages.
             exemptPackages.add(idJavaLang);
 
-            try {
-                if (!getPackage(idJavaLang).exists()) {
-                    // java.lang doesn't exist.
-                    error(0, "package.not.found.strong", idJavaLang);
-                    return;
-                }
-            } catch (IOException ee) {
-                // We got an IO exception checking to see if the package
-                // java.lang exists.
-                error(0, "io.exception.package", idJavaLang);
+            if (!getPackage(idJavaLang).exists()) {
+                // java.lang doesn't exist.
+                error(0, "package.not.found.strong", idJavaLang);
             }
         }
 
@@ -293,48 +286,14 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
             nm = nm.getTopName();       // just in case
         }
         Type t = Type.tClass(nm);
-        try {
-            ClassDeclaration c = classes.get(t);
-            return (c != null) ? c.getName().equals(nm) :
-                getPackage(nm.getQualifier()).classExists(nm.getName());
-        } catch (IOException e) {
-            return true;
-        }
+        ClassDeclaration c = classes.get(t);
+        return (c != null) ? c.getName().equals(nm) : getPackage(nm.getQualifier()).classExists(nm.getName());
     }
-
-    /**
-     * Generate a new name similar to the given one.
-     * Do it in such a way that repeated compilations of
-     * the same source generate the same series of names.
-     */
-
-    // This code does not perform as stated above.
-    // Correction below is part of fix for bug id 4056065.
-    //
-    // NOTE: The method 'generateName' has now been folded into its
-    // single caller, 'makeClassDefinition', which appears later in
-    // this file.
-
-    /*--------------------------*
-    public Identifier generateName(ClassDefinition outerClass, Identifier nm) {
-        Identifier outerNm = outerClass.getName();
-        Identifier flat = outerNm.getFlatName();
-        Identifier stem = Identifier.lookup(outerNm.getQualifier(),
-                                            flat.getHead());
-        for (int i = 1; ; i++) {
-            String name = i + (nm.equals(idNull) ? "" : SIG_INNERCLASS + nm);
-            Identifier nm1 = Identifier.lookupInner(stem,
-                                                    Identifier.lookup(name));
-            if (classes.get(Type.tClass(nm1)) == null)
-                return nm1;
-        }
-    }
-    *--------------------------*/
-
+    
     /**
      * Get the package path for a package
      */
-    public Package getPackage(Identifier pkg) throws IOException {
+    public Package getPackage(Identifier pkg) {
         Package p = packages.get(pkg);
         if (p == null) {
             packages.put(pkg, p = new Package(binaryPath, pkg));
@@ -456,8 +415,7 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
         if (tracing) dtEnter("loadFile: LOADING CLASSFILE " + file);
 
         try {
-            DataInputStream is = new DataInputStream(new BufferedInputStream(input));
-            c = classDefinitionFactory.loadDefinition(is, new Environment(this, file), loadFileFlags());
+            c = classDefinitionFactory.loadDefinition(input, new Environment(this, file));
         } catch (ClassFormatError e) {
             error(0, "class.format", file.getPath(), e.getMessage());
             if (tracing) dtExit("loadFile: CLASS FORMAT ERROR " + file);
@@ -480,13 +438,6 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
         if (tracing) dtExit("loadFile: CLASSFILE LOADED " + file);
 
         return c;
-    }
-
-    /**
-     * Default flags for loadFile.  Subclasses may override this.
-     */
-    int loadFileFlags() {
-        return 0;
     }
 
     /**
@@ -548,19 +499,8 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
                 dtEvent("loadDefinition: STATUS IS UNDEFINED");
             Identifier nm = c.getName();
             Package pkg;
-            try {
-                pkg = getPackage(nm.getQualifier());
-            } catch (IOException e) {
-                // If we can't get at the package, then we'll just
-                // have to set the class to be not found.
-                c.setDefinition(null, CS_NOTFOUND);
-
-                error(0, "io.exception", c);
-                if (tracing)
-                    dtExit("loadDefinition: IO EXCEPTION (package)");
-                return;
-            }
-            ClassFile binfile = pkg.getBinaryFile(nm.getName());
+              pkg = getPackage(nm.getQualifier());
+              ClassFile binfile = pkg.getBinaryFile(nm.getName());
             if (binfile == null) {
                 // must be source, there is no binary
                 c.setDefinition(null, CS_SOURCE);
@@ -738,14 +678,8 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
             Package pkg = null;
             if (c.getClassDefinition() != null) {
                 // Use the source file name from the binary class file
-                try {
-                    pkg = getPackage(c.getName().getQualifier());
-                    srcfile = pkg.getSourceFile((String)c.getClassDefinition().getSource());
-                } catch (IOException e) {
-                    error(0, "io.exception", c);
-                    if (tracing)
-                        dtEvent("loadDefinition: IO EXCEPTION (package)");
-                }
+                pkg = getPackage(c.getName().getQualifier());
+                srcfile = pkg.getSourceFile((String)c.getClassDefinition().getSource());
                 if (srcfile == null) {
                     String fn = (String)c.getClassDefinition().getSource();
                     srcfile = ClassFile.newClassFile(new File(fn));
@@ -753,14 +687,8 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
             } else {
                 // Get a source file name from the package
                 Identifier nm = c.getName();
-                try {
-                    pkg = getPackage(nm.getQualifier());
-                    srcfile = pkg.getSourceFile(nm.getName());
-                } catch (IOException e)  {
-                    error(0, "io.exception", c);
-                    if (tracing)
-                        dtEvent("loadDefinition: IO EXCEPTION (package)");
-                }
+                pkg = getPackage(nm.getQualifier());
+                srcfile = pkg.getSourceFile(nm.getName());
                 if (srcfile == null) {
                     // not found, there is no source
                     c.setDefinition(null, CS_NOTFOUND);
@@ -1139,8 +1067,7 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
     /**
      * Report error
      */
-    public
-    void reportError(Object src, long where, String err, String msg) {
+    private void reportError(Object src, long where, String err, String msg) {
         if (src == null) {
             if (errorFileName != null) {
                 flushErrors();

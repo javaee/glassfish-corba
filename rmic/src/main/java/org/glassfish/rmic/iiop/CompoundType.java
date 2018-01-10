@@ -46,7 +46,6 @@ import org.glassfish.rmic.tools.tree.Node;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Vector;
 
@@ -317,23 +316,6 @@ public abstract class CompoundType extends Type {
 
         Class ourClass = null;
 
-        // To avoid getting out-of-date Class instances, and
-        // to ensure that there is an instance, we must compile
-        // any classes that we've seen and which are not yet
-        // compiled. We can't just compile this class, 'cuz it
-        // may have dependencies on classes which have not been
-        // compiled...
-
-        try {
-            env.getMain().compileAllClasses(env);
-        } catch (Exception e1) {
-            for (Enumeration e = env.getClasses() ; e.hasMoreElements() ; ) {
-                ClassDeclaration c = (ClassDeclaration)e.nextElement();
-            }
-            failedConstraint(26,false,stack,"required classes");
-            env.flushErrors();
-        }
-
         // Now try to get the Class...
         // The outer try block is there for people who might want to use
         // the compiler at run-time of their AS.
@@ -371,7 +353,7 @@ public abstract class CompoundType extends Type {
             // it directly...
 
             if (env.loader == null) {
-                File destDir = env.getMain().getDestinationDir();
+                File destDir = env.getDestinationDir();
                 if (destDir == null) {
                     destDir = new File(".");
                 }

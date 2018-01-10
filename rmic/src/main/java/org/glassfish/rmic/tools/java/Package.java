@@ -25,7 +25,6 @@
 
 package org.glassfish.rmic.tools.java;
 
-import java.util.Enumeration;
 import java.io.File;
 import java.io.IOException;
 
@@ -41,36 +40,27 @@ class Package {
     /**
      * The path which we use to locate source files.
      */
-    ClassPath sourcePath;
+    private final ClassPath sourcePath = new ClassPath("");
 
     /**
      * The path which we use to locate class (binary) files.
      */
-    ClassPath binaryPath;
+    private ClassPath binaryPath;
 
     /**
      * The path name of the package.
      */
-    String pkg;
-
-    /**
-     * Create a package given a class path, and package name.
-     */
-    public Package(ClassPath path, Identifier pkg) throws IOException {
-        this(path, path, pkg);
-    }
+    private String pkg;
 
     /**
      * Create a package given a source path, binary path, and package
      * name.
      */
-    public Package(ClassPath sourcePath,
-                   ClassPath binaryPath,
+    public Package(ClassPath binaryPath,
                    Identifier pkg)
     throws IOException {
         if (pkg.isInner())
             pkg = Identifier.lookup(pkg.getQualifier(), pkg.getFlatName());
-        this.sourcePath = sourcePath;
         this.binaryPath = binaryPath;
         this.pkg = pkg.toString().replace('.', File.separatorChar);
     }
@@ -96,22 +86,13 @@ class Package {
             return true;
         }
 
-        if (sourcePath != binaryPath) {
-            // Look for the directory on our source path.
-            dir = sourcePath.getDirectory(pkg);
-            if (dir != null && dir.isDirectory()) {
-                return true;
-            }
-        }
-
         /* Accommodate ZIP files without CEN entries for directories
          * (packages): look on class path for at least one binary
          * file or one source file with the right package prefix
          */
         String prefix = pkg + File.separator;
 
-        return binaryPath.getFiles(prefix, ".class").hasMoreElements()
-            || sourcePath.getFiles(prefix, ".java").hasMoreElements();
+        return binaryPath.getFiles(prefix, ".class").hasMoreElements();
     }
 
     private String makeName(String fileName) {
@@ -142,14 +123,6 @@ class Package {
             return sourcePath.getFile(makeName(fileName));
         }
         return null;
-    }
-
-    public Enumeration<ClassFile> getSourceFiles() {
-        return sourcePath.getFiles(pkg, ".java");
-    }
-
-    public Enumeration<ClassFile> getBinaryFiles() {
-        return binaryPath.getFiles(pkg, ".class");
     }
 
     public String toString() {

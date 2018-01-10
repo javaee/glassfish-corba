@@ -49,11 +49,6 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
     OutputStream out;
 
     /**
-     * The path we use for finding source files.
-     */
-    protected ClassPath sourcePath;
-
-    /**
      * The path we use for finding class (binary) files.
      */
     protected ClassPath binaryPath;
@@ -114,101 +109,17 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
 
         ErrorConsumer errorConsumer;
 
-    /**
-     * Old constructors -- these constructors build a BatchEnvironment
-     * with an old-style class path.
-     */
-    public BatchEnvironment(ClassPath path) {
-        this(System.out, path);
-    }
     public BatchEnvironment(OutputStream out,
-                            ClassPath path) {
-        this(out, path, (ErrorConsumer) null);
-    }
-    public BatchEnvironment(OutputStream out,
-                            ClassPath path,
-                            ErrorConsumer errorConsumer) {
-        this(out, path, path, errorConsumer);
+                            ClassPath binaryPath) {
+        this(out, binaryPath, (ErrorConsumer) null);
     }
 
-    /**
-     * New constructors -- these constructors build a BatchEnvironment
-     * with a source path and a binary path.
-     */
-    public BatchEnvironment(ClassPath sourcePath,
-                            ClassPath binaryPath) {
-        this(System.out, sourcePath, binaryPath);
-    }
     public BatchEnvironment(OutputStream out,
-                            ClassPath sourcePath,
-                            ClassPath binaryPath) {
-        this(out, sourcePath, binaryPath, (ErrorConsumer) null);
-    }
-    public BatchEnvironment(OutputStream out,
-                            ClassPath sourcePath,
                             ClassPath binaryPath,
                             ErrorConsumer errorConsumer) {
         this.out = out;
-        this.sourcePath = sourcePath;
         this.binaryPath = binaryPath;
         this.errorConsumer = (errorConsumer == null) ? this : errorConsumer;
-    }
-
-    /**
-     * Factory
-     */
-    static BatchEnvironment create(OutputStream out,
-                                   String srcPathString,
-                                   String classPathString,
-                                   String sysClassPathString) {
-        ClassPath[] classPaths = classPaths(srcPathString, classPathString,
-                                            sysClassPathString);
-        return new BatchEnvironment(out, classPaths[0], classPaths[1]);
-    }
-
-    protected static ClassPath[] classPaths(String srcPathString,
-                                            String classPathString,
-                                            String sysClassPathString) {
-        // Create our source classpath and our binary classpath
-        ClassPath sourcePath;
-        ClassPath binaryPath;
-        StringBuffer binaryPathBuffer = new StringBuffer();
-
-        if (classPathString == null) {
-            // The env.class.path property is the user's CLASSPATH
-            // environment variable, and it set by the wrapper (ie,
-            // javac.exe).
-            classPathString = System.getProperty("env.class.path");
-            if (classPathString == null) {
-                classPathString = ".";
-            }
-        }
-        if (srcPathString == null) {
-            srcPathString = classPathString;
-        }
-        if (sysClassPathString == null) {
-            sysClassPathString = System.getProperty("sun.boot.class.path");
-            if (sysClassPathString == null) { // shouldn't happen; recover gracefully
-                sysClassPathString = classPathString;
-            }
-        }
-        appendPath(binaryPathBuffer, sysClassPathString);
-
-        appendPath(binaryPathBuffer, classPathString);
-
-        sourcePath = new ClassPath(srcPathString);
-        binaryPath = new ClassPath(binaryPathBuffer.toString());
-
-        return new ClassPath[]{sourcePath, binaryPath};
-    }
-
-    private static void appendPath(StringBuffer buf, String str) {
-        if (str.length() > 0) {
-            if (buf.length() > 0) {
-                buf.append(File.pathSeparator);
-            }
-            buf.append(str);
-        }
     }
 
     /**
@@ -424,7 +335,7 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
     public Package getPackage(Identifier pkg) throws IOException {
         Package p = packages.get(pkg);
         if (p == null) {
-            packages.put(pkg, p = new Package(sourcePath, binaryPath, pkg));
+            packages.put(pkg, p = new Package(binaryPath, pkg));
         }
         return p;
     }
@@ -1026,17 +937,13 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
      */
     public void shutdown() {
         try {
-            if (sourcePath != null) {
-                sourcePath.close();
-            }
-            if (binaryPath != null && binaryPath != sourcePath) {
+            if (binaryPath != null) {
                 binaryPath.close();
             }
         } catch (IOException ee) {
             output(Main.getText("benv.failed_to_close_class_path",
                                 ee.toString()));
         }
-        sourcePath = null;
         binaryPath = null;
 
         super.shutdown();

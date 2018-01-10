@@ -39,7 +39,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 /**
@@ -56,12 +55,12 @@ class ClassPath {
         return FileSystems.getFileSystem(URI.create("jrt:/"));
     }
 
-    static final char dirSeparator = File.pathSeparatorChar;
+    private static final char dirSeparator = File.pathSeparatorChar;
 
     /**
      * The original class path string
      */
-    String pathstr;
+    private String pathstr;
 
     /**
      * List of class path entries
@@ -71,7 +70,7 @@ class ClassPath {
     /**
      * Build a class path from the specified path string
      */
-    public ClassPath(String pathstr) {
+    ClassPath(String pathstr) {
         init(pathstr);
     }
 
@@ -88,23 +87,6 @@ class ClassPath {
      */
     public ClassPath(String[] patharray) {
         init(patharray);
-    }
-
-    /**
-     * Build a default class path from the path strings specified by
-     * the properties sun.boot.class.path and env.class.path, in that
-     * order.
-     */
-    public ClassPath() {
-        // though this property is removed. Check for null and use only
-        // if it is not null (when bootstrap JDK is used).
-        String syscp = System.getProperty("sun.boot.class.path");
-        String envcp = System.getProperty("env.class.path");
-        if (envcp == null) envcp = ".";
-
-        // add syscp only if not null!
-        String cp = syscp == null? envcp : (syscp + File.pathSeparator + envcp);
-        init(cp);
     }
 
     private void init(String pathstr) {
@@ -138,9 +120,7 @@ class ClassPath {
                     try {
                         ZipFile zip = new ZipFile(file);
                         path[n++] = new ZipClassPathEntry(zip);
-                    } catch (ZipException e) {
-                    } catch (IOException e) {
-                        // Ignore exceptions, at least for now...
+                    } catch (IOException ignored) {
                     }
                 } else {
                     path[n++] = new DirClassPathEntry(file);
@@ -158,7 +138,7 @@ class ClassPath {
 
         // Trim class path to exact size
         this.path = new ClassPathEntry[n];
-        System.arraycopy((Object)path, 0, (Object)this.path, 0, n);
+        System.arraycopy(path, 0, this.path, 0, n);
     }
 
     private void init(String[] patharray) {
@@ -183,8 +163,7 @@ class ClassPath {
                 try {
                     ZipFile zip = new ZipFile(file);
                     path[n++] = new ZipClassPathEntry(zip);
-                } catch (ZipException e) {
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                     // Ignore exceptions, at least for now...
                 }
             } else {
@@ -202,13 +181,13 @@ class ClassPath {
 
         // Trim class path to exact size
         this.path = new ClassPathEntry[n];
-        System.arraycopy((Object)path, 0, (Object)this.path, 0, n);
+        System.arraycopy(path, 0, this.path, 0, n);
     }
 
     /**
      * Find the specified directory in the class path
      */
-    public ClassFile getDirectory(String name) {
+    ClassFile getDirectory(String name) {
         return getFile(name, true);
     }
 
@@ -247,7 +226,7 @@ class ClassPath {
     /**
      * Returns list of files given a package name and extension.
      */
-    public Enumeration<ClassFile> getFiles(String pkg, String ext) {
+    Enumeration<ClassFile> getFiles(String pkg, String ext) {
         Hashtable<String, ClassFile> files = new Hashtable<>();
         for (int i = path.length; --i >= 0; ) {
             path[i].fillFiles(pkg, ext, files);
@@ -301,7 +280,7 @@ final class DirClassPathEntry extends ClassPathEntry {
 
     private String[] computeFiles(String subdir) {
         File sd = new File(dir.getPath(), subdir);
-        String[] files = null;
+        String[] files;
         if (sd.isDirectory()) {
             files = sd.list();
             if (files == null) {

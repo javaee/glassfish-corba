@@ -32,6 +32,8 @@
 
 package org.glassfish.rmic;
 
+import org.glassfish.rmic.tools.java.ClassPath;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,10 +43,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-import java.util.jar.Attributes;
-import org.glassfish.rmic.tools.java.ClassPath;
 
 /**
  * BatchEnvironment for rmic extends javac's version in four ways:
@@ -66,14 +67,6 @@ public class BatchEnvironment extends org.glassfish.rmic.tools.javac.BatchEnviro
 
     /** instance of Main which created this environment */
     private Main main;
-
-    /**
-     * Create a ClassPath object for rmic from a class path string.
-     */
-    public static ClassPath createClassPath(String classPathString) {
-        ClassPath[] paths = classPaths(null, classPathString, null);
-        return paths[1];
-    }
 
     /**
      * Create a ClassPath object for rmic from the relevant command line
@@ -133,8 +126,7 @@ public class BatchEnvironment extends org.glassfish.rmic.tools.javac.BatchEnviro
      * stream for messages and Main.
      */
     public BatchEnvironment(OutputStream out, ClassPath path, Main main) {
-        super(out, new ClassPath(""), path);
-                                // use empty "sourcePath" (see 4666958)
+        super(out, path);
         this.main = main;
     }
 

@@ -37,10 +37,12 @@ import com.sun.corba.ee.impl.util.Utility;
 import org.glassfish.rmic.IndentingWriter;
 import org.glassfish.rmic.Main;
 import org.glassfish.rmic.tools.java.ClassDefinition;
+import org.glassfish.rmic.tools.java.ClassFile;
 import org.glassfish.rmic.tools.java.CompilerError;
 import org.glassfish.rmic.tools.java.Identifier;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -63,22 +65,22 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
     private static final String DEFAULT_TIE_CLASS = "org.omg.CORBA_2_3.portable.ObjectImpl";
     private static final String DEFAULT_POA_TIE_CLASS = "org.omg.PortableServer.Servant";
 
-    protected boolean reverseIDs = false;
-    protected boolean localStubs = true;
-    protected boolean standardPackage = false;
-    protected boolean useHash = true;
-    protected String stubBaseClass = DEFAULT_STUB_CLASS;
-    protected String tieBaseClass = DEFAULT_TIE_CLASS;
-    protected HashSet namesInUse = new HashSet();
-    protected Hashtable classesInUse = new Hashtable();
-    protected Hashtable imports = new Hashtable();
-    protected int importCount = 0;
-    protected String currentPackage = null;
-    protected String currentClass = null;
-    protected boolean castArray = false;
-    protected Hashtable transactionalObjects = new Hashtable() ;
-    protected boolean POATie = false ;
-    protected boolean emitPermissionCheck = false;
+    private boolean reverseIDs = false;
+    private boolean localStubs = true;
+    private boolean standardPackage = false;
+    private boolean useHash = true;
+    private String stubBaseClass = DEFAULT_STUB_CLASS;
+    private String tieBaseClass = DEFAULT_TIE_CLASS;
+    private HashSet namesInUse = new HashSet();
+    private Hashtable classesInUse = new Hashtable();
+    private Hashtable imports = new Hashtable();
+    private int importCount = 0;
+    private String currentPackage = null;
+    private String currentClass = null;
+    private boolean castArray = false;
+    private Hashtable transactionalObjects = new Hashtable() ;
+    private boolean POATie = false ;
+    private boolean emitPermissionCheck = false;
 
     /**
      * Default constructor for Main to use.
@@ -89,11 +91,8 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
     /**
      * Overridden in order to set the standardPackage flag.
      */
-    public void generate(
-            org.glassfish.rmic.BatchEnvironment env,
-            ClassDefinition cdef, File destDir) {
-        ((org.glassfish.rmic.iiop.BatchEnvironment)env).
-                setStandardPackage(standardPackage);
+    public void generate(org.glassfish.rmic.BatchEnvironment env, ClassDefinition cdef, File destDir) {
+        ((BatchEnvironment)env).setStandardPackage(standardPackage);
         super.generate(env, cdef, destDir);
     }
 
@@ -128,7 +127,7 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
      */
     protected CompoundType getTopType(ClassDefinition cdef, ContextStack stack) {
 
-        CompoundType result = null;
+        CompoundType result;
 
         // Do we have an interface?
 
@@ -263,7 +262,7 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
         int filter = TYPE_REMOTE | TYPE_IMPLEMENTATION;
         Type[] genTypes = topType.collectMatching(filter,alreadyChecked);
         int count = genTypes.length;
-        Vector list = new Vector(count+5);
+        Vector<OutputType> list = new Vector<>(count+5);
         BatchEnvironment theEnv = topType.getEnv();
 
         // Now walk all types...
@@ -287,9 +286,8 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
 
                 int remoteInterfaceCount = 0;
                 InterfaceType[] interfaces = ((CompoundType)type).getInterfaces();
-                for (int j = 0; j < interfaces.length; j++) {
-                    if (interfaces[j].isType(TYPE_REMOTE) &&
-                        !interfaces[j].isType(TYPE_ABSTRACT)) {
+                for (InterfaceType anInterface : interfaces) {
+                    if (anInterface.isType(TYPE_REMOTE) && !anInterface.isType(TYPE_ABSTRACT)) {
                         remoteInterfaceCount++;
                     }
                 }
@@ -348,30 +346,22 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
                                         HashSet alreadyChecked,
                                         IndentingWriter writer) throws IOException {
 
-        String fileName = outputType.getName();
-        CompoundType theType = (CompoundType) outputType.getType();
-
-        // Are we doing a Stub or Tie?
-
-        if (fileName.endsWith(Utility.RMI_STUB_SUFFIX)) {
-
-            // Stub.
-
+        if (isStubType(outputType)) {
             writeStub(outputType,writer);
-
         } else {
-
-            // Tie
-
             writeTie(outputType,writer);
         }
+    }
+
+    private boolean isStubType(OutputType outputType) {
+        return outputType.getName().endsWith(Utility.RMI_STUB_SUFFIX);
     }
 
     /**
      * Write a stub for the specified type.
      */
-    protected void writeStub(OutputType outputType,
-                             IndentingWriter p) throws IOException {
+    private void writeStub(OutputType outputType,
+                           IndentingWriter p) throws IOException {
 
         CompoundType theType = (CompoundType) outputType.getType();
         RemoteType[] remoteInterfaces = getDirectRemoteInterfaces(theType);
@@ -394,10 +384,6 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
 
         writePackageAndImports(p);
 
-//        generate
-//        import java.security.AccessController;
-//        import java.security.PrivilegedAction;
-//        import java.io.SerializablePermission;
         if (emitPermissionCheck) {
             p.pln("import java.security.AccessController;");
             p.pln("import java.security.PrivilegedAction;");
@@ -543,7 +529,7 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
         p.pOln("}");            // end stub class
     }
 
-    void addClassInUse(String qualifiedName) {
+    private void addClassInUse(String qualifiedName) {
         String unqualifiedName = qualifiedName;
         String packageName = null;
         int index = qualifiedName.lastIndexOf('.');
@@ -554,7 +540,7 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
         addClassInUse(unqualifiedName,qualifiedName,packageName);
     }
 
-    void addClassInUse(Type type) {
+    private void addClassInUse(Type type) {
         if (!type.isPrimitive()) {
             Identifier id = type.getIdentifier();
             String name = IDLNames.replace(id.getName().toString(),". ",".");
@@ -569,15 +555,14 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
         }
     }
 
-    void addClassInUse(Type[] types) {
-        for (int i = 0; i < types.length; i++) {
-            addClassInUse(types[i]);
+    private void addClassInUse(Type[] types) {
+        for (Type type : types) {
+            addClassInUse(type);
         }
     }
 
-    void addStubInUse(Type type) {
-        if (type.getIdentifier() != idCorbaObject &&
-            type.isType(TYPE_CORBA_OBJECT)) {
+    private void addStubInUse(Type type) {
+        if (type.getIdentifier() != idCorbaObject && type.isType(TYPE_CORBA_OBJECT)) {
             String stubName = getStubNameFor(type,false);
             String packageName = type.getPackageName();
             String fullName;
@@ -594,7 +579,7 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
         }
     }
 
-    String getStubNameFor(Type type, boolean qualified) {
+    private String getStubNameFor(Type type, boolean qualified) {
         String stubName;
         String className;
         if (qualified) {
@@ -610,9 +595,9 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
         return stubName;
     }
 
-    void addStubInUse(Type[] types) {
-        for (int i = 0; i < types.length; i++) {
-            addStubInUse(types[i]);
+    private void addStubInUse(Type[] types) {
+        for (Type type : types) {
+            addStubInUse(type);
         }
     }
 
@@ -834,7 +819,7 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
         }
     }
 
-    void writePackageAndImports(IndentingWriter p) throws IOException {
+    private void writePackageAndImports(IndentingWriter p) throws IOException {
 
         // Write package declaration...
 
@@ -882,7 +867,7 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
 
     }
 
-    boolean implementsRemote(CompoundType theType) {
+    private boolean implementsRemote(CompoundType theType) {
         boolean result = theType.isType(TYPE_REMOTE) && !theType.isType(TYPE_ABSTRACT);
 
         // If theType is not remote, look at all the interfaces
@@ -901,9 +886,9 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
         return result;
     }
 
-    void writeStubMethod (  IndentingWriter p,
-                            CompoundType.Method method,
-                            CompoundType theType) throws IOException {
+    private void writeStubMethod(IndentingWriter p,
+                                 CompoundType.Method method,
+                                 CompoundType theType) throws IOException {
 
         // Wtite the method declaration and opening brace...
         String methodName = method.getName();
@@ -2342,6 +2327,18 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
                 return objectName;
         }
     }
+
+    @Override
+    protected File getOutputDirectory(File destinationDir, Identifier id, BatchEnvironment environment) {
+        return Util.getOutputDirectoryForStub(id,destinationDir,environment);
+    }
+
+    @Override
+    protected void postProcessFile(BatchEnvironment env, File file) throws FileNotFoundException {
+        env.addGeneratedFile(file);
+        env.parseFile(ClassFile.newClassFile(file));
+    }
+
 }
 
 class StringComparator implements java.util.Comparator {

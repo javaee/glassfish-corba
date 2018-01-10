@@ -261,13 +261,13 @@ public abstract class CompoundType extends Type {
      * return value will be null, and errors will have been reported to the
      * supplied BatchEnvironment.
      */
-    public static CompoundType forCompound (ClassDefinition classDef,
-                                            ContextStack stack) {
+    static CompoundType forCompound(ClassDefinition classDef,
+                                    ContextStack stack) {
         CompoundType result = null;
 
         try {
             result = (CompoundType) makeType(classDef.getType(),classDef,stack);
-        } catch (ClassCastException e) {}
+        } catch (ClassCastException ignored) {}
 
         return result;
     }

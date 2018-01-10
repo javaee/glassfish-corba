@@ -62,6 +62,7 @@ import java.util.Collections;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyArray;
 import static org.junit.Assert.fail;
 
 /**
@@ -100,6 +101,26 @@ public class RmicGenerationTest {
         checkGeneratedFiles(generator, "without_poas", ".java");
     }
 
+    @Test
+    public void whenKeepNotSpecified_deleteGeneratedJavaFiles() throws Exception {
+        GenerationControl generator = new GenerationControl(RmiIIServant.class);
+        generator.addArgs("-iiop");
+
+        generator.generate();
+
+        checkGeneratedFilesDeleted(generator, ".java");
+    }
+
+    @Test
+    public void afterProcessing_classFilesArePresent() throws Exception {
+        GenerationControl generator = new GenerationControl(RmiIIServant.class);
+        generator.addArgs("-iiop");
+
+        generator.generate();
+
+        checkClassFilesPresent(generator, "without_poas");
+    }
+
 
     @Test
     public void generateIiopStubsFromInterface() throws Exception {
@@ -126,6 +147,15 @@ public class RmicGenerationTest {
     public void generateIdlForInnerClass() throws Exception {
         GenerationControl generator = new GenerationControl(Rainbow.getInterfaceCheckerClass());
         generator.addArgs("-idl", "-keep");
+        generator.generate();
+
+        checkGeneratedFiles(generator, "idl", ".idl");
+    }
+
+    @Test
+    public void whenKeepFlagNotSpecified_dontDeleteGeneratedIdlFiles() throws Exception {
+        GenerationControl generator = new GenerationControl(Rainbow.getInterfaceCheckerClass());
+        generator.addArgs("-idl");
         generator.generate();
 
         checkGeneratedFiles(generator, "idl", ".idl");
@@ -178,6 +208,30 @@ public class RmicGenerationTest {
 
         assertThat("In " + generator.getDestDir(), generatedFilePaths, arrayContaining(expectedFilePaths));
         compareGeneratedFiles(masterDir, generator.getDestDir(), expectedFilePaths);
+    }
+
+    // Verifies that the generated files were deleted
+    private void checkGeneratedFilesDeleted(GenerationControl generator, String suffix) throws IOException {
+        String[] generatedFilePaths = getFilePaths(generator.getDestDir(), suffix);
+
+        assertThat("In " + generator.getDestDir(), generatedFilePaths, emptyArray());
+    }
+
+    // Confirms that the generated files match those in the specified directory of master files
+    private void checkClassFilesPresent(GenerationControl generator, String mastersSubDir) throws IOException {
+        File masterDir = new File("src/test/masters/" + mastersSubDir);
+
+        String[] generatedFilePaths = getFilePaths(generator.getDestDir(), ".class");
+        String[] expectedFilePaths = toClassFilePaths(getFilePaths(masterDir, ".java"));
+
+        assertThat("In " + generator.getDestDir(), generatedFilePaths, arrayContaining(expectedFilePaths));
+    }
+
+    private String[] toClassFilePaths(String[] sourceFilePaths) {
+        String[] result = new String[sourceFilePaths.length];
+        for (int i = 0; i < sourceFilePaths.length; i++)
+            result[i] = sourceFilePaths[i].replace(".java", ".class");
+        return result;
     }
 
     // Returns a sorted array of paths to files with the specified suffix under the specified directory, relative to that directory

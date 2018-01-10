@@ -37,6 +37,7 @@ import org.glassfish.rmic.tools.java.ClassDefinition;
 import org.glassfish.rmic.tools.java.CompilerError;
 import org.glassfish.rmic.tools.java.Identifier;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
@@ -68,6 +69,11 @@ public class IDLGenerator extends org.glassfish.rmic.iiop.Generator {
      * Default constructor for Main to use.
      */
     public IDLGenerator() {
+    }
+
+    @Override
+    protected File getOutputDirectory(File destinationDir, Identifier id, BatchEnvironment environment) {
+        return Util.getOutputDirectoryForIDL(id, destinationDir, environment);
     }
 
 
@@ -181,7 +187,6 @@ public class IDLGenerator extends org.glassfish.rmic.iiop.Generator {
             for (int i = 0; i < argv.length; i++) {
                 if (argv[i] != null) {
                     if (argv[i].equalsIgnoreCase("-idl")) {
-                        idl = true;
                         argv[i] = null;
                     }
                     else if ( argv[i].equalsIgnoreCase( "-valueMethods" ) ) {

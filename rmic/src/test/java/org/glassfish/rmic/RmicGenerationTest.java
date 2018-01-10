@@ -39,6 +39,7 @@ package org.glassfish.rmic;
  * holder.
  */
 
+import org.glassfish.rmic.classes.covariantReturn.DogFinder;
 import org.glassfish.rmic.classes.exceptiondetailsc.ExceptionSourceServantPOA;
 import org.glassfish.rmic.classes.giopheaderpadding.FooServantPOA;
 import org.glassfish.rmic.classes.hcks.RmiII;
@@ -52,14 +53,7 @@ import org.glassfish.rmic.classes.systemexceptions.ServerInvokerServantPOA;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -146,6 +140,35 @@ public class RmicGenerationTest {
         checkGeneratedFiles(generator, "idl", ".idl");
     }
 
+    // NOTE: The test case from which this was based (http://hg.openjdk.java.net/jdk/jdk/file/9a29aa153c20/test/jdk/sun/rmi/rmic/covariantReturns)
+    // doesn't actually seem to test the feature. This one verifies that we can generate the stubs, but they appear to me to be incorrect,
+    // in that the generated derived type is actually returning the same type as its parent rather than the specified covariant type.
+    // More testing will be needed to see if it matters.
+    @Test
+    public void canHandleCovariantReturns() throws Exception {
+        GenerationControl generator = new GenerationControl(DogFinder.class);
+        generator.addArgs("-iiop", "-keep");
+        generator.generate();
+    }
+
+    @Test
+    public void whenBinaryIsMissing_dontCompileSources() throws Exception {
+        File generatedFile = new File(getClassPath() + "Interface.java");
+        BufferedWriter writer = new BufferedWriter(new FileWriter(generatedFile));
+        writer.write("public class Interface implements java.rmi.Remote { }");
+        writer.close();
+
+        GenerationControl generator = new GenerationControl("Interface");
+        generator.addArgs("-iiop");
+
+        try {
+            generator.generate();
+            fail("Should not have succeeded in generating a stub");
+        } catch (AssertionError e) {
+            assertThat(e.getMessage(), containsString("Class Interface not found"));
+        }
+    }
+
     // Confirms that the generated files match those in the specified directory of master files
     private void checkGeneratedFiles(GenerationControl generator, String mastersSubDir, String suffix) throws IOException {
         File masterDir = new File("src/test/masters/" + mastersSubDir);
@@ -222,7 +245,7 @@ public class RmicGenerationTest {
     }
 
     private static String toPath(String className) {
-        return className.replace('.', '/') + ".class";
+        return className.replace('.', File.separatorChar) + ".class";
     }
 
 

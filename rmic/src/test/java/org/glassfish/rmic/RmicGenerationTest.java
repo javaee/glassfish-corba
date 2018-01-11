@@ -40,6 +40,8 @@ package org.glassfish.rmic;
  */
 
 import org.glassfish.rmic.classes.covariantReturn.DogFinder;
+import org.glassfish.rmic.classes.errorClasses.InterfaceWithNonRemoteMethod;
+import org.glassfish.rmic.classes.errorClasses.NotRemoteClass;
 import org.glassfish.rmic.classes.exceptiondetailsc.ExceptionSourceServantPOA;
 import org.glassfish.rmic.classes.giopheaderpadding.FooServantPOA;
 import org.glassfish.rmic.classes.hcks.RmiII;
@@ -60,9 +62,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyArray;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.fail;
 
 /**
@@ -197,6 +197,27 @@ public class RmicGenerationTest {
         } catch (AssertionError e) {
             assertThat(e.getMessage(), containsString("Class Interface not found"));
         }
+    }
+
+    @Test(expected = AssertionError.class)
+    public void whenClassDoesNotImplementRemote_cannotGenerate() throws Exception {
+        GenerationControl generator = new GenerationControl(NotRemoteClass.class);
+        generator.addArgs("-iiop");
+        generator.generate();
+    }
+    
+    @Test(expected = AssertionError.class)
+    public void whenInterfaceHasNonRemoteMethod_cannotGenerate() throws Exception {
+        GenerationControl generator = new GenerationControl(InterfaceWithNonRemoteMethod.class);
+        generator.addArgs("-iiop");
+        generator.generate();
+    }
+
+    @Test
+    public void canGenerateNonPublicClass() throws Exception {
+        GenerationControl generator = new GenerationControl("org.glassfish.rmic.classes.errorClasses.PackageInterface");
+        generator.addArgs("-iiop");
+        generator.generate();
     }
 
     // Confirms that the generated files match those in the specified directory of master files

@@ -27,6 +27,7 @@ package org.glassfish.rmic.tools.binaryclass;
 import org.glassfish.rmic.BatchEnvironment;
 import org.glassfish.rmic.TestUtils;
 import org.glassfish.rmic.classes.hcks.RmiII;
+import org.glassfish.rmic.classes.hcks.RmiIIServantPOA;
 import org.glassfish.rmic.tools.java.ClassDefinition;
 import org.glassfish.rmic.tools.java.ClassDefinitionFactory;
 import org.glassfish.rmic.tools.java.ClassPath;
@@ -38,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static org.glassfish.rmic.tools.java.Constants.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -45,34 +47,55 @@ import static org.hamcrest.Matchers.is;
 public class BinaryClassTest {
 
     private ByteArrayOutputStream messagesOut = new ByteArrayOutputStream();
-
-    private ClassDefinitionFactory factory = new BinaryClassFactory();
     private Environment environment = new BatchEnvironment(messagesOut, createTestClassPath(), null);
+    private ClassDefinitionFactory factory = new BinaryClassFactory();
 
     private ClassPath createTestClassPath() {
         return BatchEnvironment.createClassPath(TestUtils.getClassPathString(), null);
     }
 
     @Test
-    public void classDefinitionForCompileClass_hasSourceName() throws Exception {
-        ClassDefinition classDefinition = getClassDefinition(RmiII.class);
+    public void classDefinitionForCompiledClass_hasSourceName() throws Exception {
+        ClassDefinition classDefinition = definitionFor(RmiII.class);
 
         assertThat(classDefinition.getSource(), equalTo("RmiII.java"));
     }
 
-    private ClassDefinition getClassDefinition(Class<?> aClass) throws IOException {
+    private ClassDefinition definitionFor(Class<?> aClass) throws IOException {
         InputStream classFileInputStream = getClass().getClassLoader().getResourceAsStream(toPath(aClass));
         return factory.loadDefinition(classFileInputStream, environment);
-    }
-
-    @Test
-    public void classDefinitionForCompileClass_hasNoError() throws Exception {
-        ClassDefinition classDefinition = getClassDefinition(RmiII.class);
-
-        assertThat(classDefinition.getError(), is(false));
     }
 
     private String toPath(Class<?> aClass) {
         return aClass.getName().replace('.', File.separatorChar) + ".class";
     }
+
+    @Test
+    public void classDefinitionForCompiledClass_hasNoError() throws Exception {
+        ClassDefinition classDefinition = definitionFor(RmiII.class);
+
+        assertThat(classDefinition.getError(), is(false));
+    }
+
+    @Test
+    public void classDefinitionForCompiledClass_hasZeroWhereValue() throws Exception {
+        ClassDefinition classDefinition = definitionFor(RmiII.class);
+
+        assertThat(classDefinition.getWhere(), equalTo(0L));
+    }
+
+    @Test
+    public void classDefinitionForRmiII_hasExpectedModifiers() throws Exception {
+        ClassDefinition classDefinition = definitionFor(RmiII.class);
+
+        assertThat(classDefinition.getModifiers(), equalTo(M_ABSTRACT | M_INTERFACE | M_PUBLIC));
+    }
+
+    @Test
+    public void classDefinitionForRmiIIServantPOA_hasExpectedModifiers() throws Exception {
+        ClassDefinition classDefinition = definitionFor(RmiIIServantPOA.class);
+
+        assertThat(classDefinition.getModifiers(), equalTo(ACC_SUPER | M_PUBLIC));
+    }
+
 }

@@ -157,7 +157,7 @@ public abstract class ClassDefinition implements Constants {
     }
 
     /**
-     * Get the position in the input
+     * Get the position in the input                       binary
      */
     public final long getWhere() {
         return where;
@@ -424,7 +424,7 @@ public abstract class ClassDefinition implements Constants {
         return false;
     }
 
-    public final boolean inSamePackage(ClassDeclaration c) {
+    private final boolean inSamePackage(ClassDeclaration c) {
         // find out if the class stored in c is defined in the same
         // package as the current class.
         return inSamePackage(c.getName().getQualifier());
@@ -436,7 +436,7 @@ public abstract class ClassDefinition implements Constants {
         return inSamePackage(c.getName().getQualifier());
     }
 
-    private final boolean inSamePackage(Identifier packageName) {
+    private boolean inSamePackage(Identifier packageName) {
         return (getName().getQualifier().equals(packageName));
     }
 
@@ -1568,7 +1568,7 @@ public abstract class ClassDefinition implements Constants {
      * Get an Iterator of all methods which could be accessed in an
      * instance of this class.
      */
-    public Iterator<MemberDefinition> getMethods(Environment env) {
+    protected Iterator<MemberDefinition> getMethods(Environment env) {
         if (allMethods == null) {
             collectInheritedMethods(env);
         }

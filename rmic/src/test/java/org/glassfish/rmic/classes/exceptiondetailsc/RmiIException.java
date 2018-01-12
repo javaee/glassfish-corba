@@ -39,7 +39,7 @@
  */
 package org.glassfish.rmic.classes.exceptiondetailsc;
 
-class RmiIException extends Exception {
+public class RmiIException extends Exception {
     RmiIException(String x)
     {
         super(x);

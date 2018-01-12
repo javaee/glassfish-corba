@@ -27,11 +27,23 @@ package org.glassfish.rmic.tools.javac;
 
 import org.glassfish.rmic.tools.binaryclass.BinaryClassFactory;
 import org.glassfish.rmic.tools.java.*;
-import org.glassfish.rmic.tools.tree.Node;
 import org.glassfish.rmic.tools.java.Package;
+import org.glassfish.rmic.tools.tree.Node;
 
-import java.util.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * Main environment of the batch version of the Java compiler,
@@ -44,7 +56,7 @@ import java.io.*;
 @Deprecated
 public
 class BatchEnvironment extends Environment implements ErrorConsumer {
-    private final ClassDefinitionFactory classDefinitionFactory = new BinaryClassFactory();
+    private final ClassDefinitionFactory classDefinitionFactory = /*/ new AsmClassFactory() /*/ new BinaryClassFactory() /**/;
     /**
      * The stream where error message are printed.
      */

@@ -1,4 +1,3 @@
-package org.glassfish.rmic.tools.binaryclass;
 /*
  * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -23,14 +22,5 @@ package org.glassfish.rmic.tools.binaryclass;
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-
-import org.glassfish.rmic.tools.java.ClassDefinitionFactoryTest;
-
-public class BinaryClassTest extends ClassDefinitionFactoryTest {
-
-    public BinaryClassTest() {
-        super(new BinaryClassFactory());
-    }
-
-
+public class TopLevelClass {
 }

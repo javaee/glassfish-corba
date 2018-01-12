@@ -1,4 +1,4 @@
-package org.glassfish.rmic.tools.binaryclass;
+package org.glassfish.rmic.asm;
 /*
  * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -26,11 +26,9 @@ package org.glassfish.rmic.tools.binaryclass;
 
 import org.glassfish.rmic.tools.java.ClassDefinitionFactoryTest;
 
-public class BinaryClassTest extends ClassDefinitionFactoryTest {
+public class AsmClassFactoryTest extends ClassDefinitionFactoryTest {
 
-    public BinaryClassTest() {
-        super(new BinaryClassFactory());
+    public AsmClassFactoryTest() {
+        super(new AsmClassFactory());
     }
-
-
 }

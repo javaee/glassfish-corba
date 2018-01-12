@@ -108,7 +108,7 @@ public class RmicGenerationTest {
 
         generator.generate();
 
-        checkGeneratedFilesDeleted(generator, ".java");
+        checkGeneratedFilesDeleted(generator);
     }
 
     @Test
@@ -232,13 +232,14 @@ public class RmicGenerationTest {
     }
 
     // Verifies that the generated files were deleted
-    private void checkGeneratedFilesDeleted(GenerationControl generator, String suffix) throws IOException {
-        String[] generatedFilePaths = getFilePaths(generator.getDestDir(), suffix);
+    private void checkGeneratedFilesDeleted(GenerationControl generator) throws IOException {
+        String[] generatedFilePaths = getFilePaths(generator.getDestDir(), ".java");
 
         assertThat("In " + generator.getDestDir(), generatedFilePaths, emptyArray());
     }
 
     // Confirms that the generated files match those in the specified directory of master files
+    @SuppressWarnings("SameParameterValue")
     private void checkClassFilesPresent(GenerationControl generator, String mastersSubDir) throws IOException {
         File masterDir = new File("src/test/masters/" + mastersSubDir);
 

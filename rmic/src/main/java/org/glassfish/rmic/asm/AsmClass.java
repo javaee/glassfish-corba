@@ -1,4 +1,4 @@
-package org.glassfish.rmic.tools.binaryclass;
+package org.glassfish.rmic.asm;
 /*
  * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -23,14 +23,33 @@ package org.glassfish.rmic.tools.binaryclass;
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+import org.glassfish.rmic.tools.java.ClassDeclaration;
+import org.glassfish.rmic.tools.java.ClassDefinition;
+import org.glassfish.rmic.tools.java.ClassNotFound;
+import org.glassfish.rmic.tools.java.Environment;
+import org.glassfish.rmic.tools.java.Identifier;
 
-import org.glassfish.rmic.tools.java.ClassDefinitionFactoryTest;
+/**
+ * This represents a class for RMIC to process. It is built from a class file using ASM.
+ */
+class AsmClass extends ClassDefinition {
+    private Identifier outerIdentifier;
 
-public class BinaryClassTest extends ClassDefinitionFactoryTest {
-
-    public BinaryClassTest() {
-        super(new BinaryClassFactory());
+    AsmClass(String name, int modifiers, ClassDeclaration declaration, ClassDeclaration superClassDeclaration, ClassDeclaration[] interfaceDeclarations) {
+        super(name, 0, declaration, modifiers, null, null);
+        superClass = superClassDeclaration;
+        interfaces = interfaceDeclarations;
     }
 
+    @Override
+    public void loadNested(Environment env) {
+        try {
+            outerClass = env.getClassDefinition(outerIdentifier);
+        } catch (ClassNotFound ignore) {
+        }
+    }
 
+    void setOuterClass(Identifier outerClass) {
+        this.outerIdentifier = outerClass;
+    }
 }

@@ -7,7 +7,7 @@ public class TwoLevelNested {
 
     public class Level1 {
 
-        public class Level2 implements Remote {
+        public class Level2 implements Remote, Cloneable {
             public void level2Execute() throws RemoteException {
                 System.out.println("Level2.level2Execute executed");
             }

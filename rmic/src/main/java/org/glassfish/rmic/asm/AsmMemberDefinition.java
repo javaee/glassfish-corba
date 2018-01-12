@@ -1,4 +1,4 @@
-package org.glassfish.rmic.tools.binaryclass;
+package org.glassfish.rmic.asm;
 /*
  * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -23,14 +23,34 @@ package org.glassfish.rmic.tools.binaryclass;
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+import org.glassfish.rmic.tools.java.ClassDeclaration;
+import org.glassfish.rmic.tools.java.ClassDefinition;
+import org.glassfish.rmic.tools.java.Environment;
+import org.glassfish.rmic.tools.java.Identifier;
+import org.glassfish.rmic.tools.java.MemberDefinition;
+import org.glassfish.rmic.tools.java.Type;
 
-import org.glassfish.rmic.tools.java.ClassDefinitionFactoryTest;
+public class AsmMemberDefinition extends MemberDefinition {
+    private final ClassDeclaration[] exceptions;
 
-public class BinaryClassTest extends ClassDefinitionFactoryTest {
+    AsmMemberDefinition(long where, ClassDefinition clazz, int modifiers, Type type, Identifier name, String[] exceptions) {
+        super(where, clazz, modifiers, type, name, null, null);
 
-    public BinaryClassTest() {
-        super(new BinaryClassFactory());
+        this.exceptions = toClassDeclarations(exceptions);
     }
 
+    private ClassDeclaration[] toClassDeclarations(String[] classNames) {
+        if (classNames == null) return new ClassDeclaration[0];
 
+        ClassDeclaration[] result = new ClassDeclaration[classNames.length];
+        for (int i = 0; i < classNames.length; i++)
+            result[i] = new ClassDeclaration(Identifier.lookup(classNames[i].replace('/','.')));
+        return result;
+
+    }
+
+    @Override
+    public ClassDeclaration[] getExceptions(Environment env) {
+        return exceptions;
+    }
 }

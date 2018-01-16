@@ -108,6 +108,11 @@ public abstract class ClassDefinitionFactoryTest {
     }
 
     @Test
+    public void loadJavaLangObject() throws Exception {
+        definitionFor(Object.class);
+    }
+
+    @Test
     public void classDefinition_hasDeclarationWithClassName() throws Exception {
         ClassDefinition classDefinition = definitionFor(RmiII.class);
 

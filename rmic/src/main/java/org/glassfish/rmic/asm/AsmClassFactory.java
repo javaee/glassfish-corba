@@ -103,7 +103,7 @@ public class AsmClassFactory implements ClassDefinitionFactory {
         }
 
         private ClassDeclaration toClassDeclaration(String name) {
-            return new ClassDeclaration(getIdentifier(name));
+            return name == null ? null : new ClassDeclaration(getIdentifier(name));
         }
 
         private Identifier getIdentifier(String name) {

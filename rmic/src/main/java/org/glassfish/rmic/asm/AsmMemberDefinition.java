@@ -30,6 +30,8 @@ import org.glassfish.rmic.tools.java.Identifier;
 import org.glassfish.rmic.tools.java.MemberDefinition;
 import org.glassfish.rmic.tools.java.Type;
 
+import java.util.Vector;
+
 public class AsmMemberDefinition extends MemberDefinition {
     private final ClassDeclaration[] exceptions;
 
@@ -52,5 +54,10 @@ public class AsmMemberDefinition extends MemberDefinition {
     @Override
     public ClassDeclaration[] getExceptions(Environment env) {
         return exceptions;
+    }
+
+    @Override
+    public Vector<MemberDefinition> getArguments() {
+        return null;
     }
 }

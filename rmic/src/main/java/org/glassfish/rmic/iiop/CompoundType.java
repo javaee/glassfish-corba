@@ -1346,8 +1346,8 @@ public abstract class CompoundType extends Type {
                             // If the two methods belong to interfaces that inherit from each other
                             // then it is just a redefinition which is legal.
                             if ( current != existingMemberClassDef &&
-                                 ! inheritsFrom(current, existingMemberClassDef) &&
-                                 ! inheritsFrom(existingMemberClassDef, current))
+                                 ! inheritsFrom(stack, current, existingMemberClassDef) &&
+                                 ! inheritsFrom(stack, existingMemberClassDef, current))
                             {
                                 //Identifier int1 = existingMethod.getEnclosing().getIdentifier();
                                 //Identifier int2 = current.getName();
@@ -1380,21 +1380,21 @@ public abstract class CompoundType extends Type {
 
     // This should really be a method on ClassDefinition, but it takes too long to change the shared source.
     // Works for both, classes and interfaces.
-    protected boolean inheritsFrom(ClassDefinition def, ClassDefinition otherDef) {
+    protected boolean inheritsFrom(ContextStack stack, ClassDefinition def, ClassDefinition otherDef) throws ClassNotFound {
         if (def == otherDef)
             return true;
 
         ClassDefinition superDef;
         if (def.getSuperClass() != null) {
-            superDef = def.getSuperClass().getClassDefinition();
-            if (inheritsFrom(superDef, otherDef))
+            superDef = def.getSuperClass().getClassDefinition(stack.getEnv());
+            if (inheritsFrom(stack, superDef, otherDef))
                 return true;
         }
 
         ClassDeclaration[] interfaces = def.getInterfaces();
         for (int i=0; i<interfaces.length; i++) {
-            superDef = interfaces[i].getClassDefinition();
-            if (inheritsFrom(superDef, otherDef))
+            superDef = interfaces[i].getClassDefinition(stack.getEnv());
+            if (inheritsFrom(stack, superDef, otherDef))
                 return true;
         }
         return false;

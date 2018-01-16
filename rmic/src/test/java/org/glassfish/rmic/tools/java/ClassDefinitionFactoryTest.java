@@ -240,11 +240,20 @@ public abstract class ClassDefinitionFactoryTest {
     }
 
     @Test
-    public void classDefinitionHasThrownExceptions() throws Exception {
+    public void methodDefinition_hasThrownExceptions() throws Exception {
         ClassDefinition classDefinition = definitionFor(ExceptionSource.class);
 
         MemberDefinition method = classDefinition.findAnyMethod(environment, Identifier.lookup("raiseUserException"));
         assertThat(method.getExceptions(environment), arrayContainingInAnyOrder(declarationFor(RemoteException.class), declarationFor(RmiIException.class)));
+    }
+
+    // It appears that only the static initializer is allowed to return an empty array for this.
+    @Test
+    public void methodDefinitionGetArguments_returnsNull() throws Exception {
+        ClassDefinition classDefinition = definitionFor(ExceptionSource.class);
+
+        MemberDefinition method = classDefinition.findAnyMethod(environment, Identifier.lookup("raiseUserException"));
+        assertThat(method.getArguments(), nullValue());
     }
 
     @SuppressWarnings("unchecked")

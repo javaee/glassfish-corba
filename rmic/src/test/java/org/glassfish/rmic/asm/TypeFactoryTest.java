@@ -78,6 +78,14 @@ public class TypeFactoryTest {
     }
 
     @Test
+    public void constructCharArrayArgument() throws Exception {
+        Type methodType = TypeFactory.createMethodType("([C)V");
+
+        assertThat(methodType.getReturnType(), equalTo(Type.tVoid));
+        assertThat(methodType.getArgumentTypes(), arrayContaining(Type.tArray(Type.tChar)));
+    }
+
+    @Test
     public void constructMultiDimensionalArrayType() throws Exception {
         assertThat(TypeFactory.createType("[[I"), equalTo(Type.tArray(Type.tArray(Type.tInt))));
     }

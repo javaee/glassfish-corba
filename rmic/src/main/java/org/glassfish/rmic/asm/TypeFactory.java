@@ -65,6 +65,8 @@ class TypeFactory {
                 return Type.tFloat;
             case org.objectweb.asm.Type.DOUBLE:
                 return Type.tDouble;
+            case org.objectweb.asm.Type.CHAR:
+                return Type.tChar;
             case org.objectweb.asm.Type.ARRAY:
                 return toArrayType(asmType);
             default:

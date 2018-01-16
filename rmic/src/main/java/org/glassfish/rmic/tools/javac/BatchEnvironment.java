@@ -55,7 +55,7 @@ import java.util.Vector;
 @Deprecated
 public
 class BatchEnvironment extends Environment implements ErrorConsumer {
-    private final ClassDefinitionFactory classDefinitionFactory
+    private final static ClassDefinitionFactory classDefinitionFactory
             = /*/ new org.glassfish.rmic.asm.AsmClassFactory() /*/ new org.glassfish.rmic.tools.binaryclass.BinaryClassFactory() /**/;
     /**
      * The stream where error message are printed.

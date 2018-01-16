@@ -13,4 +13,15 @@ public class TwoLevelNested {
             }
         }
     }
+/*
+
+    void tryThis() {
+        new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Called inner class");
+            }
+        };
+    }
+*/
 }

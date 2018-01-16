@@ -1,5 +1,7 @@
 package org.glassfish.rmic.tools.java;
 
+import com.meterware.simplestub.Memento;
+import com.meterware.simplestub.StaticStubSupport;
 import org.glassfish.rmic.BatchEnvironment;
 import org.glassfish.rmic.Names;
 import org.glassfish.rmic.TestUtils;
@@ -14,6 +16,8 @@ import org.glassfish.rmic.classes.nestedClasses.TwoLevelNested;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.rmi.PortableRemoteObject;
@@ -65,6 +69,17 @@ public abstract class ClassDefinitionFactoryTest {
     private ByteArrayOutputStream messagesOut = new ByteArrayOutputStream();
     private Environment environment = new BatchEnvironment(messagesOut, createTestClassPath(), null);
     private ClassDefinitionFactory factory;
+    private Memento memento;
+
+    @Before
+    public void setUp() throws Exception {
+        memento = StaticStubSupport.install(BatchEnvironment.class, "classDefinitionFactory", factory);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        memento.revert();
+    }
 
     protected ClassDefinitionFactoryTest(ClassDefinitionFactory factory) {
         this.factory = factory;
@@ -74,7 +89,7 @@ public abstract class ClassDefinitionFactoryTest {
         return BatchEnvironment.createClassPath(TestUtils.getClassPathString(), null);
     }
 
-    protected final ClassDefinition definitionFor(Class<?> aClass) throws IOException {
+    private ClassDefinition definitionFor(Class<?> aClass) throws IOException {
         InputStream classFileInputStream = getClass().getClassLoader().getResourceAsStream(toPath(aClass));
         return factory.loadDefinition(classFileInputStream, environment);
     }
@@ -83,7 +98,7 @@ public abstract class ClassDefinitionFactoryTest {
         return aClass.getName().replace('.', File.separatorChar) + ".class";
     }
 
-    protected final void loadNested(ClassDefinition classDefinition) {
+    private void loadNested(ClassDefinition classDefinition) {
         classDefinition.loadNested(environment);
     }
 
@@ -228,7 +243,7 @@ public abstract class ClassDefinitionFactoryTest {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> Matcher<MemberDefinition>[] allMembers(Class<?> aClass) {
+    private Matcher<MemberDefinition>[] allMembers(Class<?> aClass) {
         List<Matcher<MemberDefinition>> matchers = new ArrayList<>();
         for (Method method : aClass.getDeclaredMethods())
             matchers.add(isDefinitionFor(method));

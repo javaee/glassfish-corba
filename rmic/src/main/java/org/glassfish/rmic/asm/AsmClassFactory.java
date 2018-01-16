@@ -23,12 +23,13 @@ package org.glassfish.rmic.asm;
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+import org.glassfish.rmic.Names;
 import org.glassfish.rmic.tools.java.ClassDeclaration;
 import org.glassfish.rmic.tools.java.ClassDefinition;
 import org.glassfish.rmic.tools.java.ClassDefinitionFactory;
 import org.glassfish.rmic.tools.java.Environment;
 import org.glassfish.rmic.tools.java.Identifier;
-import org.glassfish.rmic.tools.java.IdentifierToken;
 import org.glassfish.rmic.tools.java.MemberDefinition;
 import org.glassfish.rmic.tools.java.Type;
 import org.objectweb.asm.ClassReader;
@@ -39,8 +40,23 @@ import org.objectweb.asm.Opcodes;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AsmClassFactory implements ClassDefinitionFactory {
+    private Map<Identifier, Identifier> outerClasses = new HashMap<>();
+
+    Identifier getOuterClassName(Identifier className) {
+        if (isResolvedInnerClassName(className))
+            className = Names.mangleClass(className);
+        return outerClasses.get(className);
+    }
+
+    // This is needed to compensate for the hack described in Main.getClassIdentifier()
+    private boolean isResolvedInnerClassName(Identifier className) {
+        return className.toString().contains(". ");
+    }
+
     @Override
     public ClassDefinition loadDefinition(InputStream is, Environment env) throws IOException {
         ClassDefinitionVisitor visitor = new ClassDefinitionVisitor(env);
@@ -64,7 +80,7 @@ public class AsmClassFactory implements ClassDefinitionFactory {
 
         @Override
         public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-            asmClass = new AsmClass(toSourceFileName(name), access, toClassDeclaration(name),
+            asmClass = new AsmClass(AsmClassFactory.this, toSourceFileName(name), access, toClassDeclaration(name),
                                     toClassDeclaration(superName), toClassDeclarations(interfaces));
         }
 
@@ -96,7 +112,8 @@ public class AsmClassFactory implements ClassDefinitionFactory {
 
         @Override
         public void visitInnerClass(String name, String outerName, String innerName, int access) {
-            asmClass.setOuterClass(getIdentifier(outerName));
+            if (outerName != null)
+                outerClasses.put(getIdentifier(name), getIdentifier(outerName));
         }
 
         @Override
@@ -111,15 +128,6 @@ public class AsmClassFactory implements ClassDefinitionFactory {
             MemberDefinition definition = new AsmMemberDefinition(0, asmClass, access, createType(desc), getIdentifier(name), exceptions);
             asmClass.addMember(env, definition);
             return null;
-        }
-
-        private IdentifierToken[] toIdentifierTokens(String[] exceptions) {
-            if (exceptions == null) return new IdentifierToken[0];
-
-            IdentifierToken[] result = new IdentifierToken[exceptions.length];
-            for (int i = 0; i < exceptions.length; i++)
-                result[i] = new IdentifierToken(Identifier.lookup(exceptions[i]));
-            return result;
         }
 
         private Type createType(String desc) {

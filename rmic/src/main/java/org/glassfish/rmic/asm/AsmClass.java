@@ -33,10 +33,12 @@ import org.glassfish.rmic.tools.java.Identifier;
  * This represents a class for RMIC to process. It is built from a class file using ASM.
  */
 class AsmClass extends ClassDefinition {
-    private Identifier outerIdentifier;
 
-    AsmClass(String name, int modifiers, ClassDeclaration declaration, ClassDeclaration superClassDeclaration, ClassDeclaration[] interfaceDeclarations) {
+    private final AsmClassFactory factory;
+
+    AsmClass(AsmClassFactory factory, String name, int modifiers, ClassDeclaration declaration, ClassDeclaration superClassDeclaration, ClassDeclaration[] interfaceDeclarations) {
         super(name, 0, declaration, modifiers, null, null);
+        this.factory = factory;
         superClass = superClassDeclaration;
         interfaces = interfaceDeclarations;
     }
@@ -44,12 +46,11 @@ class AsmClass extends ClassDefinition {
     @Override
     public void loadNested(Environment env) {
         try {
-            outerClass = env.getClassDefinition(outerIdentifier);
+            Identifier outerClass = factory.getOuterClassName(getName());
+            if (outerClass != null)
+                this.outerClass = env.getClassDefinition(outerClass);
         } catch (ClassNotFound ignore) {
         }
     }
 
-    void setOuterClass(Identifier outerClass) {
-        this.outerIdentifier = outerClass;
-    }
 }

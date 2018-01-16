@@ -222,13 +222,18 @@ public class RmicGenerationTest {
 
     // Confirms that the generated files match those in the specified directory of master files
     private void checkGeneratedFiles(GenerationControl generator, String mastersSubDir, String suffix) throws IOException {
-        File masterDir = new File("src/test/masters/" + mastersSubDir);
+        File masterDir = new File(getModuleRoot(), "src/test/masters/" + mastersSubDir);
 
         String[] generatedFilePaths = getFilePaths(generator.getDestDir(), suffix);
         String[] expectedFilePaths = getFilePaths(masterDir, suffix);
 
         assertThat("In " + generator.getDestDir(), generatedFilePaths, arrayContaining(expectedFilePaths));
         compareGeneratedFiles(masterDir, generator.getDestDir(), expectedFilePaths);
+    }
+
+    private File getModuleRoot() {
+        String classPathString = TestUtils.getClassPathString();
+        return new File(classPathString.substring(0, classPathString.indexOf("/target/")));
     }
 
     // Verifies that the generated files were deleted
@@ -241,7 +246,7 @@ public class RmicGenerationTest {
     // Confirms that the generated files match those in the specified directory of master files
     @SuppressWarnings("SameParameterValue")
     private void checkClassFilesPresent(GenerationControl generator, String mastersSubDir) throws IOException {
-        File masterDir = new File("src/test/masters/" + mastersSubDir);
+        File masterDir = new File(getModuleRoot(), "src/test/masters/" + mastersSubDir);
 
         String[] generatedFilePaths = getFilePaths(generator.getDestDir(), ".class");
         String[] expectedFilePaths = toClassFilePaths(getFilePaths(masterDir, ".java"));

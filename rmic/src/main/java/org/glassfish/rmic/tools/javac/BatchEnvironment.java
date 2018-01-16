@@ -25,7 +25,6 @@
 
 package org.glassfish.rmic.tools.javac;
 
-import org.glassfish.rmic.tools.binaryclass.BinaryClassFactory;
 import org.glassfish.rmic.tools.java.*;
 import org.glassfish.rmic.tools.java.Package;
 import org.glassfish.rmic.tools.tree.Node;
@@ -56,7 +55,8 @@ import java.util.Vector;
 @Deprecated
 public
 class BatchEnvironment extends Environment implements ErrorConsumer {
-    private final ClassDefinitionFactory classDefinitionFactory = /*/ new AsmClassFactory() /*/ new BinaryClassFactory() /**/;
+    private final ClassDefinitionFactory classDefinitionFactory
+            = /*/ new org.glassfish.rmic.asm.AsmClassFactory() /*/ new org.glassfish.rmic.tools.binaryclass.BinaryClassFactory() /**/;
     /**
      * The stream where error message are printed.
      */

@@ -64,6 +64,7 @@ import java.util.Collections;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * Tests RMIC by comparing the kept generated source files against the expected files.
@@ -72,6 +73,7 @@ public class RmicGenerationTest {
 
     private static int testNum = 0;
     private static File rootDir;
+    private static final boolean COMPILE_GENERATED = true;  // set false to check generated files without compiling
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeClass
@@ -103,6 +105,7 @@ public class RmicGenerationTest {
 
     @Test
     public void whenKeepNotSpecified_deleteGeneratedJavaFiles() throws Exception {
+        assumeTrue(COMPILE_GENERATED);
         GenerationControl generator = new GenerationControl(RmiIIServant.class);
         generator.addArgs("-iiop");
 
@@ -113,6 +116,7 @@ public class RmicGenerationTest {
 
     @Test
     public void afterProcessing_classFilesArePresent() throws Exception {
+        assumeTrue(COMPILE_GENERATED);
         GenerationControl generator = new GenerationControl(RmiIIServant.class);
         generator.addArgs("-iiop");
 
@@ -353,6 +357,7 @@ public class RmicGenerationTest {
         }
 
         private void generate() throws IOException {
+            if (argList.contains("-iiop") && !COMPILE_GENERATED) addArgs("-Xnocompile");
             for (String name : classNames)
                 addArgs(name);
             ByteArrayOutputStream out = new ByteArrayOutputStream();

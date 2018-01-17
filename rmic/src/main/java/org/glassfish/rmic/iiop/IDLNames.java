@@ -261,7 +261,7 @@ public class IDLNames implements org.glassfish.rmic.iiop.Constants {
 
             // 28.3.2.5 Inner classes...
 
-            result = replace(typeName,". ","__");
+            result = toInnerClassName(typeName);
 
             // 28.3.2.4 Illegal identifier characters...
 
@@ -282,6 +282,13 @@ public class IDLNames implements org.glassfish.rmic.iiop.Constants {
         }
 
         return result;
+    }
+
+    private static String toInnerClassName(String typeName) {
+        if (typeName.contains(". "))
+            return replace(typeName,". ","__");
+        else
+            return replace(typeName,"$","__");
     }
 
     /**

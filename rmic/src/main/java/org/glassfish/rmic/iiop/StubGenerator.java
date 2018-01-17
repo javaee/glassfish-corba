@@ -91,9 +91,9 @@ public class StubGenerator extends org.glassfish.rmic.iiop.Generator {
     /**
      * Overridden in order to set the standardPackage flag.
      */
-    public void generate(org.glassfish.rmic.BatchEnvironment env, ClassDefinition cdef, File destDir) {
+    public void generate(org.glassfish.rmic.BatchEnvironment env, File destDir, ClassDefinition cdef) {
         ((BatchEnvironment)env).setStandardPackage(standardPackage);
-        super.generate(env, cdef, destDir);
+        super.generate(env, destDir, cdef);
     }
 
     /**

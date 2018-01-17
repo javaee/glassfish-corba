@@ -43,6 +43,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 /**
  * Main environment of the batch version of the Java compiler,
@@ -175,6 +176,16 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
     }
 
     /**
+     * Return the declarations for all generated classes. These can be recognized
+     * as having the 'parsed' status
+     */
+    public Iterable<ClassDeclaration> getGeneratedClasses() {
+        return classesOrdered.stream()
+                .filter(p -> p.getStatus() == Constants.CS_PARSED)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * A set of Identifiers for all packages exempt from the "exists"
      * check in Imports#resolve().  These are the current packages for
      * all classes being compiled as of the first call to isExemptPackage.
@@ -219,20 +230,17 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
         exemptPackages = new HashSet<>(101);
 
         // Add all of the current packages and their prefixes to our set.
-        for (Enumeration<ClassDeclaration> e = getClasses(); e.hasMoreElements(); ) {
-            ClassDeclaration c = e.nextElement();
-            if (c.getStatus() == CS_PARSED) {
-                SourceClass def = (SourceClass) c.getClassDefinition();
-                if (def.isLocal())
-                    continue;
+        for (ClassDeclaration c : getGeneratedClasses()) {
+            SourceClass def = (SourceClass) c.getClassDefinition();
+            if (def.isLocal())
+                continue;
 
-                Identifier pkg = def.getImports().getCurrentPackage();
+            Identifier pkg = def.getImports().getCurrentPackage();
 
-                // Add the name of this package and all of its prefixes
-                // to our set.
-                while (pkg != idNull && exemptPackages.add(pkg)) {
-                    pkg = pkg.getQualifier();
-                }
+            // Add the name of this package and all of its prefixes
+            // to our set.
+            while (pkg != idNull && exemptPackages.add(pkg)) {
+                pkg = pkg.getQualifier();
             }
         }
 

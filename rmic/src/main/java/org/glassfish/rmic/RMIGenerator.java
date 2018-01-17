@@ -58,14 +58,12 @@ public class RMIGenerator implements RMIConstants, Generator {
     /**
      * Generate the source files for the stub and/or skeleton classes
      * needed by RMI for the given remote implementation class.
-     *
-     * @param env       compiler environment
-     * @param cdef      definition of remote implementation class
-     *                  to generate stubs and/or skeletons for
+     *  @param env       compiler environment
      * @param destDir   directory for the root of the package hierarchy
-     *                  for generated files
+     * @param cdef      definition of remote implementation class
+ *                  to generate stubs and/or skeletons for
      */
-    public void generate(BatchEnvironment env, ClassDefinition cdef, File destDir) {
+    public void generate(BatchEnvironment env, File destDir, ClassDefinition cdef) {
     }
 
 }

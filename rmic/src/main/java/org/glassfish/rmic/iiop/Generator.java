@@ -247,14 +247,12 @@ public abstract class Generator implements      org.glassfish.rmic.Generator,
      * Generate output. Any source files created which need compilation should
      * be added to the compiler environment using the addGeneratedFile(File)
      * method.
-     *
-     * @param env       The compiler environment
-     * @param cdef      The definition for the implementation class or interface from
-     *              which to generate output
+     *  @param env       The compiler environment
      * @param destDir   The directory for the root of the package hierarchy
-     *                          for generated files. May be null.
+     * @param cdef      The definition for the implementation class or interface from
+ *              which to generate output
      */
-    public void generate(org.glassfish.rmic.BatchEnvironment env, ClassDefinition cdef, File destDir) {
+    public void generate(org.glassfish.rmic.BatchEnvironment env, File destDir, ClassDefinition cdef) {
 
         this.env = (BatchEnvironment) env;
         ContextStack contextStack = new ContextStack(this.env);

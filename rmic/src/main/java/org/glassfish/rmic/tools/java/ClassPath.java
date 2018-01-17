@@ -85,7 +85,7 @@ class ClassPath {
      * previous constructor as a single path-separator-delimited
      * string; use of this constructor avoids that problem.
      */
-    public ClassPath(String[] patharray) {
+    public ClassPath(String... patharray) {
         init(patharray);
     }
 

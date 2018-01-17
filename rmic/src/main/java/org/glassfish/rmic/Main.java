@@ -33,7 +33,6 @@
 package org.glassfish.rmic;
 
 import org.glassfish.rmic.tools.java.ClassDeclaration;
-import org.glassfish.rmic.tools.java.ClassDefinition;
 import org.glassfish.rmic.tools.java.ClassFile;
 import org.glassfish.rmic.tools.java.ClassNotFound;
 import org.glassfish.rmic.tools.java.ClassPath;
@@ -49,7 +48,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
@@ -156,7 +157,7 @@ public class Main implements org.glassfish.rmic.Constants {
     /**
      * Parse the arguments for compile.
      */
-    public boolean parseArgs(String argv[]) {
+    public boolean parseArgs(String... argv) {
         sourcePathArg = null;
         sysClassPathArg = null;
 
@@ -491,28 +492,8 @@ public class Main implements org.glassfish.rmic.Constants {
         String stackOverflowErrorString = getText("rmic.stack.overflow");
 
         try {
-            /* Load the classes on the command line
-             * Replace the entries in classes with the ClassDefinition for the class
-             */
-            for (int i = classes.size()-1; i >= 0; i-- ) {
-                String className = classes.elementAt(i);
-                Identifier implClassName = getClassIdentifier(env, className);
-
-                ClassDeclaration decl = env.getClassDeclaration(implClassName);
-                try {
-                    ClassDefinition def = decl.getClassDefinition(env);
-                    for (int j = 0; j < generators.size(); j++) {
-                        Generator gen = generators.elementAt(j);
-                        gen.generate(env, def, destDir);
-                    }
-                } catch (ClassNotFound ex) {
-                    env.error(0, "rmic.class.not.found", implClassName);
-                }
-
-            }
-
-            // compile all classes that need compilation
-            if (!nocompile) {
+            generateClasses(env);
+            if (!nocompile) { // compile all classes that need compilation
                 compileAllClasses(env);
             }
         } catch (OutOfMemoryError ee) {
@@ -544,32 +525,7 @@ public class Main implements org.glassfish.rmic.Constants {
 
         env.flushErrors();
 
-        boolean status = true;
-        if (env.nerrors > 0) {
-            String msg = "";
-            if (env.nerrors > 1) {
-                msg = getText("rmic.errors", env.nerrors);
-            } else {
-                msg = getText("rmic.1error");
-            }
-            if (env.nwarnings > 0) {
-                if (env.nwarnings > 1) {
-                    msg += ", " + getText("rmic.warnings", env.nwarnings);
-                } else {
-                    msg += ", " + getText("rmic.1warning");
-                }
-            }
-            output(msg);
-            status = false;
-        } else {
-            if (env.nwarnings > 0) {
-                if (env.nwarnings > 1) {
-                    output(getText("rmic.warnings", env.nwarnings));
-                } else {
-                    output(getText("rmic.1warning"));
-                }
-            }
-        }
+        boolean status = displayErrors(env);
 
         // last step is to delete generated source files
         if (!keepGenerated) {
@@ -604,7 +560,40 @@ public class Main implements org.glassfish.rmic.Constants {
         return status;
     }
 
-    private static Identifier getClassIdentifier(BatchEnvironment env, String className) {
+    private void generateClasses(BatchEnvironment env) {
+        for (String className : classes)
+            generateClass(env, getClassIdentifier(env, className));
+    }
+
+    void generateClass(BatchEnvironment env, Identifier implClassName) {
+        ClassDeclaration decl = env.getClassDeclaration(implClassName);
+        try {
+            for (Generator gen : generators)
+                gen.generate(env, destDir, decl.getClassDefinition(env));
+        } catch (ClassNotFound ex) {
+            env.error(0, "rmic.class.not.found", implClassName);
+        }
+    }
+
+    boolean displayErrors(BatchEnvironment env) {
+        List<String> summary = new ArrayList<>();
+        
+        if (env.nerrors > 0) summary.add(getErrorSummary(env));
+        if (env.nwarnings > 0) summary.add(getWarningSummary(env));
+        if (!summary.isEmpty()) output(String.join(", ", summary));
+
+        return env.nerrors == 0;
+    }
+
+    private String getErrorSummary(BatchEnvironment env) {
+        return env.nerrors == 1 ? getText("rmic.1error") : getText("rmic.errors", env.nerrors);
+    }
+
+    private String getWarningSummary(BatchEnvironment env) {
+        return env.nwarnings == 1 ? getText("rmic.1warning") : getText("rmic.warnings", env.nwarnings);
+    }
+
+    static Identifier getClassIdentifier(BatchEnvironment env, String className) {
         Identifier implClassName = Identifier.lookup(className);
 
                 /*
@@ -851,5 +840,14 @@ public class Main implements org.glassfish.rmic.Constants {
         args[2] = (arg2 != null ? arg2 : "null");
 
         return java.text.MessageFormat.format(format, (Object[]) args);
+    }
+
+    String[] getGeneratedClassNames(BatchEnvironment environment) {
+        List<String> result = new ArrayList<>();
+        for (ClassDeclaration declaration : environment.getGeneratedClasses()) {
+            result.add(declaration.getName().toString());
+        }
+
+        return result.toArray(new String[result.size()]);
     }
 }

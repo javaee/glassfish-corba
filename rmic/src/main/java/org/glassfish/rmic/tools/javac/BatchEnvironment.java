@@ -25,6 +25,8 @@
 
 package org.glassfish.rmic.tools.javac;
 
+import org.glassfish.rmic.asm.AsmClassFactory;
+import org.glassfish.rmic.tools.binaryclass.BinaryClassFactory;
 import org.glassfish.rmic.tools.java.*;
 import org.glassfish.rmic.tools.java.Package;
 import org.glassfish.rmic.tools.tree.Node;
@@ -45,6 +47,8 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
+import static java.lang.Character.isDigit;
+
 /**
  * Main environment of the batch version of the Java compiler,
  * this needs more work.
@@ -56,8 +60,35 @@ import java.util.stream.Collectors;
 @Deprecated
 public
 class BatchEnvironment extends Environment implements ErrorConsumer {
-    private final static ClassDefinitionFactory classDefinitionFactory
-            = /*/ new org.glassfish.rmic.asm.AsmClassFactory() /*/ new org.glassfish.rmic.tools.binaryclass.BinaryClassFactory() /**/;
+    private static final String USE_LEGACY_PARSING_PROPERTY = "org.glassfish.rmic.UseLegacyClassParsing";
+    private static final String JAVA_VERSION_PROPERTY = "java.version";
+    private static final int ASM_ONLY_JAVA_VERSION = 10;
+    private static final ClassDefinitionFactory classDefinitionFactory = createClassDefinitionFactory();
+
+    static ClassDefinitionFactory createClassDefinitionFactory() {
+        return useBinaryClassFactory() ? new BinaryClassFactory() : new AsmClassFactory();
+    }
+
+    private static boolean useBinaryClassFactory() {
+        return Boolean.getBoolean(USE_LEGACY_PARSING_PROPERTY) && mayUseBinaryClassFactory();
+    }
+
+    private static boolean mayUseBinaryClassFactory() {
+        return isBinaryClassCompatibleJavaVersion(System.getProperty(JAVA_VERSION_PROPERTY));
+    }
+
+    private static boolean isBinaryClassCompatibleJavaVersion(String property) {
+        return property.startsWith("1.") || getVersionPortion(property) < ASM_ONLY_JAVA_VERSION;
+    }
+
+    private static int getVersionPortion(String versionString) {
+        for (int i = 0; i < versionString.length(); i++)
+            if (!isDigit(versionString.charAt(i)))
+                return Integer.parseInt(versionString.substring(0, i));
+        
+        return Integer.parseInt(versionString);
+    }
+
     /**
      * The stream where error message are printed.
      */

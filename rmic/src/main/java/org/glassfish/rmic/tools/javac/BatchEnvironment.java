@@ -66,7 +66,11 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
     private static final ClassDefinitionFactory classDefinitionFactory = createClassDefinitionFactory();
 
     static ClassDefinitionFactory createClassDefinitionFactory() {
-        return useBinaryClassFactory() ? new BinaryClassFactory() : new AsmClassFactory();
+        try {
+            return useBinaryClassFactory() ? new BinaryClassFactory() : new AsmClassFactory();
+        } catch (NoClassDefFoundError e) {
+            return mayUseBinaryClassFactory() ? new BinaryClassFactory() : new NullClassDefinitionFactory();
+        }
     }
 
     private static boolean useBinaryClassFactory() {
@@ -92,7 +96,7 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
     /**
      * The stream where error message are printed.
      */
-    OutputStream out;
+    private OutputStream out;
 
     /**
      * The path we use for finding class (binary) files.
@@ -102,17 +106,17 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
     /**
      * A hashtable of resource contexts.
      */
-    Hashtable<Identifier, Package> packages = new Hashtable<>(31);
+    private Hashtable<Identifier, Package> packages = new Hashtable<>(31);
 
     /**
      * The classes, in order of appearance.
      */
-    Vector<ClassDeclaration> classesOrdered = new Vector<>();
+    private Vector<ClassDeclaration> classesOrdered = new Vector<>();
 
     /**
      * The classes, keyed by ClassDeclaration.
      */
-    Hashtable<Type, ClassDeclaration> classes = new Hashtable<>(351);
+    private Hashtable<Type, ClassDeclaration> classes = new Hashtable<>(351);
 
     /**
      * flags
@@ -134,7 +138,7 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
     /**
      * coverage data file
      */
-    public File covFile;
+    private File covFile;
 // end JCOV
 
     /**
@@ -142,22 +146,22 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
      */
     public int nerrors;
     public int nwarnings;
-    public int ndeprecations;
+    private int ndeprecations;
 
     /**
      * A list of files containing deprecation warnings.
      */
-    Vector<Object> deprecationFiles = new Vector<>();
+    private Vector<Object> deprecationFiles = new Vector<>();
 
         /**
          * writes out error messages
          */
 
-        ErrorConsumer errorConsumer;
+    private ErrorConsumer errorConsumer;
 
     public BatchEnvironment(OutputStream out,
                             ClassPath binaryPath) {
-        this(out, binaryPath, (ErrorConsumer) null);
+        this(out, binaryPath, null);
     }
 
     public BatchEnvironment(OutputStream out,
@@ -494,7 +498,7 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
     /**
      * Load a binary class
      */
-    boolean needsCompilation(Hashtable<ClassDeclaration, ClassDeclaration> check, ClassDeclaration c) {
+    private boolean needsCompilation(Hashtable<ClassDeclaration, ClassDeclaration> check, ClassDeclaration c) {
         switch (c.getStatus()) {
 
           case CS_UNDEFINED:
@@ -565,7 +569,7 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
             if (srcfile == null) {
                 if (tracing)
                     dtEvent("loadDefinition: NO SOURCE " + c.getName());
-                ClassDefinition cDef = null;
+                ClassDefinition cDef;
                 try {
                     cDef = loadFile(binfile);
                 } catch (IOException e) {
@@ -725,8 +729,8 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
 
           case CS_SOURCE: {
             if (tracing) dtEvent("loadDefinition: STATUS IS SOURCE");
-            ClassFile srcfile = null;
-            Package pkg = null;
+            ClassFile srcfile;
+            Package pkg;
             if (c.getClassDefinition() != null) {
                 // Use the source file name from the binary class file
                 pkg = getPackage(c.getName().getQualifier());
@@ -901,8 +905,8 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
         Vector v = null;
         if (argNames != null) {
             v = new Vector(argNames.length);
-            for (int i = 0 ; i < argNames.length ; i++) {
-                v.addElement(argNames[i]);
+            for (IdentifierToken argName : argNames) {
+                v.addElement(argName);
             }
         }
         SourceMember f = new SourceMember(where, clazz, doc, modifiers,
@@ -933,7 +937,7 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
      */
     public
     String errorString(String err, Object arg1, Object arg2, Object arg3) {
-        String key = null;
+        String key;
 
         if(err.startsWith("warn."))
             key = "javac.err." + err.substring(5);
@@ -949,12 +953,12 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
     /**
      * The filename where the last errors have occurred
      */
-    String errorFileName;
+    private String errorFileName;
 
     /**
      * List of outstanding error messages
      */
-    ErrorMessage errors;
+    private ErrorMessage errors;
 
     /**
      * Insert an error message in the list of outstanding error messages.
@@ -968,8 +972,7 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
      * at insertion time, so the functionality was moved here.  This also
      * saves a miniscule number of allocations.
      */
-    protected
-    boolean insertError(long where, String message) {
+    private boolean insertError(long where, String message) {
         //output("ERR = " + message);
 
         if (errors == null
@@ -1025,7 +1028,7 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
     /**
      * Maximum number of errors to print.
      */
-    public int errorLimit = 100;
+    private int errorLimit = 100;
 
     private boolean hitErrorLimit;
 
@@ -1147,7 +1150,7 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
             // Classify `err' as a warning, deprecation warning, or
             // error message.  Proceed accordingly.
             if (err.startsWith("warn.")) {
-                if (err.indexOf("is.deprecated") >= 0) {
+                if (err.contains("is.deprecated")) {
                     // This is a deprecation warning.  Add `src' to the
                     // list of files with deprecation warnings.
                     if (!deprecationFiles.contains(src)) {
@@ -1235,5 +1238,12 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
             this.out instanceof PrintStream ? (PrintStream)this.out
                                             : new PrintStream(this.out, true);
         out.println(msg);
+    }
+
+    static class NullClassDefinitionFactory implements ClassDefinitionFactory {
+        @Override
+        public ClassDefinition loadDefinition(InputStream is, Environment env) throws IOException {
+            throw new RuntimeException("Unable to parse classes. Please ensure that an appropriate version of ASM is in the class path");
+        }
     }
 }

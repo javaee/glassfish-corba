@@ -2,6 +2,8 @@ package org.glassfish.rmic.tools.javac;
 
 import com.meterware.simplestub.Memento;
 import com.meterware.simplestub.SystemPropertySupport;
+import mockit.Expectations;
+import mockit.Mocked;
 import org.glassfish.rmic.asm.AsmClassFactory;
 import org.glassfish.rmic.tools.binaryclass.BinaryClassFactory;
 import org.glassfish.rmic.tools.java.ClassDefinitionFactory;
@@ -25,6 +27,7 @@ public class BatchEnvironmentTest {
     public void setUp() throws Exception {
         mementos.add(SystemPropertySupport.preserve(USE_LEGACY_PARSING_PROPERTY));
         mementos.add(SystemPropertySupport.preserve(JAVA_VERSION_PROPERTY));
+        System.clearProperty(USE_LEGACY_PARSING_PROPERTY);
     }
 
     @After
@@ -34,11 +37,33 @@ public class BatchEnvironmentTest {
 
     @Test
     public void whenPropertyNotSet_chooseAsmParser() throws Exception {
-        System.clearProperty(USE_LEGACY_PARSING_PROPERTY);
-
         ClassDefinitionFactory factory = BatchEnvironment.createClassDefinitionFactory();
 
         assertThat(factory, instanceOf(AsmClassFactory.class));
+    }
+
+    @Test
+    public void whenAsmParserNotPresent_chooseBinaryParserInJdk8(@Mocked final AsmClassFactory ignored) throws Exception {
+        new Expectations() {{
+            new AsmClassFactory(); result = new NoClassDefFoundError();
+        }};
+        System.setProperty(JAVA_VERSION_PROPERTY, "1.8");
+
+        ClassDefinitionFactory factory = BatchEnvironment.createClassDefinitionFactory();
+
+        assertThat(factory, instanceOf(BinaryClassFactory.class));
+    }
+
+    @Test
+    public void whenAsmParserNotPresent_reportErrorInJdk10(@Mocked final AsmClassFactory ignored) throws Exception {
+        new Expectations() {{
+            new AsmClassFactory(); result = new NoClassDefFoundError();
+        }};
+        System.setProperty(JAVA_VERSION_PROPERTY, "10");
+
+        ClassDefinitionFactory factory = BatchEnvironment.createClassDefinitionFactory();
+
+        assertThat(factory, instanceOf(BatchEnvironment.NullClassDefinitionFactory.class));
     }
 
     @Test

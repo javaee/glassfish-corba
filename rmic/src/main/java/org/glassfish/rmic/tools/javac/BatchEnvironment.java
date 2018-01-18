@@ -25,6 +25,7 @@
 
 package org.glassfish.rmic.tools.javac;
 
+import org.glassfish.rmic.BatchEnvironmentError;
 import org.glassfish.rmic.asm.AsmClassFactory;
 import org.glassfish.rmic.tools.binaryclass.BinaryClassFactory;
 import org.glassfish.rmic.tools.java.*;
@@ -69,7 +70,10 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
         try {
             return useBinaryClassFactory() ? new BinaryClassFactory() : new AsmClassFactory();
         } catch (NoClassDefFoundError e) {
-            return mayUseBinaryClassFactory() ? new BinaryClassFactory() : new NullClassDefinitionFactory();
+            if (!mayUseBinaryClassFactory())
+                throw new BatchEnvironmentError("Unable to parse classes. Please ensure that an appropriate version of ASM is in the class path");
+
+            return new BinaryClassFactory();
         }
     }
 
@@ -1240,10 +1244,4 @@ class BatchEnvironment extends Environment implements ErrorConsumer {
         out.println(msg);
     }
 
-    static class NullClassDefinitionFactory implements ClassDefinitionFactory {
-        @Override
-        public ClassDefinition loadDefinition(InputStream is, Environment env) throws IOException {
-            throw new RuntimeException("Unable to parse classes. Please ensure that an appropriate version of ASM is in the class path");
-        }
-    }
 }

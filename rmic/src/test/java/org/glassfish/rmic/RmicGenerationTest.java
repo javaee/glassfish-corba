@@ -237,7 +237,7 @@ public class RmicGenerationTest {
 
     private File getModuleRoot() {
         String classPathString = TestUtils.getClassPathString();
-        return new File(classPathString.substring(0, classPathString.indexOf("/target/")));
+        return new File(classPathString.substring(0, classPathString.lastIndexOf("/target/")));
     }
 
     // Verifies that the generated files were deleted

@@ -284,7 +284,7 @@
 
     <profiles>
 
-        <!-- ignore javadoc lint checks, enabled by default in JDK 1.8 (really want to run based on toolchain selection)
+        <!-- ignore javadoc lint checks, enabled by default in JDK 1.8 (really want to run based on toolchain selection) -->
         <profile>
             <id>disable-java8-doclint</id>
             <activation>
@@ -294,7 +294,6 @@
                 <additionalparam>-Xdoclint:none</additionalparam>
             </properties>
         </profile>
-        -->
 
         <!-- During release, always build with specified JDK -->
         <profile>

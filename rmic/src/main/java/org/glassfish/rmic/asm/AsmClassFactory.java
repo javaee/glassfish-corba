@@ -44,7 +44,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AsmClassFactory implements ClassDefinitionFactory {
+    // This field exists to allow unit testing of the case when ASM is not in the classpath.
+    @SuppressWarnings("unused")
+    private static final Boolean simulateMissingASM = false;
+
     private Map<Identifier, Identifier> outerClasses = new HashMap<>();
+
+    public AsmClassFactory() {
+        if (simulateMissingASM) throw new NoClassDefFoundError();
+    }
 
     Identifier getOuterClassName(Identifier className) {
         if (isResolvedInnerClassName(className))

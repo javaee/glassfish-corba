@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2018 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -151,7 +151,7 @@ public class Compile extends com.sun.tools.corba.ee.idl.Compile
     {
       // <f46082.51> Use generator-specific messages file.
       //Util.registerMessageFile ("com/sun/corba/ee/idl/toJavaPortable/toJava.prp");
-      com.sun.tools.corba.ee.idl.toJavaPortable.Util.registerMessageResource("com/sun/tools/corba/ee/idl/toJavaPortable/toJavaPortable.properties");
+      com.sun.tools.corba.ee.idl.toJavaPortable.Util.registerMessageResource("com/sun/tools/corba/ee/idl/toJavaPortable/toJavaPortable");
       init (args);
       if (arguments.versionRequest)
         displayVersion ();

@@ -69,7 +69,7 @@ public class IdljGenerationTest {
 
     @Test
     public void generateClassesWithoutOptions() throws Exception {
-        GenerationControl generator = new GenerationControl("idlj/src/main/java/com/sun/tools/corba/ee/idl/ir.idl");
+        GenerationControl generator = new GenerationControl("src/main/java/com/sun/tools/corba/ee/idl/ir.idl");
 
         generator.generate();
 
@@ -152,22 +152,17 @@ public class IdljGenerationTest {
 
     private class GenerationControl {
         private ArrayList<String> argList = new ArrayList<>();
-        private String[] classNames;
+        private String[] idlFiles;
         private File destDir;
         private String warning;
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
-        GenerationControl(String... classNames) {
-            this.classNames = classNames;
+        GenerationControl(String... idlFiles) {
+            this.idlFiles = idlFiles;
 
             destDir = new File(rootDir + "/" + (++testNum));
             destDir.mkdirs();
             addArgs("-td", destDir.getAbsolutePath());
-        }
-
-        @SuppressWarnings("ResultOfMethodCallIgnored")
-        private GenerationControl(Class<?>... classes) {
-            this(toNameList(classes));
         }
 
         private void addArgs(String... args) {
@@ -184,8 +179,8 @@ public class IdljGenerationTest {
 
         private void generate() throws IOException {
             if (argList.contains("-iiop") && !COMPILE_GENERATED) addArgs("-Xnocompile");
-            for (String name : classNames)
-                addArgs(name);
+            for (String name : idlFiles)
+                addArgs(new File(getModuleRoot(), name).getAbsolutePath());
             Compile.compiler = new Compile();
             String[] argv = argList.toArray(new String[argList.size()]);
             Compile.compiler.start(argv);

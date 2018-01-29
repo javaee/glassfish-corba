@@ -76,6 +76,17 @@ public class IdljGenerationTest {
         checkGeneratedFiles(generator, "ir");
     }
 
+    @Test
+    public void generateStructureClasses() throws Exception {
+        GenerationControl generator = new GenerationControl("src/test/idl/CorbaServerTest.idl");
+        generator.addArgs("-oldImplBase", "-fall");
+        generator.addIncludePath("src/main/java/com/sun/tools/corba/ee/idl");
+
+        generator.generate();
+
+        checkGeneratedFiles(generator, "structures");
+    }
+
     // Confirms that the generated files match those in the specified directory of master files
     private void checkGeneratedFiles(GenerationControl generator, String mastersSubDir) throws IOException {
         File masterDir = new File(getModuleRoot(), "src/test/masters/" + mastersSubDir);
@@ -87,7 +98,7 @@ public class IdljGenerationTest {
         compareGeneratedFiles(masterDir, generator.getDestDir(), expectedFilePaths);
     }
 
-    private File getModuleRoot() {
+    private static File getModuleRoot() {
         String classPathString = TestUtils.getClassPathString();
         return new File(classPathString.substring(0, classPathString.lastIndexOf("/target/")));
     }
@@ -142,7 +153,7 @@ public class IdljGenerationTest {
             fail("Unexpected line in generated file at " + actual.getLineNumber() + ": " + actualLine);
         else if (actualLine == null)
             fail("Actual file ends unexpectedly at line " + expected.getLineNumber());
-        else if (!expectedLine.trim().startsWith("* IGNORE"))
+        else if (!expectedLine.trim().startsWith("* "))
             fail("Generated file mismatch in " + actualFile + " at line " + actual.getLineNumber() +
                     "\nshould be <" + expectedLine + "> " +
                     "\nbut found <" + actualLine + ">");
@@ -163,6 +174,10 @@ public class IdljGenerationTest {
             destDir = new File(rootDir + "/" + (++testNum));
             destDir.mkdirs();
             addArgs("-td", destDir.getAbsolutePath());
+        }
+
+        private void addIncludePath(String includePath) {
+            addArgs("-i", new File(getModuleRoot(), includePath).getAbsolutePath());
         }
 
         private void addArgs(String... args) {

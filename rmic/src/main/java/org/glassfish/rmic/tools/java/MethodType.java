@@ -25,6 +25,8 @@
 
 package org.glassfish.rmic.tools.java;
 
+import org.glassfish.rmic.TypeCode;
+
 /**
  * This class represents an Java method type.
  * It overrides the relevant methods in class Type.
@@ -53,7 +55,7 @@ class MethodType extends Type {
      * @see Type.tMethod
      */
     MethodType(String typeSig, Type returnType, Type argTypes[]) {
-        super(TC_METHOD, typeSig);
+        super(TypeCode.METHOD, typeSig);
         this.returnType = returnType;
         this.argTypes = argTypes;
     }
@@ -67,7 +69,7 @@ class MethodType extends Type {
     }
 
     public boolean equalArguments(Type t) {
-        if (t.typeCode != TC_METHOD) {
+        if (t.getTypeCode() != TC_METHOD) {
             return false;
         }
         MethodType m = (MethodType)t;

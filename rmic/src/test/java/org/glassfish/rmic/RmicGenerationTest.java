@@ -153,7 +153,6 @@ public class RmicGenerationTest {
 
     @Test
     public void generateIiopStubsWithConstant() throws Exception {
-        assumeTrue(Boolean.getBoolean(USE_LEGACY_PARSING_PROPERTY));
         GenerationControl generator = new GenerationControl(RmiTestRemoteImpl.class);
         generator.addArgs("-iiop","-always", "-keep");
         generator.generate();

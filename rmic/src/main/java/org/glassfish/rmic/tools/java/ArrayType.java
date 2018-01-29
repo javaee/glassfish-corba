@@ -25,6 +25,8 @@
 
 package org.glassfish.rmic.tools.java;
 
+import org.glassfish.rmic.TypeCode;
+
 /**
  * This class represents an Java array type.
  * It overrides the relevant methods in class Type.
@@ -47,7 +49,7 @@ class ArrayType extends Type {
      * a new array type.
      */
     ArrayType(String typeSig, Type elemType) {
-        super(TC_ARRAY, typeSig);
+        super(TypeCode.ARRAY, typeSig);
         this.elemType = elemType;
     }
 

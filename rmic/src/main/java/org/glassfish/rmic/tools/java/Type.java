@@ -25,6 +25,8 @@
 
 package org.glassfish.rmic.tools.java;
 
+import org.glassfish.rmic.TypeCode;
+
 import java.util.Hashtable;
 
 /**
@@ -60,11 +62,9 @@ class Type implements Constants {
     private static final Hashtable<String, Type> typeHash = new Hashtable<>(231);
 
     /**
-     * The TypeCode of this type. The value of this field is one
-     * of the TC_* contant values defined in Constants.
-     * @see Constants
+     * The TypeCode of this type.
      */
-    protected int typeCode;
+    private TypeCode typeCode;
 
     /**
      * The TypeSignature of this type. This type signature is
@@ -77,18 +77,18 @@ class Type implements Constants {
      * Predefined types.
      */
     public static final Type noArgs[]   = new Type[0];
-    public static final Type tError     = new Type(TC_ERROR,    "?");
-    public static final Type tPackage   = new Type(TC_ERROR,    ".");
-    public static final Type tNull      = new Type(TC_NULL,     "*");
-    public static final Type tVoid      = new Type(TC_VOID,     SIG_VOID);
-    public static final Type tBoolean   = new Type(TC_BOOLEAN,  SIG_BOOLEAN);
-    public static final Type tByte      = new Type(TC_BYTE,     SIG_BYTE);
-    public static final Type tChar      = new Type(TC_CHAR,     SIG_CHAR);
-    public static final Type tShort     = new Type(TC_SHORT,    SIG_SHORT);
-    public static final Type tInt       = new Type(TC_INT,      SIG_INT);
-    public static final Type tFloat     = new Type(TC_FLOAT,    SIG_FLOAT);
-    public static final Type tLong      = new Type(TC_LONG,     SIG_LONG);
-    public static final Type tDouble    = new Type(TC_DOUBLE,   SIG_DOUBLE);
+    public static final Type tError     = new Type(TypeCode.ERROR,    "?");
+    public static final Type tPackage   = new Type(TypeCode.ERROR,    ".");
+    public static final Type tNull      = new Type(TypeCode.NULL,     "*");
+    public static final Type tVoid      = new Type(TypeCode.VOID,     SIG_VOID);
+    public static final Type tBoolean   = new Type(TypeCode.BOOLEAN,  SIG_BOOLEAN);
+    public static final Type tByte      = new Type(TypeCode.BYTE,     SIG_BYTE);
+    public static final Type tChar      = new Type(TypeCode.CHAR,     SIG_CHAR);
+    public static final Type tShort     = new Type(TypeCode.SHORT,    SIG_SHORT);
+    public static final Type tInt       = new Type(TypeCode.INT,      SIG_INT);
+    public static final Type tFloat     = new Type(TypeCode.FLOAT,    SIG_FLOAT);
+    public static final Type tLong      = new Type(TypeCode.LONG,     SIG_LONG);
+    public static final Type tDouble    = new Type(TypeCode.DOUBLE,   SIG_DOUBLE);
     public static final Type tObject    = Type.tClass(idJavaLangObject);
     public static final Type tClassDesc = Type.tClass(idJavaLangClass);
     public static final Type tString    = Type.tClass(idJavaLangString);
@@ -98,8 +98,8 @@ class Type implements Constants {
     /**
      * Create a type given a typecode and a type signature.
      */
-    protected Type(int typeCode, String typeSig) {
-        this.typeCode = typeCode;
+    protected Type(TypeCode tc, String typeSig) {
+        this.typeCode = tc;
         this.typeSig = typeSig;
         typeHash.put(typeSig, this);
     }
@@ -115,7 +115,7 @@ class Type implements Constants {
      * Return the type code.
      */
     public final int getTypeCode() {
-        return typeCode;
+        return typeCode.tcCode();
     }
 
     /**
@@ -125,14 +125,14 @@ class Type implements Constants {
      * @see Constants
      */
     public final int getTypeMask() {
-        return 1 << typeCode;
+        return 1 << typeCode.tcCode();
     }
 
     /**
      * Check for a certain type.
      */
     public final boolean isType(int tc) {
-        return typeCode == tc;
+        return typeCode.tcCode() == tc;
     }
 
     /**
@@ -161,14 +161,14 @@ class Type implements Constants {
      * Check for a certain set of types.
      */
     public final boolean inMask(int tm) {
-        return ((1 << typeCode) & tm) != 0;
+        return ((1 << typeCode.tcCode()) & tm) != 0;
     }
 
     /**
      * Create an array type.
      */
     public static synchronized Type tArray(Type elem) {
-        String sig = new String(SIG_ARRAY + elem.getTypeSignature());
+        String sig = SIG_ARRAY + elem.getTypeSignature();
         Type t = typeHash.get(sig);
         if (t == null) {
             t = new ArrayType(sig, elem);
@@ -210,9 +210,9 @@ class Type implements Constants {
             return className.typeObject;
         }
         String sig =
-            new String(SIG_CLASS +
-                       className.toString().replace('.', SIGC_PACKAGE) +
-                       SIG_ENDCLASS);
+                SIG_CLASS +
+                        className.toString().replace('.', SIGC_PACKAGE) +
+                        SIG_ENDCLASS;
         Type t = typeHash.get(sig);
         if (t == null) {
             t = new ClassType(sig, className);
@@ -256,7 +256,7 @@ class Type implements Constants {
      * low-level signatures of inner types and their manglings.
      * Note that the latter are also valid class names.)
      */
-    static void changeClassName(Identifier oldName, Identifier newName) {
+    private static void changeClassName(Identifier oldName, Identifier newName) {
         // Note:  If we are upgrading "pkg.Foo$Bar" to "pkg.Foo. Bar",
         // we assume someone else will come along and deal with any types
         // inner within Bar.  So, there's only one change to make.
@@ -276,8 +276,8 @@ class Type implements Constants {
     public static synchronized Type tMethod(Type returnType, Type argTypes[]) {
         StringBuilder sb = new StringBuilder();
         sb.append(SIG_METHOD);
-        for (int i = 0 ; i < argTypes.length ; i++) {
-            sb.append(argTypes[i].getTypeSignature());
+        for (Type argType : argTypes) {
+            sb.append(argType.getTypeSignature());
         }
         sb.append(SIG_ENDMETHOD);
         sb.append(returnType.getTypeSignature());
@@ -363,7 +363,7 @@ class Type implements Constants {
      * total space taken up by the arguments.
      */
     public int stackSize() {
-        switch (typeCode) {
+        switch (typeCode.tcCode()) {
           case TC_ERROR:
           case TC_VOID:
             return 0;
@@ -391,7 +391,7 @@ class Type implements Constants {
      * appropriate opcode is iadd + type.getTypeCodeOffset().
      */
     public int getTypeCodeOffset() {
-        switch (typeCode) {
+        switch (typeCode.tcCode()) {
           case TC_BOOLEAN:
           case TC_BYTE:
           case TC_SHORT:
@@ -419,7 +419,7 @@ class Type implements Constants {
     public String typeString(String id, boolean abbrev, boolean ret) {
         String s = null;
 
-        switch (typeCode) {
+        switch (typeCode.tcCode()) {
           case TC_NULL:         s = "null";    break;
           case TC_VOID:         s = "void";    break;
           case TC_BOOLEAN:      s = "boolean"; break;
@@ -451,5 +451,9 @@ class Type implements Constants {
      */
     public String toString() {
         return typeString("", false, true);
+    }
+
+    public String toStringValue(Object value) {
+        return typeCode.toValueString(value);
     }
 }

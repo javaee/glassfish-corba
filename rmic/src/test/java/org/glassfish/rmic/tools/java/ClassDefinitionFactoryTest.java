@@ -15,12 +15,10 @@ import org.glassfish.rmic.classes.inneraccess.Rainbow;
 import org.glassfish.rmic.classes.nestedClasses.TwoLevelNested;
 import org.glassfish.rmic.classes.primitives.NonFinalInterface;
 import org.glassfish.rmic.classes.primitives.RmiTestRemote;
-import org.glassfish.rmic.tools.binaryclass.BinaryClassFactory;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -275,7 +273,7 @@ public abstract class ClassDefinitionFactoryTest {
 
     @Test
     public void verifyFinalMemberDefs() throws Exception {
-        Assume.assumeTrue(factory instanceof BinaryClassFactory);
+//        Assume.assumeTrue(factory instanceof BinaryClassFactory);
         ClassDefinition classDefinition = definitionFor(RmiTestRemote.class);
         assertThat(getMember(classDefinition, "A_DOUBLE").getMemberValueString(environment), equalTo("123.567D"));
         assertThat(getMember(classDefinition, "A_FLOAT").getMemberValueString(environment), equalTo("123.5F"));

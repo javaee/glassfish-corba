@@ -25,6 +25,7 @@ package org.glassfish.rmic.asm;
  */
 import org.glassfish.rmic.tools.java.ClassDeclaration;
 import org.glassfish.rmic.tools.java.ClassDefinition;
+import org.glassfish.rmic.tools.java.ClassNotFound;
 import org.glassfish.rmic.tools.java.Environment;
 import org.glassfish.rmic.tools.java.Identifier;
 import org.glassfish.rmic.tools.java.MemberDefinition;
@@ -34,6 +35,7 @@ import java.util.Vector;
 
 public class AsmMemberDefinition extends MemberDefinition {
     private final ClassDeclaration[] exceptions;
+    private final String memberValueString;
 
     /**
      * Constructor for a method definition
@@ -47,6 +49,7 @@ public class AsmMemberDefinition extends MemberDefinition {
     AsmMemberDefinition(long where, ClassDefinition clazz, int modifiers, Type type, Identifier name, String[] exceptions) {
         super(where, clazz, modifiers, type, name, null, null);
 
+        this.memberValueString = null;
         this.exceptions = toClassDeclarations(exceptions);
     }
 
@@ -61,6 +64,8 @@ public class AsmMemberDefinition extends MemberDefinition {
      */
     AsmMemberDefinition(long where, ClassDefinition clazz, int modifiers, Type type, Identifier name, Object value) {
         super(where, clazz, modifiers, type, name, null, null);
+
+        memberValueString = type.toStringValue(value);
         exceptions = null;
     }
 
@@ -72,6 +77,11 @@ public class AsmMemberDefinition extends MemberDefinition {
             result[i] = new ClassDeclaration(Identifier.lookup(classNames[i].replace('/','.')));
         return result;
 
+    }
+
+    @Override
+    public String getMemberValueString(Environment env) throws ClassNotFound {
+        return memberValueString;
     }
 
     @Override

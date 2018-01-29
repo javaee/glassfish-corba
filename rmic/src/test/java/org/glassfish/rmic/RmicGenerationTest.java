@@ -50,6 +50,9 @@ import org.glassfish.rmic.classes.hcks.RmiIIServantPOA;
 import org.glassfish.rmic.classes.inneraccess.Rainbow;
 import org.glassfish.rmic.classes.islocal.MessageBuilderServantPOA;
 import org.glassfish.rmic.classes.preinvokepostinvoke.MyServant;
+import org.glassfish.rmic.classes.primitives.InterfaceWithConstantArray;
+import org.glassfish.rmic.classes.primitives.InterfaceWithNonPrimitiveConstant;
+import org.glassfish.rmic.classes.primitives.RmiTestRemoteImpl;
 import org.glassfish.rmic.classes.rmipoacounter.CounterImpl;
 import org.glassfish.rmic.classes.systemexceptions.ServerInvokerServantPOA;
 import org.junit.BeforeClass;
@@ -74,6 +77,7 @@ public class RmicGenerationTest {
     private static int testNum = 0;
     private static File rootDir;
     private static final boolean COMPILE_GENERATED = true;  // set false to check generated files without compiling
+    private static final String USE_LEGACY_PARSING_PROPERTY = "org.glassfish.rmic.UseLegacyClassParsing";
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeClass
@@ -145,6 +149,30 @@ public class RmicGenerationTest {
         generator.generate();
 
         checkGeneratedFiles(generator, "with_poas", ".java");
+    }
+
+    @Test
+    public void generateIiopStubsWithConstant() throws Exception {
+        assumeTrue(Boolean.getBoolean(USE_LEGACY_PARSING_PROPERTY));
+        GenerationControl generator = new GenerationControl(RmiTestRemoteImpl.class);
+        generator.addArgs("-iiop","-always", "-keep");
+        generator.generate();
+
+        checkGeneratedFiles(generator, "primitives", ".java");
+    }
+
+    @Test(expected = AssertionError.class)
+    public void dontGenerateIiopStubsWithConstantArray() throws Exception {
+        GenerationControl generator = new GenerationControl(InterfaceWithConstantArray.class);
+        generator.addArgs("-iiop","-always", "-keep");
+        generator.generate();
+    }
+
+    @Test(expected = AssertionError.class)
+    public void dontGenerateIiopStubsWithConstantException() throws Exception {
+        GenerationControl generator = new GenerationControl(InterfaceWithNonPrimitiveConstant.class);
+        generator.addArgs("-iiop","-always", "-keep");
+        generator.generate();
     }
 
     @Test

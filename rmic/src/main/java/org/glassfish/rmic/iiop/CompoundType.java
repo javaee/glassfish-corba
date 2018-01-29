@@ -39,7 +39,6 @@ import org.glassfish.rmic.tools.java.ClassNotFound;
 import org.glassfish.rmic.tools.java.CompilerError;
 import org.glassfish.rmic.tools.java.Identifier;
 import org.glassfish.rmic.tools.java.MemberDefinition;
-import org.glassfish.rmic.tools.tree.IntegerExpression;
 import org.glassfish.rmic.tools.tree.LocalMember;
 import org.glassfish.rmic.tools.tree.Node;
 
@@ -1525,27 +1524,7 @@ public abstract class CompoundType extends Type {
                 if (!member.isMethod()) {
 
                     try {
-                        String value = null;
-
-                        // Prod it to setValue if it is a constant...
-
-                        member.getValue(env);
-
-                                // Get the value, if any...
-
-                        Node node = member.getValue();
-
-                        if (node != null) {
-                            // We don't want to change the code in CharExpression,
-                            // which is shared among tools, to return the right string
-                            // in case the type is char, so we treat it special here.
-                            if (member.getType().getTypeCode() == TC_CHAR) {
-                                Integer intValue = (Integer)((IntegerExpression)node).getValue();
-                                value = "L'" + String.valueOf((char)intValue.intValue()) + "'";
-                            } else {
-                                value = node.toString();
-                            }
-                        }
+                        String value = member.getMemberValueString(env);
 
                         // Are we supposed to allow only conforming constants?
 
@@ -1578,6 +1557,7 @@ public abstract class CompoundType extends Type {
 
         return result;
     }
+
     /*
      * Walk self, adding constants.
      * @return true if all conform, false otherwise.

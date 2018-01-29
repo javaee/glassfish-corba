@@ -27,20 +27,13 @@ package org.glassfish.rmic.tools.binaryclass;
 
 import org.glassfish.rmic.tools.java.ClassDeclaration;
 import org.glassfish.rmic.tools.java.ClassDefinition;
+import org.glassfish.rmic.tools.java.ClassNotFound;
 import org.glassfish.rmic.tools.java.CompilerError;
 import org.glassfish.rmic.tools.java.Environment;
 import org.glassfish.rmic.tools.java.Identifier;
 import org.glassfish.rmic.tools.java.MemberDefinition;
 import org.glassfish.rmic.tools.java.Type;
-import org.glassfish.rmic.tools.tree.BooleanExpression;
-import org.glassfish.rmic.tools.tree.DoubleExpression;
-import org.glassfish.rmic.tools.tree.Expression;
-import org.glassfish.rmic.tools.tree.FloatExpression;
-import org.glassfish.rmic.tools.tree.IntExpression;
-import org.glassfish.rmic.tools.tree.LocalMember;
-import org.glassfish.rmic.tools.tree.LongExpression;
-import org.glassfish.rmic.tools.tree.Node;
-import org.glassfish.rmic.tools.tree.StringExpression;
+import org.glassfish.rmic.tools.tree.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -169,6 +162,33 @@ class BinaryMember extends MemberDefinition {
         }
         return isConstantCache;
     }
+
+    @Override
+    public String getMemberValueString(Environment env) throws ClassNotFound {
+        String value = null;
+
+        // Prod it to setValue if it is a constant...
+
+        getValue(env);
+
+        // Get the value, if any...
+
+        Node node = getValue();
+
+        if (node != null) {
+            // We don't want to change the code in CharExpression,
+            // which is shared among tools, to return the right string
+            // in case the type is char, so we treat it special here.
+            if (getType().getTypeCode() == TC_CHAR) {
+                Integer intValue = (Integer)((IntegerExpression)node).getValue();
+                value = "L'" + String.valueOf((char)intValue.intValue()) + "'";
+            } else {
+                value = node.toString();
+            }
+        }
+        return value;
+    }
+
 
     /**
      * Get the value

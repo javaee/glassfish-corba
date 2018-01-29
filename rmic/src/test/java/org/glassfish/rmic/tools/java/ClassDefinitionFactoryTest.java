@@ -13,10 +13,14 @@ import org.glassfish.rmic.classes.hcks.RmiII;
 import org.glassfish.rmic.classes.hcks.RmiIIServantPOA;
 import org.glassfish.rmic.classes.inneraccess.Rainbow;
 import org.glassfish.rmic.classes.nestedClasses.TwoLevelNested;
+import org.glassfish.rmic.classes.primitives.NonFinalInterface;
+import org.glassfish.rmic.classes.primitives.RmiTestRemote;
+import org.glassfish.rmic.tools.binaryclass.BinaryClassFactory;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -74,6 +78,7 @@ public abstract class ClassDefinitionFactoryTest {
     @Before
     public void setUp() throws Exception {
         memento = StaticStubSupport.install(BatchEnvironment.class, "classDefinitionFactory", factory);
+        environment = new BatchEnvironment(messagesOut, createTestClassPath(), null);
     }
 
     @After
@@ -266,6 +271,43 @@ public abstract class ClassDefinitionFactoryTest {
         for (Constructor constructor : aClass.getDeclaredConstructors())
             matchers.add(isDefinitionFor(constructor));
         return matchers.toArray(new Matcher[matchers.size()]);
+    }
+
+    @Test
+    public void verifyFinalMemberDefs() throws Exception {
+        Assume.assumeTrue(factory instanceof BinaryClassFactory);
+        ClassDefinition classDefinition = definitionFor(RmiTestRemote.class);
+        assertThat(getMember(classDefinition, "A_DOUBLE").getMemberValueString(environment), equalTo("123.567D"));
+        assertThat(getMember(classDefinition, "A_FLOAT").getMemberValueString(environment), equalTo("123.5F"));
+        assertThat(getMember(classDefinition, "A_LONG").getMemberValueString(environment), equalTo("1234567L"));
+        assertThat(getMember(classDefinition, "AN_INT").getMemberValueString(environment), equalTo("17"));
+        assertThat(getMember(classDefinition, "A_SHORT").getMemberValueString(environment), equalTo("12"));
+        assertThat(getMember(classDefinition, "A_BYTE").getMemberValueString(environment), equalTo("52"));
+        assertThat(getMember(classDefinition, "A_CHAR").getMemberValueString(environment), equalTo("L'x'"));
+        assertThat(getMember(classDefinition, "A_BOOLEAN").getMemberValueString(environment), equalTo("true"));
+        assertThat(getMember(classDefinition, "JNDI_NAME").getMemberValueString(environment), equalTo("\"IIOP_RmiTestRemote\""));
+    }
+
+    private MemberDefinition getMember(ClassDefinition classDefinition, String name) {
+        for (MemberDefinition def = classDefinition.getFirstMember(); def != null; def = def.getNextMember()) {
+            if (name.equals(def.getName().toString())) return def;
+        }
+
+        throw new AssertionError("No member named " + name + " found in class " + classDefinition.getName());
+    }
+
+    @Test
+    public void verifyNonFinalMemberDefs() throws Exception {
+        ClassDefinition classDefinition = definitionFor(NonFinalInterface.class);
+        assertThat(getMember(classDefinition, "A_DOUBLE").getMemberValueString(environment), nullValue());
+        assertThat(getMember(classDefinition, "A_FLOAT").getMemberValueString(environment), nullValue());
+        assertThat(getMember(classDefinition, "A_LONG").getMemberValueString(environment), nullValue());
+        assertThat(getMember(classDefinition, "AN_INT").getMemberValueString(environment), nullValue());
+        assertThat(getMember(classDefinition, "A_SHORT").getMemberValueString(environment), nullValue());
+        assertThat(getMember(classDefinition, "A_BYTE").getMemberValueString(environment), nullValue());
+        assertThat(getMember(classDefinition, "A_CHAR").getMemberValueString(environment), nullValue());
+        assertThat(getMember(classDefinition, "A_BOOLEAN").getMemberValueString(environment), nullValue());
+        assertThat(getMember(classDefinition, "JNDI_NAME").getMemberValueString(environment), nullValue());
     }
 
     static class MemberDefinitionMatcher extends TypeSafeDiagnosingMatcher<MemberDefinition> {

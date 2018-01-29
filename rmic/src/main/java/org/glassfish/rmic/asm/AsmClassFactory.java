@@ -23,7 +23,6 @@ package org.glassfish.rmic.asm;
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-
 import org.glassfish.rmic.Names;
 import org.glassfish.rmic.tools.java.ClassDeclaration;
 import org.glassfish.rmic.tools.java.ClassDefinition;
@@ -43,6 +42,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A factory for a class definition produced via ASM.
+ */
 public class AsmClassFactory implements ClassDefinitionFactory {
     // This field exists to allow unit testing of the case when ASM is not in the classpath.
     @SuppressWarnings("unused")
@@ -126,7 +128,7 @@ public class AsmClassFactory implements ClassDefinitionFactory {
 
         @Override
         public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
-            MemberDefinition definition = new MemberDefinition(0, asmClass, access, TypeFactory.createType(desc), getIdentifier(name), null, null);
+            MemberDefinition definition = new AsmMemberDefinition(0, asmClass, access, TypeFactory.createType(desc), getIdentifier(name), value);
             asmClass.addMember(env, definition);
             return null;
         }

@@ -35,10 +35,33 @@ import java.util.Vector;
 public class AsmMemberDefinition extends MemberDefinition {
     private final ClassDeclaration[] exceptions;
 
+    /**
+     * Constructor for a method definition
+     * @param where the location of the definition relative to the class
+     * @param clazz the containing class
+     * @param modifiers the access modifiers
+     * @param type the constructed type
+     * @param name the name of the method
+     * @param exceptions the checked exceptions throwable by the method
+     */
     AsmMemberDefinition(long where, ClassDefinition clazz, int modifiers, Type type, Identifier name, String[] exceptions) {
         super(where, clazz, modifiers, type, name, null, null);
 
         this.exceptions = toClassDeclarations(exceptions);
+    }
+
+    /**
+     * Constructor for a field definition
+     * @param where the location of the definition relative to the class
+     * @param clazz the containing class
+     * @param modifiers the access modifiers
+     * @param type the constructed type
+     * @param name the name of the method
+     * @param value the default value for the field
+     */
+    AsmMemberDefinition(long where, ClassDefinition clazz, int modifiers, Type type, Identifier name, Object value) {
+        super(where, clazz, modifiers, type, name, null, null);
+        exceptions = null;
     }
 
     private ClassDeclaration[] toClassDeclarations(String[] classNames) {

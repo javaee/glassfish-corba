@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2018 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,21 +44,20 @@
 
 package corba.systemexceptions;
 
-import javax.naming.InitialContext;
-import javax.rmi.CORBA.Util;
-
-import javax.activity.ActivityRequiredException;
-import javax.activity.ActivityCompletedException;
-import javax.activity.InvalidActivityException;
-
+import com.sun.corba.ee.impl.misc.ORBUtility;
 import corba.framework.Controller;
 import corba.hcks.C;
 import corba.hcks.U;
+import org.omg.CORBA.CompletionStatus;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.SystemException;
+import org.omg.PortableInterceptor.ClientRequestInfo;
+import org.omg.PortableInterceptor.ClientRequestInterceptor;
+import org.omg.PortableInterceptor.ForwardRequest;
+import org.omg.PortableInterceptor.ORBInitInfo;
+import org.omg.PortableInterceptor.ORBInitializer;
 
-import com.sun.corba.ee.impl.misc.ORBUtility;
-
-import org.omg.CORBA.*;
-import org.omg.PortableInterceptor.*;
+import javax.naming.InitialContext;
 
 public class Client extends org.omg.CORBA.LocalObject 
     implements ORBInitializer, ClientRequestInterceptor {
@@ -101,22 +100,6 @@ public class Client extends org.omg.CORBA.LocalObject
                     rmiiIPOA.invoke(i);
                 } catch (java.rmi.RemoteException re) {
                     SystemException se = (SystemException) re.getCause();
-                    if (se instanceof ACTIVITY_REQUIRED) {
-                        if (!(re instanceof ActivityRequiredException)) {
-                            throw new RuntimeException("Test Failed");
-                        }
-                        U.sop("javax.activity.ActivityRequiredException");
-                    } else if (se instanceof ACTIVITY_COMPLETED) {
-                        if (!(re instanceof ActivityCompletedException)) {
-                            throw new RuntimeException("Test Failed");
-                        }
-                        U.sop("javax.activity.ActivityCompletedException");
-                    } else if (se instanceof INVALID_ACTIVITY) {
-                        if (!(re instanceof InvalidActivityException)) {
-                            throw new RuntimeException("Test Failed");
-                        }
-                        U.sop("javax.activity.InvalidActivityException");
-                    }
                     String name = se.getClass().getName();
                     U.sop("name: " + name + ", minorCode: " + se.minor +
                           ", completed: " + 

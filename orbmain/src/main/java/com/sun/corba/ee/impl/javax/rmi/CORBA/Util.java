@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2018 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,86 +48,55 @@
 
 package com.sun.corba.ee.impl.javax.rmi.CORBA; // Util (sed marker, don't remove!)
 
-import java.rmi.RemoteException;
-import java.rmi.UnexpectedException;
-
-import java.rmi.server.RMIClassLoader;
-
-import java.util.WeakHashMap;
-
-import java.io.Serializable;
-import java.io.NotSerializableException;
-
-
-import javax.rmi.CORBA.ValueHandler;
-import javax.rmi.CORBA.Tie;
-
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
-import java.rmi.MarshalException;
-import java.rmi.NoSuchObjectException;
-import java.rmi.AccessException;
-import java.rmi.Remote;
-import java.rmi.ServerError;
-import java.rmi.ServerException;
-
-import javax.transaction.TransactionRequiredException;
-import javax.transaction.TransactionRolledbackException;
-import javax.transaction.InvalidTransactionException;
-
-// These classes only exist in Java SE 6 and later.
-import javax.activity.ActivityRequiredException ;
-import javax.activity.ActivityCompletedException ;
-import javax.activity.InvalidActivityException ;
-
-import org.omg.CORBA.SystemException;
-import org.omg.CORBA.Any;
-import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.COMM_FAILURE;
-import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.INV_OBJREF;
-import org.omg.CORBA.NO_PERMISSION;
-import org.omg.CORBA.MARSHAL;
-import org.omg.CORBA.OBJECT_NOT_EXIST;
-import org.omg.CORBA.TRANSACTION_REQUIRED;
-import org.omg.CORBA.TRANSACTION_ROLLEDBACK;
-import org.omg.CORBA.INVALID_TRANSACTION;
-import org.omg.CORBA.BAD_OPERATION;
-import org.omg.CORBA.ACTIVITY_REQUIRED;
-import org.omg.CORBA.ACTIVITY_COMPLETED;
-import org.omg.CORBA.INVALID_ACTIVITY;
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.TCKind;
-import org.omg.CORBA.portable.UnknownException;
-import org.omg.CORBA.portable.InputStream;
-import org.omg.CORBA.portable.OutputStream;
-
-// This class must be able to function with non-Sun ORBs.
-// This means that any of the following com.sun.corba classes
-// must only occur in contexts that also handle the non-Sun case.
-
+import com.sun.corba.ee.impl.io.SharedSecrets;
+import com.sun.corba.ee.impl.misc.ClassInfoCache;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.impl.util.JDKBridge;
+import com.sun.corba.ee.impl.util.Utility;
+import com.sun.corba.ee.spi.copyobject.CopierManager;
+import com.sun.corba.ee.spi.logging.OMGSystemException;
+import com.sun.corba.ee.spi.logging.UtilSystemException;
+import com.sun.corba.ee.spi.misc.ORBConstants;
 import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.orb.ORBVersionFactory;
 import com.sun.corba.ee.spi.protocol.ClientDelegate;
-import com.sun.corba.ee.spi.transport.ContactInfoList ;
-import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcher ;
-import com.sun.corba.ee.spi.copyobject.CopierManager ;
-import com.sun.corba.ee.impl.io.SharedSecrets;
-import com.sun.corba.ee.impl.io.ValueHandlerImpl;
-import com.sun.corba.ee.spi.misc.ORBConstants;
-import com.sun.corba.ee.impl.misc.ORBUtility;
-import com.sun.corba.ee.spi.logging.OMGSystemException;
-import com.sun.corba.ee.impl.util.Utility;
-import com.sun.corba.ee.impl.util.JDKBridge;
-import com.sun.corba.ee.spi.logging.UtilSystemException;
-
-import com.sun.corba.ee.impl.misc.ClassInfoCache ;
-import java.util.IdentityHashMap;
-import java.util.Map;
+import com.sun.corba.ee.spi.protocol.LocalClientRequestDispatcher;
+import com.sun.corba.ee.spi.transport.ContactInfoList;
 import org.glassfish.pfl.basic.logex.OperationTracer;
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
 import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
+import org.omg.CORBA.*;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.UnknownException;
+
+import javax.rmi.CORBA.Tie;
+import javax.rmi.CORBA.ValueHandler;
+import javax.transaction.InvalidTransactionException;
+import javax.transaction.TransactionRequiredException;
+import javax.transaction.TransactionRolledbackException;
+import java.io.NotSerializableException;
+import java.io.Serializable;
+import java.rmi.AccessException;
+import java.rmi.MarshalException;
+import java.rmi.NoSuchObjectException;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.ServerError;
+import java.rmi.ServerException;
+import java.rmi.UnexpectedException;
+import java.rmi.server.RMIClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.lang.Object;
+
+// These classes only exist in Java SE 6 and later.
+// This class must be able to function with non-Sun ORBs.
+// This means that any of the following com.sun.corba classes
+// must only occur in contexts that also handle the non-Sun case.
 
 /**
  * Provides utility methods that can be used by stubs and ties to
@@ -139,24 +108,19 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     private static KeepAlive keepAlive = null;
 
     // Maps targets to ties.
-    private static final IdentityHashMap<Remote,Tie> exportedServants =
-        new IdentityHashMap<Remote,Tie>();
+    private static final IdentityHashMap<Remote,Tie> exportedServants = new IdentityHashMap<>();
 
     private static ValueHandler valueHandlerSingleton;          
 
-    private static final UtilSystemException utilWrapper =
-        UtilSystemException.self ;
+    private static final UtilSystemException utilWrapper = UtilSystemException.self ;
 
     private static Util instance = null;
 
     // XXX Would like to have a WeakConcurrentHashMap here to reduce contention,
     // but that is only available with Google collections at present.
-    private WeakHashMap<java.lang.Class<?>, String> annotationMap =
-        new WeakHashMap<java.lang.Class<?>, String> ();
+    private WeakHashMap<java.lang.Class<?>, String> annotationMap = new WeakHashMap<>();
 
     private static final java.lang.Object annotObj = new java.lang.Object();
-
-    private static final String SUN_JAVA_VENDOR = "Sun Microsystems Inc." ;
 
     static {
         // Note: there uses to be code here to use the JDK value handler for embedded
@@ -193,8 +157,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     {
         // Copy exportedServants set we don't get a 
         // ConcurrentModificationException.
-        Map<Remote,Tie> copy =
-            new IdentityHashMap<Remote,Tie>( exportedServants ) ;
+        Map<Remote,Tie> copy = new IdentityHashMap<>(exportedServants) ;
 
         for (Remote key : copy.keySet() ) {
             Remote target = key instanceof Tie ? ((Tie)key).getTarget() : key ;
@@ -299,12 +262,6 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
             }
 
             return new MarshalException(message,inner);
-        } else if (ex instanceof ACTIVITY_REQUIRED) {
-            return new ActivityRequiredException( message, ex ) ;
-        } else if (ex instanceof ACTIVITY_COMPLETED) {
-            return new ActivityCompletedException( message, ex ) ;
-        } else if (ex instanceof INVALID_ACTIVITY) {
-            return new InvalidActivityException( message, ex ) ;
         }
 
         // Just map to a generic RemoteException...
@@ -629,7 +586,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
      * @param className the name of the class.
      * @param remoteCodebase a space-separated list of URLs at which
      * the class might be found. May be null.
-     * @param loadingContext a class whose ClassLoader may be used to
+     * @param loader a ClassLoader who may be used to
      * load the class if all other methods fail.
      * @return the <code>Class</code> object representing the loaded class.
      * @exception ClassNotFoundException if class cannot be loaded.

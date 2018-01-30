@@ -2101,7 +2101,7 @@ class Parser
 
     if (token.type == com.sun.tools.corba.ee.idl.Token.LeftBrace) {
       repIDStack.push(((com.sun.tools.corba.ee.idl.IDLID)repIDStack.peek ()).clone ()) ;
-      ((com.sun.tools.corba.ee.idl.IDLID)repIDStack.peek ()).appendToName (name);
+//!!!      ((com.sun.tools.corba.ee.idl.IDLID)repIDStack.peek ()).appendToName (name);
       structEntry = makeStructEntry( name, entry, false ) ;
       prep.openScope (structEntry);
       match (com.sun.tools.corba.ee.idl.Token.LeftBrace) ;
@@ -2189,7 +2189,7 @@ class Parser
 
     if (token.type == com.sun.tools.corba.ee.idl.Token.Switch) {
       repIDStack.push (((com.sun.tools.corba.ee.idl.IDLID)repIDStack.peek ()).clone ());
-      ((com.sun.tools.corba.ee.idl.IDLID)repIDStack.peek ()).appendToName (name);
+//!!!      ((com.sun.tools.corba.ee.idl.IDLID)repIDStack.peek ()).appendToName (name);
       unionEntry = makeUnionEntry( name, entry, false ) ;
       match (com.sun.tools.corba.ee.idl.Token.Switch);
       match (com.sun.tools.corba.ee.idl.Token.LeftParen);

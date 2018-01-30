@@ -10,7 +10,7 @@ package org.glassfish.idlj;
 
 abstract public class CORBAUnionHelper
 {
-  private static String  _id = "IDL:org/glassfish/idlj/CORBAUnion/CORBAUnion:1.0";
+  private static String  _id = "IDL:org/glassfish/idlj/CORBAUnion:1.0";
 
   public static void insert (org.omg.CORBA.Any a, org.glassfish.idlj.CORBAUnion that)
   {

@@ -331,7 +331,7 @@ public class RmicGenerationTest {
 
         String expectedLine = "";
         String actualLine = "";
-        while (expectedLine != null && actualLine != null && expectedLine.equals(actualLine)) {
+        while (expectedLine != null && actualLine != null && linesMatch(expectedLine, actualLine)) {
             expectedLine = expected.readLine();
             actualLine = actual.readLine();
         }
@@ -342,11 +342,15 @@ public class RmicGenerationTest {
             fail("Unexpected line in generated file at " + actual.getLineNumber() + ": " + actualLine);
         else if (actualLine == null)
             fail("Actual file ends unexpectedly at line " + expected.getLineNumber());
-        else if (!expectedLine.trim().startsWith("* IGNORE"))
+        else
             fail("Generated file mismatch at line " + actual.getLineNumber() +
                     "\nshould be <" + expectedLine + "> " +
                     "\nbut found <" + actualLine + ">");
 
+    }
+
+    private boolean linesMatch(String expectedLine, String actualLine) {
+        return expectedLine.equals(actualLine) || expectedLine.trim().startsWith("* ");
     }
 
 

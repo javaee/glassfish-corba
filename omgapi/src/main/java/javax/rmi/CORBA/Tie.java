@@ -39,6 +39,8 @@
  * holder.
  */
 
+package javax.rmi.CORBA;
+
 import java.rmi.Remote;
 import java.util.Hashtable;
 

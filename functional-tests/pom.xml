@@ -82,6 +82,18 @@
           <version>6.1.1</version>
           <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.jdo</groupId>
+            <artifactId>jdo2-api</artifactId>
+            <version>2.3-eb</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.japex</groupId>
+            <artifactId>japex</artifactId>
+            <version>1.2.4</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

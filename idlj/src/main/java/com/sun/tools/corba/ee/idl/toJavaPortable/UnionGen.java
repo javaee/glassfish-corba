@@ -1,7 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997 IBM Corp. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -13,7 +14,7 @@
  * language governing permissions and limitations under the License.
  * 
  * When distributing the software, include this License Header Notice in each
- * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ * file and include the License file at packager/legal/LICENSE.txt.
  * 
  * GPL Classpath Exception:
  * Oracle designates this particular file as subject to the "Classpath"
@@ -36,19 +37,6 @@
  * and therefore, elected the GPL Version 2 license, then the option applies
  * only if the new code is made subject to such option by the copyright
  * holder.
- */
-/*
- * COMPONENT_NAME: idl.toJava
- *
- * ORIGINS: 27
- *
- * Licensed Materials - Property of IBM
- * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
- * RMI-IIOP v1.0
- * US Government Users Restricted Rights - Use, duplication or
- * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
- *
- * @(#)UnionGen.java    1.10 01/01/09
  */
 
 package com.sun.tools.corba.ee.idl.toJavaPortable;

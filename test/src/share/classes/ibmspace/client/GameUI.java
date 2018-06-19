@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
  * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1998 IBM Corp. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -13,7 +14,7 @@
  * language governing permissions and limitations under the License.
  * 
  * When distributing the software, include this License Header Notice in each
- * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ * file and include the License file at packager/legal/LICENSE.txt.
  * 
  * GPL Classpath Exception:
  * Oracle designates this particular file as subject to the "Classpath"
@@ -37,27 +38,11 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/* @(#)GameUI.java      1.3 99/06/07 */
-/*
- * Licensed Materials - Property of IBM
- * RMI-IIOP v1.0
- * Copyright IBM Corp. 1998 1999  All Rights Reserved
- *
- * US Government Users Restricted Rights - Use, duplication or
- * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
- */
 
 // This class grew to be too big and ugly and I'll probably split it
 // up in the future.  It's purpose is to create all custom UI components
 // and keep track of them so that they can be manipulated later when
 // events (actions) occur.
-
-//----------------------------------------------------------------------------
-// Change History:
-//
-// 9/98 created  rtw
-//----------------------------------------------------------------------------
-
 
 package ibmspace.client;
 

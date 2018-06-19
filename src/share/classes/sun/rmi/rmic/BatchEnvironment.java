@@ -1,7 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1998 IBM Corp. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -13,7 +14,7 @@
  * language governing permissions and limitations under the License.
  * 
  * When distributing the software, include this License Header Notice in each
- * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ * file and include the License file at packager/legal/LICENSE.txt.
  * 
  * GPL Classpath Exception:
  * Oracle designates this particular file as subject to the "Classpath"
@@ -37,21 +38,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
-/*****************************************************************************/
-/*                    Copyright (c) IBM Corporation 1998                     */
-/*                                                                           */
-/* IBM Confidential                                           ClassType.java */
-/*                                                                           */
-/* OCO Source Materials                                                      */
-/*                                                                           */
-/* (C) Copyright IBM Corp. 1998                                              */
-/*                                                                           */
-/* The source code for this program is not published or otherwise            */
-/* divested of its trade secrets, irrespective of what has been              */
-/* deposited with the U.S. Copyright Office.                                 */
-/*                                                                           */
-/*****************************************************************************/
 
 package sun.rmi.rmic;
 

@@ -10,7 +10,7 @@ package org.glassfish.idlj;
 
 abstract public class CORBAStructHelper
 {
-  private static String  _id = "IDL:org/glassfish/idlj/CORBAStruct/CORBAStruct:1.0";
+  private static String  _id = "IDL:org/glassfish/idlj/CORBAStruct:1.0";
 
   public static void insert (org.omg.CORBA.Any a, org.glassfish.idlj.CORBAStruct that)
   {

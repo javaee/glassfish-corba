@@ -1,4 +1,3 @@
-package com.sun.tools.corba.ee.idl.toJavaPortable;
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
@@ -38,6 +37,8 @@ package com.sun.tools.corba.ee.idl.toJavaPortable;
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+
+package com.sun.tools.corba.ee.idl.toJavaPortable;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

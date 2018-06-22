@@ -40,105 +40,58 @@
 
 package corba.misc ;
 
-import java.lang.annotation.Annotation ;
-
-import java.util.Properties ;
-import java.util.Random ;
-import java.util.Date ;
-import java.util.List ;
-import java.util.ArrayList ;
-
-import java.nio.ByteBuffer ;
-
-import java.io.ObjectOutputStream ;
-import java.io.Serializable ;
-import java.io.IOException ;
-import java.io.PrintStream ;
-import java.io.ByteArrayOutputStream ;
-
-import java.rmi.Remote ;
-import java.rmi.RemoteException ;
-
-import javax.jdo.identity.LongIdentity ;
-
-import javax.rmi.PortableRemoteObject ;
-
-import javax.rmi.CORBA.Tie ;
-
-import org.omg.CORBA_2_3.portable.OutputStream ;
-import org.omg.CORBA_2_3.portable.InputStream ;
-
-import org.omg.CosNaming.NamingContextExt ;
-import org.omg.CosNaming.NamingContextExtHelper ;
-
-import org.omg.CORBA.Policy ;
-import org.omg.CORBA.Any ;
-import org.omg.CORBA.LocalObject ;
-
-import org.omg.IOP.TAG_ALTERNATE_IIOP_ADDRESS ;
-
-import org.omg.PortableServer.POA ;
-import org.omg.PortableServer.ServantLocator ;
-import org.omg.PortableServer.Servant ;
-import org.omg.PortableServer.ServantRetentionPolicyValue ;
-import org.omg.PortableServer.LifespanPolicyValue ;
-import org.omg.PortableServer.ImplicitActivationPolicyValue ;
-import org.omg.PortableServer.RequestProcessingPolicyValue ;
-import org.omg.PortableServer.IdUniquenessPolicyValue ;
-import org.omg.PortableServer.IdAssignmentPolicyValue ;
-
-import org.omg.PortableServer.POAPackage.ObjectNotActive ;
-
-import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
-
-import org.omg.PortableServer.ForwardRequest ;
-import org.omg.PortableServer.ForwardRequestHelper ;
-
-import junit.framework.TestCase ;
-import junit.framework.Test ;
-import junit.framework.TestResult ;
-import junit.framework.TestSuite ;
-import junit.extensions.TestSetup ;
-
-import com.sun.corba.ee.spi.orb.ORB ;
-
-import com.sun.corba.ee.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.ee.spi.ior.iiop.IIOPFactories ;
-import com.sun.corba.ee.spi.ior.iiop.AlternateIIOPAddressComponent ;
-
-import com.sun.corba.ee.spi.transport.TcpTimeouts ;
-
-//import com.sun.corba.ee.impl.orbutil.newtimer.generated.TimingPoints ;
-import com.sun.corba.ee.spi.misc.ORBConstants ;
-
-import com.sun.corba.ee.impl.misc.ORBUtility ;
-
-import com.sun.corba.ee.spi.presentation.rmi.PresentationManager ;
-
-import com.sun.corba.ee.spi.oa.rfm.ReferenceFactoryManager ;
-import com.sun.corba.ee.spi.oa.rfm.ReferenceFactory ;
-
-import com.sun.corba.ee.spi.trace.CdrRead ;
-import com.sun.corba.ee.spi.trace.CdrWrite ;
-import com.sun.corba.ee.spi.trace.PrimitiveRead ;
-import com.sun.corba.ee.spi.trace.PrimitiveWrite ;
-import com.sun.corba.ee.spi.trace.ValueHandlerRead ;
-import com.sun.corba.ee.spi.trace.ValueHandlerWrite ;
-
-import corba.folb_8_1.IIOPPrimaryToContactInfoImpl ;
+import com.sun.corba.ee.impl.misc.ORBUtility;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.oa.rfm.ReferenceFactory;
+import com.sun.corba.ee.spi.oa.rfm.ReferenceFactoryManager;
+import com.sun.corba.ee.spi.orb.ORB;
+import com.sun.corba.ee.spi.presentation.rmi.PresentationManager;
+import com.sun.corba.ee.spi.trace.CdrRead;
+import com.sun.corba.ee.spi.trace.CdrWrite;
+import com.sun.corba.ee.spi.trace.PrimitiveRead;
+import com.sun.corba.ee.spi.trace.PrimitiveWrite;
+import com.sun.corba.ee.spi.trace.ValueHandlerRead;
+import com.sun.corba.ee.spi.trace.ValueHandlerWrite;
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
 import org.glassfish.pfl.basic.contain.SPair;
 import org.glassfish.pfl.basic.logex.OperationTracer;
 import org.glassfish.pfl.test.TestCaseTools;
 import org.glassfish.pfl.tf.spi.MethodMonitorFactory;
 import org.glassfish.pfl.tf.spi.MethodMonitorFactoryDefaults;
 import org.glassfish.pfl.tf.spi.MethodMonitorRegistry;
-import org.glassfish.pfl.tf.timer.spi.LogEventHandler;
-import org.glassfish.pfl.tf.timer.spi.Timer;
-import org.glassfish.pfl.tf.timer.spi.TimerEvent;
 import org.glassfish.pfl.tf.timer.spi.TimerFactory;
 import org.glassfish.pfl.tf.timer.spi.TimerFactoryBuilder;
-import org.glassfish.pfl.tf.timer.spi.TimerGroup;
-import org.glassfish.pfl.tf.timer.spi.TimerManager;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.Policy;
+import org.omg.CORBA_2_3.portable.InputStream;
+import org.omg.CORBA_2_3.portable.OutputStream;
+import org.omg.PortableServer.*;
+import org.omg.PortableServer.POAPackage.ObjectNotActive;
+import org.omg.PortableServer.ServantLocatorPackage.CookieHolder;
+
+import javax.rmi.CORBA.Tie;
+import javax.rmi.PortableRemoteObject;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.nio.ByteBuffer;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.Random;
+
+//import com.sun.corba.ee.impl.orbutil.newtimer.generated.TimingPoints ;
 
 public class Client extends TestCase
 {
@@ -1115,9 +1068,6 @@ public class Client extends TestCase
         String featuresCode = "a Feature" ;
         String fullName = "Full name" ;
         Point geoPoint = new Point() ;
-        Object[] jdoDetachedState = {
-            new LongIdentity( this.getClass(), 0x123458275374573L ), 
-            null, null, null } ;
         String name = "name" ;
 
         private final void writeObject( ObjectOutputStream os ) throws IOException {

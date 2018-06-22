@@ -75,9 +75,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.felix</groupId>
+            <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>1.2.0</version>
+            <version>6.0.0</version>
         </dependency>
         <dependency>
           <groupId>org.glassfish.gmbal</groupId>
@@ -108,7 +108,7 @@
         <dependency>
             <groupId>org.glassfish.grizzly</groupId>
             <artifactId>grizzly-framework</artifactId>
-            <version>2.2.10</version>
+            <version>2.4.3</version>
         </dependency>
         <dependency>
             <groupId>javax.jdo</groupId>

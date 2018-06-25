@@ -38,15 +38,6 @@
  * holder.
  */
 
-/*
- * @(#)counterIF.java   1.4 99/10/29
- *
- * Copyright 1998, 1999 Sun Microsystems, Inc. All Rights Reserved.
- * 
- * This software is the proprietary information of Sun Microsystems, Inc.  
- * Use is subject to license terms.
- * 
- */
 package corba.rmipoacounter;
 
 import java.rmi.Remote ;

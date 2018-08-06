@@ -56,6 +56,7 @@ import org.objectweb.asm.Opcodes;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,6 +72,24 @@ public class AsmClassFactory implements ClassDefinitionFactory {
 
     public AsmClassFactory() {
         if (simulateMissingASM) throw new NoClassDefFoundError();
+    }
+
+    /**
+     * Returns the latest API supported by the active version of ASM.
+     * @return an integer value
+     */
+    static int getLatestVersion() {
+        try {
+            int latest = 0;
+            for (Field field : Opcodes.class.getDeclaredFields()) {
+                if (field.getName().startsWith("ASM") && field.getType().equals(int.class)) {
+                    latest = Math.max(latest, field.getInt(Opcodes.class));
+                }
+            }
+            return latest;
+        } catch (IllegalAccessException e) {
+            return Opcodes.ASM6;
+        }
     }
 
     Identifier getOuterClassName(Identifier className) {
@@ -97,7 +116,7 @@ public class AsmClassFactory implements ClassDefinitionFactory {
         private AsmClass asmClass;
 
         ClassDefinitionVisitor(Environment env) {
-            super(Opcodes.ASM6);
+            super(getLatestVersion());
             this.env = env;
         }
 

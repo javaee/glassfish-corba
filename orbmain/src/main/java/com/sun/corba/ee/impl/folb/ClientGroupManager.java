@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2020 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,64 +45,57 @@
 
 package com.sun.corba.ee.impl.folb;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import javax.rmi.PortableRemoteObject;
 
-import org.omg.CORBA.Any;
-import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.ORBPackage.InvalidName;
-import org.omg.IOP.Codec;
-import org.omg.IOP.CodecPackage.FormatMismatch;
-import org.omg.IOP.CodecPackage.TypeMismatch;
-import org.omg.IOP.CodecFactory;
-import org.omg.IOP.CodecFactoryHelper;
-import org.omg.IOP.CodecFactoryPackage.UnknownEncoding;
-import org.omg.IOP.Encoding;
-import org.omg.IOP.ServiceContext;
-import org.omg.PortableInterceptor.ClientRequestInterceptor;
-import org.omg.PortableInterceptor.ClientRequestInfo;
-import org.omg.PortableInterceptor.ForwardRequest;
-import org.omg.PortableInterceptor.ForwardRequestHelper;
-import org.omg.PortableInterceptor.ORBInitializer;
-import org.omg.PortableInterceptor.ORBInitInfo;
-
+import com.sun.corba.ee.impl.interceptors.ClientRequestInfoImpl;
 import com.sun.corba.ee.spi.folb.ClusterInstanceInfo;
 import com.sun.corba.ee.spi.folb.GroupInfoService;
 import com.sun.corba.ee.spi.folb.GroupInfoServiceObserver;
-
 import com.sun.corba.ee.spi.ior.IOR;
-import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate ;
-import com.sun.corba.ee.spi.orb.DataCollector ;
+import com.sun.corba.ee.spi.ior.iiop.AlternateIIOPAddressComponent;
+import com.sun.corba.ee.spi.ior.iiop.ClusterInstanceInfoComponent;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate;
+import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
+import com.sun.corba.ee.spi.misc.ORBConstants;
+import com.sun.corba.ee.spi.orb.DataCollector;
 import com.sun.corba.ee.spi.orb.ORB;
-import com.sun.corba.ee.spi.orb.ORBConfigurator ;
+import com.sun.corba.ee.spi.orb.ORBConfigurator;
+import com.sun.corba.ee.spi.trace.Folb;
+import com.sun.corba.ee.spi.transport.ContactInfo;
 import com.sun.corba.ee.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.ee.spi.transport.IORToSocketInfo;
 import com.sun.corba.ee.spi.transport.SocketInfo;
-import com.sun.corba.ee.spi.transport.ContactInfo;
-
-import com.sun.corba.ee.impl.interceptors.ClientRequestInfoImpl;
-import com.sun.corba.ee.spi.logging.ORBUtilSystemException;
-import com.sun.corba.ee.spi.misc.ORBConstants;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.ORBPackage.InvalidName;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
+import org.omg.IOP.Codec;
+import org.omg.IOP.CodecFactory;
+import org.omg.IOP.CodecFactoryHelper;
+import org.omg.IOP.CodecFactoryPackage.UnknownEncoding;
+import org.omg.IOP.CodecPackage.FormatMismatch;
+import org.omg.IOP.CodecPackage.TypeMismatch;
+import org.omg.IOP.Encoding;
+import org.omg.IOP.ServiceContext;
+import org.omg.PortableInterceptor.ClientRequestInfo;
+import org.omg.PortableInterceptor.ClientRequestInterceptor;
+import org.omg.PortableInterceptor.ForwardRequest;
+import org.omg.PortableInterceptor.ForwardRequestHelper;
+import org.omg.PortableInterceptor.ORBInitInfo;
+import org.omg.PortableInterceptor.ORBInitializer;
 
 // BEGIN imports for IIOPPrimaryToContactInfo
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 // END imports for IIOPPrimaryToContactInfo
-
 // BEGIN import for IORToSocketInfo
-import java.util.ArrayList;
-import com.sun.corba.ee.spi.ior.iiop.AlternateIIOPAddressComponent;
-import com.sun.corba.ee.spi.ior.iiop.ClusterInstanceInfoComponent;
-import com.sun.corba.ee.spi.ior.iiop.IIOPAddress;
-import com.sun.corba.ee.spi.trace.Folb;
-
-import org.omg.CosNaming.NamingContext ;
-import org.omg.CosNaming.NamingContextHelper ;
-import org.omg.CosNaming.NameComponent ;
-
-import javax.rmi.PortableRemoteObject ;
-import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 
 // END import for IORToSocketInfo
@@ -219,22 +212,14 @@ public class ClientGroupManager
                 return previous;
             }
 
-            List result = new ArrayList();
+            List<SocketInfo> result = new ArrayList<>();
 
             //
             // IIOPProfile Primary address
             //
 
-            IIOPProfileTemplate iiopProfileTemplate = (IIOPProfileTemplate)
-                ior.getProfile().getTaggedProfileTemplate();
-            IIOPAddress primary = iiopProfileTemplate.getPrimaryAddress() ;
-            String host = primary.getHost().toLowerCase();
-            int port = primary.getPort();
-            
-            SocketInfo primarySocketInfo = 
-                createSocketInfo("primary", 
-                                 SocketInfo.IIOP_CLEAR_TEXT, host, port);
-            result.add(primarySocketInfo);
+            IIOPProfileTemplate iiopProfileTemplate = (IIOPProfileTemplate) ior.getProfile().getTaggedProfileTemplate();
+            result.add(iiopProfileTemplate.getPrimarySocketInfo());
 
             //
             // List alternate cluster addresses
@@ -268,11 +253,10 @@ public class ClientGroupManager
                     AlternateIIOPAddressComponent.class );
 
             while (aiterator.hasNext()) {
-                AlternateIIOPAddressComponent alternate = 
-                    aiterator.next();
+                AlternateIIOPAddressComponent alternate = aiterator.next();
                 
-                host = alternate.getAddress().getHost().toLowerCase();
-                port = alternate.getAddress().getPort();
+                String host = alternate.getAddress().getHost().toLowerCase();
+                int port = alternate.getAddress().getPort();
                 
                 result.add(createSocketInfo(
                     "AlternateIIOPAddressComponent",

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2020 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -349,18 +349,11 @@ public class ContactInfoListImpl implements ContactInfoList {
         final boolean isLocal = iiopProfile.isLocal() ;
 
         if (effectiveTargetIORContactInfoList == null) {
-            effectiveTargetIORContactInfoList = 
-                new ArrayList<ContactInfo>();
+            effectiveTargetIORContactInfoList = new ArrayList<>();
 
-            String hostname = 
-                ((IIOPProfileTemplate)iiopProfile.getTaggedProfileTemplate())
-                    .getPrimaryAddress().getHost().toLowerCase();
-            int    port     = 
-                ((IIOPProfileTemplate)iiopProfile.getTaggedProfileTemplate())
-                    .getPrimaryAddress().getPort();
-            // For use by "sticky manager" if one is registered.
-            primaryContactInfo = 
-                createContactInfo(SocketInfo.IIOP_CLEAR_TEXT, hostname, port);
+            IIOPProfileTemplate taggedProfileTemplate = (IIOPProfileTemplate) iiopProfile.getTaggedProfileTemplate();
+            SocketInfo socketInfo = taggedProfileTemplate.getPrimarySocketInfo();
+            primaryContactInfo = createContactInfo(socketInfo.getType(), socketInfo.getHost(), socketInfo.getPort());
 
             if (isLocal) {
                 // NOTE: IMPORTANT:
@@ -422,7 +415,7 @@ public class ContactInfoListImpl implements ContactInfoList {
         int port) {
 
         return new ContactInfoImpl(
-            orb, this, 
+            orb, this,
             // XREVISIT - See Base Line 62
             effectiveTargetIOR,
             orb.getORBData().getGIOPAddressDisposition(),

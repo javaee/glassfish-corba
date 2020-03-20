@@ -1,7 +1,8 @@
+package com.sun.corba.ee.impl.ior.iiop;
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,38 +39,52 @@
  * holder.
  */
 
-package com.sun.corba.ee.spi.ior.iiop;
-
-import com.sun.corba.ee.spi.ior.TaggedProfileTemplate;
+import com.sun.corba.ee.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.ee.spi.ior.iiop.IIOPAddress;
+import com.sun.corba.ee.spi.ior.iiop.IIOPProfileTemplate;
+import com.sun.corba.ee.spi.orb.ORB;
 import com.sun.corba.ee.spi.transport.SocketInfo;
-import org.glassfish.gmbal.Description;
-import org.glassfish.gmbal.ManagedAttribute;
-import org.glassfish.gmbal.ManagedData;
+import org.junit.Test;
 
-/**
- * IIOPProfileTemplate represents the parts of an IIOPProfile that are independent
- * of the object identifier.  It is a container of tagged components.
- */
-@ManagedData
-@Description( "Template for an IIOP profile" )
-public interface IIOPProfileTemplate extends TaggedProfileTemplate
-{
-    /** Return the GIOP version of this profile.
-    */
-    public GIOPVersion getGIOPVersion() ;
+import static com.meterware.simplestub.Stub.createStrictStub;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
-    /** Return the IIOP address from the IIOP profile.  This is called the 
-    * primary address here since other addresses may be contained in 
-    * components.
-    */
-    @ManagedAttribute
-    @Description( "The host and port of the IP address for the primary endpoint of this profile" )
-    public IIOPAddress getPrimaryAddress()  ;
+public class IIOPProfileTemplateImplTest {
+  private static final String HOST = "testhost";
+  private static final int PORT = 1234;
 
-    /**
-     * Returns the description of a socket to create to access the associated endpoint. It's host and port
-     * will match the primary address
-     * @return a description of a socket.
-     */
-    SocketInfo getPrimarySocketInfo();
+  private ORB orb = createStrictStub(ORB.class);
+  private GIOPVersion version = new GIOPVersion(1, 2);
+  private IIOPAddress primary = new IIOPAddressImpl(HOST, PORT);
+  private IIOPProfileTemplate impl = new IIOPProfileTemplateImpl(orb, version, primary);
+
+  @Test
+  public void socketHostAndAddress_matchPrimaryAddress() {
+    assertThat(impl.getPrimarySocketInfo().getHost(), equalTo(HOST));
+    assertThat(impl.getPrimarySocketInfo().getPort(), equalTo(PORT));
+  }
+
+  @Test
+  public void whenNoTaggedComponents_socketTypeIsPlainText() {
+    assertThat(impl.getPrimarySocketInfo().getType(), equalTo(SocketInfo.IIOP_CLEAR_TEXT));
+  }
+
+  @Test
+  public void whenContainsHttpJavaCodebaseComponent_socketTypeIsPlainText() {
+    addJavaCodebase("http://localhost:1401/base");
+
+    assertThat(impl.getPrimarySocketInfo().getType(), equalTo(SocketInfo.IIOP_CLEAR_TEXT));
+  }
+
+  @Test
+  public void whenContainsHttpsJavaCodebaseComponent_socketTypeIsSsl() {
+    addJavaCodebase("https://localhost:1402/base");
+
+    assertThat(impl.getPrimarySocketInfo().getType(), equalTo(SocketInfo.SSL_PREFIX));
+  }
+
+  private void addJavaCodebase(String urls) {
+    impl.add(new JavaCodebaseComponentImpl(urls));
+  }
 }

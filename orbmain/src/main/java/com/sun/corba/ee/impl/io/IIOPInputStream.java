@@ -41,6 +41,27 @@
 
 package com.sun.corba.ee.impl.io;
 
+import java.io.EOFException;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.InvalidClassException;
+import java.io.InvalidObjectException;
+import java.io.NotActiveException;
+import java.io.ObjectInputValidation;
+import java.io.OptionalDataException;
+import java.io.StreamCorruptedException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import javax.rmi.CORBA.ValueHandler;
+
 import com.sun.corba.ee.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.ee.impl.misc.ClassInfoCache;
 import com.sun.corba.ee.impl.util.Utility;
@@ -63,26 +84,6 @@ import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.ValueMember;
 import org.omg.CORBA.portable.IndirectionException;
 import org.omg.CORBA.portable.ValueInputStream;
-
-import javax.rmi.CORBA.ValueHandler;
-import java.io.EOFException;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.InvalidClassException;
-import java.io.InvalidObjectException;
-import java.io.NotActiveException;
-import java.io.ObjectInputValidation;
-import java.io.OptionalDataException;
-import java.io.StreamCorruptedException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * IIOPInputStream is used by the ValueHandlerImpl to handle Java serialization
@@ -1123,7 +1124,7 @@ public class IIOPInputStream
                                 readFormatVersion();
 
                                 // Read defaultWriteObject indicator
-                                boolean calledDefaultWriteObject = readBoolean();
+                                boolean calledDefaultWriteObject = readDefaultWriteObjectCalled();
 
                                 readObjectState.beginUnmarshalCustomValue( this, 
                                     calledDefaultWriteObject, 
@@ -1184,6 +1185,23 @@ public class IIOPInputStream
             activeRecursionMgr.removeObject(offset);
         }
         return currentObject;
+    }
+
+    // Uck, pee-ew, evil hack.
+    // In JDK11, the Date class was modified to call defaultWriteObject(), which doesn't actually do anything but
+    // set the "defaultWriteObjectCalled" flag in the serialization of the class; unfortunately, the
+    // deserialization logic cannot handle that case and throws an exception. We are therefore employing this
+    // workaround to allow Date objects to be read across the wire between JDK8 and JDK11.
+    // Fixing it will probably involve changes to the state-machine in InputStreamHook.ReadObjectState.
+    private boolean readDefaultWriteObjectCalled() throws IOException {
+        boolean sentDefaultWriteObjectCalled = readBoolean();
+
+        if (isDateClassWorkaroundRequired()) return false;
+        return sentDefaultWriteObjectCalled;
+    }
+
+    private boolean isDateClassWorkaroundRequired() {
+        return currentClassDesc.getName().equals(Date.class.getName());
     }
 
     @InfoMethod

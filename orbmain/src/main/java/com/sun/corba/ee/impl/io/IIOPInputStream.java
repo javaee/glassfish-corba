@@ -1187,13 +1187,17 @@ public class IIOPInputStream
         return currentObject;
     }
 
+    // Uck, pee-ew, evil hack.
+    // In JDK11, the Date class was modified to call defaultWriteObject(), which doesn't actually do anything but
+    // set the "defaultWriteObjectCalled" flag in the serialization of the class; unfortunately, the
+    // deserialization logic cannot handle that case and throws an exception. We are therefore employing this
+    // workaround to allow Date objects to be read across the wire between JDK8 and JDK11.
+    // Fixing it will probably involve changes to the state-machine in InputStreamHook.ReadObjectState.
     private boolean readDefaultWriteObjectCalled() throws IOException {
         boolean sentDefaultWriteObjectCalled = readBoolean();
-        return notSpecialCase() && sentDefaultWriteObjectCalled;
-    }
 
-    private boolean notSpecialCase() {
-        return !isDateClassWorkaroundRequired();
+        if (isDateClassWorkaroundRequired()) return false;
+        return sentDefaultWriteObjectCalled;
     }
 
     private boolean isDateClassWorkaroundRequired() {
